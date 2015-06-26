@@ -1,0 +1,10 @@
+framework module JWTDecode {
+  umbrella header "JWTDecode.h"
+
+  export *
+  module * { export * }
+}
+
+module JWTDecode.Swift {
+    header "JWTDecode-Swift.h"
+}

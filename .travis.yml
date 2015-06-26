@@ -1,0 +1,12 @@
+reference: http://www.objc.io/issue-6/travis-ci.html
+language: objective-c
+osx_image: beta-xcode6.3
+cache:
+  - bundler
+before_install:
+  - gem install xcpretty --no-ri --no-rdoc
+script:
+  - xcodebuild -project Auth0.xcodeproj -scheme Auth0-iOS -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 6" ONLY_ACTIVE_ARCH=NO test | xcpretty -c ; exit ${PIPESTATUS[0]}
+branches:
+  only:
+  - master
