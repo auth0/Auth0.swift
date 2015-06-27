@@ -23,6 +23,14 @@
 		5F0069771B3DFB2D0048928E /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069461B3DCE120048928E /* Nimble.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5F0069781B3DFB2D0048928E /* Quick.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069471B3DCE120048928E /* Quick.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5F0069791B3DFB490048928E /* Auth0.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F0068C11B3B3EFF0048928E /* Auth0.h */; };
+		5F00697B1B3E01550048928E /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F00697A1B3E01550048928E /* Auth0.swift */; };
+		5F00697C1B3E01550048928E /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F00697A1B3E01550048928E /* Auth0.swift */; };
+		5F00697E1B3E01740048928E /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F00697D1B3E01740048928E /* Users.swift */; };
+		5F00697F1B3E01740048928E /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F00697D1B3E01740048928E /* Users.swift */; };
+		5F0069811B3E01B80048928E /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0069801B3E01B80048928E /* API.swift */; };
+		5F0069821B3E01B80048928E /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0069801B3E01B80048928E /* API.swift */; };
+		5F0069841B3E01DD0048928E /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0069831B3E01DD0048928E /* APIRequest.swift */; };
+		5F0069851B3E01DD0048928E /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0069831B3E01DD0048928E /* APIRequest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,7 +79,7 @@
 		5F0068BC1B3B3EFF0048928E /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F0068C01B3B3EFF0048928E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F0068C11B3B3EFF0048928E /* Auth0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Auth0.h; sourceTree = "<group>"; };
-		5F0068C71B3B3EFF0048928E /* Auth0Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Auth0Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F0068C71B3B3EFF0048928E /* Auth0-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Auth0-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F0068CD1B3B3EFF0048928E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F0069441B3DCE120048928E /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Alamofire.framework; sourceTree = "<group>"; };
 		5F0069451B3DCE120048928E /* JWTDecode.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JWTDecode.framework; sourceTree = "<group>"; };
@@ -83,6 +91,10 @@
 		5F00694C1B3DCE120048928E /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Quick.framework; sourceTree = "<group>"; };
 		5F0069591B3DFAF30048928E /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F0069631B3DFAF30048928E /* Auth0-OSXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Auth0-OSXTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F00697A1B3E01550048928E /* Auth0.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0.swift; sourceTree = "<group>"; };
+		5F00697D1B3E01740048928E /* Users.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Users.swift; sourceTree = "<group>"; };
+		5F0069801B3E01B80048928E /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		5F0069831B3E01DD0048928E /* APIRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIRequest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,7 +153,7 @@
 			isa = PBXGroup;
 			children = (
 				5F0068BC1B3B3EFF0048928E /* Auth0.framework */,
-				5F0068C71B3B3EFF0048928E /* Auth0Tests.xctest */,
+				5F0068C71B3B3EFF0048928E /* Auth0-iOSTests.xctest */,
 				5F0069591B3DFAF30048928E /* Auth0.framework */,
 				5F0069631B3DFAF30048928E /* Auth0-OSXTests.xctest */,
 			);
@@ -153,6 +165,8 @@
 			children = (
 				5F0068C11B3B3EFF0048928E /* Auth0.h */,
 				5F0068BF1B3B3EFF0048928E /* Supporting Files */,
+				5F00697A1B3E01550048928E /* Auth0.swift */,
+				5F0069861B3E02D00048928E /* API */,
 			);
 			path = Auth0;
 			sourceTree = "<group>";
@@ -214,6 +228,16 @@
 			path = Carthage/Build/iOS;
 			sourceTree = "<group>";
 		};
+		5F0069861B3E02D00048928E /* API */ = {
+			isa = PBXGroup;
+			children = (
+				5F00697D1B3E01740048928E /* Users.swift */,
+				5F0069801B3E01B80048928E /* API.swift */,
+				5F0069831B3E01DD0048928E /* APIRequest.swift */,
+			);
+			name = API;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -270,7 +294,7 @@
 			);
 			name = "Auth0-iOSTests";
 			productName = Auth0Tests;
-			productReference = 5F0068C71B3B3EFF0048928E /* Auth0Tests.xctest */;
+			productReference = 5F0068C71B3B3EFF0048928E /* Auth0-iOSTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		5F0069581B3DFAF30048928E /* Auth0-OSX */ = {
@@ -389,6 +413,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F00697E1B3E01740048928E /* Users.swift in Sources */,
+				5F0069811B3E01B80048928E /* API.swift in Sources */,
+				5F0069841B3E01DD0048928E /* APIRequest.swift in Sources */,
+				5F00697B1B3E01550048928E /* Auth0.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +431,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F00697F1B3E01740048928E /* Users.swift in Sources */,
+				5F0069821B3E01B80048928E /* API.swift in Sources */,
+				5F0069851B3E01DD0048928E /* APIRequest.swift in Sources */,
+				5F00697C1B3E01550048928E /* Auth0.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -521,6 +553,7 @@
 		5F0068D31B3B3EFF0048928E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -534,12 +567,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = Auth0;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		5F0068D41B3B3EFF0048928E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -591,6 +626,7 @@
 		5F00696D1B3DFAF30048928E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
@@ -613,12 +649,14 @@
 				PRODUCT_NAME = Auth0;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		5F00696E1B3DFAF30048928E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -715,6 +753,7 @@
 				5F00696E1B3DFAF30048928E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5F00696F1B3DFAF30048928E /* Build configuration list for PBXNativeTarget "Auth0-OSXTests" */ = {
 			isa = XCConfigurationList;
@@ -723,6 +762,7 @@
 				5F0069711B3DFAF30048928E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
