@@ -25,14 +25,73 @@ import Nimble
 import OHHTTPStubs
 import Auth0
 
-let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMDEyMzQ1Njc4OTAifQ.THyUGyQ5rPMcGSb7UyQU-O783DhGZZrUH_XesYxqbKc"
+let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiI4OVFJZTAzZk0xMjM0NTY3OFFhWGh6bkZialRhUWJVNSIsInNjb3BlcyI6eyJ1c2VycyI6eyJhY3Rpb25zIjpbInVwZGF0ZSJdfX0sImlhdCI6MTQzNTcwNjI1MSwianRpIjoiZDFlZGNiMDkwMmRjNDNhYjgzYTYyNDNmMTcyZjY1ZjgifQ.Hyazrf5iYZM_-5qVrrs60HkSTxk3BoYWwP1bGmqQLfs"
+let id_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMDEyMzQ1Njc4OTAifQ.THyUGyQ5rPMcGSb7UyQU-O783DhGZZrUH_XesYxqbKc"
 let userId = "auth01234567890"
-let error = NSError(domain: "com.auth0", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed Mocked Request"])
+let error = NSError(domain: "com.auth0.api", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed Mocked Request"])
+
+let patch_user_metadata_ok = "successful PATCH user_metadata"
+let patch_user_metadata_request_error = "failed PATCH user_metadata"
+
+class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
+    override class func configure(configuration: Configuration) {
+        sharedExamples(patch_user_metadata_ok) { (sharedExampleContext: SharedExampleContext) in
+            let users = sharedExampleContext()["users"] as! Users
+            let id = sharedExampleContext()["id"] as? String
+            let metadata = sharedExampleContext()["metadata"] as! [String: AnyObject]
+
+            it("should not yield error") {
+                waitUntil { done in
+                    users.updateMetadata(id: id, metadata).responseJSON { error, payload in
+                        expect(error).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+            it("should yield JSON payload") {
+                waitUntil { done in
+                    users.updateMetadata(id: id, metadata).responseJSON { error, payload in
+                        expect(payload).toNot(beNil())
+                        expect(payload?["user_id"] as? String).toNot(beNil())
+                        done()
+                    }
+                }
+            }
+        }
+
+        sharedExamples(patch_user_metadata_request_error) { (sharedExampleContext: SharedExampleContext) in
+            let users = sharedExampleContext()["users"] as! Users
+            let id = sharedExampleContext()["id"] as? String
+            let metadata = sharedExampleContext()["metadata"] as! [String: AnyObject]
+
+            it("should not yield payload") {
+                waitUntil { done in
+                    users.updateMetadata(id: id, metadata).responseJSON { error, payload in
+                        expect(payload).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+            it("should yield error") {
+                waitUntil { done in
+                    users.updateMetadata(id: id, metadata).responseJSON { err, payload in
+                        expect(err).toNot(beNil())
+                        expect(err?.domain).to(equal("com.auth0.api"))
+                        done()
+                    }
+                }
+            }
+        }
+
+    }
+}
 
 class UsersSpec: QuickSpec {
     override func spec() {
 
-        let users = API(domain: "https://samples.auth0.com").users(jwt)
+        let api = API(domain: "https://samples.auth0.com")
         var request: FilteredRequest = none()
 
         afterEach() {
@@ -40,7 +99,9 @@ class UsersSpec: QuickSpec {
             all().stubWithName("THOU SHALL NOT PASS!", error: NSError(domain: "com.auth0", code: -1, userInfo: nil))
         }
 
-        describe("updateUserMetadata") {
+        describe("updateUserMetadata with id_token") {
+
+            let users = api.users(id_token)
 
             beforeEach {
                 request = filter { return $0.URL!.path == "/api/v2/users/\(userId)" && $0.HTTPMethod == "PATCH" }
@@ -51,24 +112,8 @@ class UsersSpec: QuickSpec {
                     request.stubWithName("PATCH user_metadata", json: ["user_id": userId])
                 }
 
-                it("should not yield error") {
-                    waitUntil { done in
-                        users.updateMetadata(["key": "value"]).responseJSON { error, payload in
-                            done()
-                            expect(error).to(beNil())
-                        }
-                    }
-                }
+                itBehavesLike(patch_user_metadata_ok) { ["users": users, "metadata": ["key": "value"]] }
 
-                it("should yield JSON payload") {
-                    waitUntil { done in
-                        users.updateMetadata(["key": "value"]).responseJSON { error, payload in
-                            done()
-                            expect(payload).toNot(beNil())
-                            expect(payload?["user_id"] as? String).to(equal(userId))
-                        }
-                    }
-                }
             }
 
             context("failed request no response") {
@@ -76,23 +121,7 @@ class UsersSpec: QuickSpec {
                     request.stubWithName("PATCH user_metadata error", error: error)
                 }
 
-                it("should not yield payload") {
-                    waitUntil { done in
-                        users.updateMetadata(["key": "value"]).responseJSON { error, payload in
-                            done()
-                            expect(payload).to(beNil())
-                        }
-                    }
-                }
-
-                it("should yield error") {
-                    waitUntil { done in
-                        users.updateMetadata(["key": "value"]).responseJSON { err, payload in
-                            done()
-                            expect(err).to(equal(error))
-                        }
-                    }
-                }
+                itBehavesLike(patch_user_metadata_request_error) { ["users": users, "metadata": ["key": "value"]] }
             }
 
             context("failed request with error payload") {
@@ -102,26 +131,62 @@ class UsersSpec: QuickSpec {
                     request.stubWithName("PATCH user_metadata bad request", json: invalidRequestJson, statusCode: 400)
                 }
 
-                it("should not yield payload") {
+                it("should yield error with response") {
                     waitUntil { done in
                         users.updateMetadata(["key": "value"]).responseJSON { error, payload in
+                            expect(error).toNot(beNil())
+                            expect(error?.userInfo?[APIRequestErrorStatusCodeKey as NSObject] as? Int).to(equal(400))
+                            expect(error?.userInfo?[APIRequestErrorErrorKey as NSObject] as? [String: String]).to(equal(invalidRequestJson))
                             done()
-                            expect(payload).to(beNil())
                         }
                     }
+                }
+            }
+        }
+
+        describe("updateUserMetadata with jwt") {
+
+            let users = api.users(jwt)
+
+            beforeEach {
+                request = filter { return $0.URL!.path == "/api/v2/users/\(userId)" && $0.HTTPMethod == "PATCH" }
+            }
+
+            context("successful request") {
+                beforeEach {
+                    request.stubWithName("PATCH user_metadata", json: ["user_id": userId])
+                }
+
+                itBehavesLike(patch_user_metadata_ok) { ["users": users, "metadata": ["key": "value"], "id": userId] }
+
+            }
+
+            context("failed request no response") {
+                beforeEach {
+                    request.stubWithName("PATCH user_metadata error", error: error)
+                }
+
+                itBehavesLike(patch_user_metadata_request_error) { ["users": users, "metadata": ["key": "value"], "id": userId] }
+            }
+
+            context("failed request with error payload") {
+                let invalidRequestJson = ["error_code": "invalid_request"]
+
+                beforeEach {
+                    request.stubWithName("PATCH user_metadata bad request", json: invalidRequestJson, statusCode: 400)
                 }
 
                 it("should yield error with response") {
                     waitUntil { done in
-                        users.updateMetadata(["key": "value"]).responseJSON { error, payload in
-                            done()
+                        users.updateMetadata(id: userId, ["key": "value"]).responseJSON { error, payload in
                             expect(error).toNot(beNil())
                             expect(error?.userInfo?[APIRequestErrorStatusCodeKey as NSObject] as? Int).to(equal(400))
                             expect(error?.userInfo?[APIRequestErrorErrorKey as NSObject] as? [String: String]).to(equal(invalidRequestJson))
+                            done()
                         }
                     }
                 }
-
+                
             }
         }
     }
