@@ -22,7 +22,7 @@
 		5F0069751B3DFB0F0048928E /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F0069471B3DCE120048928E /* Quick.framework */; };
 		5F0069771B3DFB2D0048928E /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069461B3DCE120048928E /* Nimble.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5F0069781B3DFB2D0048928E /* Quick.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069471B3DCE120048928E /* Quick.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		5F0069791B3DFB490048928E /* Auth0.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F0068C11B3B3EFF0048928E /* Auth0.h */; };
+		5F0069791B3DFB490048928E /* Auth0.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F0068C11B3B3EFF0048928E /* Auth0.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5F00697B1B3E01550048928E /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F00697A1B3E01550048928E /* Auth0.swift */; };
 		5F00697C1B3E01550048928E /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F00697A1B3E01550048928E /* Auth0.swift */; };
 		5F00697E1B3E01740048928E /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F00697D1B3E01740048928E /* Users.swift */; };
@@ -31,6 +31,20 @@
 		5F0069821B3E01B80048928E /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0069801B3E01B80048928E /* API.swift */; };
 		5F0069841B3E01DD0048928E /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0069831B3E01DD0048928E /* APIRequest.swift */; };
 		5F0069851B3E01DD0048928E /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0069831B3E01DD0048928E /* APIRequest.swift */; };
+		5F074C5E1B3F68B00084D68C /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F0069441B3DCE120048928E /* Alamofire.framework */; };
+		5F074C5F1B3F68B90084D68C /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F0069491B3DCE120048928E /* Alamofire.framework */; };
+		5F5422F01B41819500FF6171 /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5422EC1B41817E00FF6171 /* OHHTTPStubs.framework */; };
+		5F5422F11B41819900FF6171 /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5422EE1B41818700FF6171 /* OHHTTPStubs.framework */; };
+		5F5422F21B4181B200FF6171 /* OHHTTPStubs.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F5422EE1B41818700FF6171 /* OHHTTPStubs.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5F5422F31B4181BB00FF6171 /* OHHTTPStubs.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F5422EC1B41817E00FF6171 /* OHHTTPStubs.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5F5422F61B41841D00FF6171 /* UsersSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5422F41B41841900FF6171 /* UsersSpec.swift */; };
+		5F5422F71B41841E00FF6171 /* UsersSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5422F41B41841900FF6171 /* UsersSpec.swift */; };
+		5F94F6AC1B418B0D0063F100 /* Alamofire.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069491B3DCE120048928E /* Alamofire.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5F94F6AD1B418B160063F100 /* Alamofire.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069441B3DCE120048928E /* Alamofire.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5F94F6AE1B418B350063F100 /* JWTDecode.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069451B3DCE120048928E /* JWTDecode.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5F94F6AF1B418B3F0063F100 /* JWTDecode.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F00694A1B3DCE120048928E /* JWTDecode.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5FA0FB6C1B4227AD00F12BF1 /* FilteredRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA0FB6B1B4227AD00F12BF1 /* FilteredRequest.swift */; };
+		5FA0FB6D1B4227AD00F12BF1 /* FilteredRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA0FB6B1B4227AD00F12BF1 /* FilteredRequest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +71,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				5F94F6AF1B418B3F0063F100 /* JWTDecode.framework in CopyFiles */,
+				5F94F6AC1B418B0D0063F100 /* Alamofire.framework in CopyFiles */,
+				5F5422F21B4181B200FF6171 /* OHHTTPStubs.framework in CopyFiles */,
 				5F0069521B3DCE390048928E /* Nimble.framework in CopyFiles */,
 				5F0069531B3DCE390048928E /* Quick.framework in CopyFiles */,
 			);
@@ -68,6 +85,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				5F94F6AE1B418B350063F100 /* JWTDecode.framework in CopyFiles */,
+				5F94F6AD1B418B160063F100 /* Alamofire.framework in CopyFiles */,
+				5F5422F31B4181BB00FF6171 /* OHHTTPStubs.framework in CopyFiles */,
 				5F0069771B3DFB2D0048928E /* Nimble.framework in CopyFiles */,
 				5F0069781B3DFB2D0048928E /* Quick.framework in CopyFiles */,
 			);
@@ -95,6 +115,10 @@
 		5F00697D1B3E01740048928E /* Users.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Users.swift; sourceTree = "<group>"; };
 		5F0069801B3E01B80048928E /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 		5F0069831B3E01DD0048928E /* APIRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIRequest.swift; sourceTree = "<group>"; };
+		5F5422EC1B41817E00FF6171 /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OHHTTPStubs.framework; sourceTree = "<group>"; };
+		5F5422EE1B41818700FF6171 /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OHHTTPStubs.framework; sourceTree = "<group>"; };
+		5F5422F41B41841900FF6171 /* UsersSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsersSpec.swift; sourceTree = "<group>"; };
+		5FA0FB6B1B4227AD00F12BF1 /* FilteredRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilteredRequest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,7 +137,9 @@
 			files = (
 				5F0068C81B3B3EFF0048928E /* Auth0.framework in Frameworks */,
 				5F00694F1B3DCE1F0048928E /* Nimble.framework in Frameworks */,
+				5F5422F11B41819900FF6171 /* OHHTTPStubs.framework in Frameworks */,
 				5F0069501B3DCE1F0048928E /* Quick.framework in Frameworks */,
+				5F074C5F1B3F68B90084D68C /* Alamofire.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,7 +158,9 @@
 			files = (
 				5F0069641B3DFAF30048928E /* Auth0.framework in Frameworks */,
 				5F0069741B3DFB0F0048928E /* Nimble.framework in Frameworks */,
+				5F5422F01B41819500FF6171 /* OHHTTPStubs.framework in Frameworks */,
 				5F0069751B3DFB0F0048928E /* Quick.framework in Frameworks */,
+				5F074C5E1B3F68B00084D68C /* Alamofire.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,6 +210,8 @@
 		5F0068CB1B3B3EFF0048928E /* Auth0Tests */ = {
 			isa = PBXGroup;
 			children = (
+				5FA0FB6A1B42277F00F12BF1 /* Utils */,
+				5F074C591B3F65560084D68C /* API */,
 				5F0068CC1B3B3EFF0048928E /* Supporting Files */,
 			);
 			path = Auth0Tests;
@@ -207,6 +237,7 @@
 		5F0069431B3DCE120048928E /* Mac */ = {
 			isa = PBXGroup;
 			children = (
+				5F5422EC1B41817E00FF6171 /* OHHTTPStubs.framework */,
 				5F0069441B3DCE120048928E /* Alamofire.framework */,
 				5F0069451B3DCE120048928E /* JWTDecode.framework */,
 				5F0069461B3DCE120048928E /* Nimble.framework */,
@@ -219,6 +250,7 @@
 		5F0069481B3DCE120048928E /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				5F5422EE1B41818700FF6171 /* OHHTTPStubs.framework */,
 				5F0069491B3DCE120048928E /* Alamofire.framework */,
 				5F00694A1B3DCE120048928E /* JWTDecode.framework */,
 				5F00694B1B3DCE120048928E /* Nimble.framework */,
@@ -236,6 +268,22 @@
 				5F0069831B3E01DD0048928E /* APIRequest.swift */,
 			);
 			name = API;
+			sourceTree = "<group>";
+		};
+		5F074C591B3F65560084D68C /* API */ = {
+			isa = PBXGroup;
+			children = (
+				5F5422F41B41841900FF6171 /* UsersSpec.swift */,
+			);
+			name = API;
+			sourceTree = "<group>";
+		};
+		5FA0FB6A1B42277F00F12BF1 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				5FA0FB6B1B4227AD00F12BF1 /* FilteredRequest.swift */,
+			);
+			name = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -424,6 +472,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F5422F61B41841D00FF6171 /* UsersSpec.swift in Sources */,
+				5FA0FB6C1B4227AD00F12BF1 /* FilteredRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,6 +492,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F5422F71B41841E00FF6171 /* UsersSpec.swift in Sources */,
+				5FA0FB6D1B4227AD00F12BF1 /* FilteredRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,6 +613,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -582,6 +635,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

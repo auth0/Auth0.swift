@@ -23,6 +23,17 @@
 import Foundation
 import Alamofire
 
+public let APIRequestErrorStatusCodeKey = "com.auth0.api.v2.status_code"
+public let APIRequestErrorErrorKey = "com.auth0.api.v2.error"
+
+public enum APIRequestErrorCode: Int {
+    case Failed = 0, InvalidPayload = 1
+}
+
+func errorWithCode(code: APIRequestErrorCode, userInfo: [String: AnyObject]? = nil) -> NSError {
+    return NSError(domain: "com.auth0.api", code: code.rawValue, userInfo: userInfo)
+}
+
 public class APIRequest<T>: NSObject {
 
     let request: Alamofire.Request
@@ -33,10 +44,26 @@ public class APIRequest<T>: NSObject {
         self.builder = builder
     }
 
-    public func responseJSON(callback: (error: NSError?, payload:T?) -> Void) {
-        self.request.responseJSON { (_, _, payload, error) in
-            if let responseObject = self.builder(payload: payload) {
-                callback(error: nil, payload: responseObject)
+    public func responseJSON(callback: (error: NSError?, payload:T?) -> ()) {
+        self.request.responseJSON { _, resp, payload, err in
+            switch (resp, payload, err) {
+            case (_, nil, let error):
+                callback(error: error, payload: nil)
+            case (let response, _, nil) where response != nil && 200...299 ~= response!.statusCode:
+                if let responseObject = self.builder(payload: payload) {
+                    callback(error: nil, payload: responseObject)
+                } else {
+                    callback(error: errorWithCode(.InvalidPayload, userInfo: [NSLocalizedDescriptionKey: "Failed to obtain JSON from \(payload)"]), payload: nil)
+                }
+            case (let response, _, nil) where response != nil && 400...599 ~= response!.statusCode && payload != nil:
+                let info = [
+                    NSLocalizedDescriptionKey: "Request to \(self.request.request.URL) failed with status code \(response?.statusCode)",
+                    APIRequestErrorErrorKey: payload!,
+                    APIRequestErrorStatusCodeKey: response!.statusCode
+                ]
+                callback(error: errorWithCode(.Failed, userInfo: info), payload: nil)
+            default:
+                callback(error: errorWithCode(.Failed, userInfo: [NSLocalizedDescriptionKey: "Request to \(self.request.request.URL) failed"]), payload: nil)
             }
         }
     }
