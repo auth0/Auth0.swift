@@ -35,14 +35,18 @@ public class Users: NSObject {
         super.init()
     }
 
-    public func updateMetadata(id: String? = nil, _ metadata: [String: AnyObject]) -> APIRequest<[String: AnyObject]> {
+    public func update(id: String? = nil, userMetadata: [String: AnyObject]? = nil, appMetadata: [String: AnyObject]? = nil, parameters: [String: AnyObject]? = [:]) -> APIRequest<[String: AnyObject]> {
         switch(normalizedUserId(id)) {
         case let .Some(userId):
             let url = NSURL(string: "api/v2/users/\(userId)", relativeToURL: self.api.domainUrl)!
-            let parameters = [
-                "user_metadata": metadata
-            ]
-            let request = self.api.manager.request(jsonRequest(.PATCH, url: url, parameters: parameters))
+            var param: [String: AnyObject] = parameters != nil ? parameters! : [:]
+            if let metadata = userMetadata {
+                param["user_metadata"] = metadata
+            }
+            if let metadata = appMetadata {
+                param["app_metadata"] = metadata
+            }
+            let request = self.api.manager.request(jsonRequest(.PATCH, url: url, parameters: param))
             return APIRequest<[String: AnyObject]>(request: request) { return $0 as? [String: AnyObject] }
         case .None:
             return APIRequest<[String: AnyObject]>(error: NSError(domain: "com.auth0.api", code: 0, userInfo: [NSLocalizedDescriptionKey: "No id of a user supplied to perform the update"]))

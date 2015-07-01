@@ -91,29 +91,11 @@ typedef struct _NSZone NSZone;
 #pragma clang diagnostic ignored "-Wduplicate-method-arg"
 @class NSDate;
 
-
-/// Class that decodes a JWT payload from Base64
 SWIFT_CLASS("A0JWTDecoder")
 @interface JWTDecoder : NSObject
-
-/// Create a new instance of JWTDecoder
-///
-/// \param jwt to decode
-///
-/// \returns a new instance
 - (SWIFT_NULLABILITY(nonnull) instancetype)initWithJwt:(NSString * __nonnull)jwt OBJC_DESIGNATED_INITIALIZER;
-
-/// Returns the payload of the JWT
-///
-/// \param error if the JWT can't be decoded
-///
-/// \returns dictionary with JWT payload
 - (NSDictionary * __nullable)payloadWithError:(NSError * __nullable * __null_unspecified)error;
-
-/// If the JWT is expired or not
 @property (nonatomic, readonly) BOOL expired;
-
-/// Date when the JWT will expire
 @property (nonatomic, readonly) NSDate * __nullable expireDate;
 @end
 

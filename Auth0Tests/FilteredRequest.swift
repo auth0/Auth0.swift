@@ -35,6 +35,24 @@ func filter(filter: (NSURLRequest -> Bool)) -> FilteredRequest {
     return FilteredRequest(filter: filter)
 }
 
+func hasJSON(expected: [String: AnyObject], request: NSURLRequest) -> Bool {
+    var filter: Bool = false
+    if let stream = request.HTTPBodyStream {
+        stream.open()
+        if let json = NSJSONSerialization.JSONObjectWithStream(stream, options: .allZeros, error: nil) as? [String: AnyObject] {
+            filter = true
+            for key in expected.keys {
+                filter = contains(json.keys, key)
+                if !filter {
+                    break
+                }
+            }
+        }
+        stream.close()
+    }
+    return filter
+}
+
 struct FilteredRequest {
     let requestFilter: (NSURLRequest -> Bool)
 
