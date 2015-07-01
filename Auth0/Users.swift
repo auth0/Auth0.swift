@@ -53,11 +53,19 @@ public class Users: NSObject {
         }
     }
 
-    public func find(id: String? = nil, fields: [String]? = nil, includeFields: Bool = false) -> APIRequest<[String: AnyObject]> {
+    public func find(id: String? = nil, fields: [String]? = nil, includeFields: Bool = true) -> APIRequest<[String: AnyObject]> {
         switch(normalizedUserId(id)) {
         case let .Some(userId):
-            let url = NSURL(string: "api/v2/users/\(userId)", relativeToURL: self.api.domainUrl)!
-            let request = self.api.manager.request(jsonRequest(.GET, url: url))
+            let components = NSURLComponents(URL: self.api.domainUrl, resolvingAgainstBaseURL: true)!
+            components.path = "/api/v2/users/\(userId)"
+            if fields != nil && !fields!.isEmpty {
+                let items:[AnyObject] = [
+                    NSURLQueryItem(name: "fields", value: join(",", fields!)),
+                    NSURLQueryItem(name: "include_fields", value: "\(includeFields)"),
+                ]
+                components.queryItems = items
+            }
+            let request = self.api.manager.request(jsonRequest(.GET, url: components.URL!))
             return APIRequest<[String: AnyObject]>(request: request) { return $0 as? [String: AnyObject] }
         case .None:
             return APIRequest<[String: AnyObject]>(error: NSError(domain: "com.auth0.api", code: 0, userInfo: [NSLocalizedDescriptionKey: "No id of a user supplied to fetch"]))
