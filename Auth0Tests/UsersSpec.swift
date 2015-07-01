@@ -176,6 +176,8 @@ class UsersSpec: QuickSpec {
                     request.stubWithName("PATCH user_metadata bad request", json: invalidRequestJson, statusCode: 400)
                 }
 
+                itBehavesLike(patch_user_metadata_request_error) { ["users": users, "metadata": ["key": "value"], "id": userId] }
+
                 it("should yield error with response") {
                     waitUntil { done in
                         users.updateMetadata(id: userId, ["key": "value"]).responseJSON { error, payload in
@@ -186,8 +188,24 @@ class UsersSpec: QuickSpec {
                         }
                     }
                 }
-                
             }
+
+            context("failed request when no id is provided") {
+
+                itBehavesLike(patch_user_metadata_request_error) { ["users": users, "metadata": ["key": "value"]] }
+
+                it("should yield error with response") {
+                    waitUntil { done in
+                        users.updateMetadata(["key": "value"]).responseJSON { error, payload in
+                            expect(error).toNot(beNil())
+                            expect(error?.userInfo?[NSLocalizedDescriptionKey] as? String).to(equal("No id of a user supplied to perform the update"))
+                            done()
+                        }
+                    }
+                }
+
+            }
+
         }
     }
 }

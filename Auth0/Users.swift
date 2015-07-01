@@ -36,33 +36,39 @@ public class Users: NSObject {
     }
 
     public func updateMetadata(id: String? = nil, _ metadata: [String: AnyObject]) -> APIRequest<[String: AnyObject]> {
-        let url = NSURL(string: "api/v2/users/\(self.normalizedUserId(id))", relativeToURL: self.api.domainUrl)!
-        let parameters = [
-            "user_metadata": metadata
-        ]
-        let request = self.api.manager.request(jsonRequest(.PATCH, url: url, parameters: parameters))
-        return APIRequest<[String: AnyObject]>(request: request) { return $0 as? [String: AnyObject] }
+        switch(normalizedUserId(id)) {
+        case let .Some(userId):
+            let url = NSURL(string: "api/v2/users/\(userId)", relativeToURL: self.api.domainUrl)!
+            let parameters = [
+                "user_metadata": metadata
+            ]
+            let request = self.api.manager.request(jsonRequest(.PATCH, url: url, parameters: parameters))
+            return APIRequest<[String: AnyObject]>(request: request) { return $0 as? [String: AnyObject] }
+        case .None:
+            return APIRequest<[String: AnyObject]>(error: NSError(domain: "com.auth0.api", code: 0, userInfo: [NSLocalizedDescriptionKey: "No id of a user supplied to perform the update"]))
+        }
     }
 
     public func findWithId(id: String? = nil, fields: [String] = []) -> APIRequest<[String: AnyObject]> {
-        let url = NSURL(string: "api/v2/users/\(self.normalizedUserId(id))", relativeToURL: self.api.domainUrl)!
+        let url = NSURL(string: "api/v2/users/\(self.normalizedUserId(id)!)", relativeToURL: self.api.domainUrl)!
         let request = self.api.manager.request(jsonRequest(.GET, url: url, parameters: nil))
         return APIRequest<[String: AnyObject]>(request: request) { return $0 as? [String: AnyObject] }
     }
 
-    private func normalizedUserId(id: String?) -> String {
-        let userId:String
-        if id != nil {
-            userId = id!
-        } else {
-            userId = self.subjectFromToken(self.token)
+    private func normalizedUserId(id: String?) -> String? {
+        var identifier: String?
+        switch(id) {
+        case let .Some(id):
+            identifier = id
+        default:
+            identifier = self.subjectFromToken(self.token)
         }
-        return userId.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!
+        return identifier?.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())
     }
 
-    private func subjectFromToken(token: String) -> String {
+    private func subjectFromToken(token: String) -> String? {
         let payload = JWTDecode.payload(jwt: token)!
-        return payload["sub"] as! String
+        return payload["sub"] as? String
     }
 
     private func jsonRequest(method: Alamofire.Method, url: NSURL, parameters: [String: AnyObject]?) -> NSURLRequest {
@@ -76,5 +82,4 @@ public class Users: NSObject {
         }
     }
 }
-
 

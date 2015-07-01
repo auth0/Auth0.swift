@@ -36,35 +36,49 @@ func errorWithCode(code: APIRequestErrorCode, userInfo: [String: AnyObject]? = n
 
 public class APIRequest<T>: NSObject {
 
-    let request: Alamofire.Request
-    let builder: (payload: AnyObject?) -> T?
+    var error: NSError?
+    var request: Alamofire.Request?
+    var builder: ((payload: AnyObject?) -> T?)?
 
     init(request: Alamofire.Request, builder: (payload: AnyObject?) -> T?) {
         self.request = request
         self.builder = builder
     }
 
+    init(error: NSError) {
+        self.error = error
+        self.request = nil
+        self.builder = nil
+    }
+
     public func responseJSON(callback: (error: NSError?, payload:T?) -> ()) {
-        self.request.responseJSON { _, resp, payload, err in
-            switch (resp, payload, err) {
-            case (_, nil, let error):
-                callback(error: error, payload: nil)
-            case (let response, _, nil) where response != nil && 200...299 ~= response!.statusCode:
-                if let responseObject = self.builder(payload: payload) {
-                    callback(error: nil, payload: responseObject)
-                } else {
-                    callback(error: errorWithCode(.InvalidPayload, userInfo: [NSLocalizedDescriptionKey: "Failed to obtain JSON from \(payload)"]), payload: nil)
+        switch(request, error) {
+        case let (.None, .Some(error)):
+            callback(error: error, payload: nil)
+        case let (.Some(request), .None):
+            request.responseJSON { _, resp, payload, err in
+                switch (resp, payload, err) {
+                case (_, nil, let error):
+                    callback(error: error, payload: nil)
+                case (let response, _, nil) where response != nil && 200...299 ~= response!.statusCode:
+                    if let responseObject = self.builder?(payload: payload) {
+                        callback(error: nil, payload: responseObject)
+                    } else {
+                        callback(error: errorWithCode(.InvalidPayload, userInfo: [NSLocalizedDescriptionKey: "Failed to obtain JSON from \(payload)"]), payload: nil)
+                    }
+                case (let response, _, nil) where response != nil && 400...599 ~= response!.statusCode && payload != nil:
+                    let info = [
+                        NSLocalizedDescriptionKey: "Request to \(request.request.URL) failed with status code \(response?.statusCode)",
+                        APIRequestErrorErrorKey: payload!,
+                        APIRequestErrorStatusCodeKey: response!.statusCode
+                    ]
+                    callback(error: errorWithCode(.Failed, userInfo: info), payload: nil)
+                default:
+                    callback(error: errorWithCode(.Failed, userInfo: [NSLocalizedDescriptionKey: "Request to \(request.request.URL) failed"]), payload: nil)
                 }
-            case (let response, _, nil) where response != nil && 400...599 ~= response!.statusCode && payload != nil:
-                let info = [
-                    NSLocalizedDescriptionKey: "Request to \(self.request.request.URL) failed with status code \(response?.statusCode)",
-                    APIRequestErrorErrorKey: payload!,
-                    APIRequestErrorStatusCodeKey: response!.statusCode
-                ]
-                callback(error: errorWithCode(.Failed, userInfo: info), payload: nil)
-            default:
-                callback(error: errorWithCode(.Failed, userInfo: [NSLocalizedDescriptionKey: "Request to \(self.request.request.URL) failed"]), payload: nil)
             }
+        default:
+            callback(error: errorWithCode(.Failed, userInfo: [NSLocalizedDescriptionKey: "Request failed with no clear reason."]), payload: nil)
         }
     }
 }
