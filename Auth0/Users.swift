@@ -53,10 +53,15 @@ public class Users: NSObject {
         }
     }
 
-    public func findWithId(id: String? = nil, fields: [String] = []) -> APIRequest<[String: AnyObject]> {
-        let url = NSURL(string: "api/v2/users/\(self.normalizedUserId(id)!)", relativeToURL: self.api.domainUrl)!
-        let request = self.api.manager.request(jsonRequest(.GET, url: url, parameters: nil))
-        return APIRequest<[String: AnyObject]>(request: request) { return $0 as? [String: AnyObject] }
+    public func find(id: String? = nil, fields: [String]? = nil, includeFields: Bool = false) -> APIRequest<[String: AnyObject]> {
+        switch(normalizedUserId(id)) {
+        case let .Some(userId):
+            let url = NSURL(string: "api/v2/users/\(userId)", relativeToURL: self.api.domainUrl)!
+            let request = self.api.manager.request(jsonRequest(.GET, url: url))
+            return APIRequest<[String: AnyObject]>(request: request) { return $0 as? [String: AnyObject] }
+        case .None:
+            return APIRequest<[String: AnyObject]>(error: NSError(domain: "com.auth0.api", code: 0, userInfo: [NSLocalizedDescriptionKey: "No id of a user supplied to fetch"]))
+        }
     }
 
     private func normalizedUserId(id: String?) -> String? {
@@ -75,7 +80,7 @@ public class Users: NSObject {
         return payload["sub"] as? String
     }
 
-    private func jsonRequest(method: Alamofire.Method, url: NSURL, parameters: [String: AnyObject]?) -> NSURLRequest {
+    private func jsonRequest(method: Alamofire.Method, url: NSURL, parameters: [String: AnyObject]? = nil) -> NSURLRequest {
         let request = NSMutableURLRequest(URL: url)
         request.HTTPMethod = method.rawValue
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")

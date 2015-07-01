@@ -32,6 +32,8 @@ let error = NSError(domain: "com.auth0.api", code: 0, userInfo: [NSLocalizedDesc
 
 let patch_user_ok = "successful PATCH user"
 let patch_user_error = "failed PATCH user"
+let get_user_ok = "successful GET user"
+let get_user_error = "failed GET user"
 
 class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
     override class func configure(configuration: Configuration) {
@@ -81,6 +83,54 @@ class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
             it("should yield error") {
                 waitUntil { done in
                     users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { err, payload in
+                        expect(err).toNot(beNil())
+                        expect(err?.domain).to(equal("com.auth0.api"))
+                        done()
+                    }
+                }
+            }
+        }
+
+        sharedExamples(get_user_ok) { (sharedExampleContext: SharedExampleContext) in
+            let users = sharedExampleContext()["users"] as! Users
+            let id = sharedExampleContext()["id"] as? String
+
+            it("should yield user") {
+                waitUntil { done in
+                    users.find(id: id).responseJSON { error, payload in
+                        expect(payload).toNot(beNil())
+                        expect(payload?["user_id"] as? String).to(equal(id))
+                        done()
+                    }
+                }
+            }
+
+            it("should not yield error") {
+                waitUntil { done in
+                    users.find(id: id).responseJSON { error, payload in
+                        expect(error).to(beNil())
+                        done()
+                    }
+                }
+            }
+        }
+
+        sharedExamples(get_user_error) { (sharedExampleContext: SharedExampleContext) in
+            let users = sharedExampleContext()["users"] as! Users
+            let id = sharedExampleContext()["id"] as? String
+
+            it("should not yield payload") {
+                waitUntil { done in
+                    users.find(id: id).responseJSON { error, payload in
+                        expect(payload).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+            it("should yield error") {
+                waitUntil { done in
+                    users.find(id: id).responseJSON { err, payload in
                         expect(err).toNot(beNil())
                         expect(err?.domain).to(equal("com.auth0.api"))
                         done()
@@ -178,7 +228,7 @@ class UsersSpec: QuickSpec {
             }
         }
 
-        describe("updateUserMetadata with jwt") {
+        describe("update user_metadata with jwt") {
 
             let users = api.users(jwt)
 
@@ -331,6 +381,103 @@ class UsersSpec: QuickSpec {
                     }
                 }
             }
+
+            describe("get user with id_token") {
+
+                let users = api.users(id_token)
+
+                beforeEach {
+                    request = filter { return $0.URL!.path == "/api/v2/users/\(userId)" && $0.HTTPMethod == "GET" }
+                }
+
+                context("successful request") {
+                    beforeEach {
+                        request.stubWithName("GET app_metadata", json: ["user_id": userId])
+                    }
+
+                    itBehavesLike(get_user_ok) { ["users": users, "id": userId] }
+                }
+
+                context("failed request no response") {
+                    beforeEach {
+                        request.stubWithName("GET app_metadata error", error: error)
+                    }
+
+                    itBehavesLike(get_user_error) { ["users": users] }
+                }
+
+                context("failed request with error payload") {
+                    let invalidRequestJson = ["error_code": "invalid_request"]
+
+                    beforeEach {
+                        request.stubWithName("GET app_metadata bad request", json: invalidRequestJson, statusCode: 400)
+                    }
+
+                    itBehavesLike(get_user_error) { ["users": users] }
+
+                    it("should yield error with response") {
+                        waitUntil { done in
+                            users.find().responseJSON { error, payload in
+                                expect(error).toNot(beNil())
+                                expect(error?.userInfo?[APIRequestErrorStatusCodeKey as NSObject] as? Int).to(equal(400))
+                                expect(error?.userInfo?[APIRequestErrorErrorKey as NSObject] as? [String: String]).to(equal(invalidRequestJson))
+                                done()
+                            }
+                        }
+                    }
+                }
+            }
+
+            describe("get user with jwt") {
+
+                let users = api.users(jwt)
+
+                beforeEach {
+                    request = filter { return $0.URL!.path == "/api/v2/users/\(userId)" && $0.HTTPMethod == "GET" }
+                }
+
+                context("successful request") {
+                    beforeEach {
+                        request.stubWithName("GET app_metadata", json: ["user_id": userId])
+                    }
+
+                    itBehavesLike(get_user_ok) { ["users": users, "id": userId] }
+                    itBehavesLike(get_user_ok) { ["users": users, "id": userId] }
+                }
+
+                context("failed request no response") {
+                    beforeEach {
+                        request.stubWithName("GET app_metadata error", error: error)
+                    }
+
+                    itBehavesLike(get_user_error) { ["users": users, "id": userId] }
+                    itBehavesLike(get_user_error) { ["users": users, "id": userId] }
+                }
+
+                context("failed request with error payload") {
+                    let invalidRequestJson = ["error_code": "invalid_request"]
+
+                    beforeEach {
+                        request.stubWithName("GET app_metadata bad request", json: invalidRequestJson, statusCode: 400)
+                    }
+
+                    itBehavesLike(get_user_error) { ["users": users, "id": userId] }
+                    itBehavesLike(get_user_error) { ["users": users, "id": userId] }
+
+                    it("should yield error with response") {
+                        waitUntil { done in
+                            users.find(id: userId).responseJSON { error, payload in
+                                expect(error).toNot(beNil())
+                                expect(error?.userInfo?[APIRequestErrorStatusCodeKey as NSObject] as? Int).to(equal(400))
+                                expect(error?.userInfo?[APIRequestErrorErrorKey as NSObject] as? [String: String]).to(equal(invalidRequestJson))
+                                done()
+                            }
+                        }
+                    }
+                }
+                
+            }
+
         }
     }
 }
