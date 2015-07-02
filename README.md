@@ -61,17 +61,6 @@ Auth0
     }
 ```
 
-####Update `app_metadata` with `id_token`
-
-```swift
-Auth0
-    .users(id_token)
-    .update(appMetadata: ["role": "admin"])
-    .responseJSON { error, userJSON in
-        //Do stuff...
-    }
-```
-
 ####Update User root attributes (including metadata) with `id_token`
 
 ```swift
@@ -81,6 +70,17 @@ Auth0
         "email": "support@auth0.com", 
         "verify_email": true
         ])
+    .responseJSON { error, userJSON in
+        //Do stuff...
+    }
+```
+
+####Update `app_metadata` using API v2 JWT
+
+```swift
+Auth0
+    .users(jwt)
+    .update(id: "auth0|1234567890", appMetadata: ["role": "admin"])
     .responseJSON { error, userJSON in
         //Do stuff...
     }
