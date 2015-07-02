@@ -41,6 +41,8 @@
 		5F5422F71B41841E00FF6171 /* UsersSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5422F41B41841900FF6171 /* UsersSpec.swift */; };
 		5F6BB0FA1B44BC5E00BE1BF0 /* Auth0API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6BB0F91B44BC5E00BE1BF0 /* Auth0API.swift */; };
 		5F6BB0FB1B44BC5E00BE1BF0 /* Auth0API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6BB0F91B44BC5E00BE1BF0 /* Auth0API.swift */; };
+		5F86D3221B44A27700BFED2E /* A0UsersSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F86D3211B44A27700BFED2E /* A0UsersSpec.m */; };
+		5F86D3231B44A27700BFED2E /* A0UsersSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F86D3211B44A27700BFED2E /* A0UsersSpec.m */; };
 		5F94F6AC1B418B0D0063F100 /* Alamofire.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069491B3DCE120048928E /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F94F6AD1B418B160063F100 /* Alamofire.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069441B3DCE120048928E /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F94F6AE1B418B350063F100 /* JWTDecode.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F0069451B3DCE120048928E /* JWTDecode.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -121,6 +123,9 @@
 		5F5422EE1B41818700FF6171 /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OHHTTPStubs.framework; sourceTree = "<group>"; };
 		5F5422F41B41841900FF6171 /* UsersSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsersSpec.swift; sourceTree = "<group>"; };
 		5F6BB0F91B44BC5E00BE1BF0 /* Auth0API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0API.swift; sourceTree = "<group>"; };
+		5F86D31F1B44A27700BFED2E /* Auth0-iOSTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auth0-iOSTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		5F86D3201B44A27700BFED2E /* Auth0-OSXTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auth0-OSXTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		5F86D3211B44A27700BFED2E /* A0UsersSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = A0UsersSpec.m; sourceTree = "<group>"; };
 		5FA0FB6B1B4227AD00F12BF1 /* FilteredRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilteredRequest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -224,6 +229,8 @@
 		5F0068CC1B3B3EFF0048928E /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				5F86D31F1B44A27700BFED2E /* Auth0-iOSTests-Bridging-Header.h */,
+				5F86D3201B44A27700BFED2E /* Auth0-OSXTests-Bridging-Header.h */,
 				5F0068CD1B3B3EFF0048928E /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -278,6 +285,7 @@
 			isa = PBXGroup;
 			children = (
 				5F5422F41B41841900FF6171 /* UsersSpec.swift */,
+				5F86D3211B44A27700BFED2E /* A0UsersSpec.m */,
 			);
 			name = API;
 			sourceTree = "<group>";
@@ -478,6 +486,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F5422F61B41841D00FF6171 /* UsersSpec.swift in Sources */,
+				5F86D3221B44A27700BFED2E /* A0UsersSpec.m in Sources */,
 				5FA0FB6C1B4227AD00F12BF1 /* FilteredRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -499,6 +508,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F5422F71B41841E00FF6171 /* UsersSpec.swift in Sources */,
+				5F86D3231B44A27700BFED2E /* A0UsersSpec.m in Sources */,
 				5FA0FB6D1B4227AD00F12BF1 /* FilteredRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -654,6 +664,7 @@
 		5F0068D61B3B3EFF0048928E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -666,12 +677,15 @@
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0-iOSTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		5F0068D71B3B3EFF0048928E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -680,6 +694,7 @@
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0-iOSTests-Bridging-Header.h";
 			};
 			name = Release;
 		};
@@ -740,6 +755,7 @@
 		5F0069701B3DFAF30048928E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -756,12 +772,15 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0-OSXTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		5F0069711B3DFAF30048928E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -773,6 +792,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0-OSXTests-Bridging-Header.h";
 			};
 			name = Release;
 		};

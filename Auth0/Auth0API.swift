@@ -27,12 +27,12 @@ public class Auth0API: NSObject {
     let token: String
     let api: API
 
-    init(token: String) {
+    public init(token: String) {
         self.token = token
         self.api = API.sharedInstance
     }
 
-    init(domain: String, token: String) {
+    public init(domain: String, token: String) {
         self.token = token
         self.api = API(domain: domain)
     }
