@@ -24,5 +24,26 @@ import Foundation
 import Alamofire
 
 public func users(token: String) -> Users {
-    return API.sharedInstance.users(token)
+    return Auth0.sharedInstance.api.users(token)
+}
+
+public struct Auth0 {
+    public static let sharedInstance = Auth0()
+
+    public let api: API
+
+    public init() {
+        let info = NSBundle.mainBundle().infoDictionary
+        let domain:String = info?["Auth0Domain"] as! String
+        self.init(domain: domain)
+    }
+
+    public init(domain: String) {
+        self.api = API(domain: domain)
+    }
+
+    public func users(token: String) -> Users {
+        return api.users(token)
+    }
+
 }

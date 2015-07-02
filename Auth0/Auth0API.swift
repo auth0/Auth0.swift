@@ -29,12 +29,12 @@ public class Auth0API: NSObject {
 
     public init(token: String) {
         self.token = token
-        self.api = API.sharedInstance
+        self.api = Auth0.sharedInstance.api
     }
 
     public init(domain: String, token: String) {
         self.token = token
-        self.api = API(domain: domain)
+        self.api = Auth0(domain: domain).api
     }
 
     @objc public func updateUser(id: String, parameters: [String: AnyObject], callback: (NSError?, [String: AnyObject]?) -> ()) {

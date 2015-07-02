@@ -24,7 +24,6 @@ import Foundation
 import Alamofire
 
 public struct API {
-    public static let sharedInstance = API()
 
     public let domainUrl:NSURL
     let manager: Alamofire.Manager

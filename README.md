@@ -33,9 +33,94 @@ github "auth0/Auth0.swift"
 
 ###Manual installation
 
-Download and add `Auth0.swift` to your project in Xcode.
+Download and add all `.swift` files to your project in Xcode.
 
 ##Auth0.swift
+
+Before we start add your **Auth0** domain in your `Info.plist` file as the value of the key `Auth0Domain`, e.g.:
+
+`Auth0Domain`: `https://samples.auth0.com`
+
+Or create your own instance of Auth0
+
+```swift
+let auth0 = Auth0(domain: "https://samples.auth0.com")
+```
+> If you choose to follow this path, you are responsible to keep this reference alive
+
+### Users
+
+####Update `user_metadata` with `id_token`
+
+```swift
+Auth0
+    .users(id_token)
+    .update(userMetadata: ["first_name": "John Doe"])
+    .responseJSON { error, userJSON in
+        //Do stuff...
+    }
+```
+
+####Update `app_metadata` with `id_token`
+
+```swift
+Auth0
+    .users(id_token)
+    .update(appMetadata: ["role": "admin"])
+    .responseJSON { error, userJSON in
+        //Do stuff...
+    }
+```
+
+####Update User root attributes (including metadata) with `id_token`
+
+```swift
+Auth0
+    .users(id_token)
+    .update(parameter: [
+        "email": "support@auth0.com", 
+        "verify_email": true
+        ])
+    .responseJSON { error, userJSON in
+        //Do stuff...
+    }
+```
+
+####Update User root attributes (including metadata) using API v2 JWT
+
+```swift
+Auth0
+    .users(jwt)
+    .update(id: "auth0|1234567890", parameter: [
+        "email": "support@auth0.com", 
+        "verify_email": true
+        ])
+    .responseJSON { error, userJSON in
+        //Do stuff...
+    }
+```
+
+####Fetch User using id_token
+
+```swift
+Auth0
+    .users(id_token)
+    .find()
+    .responseJSON { error, userJSON in
+        //Do stuff...
+    }
+```
+
+####Fetch User using API v2 JWT
+
+```swift
+Auth0
+    .users(id_token)
+    .find(id: "auth0|1234567890")
+    .responseJSON { error, userJSON in
+        //Do stuff...
+    }
+```
 
 ## What is Auth0?
 
