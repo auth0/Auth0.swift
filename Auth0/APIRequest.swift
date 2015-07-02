@@ -34,7 +34,7 @@ func errorWithCode(code: APIRequestErrorCode, userInfo: [String: AnyObject]? = n
     return NSError(domain: "com.auth0.api", code: code.rawValue, userInfo: userInfo)
 }
 
-public class APIRequest<T>: NSObject {
+public struct APIRequest<T> {
 
     var error: NSError?
     var request: Alamofire.Request?

@@ -24,7 +24,7 @@ import Foundation
 import Alamofire
 import JWTDecode
 
-public class Users: NSObject {
+public struct Users {
 
     let api: API
     let token: String
@@ -32,7 +32,6 @@ public class Users: NSObject {
     init(api: API, token: String) {
         self.api = api
         self.token = token
-        super.init()
     }
 
     public func update(id: String? = nil, userMetadata: [String: AnyObject]? = nil, appMetadata: [String: AnyObject]? = nil, parameters: [String: AnyObject]? = [:]) -> APIRequest<[String: AnyObject]> {

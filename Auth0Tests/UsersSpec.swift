@@ -35,115 +35,6 @@ let patch_user_error = "failed PATCH user"
 let get_user_ok = "successful GET user"
 let get_user_error = "failed GET user"
 
-class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
-    override class func configure(configuration: Configuration) {
-        sharedExamples(patch_user_ok) { (sharedExampleContext: SharedExampleContext) in
-            let users = sharedExampleContext()["users"] as! Users
-            let id = sharedExampleContext()["id"] as? String
-            let userMetadata = sharedExampleContext()["user_metadata"] as? [String: AnyObject]
-            let appMetadata = sharedExampleContext()["app_metadata"] as? [String: AnyObject]
-            let parameters = sharedExampleContext()["parameters"] as? [String: AnyObject]
-
-            it("should not yield error") {
-                waitUntil { done in
-                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
-                        expect(error).to(beNil())
-                        done()
-                    }
-                }
-            }
-
-            it("should yield JSON payload") {
-                waitUntil { done in
-                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
-                        expect(payload).toNot(beNil())
-                        expect(payload?["user_id"] as? String).toNot(beNil())
-                        done()
-                    }
-                }
-            }
-        }
-
-        sharedExamples(patch_user_error) { (sharedExampleContext: SharedExampleContext) in
-            let users = sharedExampleContext()["users"] as! Users
-            let id = sharedExampleContext()["id"] as? String
-            let userMetadata = sharedExampleContext()["user_metadata"] as? [String: AnyObject]
-            let appMetadata = sharedExampleContext()["app_metadata"] as? [String: AnyObject]
-            let parameters = sharedExampleContext()["parameters"] as? [String: AnyObject]
-
-            it("should not yield payload") {
-                waitUntil { done in
-                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
-                        expect(payload).to(beNil())
-                        done()
-                    }
-                }
-            }
-
-            it("should yield error") {
-                waitUntil { done in
-                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { err, payload in
-                        expect(err).toNot(beNil())
-                        expect(err?.domain).to(equal("com.auth0.api"))
-                        done()
-                    }
-                }
-            }
-        }
-
-        sharedExamples(get_user_ok) { (sharedExampleContext: SharedExampleContext) in
-            let users = sharedExampleContext()["users"] as! Users
-            let id = sharedExampleContext()["id"] as? String
-            let fieldList = sharedExampleContext()["fields"] as? [String]
-
-            it("should yield user") {
-                waitUntil { done in
-                    users.find(id: id, fields: fieldList).responseJSON { error, payload in
-                        expect(payload).toNot(beNil())
-                        expect(payload?["user_id"] as? String).to(equal(id))
-                        done()
-                    }
-                }
-            }
-
-            it("should not yield error") {
-                waitUntil { done in
-                    users.find(id: id, fields: fieldList).responseJSON { error, payload in
-                        expect(error).to(beNil())
-                        done()
-                    }
-                }
-            }
-        }
-
-        sharedExamples(get_user_error) { (sharedExampleContext: SharedExampleContext) in
-            let users = sharedExampleContext()["users"] as! Users
-            let id = sharedExampleContext()["id"] as? String
-            let fields = sharedExampleContext()["fields"] as? [String]
-
-            it("should not yield payload") {
-                waitUntil { done in
-                    users.find(id: id, fields: fields).responseJSON { error, payload in
-                        expect(payload).to(beNil())
-                        done()
-                    }
-                }
-            }
-
-            it("should yield error") {
-                waitUntil { done in
-                    users.find(id: id, fields: fields).responseJSON { err, payload in
-                        expect(err).toNot(beNil())
-                        expect(err?.domain).to(equal("com.auth0.api"))
-                        done()
-                    }
-                }
-            }
-        }
-
-    }
-}
-
 class UsersSpec: QuickSpec {
     override func spec() {
 
@@ -199,8 +90,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("PATCH user id_token", json: ["user_id": userId])
                     }
 
-                    itBehavesLike(patch_user_ok) { ["users": users, "user_metadata": ["key": "value"]] }
-                    itBehavesLike(patch_user_ok) { ["users": users, "app_metadata": ["key": "value"]] }
+                    itBehavesLike(patch_user_ok) { ["users": UsersHolder(value: users), "user_metadata": ["key": "value"]] }
+                    itBehavesLike(patch_user_ok) { ["users": UsersHolder(value: users), "app_metadata": ["key": "value"]] }
 
                 }
 
@@ -209,8 +100,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("PATCH user_metadata error", error: error)
                     }
 
-                    itBehavesLike(patch_user_error) { ["users": users, "user_metadata": ["key": "value"]] }
-                    itBehavesLike(patch_user_error) { ["users": users, "app_metadata": ["key": "value"]] }
+                    itBehavesLike(patch_user_error) { ["users": UsersHolder(value: users), "user_metadata": ["key": "value"]] }
+                    itBehavesLike(patch_user_error) { ["users": UsersHolder(value: users), "app_metadata": ["key": "value"]] }
                 }
 
                 context("failed request with error payload") {
@@ -246,8 +137,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("PATCH user with JWT", json: ["user_id": userId])
                     }
 
-                    itBehavesLike(patch_user_ok) { ["users": users, "user_metadata": ["key": "value"], "id": userId] }
-                    itBehavesLike(patch_user_ok) { ["users": users, "app_metadata": ["key": "value"], "id": userId] }
+                    itBehavesLike(patch_user_ok) { ["users": UsersHolder(value: users), "user_metadata": ["key": "value"], "id": userId] }
+                    itBehavesLike(patch_user_ok) { ["users": UsersHolder(value: users), "app_metadata": ["key": "value"], "id": userId] }
 
                 }
 
@@ -256,8 +147,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("PATCH user_metadata error", error: error)
                     }
 
-                    itBehavesLike(patch_user_error) { ["users": users, "user_metadata": ["key": "value"], "id": userId] }
-                    itBehavesLike(patch_user_error) { ["users": users, "app_metadata": ["key": "value"], "id": userId] }
+                    itBehavesLike(patch_user_error) { ["users": UsersHolder(value: users), "user_metadata": ["key": "value"], "id": userId] }
+                    itBehavesLike(patch_user_error) { ["users": UsersHolder(value: users), "app_metadata": ["key": "value"], "id": userId] }
                 }
 
                 context("failed request with error payload") {
@@ -267,7 +158,7 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("PATCH user_metadata bad request", json: invalidRequestJson, statusCode: 400)
                     }
 
-                    itBehavesLike(patch_user_error) { ["users": users, "user_metadata": ["key": "value"], "id": userId] }
+                    itBehavesLike(patch_user_error) { ["users": UsersHolder(value: users), "user_metadata": ["key": "value"], "id": userId] }
 
                     it("should yield error with response") {
                         waitUntil { done in
@@ -283,7 +174,7 @@ class UsersSpec: QuickSpec {
                 
                 context("failed request when no id is provided") {
                     
-                    itBehavesLike(patch_user_error) { ["users": users, "user_metadata": ["key": "value"]] }
+                    itBehavesLike(patch_user_error) { ["users": UsersHolder(value: users), "user_metadata": ["key": "value"]] }
                     
                     it("should yield error with response") {
                         waitUntil { done in
@@ -313,8 +204,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("GET app_metadata", json: ["user_id": userId])
                     }
 
-                    itBehavesLike(get_user_ok) { ["users": users, "id": userId] }
-                    itBehavesLike(get_user_ok) { ["users": users, "id": userId, "fields": ["email", "user_id"]] }
+                    itBehavesLike(get_user_ok) { ["users": UsersHolder(value: users), "id": userId] }
+                    itBehavesLike(get_user_ok) { ["users": UsersHolder(value: users), "id": userId, "fields": ["email", "user_id"]] }
                 }
 
                 context("failed request no response") {
@@ -322,8 +213,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("GET app_metadata error", error: error)
                     }
 
-                    itBehavesLike(get_user_error) { ["users": users] }
-                    itBehavesLike(get_user_error) { ["users": users, "fields": ["email", "user_id"]] }
+                    itBehavesLike(get_user_error) { ["users": UsersHolder(value: users)] }
+                    itBehavesLike(get_user_error) { ["users": UsersHolder(value: users), "fields": ["email", "user_id"]] }
                 }
 
                 context("failed request with error payload") {
@@ -333,8 +224,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("GET app_metadata bad request", json: invalidRequestJson, statusCode: 400)
                     }
 
-                    itBehavesLike(get_user_error) { ["users": users] }
-                    itBehavesLike(get_user_error) { ["users": users, "fields": ["email", "user_id"]] }
+                    itBehavesLike(get_user_error) { ["users": UsersHolder(value: users)] }
+                    itBehavesLike(get_user_error) { ["users": UsersHolder(value: users), "fields": ["email", "user_id"]] }
 
                     it("should yield error with response") {
                         waitUntil { done in
@@ -362,8 +253,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("GET app_metadata", json: ["user_id": userId])
                     }
 
-                    itBehavesLike(get_user_ok) { ["users": users, "id": userId] }
-                    itBehavesLike(get_user_ok) { ["users": users, "id": userId, "fields": ["email", "user_id"]] }
+                    itBehavesLike(get_user_ok) { ["users": UsersHolder(value: users), "id": userId] }
+                    itBehavesLike(get_user_ok) { ["users": UsersHolder(value: users), "id": userId, "fields": ["email", "user_id"]] }
                 }
 
                 context("failed request no response") {
@@ -371,8 +262,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("GET app_metadata error", error: error)
                     }
 
-                    itBehavesLike(get_user_error) { ["users": users, "id": userId] }
-                    itBehavesLike(get_user_error) { ["users": users, "id": userId, "fields": ["email", "user_id"]] }
+                    itBehavesLike(get_user_error) { ["users": UsersHolder(value: users), "id": userId] }
+                    itBehavesLike(get_user_error) { ["users": UsersHolder(value: users), "id": userId, "fields": ["email", "user_id"]] }
                 }
 
                 context("failed request with error payload") {
@@ -382,8 +273,8 @@ class UsersSpec: QuickSpec {
                         request.stubWithName("GET app_metadata bad request", json: invalidRequestJson, statusCode: 400)
                     }
 
-                    itBehavesLike(get_user_error) { ["users": users, "id": userId] }
-                    itBehavesLike(get_user_error) { ["users": users, "id": userId, "fields": ["email", "user_id"]] }
+                    itBehavesLike(get_user_error) { ["users": UsersHolder(value: users), "id": userId] }
+                    itBehavesLike(get_user_error) { ["users": UsersHolder(value: users), "id": userId, "fields": ["email", "user_id"]] }
 
                     it("should yield error with response") {
                         waitUntil { done in
@@ -399,5 +290,122 @@ class UsersSpec: QuickSpec {
                 
             }
         }
+    }
+}
+
+class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
+    override class func configure(configuration: Configuration) {
+        sharedExamples(patch_user_ok) { (sharedExampleContext: SharedExampleContext) in
+            let users = (sharedExampleContext()["users"] as! UsersHolder).value
+            let id = sharedExampleContext()["id"] as? String
+            let userMetadata = sharedExampleContext()["user_metadata"] as? [String: AnyObject]
+            let appMetadata = sharedExampleContext()["app_metadata"] as? [String: AnyObject]
+            let parameters = sharedExampleContext()["parameters"] as? [String: AnyObject]
+
+            it("should not yield error") {
+                waitUntil { done in
+                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
+                        expect(error).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+            it("should yield JSON payload") {
+                waitUntil { done in
+                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
+                        expect(payload).toNot(beNil())
+                        expect(payload?["user_id"] as? String).toNot(beNil())
+                        done()
+                    }
+                }
+            }
+        }
+
+        sharedExamples(patch_user_error) { (sharedExampleContext: SharedExampleContext) in
+            let users = (sharedExampleContext()["users"] as! UsersHolder).value
+            let id = sharedExampleContext()["id"] as? String
+            let userMetadata = sharedExampleContext()["user_metadata"] as? [String: AnyObject]
+            let appMetadata = sharedExampleContext()["app_metadata"] as? [String: AnyObject]
+            let parameters = sharedExampleContext()["parameters"] as? [String: AnyObject]
+
+            it("should not yield payload") {
+                waitUntil { done in
+                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
+                        expect(payload).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+            it("should yield error") {
+                waitUntil { done in
+                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { err, payload in
+                        expect(err).toNot(beNil())
+                        expect(err?.domain).to(equal("com.auth0.api"))
+                        done()
+                    }
+                }
+            }
+        }
+
+        sharedExamples(get_user_ok) { (sharedExampleContext: SharedExampleContext) in
+            let users = (sharedExampleContext()["users"] as! UsersHolder).value
+            let id = sharedExampleContext()["id"] as? String
+            let fieldList = sharedExampleContext()["fields"] as? [String]
+
+            it("should yield user") {
+                waitUntil { done in
+                    users.find(id: id, fields: fieldList).responseJSON { error, payload in
+                        expect(payload).toNot(beNil())
+                        expect(payload?["user_id"] as? String).to(equal(id))
+                        done()
+                    }
+                }
+            }
+
+            it("should not yield error") {
+                waitUntil { done in
+                    users.find(id: id, fields: fieldList).responseJSON { error, payload in
+                        expect(error).to(beNil())
+                        done()
+                    }
+                }
+            }
+        }
+
+        sharedExamples(get_user_error) { (sharedExampleContext: SharedExampleContext) in
+            let users = (sharedExampleContext()["users"] as! UsersHolder).value
+            let id = sharedExampleContext()["id"] as? String
+            let fields = sharedExampleContext()["fields"] as? [String]
+
+            it("should not yield payload") {
+                waitUntil { done in
+                    users.find(id: id, fields: fields).responseJSON { error, payload in
+                        expect(payload).to(beNil())
+                        done()
+                    }
+                }
+            }
+
+            it("should yield error") {
+                waitUntil { done in
+                    users.find(id: id, fields: fields).responseJSON { err, payload in
+                        expect(err).toNot(beNil())
+                        expect(err?.domain).to(equal("com.auth0.api"))
+                        done()
+                    }
+                }
+            }
+        }
+        
+    }
+}
+
+class UsersHolder {
+    let value: Users
+
+    init(value: Users) {
+        self.value = value
     }
 }
