@@ -23,9 +23,17 @@
 import Foundation
 import Alamofire
 
+/// Key of the status code to be included in `NSError`'s userInfo
 public let APIRequestErrorStatusCodeKey = "com.auth0.api.v2.status_code"
+/// Key of the response error object to be included in `NSError`'s userInfo
 public let APIRequestErrorErrorKey = "com.auth0.api.v2.error"
 
+/**
+Auth0.swift error codes
+
+- Failed:         the request failed
+- InvalidPayload: couldn't convert request body to JSON
+*/
 public enum APIRequestErrorCode: Int {
     case Failed = 0, InvalidPayload = 1
 }
@@ -34,6 +42,9 @@ func errorWithCode(code: APIRequestErrorCode, userInfo: [String: AnyObject]? = n
     return NSError(domain: "com.auth0.api", code: code.rawValue, userInfo: userInfo)
 }
 
+/**
+*  Auth0 API request object
+*/
 public struct APIRequest<T> {
 
     var error: NSError?
@@ -51,6 +62,11 @@ public struct APIRequest<T> {
         self.builder = nil
     }
 
+    /**
+    Register a new callback for the request's JSON response
+
+    :param: callback to be called when a response is received or an error occurs. It can yield the error that caused the request to fail or server's JSON response if it's successful
+    */
     public func responseJSON(callback: (error: NSError?, payload:T?) -> ()) {
         switch(request, error) {
         case let (.None, .Some(error)):

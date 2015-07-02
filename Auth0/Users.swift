@@ -24,6 +24,9 @@ import Foundation
 import Alamofire
 import JWTDecode
 
+/**
+*  Auth0 API v2 `/users` endpoint helper
+*/
 public struct Users {
 
     let api: API
@@ -34,6 +37,16 @@ public struct Users {
         self.token = token
     }
 
+    /**
+    Update a user performing a `PATCH` to `/users/:id`
+
+    :param: id           of the auth0 user to update. If nil it will be obtained from the `id_token`.
+    :param: userMetadata of the user to update.
+    :param: appMetadata  of the user to update.
+    :param: parameters   of the user, can include `user_metadata` and `app_metadata`.
+
+    :returns: API request sent to Auth0
+    */
     public func update(id: String? = nil, userMetadata: [String: AnyObject]? = nil, appMetadata: [String: AnyObject]? = nil, parameters: [String: AnyObject]? = [:]) -> APIRequest<[String: AnyObject]> {
         switch(normalizedUserId(id)) {
         case let .Some(userId):
@@ -52,6 +65,15 @@ public struct Users {
         }
     }
 
+    /**
+    Find a user by id performing a `GET` to `/users/:id`
+
+    :param: id            of the auth0 user to update. If nil it will be obtained from the `id_token`
+    :param: fields        to be included or excluded from the response
+    :param: includeFields that will determine if the list of fields are to be included or excluded from the response
+
+    :returns: API request sent to Auth0
+    */
     public func find(id: String? = nil, fields: [String]? = nil, includeFields: Bool = true) -> APIRequest<[String: AnyObject]> {
         switch(normalizedUserId(id)) {
         case let .Some(userId):

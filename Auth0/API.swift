@@ -23,23 +23,35 @@
 import Foundation
 import Alamofire
 
+/**
+*  Object that represent Auth0 API v2 endpoints
+*/
 public struct API {
 
+    /// Auth0 API domain url
     public let domainUrl:NSURL
+
     let manager: Alamofire.Manager
 
-    public init() {
-        let info = NSBundle.mainBundle().infoDictionary
-        let domain:String = info?["Auth0Domain"] as! String
-        self.init(domain: domain)
-    }
+    /**
+    Creates a new API object for a given Auth0 subdomain
 
+    :param: domain of an Auth0 account
+
+    :returns: a new instance
+    */
     public init(domain: String) {
         self.domainUrl = (domain.hasPrefix("http") ? NSURL(string: domain) : NSURL(string: "https://".stringByAppendingString(domain)))!
         let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
         self.manager = Alamofire.Manager(configuration: configuration)
     }
+    /**
+    Initialize API v2 /users endpoint with a valid JWT
 
+    :param: token a valid jwt of API v2 or an `id_token` of a user
+
+    :returns: users api helper
+    */
     public func users(token: String) -> Users {
         return Users(api: self, token: token)
     }

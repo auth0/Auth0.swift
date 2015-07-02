@@ -22,21 +22,47 @@
 
 import Foundation
 
+/**
+*   Auth0 API helper class for *Objective-C*. If you using *Swift* just use *Auth0* struct or global functions
+*/
 public class Auth0API: NSObject {
 
     let token: String
     let api: API
 
+    /**
+    Creates a new helper with a jwt for Auth0 API.
+    The Auth0 account domain will be obtained from `Info.plist` file entry with key `Auth0Domain`
+
+    :param: token for Auth0 API v2
+
+    :returns: new helper instance
+    */
     public init(token: String) {
         self.token = token
         self.api = Auth0.sharedInstance.api
     }
 
+    /**
+    Creates a new helper with a jwt for Auth0 API and an account domain
+
+    :param: domain of the Auth0 account
+    :param: token  for Auth0 API v2
+
+    :returns: new helper instance
+    */
     public init(domain: String, token: String) {
         self.token = token
         self.api = Auth0(domain: domain).api
     }
 
+    /**
+    Updates a user calling `PATCH /users/:id`
+
+    :param: id         of the user to update
+    :param: parameters that hold the attributes of the user to update
+    :param: callback   that will be called with the result of the request
+    */
     @objc public func updateUser(id: String, parameters: [String: AnyObject], callback: (NSError?, [String: AnyObject]?) -> ()) {
         api
         .users(token)
@@ -44,6 +70,14 @@ public class Auth0API: NSObject {
         .responseJSON(callback)
     }
 
+    /**
+    Finds a user calling `GET /users/:id`
+
+    :param: id            of the user to find
+    :param: fields        to be included/excluded from the response
+    :param: includeFields that tells if the fields listed should be included or not in the response
+    :param: callback      that will be called with the result of the request
+    */
     @objc public func findUser(id: String, fields: [String]? = nil, includeFields: Bool = true, callback: (NSError?, [String: AnyObject]?) -> ()) {
         api
         .users(token)
