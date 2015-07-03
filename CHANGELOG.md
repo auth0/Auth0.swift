@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.1.2](https://github.com/auth0/Auth0.swift/tree/0.1.2) (2015-07-03)
+
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/0.1.1...0.1.2)
+
+**Merged pull requests:**
+
+- Allow to call method users from Auth0 struct [\#1](https://github.com/auth0/Auth0.swift/pull/1) ([hzalaz](https://github.com/hzalaz))
+
 ## [0.1.1](https://github.com/auth0/Auth0.swift/tree/0.1.1) (2015-07-02)
 
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/0.1.0...0.1.1)
