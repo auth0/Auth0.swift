@@ -24,20 +24,10 @@ import Foundation
 import Alamofire
 
 /**
-Initialize API v2 /users endpoint with a valid JWT
-
-:param: token a valid jwt of API v2 or an `id_token` of a user
-
-:returns: users api helper
-*/
-public func users(token: String) -> Users {
-    return Auth0.sharedInstance.api.users(token)
-}
-
-/**
 *  Main object of Auth0 swift toolkit that provides access to the different Auth0 API endpoints
 */
 public struct Auth0 {
+    /// Shared Auth0 instance with configuration info obtained from `Info.plist`
     public static let sharedInstance = Auth0()
 
     /// Auth0 API v2 helper
@@ -76,6 +66,17 @@ public struct Auth0 {
     */
     public func users(token: String) -> Users {
         return api.users(token)
+    }
+
+    /**
+    Initialize API v2 /users endpoint with a valid JWT from shared Auth0 configuration
+
+    :param: token a valid jwt of API v2 or an `id_token` of a user
+
+    :returns: users api helper
+    */
+    public static func users(token: String) -> Users {
+        return Auth0.sharedInstance.api.users(token)
     }
 
 }
