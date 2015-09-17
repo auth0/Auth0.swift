@@ -10,7 +10,7 @@ Swift toolkit for Auth0 API
 
 ## Requirements
 
-iOS 8+
+iOS 8+ and Xcode 7 (Swift 2.0)
 
 ## Installation
 
@@ -20,7 +20,7 @@ Auth0.swift is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod "Auth0", '~> 0.1'
+pod "Auth0", '~> 0.2'
 ```
 
 ###Carthage
@@ -33,7 +33,7 @@ github "auth0/Auth0.swift"
 
 ###Manual installation
 
-Download and add all `.swift` files to your project in Xcode.
+Download `Auth0.framework` from [Releases](/releases) and add it to your project in Xcode.
 
 ##Auth0.swift
 

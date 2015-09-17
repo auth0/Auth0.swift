@@ -13,10 +13,10 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://twitter.com/auth0'
 
   s.ios.deployment_target = '8.0'
-  s.osx.deployment_target = '10.9'
+  s.osx.deployment_target = '10.10'
   s.requires_arc = true
-  s.dependency 'Alamofire', '~> 1.2'
-  s.dependency 'JWTDecode', '~> 0.3'
+  s.dependency 'Alamofire', '~> 2.0'
+  s.dependency 'JWTDecode', '~> 1.0'
 
   s.source_files = 'Auth0/*.swift'
 end
