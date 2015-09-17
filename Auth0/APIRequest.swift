@@ -65,32 +65,38 @@ public struct APIRequest<T> {
     /**
     Register a new callback for the request's JSON response
 
-    :param: callback to be called when a response is received or an error occurs. It can yield the error that caused the request to fail or server's JSON response if it's successful
+    - parameter callback: to be called when a response is received or an error occurs. It can yield the error that caused the request to fail or server's JSON response if it's successful
     */
     public func responseJSON(callback: (error: NSError?, payload:T?) -> ()) {
         switch(request, error) {
         case let (.None, .Some(error)):
             callback(error: error, payload: nil)
         case let (.Some(request), .None):
-            request.responseJSON { _, resp, payload, err in
-                switch (resp, payload, err) {
-                case (_, nil, let error):
+            request
+                .validate(statusCode: 200..<300)
+                .responseJSON { request, response, result in
+                switch (response, result) {
+                case (_, .Failure(nil, let error as NSError)):
                     callback(error: error, payload: nil)
-                case (let response, _, nil) where response != nil && 200...299 ~= response!.statusCode:
+                case (_, .Success(let payload)):
                     if let responseObject = self.builder?(payload: payload) {
                         callback(error: nil, payload: responseObject)
                     } else {
                         callback(error: errorWithCode(.InvalidPayload, userInfo: [NSLocalizedDescriptionKey: "Failed to obtain JSON from \(payload)"]), payload: nil)
                     }
-                case (let response, _, nil) where response != nil && 400...599 ~= response!.statusCode && payload != nil:
-                    let info = [
-                        NSLocalizedDescriptionKey: "Request to \(request.request.URL) failed with status code \(response?.statusCode)",
-                        APIRequestErrorErrorKey: payload!,
-                        APIRequestErrorStatusCodeKey: response!.statusCode
+                case (let response, .Failure(let payload, _)) where payload != nil && response != nil:
+                    let statusCode = response!.statusCode
+                    let message = "Request to \(request?.URL) failed with status code \(statusCode)"
+                    var info: [String: AnyObject] = [
+                        NSLocalizedDescriptionKey: message,
+                        APIRequestErrorStatusCodeKey: statusCode
                     ]
+                    if let error = try? NSJSONSerialization.JSONObjectWithData(payload!, options: NSJSONReadingOptions()) {
+                        info[APIRequestErrorErrorKey] = error
+                    }
                     callback(error: errorWithCode(.Failed, userInfo: info), payload: nil)
                 default:
-                    callback(error: errorWithCode(.Failed, userInfo: [NSLocalizedDescriptionKey: "Request to \(request.request.URL) failed"]), payload: nil)
+                    callback(error: errorWithCode(.Failed, userInfo: [NSLocalizedDescriptionKey: "Request to \(request?.URL) failed"]), payload: nil)
                 }
             }
         default:

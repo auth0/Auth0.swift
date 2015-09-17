@@ -40,12 +40,12 @@ public struct Users {
     /**
     Update a user performing a `PATCH` to `/users/:id`
 
-    :param: id           of the auth0 user to update. If nil it will be obtained from the `id_token`.
-    :param: userMetadata of the user to update.
-    :param: appMetadata  of the user to update.
-    :param: parameters   of the user, can include `user_metadata` and `app_metadata`.
+    - parameter id:           of the auth0 user to update. If nil it will be obtained from the `id_token`.
+    - parameter userMetadata: of the user to update.
+    - parameter appMetadata:  of the user to update.
+    - parameter parameters:   of the user, can include `user_metadata` and `app_metadata`.
 
-    :returns: API request sent to Auth0
+    - returns: API request sent to Auth0
     */
     public func update(id: String? = nil, userMetadata: [String: AnyObject]? = nil, appMetadata: [String: AnyObject]? = nil, parameters: [String: AnyObject]? = [:]) -> APIRequest<[String: AnyObject]> {
         switch(normalizedUserId(id)) {
@@ -68,11 +68,11 @@ public struct Users {
     /**
     Find a user by id performing a `GET` to `/users/:id`
 
-    :param: id            of the auth0 user to update. If nil it will be obtained from the `id_token`
-    :param: fields        to be included or excluded from the response
-    :param: includeFields that will determine if the list of fields are to be included or excluded from the response
+    - parameter id:            of the auth0 user to update. If nil it will be obtained from the `id_token`
+    - parameter fields:        to be included or excluded from the response
+    - parameter includeFields: that will determine if the list of fields are to be included or excluded from the response
 
-    :returns: API request sent to Auth0
+    - returns: API request sent to Auth0
     */
     public func find(id: String? = nil, fields: [String]? = nil, includeFields: Bool = true) -> APIRequest<[String: AnyObject]> {
         switch(normalizedUserId(id)) {
@@ -80,11 +80,10 @@ public struct Users {
             let components = NSURLComponents(URL: self.api.domainUrl, resolvingAgainstBaseURL: true)!
             components.path = "/api/v2/users/\(userId)"
             if fields != nil && !fields!.isEmpty {
-                let items:[AnyObject] = [
-                    NSURLQueryItem(name: "fields", value: join(",", fields!)),
+                components.queryItems = [
+                    NSURLQueryItem(name: "fields", value: (fields!).joinWithSeparator(",")),
                     NSURLQueryItem(name: "include_fields", value: "\(includeFields)"),
                 ]
-                components.queryItems = items
             }
             let request = self.api.manager.request(jsonRequest(.GET, url: components.URL!))
             return APIRequest<[String: AnyObject]>(request: request) { return $0 as? [String: AnyObject] }
@@ -105,8 +104,8 @@ public struct Users {
     }
 
     private func subjectFromToken(token: String) -> String? {
-        let payload = JWTDecode.payload(jwt: token)!
-        return payload["sub"] as? String
+        let jwt = try? JWTDecode.decode(token)
+        return jwt?.subject
     }
 
     private func jsonRequest(method: Alamofire.Method, url: NSURL, parameters: [String: AnyObject]? = nil) -> NSURLRequest {

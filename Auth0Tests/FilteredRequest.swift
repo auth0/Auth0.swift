@@ -35,14 +35,14 @@ func filter(filter: (NSURLRequest -> Bool)) -> FilteredRequest {
     return FilteredRequest(filter: filter)
 }
 
-func hasJSON(expected: [String: AnyObject], request: NSURLRequest) -> Bool {
+func hasJSON(expected: [String: AnyObject], _ request: NSURLRequest) -> Bool {
     var filter: Bool = false
     if let stream = request.HTTPBodyStream {
         stream.open()
-        if let json = NSJSONSerialization.JSONObjectWithStream(stream, options: .allZeros, error: nil) as? [String: AnyObject] {
+        if let json = (try? NSJSONSerialization.JSONObjectWithStream(stream, options: [])) as? [String: AnyObject] {
             filter = true
             for key in expected.keys {
-                filter = contains(json.keys, key)
+                filter = json.keys.contains(key)
                 if !filter {
                     break
                 }

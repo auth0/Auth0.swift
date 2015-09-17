@@ -115,8 +115,8 @@ class UsersSpec: QuickSpec {
                         waitUntil { done in
                             users.update(userMetadata: ["key": "value"], appMetadata: ["role": "admin"]).responseJSON { error, payload in
                                 expect(error).toNot(beNil())
-                                expect(error?.userInfo?[APIRequestErrorStatusCodeKey as NSObject] as? Int).to(equal(400))
-                                expect(error?.userInfo?[APIRequestErrorErrorKey as NSObject] as? [String: String]).to(equal(invalidRequestJson))
+                                expect(error?.userInfo[APIRequestErrorStatusCodeKey] as? Int).to(equal(400))
+                                expect(error?.userInfo[APIRequestErrorErrorKey] as? [String: String]).to(equal(invalidRequestJson))
                                 done()
                             }
                         }
@@ -162,10 +162,10 @@ class UsersSpec: QuickSpec {
 
                     it("should yield error with response") {
                         waitUntil { done in
-                            users.update(id: userId, userMetadata: ["key": "value"], appMetadata: ["role": "admin"]).responseJSON { error, payload in
+                            users.update(userId, userMetadata: ["key": "value"], appMetadata: ["role": "admin"]).responseJSON { error, payload in
                                 expect(error).toNot(beNil())
-                                expect(error?.userInfo?[APIRequestErrorStatusCodeKey as NSObject] as? Int).to(equal(400))
-                                expect(error?.userInfo?[APIRequestErrorErrorKey as NSObject] as? [String: String]).to(equal(invalidRequestJson))
+                                expect(error?.userInfo[APIRequestErrorStatusCodeKey] as? Int).to(equal(400))
+                                expect(error?.userInfo[APIRequestErrorErrorKey] as? [String: String]).to(equal(invalidRequestJson))
                                 done()
                             }
                         }
@@ -180,7 +180,7 @@ class UsersSpec: QuickSpec {
                         waitUntil { done in
                             users.update(userMetadata: ["key": "value"]).responseJSON { error, payload in
                                 expect(error).toNot(beNil())
-                                expect(error?.userInfo?[NSLocalizedDescriptionKey] as? String).to(equal("No id of a user supplied to perform the update"))
+                                expect(error?.userInfo[NSLocalizedDescriptionKey] as? String).to(equal("No id of a user supplied to perform the update"))
                                 done()
                             }
                         }
@@ -231,8 +231,8 @@ class UsersSpec: QuickSpec {
                         waitUntil { done in
                             users.find().responseJSON { error, payload in
                                 expect(error).toNot(beNil())
-                                expect(error?.userInfo?[APIRequestErrorStatusCodeKey as NSObject] as? Int).to(equal(400))
-                                expect(error?.userInfo?[APIRequestErrorErrorKey as NSObject] as? [String: String]).to(equal(invalidRequestJson))
+                                expect(error?.userInfo[APIRequestErrorStatusCodeKey] as? Int).to(equal(400))
+                                expect(error?.userInfo[APIRequestErrorErrorKey] as? [String: String]).to(equal(invalidRequestJson))
                                 done()
                             }
                         }
@@ -278,10 +278,10 @@ class UsersSpec: QuickSpec {
 
                     it("should yield error with response") {
                         waitUntil { done in
-                            users.find(id: userId).responseJSON { error, payload in
+                            users.find(userId).responseJSON { error, payload in
                                 expect(error).toNot(beNil())
-                                expect(error?.userInfo?[APIRequestErrorStatusCodeKey as NSObject] as? Int).to(equal(400))
-                                expect(error?.userInfo?[APIRequestErrorErrorKey as NSObject] as? [String: String]).to(equal(invalidRequestJson))
+                                expect(error?.userInfo[APIRequestErrorStatusCodeKey] as? Int).to(equal(400))
+                                expect(error?.userInfo[APIRequestErrorErrorKey] as? [String: String]).to(equal(invalidRequestJson))
                                 done()
                             }
                         }
@@ -304,7 +304,7 @@ class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
 
             it("should not yield error") {
                 waitUntil { done in
-                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
+                    users.update(id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
                         expect(error).to(beNil())
                         done()
                     }
@@ -313,7 +313,7 @@ class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
 
             it("should yield JSON payload") {
                 waitUntil { done in
-                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
+                    users.update(id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
                         expect(payload).toNot(beNil())
                         expect(payload?["user_id"] as? String).toNot(beNil())
                         done()
@@ -331,7 +331,7 @@ class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
 
             it("should not yield payload") {
                 waitUntil { done in
-                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
+                    users.update(id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { error, payload in
                         expect(payload).to(beNil())
                         done()
                     }
@@ -340,7 +340,7 @@ class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
 
             it("should yield error") {
                 waitUntil { done in
-                    users.update(id: id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { err, payload in
+                    users.update(id, userMetadata: userMetadata, appMetadata: appMetadata, parameters: parameters).responseJSON { err, payload in
                         expect(err).toNot(beNil())
                         expect(err?.domain).to(equal("com.auth0.api"))
                         done()
@@ -356,7 +356,7 @@ class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
 
             it("should yield user") {
                 waitUntil { done in
-                    users.find(id: id, fields: fieldList).responseJSON { error, payload in
+                    users.find(id, fields: fieldList).responseJSON { error, payload in
                         expect(payload).toNot(beNil())
                         expect(payload?["user_id"] as? String).to(equal(id))
                         done()
@@ -366,7 +366,7 @@ class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
 
             it("should not yield error") {
                 waitUntil { done in
-                    users.find(id: id, fields: fieldList).responseJSON { error, payload in
+                    users.find(id, fields: fieldList).responseJSON { error, payload in
                         expect(error).to(beNil())
                         done()
                     }
@@ -381,7 +381,7 @@ class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
 
             it("should not yield payload") {
                 waitUntil { done in
-                    users.find(id: id, fields: fields).responseJSON { error, payload in
+                    users.find(id, fields: fields).responseJSON { error, payload in
                         expect(payload).to(beNil())
                         done()
                     }
@@ -390,7 +390,7 @@ class UpdateMetadataSharedExamplesConfiguration: QuickConfiguration {
 
             it("should yield error") {
                 waitUntil { done in
-                    users.find(id: id, fields: fields).responseJSON { err, payload in
+                    users.find(id, fields: fields).responseJSON { err, payload in
                         expect(err).toNot(beNil())
                         expect(err?.domain).to(equal("com.auth0.api"))
                         done()
