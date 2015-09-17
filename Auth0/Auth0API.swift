@@ -23,7 +23,7 @@
 import Foundation
 
 /**
-*   Auth0 API helper class for *Objective-C*. If you using *Swift* just use *Auth0* struct or global functions
+*   Auth0 API helper class for *Objective-C*. If you are using *Swift* just use *Auth0* struct or global functions
 */
 public class Auth0API: NSObject {
 
@@ -34,9 +34,9 @@ public class Auth0API: NSObject {
     Creates a new helper with a jwt for Auth0 API.
     The Auth0 account domain will be obtained from `Info.plist` file entry with key `Auth0Domain`
 
-    :param: token for Auth0 API v2
+    - parameter token: for Auth0 API v2
 
-    :returns: new helper instance
+    - returns: new helper instance
     */
     public init(token: String) {
         self.token = token
@@ -46,10 +46,10 @@ public class Auth0API: NSObject {
     /**
     Creates a new helper with a jwt for Auth0 API and an account domain
 
-    :param: domain of the Auth0 account
-    :param: token  for Auth0 API v2
+    - parameter domain: of the Auth0 account
+    - parameter token:  for Auth0 API v2
 
-    :returns: new helper instance
+    - returns: new helper instance
     */
     public init(domain: String, token: String) {
         self.token = token
@@ -59,29 +59,29 @@ public class Auth0API: NSObject {
     /**
     Updates a user calling `PATCH /users/:id`
 
-    :param: id         of the user to update
-    :param: parameters that hold the attributes of the user to update
-    :param: callback   that will be called with the result of the request
+    - parameter id:         of the user to update
+    - parameter parameters: that hold the attributes of the user to update
+    - parameter callback:   that will be called with the result of the request
     */
     @objc public func updateUser(id: String, parameters: [String: AnyObject], callback: (NSError?, [String: AnyObject]?) -> ()) {
         api
         .users(token)
-        .update(id: id, parameters: parameters)
+        .update(id, parameters: parameters)
         .responseJSON(callback)
     }
 
     /**
     Finds a user calling `GET /users/:id`
 
-    :param: id            of the user to find
-    :param: fields        to be included/excluded from the response
-    :param: includeFields that tells if the fields listed should be included or not in the response
-    :param: callback      that will be called with the result of the request
+    - parameter id:            of the user to find
+    - parameter fields:        to be included/excluded from the response
+    - parameter includeFields: that tells if the fields listed should be included or not in the response
+    - parameter callback:      that will be called with the result of the request
     */
     @objc public func findUser(id: String, fields: [String]? = nil, includeFields: Bool = true, callback: (NSError?, [String: AnyObject]?) -> ()) {
         api
         .users(token)
-        .find(id: id, fields: fields, includeFields: includeFields)
+        .find(id, fields: fields, includeFields: includeFields)
         .responseJSON(callback)
     }
 }

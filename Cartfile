@@ -1,2 +1,2 @@
-github "auth0/JWTDecode.swift" ~> 0.3
-github "Alamofire/Alamofire" ~> 1.2
+github "auth0/JWTDecode.swift" ~> 1.0
+github "Alamofire/Alamofire" ~> 2.0

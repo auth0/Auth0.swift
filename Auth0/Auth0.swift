@@ -37,7 +37,7 @@ public struct Auth0 {
     Creates a new Auth0 object. 
     It retrieves your Auth0 account domain from `Info.plist` file entry with key `Auth0Domain`
 
-    :returns: a new instance
+    - returns: a new instance
     */
     public init() {
         let info = NSBundle.mainBundle().infoDictionary
@@ -49,9 +49,9 @@ public struct Auth0 {
     Creates a new Auth0 object with an account Auth0 domain.
     The domain can be a full web url, e.g.: `https://samples.auth0.com`, or just the domain name, e.g. `samples.auth0.com`
 
-    :param: domain of your Auth0 account
+    - parameter domain: of your Auth0 account
 
-    :returns: a new instance
+    - returns: a new instance
     */
     public init(domain: String) {
         self.api = API(domain: domain)
@@ -60,9 +60,9 @@ public struct Auth0 {
     /**
     Initialize API v2 /users endpoint with a valid JWT
 
-    :param: token a valid jwt of API v2 or an `id_token` of a user
+    - parameter token: a valid jwt of API v2 or an `id_token` of a user
 
-    :returns: users api helper
+    - returns: users api helper
     */
     public func users(token: String) -> Users {
         return api.users(token)
@@ -71,9 +71,9 @@ public struct Auth0 {
     /**
     Initialize API v2 /users endpoint with a valid JWT from shared Auth0 configuration
 
-    :param: token a valid jwt of API v2 or an `id_token` of a user
+    - parameter token: a valid jwt of API v2 or an `id_token` of a user
 
-    :returns: users api helper
+    - returns: users api helper
     */
     public static func users(token: String) -> Users {
         return Auth0.sharedInstance.api.users(token)

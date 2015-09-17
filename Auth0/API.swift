@@ -36,9 +36,9 @@ public struct API {
     /**
     Creates a new API object for a given Auth0 subdomain
 
-    :param: domain of an Auth0 account
+    - parameter domain: of an Auth0 account
 
-    :returns: a new instance
+    - returns: a new instance
     */
     public init(domain: String) {
         self.domainUrl = (domain.hasPrefix("http") ? NSURL(string: domain) : NSURL(string: "https://".stringByAppendingString(domain)))!
@@ -48,9 +48,9 @@ public struct API {
     /**
     Initialize API v2 /users endpoint with a valid JWT
 
-    :param: token a valid jwt of API v2 or an `id_token` of a user
+    - parameter token: a valid jwt of API v2 or an `id_token` of a user
 
-    :returns: users api helper
+    - returns: users api helper
     */
     public func users(token: String) -> Users {
         return Users(api: self, token: token)

@@ -4,29 +4,37 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>Headers/Compatibility.h</key>
+		<data>
+		nemLhJiiA6nuG4OxoVs57Y5zqGo=
+		</data>
+		<key>Headers/OHHTTPStubs+Mocktail.h</key>
+		<data>
+		I8bdJCahx5vpvaqH0I3oq5ISHEU=
+		</data>
 		<key>Headers/OHHTTPStubs.h</key>
 		<data>
-		ZkXCkCRNKzaJS/i+B9tx8gxjWWs=
+		Z/SlgWsuJ0vpbiFJJnd4+y6rP2w=
 		</data>
 		<key>Headers/OHHTTPStubsResponse+HTTPMessage.h</key>
 		<data>
-		hgifl+yah1JagNk/rKesX9FHBV8=
+		8mTZt7FXcs2TGd9QA2DlnFQ1Qus=
 		</data>
 		<key>Headers/OHHTTPStubsResponse+JSON.h</key>
 		<data>
-		OX+IsaPPIQ4BdCfrwyNXYSEQU58=
+		Hj/JeqXzjLu42YRoMyfhKjzBb3o=
 		</data>
 		<key>Headers/OHHTTPStubsResponse.h</key>
 		<data>
-		XHfS5+5MkBD0hmctMm/Uk5d+EkI=
+		JdImAemcp0oZJ8HetxcTWXPxqyE=
 		</data>
 		<key>Headers/OHPathHelpers.h</key>
 		<data>
-		GEUzcWco3IiHZuJHljoi0fkrZcg=
+		gTTt2mHzEL2wV2HtiBVBQOQCOBs=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		YC9+KHInbDtNu7iKp2qzy+94W8s=
+		Oa15qik9N8NKi9VZJRHe+7KIDNs=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -35,25 +43,33 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Headers/Compatibility.h</key>
+		<data>
+		nemLhJiiA6nuG4OxoVs57Y5zqGo=
+		</data>
+		<key>Headers/OHHTTPStubs+Mocktail.h</key>
+		<data>
+		I8bdJCahx5vpvaqH0I3oq5ISHEU=
+		</data>
 		<key>Headers/OHHTTPStubs.h</key>
 		<data>
-		ZkXCkCRNKzaJS/i+B9tx8gxjWWs=
+		Z/SlgWsuJ0vpbiFJJnd4+y6rP2w=
 		</data>
 		<key>Headers/OHHTTPStubsResponse+HTTPMessage.h</key>
 		<data>
-		hgifl+yah1JagNk/rKesX9FHBV8=
+		8mTZt7FXcs2TGd9QA2DlnFQ1Qus=
 		</data>
 		<key>Headers/OHHTTPStubsResponse+JSON.h</key>
 		<data>
-		OX+IsaPPIQ4BdCfrwyNXYSEQU58=
+		Hj/JeqXzjLu42YRoMyfhKjzBb3o=
 		</data>
 		<key>Headers/OHHTTPStubsResponse.h</key>
 		<data>
-		XHfS5+5MkBD0hmctMm/Uk5d+EkI=
+		JdImAemcp0oZJ8HetxcTWXPxqyE=
 		</data>
 		<key>Headers/OHPathHelpers.h</key>
 		<data>
-		GEUzcWco3IiHZuJHljoi0fkrZcg=
+		gTTt2mHzEL2wV2HtiBVBQOQCOBs=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>

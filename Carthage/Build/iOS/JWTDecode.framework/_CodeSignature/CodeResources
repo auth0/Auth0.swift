@@ -6,7 +6,7 @@
 	<dict>
 		<key>Headers/JWTDecode-Swift.h</key>
 		<data>
-		qglGLpYGoZ2VE8alFs+rGVu/WxE=
+		4XlFKc+Ak/+CMECOxhw7Zsovudo=
 		</data>
 		<key>Headers/JWTDecode.h</key>
 		<data>
@@ -14,23 +14,23 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		ufm6KA0eVFqlg+NxGiHiBPhoR7s=
+		ZytGjZyf4o8l0Q7lnBVd4aWhkUE=
 		</data>
 		<key>Modules/JWTDecode.swiftmodule/arm.swiftdoc</key>
 		<data>
-		OilYcVejYM3lhY1vmSptohiAi3w=
+		JM7KXCuqWYKIrUec9h8olWFTnp8=
 		</data>
 		<key>Modules/JWTDecode.swiftmodule/arm.swiftmodule</key>
 		<data>
-		FAM+OxnsfxIuTrzIXksVixVHYn4=
+		9mWDjN8ZoeOnoEfGXuNSNz2BQCk=
 		</data>
 		<key>Modules/JWTDecode.swiftmodule/arm64.swiftdoc</key>
 		<data>
-		s0RTzeBYrS8s/f0ynb+rOZcmDHE=
+		EAvR75PteUKG6ZI+xvUQ+s2lB1U=
 		</data>
 		<key>Modules/JWTDecode.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		CZt0Ina21RFFyjRNeV2+Y0wrBJc=
+		QLHi03u5dpo/uRseNM3sEPPwq6A=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -41,7 +41,7 @@
 	<dict>
 		<key>Headers/JWTDecode-Swift.h</key>
 		<data>
-		qglGLpYGoZ2VE8alFs+rGVu/WxE=
+		4XlFKc+Ak/+CMECOxhw7Zsovudo=
 		</data>
 		<key>Headers/JWTDecode.h</key>
 		<data>
@@ -49,19 +49,19 @@
 		</data>
 		<key>Modules/JWTDecode.swiftmodule/arm.swiftdoc</key>
 		<data>
-		OilYcVejYM3lhY1vmSptohiAi3w=
+		JM7KXCuqWYKIrUec9h8olWFTnp8=
 		</data>
 		<key>Modules/JWTDecode.swiftmodule/arm.swiftmodule</key>
 		<data>
-		FAM+OxnsfxIuTrzIXksVixVHYn4=
+		9mWDjN8ZoeOnoEfGXuNSNz2BQCk=
 		</data>
 		<key>Modules/JWTDecode.swiftmodule/arm64.swiftdoc</key>
 		<data>
-		s0RTzeBYrS8s/f0ynb+rOZcmDHE=
+		EAvR75PteUKG6ZI+xvUQ+s2lB1U=
 		</data>
 		<key>Modules/JWTDecode.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		CZt0Ina21RFFyjRNeV2+Y0wrBJc=
+		QLHi03u5dpo/uRseNM3sEPPwq6A=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
