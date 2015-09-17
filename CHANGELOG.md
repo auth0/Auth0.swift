@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.2.0](https://github.com/auth0/Auth0.swift/tree/0.2.0) (2015-09-17)
+
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/0.1.2...0.2.0)
+
+**Merged pull requests:**
+
+- Swift 2.0 [\#2](https://github.com/auth0/Auth0.swift/pull/2) ([hzalaz](https://github.com/hzalaz))
+
 ## [0.1.2](https://github.com/auth0/Auth0.swift/tree/0.1.2) (2015-07-03)
 
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/0.1.1...0.1.2)
