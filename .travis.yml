@@ -1,0 +1,24 @@
+reference: http://www.objc.io/issue-6/travis-ci.html
+language: objective-c
+osx_image: xcode7
+env:
+  global:
+  - LC_CTYPE=en_US.UTF-8
+  - LANG=en_US.UTF-8
+  matrix:
+  - DESTINATION="OS=9.0,name=iPhone 6" SCHEME="Auth0-iOS" SDK=iphonesimulator
+  - DESTINATION="OS=8.3,name=iPhone 6" SCHEME="Auth0-iOS" SDK=iphonesimulator
+  - DESTINATION="OS=8.4,name=iPhone 6 Plus" SCHEME="Auth0-iOS" SDK=iphonesimulator
+  - DESTINATION="arch=x86_64" SCHEME="Auth0-OSX" SDK=macosx
+cache:
+- bundler
+before_install:
+- gem install xcpretty --no-ri --no-rdoc
+script:
+- xcodebuild -project Auth0.xcodeproj -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" ONLY_ACTIVE_ARCH=NO test | xcpretty -c ; exit ${PIPESTATUS[0]}
+branches:
+  only:
+  - master
+notifications:
+  slack:
+    secure: XLY5Matw/LaMdDWMkTu2t6OwOGfk9c6bvzW7MBRqHYV85W22VS2BbnbotTmRgVq4tY8EehJmuMVdBMJ04ojXwtw3tyPRdYrA0OyR+eis+OCN0M0wPDDbYNPihMD+nAmLf7MjRnCH/esV0ENJ1/x2oODX6NwwqThi8jgoxpnWAoZWUsneH6/YGtk66ZDbKs7MN637/x7Sd/uCpVpmrREA3yQARJwvrYD88JmGGQ7v1OOZWK09lGUC2L5omaVVeponUKMbX0VN2pkcVKxhiOhVWLVVcQxNvofAu3kdAde8Cde/wQQ1YbihZ7cZYp9BtSuhySTKygMfMRur9oACpA/Qx04ajTPV0m6vDJDCrWipmumJceKcNAk4xw568kwMzknnhLCAS36vMKxp1LvmQHkaRb6T+DkdIHoCBMOb/kOGSlLVyuaO2vOkbHZ0Gy9ZaQwFEwYM2+IUMu45hi8DSIUMEvRN9b5W39CecYLVvE9j//+eqCQbv1cYhqzImzo9/jjPU0YBeD+6LdYnNOR37jWJ7YzWJ1dybezfM1enj13K/+2Wum3qbc97Q+qp88nOFeFktg8KSTFOTz+XbSsLiXI40pYbNqkVpfyzC/mlEnJTZd751E2ZkOLpY9Hdx1ubrUOJjaiisleDNBJFrTsVkMHpVJBaYM5ZYO6XLmCgRJAxhCw=

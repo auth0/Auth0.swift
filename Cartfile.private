@@ -1,0 +1,3 @@
+github "Quick/Quick" ~> 0.9
+github "Quick/Nimble" ~> 4.0
+github "AliSoftware/OHHTTPStubs" ~> 5.0
