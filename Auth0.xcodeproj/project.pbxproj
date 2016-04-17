@@ -6,18 +6,22 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		5F049B6D1CB42C29006F6C05 /* Auth0.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F049B6C1CB42C29006F6C05 /* Auth0.h */; settings = {ATTRIBUTES = (Public, ); }; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
-		5F049B691CB42C29006F6C05 /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F049B6C1CB42C29006F6C05 /* Auth0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Auth0.h; sourceTree = "<group>"; };
 		5F049B6E1CB42C29006F6C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5F06DD781CC448B10011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F06DD851CC448C90011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		5F049B651CB42C29006F6C05 /* Frameworks */ = {
+		5F06DD741CC448B10011842B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F06DD811CC448C90011842B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -38,7 +42,8 @@
 		5F049B6A1CB42C29006F6C05 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5F049B691CB42C29006F6C05 /* Auth0.framework */,
+				5F06DD781CC448B10011842B /* Auth0.framework */,
+				5F06DD851CC448C90011842B /* Auth0.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -55,33 +60,57 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		5F049B661CB42C29006F6C05 /* Headers */ = {
+		5F06DD751CC448B10011842B /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5F049B6D1CB42C29006F6C05 /* Auth0.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F06DD821CC448C90011842B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		5F049B681CB42C29006F6C05 /* Auth0 */ = {
+		5F06DD771CC448B10011842B /* Auth0.iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5F049B711CB42C29006F6C05 /* Build configuration list for PBXNativeTarget "Auth0" */;
+			buildConfigurationList = 5F06DD7F1CC448B10011842B /* Build configuration list for PBXNativeTarget "Auth0.iOS" */;
 			buildPhases = (
-				5F049B641CB42C29006F6C05 /* Sources */,
-				5F049B651CB42C29006F6C05 /* Frameworks */,
-				5F049B661CB42C29006F6C05 /* Headers */,
-				5F049B671CB42C29006F6C05 /* Resources */,
+				5F06DD731CC448B10011842B /* Sources */,
+				5F06DD741CC448B10011842B /* Frameworks */,
+				5F06DD751CC448B10011842B /* Headers */,
+				5F06DD761CC448B10011842B /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Auth0;
-			productName = Auth0;
-			productReference = 5F049B691CB42C29006F6C05 /* Auth0.framework */;
+			name = Auth0.iOS;
+			productName = Auth0.iOS;
+			productReference = 5F06DD781CC448B10011842B /* Auth0.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		5F06DD841CC448C90011842B /* Auth0.OSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5F06DD8A1CC448C90011842B /* Build configuration list for PBXNativeTarget "Auth0.OSX" */;
+			buildPhases = (
+				5F06DD801CC448C90011842B /* Sources */,
+				5F06DD811CC448C90011842B /* Frameworks */,
+				5F06DD821CC448C90011842B /* Headers */,
+				5F06DD831CC448C90011842B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Auth0.OSX;
+			productName = Auth0.OSX;
+			productReference = 5F06DD851CC448C90011842B /* Auth0.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -93,8 +122,11 @@
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = Auth0;
 				TargetAttributes = {
-					5F049B681CB42C29006F6C05 = {
-						CreatedOnToolsVersion = 7.2.1;
+					5F06DD771CC448B10011842B = {
+						CreatedOnToolsVersion = 7.3;
+					};
+					5F06DD841CC448C90011842B = {
+						CreatedOnToolsVersion = 7.3;
 					};
 				};
 			};
@@ -110,13 +142,21 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5F049B681CB42C29006F6C05 /* Auth0 */,
+				5F06DD771CC448B10011842B /* Auth0.iOS */,
+				5F06DD841CC448C90011842B /* Auth0.OSX */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		5F049B671CB42C29006F6C05 /* Resources */ = {
+		5F06DD761CC448B10011842B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F06DD831CC448C90011842B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -126,7 +166,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		5F049B641CB42C29006F6C05 /* Sources */ = {
+		5F06DD731CC448B10011842B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F06DD801CC448C90011842B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -173,7 +220,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -215,7 +263,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -225,34 +274,84 @@
 			};
 			name = Release;
 		};
-		5F049B721CB42C29006F6C05 /* Debug */ = {
+		5F06DD7D1CC448B10011842B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
+				PRODUCT_NAME = Auth0;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
-		5F049B731CB42C29006F6C05 /* Release */ = {
+		5F06DD7E1CC448B10011842B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
+				PRODUCT_NAME = Auth0;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		5F06DD8B1CC448C90011842B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = Auth0/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
+				PRODUCT_NAME = Auth0;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		5F06DD8C1CC448C90011842B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = Auth0/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
+				PRODUCT_NAME = Auth0;
+				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -269,11 +368,19 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5F049B711CB42C29006F6C05 /* Build configuration list for PBXNativeTarget "Auth0" */ = {
+		5F06DD7F1CC448B10011842B /* Build configuration list for PBXNativeTarget "Auth0.iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5F049B721CB42C29006F6C05 /* Debug */,
-				5F049B731CB42C29006F6C05 /* Release */,
+				5F06DD7D1CC448B10011842B /* Debug */,
+				5F06DD7E1CC448B10011842B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		5F06DD8A1CC448C90011842B /* Build configuration list for PBXNativeTarget "Auth0.OSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F06DD8B1CC448C90011842B /* Debug */,
+				5F06DD8C1CC448C90011842B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};
