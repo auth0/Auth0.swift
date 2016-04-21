@@ -25,7 +25,7 @@ import OHHTTPStubs
 import Nimble
 import Auth0
 
-func hasParameters(parameters: [String: String]) -> OHHTTPStubsTestBlock {
+func hasAllOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload else { return false }
         return parameters.filter { (key, _) in payload.contains { (name, _) in  key == name } }.reduce(true, combine: { (initial, entry) -> Bool in
@@ -35,12 +35,13 @@ func hasParameters(parameters: [String: String]) -> OHHTTPStubsTestBlock {
 }
 
 func hasNoneOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
-    let all = hasParameters(parameters)
-
-    return { request in
-        return !all(request)
-    }
+    return !hasAllOf(parameters)
 }
+
+func isResourceOwner(domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
+}
+
 
 func hasCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> MatcherFunc<Authentication.Result> {
     return MatcherFunc { expression, failureMessage in

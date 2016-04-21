@@ -27,17 +27,18 @@ import Alamofire
 
 @testable import Auth0
 
-let ClientId = "CLIENT_ID"
-let Domain = "samples.auth0.com"
+private let ClientId = "CLIENT_ID"
+private let Domain = "samples.auth0.com"
 
-let Timeout: NSTimeInterval = 1000000
+private let Timeout: NSTimeInterval = 1000000
 
 
-let SupportAtAuth0 = "support@auth0.com"
-let ValidPassword = "I.O.U. a password"
-let ConnectionName = "Username-Password-Authentication"
-let AccessToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-let IdToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+private let SupportAtAuth0 = "support@auth0.com"
+private let ValidPassword = "I.O.U. a password"
+private let InvalidPassword = "InvalidPassword"
+private let ConnectionName = "Username-Password-Authentication"
+private let AccessToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+private let IdToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
 
 class Auth0Spec: QuickSpec {
     override func spec() {
@@ -46,7 +47,7 @@ class Auth0Spec: QuickSpec {
             OHHTTPStubs.removeAllStubs()
             stub(isHost(Domain)) { _ in
                 return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-            }
+            }.name = "YOU SHALL NOT PASS!"
         }
 
         describe("endpoints") {
@@ -71,16 +72,13 @@ class Auth0Spec: QuickSpec {
 
             let auth = Authentication(clientId: ClientId, url: NSURL(string: "https://\(Domain)")!, manager: TestManager())
 
-            beforeEach {
-                stub(isHost(Domain) && isPath("/oauth/ro") && hasParameters(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { request in
-                    return OHHTTPStubsResponse(JSONObject: ["access_token": AccessToken, "id_token": IdToken], statusCode: 200, headers: nil)
-                }
-                stub(isHost(Domain) && isPath("/oauth/ro") && hasParameters(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": "openid"])) { request in
-                    return OHHTTPStubsResponse(JSONObject: ["access_token": AccessToken], statusCode: 200, headers: nil)
-                }
-            }
-
             context("login") {
+
+                beforeEach {
+                    stub(isResourceOwner(Domain) && hasAllOf(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                    stub(isResourceOwner(Domain) && hasAllOf(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
+                    stub(isResourceOwner(Domain) && hasAllOf(["password": InvalidPassword])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
+                }
 
                 it("should login with username and password") {
                     waitUntil(timeout: Timeout) { done in
@@ -113,6 +111,19 @@ class Auth0Spec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         auth.login(SupportAtAuth0, password: "invalid", connection: ConnectionName) { result in
                             expect(result).toNot(hasCredentials())
+                            done()
+                        }
+                    }
+                }
+
+                it("should send additional parameters") {
+                    let token = "special token for state"
+                    let state = NSUUID().UUIDString
+                    let password = NSUUID().UUIDString
+                    stub(isResourceOwner(Domain) && hasAllOf(["password": password, "state": state])) { _ in return authResponse(accessToken: token) }.name = "Custom Parameter Auth"
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login("mail@auth0.com", password: password, connection: ConnectionName, parameters: ["state": state]) { result in
+                            expect(result).to(hasCredentials(token))
                             done()
                         }
                     }

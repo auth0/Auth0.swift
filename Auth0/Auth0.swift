@@ -58,8 +58,8 @@ public struct Authentication {
         case Failure
     }
 
-    public func login(username: String, password: String, connection: String, scope: String = "openid", callback: Result -> ()) {
-        let parameters = [
+    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:], callback: Result -> ()) {
+        var payload: [String: AnyObject] = [
             "username": username,
             "password": password,
             "connection": connection,
@@ -67,8 +67,12 @@ public struct Authentication {
             "scope": scope,
             "client_id": self.clientId
         ]
-        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
-        self.manager.request(.POST, resourceOwner, parameters: parameters)
+        parameters.forEach { key, value in payload[key] = value }
+        guard let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url) else {
+            callback(.Failure)
+            return
+        }
+        self.manager.request(.POST, resourceOwner, parameters: payload)
             .validate()
             .responseJSON { response in
                 switch response.result {
