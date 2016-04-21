@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 
 import Foundation
-
+import Alamofire
 
 func url(domain: String) -> NSURL {
     let urlString: String
@@ -40,4 +40,47 @@ public func authentication(clientId clientId: String, domain: String) -> Authent
 public struct Authentication {
     public let clientId: String
     public let url: NSURL
+
+    let manager: Alamofire.Manager
+
+    public init(clientId: String, url: NSURL) {
+        self.init(clientId: clientId, url: url, manager: Alamofire.Manager.sharedInstance)
+    }
+
+    init(clientId: String, url: NSURL, manager: Alamofire.Manager) {
+        self.clientId = clientId
+        self.url = url
+        self.manager = manager
+    }
+
+    public enum Result {
+        case Success([String: String])
+        case Failure
+    }
+
+    public func login(username: String, password: String, connection: String, scope: String = "openid", callback: Result -> ()) {
+        let parameters = [
+            "username": username,
+            "password": password,
+            "connection": connection,
+            "grant_type": "password",
+            "scope": scope,
+            "client_id": self.clientId
+        ]
+        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
+        self.manager.request(.POST, resourceOwner, parameters: parameters)
+            .validate()
+            .responseJSON { response in
+                switch response.result {
+                case .Success(let payload):
+                    if let credentials = payload as? [String: String] {
+                        callback(.Success(credentials))
+                    } else {
+                        callback(.Failure)
+                    }
+                case .Failure:
+                    callback(.Failure)
+                }
+        }
+    }
 }
