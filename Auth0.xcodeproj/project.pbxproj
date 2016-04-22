@@ -35,6 +35,10 @@
 		5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
 		5FBBF03B1CC96AA70024D2AF /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
 		5FBBF03C1CC96AA70024D2AF /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
+		5FBBF03F1CCA8FF40024D2AF /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */; };
+		5FBBF0401CCA8FF40024D2AF /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */; };
+		5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */; };
+		5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,6 +108,8 @@
 		5FBBF0341CC95FBF0024D2AF /* TestManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestManager.swift; sourceTree = "<group>"; };
 		5FBBF0371CC964BC0024D2AF /* Matchers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matchers.swift; sourceTree = "<group>"; };
 		5FBBF03A1CC96AA70024D2AF /* Responses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Responses.swift; sourceTree = "<group>"; };
+		5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
+		5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationSpec.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +178,7 @@
 		5F049B6B1CB42C29006F6C05 /* Auth0 */ = {
 			isa = PBXGroup;
 			children = (
+				5FBBF03D1CCA8FC20024D2AF /* Authentication */,
 				5F049B6C1CB42C29006F6C05 /* Auth0.h */,
 				5F049B6E1CB42C29006F6C05 /* Info.plist */,
 				5F06DDC81CC66B710011842B /* Auth0.swift */,
@@ -182,6 +189,7 @@
 		5F06DD921CC451430011842B /* Auth0Tests */ = {
 			isa = PBXGroup;
 			children = (
+				5FBBF0411CCA901B0024D2AF /* Authentication */,
 				5FBBF0331CC95FA40024D2AF /* Utils */,
 				5F06DD951CC451430011842B /* Info.plist */,
 				5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */,
@@ -228,6 +236,22 @@
 				5FBBF03A1CC96AA70024D2AF /* Responses.swift */,
 			);
 			name = Utils;
+			sourceTree = "<group>";
+		};
+		5FBBF03D1CCA8FC20024D2AF /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */,
+			);
+			name = Authentication;
+			sourceTree = "<group>";
+		};
+		5FBBF0411CCA901B0024D2AF /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */,
+			);
+			name = Authentication;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -405,6 +429,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
+				5FBBF03F1CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +438,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */,
+				5FBBF0401CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,6 +450,7 @@
 				5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
 				5FBBF0351CC95FBF0024D2AF /* TestManager.swift in Sources */,
+				5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +462,7 @@
 				5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5F93BC0C1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
 				5FBBF0361CC95FBF0024D2AF /* TestManager.swift in Sources */,
+				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
