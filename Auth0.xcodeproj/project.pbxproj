@@ -39,6 +39,10 @@
 		5FBBF0401CCA8FF40024D2AF /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */; };
 		5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */; };
 		5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */; };
+		5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0451CCA99E90024D2AF /* Credentials.swift */; };
+		5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0451CCA99E90024D2AF /* Credentials.swift */; };
+		5FE2F8A61CCA9C17003628F4 /* CredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */; };
+		5FE2F8A71CCA9C17003628F4 /* CredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,6 +114,8 @@
 		5FBBF03A1CC96AA70024D2AF /* Responses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Responses.swift; sourceTree = "<group>"; };
 		5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
 		5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationSpec.swift; sourceTree = "<group>"; };
+		5FBBF0451CCA99E90024D2AF /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
+		5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsSpec.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +248,7 @@
 			isa = PBXGroup;
 			children = (
 				5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */,
+				5FBBF0451CCA99E90024D2AF /* Credentials.swift */,
 			);
 			name = Authentication;
 			sourceTree = "<group>";
@@ -250,6 +257,7 @@
 			isa = PBXGroup;
 			children = (
 				5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */,
+				5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */,
 			);
 			name = Authentication;
 			sourceTree = "<group>";
@@ -428,6 +436,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
 				5FBBF03F1CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);
@@ -437,6 +446,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */,
 				5FBBF0401CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);
@@ -449,6 +459,7 @@
 				5FBBF03B1CC96AA70024D2AF /* Responses.swift in Sources */,
 				5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
+				5FE2F8A61CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
 				5FBBF0351CC95FBF0024D2AF /* TestManager.swift in Sources */,
 				5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 			);
@@ -461,6 +472,7 @@
 				5FBBF03C1CC96AA70024D2AF /* Responses.swift in Sources */,
 				5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5F93BC0C1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
+				5FE2F8A71CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
 				5FBBF0361CC95FBF0024D2AF /* TestManager.swift in Sources */,
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 			);
