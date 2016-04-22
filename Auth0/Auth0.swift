@@ -54,8 +54,15 @@ public struct Authentication {
     }
 
     public enum Result {
-        case Success([String: String])
-        case Failure
+        case Success(credentials: [String: String])
+        case Failure(error: Error)
+    }
+
+    public enum Error: ErrorType {
+        case Response(code: String, description: String)
+        case InvalidURL(urlString: String)
+        case InvalidResponse(response: AnyObject)
+        case Unknown(cause: ErrorType)
     }
 
     public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:], callback: Result -> ()) {
@@ -69,7 +76,7 @@ public struct Authentication {
         ]
         parameters.forEach { key, value in payload[key] = value }
         guard let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url) else {
-            callback(.Failure)
+            callback(.Failure(error: .InvalidURL(urlString: self.url.absoluteString)))
             return
         }
         self.manager.request(.POST, resourceOwner, parameters: payload)
@@ -78,13 +85,35 @@ public struct Authentication {
                 switch response.result {
                 case .Success(let payload):
                     if let credentials = payload as? [String: String] {
-                        callback(.Success(credentials))
+                        callback(.Success(credentials: credentials))
                     } else {
-                        callback(.Failure)
+                        callback(.Failure(error: .InvalidResponse(response: payload)))
                     }
-                case .Failure:
-                    callback(.Failure)
+                case .Failure(let cause):
+                    callback(.Failure(error: authenticationError(response, cause: cause)))
                 }
         }
     }
+}
+
+private func authenticationError(response: Alamofire.Response<AnyObject, NSError>, cause: NSError) -> Authentication.Error {
+    if let jsonData = response.data,
+        let json = try? NSJSONSerialization.JSONObjectWithData(jsonData, options: NSJSONReadingOptions()),
+        let payload = json as? [String: AnyObject] {
+        return payloadError(payload, cause: cause)
+    } else {
+        return .Unknown(cause: cause)
+    }
+}
+
+private func payloadError(payload: [String: AnyObject], cause: ErrorType) -> Authentication.Error {
+    if let code = payload["error"] as? String, let description = payload["error_description"] as? String {
+        return .Response(code: code, description: description)
+    }
+
+    if let code = payload["code"] as? String, let description = payload["description"] as? String {
+        return .Response(code: code, description: description)
+    }
+
+    return .Unknown(cause: cause)
 }

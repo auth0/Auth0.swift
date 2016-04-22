@@ -83,7 +83,7 @@ class Auth0Spec: QuickSpec {
                 it("should login with username and password") {
                     waitUntil(timeout: Timeout) { done in
                         auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName) { result in
-                            expect(result).to(hasCredentials())
+                            expect(result).to(haveCredentials())
                             done()
                         }
                     }
@@ -92,7 +92,7 @@ class Auth0Spec: QuickSpec {
                 it("should have an access_token") {
                     waitUntil(timeout: Timeout) { done in
                         auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "read:users") { result in
-                            expect(result).to(hasCredentials(AccessToken))
+                            expect(result).to(haveCredentials(AccessToken))
                             done()
                         }
                     }
@@ -101,7 +101,7 @@ class Auth0Spec: QuickSpec {
                 it("should have both token when scope is 'openid'") {
                     waitUntil(timeout: Timeout) { done in
                         auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "openid") { result in
-                            expect(result).to(hasCredentials(AccessToken, IdToken))
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
                             done()
                         }
                     }
@@ -110,7 +110,35 @@ class Auth0Spec: QuickSpec {
                 it("should report when fails to login") {
                     waitUntil(timeout: Timeout) { done in
                         auth.login(SupportAtAuth0, password: "invalid", connection: ConnectionName) { result in
-                            expect(result).toNot(hasCredentials())
+                            expect(result).toNot(haveCredentials())
+                            done()
+                        }
+                    }
+                }
+
+                it("should provide error payload from auth api") {
+
+                    waitUntil(timeout: Timeout) { done in
+                        let code = "invalid_username_password"
+                        let description = "Invalid password"
+                        let password = "return invalid password"
+                        stub(isResourceOwner(Domain) && hasAllOf(["password": password])) { _ in return authFailure(code: code, description: description) }
+                        auth.login(SupportAtAuth0, password: password, connection: ConnectionName) { result in
+                            expect(result).to(haveError(code: code, description: description))
+                            done()
+                        }
+                    }
+                }
+
+                it("should provide error payload from lock auth api") {
+
+                    waitUntil(timeout: Timeout) { done in
+                        let code = "invalid_username_password"
+                        let description = "Invalid password"
+                        let password = "return invalid password"
+                        stub(isResourceOwner(Domain) && hasAllOf(["password": password])) { _ in return authFailure(error: code, description: description) }
+                        auth.login(SupportAtAuth0, password: password, connection: ConnectionName) { result in
+                            expect(result).to(haveError(code: code, description: description))
                             done()
                         }
                     }
@@ -123,7 +151,7 @@ class Auth0Spec: QuickSpec {
                     stub(isResourceOwner(Domain) && hasAllOf(["password": password, "state": state])) { _ in return authResponse(accessToken: token) }.name = "Custom Parameter Auth"
                     waitUntil(timeout: Timeout) { done in
                         auth.login("mail@auth0.com", password: password, connection: ConnectionName, parameters: ["state": state]) { result in
-                            expect(result).to(hasCredentials(token))
+                            expect(result).to(haveCredentials(token))
                             done()
                         }
                     }

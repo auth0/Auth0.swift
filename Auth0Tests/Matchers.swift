@@ -43,7 +43,17 @@ func isResourceOwner(domain: String) -> OHHTTPStubsTestBlock {
 }
 
 
-func hasCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> MatcherFunc<Authentication.Result> {
+func haveError(code code: String, description: String) -> MatcherFunc<Authentication.Result> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "an error response with code <\(code)> and description <\(description)>"
+        if let actual = try expression.evaluate(), case .Failure(let cause) = actual, case .Response(let actualCode, let actualDescription) = cause {
+            return code == actualCode && description == actualDescription
+        }
+        return false
+    }
+}
+
+func haveCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> MatcherFunc<Authentication.Result> {
     return MatcherFunc { expression, failureMessage in
         var message = "a successful authentication result"
         if let accessToken = accessToken {

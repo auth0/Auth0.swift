@@ -34,3 +34,11 @@ func authResponse(accessToken accessToken: String, idToken: String? = nil) -> OH
     }
     return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: nil)
 }
+
+func authFailure(code code: String, description: String, name: String? = nil) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: nil)
+}
+
+func authFailure(error error: String, description: String) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(JSONObject: ["error": error, "error_description": description], statusCode: 400, headers: nil)
+}
