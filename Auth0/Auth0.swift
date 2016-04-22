@@ -60,7 +60,6 @@ public struct Authentication {
 
     public enum Error: ErrorType {
         case Response(code: String, description: String)
-        case InvalidURL(urlString: String)
         case InvalidResponse(response: AnyObject)
         case Unknown(cause: ErrorType)
     }
@@ -75,10 +74,7 @@ public struct Authentication {
             "client_id": self.clientId
         ]
         parameters.forEach { key, value in payload[key] = value }
-        guard let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url) else {
-            callback(.Failure(error: .InvalidURL(urlString: self.url.absoluteString)))
-            return
-        }
+        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         self.manager.request(.POST, resourceOwner, parameters: payload)
             .validate()
             .responseJSON { response in
