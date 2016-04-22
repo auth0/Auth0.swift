@@ -40,7 +40,7 @@ public struct Authentication {
     }
 
     public enum Result {
-        case Success(credentials: [String: String])
+        case Success(credentials: Credentials)
         case Failure(error: Error)
     }
 
@@ -66,7 +66,7 @@ public struct Authentication {
             .responseJSON { response in
                 switch response.result {
                 case .Success(let payload):
-                    if let credentials = payload as? [String: String] {
+                    if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
                         callback(.Success(credentials: credentials))
                     } else {
                         callback(.Failure(error: .InvalidResponse(response: payload)))

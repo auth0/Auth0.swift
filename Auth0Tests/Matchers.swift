@@ -64,7 +64,7 @@ func haveCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> Ma
         }
         failureMessage.postfixMessage = message
         if let actual = try expression.evaluate(), case .Success(let credentials) = actual {
-            return (accessToken == nil || credentials["access_token"] == accessToken) && (idToken == nil || credentials["id_token"] == idToken)
+            return (accessToken == nil || credentials.accessToken == accessToken) && (idToken == nil || credentials.idToken == idToken)
         }
         return false
     }
