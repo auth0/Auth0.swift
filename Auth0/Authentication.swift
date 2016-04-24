@@ -39,18 +39,13 @@ public struct Authentication {
         self.manager = manager
     }
 
-    public enum Result {
-        case Success(credentials: Credentials)
-        case Failure(error: Error)
-    }
-
     public enum Error: ErrorType {
         case Response(code: String, description: String)
         case InvalidResponse(response: AnyObject)
         case Unknown(cause: ErrorType)
     }
 
-    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:], callback: Result -> ()) {
+    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:], callback: Result<Credentials, Error> -> ()) {
         var payload: [String: AnyObject] = [
             "username": username,
             "password": password,
@@ -67,7 +62,7 @@ public struct Authentication {
                 switch response.result {
                 case .Success(let payload):
                     if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
-                        callback(.Success(credentials: credentials))
+                        callback(.Success(result: credentials))
                     } else {
                         callback(.Failure(error: .InvalidResponse(response: payload)))
                     }
@@ -76,6 +71,11 @@ public struct Authentication {
                 }
         }
     }
+}
+
+public enum Result<T, E: ErrorType> {
+    case Success(result: T)
+    case Failure(error: E)
 }
 
 private func authenticationError(response: Alamofire.Response<AnyObject, NSError>, cause: NSError) -> Authentication.Error {
