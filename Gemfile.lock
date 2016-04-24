@@ -1,0 +1,28 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    aws-sdk (2.2.36)
+      aws-sdk-resources (= 2.2.36)
+    aws-sdk-core (2.2.36)
+      jmespath (~> 1.0)
+    aws-sdk-resources (2.2.36)
+      aws-sdk-core (= 2.2.36)
+    carthage_cache (0.4.0)
+      aws-sdk (~> 2.2.3)
+      commander (~> 4.3.8)
+    commander (4.3.8)
+      highline (~> 1.7.2)
+    highline (1.7.8)
+    jmespath (1.2.4)
+      json_pure (>= 1.8.1)
+    json_pure (1.8.3)
+    rouge (1.10.1)
+    xcpretty (0.2.2)
+      rouge (~> 1.8)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  carthage_cache
+  xcpretty
