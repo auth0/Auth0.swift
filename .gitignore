@@ -76,6 +76,7 @@ playground.xcworkspace
 # Carthage/Checkouts
 
 Carthage/Build
+.carthage_cache.yml
 
 # fastlane
 #

@@ -28,7 +28,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5F06DDAE1CC451700011842B"
+               BuildableName = "Auth0Tests.xctest"
+               BlueprintName = "Auth0Tests.OSX"
+               ReferencedContainer = "container:Auth0.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "5F06DD841CC448C90011842B"
+            BuildableName = "Auth0.framework"
+            BlueprintName = "Auth0.OSX"
+            ReferencedContainer = "container:Auth0.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
