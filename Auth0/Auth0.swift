@@ -35,26 +35,24 @@ public struct Auth0 {
 
     /**
     Creates a new Auth0 object. 
-    It retrieves your Auth0 account domain from `Info.plist` file entry with key `Auth0Domain`
+    It retrieves your Auth0 account domain from `Info.plist` file entry with key `Auth0Domain` or from `Auth0.plist` file with `Domain` entry.
 
     - returns: a new instance
     */
     public init() {
-        let info = NSBundle.mainBundle().infoDictionary
-        var auth0Info: NSDictionary?
-        if let auth0Plist = NSBundle.mainBundle().pathForResource("Auth0", ofType: "plist") {
-            auth0Info = NSDictionary(contentsOfFile: auth0Plist)
+        let mainBundle = NSBundle.mainBundle()
+
+        if let info = mainBundle.infoDictionary, let domain = info["Auth0Domain"] as? String {
+            self.init(domain: domain)
+            return
         }
-        
-        let domain: String
-        if let mainBundleDomain = info?["Auth0Domain"] as? String {
-            domain = mainBundleDomain
-        } else if let authPlistDomain = auth0Info?["Domain"] as? String {
-            domain = authPlistDomain
-        } else {
-            preconditionFailure("Could not load the Auth0 Domain")
+
+        if let path = mainBundle.pathForResource("Auth0", ofType: "plist"),
+            let info = NSDictionary(contentsOfFile: path),
+            let domain = info["Domain"] as? String {
+            self.init(domain: domain)
         }
-        self.init(domain: domain)
+        preconditionFailure("Could not load the Auth0 Domain from either Info.plist or Auth0.plist")
     }
 
     /**
