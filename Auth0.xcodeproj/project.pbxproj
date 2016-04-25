@@ -47,6 +47,8 @@
 		5FE2F8AA1CCE54F1003628F4 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A81CCE54F1003628F4 /* Result.swift */; };
 		5FE2F8B21CCEAED8003628F4 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B11CCEAED8003628F4 /* Request.swift */; };
 		5FE2F8B31CCEAED8003628F4 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B11CCEAED8003628F4 /* Request.swift */; };
+		5FE2F8B51CCEB1C0003628F4 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B41CCEB1C0003628F4 /* Requests.swift */; };
+		5FE2F8B61CCEB1C0003628F4 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B41CCEB1C0003628F4 /* Requests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +124,7 @@
 		5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsSpec.swift; sourceTree = "<group>"; };
 		5FE2F8A81CCE54F1003628F4 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		5FE2F8B11CCEAED8003628F4 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
+		5FE2F8B41CCEB1C0003628F4 /* Requests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Requests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -257,6 +260,7 @@
 			children = (
 				5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */,
 				5FBBF0451CCA99E90024D2AF /* Credentials.swift */,
+				5FE2F8B41CCEB1C0003628F4 /* Requests.swift */,
 			);
 			name = Authentication;
 			sourceTree = "<group>";
@@ -447,6 +451,7 @@
 				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
 				5FE2F8B21CCEAED8003628F4 /* Request.swift in Sources */,
+				5FE2F8B51CCEB1C0003628F4 /* Requests.swift in Sources */,
 				5FE2F8A91CCE54F1003628F4 /* Result.swift in Sources */,
 				5FBBF03F1CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);
@@ -459,6 +464,7 @@
 				5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */,
 				5FE2F8B31CCEAED8003628F4 /* Request.swift in Sources */,
+				5FE2F8B61CCEB1C0003628F4 /* Requests.swift in Sources */,
 				5FE2F8AA1CCE54F1003628F4 /* Result.swift in Sources */,
 				5FBBF0401CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);

@@ -29,10 +29,8 @@ import OHHTTPStubs
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 
-private let Timeout: NSTimeInterval = 1000000
-
-
 private let SupportAtAuth0 = "support@auth0.com"
+private let Support = "support"
 private let ValidPassword = "I.O.U. a password"
 private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
@@ -54,13 +52,13 @@ class AuthenticationSpec: QuickSpec {
         context("login") {
 
             beforeEach {
-                stub(isResourceOwner(Domain) && hasAllOf(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                stub(isResourceOwner(Domain) && hasAllOf(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
-                stub(isResourceOwner(Domain) && hasAllOf(["password": InvalidPassword])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
+                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
+                stub(isResourceOwner(Domain) && hasAtLeast(["password": InvalidPassword])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
             }
 
             it("should login with username and password") {
-                waitUntil(timeout: Timeout) { done in
+                waitUntil { done in
                     auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -69,7 +67,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should have an access_token") {
-                waitUntil(timeout: Timeout) { done in
+                waitUntil { done in
                     auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "read:users").start { result in
                         expect(result).to(haveCredentials(AccessToken))
                         done()
@@ -78,7 +76,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should have both token when scope is 'openid'") {
-                waitUntil(timeout: Timeout) { done in
+                waitUntil { done in
                     auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "openid").start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
@@ -87,7 +85,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should report when fails to login") {
-                waitUntil(timeout: Timeout) { done in
+                waitUntil { done in
                     auth.login(SupportAtAuth0, password: "invalid", connection: ConnectionName).start { result in
                         expect(result).toNot(haveCredentials())
                         done()
@@ -97,11 +95,11 @@ class AuthenticationSpec: QuickSpec {
 
             it("should provide error payload from auth api") {
 
-                waitUntil(timeout: Timeout) { done in
+                waitUntil { done in
                     let code = "invalid_username_password"
                     let description = "Invalid password"
                     let password = "return invalid password"
-                    stub(isResourceOwner(Domain) && hasAllOf(["password": password])) { _ in return authFailure(code: code, description: description) }
+                    stub(isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }
                     auth.login(SupportAtAuth0, password: password, connection: ConnectionName).start { result in
                         expect(result).to(haveError(code: code, description: description))
                         done()
@@ -111,11 +109,11 @@ class AuthenticationSpec: QuickSpec {
 
             it("should provide error payload from lock auth api") {
 
-                waitUntil(timeout: Timeout) { done in
+                waitUntil { done in
                     let code = "invalid_username_password"
                     let description = "Invalid password"
                     let password = "return invalid password"
-                    stub(isResourceOwner(Domain) && hasAllOf(["password": password])) { _ in return authFailure(error: code, description: description) }
+                    stub(isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(error: code, description: description) }
                     auth.login(SupportAtAuth0, password: password, connection: ConnectionName).start { result in
                         expect(result).to(haveError(code: code, description: description))
                         done()
@@ -127,8 +125,8 @@ class AuthenticationSpec: QuickSpec {
                 let token = "special token for state"
                 let state = NSUUID().UUIDString
                 let password = NSUUID().UUIDString
-                stub(isResourceOwner(Domain) && hasAllOf(["password": password, "state": state])) { _ in return authResponse(accessToken: token) }.name = "Custom Parameter Auth"
-                waitUntil(timeout: Timeout) { done in
+                stub(isResourceOwner(Domain) && hasAtLeast(["password": password, "state": state])) { _ in return authResponse(accessToken: token) }.name = "Custom Parameter Auth"
+                waitUntil { done in
                     auth.login("mail@auth0.com", password: password, connection: ConnectionName, parameters: ["state": state]).start { result in
                         expect(result).to(haveCredentials(token))
                         done()
@@ -136,6 +134,47 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
             
+        }
+
+        context("create user") {
+
+            beforeEach {
+                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "username": Support, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0, username: Support) }.name = "User w/username"
+            }
+
+            it("should create a user with email & password") {
+                waitUntil { done in
+                    auth.createUser(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
+                        expect(result).to(haveCreatedUser(SupportAtAuth0))
+                        done()
+                    }
+                }
+            }
+
+
+            it("should create a user with email, username & password") {
+                waitUntil { done in
+                    auth.createUser(SupportAtAuth0, username: Support, password: ValidPassword, connection: ConnectionName).start { result in
+                        expect(result).to(haveCreatedUser(SupportAtAuth0, username: Support))
+                        done()
+                    }
+                }
+            }
+
+            it("should provide error payload from auth api") {
+
+                waitUntil { done in
+                    let code = "invalid_username_password"
+                    let description = "Invalid password"
+                    let password = "return invalid password"
+                    stub(isSignUp(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }
+                    auth.createUser(SupportAtAuth0, password: password, connection: ConnectionName).start { result in
+                        expect(result).to(haveError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
         }
 
     }

@@ -52,53 +52,27 @@ public struct Authentication {
             "connection": connection,
             "grant_type": "password",
             "scope": scope,
-            "client_id": self.clientId
+            "client_id": self.clientId,
         ]
         parameters.forEach { key, value in payload[key] = value }
         let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         let request = self.manager.request(.POST, resourceOwner, parameters: payload).validate()
         return CredentialsRequest(request: request)
     }
-}
 
-public struct CredentialsRequest: Request {
-
-    let request: Alamofire.Request
-
-    public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
-        request.responseJSON { response in
-            switch response.result {
-            case .Success(let payload):
-                if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
-                    callback(.Success(result: credentials))
-                } else {
-                    callback(.Failure(error: .InvalidResponse(response: payload)))
-                }
-            case .Failure(let cause):
-                callback(.Failure(error: authenticationError(response, cause: cause)))
-            }
+    public func createUser(email: String, username: String? = nil, password: String, connection: String) -> CreateUserRequest {
+        var payload: [String: AnyObject] = [
+            "email": email,
+            "password": password,
+            "connection": connection,
+            "client_id": self.clientId
+        ]
+        if let username = username {
+            payload["username"] = username
         }
-    }
-}
 
-private func authenticationError(response: Alamofire.Response<AnyObject, NSError>, cause: NSError) -> Authentication.Error {
-    if let jsonData = response.data,
-        let json = try? NSJSONSerialization.JSONObjectWithData(jsonData, options: NSJSONReadingOptions()),
-        let payload = json as? [String: AnyObject] {
-        return payloadError(payload, cause: cause)
-    } else {
-        return .Unknown(cause: cause)
+        let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
+        let request = self.manager.request(.POST, createUser, parameters: payload).validate()
+        return CreateUserRequest(request: request)
     }
-}
-
-private func payloadError(payload: [String: AnyObject], cause: ErrorType) -> Authentication.Error {
-    if let code = payload["error"] as? String, let description = payload["error_description"] as? String {
-        return .Response(code: code, description: description)
-    }
-
-    if let code = payload["code"] as? String, let description = payload["description"] as? String {
-        return .Response(code: code, description: description)
-    }
-
-    return .Unknown(cause: cause)
 }
