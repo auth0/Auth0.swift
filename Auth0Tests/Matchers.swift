@@ -43,6 +43,16 @@ func hasAtLeast(parameters: [String: String]) -> OHHTTPStubsTestBlock {
     }
 }
 
+func hasUserMetadata(metadata: [String: String]) -> OHHTTPStubsTestBlock {
+    return { request in
+        guard let payload = request.a0_payload, userMetadata = payload["user_metadata"] as? [String: AnyObject] else { return false }
+        return metadata.count == userMetadata.count && metadata.reduce(true, combine: { (initial, entry) -> Bool in
+            guard let value = userMetadata[entry.0] as? String else { return false }
+            return initial && value == entry.1
+        })
+    }
+}
+
 func hasNoneOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return !hasAtLeast(parameters)
 }

@@ -60,7 +60,7 @@ public struct Authentication {
         return CredentialsRequest(request: request)
     }
 
-    public func createUser(email: String, username: String? = nil, password: String, connection: String) -> CreateUserRequest {
+    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> CreateUserRequest {
         var payload: [String: AnyObject] = [
             "email": email,
             "password": password,
@@ -69,6 +69,10 @@ public struct Authentication {
         ]
         if let username = username {
             payload["username"] = username
+        }
+
+        if let userMetadata = userMetadata {
+            payload["user_metadata"] = userMetadata
         }
 
         let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!

@@ -175,6 +175,20 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should send user metadata") {
+                let country = "Argentina"
+                let email = "metadata@auth0.com"
+                let metadata = ["country": country]
+                stub(isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: email) }.name = "User w/metadata"
+                waitUntil { done in
+                    auth.createUser(email, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
+                        expect(result).to(haveCreatedUser(email))
+                        done()
+                    }
+                }
+            }
+
         }
 
     }
