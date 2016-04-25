@@ -43,6 +43,8 @@
 		5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0451CCA99E90024D2AF /* Credentials.swift */; };
 		5FE2F8A61CCA9C17003628F4 /* CredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */; };
 		5FE2F8A71CCA9C17003628F4 /* CredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */; };
+		5FE2F8A91CCE54F1003628F4 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A81CCE54F1003628F4 /* Result.swift */; };
+		5FE2F8AA1CCE54F1003628F4 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A81CCE54F1003628F4 /* Result.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +118,7 @@
 		5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationSpec.swift; sourceTree = "<group>"; };
 		5FBBF0451CCA99E90024D2AF /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
 		5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsSpec.swift; sourceTree = "<group>"; };
+		5FE2F8A81CCE54F1003628F4 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -188,6 +191,7 @@
 				5F049B6C1CB42C29006F6C05 /* Auth0.h */,
 				5F049B6E1CB42C29006F6C05 /* Info.plist */,
 				5F06DDC81CC66B710011842B /* Auth0.swift */,
+				5FE2F8A81CCE54F1003628F4 /* Result.swift */,
 			);
 			path = Auth0;
 			sourceTree = "<group>";
@@ -438,6 +442,7 @@
 			files = (
 				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
+				5FE2F8A91CCE54F1003628F4 /* Result.swift in Sources */,
 				5FBBF03F1CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -448,6 +453,7 @@
 			files = (
 				5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */,
+				5FE2F8AA1CCE54F1003628F4 /* Result.swift in Sources */,
 				5FBBF0401CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
