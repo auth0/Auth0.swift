@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
   s.osx.deployment_target = '10.10'
   s.requires_arc = true
-  s.dependency 'Alamofire', '~> 2.0'
+  s.dependency 'Alamofire', '~> 3.0'
   s.dependency 'JWTDecode', '~> 1.0'
 
   s.source_files = 'Auth0/*.swift'
