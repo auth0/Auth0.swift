@@ -41,7 +41,19 @@ public struct Auth0 {
     */
     public init() {
         let info = NSBundle.mainBundle().infoDictionary
-        let domain:String = info?["Auth0Domain"] as! String
+        var auth0Info: NSDictionary?
+        if let auth0Plist = NSBundle.mainBundle().pathForResource("Auth0", ofType: "plist") {
+            auth0Info = NSDictionary(contentsOfFile: auth0Plist)
+        }
+        
+        let domain: String
+        if let mainBundleDomain = info?["Auth0Domain"] as? String {
+            domain = mainBundleDomain
+        } else if let authPlistDomain = auth0Info?["Domain"] as? String {
+            domain = authPlistDomain
+        } else {
+            preconditionFailure("Could not load the Auth0 Domain")
+        }
         self.init(domain: domain)
     }
 
