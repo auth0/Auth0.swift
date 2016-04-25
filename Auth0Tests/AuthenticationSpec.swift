@@ -191,5 +191,18 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        context("reset password") {
+
+            it("should reset password") {
+                stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return resetPasswordResponse() }
+                waitUntil { done in
+                    auth.resetPassword(SupportAtAuth0, connection: ConnectionName).start { result in
+                        guard case .Success = result else { return fail("Failed to reset password") }
+                        done()
+                    }
+                }
+            }
+        }
+
     }
 }

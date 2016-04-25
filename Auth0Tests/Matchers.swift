@@ -65,6 +65,10 @@ func isSignUp(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/dbconnections/signup")
 }
 
+func isResetPassword(domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/dbconnections/change_password")
+}
+
 func haveError<T>(code code: String, description: String) -> MatcherFunc<Result<T, Authentication.Error>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "an error response with code <\(code)> and description <\(description)>"

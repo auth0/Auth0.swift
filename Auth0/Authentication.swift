@@ -65,7 +65,7 @@ public struct Authentication {
             "email": email,
             "password": password,
             "connection": connection,
-            "client_id": self.clientId
+            "client_id": self.clientId,
         ]
         if let username = username {
             payload["username"] = username
@@ -78,5 +78,16 @@ public struct Authentication {
         let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
         let request = self.manager.request(.POST, createUser, parameters: payload).validate()
         return CreateUserRequest(request: request)
+    }
+
+    public func resetPassword(email: String, connection: String) -> ResetPasswordRequest {
+        let payload = [
+            "email": email,
+            "connection": connection,
+            "client_id": self.clientId
+        ]
+        let resetPassword = NSURL(string: "/dbconnections/change_password", relativeToURL: self.url)!
+        let request = self.manager.request(.POST, resetPassword, parameters: payload).validate()
+        return ResetPasswordRequest(request: request)
     }
 }

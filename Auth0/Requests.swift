@@ -67,9 +67,34 @@ public struct CredentialsRequest: Request {
     }
 }
 
+public struct ResetPasswordRequest: Request {
+
+    let request: Alamofire.Request
+
+    public func start(callback: Result<Void, Authentication.Error> -> ()) {
+        request.responseData { response in
+            switch response.result {
+            case .Success:
+                callback(.Success(result: ()))
+            case .Failure(let cause):
+                callback(.Failure(error: authenticationError(response.data, cause: cause)))
+            }
+        }
+    }
+}
+
 private func authenticationError(response: Alamofire.Response<AnyObject, NSError>, cause: NSError) -> Authentication.Error {
-    if let jsonData = response.data,
-        let json = try? NSJSONSerialization.JSONObjectWithData(jsonData, options: NSJSONReadingOptions()),
+    if let jsonData = response.data {
+        return authenticationError(jsonData, cause: cause)
+    } else {
+        return .Unknown(cause: cause)
+    }
+}
+
+private func authenticationError(data: NSData?, cause: NSError) -> Authentication.Error {
+    if
+        let data = data,
+        let json = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions()),
         let payload = json as? [String: AnyObject] {
         return payloadError(payload, cause: cause)
     } else {
