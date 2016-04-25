@@ -45,27 +45,7 @@ public struct Authentication {
         case Unknown(cause: ErrorType)
     }
 
-    public struct Request {
-
-        let request: Alamofire.Request
-
-        public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
-            request.responseJSON { response in
-                switch response.result {
-                case .Success(let payload):
-                    if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
-                        callback(.Success(result: credentials))
-                    } else {
-                        callback(.Failure(error: .InvalidResponse(response: payload)))
-                    }
-                case .Failure(let cause):
-                    callback(.Failure(error: authenticationError(response, cause: cause)))
-                }
-            }
-        }
-    }
-
-    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request {
+    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> CredentialsRequest {
         var payload: [String: AnyObject] = [
             "username": username,
             "password": password,
@@ -77,7 +57,27 @@ public struct Authentication {
         parameters.forEach { key, value in payload[key] = value }
         let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         let request = self.manager.request(.POST, resourceOwner, parameters: payload).validate()
-        return Request(request: request)
+        return CredentialsRequest(request: request)
+    }
+}
+
+public struct CredentialsRequest: Request {
+
+    let request: Alamofire.Request
+
+    public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
+        request.responseJSON { response in
+            switch response.result {
+            case .Success(let payload):
+                if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
+                    callback(.Success(result: credentials))
+                } else {
+                    callback(.Failure(error: .InvalidResponse(response: payload)))
+                }
+            case .Failure(let cause):
+                callback(.Failure(error: authenticationError(response, cause: cause)))
+            }
+        }
     }
 }
 
