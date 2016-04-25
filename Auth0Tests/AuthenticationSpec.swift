@@ -61,7 +61,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should login with username and password") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName) { result in
+                    auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
@@ -70,7 +70,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should have an access_token") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "read:users") { result in
+                    auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "read:users").start { result in
                         expect(result).to(haveCredentials(AccessToken))
                         done()
                     }
@@ -79,7 +79,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should have both token when scope is 'openid'") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "openid") { result in
+                    auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "openid").start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
                     }
@@ -88,7 +88,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should report when fails to login") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(SupportAtAuth0, password: "invalid", connection: ConnectionName) { result in
+                    auth.login(SupportAtAuth0, password: "invalid", connection: ConnectionName).start { result in
                         expect(result).toNot(haveCredentials())
                         done()
                     }
@@ -102,7 +102,7 @@ class AuthenticationSpec: QuickSpec {
                     let description = "Invalid password"
                     let password = "return invalid password"
                     stub(isResourceOwner(Domain) && hasAllOf(["password": password])) { _ in return authFailure(code: code, description: description) }
-                    auth.login(SupportAtAuth0, password: password, connection: ConnectionName) { result in
+                    auth.login(SupportAtAuth0, password: password, connection: ConnectionName).start { result in
                         expect(result).to(haveError(code: code, description: description))
                         done()
                     }
@@ -116,7 +116,7 @@ class AuthenticationSpec: QuickSpec {
                     let description = "Invalid password"
                     let password = "return invalid password"
                     stub(isResourceOwner(Domain) && hasAllOf(["password": password])) { _ in return authFailure(error: code, description: description) }
-                    auth.login(SupportAtAuth0, password: password, connection: ConnectionName) { result in
+                    auth.login(SupportAtAuth0, password: password, connection: ConnectionName).start { result in
                         expect(result).to(haveError(code: code, description: description))
                         done()
                     }
@@ -129,7 +129,7 @@ class AuthenticationSpec: QuickSpec {
                 let password = NSUUID().UUIDString
                 stub(isResourceOwner(Domain) && hasAllOf(["password": password, "state": state])) { _ in return authResponse(accessToken: token) }.name = "Custom Parameter Auth"
                 waitUntil(timeout: Timeout) { done in
-                    auth.login("mail@auth0.com", password: password, connection: ConnectionName, parameters: ["state": state]) { result in
+                    auth.login("mail@auth0.com", password: password, connection: ConnectionName, parameters: ["state": state]).start { result in
                         expect(result).to(haveCredentials(token))
                         done()
                     }

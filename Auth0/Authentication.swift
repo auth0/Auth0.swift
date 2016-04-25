@@ -45,20 +45,12 @@ public struct Authentication {
         case Unknown(cause: ErrorType)
     }
 
-    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:], callback: Result<Credentials, Error> -> ()) {
-        var payload: [String: AnyObject] = [
-            "username": username,
-            "password": password,
-            "connection": connection,
-            "grant_type": "password",
-            "scope": scope,
-            "client_id": self.clientId
-        ]
-        parameters.forEach { key, value in payload[key] = value }
-        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
-        self.manager.request(.POST, resourceOwner, parameters: payload)
-            .validate()
-            .responseJSON { response in
+    public struct Request {
+
+        let request: Alamofire.Request
+
+        public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
+            request.responseJSON { response in
                 switch response.result {
                 case .Success(let payload):
                     if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
@@ -69,13 +61,24 @@ public struct Authentication {
                 case .Failure(let cause):
                     callback(.Failure(error: authenticationError(response, cause: cause)))
                 }
+            }
         }
     }
-}
 
-public enum Result<T, E: ErrorType> {
-    case Success(result: T)
-    case Failure(error: E)
+    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request {
+        var payload: [String: AnyObject] = [
+            "username": username,
+            "password": password,
+            "connection": connection,
+            "grant_type": "password",
+            "scope": scope,
+            "client_id": self.clientId
+        ]
+        parameters.forEach { key, value in payload[key] = value }
+        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
+        let request = self.manager.request(.POST, resourceOwner, parameters: payload).validate()
+        return Request(request: request)
+    }
 }
 
 private func authenticationError(response: Alamofire.Response<AnyObject, NSError>, cause: NSError) -> Authentication.Error {
