@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
-#import <Nimble/NMBExceptionCapture.h>
-#import <Nimble/DSL.h>
+#import "NMBExceptionCapture.h"
+#import "NMBStringify.h"
+#import "DSL.h"
 
 FOUNDATION_EXPORT double NimbleVersionNumber;
 FOUNDATION_EXPORT const unsigned char NimbleVersionString[];

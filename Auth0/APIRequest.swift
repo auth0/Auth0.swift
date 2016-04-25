@@ -74,30 +74,29 @@ public struct APIRequest<T> {
         case let (.Some(request), .None):
             request
                 .validate(statusCode: 200..<300)
-                .responseJSON { request, response, result in
-                switch (response, result) {
-                case (_, .Failure(nil, let error as NSError)):
-                    callback(error: error, payload: nil)
-                case (_, .Success(let payload)):
-                    if let responseObject = self.builder?(payload: payload) {
-                        callback(error: nil, payload: responseObject)
-                    } else {
-                        callback(error: errorWithCode(.InvalidPayload, userInfo: [NSLocalizedDescriptionKey: "Failed to obtain JSON from \(payload)"]), payload: nil)
+                .responseJSON { result in
+                    switch result.result {
+                    case .Success(let payload):
+                        if let responseObject = self.builder?(payload: payload) {
+                            callback(error: nil, payload: responseObject)
+                        } else {
+                            callback(error: errorWithCode(.InvalidPayload, userInfo: [NSLocalizedDescriptionKey: "Failed to obtain JSON from \(payload)"]), payload: nil)
+                        }
+                    case .Failure(let cause):
+                        let statusCode = result.response?.statusCode ?? 0
+                        let message = "Request to \(result.request?.URL) failed with status code \(statusCode)"
+                        var info: [String: AnyObject] = [
+                            NSLocalizedDescriptionKey: message,
+                            APIRequestErrorStatusCodeKey: statusCode
+                        ]
+                        if let data = result.data, let error = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions()) {
+                            info[APIRequestErrorErrorKey] = error
+                        } else {
+                            info[APIRequestErrorErrorKey] = cause
+                        }
+                        callback(error: errorWithCode(.Failed, userInfo: info), payload: nil)
+
                     }
-                case (let response, .Failure(let payload, _)) where payload != nil && response != nil:
-                    let statusCode = response!.statusCode
-                    let message = "Request to \(request?.URL) failed with status code \(statusCode)"
-                    var info: [String: AnyObject] = [
-                        NSLocalizedDescriptionKey: message,
-                        APIRequestErrorStatusCodeKey: statusCode
-                    ]
-                    if let error = try? NSJSONSerialization.JSONObjectWithData(payload!, options: NSJSONReadingOptions()) {
-                        info[APIRequestErrorErrorKey] = error
-                    }
-                    callback(error: errorWithCode(.Failed, userInfo: info), payload: nil)
-                default:
-                    callback(error: errorWithCode(.Failed, userInfo: [NSLocalizedDescriptionKey: "Request to \(request?.URL) failed"]), payload: nil)
-                }
             }
         default:
             callback(error: errorWithCode(.Failed, userInfo: [NSLocalizedDescriptionKey: "Request failed with no clear reason."]), payload: nil)

@@ -21,6 +21,10 @@ NIMBLE_EXPORT id<NMBMatcher> NMB_equal(id expectedValue);
 NIMBLE_SHORT(id<NMBMatcher> equal(id expectedValue),
              NMB_equal(expectedValue));
 
+NIMBLE_EXPORT id<NMBMatcher> NMB_haveCount(id expectedValue);
+NIMBLE_SHORT(id<NMBMatcher> haveCount(id expectedValue),
+             NMB_haveCount(expectedValue));
+
 NIMBLE_EXPORT NMBObjCBeCloseToMatcher *NMB_beCloseTo(NSNumber *expectedValue);
 NIMBLE_SHORT(NMBObjCBeCloseToMatcher *beCloseTo(id expectedValue),
              NMB_beCloseTo(expectedValue));
@@ -48,6 +52,10 @@ NIMBLE_SHORT(id<NMBMatcher> beGreaterThanOrEqualTo(NSNumber *expectedValue),
 NIMBLE_EXPORT id<NMBMatcher> NMB_beIdenticalTo(id expectedInstance);
 NIMBLE_SHORT(id<NMBMatcher> beIdenticalTo(id expectedInstance),
              NMB_beIdenticalTo(expectedInstance));
+
+NIMBLE_EXPORT id<NMBMatcher> NMB_be(id expectedInstance);
+NIMBLE_SHORT(id<NMBMatcher> be(id expectedInstance),
+             NMB_be(expectedInstance));
 
 NIMBLE_EXPORT id<NMBMatcher> NMB_beLessThan(NSNumber *expectedValue);
 NIMBLE_SHORT(id<NMBMatcher> beLessThan(NSNumber *expectedValue),
@@ -103,11 +111,19 @@ NIMBLE_EXPORT id<NMBMatcher> NMB_allPass(id matcher);
 NIMBLE_SHORT(id<NMBMatcher> allPass(id matcher),
              NMB_allPass(matcher));
 
+NIMBLE_EXPORT id<NMBMatcher> NMB_satisfyAnyOfWithMatchers(id matchers);
+#define NMB_satisfyAnyOf(...) NMB_satisfyAnyOfWithMatchers(@[__VA_ARGS__])
+#ifndef NIMBLE_DISABLE_SHORT_SYNTAX
+#define satisfyAnyOf(...) NMB_satisfyAnyOf(__VA_ARGS__)
+#endif
+
 // In order to preserve breakpoint behavior despite using macros to fill in __FILE__ and __LINE__,
 // define a builder that populates __FILE__ and __LINE__, and returns a block that takes timeout
 // and action arguments. See https://github.com/Quick/Quick/pull/185 for details.
 typedef void (^NMBWaitUntilTimeoutBlock)(NSTimeInterval timeout, void (^action)(void (^)(void)));
 typedef void (^NMBWaitUntilBlock)(void (^action)(void (^)(void)));
+
+NIMBLE_EXPORT void NMB_failWithMessage(NSString *msg, NSString *file, NSUInteger line);
 
 NIMBLE_EXPORT NMBWaitUntilTimeoutBlock NMB_waitUntilTimeoutBuilder(NSString *file, NSUInteger line);
 NIMBLE_EXPORT NMBWaitUntilBlock NMB_waitUntilBuilder(NSString *file, NSUInteger line);
