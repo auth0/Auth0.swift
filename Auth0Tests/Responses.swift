@@ -35,6 +35,23 @@ func authResponse(accessToken accessToken: String, idToken: String? = nil) -> OH
     return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: nil)
 }
 
+func createdUser(email email: String, username: String? = nil, verified: Bool = true) -> OHHTTPStubsResponse {
+    var json: [String: AnyObject] = [
+        "email": email,
+        "email_verified": verified ? "true" : "false",
+        ]
+
+    if let username = username {
+        json["username"] = username
+    }
+    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: nil)
+}
+
+func resetPasswordResponse() -> OHHTTPStubsResponse {
+    let data = "We've just sent you an email to reset your password.".dataUsingEncoding(NSUTF8StringEncoding)!
+    return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
+}
+
 func authFailure(code code: String, description: String, name: String? = nil) -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: nil)
 }

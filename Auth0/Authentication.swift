@@ -45,60 +45,55 @@ public struct Authentication {
         case Unknown(cause: ErrorType)
     }
 
-    public struct Request {
-
-        let request: Alamofire.Request
-
-        public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
-            request.responseJSON { response in
-                switch response.result {
-                case .Success(let payload):
-                    if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
-                        callback(.Success(result: credentials))
-                    } else {
-                        callback(.Failure(error: .InvalidResponse(response: payload)))
-                    }
-                case .Failure(let cause):
-                    callback(.Failure(error: authenticationError(response, cause: cause)))
-                }
-            }
-        }
-    }
-
-    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request {
+    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> CredentialsRequest {
         var payload: [String: AnyObject] = [
             "username": username,
             "password": password,
             "connection": connection,
             "grant_type": "password",
             "scope": scope,
-            "client_id": self.clientId
+            "client_id": self.clientId,
         ]
         parameters.forEach { key, value in payload[key] = value }
         let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         let request = self.manager.request(.POST, resourceOwner, parameters: payload).validate()
-        return Request(request: request)
-    }
-}
-
-private func authenticationError(response: Alamofire.Response<AnyObject, NSError>, cause: NSError) -> Authentication.Error {
-    if let jsonData = response.data,
-        let json = try? NSJSONSerialization.JSONObjectWithData(jsonData, options: NSJSONReadingOptions()),
-        let payload = json as? [String: AnyObject] {
-        return payloadError(payload, cause: cause)
-    } else {
-        return .Unknown(cause: cause)
-    }
-}
-
-private func payloadError(payload: [String: AnyObject], cause: ErrorType) -> Authentication.Error {
-    if let code = payload["error"] as? String, let description = payload["error_description"] as? String {
-        return .Response(code: code, description: description)
+        return CredentialsRequest(request: request)
     }
 
-    if let code = payload["code"] as? String, let description = payload["description"] as? String {
-        return .Response(code: code, description: description)
+    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> CreateUserRequest {
+        var payload: [String: AnyObject] = [
+            "email": email,
+            "password": password,
+            "connection": connection,
+            "client_id": self.clientId,
+        ]
+        if let username = username {
+            payload["username"] = username
+        }
+
+        if let userMetadata = userMetadata {
+            payload["user_metadata"] = userMetadata
+        }
+
+        let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
+        let request = self.manager.request(.POST, createUser, parameters: payload).validate()
+        return CreateUserRequest(request: request)
     }
 
-    return .Unknown(cause: cause)
+    public func resetPassword(email: String, connection: String) -> ResetPasswordRequest {
+        let payload = [
+            "email": email,
+            "connection": connection,
+            "client_id": self.clientId
+        ]
+        let resetPassword = NSURL(string: "/dbconnections/change_password", relativeToURL: self.url)!
+        let request = self.manager.request(.POST, resetPassword, parameters: payload).validate()
+        return ResetPasswordRequest(request: request)
+    }
+
+    public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> SignUpRequest {
+        let create = createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
+        let credentials = login(email, password: password, connection: connection, scope: scope, parameters: parameters)
+        return SignUpRequest(createRequest: create, credentialRequest: credentials)
+    }
 }

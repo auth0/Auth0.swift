@@ -28,20 +28,46 @@ import Auth0
 func hasAllOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload else { return false }
+        return parameters.count == payload.count && parameters.reduce(true, combine: { (initial, entry) -> Bool in
+            return initial && payload[entry.0] as? String == entry.1
+        })
+    }
+}
+
+func hasAtLeast(parameters: [String: String]) -> OHHTTPStubsTestBlock {
+    return { request in
+        guard let payload = request.a0_payload else { return false }
         return parameters.filter { (key, _) in payload.contains { (name, _) in  key == name } }.reduce(true, combine: { (initial, entry) -> Bool in
             return initial && payload[entry.0] as? String == entry.1
         })
     }
 }
 
+func hasUserMetadata(metadata: [String: String]) -> OHHTTPStubsTestBlock {
+    return { request in
+        guard let payload = request.a0_payload, userMetadata = payload["user_metadata"] as? [String: AnyObject] else { return false }
+        return metadata.count == userMetadata.count && metadata.reduce(true, combine: { (initial, entry) -> Bool in
+            guard let value = userMetadata[entry.0] as? String else { return false }
+            return initial && value == entry.1
+        })
+    }
+}
+
 func hasNoneOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
-    return !hasAllOf(parameters)
+    return !hasAtLeast(parameters)
 }
 
 func isResourceOwner(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
 }
 
+func isSignUp(domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/dbconnections/signup")
+}
+
+func isResetPassword(domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/dbconnections/change_password")
+}
 
 func haveError<T>(code code: String, description: String) -> MatcherFunc<Result<T, Authentication.Error>> {
     return MatcherFunc { expression, failureMessage in
@@ -65,6 +91,16 @@ func haveCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> Ma
         failureMessage.postfixMessage = message
         if let actual = try expression.evaluate(), case .Success(let credentials) = actual {
             return (accessToken == nil || credentials.accessToken == accessToken) && (idToken == nil || credentials.idToken == idToken)
+        }
+        return false
+    }
+}
+
+func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Result<CreateUser, Authentication.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "have created user with email <\(email)>"
+        if let actual = try expression.evaluate(), case .Success(let created) = actual {
+            return created.email == email && (username == nil || created.username == username)
         }
         return false
     }
