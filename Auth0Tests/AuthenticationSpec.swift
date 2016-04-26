@@ -49,7 +49,7 @@ class AuthenticationSpec: QuickSpec {
                 }.name = "YOU SHALL NOT PASS!"
         }
 
-        context("login") {
+        fcontext("login") {
 
             beforeEach {
                 stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"

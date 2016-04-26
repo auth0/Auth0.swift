@@ -28,15 +28,17 @@ public struct Authentication {
     public let url: NSURL
 
     let manager: Alamofire.Manager
+    let session: NSURLSession
 
     init(clientId: String, url: NSURL) {
         self.init(clientId: clientId, url: url, manager: Alamofire.Manager.sharedInstance)
     }
 
-    init(clientId: String, url: NSURL, manager: Alamofire.Manager) {
+    init(clientId: String, url: NSURL, manager: Alamofire.Manager, session: NSURLSession = NSURLSession.sharedSession()) {
         self.clientId = clientId
         self.url = url
         self.manager = manager
+        self.session = session
     }
 
     public enum Error: ErrorType {
@@ -45,7 +47,7 @@ public struct Authentication {
         case Unknown(cause: ErrorType)
     }
 
-    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> AuthenticationRequest<Credentials> {
+    public func login2(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> AuthenticationRequest<Credentials> {
         let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         var payload: [String: AnyObject] = [
             "username": username,
@@ -58,6 +60,21 @@ public struct Authentication {
         parameters.forEach { key, value in payload[key] = value }
         return AuthenticationRequest(manager: manager, url: resourceOwner, method: .POST, execute: credentials, payload: payload)
     }
+    
+    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> FoundationRequest<Credentials> {
+        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
+        var payload: [String: AnyObject] = [
+            "username": username,
+            "password": password,
+            "connection": connection,
+            "grant_type": "password",
+            "scope": scope,
+            "client_id": self.clientId,
+            ]
+        parameters.forEach { key, value in payload[key] = value }
+        return FoundationRequest(session: session, url: resourceOwner, method: "POST", execute: credentials2, payload: payload)
+    }
+
 
     public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> AuthenticationRequest<DatabaseUser> {
         var payload: [String: AnyObject] = [
@@ -90,6 +107,6 @@ public struct Authentication {
 
     public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials> {
         return createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
-            .concat(login(email, password: password, connection: connection, scope: scope, parameters: parameters))
+            .concat(login2(email, password: password, connection: connection, scope: scope, parameters: parameters))
     }
 }
