@@ -23,7 +23,6 @@
 import Quick
 import Nimble
 import OHHTTPStubs
-import Alamofire
 
 @testable import Auth0
 

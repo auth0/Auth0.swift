@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 
 import Foundation
-import Alamofire
 
 public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
 
@@ -39,21 +38,6 @@ public struct ConcatRequest<F, S>: Request {
                 second.start(callback)
             }
         }
-    }
-}
-
-public struct AuthenticationRequest<T>: Request {
-    public typealias AuthenticationCallback = Result<T, Authentication.Error> -> ()
-
-    let manager: Alamofire.Manager
-    let url: NSURL
-    let method: Alamofire.Method
-    let execute: (Alamofire.Request, AuthenticationCallback) -> ()
-    var payload: [String: AnyObject] = [:]
-
-    public func start(callback: AuthenticationCallback) {
-        let request = manager.request(method, url, parameters: payload).validate()
-        execute(request, callback)
     }
 }
 
@@ -139,7 +123,7 @@ struct Response {
     }
 }
 
-func databaseUser(response: Response, callback: AuthenticationRequest<DatabaseUser>.AuthenticationCallback) {
+func databaseUser(response: Response, callback: FoundationRequest<DatabaseUser>.AuthenticationCallback) {
     switch response.result {
     case .Success(let payload):
         if let dictionary = payload as? [String: AnyObject], let email = dictionary["email"] as? String {
@@ -154,7 +138,7 @@ func databaseUser(response: Response, callback: AuthenticationRequest<DatabaseUs
     }
 }
 
-func noBody(response: Response, callback: AuthenticationRequest<Void>.AuthenticationCallback) {
+func noBody(response: Response, callback: FoundationRequest<Void>.AuthenticationCallback) {
     switch response.result {
     case .Success:
         callback(.Success(result: ()))
@@ -163,7 +147,7 @@ func noBody(response: Response, callback: AuthenticationRequest<Void>.Authentica
     }
 }
 
-func credentials(response: Response, callback: AuthenticationRequest<Credentials>.AuthenticationCallback) {
+func credentials(response: Response, callback: FoundationRequest<Credentials>.AuthenticationCallback) {
     switch response.result {
     case .Success(let payload):
         if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
@@ -173,14 +157,6 @@ func credentials(response: Response, callback: AuthenticationRequest<Credentials
         }
     case .Failure(let cause):
         callback(.Failure(error: authenticationError(response.data, cause: cause)))
-    }
-}
-
-private func authenticationError(response: Alamofire.Response<AnyObject, NSError>, cause: NSError) -> Authentication.Error {
-    if let jsonData = response.data {
-        return authenticationError(jsonData, cause: cause)
-    } else {
-        return .Unknown(cause: cause)
     }
 }
 

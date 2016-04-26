@@ -21,23 +21,20 @@
 // THE SOFTWARE.
 
 import Foundation
-import Alamofire
 
 public struct Authentication {
     public let clientId: String
     public let url: NSURL
 
-    let manager: Alamofire.Manager
     let session: NSURLSession
 
     init(clientId: String, url: NSURL) {
-        self.init(clientId: clientId, url: url, manager: Alamofire.Manager.sharedInstance)
+        self.init(clientId: clientId, url: url, session: NSURLSession.sharedSession())
     }
 
-    init(clientId: String, url: NSURL, manager: Alamofire.Manager, session: NSURLSession = NSURLSession.sharedSession()) {
+    init(clientId: String, url: NSURL, session: NSURLSession) {
         self.clientId = clientId
         self.url = url
-        self.manager = manager
         self.session = session
     }
 

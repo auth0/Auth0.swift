@@ -40,7 +40,7 @@ private let IdToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("
 class AuthenticationSpec: QuickSpec {
     override func spec() {
 
-        let auth = Authentication(clientId: ClientId, url: NSURL(string: "https://\(Domain)")!, manager: TestManager())
+        let auth = Authentication(clientId: ClientId, url: NSURL(string: "https://\(Domain)")!)
 
         afterEach {
             OHHTTPStubs.removeAllStubs()

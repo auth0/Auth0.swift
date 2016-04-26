@@ -105,3 +105,24 @@ func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Resu
         return false
     }
 }
+
+let ParameterPropertyKey = "com.auth0.parameter"
+
+extension NSURLRequest {
+    var a0_payload: [String: AnyObject]? {
+        return NSURLProtocol.propertyForKey(ParameterPropertyKey, inRequest: self) as? [String: AnyObject]
+    }
+}
+
+extension NSMutableURLRequest {
+    override var a0_payload: [String: AnyObject]? {
+        get {
+            return NSURLProtocol.propertyForKey(ParameterPropertyKey, inRequest: self) as? [String: AnyObject]
+        }
+        set(newValue) {
+            if let parameters = newValue {
+                NSURLProtocol.setProperty(parameters, forKey: ParameterPropertyKey, inRequest: self)
+            }
+        }
+    }
+}
