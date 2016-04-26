@@ -1,4 +1,4 @@
-// Request.swift
+// Requestable.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,7 +22,7 @@
 
 import Foundation
 
-protocol Request {
+protocol Requestable {
     associatedtype T
     associatedtype E: ErrorType
 

@@ -44,7 +44,7 @@ public struct Authentication {
         case Unknown(cause: ErrorType)
     }
 
-    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> FoundationRequest<Credentials> {
+    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> AuthenticationRequest<Credentials> {
         let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         var payload: [String: AnyObject] = [
             "username": username,
@@ -55,11 +55,11 @@ public struct Authentication {
             "client_id": self.clientId,
             ]
         parameters.forEach { key, value in payload[key] = value }
-        return FoundationRequest(session: session, url: resourceOwner, method: "POST", execute: credentials, payload: payload)
+        return AuthenticationRequest(session: session, url: resourceOwner, method: "POST", execute: credentials, payload: payload)
     }
 
 
-    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> FoundationRequest<DatabaseUser> {
+    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> AuthenticationRequest<DatabaseUser> {
         var payload: [String: AnyObject] = [
             "email": email,
             "password": password,
@@ -75,17 +75,17 @@ public struct Authentication {
         }
 
         let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
-        return FoundationRequest(session: session, url: createUser, method: "POST", execute: databaseUser, payload: payload)
+        return AuthenticationRequest(session: session, url: createUser, method: "POST", execute: databaseUser, payload: payload)
     }
 
-    public func resetPassword(email: String, connection: String) -> FoundationRequest<Void> {
+    public func resetPassword(email: String, connection: String) -> AuthenticationRequest<Void> {
         let payload = [
             "email": email,
             "connection": connection,
             "client_id": self.clientId
         ]
         let resetPassword = NSURL(string: "/dbconnections/change_password", relativeToURL: self.url)!
-        return FoundationRequest(session: session, url: resetPassword, method: "POST", execute: noBody, payload: payload)
+        return AuthenticationRequest(session: session, url: resetPassword, method: "POST", execute: noBody, payload: payload)
     }
 
     public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials> {

@@ -24,9 +24,9 @@ import Foundation
 
 public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
 
-public struct ConcatRequest<F, S>: Request {
-    let first: FoundationRequest<F>
-    let second: FoundationRequest<S>
+public struct ConcatRequest<F, S>: Requestable {
+    let first: AuthenticationRequest<F>
+    let second: AuthenticationRequest<S>
 
     func start(callback: Result<S, Authentication.Error> -> ()) {
         let second = self.second
@@ -41,16 +41,16 @@ public struct ConcatRequest<F, S>: Request {
     }
 }
 
-public struct FoundationRequest<T>: Request {
-    public typealias AuthenticationCallback = Result<T, Authentication.Error> -> ()
+public struct AuthenticationRequest<T>: Requestable {
+    public typealias Callback = Result<T, Authentication.Error> -> ()
 
     let session: NSURLSession
     let url: NSURL
     let method: String
-    let execute: (Response, AuthenticationCallback) -> ()
+    let execute: (Response, Callback) -> ()
     var payload: [String: AnyObject] = [:]
 
-    public func start(callback: AuthenticationCallback) {
+    public func start(callback: Callback) {
         let request = NSMutableURLRequest(URL: url)
         request.HTTPMethod = method
         if !payload.isEmpty {
@@ -66,7 +66,7 @@ public struct FoundationRequest<T>: Request {
         }.resume()
     }
 
-    public func concat<N>(request: FoundationRequest<N>) -> ConcatRequest<T, N> {
+    public func concat<N>(request: AuthenticationRequest<N>) -> ConcatRequest<T, N> {
         return ConcatRequest(first: self, second: request)
     }
 
@@ -123,7 +123,7 @@ struct Response {
     }
 }
 
-func databaseUser(response: Response, callback: FoundationRequest<DatabaseUser>.AuthenticationCallback) {
+func databaseUser(response: Response, callback: AuthenticationRequest<DatabaseUser>.Callback) {
     switch response.result {
     case .Success(let payload):
         if let dictionary = payload as? [String: AnyObject], let email = dictionary["email"] as? String {
@@ -138,7 +138,7 @@ func databaseUser(response: Response, callback: FoundationRequest<DatabaseUser>.
     }
 }
 
-func noBody(response: Response, callback: FoundationRequest<Void>.AuthenticationCallback) {
+func noBody(response: Response, callback: AuthenticationRequest<Void>.Callback) {
     switch response.result {
     case .Success:
         callback(.Success(result: ()))
@@ -147,7 +147,7 @@ func noBody(response: Response, callback: FoundationRequest<Void>.Authentication
     }
 }
 
-func credentials(response: Response, callback: FoundationRequest<Credentials>.AuthenticationCallback) {
+func credentials(response: Response, callback: AuthenticationRequest<Credentials>.Callback) {
     switch response.result {
     case .Success(let payload):
         if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
