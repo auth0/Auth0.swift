@@ -202,6 +202,84 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should handle errors") {
+                let code = "reset_failed"
+                let description = "failed reset password"
+                stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }
+                waitUntil { done in
+                    auth.resetPassword(SupportAtAuth0, connection: ConnectionName).start { result in
+                        expect(result).to(haveError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+        }
+
+        context("create user and login") {
+
+            it("should fail if create user fails") {
+                let code = "create_failed"
+                let description = "failed create user"
+                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "User w/email"
+                waitUntil { done in
+                    auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
+                        expect(result).to(haveError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail if login fails") {
+                let code = "invalid_password_failed"
+                let description = "failed to login"
+                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authFailure(code: code, description: description) }.name = "OpenID Auth"
+                waitUntil { done in
+                    auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
+                        expect(result).to(haveError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+            it("should create user and login") {
+                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                waitUntil { done in
+                    auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
+                        done()
+                    }
+                }
+            }
+
+            it("should login with custom parameters") {
+                let state = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "state": state])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                waitUntil { done in
+                    auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, parameters: ["state": state]).start { result in
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
+                        done()
+                    }
+                }
+            }
+
+            it("should create user with metadata") {
+                let country = "Argentina"
+                let metadata = ["country": country]
+                stub(isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                waitUntil { done in
+                    auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
+                        done()
+                    }
+                }
+            }
+
         }
 
     }

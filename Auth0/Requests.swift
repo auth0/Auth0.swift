@@ -47,6 +47,24 @@ public struct CreateUserRequest: Request {
     }
 }
 
+public struct SignUpRequest: Request {
+
+    let createRequest: CreateUserRequest
+    let credentialRequest: CredentialsRequest
+
+    public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
+        let request = self.credentialRequest
+        createRequest.start { result in
+            switch result {
+            case .Failure(let cause):
+                callback(.Failure(error: cause))
+            case .Success:
+                request.start(callback)
+            }
+        }
+    }
+}
+
 public struct CredentialsRequest: Request {
 
     let request: Alamofire.Request

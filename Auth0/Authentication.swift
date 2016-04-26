@@ -90,4 +90,10 @@ public struct Authentication {
         let request = self.manager.request(.POST, resetPassword, parameters: payload).validate()
         return ResetPasswordRequest(request: request)
     }
+
+    public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> SignUpRequest {
+        let create = createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
+        let credentials = login(email, password: password, connection: connection, scope: scope, parameters: parameters)
+        return SignUpRequest(createRequest: create, credentialRequest: credentials)
+    }
 }
