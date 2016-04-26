@@ -51,24 +51,6 @@ public struct AuthenticationRequest<T>: Request {
     let execute: (Alamofire.Request, AuthenticationCallback) -> ()
     var payload: [String: AnyObject] = [:]
 
-    subscript(key: String) -> String? {
-        get {
-            return self.payload[key] as? String
-        }
-        set(newValue) {
-            self.payload[key] = newValue
-        }
-    }
-
-    subscript(key: String) -> [String: AnyObject]? {
-        get {
-            return self.payload[key] as? [String: AnyObject]
-        }
-        set(newValue) {
-            self.payload[key] = newValue
-        }
-    }
-
     public func start(callback: AuthenticationCallback) {
         let request = manager.request(method, url, parameters: payload).validate()
         execute(request, callback)
