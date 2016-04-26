@@ -96,7 +96,7 @@ func haveCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> Ma
     }
 }
 
-func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Result<CreateUser, Authentication.Error>> {
+func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Result<DatabaseUser, Authentication.Error>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have created user with email <\(email)>"
         if let actual = try expression.evaluate(), case .Success(let created) = actual {

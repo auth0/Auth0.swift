@@ -23,80 +23,101 @@
 import Foundation
 import Alamofire
 
-public typealias CreateUser = (email: String, username: String?, verified: Bool)
+public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
 
-public struct CreateUserRequest: Request {
+public struct ConcatRequest<F, S>: Request {
+    let first: AuthenticationRequest<F>
+    let second: AuthenticationRequest<S>
 
-    let request: Alamofire.Request
-
-    public func start(callback: Result<CreateUser, Authentication.Error> -> ()) {
-        request.responseJSON { response in
-            switch response.result {
-            case .Success(let payload):
-                if let dictionary = payload as? [String: String], let email: String = dictionary["email"] {
-                    let username = payload["username"] as? String
-                    let verified = payload["email_verified"] as? Bool ?? false
-                    callback(.Success(result: (email: email, username: username, verified: verified)))
-                } else {
-                    callback(.Failure(error: .InvalidResponse(response: payload)))
-                }
-            case .Failure(let cause):
-                callback(.Failure(error: authenticationError(response, cause: cause)))
-            }
-        }
-    }
-}
-
-public struct SignUpRequest: Request {
-
-    let createRequest: CreateUserRequest
-    let credentialRequest: CredentialsRequest
-
-    public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
-        let request = self.credentialRequest
-        createRequest.start { result in
+    func start(callback: Result<S, Authentication.Error> -> ()) {
+        let second = self.second
+        first.start { result in
             switch result {
             case .Failure(let cause):
                 callback(.Failure(error: cause))
             case .Success:
-                request.start(callback)
+                second.start(callback)
             }
         }
     }
 }
 
-public struct CredentialsRequest: Request {
+public struct AuthenticationRequest<T>: Request {
+    public typealias AuthenticationCallback = Result<T, Authentication.Error> -> ()
 
-    let request: Alamofire.Request
+    let manager: Alamofire.Manager
+    let url: NSURL
+    let method: Alamofire.Method
+    let execute: (Alamofire.Request, AuthenticationCallback) -> ()
+    var payload: [String: AnyObject] = [:]
 
-    public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
-        request.responseJSON { response in
-            switch response.result {
-            case .Success(let payload):
-                if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
-                    callback(.Success(result: credentials))
-                } else {
-                    callback(.Failure(error: .InvalidResponse(response: payload)))
-                }
-            case .Failure(let cause):
-                callback(.Failure(error: authenticationError(response, cause: cause)))
+    subscript(key: String) -> String? {
+        get {
+            return self.payload[key] as? String
+        }
+        set(newValue) {
+            self.payload[key] = newValue
+        }
+    }
+
+    subscript(key: String) -> [String: AnyObject]? {
+        get {
+            return self.payload[key] as? [String: AnyObject]
+        }
+        set(newValue) {
+            self.payload[key] = newValue
+        }
+    }
+
+    public func start(callback: AuthenticationCallback) {
+        let request = manager.request(method, url, parameters: payload).validate()
+        execute(request, callback)
+    }
+
+    public func concat<N>(request: AuthenticationRequest<N>) -> ConcatRequest<T, N> {
+        return ConcatRequest(first: self, second: request)
+    }
+}
+
+func databaseUser(request: Alamofire.Request, callback: AuthenticationRequest<DatabaseUser>.AuthenticationCallback) {
+    request.responseJSON { response in
+        switch response.result {
+        case .Success(let payload):
+            if let dictionary = payload as? [String: String], let email: String = dictionary["email"] {
+                let username = payload["username"] as? String
+                let verified = payload["email_verified"] as? Bool ?? false
+                callback(.Success(result: (email: email, username: username, verified: verified)))
+            } else {
+                callback(.Failure(error: .InvalidResponse(response: payload)))
             }
+        case .Failure(let cause):
+            callback(.Failure(error: authenticationError(response, cause: cause)))
         }
     }
 }
 
-public struct ResetPasswordRequest: Request {
+func noBody(request: Alamofire.Request, callback: AuthenticationRequest<Void>.AuthenticationCallback) {
+    request.responseData { response in
+        switch response.result {
+        case .Success:
+            callback(.Success(result: ()))
+        case .Failure(let cause):
+            callback(.Failure(error: authenticationError(response.data, cause: cause)))
+        }
+    }
+}
 
-    let request: Alamofire.Request
-
-    public func start(callback: Result<Void, Authentication.Error> -> ()) {
-        request.responseData { response in
-            switch response.result {
-            case .Success:
-                callback(.Success(result: ()))
-            case .Failure(let cause):
-                callback(.Failure(error: authenticationError(response.data, cause: cause)))
+func credentials(request: Alamofire.Request, callback: AuthenticationRequest<Credentials>.AuthenticationCallback) {
+    request.responseJSON { response in
+        switch response.result {
+        case .Success(let payload):
+            if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
+                callback(.Success(result: credentials))
+            } else {
+                callback(.Failure(error: .InvalidResponse(response: payload)))
             }
+        case .Failure(let cause):
+            callback(.Failure(error: authenticationError(response, cause: cause)))
         }
     }
 }
