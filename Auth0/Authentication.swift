@@ -47,20 +47,6 @@ public struct Authentication {
         case Unknown(cause: ErrorType)
     }
 
-    public func login2(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> AuthenticationRequest<Credentials> {
-        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
-        var payload: [String: AnyObject] = [
-            "username": username,
-            "password": password,
-            "connection": connection,
-            "grant_type": "password",
-            "scope": scope,
-            "client_id": self.clientId,
-        ]
-        parameters.forEach { key, value in payload[key] = value }
-        return AuthenticationRequest(manager: manager, url: resourceOwner, method: .POST, execute: credentials, payload: payload)
-    }
-    
     public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> FoundationRequest<Credentials> {
         let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         var payload: [String: AnyObject] = [
@@ -72,11 +58,11 @@ public struct Authentication {
             "client_id": self.clientId,
             ]
         parameters.forEach { key, value in payload[key] = value }
-        return FoundationRequest(session: session, url: resourceOwner, method: "POST", execute: credentials2, payload: payload)
+        return FoundationRequest(session: session, url: resourceOwner, method: "POST", execute: credentials, payload: payload)
     }
 
 
-    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> AuthenticationRequest<DatabaseUser> {
+    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> FoundationRequest<DatabaseUser> {
         var payload: [String: AnyObject] = [
             "email": email,
             "password": password,
@@ -92,7 +78,7 @@ public struct Authentication {
         }
 
         let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
-        return AuthenticationRequest(manager: manager, url: createUser, method: .POST, execute: databaseUser, payload: payload)
+        return FoundationRequest(session: session, url: createUser, method: "POST", execute: databaseUser, payload: payload)
     }
 
     public func resetPassword(email: String, connection: String) -> AuthenticationRequest<Void> {
@@ -107,6 +93,6 @@ public struct Authentication {
 
     public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials> {
         return createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
-            .concat(login2(email, password: password, connection: connection, scope: scope, parameters: parameters))
+            .concat(login(email, password: password, connection: connection, scope: scope, parameters: parameters))
     }
 }

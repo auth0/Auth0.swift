@@ -26,8 +26,8 @@ import Alamofire
 public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
 
 public struct ConcatRequest<F, S>: Request {
-    let first: AuthenticationRequest<F>
-    let second: AuthenticationRequest<S>
+    let first: FoundationRequest<F>
+    let second: FoundationRequest<S>
 
     func start(callback: Result<S, Authentication.Error> -> ()) {
         let second = self.second
@@ -55,10 +55,6 @@ public struct AuthenticationRequest<T>: Request {
         let request = manager.request(method, url, parameters: payload).validate()
         execute(request, callback)
     }
-
-    public func concat<N>(request: AuthenticationRequest<N>) -> ConcatRequest<T, N> {
-        return ConcatRequest(first: self, second: request)
-    }
 }
 
 public struct FoundationRequest<T>: Request {
@@ -73,16 +69,23 @@ public struct FoundationRequest<T>: Request {
     public func start(callback: AuthenticationCallback) {
         let request = NSMutableURLRequest(URL: url)
         request.HTTPMethod = method
-        request.HTTPBody = try! NSJSONSerialization.dataWithJSONObject(payload, options: [])
+        if !payload.isEmpty {
+            request.HTTPBody = try! NSJSONSerialization.dataWithJSONObject(payload, options: [])
+            NSURLProtocol.setProperty(payload, forKey: "com.auth0.parameter", inRequest: request)
+        }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let handler = self.execute
 
-        NSURLProtocol.setProperty(payload, forKey: "com.auth0.parameter", inRequest: request)
 
         session.dataTaskWithRequest(request) { data, response, error in
             handler(Response(data: data, response: response, error: error), callback)
         }.resume()
     }
+
+    public func concat<N>(request: FoundationRequest<N>) -> ConcatRequest<T, N> {
+        return ConcatRequest(first: self, second: request)
+    }
+
 }
 
 struct Response {
@@ -124,27 +127,25 @@ struct Response {
             case .NoResponse:
                 message = "Expected JSON response but got an empty one"
             case .InvalidJSON:
-                message = "Malformed JSON in response body"
+                message = "Malformed JSON in response or body"
             }
             return NSError(domain: "com.auth0", code: self.rawValue, userInfo: [NSLocalizedDescriptionKey: message])
         }
     }
 }
 
-func databaseUser(request: Alamofire.Request, callback: AuthenticationRequest<DatabaseUser>.AuthenticationCallback) {
-    request.responseJSON { response in
-        switch response.result {
-        case .Success(let payload):
-            if let dictionary = payload as? [String: String], let email: String = dictionary["email"] {
-                let username = payload["username"] as? String
-                let verified = payload["email_verified"] as? Bool ?? false
-                callback(.Success(result: (email: email, username: username, verified: verified)))
-            } else {
-                callback(.Failure(error: .InvalidResponse(response: payload)))
-            }
-        case .Failure(let cause):
-            callback(.Failure(error: authenticationError(response, cause: cause)))
+func databaseUser(response: Response, callback: AuthenticationRequest<DatabaseUser>.AuthenticationCallback) {
+    switch response.result {
+    case .Success(let payload):
+        if let dictionary = payload as? [String: AnyObject], let email = dictionary["email"] as? String {
+            let username = dictionary["username"] as? String
+            let verified = dictionary["email_verified"] as? Bool ?? false
+            callback(.Success(result: (email: email, username: username, verified: verified)))
+        } else {
+            callback(.Failure(error: .InvalidResponse(response: payload ?? [:])))
         }
+    case .Failure(let cause):
+        callback(.Failure(error: authenticationError(response.data, cause: cause)))
     }
 }
 
@@ -159,7 +160,7 @@ func noBody(request: Alamofire.Request, callback: AuthenticationRequest<Void>.Au
     }
 }
 
-func credentials2(response: Response, callback: AuthenticationRequest<Credentials>.AuthenticationCallback) {
+func credentials(response: Response, callback: AuthenticationRequest<Credentials>.AuthenticationCallback) {
     switch response.result {
     case .Success(let payload):
         if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
@@ -169,21 +170,6 @@ func credentials2(response: Response, callback: AuthenticationRequest<Credential
         }
     case .Failure(let cause):
         callback(.Failure(error: authenticationError(response.data, cause: cause)))
-    }
-}
-
-func credentials(request: Alamofire.Request, callback: AuthenticationRequest<Credentials>.AuthenticationCallback) {
-    request.responseJSON { response in
-        switch response.result {
-        case .Success(let payload):
-            if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
-                callback(.Success(result: credentials))
-            } else {
-                callback(.Failure(error: .InvalidResponse(response: payload)))
-            }
-        case .Failure(let cause):
-            callback(.Failure(error: authenticationError(response, cause: cause)))
-        }
     }
 }
 
