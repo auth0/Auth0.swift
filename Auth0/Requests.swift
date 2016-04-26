@@ -102,7 +102,12 @@ struct Response {
             let json = try NSJSONSerialization.JSONObjectWithData(data, options: [])
             return .Success(json)
         } catch {
-            return .Failure(Error.InvalidJSON.error)
+            // This piece of code is dedicated to our friends the backend devs :)
+            if response.URL?.lastPathComponent == "change_password" {
+                return .Success(nil)
+            } else {
+                return .Failure(Error.InvalidJSON.error)
+            }
         }
     }
 
@@ -149,14 +154,12 @@ func databaseUser(response: Response, callback: AuthenticationRequest<DatabaseUs
     }
 }
 
-func noBody(request: Alamofire.Request, callback: AuthenticationRequest<Void>.AuthenticationCallback) {
-    request.responseData { response in
-        switch response.result {
-        case .Success:
-            callback(.Success(result: ()))
-        case .Failure(let cause):
-            callback(.Failure(error: authenticationError(response.data, cause: cause)))
-        }
+func noBody(response: Response, callback: AuthenticationRequest<Void>.AuthenticationCallback) {
+    switch response.result {
+    case .Success:
+        callback(.Success(result: ()))
+    case .Failure(let cause):
+        callback(.Failure(error: authenticationError(response.data, cause: cause)))
     }
 }
 

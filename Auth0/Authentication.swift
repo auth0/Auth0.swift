@@ -81,14 +81,14 @@ public struct Authentication {
         return FoundationRequest(session: session, url: createUser, method: "POST", execute: databaseUser, payload: payload)
     }
 
-    public func resetPassword(email: String, connection: String) -> AuthenticationRequest<Void> {
+    public func resetPassword(email: String, connection: String) -> FoundationRequest<Void> {
         let payload = [
             "email": email,
             "connection": connection,
             "client_id": self.clientId
         ]
         let resetPassword = NSURL(string: "/dbconnections/change_password", relativeToURL: self.url)!
-        return AuthenticationRequest(manager: manager, url: resetPassword, method: .POST, execute: noBody, payload: payload)
+        return FoundationRequest(session: session, url: resetPassword, method: "POST", execute: noBody, payload: payload)
     }
 
     public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials> {
