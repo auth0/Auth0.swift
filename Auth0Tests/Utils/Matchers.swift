@@ -44,10 +44,14 @@ func hasAtLeast(parameters: [String: String]) -> OHHTTPStubsTestBlock {
 }
 
 func hasUserMetadata(metadata: [String: String]) -> OHHTTPStubsTestBlock {
+    return hasObjectAttribute("user_metadata", value: metadata)
+}
+
+func hasObjectAttribute(name: String, value: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
-        guard let payload = request.a0_payload, userMetadata = payload["user_metadata"] as? [String: AnyObject] else { return false }
-        return metadata.count == userMetadata.count && metadata.reduce(true, combine: { (initial, entry) -> Bool in
-            guard let value = userMetadata[entry.0] as? String else { return false }
+        guard let payload = request.a0_payload, actualValue = payload[name] as? [String: AnyObject] else { return false }
+        return value.count == actualValue.count && value.reduce(true, combine: { (initial, entry) -> Bool in
+            guard let value = actualValue[entry.0] as? String else { return false }
             return initial && value == entry.1
         })
     }
@@ -67,6 +71,10 @@ func isSignUp(domain: String) -> OHHTTPStubsTestBlock {
 
 func isResetPassword(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/dbconnections/change_password")
+}
+
+func isPasswordless(domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/passwordless/start")
 }
 
 func haveError<T>(code code: String, description: String) -> MatcherFunc<Result<T, Authentication.Error>> {
@@ -101,6 +109,16 @@ func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Resu
         failureMessage.postfixMessage = "have created user with email <\(email)>"
         if let actual = try expression.evaluate(), case .Success(let created) = actual {
             return created.email == email && (username == nil || created.username == username)
+        }
+        return false
+    }
+}
+
+func beSuccessfulResult<T>() -> MatcherFunc<Result<T, Authentication.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "be a successful result"
+        if let actual = try expression.evaluate(), case .Success = actual {
+            return true
         }
         return false
     }

@@ -59,3 +59,7 @@ func authFailure(code code: String, description: String, name: String? = nil) ->
 func authFailure(error error: String, description: String) -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(JSONObject: ["error": error, "error_description": description], statusCode: 400, headers: nil)
 }
+
+func passwordless(email: String, verified: Bool) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(JSONObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: nil)
+}
