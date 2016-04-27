@@ -28,7 +28,7 @@ public struct Request<T, Error: ErrorType>: Requestable {
     let session: NSURLSession
     let url: NSURL
     let method: String
-    let execute: (Response, Callback) -> ()
+    let handle: (Response, Callback) -> ()
     var payload: [String: AnyObject] = [:]
 
     public func start(callback: Callback) {
@@ -39,7 +39,7 @@ public struct Request<T, Error: ErrorType>: Requestable {
             NSURLProtocol.setProperty(payload, forKey: "com.auth0.parameter", inRequest: request)
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let handler = self.execute
+        let handler = self.handle
 
 
         session.dataTaskWithRequest(request) { data, response, error in

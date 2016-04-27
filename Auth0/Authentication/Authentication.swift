@@ -57,7 +57,7 @@ public struct Authentication {
             "client_id": self.clientId,
             ]
         parameters.forEach { key, value in payload[key] = value }
-        return Request(session: session, url: resourceOwner, method: "POST", execute: credentials, payload: payload)
+        return Request(session: session, url: resourceOwner, method: "POST", handle: credentials, payload: payload)
     }
 
 
@@ -77,7 +77,7 @@ public struct Authentication {
         }
 
         let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
-        return Request(session: session, url: createUser, method: "POST", execute: databaseUser, payload: payload)
+        return Request(session: session, url: createUser, method: "POST", handle: databaseUser, payload: payload)
     }
 
     public func resetPassword(email: String, connection: String) -> Request<Void, Error> {
@@ -87,7 +87,7 @@ public struct Authentication {
             "client_id": self.clientId
         ]
         let resetPassword = NSURL(string: "/dbconnections/change_password", relativeToURL: self.url)!
-        return Request(session: session, url: resetPassword, method: "POST", execute: noBody, payload: payload)
+        return Request(session: session, url: resetPassword, method: "POST", handle: noBody, payload: payload)
     }
 
     public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials, Error> {
