@@ -21,31 +21,29 @@
 // THE SOFTWARE.
 
 import Foundation
-import Alamofire
+
+public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
 
 public struct Authentication {
     public let clientId: String
     public let url: NSURL
 
-    let manager: Alamofire.Manager
+    let session: NSURLSession
 
-    init(clientId: String, url: NSURL) {
-        self.init(clientId: clientId, url: url, manager: Alamofire.Manager.sharedInstance)
-    }
-
-    init(clientId: String, url: NSURL, manager: Alamofire.Manager) {
+    init(clientId: String, url: NSURL, session: NSURLSession = .sharedSession()) {
         self.clientId = clientId
         self.url = url
-        self.manager = manager
+        self.session = session
     }
 
     public enum Error: ErrorType {
         case Response(code: String, description: String)
-        case InvalidResponse(response: AnyObject)
-        case Unknown(cause: ErrorType)
+        case InvalidResponse(response: NSData?)
+        case RequestFailed(cause: ErrorType)
     }
 
-    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> CredentialsRequest {
+    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, Error> {
+        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         var payload: [String: AnyObject] = [
             "username": username,
             "password": password,
@@ -53,14 +51,13 @@ public struct Authentication {
             "grant_type": "password",
             "scope": scope,
             "client_id": self.clientId,
-        ]
+            ]
         parameters.forEach { key, value in payload[key] = value }
-        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
-        let request = self.manager.request(.POST, resourceOwner, parameters: payload).validate()
-        return CredentialsRequest(request: request)
+        return Request(session: session, url: resourceOwner, method: "POST", handle: credentials, payload: payload)
     }
 
-    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> CreateUserRequest {
+
+    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> Request<DatabaseUser, Error> {
         var payload: [String: AnyObject] = [
             "email": email,
             "password": password,
@@ -76,24 +73,21 @@ public struct Authentication {
         }
 
         let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
-        let request = self.manager.request(.POST, createUser, parameters: payload).validate()
-        return CreateUserRequest(request: request)
+        return Request(session: session, url: createUser, method: "POST", handle: databaseUser, payload: payload)
     }
 
-    public func resetPassword(email: String, connection: String) -> ResetPasswordRequest {
+    public func resetPassword(email: String, connection: String) -> Request<Void, Error> {
         let payload = [
             "email": email,
             "connection": connection,
             "client_id": self.clientId
         ]
         let resetPassword = NSURL(string: "/dbconnections/change_password", relativeToURL: self.url)!
-        let request = self.manager.request(.POST, resetPassword, parameters: payload).validate()
-        return ResetPasswordRequest(request: request)
+        return Request(session: session, url: resetPassword, method: "POST", handle: noBody, payload: payload)
     }
 
-    public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> SignUpRequest {
-        let create = createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
-        let credentials = login(email, password: password, connection: connection, scope: scope, parameters: parameters)
-        return SignUpRequest(createRequest: create, credentialRequest: credentials)
+    public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials, Error> {
+        return createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
+            .concat(login(email, password: password, connection: connection, scope: scope, parameters: parameters))
     }
 }

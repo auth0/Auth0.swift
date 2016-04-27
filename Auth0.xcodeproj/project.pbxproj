@@ -25,12 +25,6 @@
 		5F93BC081CC6ACA40031519F /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDC01CC571290011842B /* Nimble.framework */; };
 		5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
 		5F93BC0C1CC6B0DE0031519F /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
-		5FBBF0191CC834AA0024D2AF /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBD1CC571290011842B /* Alamofire.framework */; };
-		5FBBF01A1CC834AF0024D2AF /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDC11CC571290011842B /* Alamofire.framework */; };
-		5FBBF01B1CC834C70024D2AF /* Alamofire.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBD1CC571290011842B /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5FBBF01C1CC834CF0024D2AF /* Alamofire.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDC11CC571290011842B /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5FBBF0351CC95FBF0024D2AF /* TestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0341CC95FBF0024D2AF /* TestManager.swift */; };
-		5FBBF0361CC95FBF0024D2AF /* TestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0341CC95FBF0024D2AF /* TestManager.swift */; };
 		5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
 		5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
 		5FBBF03B1CC96AA70024D2AF /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
@@ -45,10 +39,16 @@
 		5FE2F8A71CCA9C17003628F4 /* CredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */; };
 		5FE2F8A91CCE54F1003628F4 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A81CCE54F1003628F4 /* Result.swift */; };
 		5FE2F8AA1CCE54F1003628F4 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A81CCE54F1003628F4 /* Result.swift */; };
-		5FE2F8B21CCEAED8003628F4 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B11CCEAED8003628F4 /* Request.swift */; };
-		5FE2F8B31CCEAED8003628F4 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B11CCEAED8003628F4 /* Request.swift */; };
-		5FE2F8B51CCEB1C0003628F4 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B41CCEB1C0003628F4 /* Requests.swift */; };
-		5FE2F8B61CCEB1C0003628F4 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B41CCEB1C0003628F4 /* Requests.swift */; };
+		5FE2F8B21CCEAED8003628F4 /* Requestable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B11CCEAED8003628F4 /* Requestable.swift */; };
+		5FE2F8B31CCEAED8003628F4 /* Requestable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B11CCEAED8003628F4 /* Requestable.swift */; };
+		5FE2F8B51CCEB1C0003628F4 /* Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B41CCEB1C0003628F4 /* Handlers.swift */; };
+		5FE2F8B61CCEB1C0003628F4 /* Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B41CCEB1C0003628F4 /* Handlers.swift */; };
+		5FE2F8B81CD0E910003628F4 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B71CD0E910003628F4 /* Request.swift */; };
+		5FE2F8B91CD0E910003628F4 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B71CD0E910003628F4 /* Request.swift */; };
+		5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8BA1CD0EAAD003628F4 /* Response.swift */; };
+		5FE2F8BC1CD0EAAD003628F4 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8BA1CD0EAAD003628F4 /* Response.swift */; };
+		5FE2F8BE1CD0EC52003628F4 /* ResponseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8BD1CD0EC52003628F4 /* ResponseSpec.swift */; };
+		5FE2F8BF1CD0EC52003628F4 /* ResponseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8BD1CD0EC52003628F4 /* ResponseSpec.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,7 +78,6 @@
 				5F1A02941CC7EEC900D3F662 /* Quick.framework in CopyFiles */,
 				5F1A02951CC7EEC900D3F662 /* OHHTTPStubs.framework in CopyFiles */,
 				5F1A02961CC7EEC900D3F662 /* Nimble.framework in CopyFiles */,
-				5FBBF01B1CC834C70024D2AF /* Alamofire.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,7 +90,6 @@
 				5F1A02981CC7EED500D3F662 /* Quick.framework in CopyFiles */,
 				5F1A02991CC7EED500D3F662 /* OHHTTPStubs.framework in CopyFiles */,
 				5F1A029A1CC7EED500D3F662 /* Nimble.framework in CopyFiles */,
-				5FBBF01C1CC834CF0024D2AF /* Alamofire.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,14 +106,11 @@
 		5F06DDBA1CC571290011842B /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quick.framework; path = Carthage/Build/iOS/Quick.framework; sourceTree = "<group>"; };
 		5F06DDBB1CC571290011842B /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = Carthage/Build/iOS/OHHTTPStubs.framework; sourceTree = "<group>"; };
 		5F06DDBC1CC571290011842B /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = Carthage/Build/iOS/Nimble.framework; sourceTree = "<group>"; };
-		5F06DDBD1CC571290011842B /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/iOS/Alamofire.framework; sourceTree = "<group>"; };
 		5F06DDBE1CC571290011842B /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quick.framework; path = Carthage/Build/Mac/Quick.framework; sourceTree = "<group>"; };
 		5F06DDBF1CC571290011842B /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = Carthage/Build/Mac/OHHTTPStubs.framework; sourceTree = "<group>"; };
 		5F06DDC01CC571290011842B /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = Carthage/Build/Mac/Nimble.framework; sourceTree = "<group>"; };
-		5F06DDC11CC571290011842B /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/Mac/Alamofire.framework; sourceTree = "<group>"; };
 		5F06DDC81CC66B710011842B /* Auth0.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0.swift; sourceTree = "<group>"; };
 		5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0Spec.swift; sourceTree = "<group>"; };
-		5FBBF0341CC95FBF0024D2AF /* TestManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestManager.swift; sourceTree = "<group>"; };
 		5FBBF0371CC964BC0024D2AF /* Matchers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matchers.swift; sourceTree = "<group>"; };
 		5FBBF03A1CC96AA70024D2AF /* Responses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Responses.swift; sourceTree = "<group>"; };
 		5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
@@ -123,8 +118,11 @@
 		5FBBF0451CCA99E90024D2AF /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
 		5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsSpec.swift; sourceTree = "<group>"; };
 		5FE2F8A81CCE54F1003628F4 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
-		5FE2F8B11CCEAED8003628F4 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
-		5FE2F8B41CCEB1C0003628F4 /* Requests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Requests.swift; sourceTree = "<group>"; };
+		5FE2F8B11CCEAED8003628F4 /* Requestable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Requestable.swift; sourceTree = "<group>"; };
+		5FE2F8B41CCEB1C0003628F4 /* Handlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Handlers.swift; sourceTree = "<group>"; };
+		5FE2F8B71CD0E910003628F4 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
+		5FE2F8BA1CD0EAAD003628F4 /* Response.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
+		5FE2F8BD1CD0EC52003628F4 /* ResponseSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseSpec.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,7 +130,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5FBBF0191CC834AA0024D2AF /* Alamofire.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,7 +137,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5FBBF01A1CC834AF0024D2AF /* Alamofire.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,11 +190,10 @@
 			isa = PBXGroup;
 			children = (
 				5FBBF03D1CCA8FC20024D2AF /* Authentication */,
+				5FE2F8C01CD0F9AF003628F4 /* Networking */,
 				5F049B6C1CB42C29006F6C05 /* Auth0.h */,
-				5F049B6E1CB42C29006F6C05 /* Info.plist */,
 				5F06DDC81CC66B710011842B /* Auth0.swift */,
-				5FE2F8A81CCE54F1003628F4 /* Result.swift */,
-				5FE2F8B11CCEAED8003628F4 /* Request.swift */,
+				5F049B6E1CB42C29006F6C05 /* Info.plist */,
 			);
 			path = Auth0;
 			sourceTree = "<group>";
@@ -207,9 +202,10 @@
 			isa = PBXGroup;
 			children = (
 				5FBBF0411CCA901B0024D2AF /* Authentication */,
+				5FE2F8C11CD0FA11003628F4 /* Networking */,
 				5FBBF0331CC95FA40024D2AF /* Utils */,
-				5F06DD951CC451430011842B /* Info.plist */,
 				5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */,
+				5F06DD951CC451430011842B /* Info.plist */,
 			);
 			path = Auth0Tests;
 			sourceTree = "<group>";
@@ -229,7 +225,6 @@
 				5F06DDBA1CC571290011842B /* Quick.framework */,
 				5F06DDBB1CC571290011842B /* OHHTTPStubs.framework */,
 				5F06DDBC1CC571290011842B /* Nimble.framework */,
-				5F06DDBD1CC571290011842B /* Alamofire.framework */,
 			);
 			name = iOS;
 			sourceTree = "<group>";
@@ -240,7 +235,6 @@
 				5F06DDBE1CC571290011842B /* Quick.framework */,
 				5F06DDBF1CC571290011842B /* OHHTTPStubs.framework */,
 				5F06DDC01CC571290011842B /* Nimble.framework */,
-				5F06DDC11CC571290011842B /* Alamofire.framework */,
 			);
 			name = OSX;
 			sourceTree = "<group>";
@@ -248,11 +242,10 @@
 		5FBBF0331CC95FA40024D2AF /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				5FBBF0341CC95FBF0024D2AF /* TestManager.swift */,
 				5FBBF0371CC964BC0024D2AF /* Matchers.swift */,
 				5FBBF03A1CC96AA70024D2AF /* Responses.swift */,
 			);
-			name = Utils;
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		5FBBF03D1CCA8FC20024D2AF /* Authentication */ = {
@@ -260,9 +253,9 @@
 			children = (
 				5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */,
 				5FBBF0451CCA99E90024D2AF /* Credentials.swift */,
-				5FE2F8B41CCEB1C0003628F4 /* Requests.swift */,
+				5FE2F8B41CCEB1C0003628F4 /* Handlers.swift */,
 			);
-			name = Authentication;
+			path = Authentication;
 			sourceTree = "<group>";
 		};
 		5FBBF0411CCA901B0024D2AF /* Authentication */ = {
@@ -271,7 +264,26 @@
 				5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */,
 				5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */,
 			);
-			name = Authentication;
+			path = Authentication;
+			sourceTree = "<group>";
+		};
+		5FE2F8C01CD0F9AF003628F4 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				5FE2F8B71CD0E910003628F4 /* Request.swift */,
+				5FE2F8B11CCEAED8003628F4 /* Requestable.swift */,
+				5FE2F8BA1CD0EAAD003628F4 /* Response.swift */,
+				5FE2F8A81CCE54F1003628F4 /* Result.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		5FE2F8C11CD0FA11003628F4 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				5FE2F8BD1CD0EC52003628F4 /* ResponseSpec.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -448,10 +460,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
-				5FE2F8B21CCEAED8003628F4 /* Request.swift in Sources */,
-				5FE2F8B51CCEB1C0003628F4 /* Requests.swift in Sources */,
+				5FE2F8B21CCEAED8003628F4 /* Requestable.swift in Sources */,
+				5FE2F8B51CCEB1C0003628F4 /* Handlers.swift in Sources */,
+				5FE2F8B81CD0E910003628F4 /* Request.swift in Sources */,
 				5FE2F8A91CCE54F1003628F4 /* Result.swift in Sources */,
 				5FBBF03F1CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);
@@ -461,10 +475,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE2F8BC1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */,
-				5FE2F8B31CCEAED8003628F4 /* Request.swift in Sources */,
-				5FE2F8B61CCEB1C0003628F4 /* Requests.swift in Sources */,
+				5FE2F8B31CCEAED8003628F4 /* Requestable.swift in Sources */,
+				5FE2F8B61CCEB1C0003628F4 /* Handlers.swift in Sources */,
+				5FE2F8B91CD0E910003628F4 /* Request.swift in Sources */,
 				5FE2F8AA1CCE54F1003628F4 /* Result.swift in Sources */,
 				5FBBF0401CCA8FF40024D2AF /* Authentication.swift in Sources */,
 			);
@@ -478,8 +494,8 @@
 				5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
 				5FE2F8A61CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
-				5FBBF0351CC95FBF0024D2AF /* TestManager.swift in Sources */,
 				5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
+				5FE2F8BE1CD0EC52003628F4 /* ResponseSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,8 +507,8 @@
 				5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5F93BC0C1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
 				5FE2F8A71CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
-				5FBBF0361CC95FBF0024D2AF /* TestManager.swift in Sources */,
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
+				5FE2F8BF1CD0EC52003628F4 /* ResponseSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -620,6 +636,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "-DDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = Auth0;
@@ -645,6 +662,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = Auth0;
@@ -671,6 +689,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_SWIFT_FLAGS = "-DDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
 				PRODUCT_NAME = Auth0;
 				SDKROOT = macosx;
@@ -698,6 +717,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
 				PRODUCT_NAME = Auth0;
 				SDKROOT = macosx;
@@ -717,6 +737,7 @@
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -735,6 +756,7 @@
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
 			};
@@ -754,6 +776,7 @@
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
 				SDKROOT = macosx;
@@ -775,6 +798,7 @@
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
 				SDKROOT = macosx;

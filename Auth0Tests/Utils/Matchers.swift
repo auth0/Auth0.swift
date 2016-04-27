@@ -23,7 +23,7 @@
 import Foundation
 import OHHTTPStubs
 import Nimble
-import Auth0
+@testable import Auth0
 
 func hasAllOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
@@ -96,12 +96,31 @@ func haveCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> Ma
     }
 }
 
-func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Result<CreateUser, Authentication.Error>> {
+func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Result<DatabaseUser, Authentication.Error>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have created user with email <\(email)>"
         if let actual = try expression.evaluate(), case .Success(let created) = actual {
             return created.email == email && (username == nil || created.username == username)
         }
         return false
+    }
+}
+
+extension NSURLRequest {
+    var a0_payload: [String: AnyObject]? {
+        return NSURLProtocol.propertyForKey(ParameterPropertyKey, inRequest: self) as? [String: AnyObject]
+    }
+}
+
+extension NSMutableURLRequest {
+    override var a0_payload: [String: AnyObject]? {
+        get {
+            return NSURLProtocol.propertyForKey(ParameterPropertyKey, inRequest: self) as? [String: AnyObject]
+        }
+        set(newValue) {
+            if let parameters = newValue {
+                NSURLProtocol.setProperty(parameters, forKey: ParameterPropertyKey, inRequest: self)
+            }
+        }
     }
 }
