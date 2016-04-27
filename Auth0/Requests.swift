@@ -22,8 +22,6 @@
 
 import Foundation
 
-public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
-
 func databaseUser(response: Response, callback: Request<DatabaseUser, Authentication.Error>.Callback) {
     switch response.result {
     case .Success(let payload):
@@ -32,7 +30,7 @@ func databaseUser(response: Response, callback: Request<DatabaseUser, Authentica
             let verified = dictionary["email_verified"] as? Bool ?? false
             callback(.Success(result: (email: email, username: username, verified: verified)))
         } else {
-            callback(.Failure(error: .InvalidResponse(response: payload ?? [:])))
+            callback(.Failure(error: .InvalidResponse(response: response.data)))
         }
     case .Failure(let cause):
         callback(.Failure(error: authenticationError(response.data, cause: cause)))
@@ -54,21 +52,27 @@ func credentials(response: Response, callback: Request<Credentials, Authenticati
         if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
             callback(.Success(result: credentials))
         } else {
-            callback(.Failure(error: .InvalidResponse(response: payload ?? [:])))
+            callback(.Failure(error: .InvalidResponse(response: response.data)))
         }
     case .Failure(let cause):
         callback(.Failure(error: authenticationError(response.data, cause: cause)))
     }
 }
 
-private func authenticationError(data: NSData?, cause: NSError) -> Authentication.Error {
-    if
-        let data = data,
-        let json = try? NSJSONSerialization.JSONObjectWithData(data, options: []),
-        let payload = json as? [String: AnyObject] {
-        return payloadError(payload, cause: cause)
-    } else {
-        return .Unknown(cause: cause)
+private func authenticationError(data: NSData?, cause: Response.Error) -> Authentication.Error {
+    switch cause {
+    case .InvalidJSON(let data):
+        return .InvalidResponse(response: data)
+    case .ServerError(let status, let data) where (400...500).contains(status) && data != nil:
+        if
+            let json = try? NSJSONSerialization.JSONObjectWithData(data!, options: []),
+            let payload = json as? [String: AnyObject] {
+            return payloadError(payload, cause: cause)
+        } else {
+            return .RequestFailed(cause: cause)
+        }
+    default:
+        return .RequestFailed(cause: cause)
     }
 }
 
@@ -81,5 +85,5 @@ private func payloadError(payload: [String: AnyObject], cause: ErrorType) -> Aut
         return .Response(code: code, description: description)
     }
 
-    return .Unknown(cause: cause)
+    return .RequestFailed(cause: cause)
 }

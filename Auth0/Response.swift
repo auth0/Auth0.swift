@@ -28,10 +28,10 @@ struct Response {
     let error: NSError?
 
     var result: Result {
-        guard error == nil else { return .Failure(error!) }
-        guard let response = self.response as? NSHTTPURLResponse else { return .Failure(Error.Unknown.foundationError) }
-        guard (200...300).contains(response.statusCode) else { return .Failure(Error.RequestFailed.foundationError) }
-        guard let data = self.data else { return response.statusCode == 204 ? .Success(nil) : .Failure(Error.NoResponse.foundationError) }
+        guard error == nil else { return .Failure(.RequestFailed(error)) }
+        guard let response = self.response as? NSHTTPURLResponse else { return .Failure(.RequestFailed(nil)) }
+        guard (200...300).contains(response.statusCode) else { return .Failure(.ServerError(response.statusCode, data)) }
+        guard let data = self.data else { return response.statusCode == 204 ? .Success(nil) : .Failure(.NoResponse) }
         do {
             let json = try NSJSONSerialization.JSONObjectWithData(data, options: [])
             return .Success(json)
@@ -40,35 +40,20 @@ struct Response {
             if response.URL?.lastPathComponent == "change_password" {
                 return .Success(nil)
             } else {
-                return .Failure(Error.InvalidJSON.foundationError)
+                return .Failure(.InvalidJSON(data))
             }
         }
     }
 
     enum Result {
         case Success(AnyObject?)
-        case Failure(NSError)
+        case Failure(Error)
     }
 
-    enum Error: Int {
-        case Unknown = 0
-        case RequestFailed
+    enum Error: ErrorType {
+        case RequestFailed(NSError?)
+        case ServerError(Int, NSData?)
         case NoResponse
-        case InvalidJSON
-
-        var foundationError: NSError {
-            let message: String
-            switch self {
-            case .Unknown:
-                message = "Request failed with no apparent cause"
-            case .RequestFailed:
-                message = "HTTP status code was not successful"
-            case .NoResponse:
-                message = "Expected JSON response but got an empty one"
-            case .InvalidJSON:
-                message = "Malformed JSON in response or body"
-            }
-            return NSError(domain: "com.auth0", code: self.rawValue, userInfo: [NSLocalizedDescriptionKey: message])
-        }
+        case InvalidJSON(NSData)
     }
 }

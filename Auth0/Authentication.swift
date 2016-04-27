@@ -22,6 +22,8 @@
 
 import Foundation
 
+public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
+
 public struct Authentication {
     public let clientId: String
     public let url: NSURL
@@ -40,8 +42,8 @@ public struct Authentication {
 
     public enum Error: ErrorType {
         case Response(code: String, description: String)
-        case InvalidResponse(response: AnyObject)
-        case Unknown(cause: ErrorType)
+        case InvalidResponse(response: NSData?)
+        case RequestFailed(cause: ErrorType)
     }
 
     public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, Error> {
