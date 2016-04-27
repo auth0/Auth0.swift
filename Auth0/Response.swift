@@ -29,9 +29,9 @@ struct Response {
 
     var result: Result {
         guard error == nil else { return .Failure(error!) }
-        guard let response = self.response as? NSHTTPURLResponse else { return .Failure(Error.Unknown.error) }
-        guard (200...300).contains(response.statusCode) else { return .Failure(Error.RequestFailed.error) }
-        guard let data = self.data else { return response.statusCode == 204 ? .Success(nil) : .Failure(Error.NoResponse.error) }
+        guard let response = self.response as? NSHTTPURLResponse else { return .Failure(Error.Unknown.foundationError) }
+        guard (200...300).contains(response.statusCode) else { return .Failure(Error.RequestFailed.foundationError) }
+        guard let data = self.data else { return response.statusCode == 204 ? .Success(nil) : .Failure(Error.NoResponse.foundationError) }
         do {
             let json = try NSJSONSerialization.JSONObjectWithData(data, options: [])
             return .Success(json)
@@ -40,7 +40,7 @@ struct Response {
             if response.URL?.lastPathComponent == "change_password" {
                 return .Success(nil)
             } else {
-                return .Failure(Error.InvalidJSON.error)
+                return .Failure(Error.InvalidJSON.foundationError)
             }
         }
     }
@@ -56,7 +56,7 @@ struct Response {
         case NoResponse
         case InvalidJSON
 
-        var error: NSError {
+        var foundationError: NSError {
             let message: String
             switch self {
             case .Unknown:
