@@ -30,11 +30,7 @@ public struct Authentication {
 
     let session: NSURLSession
 
-    init(clientId: String, url: NSURL) {
-        self.init(clientId: clientId, url: url, session: NSURLSession.sharedSession())
-    }
-
-    init(clientId: String, url: NSURL, session: NSURLSession) {
+    init(clientId: String, url: NSURL, session: NSURLSession = .sharedSession()) {
         self.clientId = clientId
         self.url = url
         self.session = session

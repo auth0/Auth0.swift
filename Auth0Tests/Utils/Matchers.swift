@@ -23,7 +23,7 @@
 import Foundation
 import OHHTTPStubs
 import Nimble
-import Auth0
+@testable import Auth0
 
 func hasAllOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
@@ -105,8 +105,6 @@ func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Resu
         return false
     }
 }
-
-let ParameterPropertyKey = "com.auth0.parameter"
 
 extension NSURLRequest {
     var a0_payload: [String: AnyObject]? {

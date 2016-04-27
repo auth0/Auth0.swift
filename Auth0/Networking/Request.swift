@@ -22,6 +22,10 @@
 
 import Foundation
 
+#if DEBUG
+    let ParameterPropertyKey = "com.auth0.parameter"
+#endif
+
 public struct Request<T, Error: ErrorType>: Requestable {
     public typealias Callback = Result<T, Error> -> ()
 
@@ -31,20 +35,22 @@ public struct Request<T, Error: ErrorType>: Requestable {
     let handle: (Response, Callback) -> ()
     var payload: [String: AnyObject] = [:]
 
-    public func start(callback: Callback) {
+    var request: NSURLRequest {
         let request = NSMutableURLRequest(URL: url)
         request.HTTPMethod = method
         if !payload.isEmpty {
             request.HTTPBody = try! NSJSONSerialization.dataWithJSONObject(payload, options: [])
-            NSURLProtocol.setProperty(payload, forKey: "com.auth0.parameter", inRequest: request)
+            #if DEBUG
+            NSURLProtocol.setProperty(payload, forKey: ParameterPropertyKey, inRequest: request)
+            #endif
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        return request
+    }
+
+    public func start(callback: Callback) {
         let handler = self.handle
-
-
-        session.dataTaskWithRequest(request) { data, response, error in
-            handler(Response(data: data, response: response, error: error), callback)
-            }.resume()
+        session.dataTaskWithRequest(request) { handler(Response(data: $0, response: $1, error: $2), callback) }.resume()
     }
 
     public func concat<S>(request: Request<S, Error>) -> ConcatRequest<T, S, Error> {
