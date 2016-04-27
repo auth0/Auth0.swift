@@ -90,4 +90,37 @@ public struct Authentication {
         return createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
             .concat(login(email, password: password, connection: connection, scope: scope, parameters: parameters))
     }
+
+    public func startPasswordless(email email: String, type: PasswordlessType = .Code, connection: String = "email", parameters: [String: AnyObject] = [:]) -> Request<Void, Authentication.Error> {
+        var payload: [String: AnyObject] = [
+            "email": email,
+            "connection": connection,
+            "send": type.rawValue,
+            "client_id": self.clientId,
+        ]
+        if case .WebLink = type where !parameters.isEmpty {
+            payload["authParams"] = parameters
+        }
+
+        let start = NSURL(string: "/passwordless/start", relativeToURL: self.url)!
+        return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload)
+    }
+
+    public func startPasswordless(phoneNumber phoneNumber: String, type: PasswordlessType = .Code, connection: String = "sms") -> Request<Void, Authentication.Error> {
+        let payload: [String: AnyObject] = [
+            "phone_number": phoneNumber,
+            "connection": connection,
+            "send": type.rawValue,
+            "client_id": self.clientId,
+            ]
+        let start = NSURL(string: "/passwordless/start", relativeToURL: self.url)!
+        return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload)
+    }
+
+    public enum PasswordlessType: String {
+        case Code = "code"
+        case WebLink = "link"
+        case iOSLink = "link_ios"
+        case AndroidLink = "link_android"
+    }
 }

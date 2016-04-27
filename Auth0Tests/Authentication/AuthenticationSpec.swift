@@ -29,6 +29,7 @@ import OHHTTPStubs
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 
+private let Phone = "+144444444444"
 private let SupportAtAuth0 = "support@auth0.com"
 private let Support = "support"
 private let ValidPassword = "I.O.U. a password"
@@ -282,5 +283,102 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        context("passwordless email") {
+
+            it("should start with email with default values") {
+                stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless"
+                waitUntil { done in
+                    auth.startPasswordless(email: SupportAtAuth0).start { result in
+                        expect(result).to(beSuccessfulResult())
+                        done()
+                    }
+                }
+            }
+
+            it("should start with email") {
+                stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "custom_email", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless custom"
+                waitUntil { done in
+                    auth.startPasswordless(email: SupportAtAuth0, type: .iOSLink, connection: "custom_email").start { result in
+                        expect(result).to(beSuccessfulResult())
+                        done()
+                    }
+                }
+            }
+
+            it("should start with email and authParameters for web link") {
+                let params = ["scope": "openid"]
+                stub(isPasswordless(Domain) && hasAtLeast(["email": SupportAtAuth0]) && hasObjectAttribute("authParams", value: params)) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless web link with parameters"
+                waitUntil { done in
+                    auth.startPasswordless(email: SupportAtAuth0, type: .WebLink, parameters: params).start { result in
+                        expect(result).to(beSuccessfulResult())
+                        done()
+                    }
+                }
+            }
+
+            it("should not send params if type is not web link") {
+                let params = ["scope": "openid"]
+                stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
+                waitUntil { done in
+                    auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: params).start { result in
+                        expect(result).to(beSuccessfulResult())
+                        done()
+                    }
+                }
+            }
+
+            it("should not add params attr if they are empty") {
+                stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
+                waitUntil { done in
+                    auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: [:]).start { result in
+                        expect(result).to(beSuccessfulResult())
+                        done()
+                    }
+                }
+            }
+
+            it("should report failure") {
+                stub(isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
+                waitUntil { done in
+                    auth.startPasswordless(email: SupportAtAuth0).start { result in
+                        expect(result).to(haveError(code: "error", description: "description"))
+                        done()
+                    }
+                }
+            }
+        }
+
+        context("passwordless sms") {
+
+            it("should start with sms with default values") {
+                stub(isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "sms", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless"
+                waitUntil { done in
+                    auth.startPasswordless(phoneNumber: Phone).start { result in
+                        expect(result).to(beSuccessfulResult())
+                        done()
+                    }
+                }
+            }
+
+            it("should start with sms") {
+                stub(isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "custom_sms", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless custom"
+                waitUntil { done in
+                    auth.startPasswordless(phoneNumber: Phone, type: .iOSLink, connection: "custom_sms").start { result in
+                        expect(result).to(beSuccessfulResult())
+                        done()
+                    }
+                }
+            }
+
+            it("should report failure") {
+                stub(isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
+                waitUntil { done in
+                    auth.startPasswordless(phoneNumber: Phone).start { result in
+                        expect(result).to(haveError(code: "error", description: "description"))
+                        done()
+                    }
+                }
+            }
+        }
     }
 }
