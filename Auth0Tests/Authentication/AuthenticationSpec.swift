@@ -38,6 +38,8 @@ private let ConnectionName = "Username-Password-Authentication"
 private let AccessToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
 private let IdToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
 
+private let Timeout: NSTimeInterval = 2
+
 class AuthenticationSpec: QuickSpec {
     override func spec() {
 
@@ -59,7 +61,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should login with username and password") {
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -68,7 +70,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should have an access_token") {
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "read:users").start { result in
                         expect(result).to(haveCredentials(AccessToken))
                         done()
@@ -77,7 +79,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should have both token when scope is 'openid'") {
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.login(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "openid").start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
@@ -86,7 +88,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should report when fails to login") {
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.login(SupportAtAuth0, password: "invalid", connection: ConnectionName).start { result in
                         expect(result).toNot(haveCredentials())
                         done()
@@ -96,7 +98,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should provide error payload from auth api") {
 
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     let code = "invalid_username_password"
                     let description = "Invalid password"
                     let password = "return invalid password"
@@ -110,7 +112,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should provide error payload from lock auth api") {
 
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     let code = "invalid_username_password"
                     let description = "Invalid password"
                     let password = "return invalid password"
@@ -127,7 +129,7 @@ class AuthenticationSpec: QuickSpec {
                 let state = NSUUID().UUIDString
                 let password = NSUUID().UUIDString
                 stub(isResourceOwner(Domain) && hasAtLeast(["password": password, "state": state])) { _ in return authResponse(accessToken: token) }.name = "Custom Parameter Auth"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.login("mail@auth0.com", password: password, connection: ConnectionName, parameters: ["state": state]).start { result in
                         expect(result).to(haveCredentials(token))
                         done()
@@ -145,7 +147,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should create a user with email & password") {
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.createUser(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCreatedUser(SupportAtAuth0))
                         done()
@@ -155,7 +157,7 @@ class AuthenticationSpec: QuickSpec {
 
 
             it("should create a user with email, username & password") {
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.createUser(SupportAtAuth0, username: Support, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCreatedUser(SupportAtAuth0, username: Support))
                         done()
@@ -165,7 +167,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should provide error payload from auth api") {
 
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     let code = "invalid_username_password"
                     let description = "Invalid password"
                     let password = "return invalid password"
@@ -182,7 +184,7 @@ class AuthenticationSpec: QuickSpec {
                 let email = "metadata@auth0.com"
                 let metadata = ["country": country]
                 stub(isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: email) }.name = "User w/metadata"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.createUser(email, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
                         expect(result).to(haveCreatedUser(email))
                         done()
@@ -196,7 +198,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should reset password") {
                 stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return resetPasswordResponse() }
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.resetPassword(SupportAtAuth0, connection: ConnectionName).start { result in
                         guard case .Success = result else { return fail("Failed to reset password") }
                         done()
@@ -208,7 +210,7 @@ class AuthenticationSpec: QuickSpec {
                 let code = "reset_failed"
                 let description = "failed reset password"
                 stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.resetPassword(SupportAtAuth0, connection: ConnectionName).start { result in
                         expect(result).to(haveError(code: code, description: description))
                         done()
@@ -224,7 +226,7 @@ class AuthenticationSpec: QuickSpec {
                 let code = "create_failed"
                 let description = "failed create user"
                 stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "User w/email"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveError(code: code, description: description))
                         done()
@@ -237,7 +239,7 @@ class AuthenticationSpec: QuickSpec {
                 let description = "failed to login"
                 stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
                 stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authFailure(code: code, description: description) }.name = "OpenID Auth"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveError(code: code, description: description))
                         done()
@@ -248,7 +250,7 @@ class AuthenticationSpec: QuickSpec {
             it("should create user and login") {
                 stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
                 stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
@@ -260,7 +262,7 @@ class AuthenticationSpec: QuickSpec {
                 let state = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
                 stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
                 stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "state": state])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, parameters: ["state": state]).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
@@ -273,7 +275,7 @@ class AuthenticationSpec: QuickSpec {
                 let metadata = ["country": country]
                 stub(isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
                 stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
@@ -287,7 +289,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should start with email with default values") {
                 stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0).start { result in
                         expect(result).to(beSuccessfulResult())
                         done()
@@ -297,7 +299,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should start with email") {
                 stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "custom_email", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless custom"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .iOSLink, connection: "custom_email").start { result in
                         expect(result).to(beSuccessfulResult())
                         done()
@@ -308,7 +310,7 @@ class AuthenticationSpec: QuickSpec {
             it("should start with email and authParameters for web link") {
                 let params = ["scope": "openid"]
                 stub(isPasswordless(Domain) && hasAtLeast(["email": SupportAtAuth0]) && hasObjectAttribute("authParams", value: params)) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless web link with parameters"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .WebLink, parameters: params).start { result in
                         expect(result).to(beSuccessfulResult())
                         done()
@@ -319,7 +321,7 @@ class AuthenticationSpec: QuickSpec {
             it("should not send params if type is not web link") {
                 let params = ["scope": "openid"]
                 stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: params).start { result in
                         expect(result).to(beSuccessfulResult())
                         done()
@@ -329,7 +331,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should not add params attr if they are empty") {
                 stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: [:]).start { result in
                         expect(result).to(beSuccessfulResult())
                         done()
@@ -339,7 +341,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should report failure") {
                 stub(isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0).start { result in
                         expect(result).to(haveError(code: "error", description: "description"))
                         done()
@@ -352,7 +354,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should start with sms with default values") {
                 stub(isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "sms", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone).start { result in
                         expect(result).to(beSuccessfulResult())
                         done()
@@ -362,7 +364,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should start with sms") {
                 stub(isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "custom_sms", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless custom"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone, type: .iOSLink, connection: "custom_sms").start { result in
                         expect(result).to(beSuccessfulResult())
                         done()
@@ -372,7 +374,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should report failure") {
                 stub(isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
-                waitUntil { done in
+                waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone).start { result in
                         expect(result).to(haveError(code: "error", description: "description"))
                         done()
