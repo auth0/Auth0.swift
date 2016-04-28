@@ -31,6 +31,11 @@ public struct UserProfile {
     public let createdAt: NSDate
 
     public let email: String?
+    public let emailVerified: Bool
+    public let givenName: String?
+    public let familyName: String?
+
+    let values: [String: AnyObject]
 
     public init?(dictionary: [String: AnyObject]) {
         guard
@@ -46,6 +51,14 @@ public struct UserProfile {
         self.pictureURL = pictureURL
         self.createdAt = createdAt
         self.email = dictionary["email"] as? String
+        self.emailVerified = dictionary["email_verified"] as? Bool ?? false
+        self.givenName = dictionary["given_name"] as? String
+        self.familyName = dictionary["family_name"] as? String
+        self.values = dictionary
+    }
+
+    public subscript(key: String) -> AnyObject? {
+        return self.values[key]
     }
 }
 

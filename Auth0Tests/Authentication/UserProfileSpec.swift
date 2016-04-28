@@ -77,6 +77,33 @@ class UserProfileSpec: QuickSpec {
                 expect(profile?.email) == SupportAtAuth0
             }
 
+            it("should build with optional values") {
+                var info = basicProfile()
+                let optional: [String: AnyObject] = [
+                    "email": SupportAtAuth0,
+                    "email_verified": true,
+                    "given_name": "John",
+                    "family_name": "Doe"
+                ]
+                optional.forEach { key, value in info[key] = value }
+                let profile = UserProfile(dictionary: info)
+                expect(profile?.email) == SupportAtAuth0
+                expect(profile?.emailVerified) == true
+                expect(profile?.givenName) == "John"
+                expect(profile?.familyName) == "Doe"
+            }
+
+            it("should build with extra values") {
+                var info = basicProfile()
+                let optional: [String: AnyObject] = [
+                    "my_custom_key": "custom_value"
+                ]
+                optional.forEach { key, value in info[key] = value }
+                let profile = UserProfile(dictionary: info)
+                expect(profile?["my_custom_key"] as? String) == "custom_value"
+            }
+
+
             ["user_id", "name", "nickname", "picture", "created_at"].forEach { key in itBehavesLike("invalid profile") { ["key": key] } }
         }
     }
