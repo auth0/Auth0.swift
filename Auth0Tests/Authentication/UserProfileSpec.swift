@@ -24,24 +24,6 @@ import Quick
 import Nimble
 import Auth0
 
-private let UserId = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-private let SupportAtAuth0 = "support@auth0.com"
-private let Support = "support"
-private let Nickname = "sup"
-private let PictureURL = NSURL(string: "https://auth0.com")!
-private let CreatedAt = "2016-04-27T17:59:00Z"
-
-private func dateFromISODate(string: String) -> NSDate {
-    let dateFormatter = NSDateFormatter()
-    dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
-    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZ"
-    return dateFormatter.dateFromString(string)!
-}
-
-private func basicProfile(id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAt) -> [String: AnyObject] {
-    return ["user_id": id, "name": name, "nickname": nickname, "picture": picture, "created_at": createdAt]
-}
-
 class ProfileSharedExamplesConfiguration: QuickConfiguration {
     override class func configure(configuration: Configuration) {
         sharedExamples("invalid profile") { (context: SharedExampleContext) in

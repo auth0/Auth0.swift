@@ -59,6 +59,19 @@ func credentials(response: Response, callback: Request<Credentials, Authenticati
     }
 }
 
+func profile(response: Response, callback: Request<UserProfile, Authentication.Error>.Callback) {
+    switch response.result {
+    case .Success(let payload):
+        if let dictionary = payload as? [String: AnyObject], let profile = UserProfile(dictionary: dictionary) {
+            callback(.Success(result: profile))
+        } else {
+            callback(.Failure(error: .InvalidResponse(response: response.data)))
+        }
+    case .Failure(let cause):
+        callback(.Failure(error: authenticationError(response.data, cause: cause)))
+    }
+}
+
 private func authenticationError(data: NSData?, cause: Response.Error) -> Authentication.Error {
     switch cause {
     case .InvalidJSON(let data):

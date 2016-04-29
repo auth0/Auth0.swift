@@ -23,6 +23,20 @@
 import Foundation
 import OHHTTPStubs
 
+let UserId = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+let SupportAtAuth0 = "support@auth0.com"
+let Support = "support"
+let Nickname = "sup"
+let PictureURL = NSURL(string: "https://auth0.com")!
+let CreatedAt = "2016-04-27T17:59:00Z"
+
+func dateFromISODate(string: String) -> NSDate {
+    let dateFormatter = NSDateFormatter()
+    dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZ"
+    return dateFormatter.dateFromString(string)!
+}
+
 func authResponse(accessToken accessToken: String, idToken: String? = nil) -> OHHTTPStubsResponse {
     var json = [
         "access_token": accessToken,
@@ -62,4 +76,12 @@ func authFailure(error error: String, description: String) -> OHHTTPStubsRespons
 
 func passwordless(email: String, verified: Bool) -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(JSONObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: nil)
+}
+
+func tokenInfo() -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(JSONObject: basicProfile(), statusCode: 200, headers: nil)
+}
+
+func basicProfile(id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAt) -> [String: AnyObject] {
+    return ["user_id": id, "name": name, "nickname": nickname, "picture": picture, "created_at": createdAt]
 }

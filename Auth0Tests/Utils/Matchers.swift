@@ -77,6 +77,10 @@ func isPasswordless(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/passwordless/start")
 }
 
+func isTokenInfo(domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/tokeninfo")
+}
+
 func haveError<T>(code code: String, description: String) -> MatcherFunc<Result<T, Authentication.Error>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "an error response with code <\(code)> and description <\(description)>"
@@ -119,6 +123,16 @@ func beSuccessfulResult<T>() -> MatcherFunc<Result<T, Authentication.Error>> {
         failureMessage.postfixMessage = "be a successful result"
         if let actual = try expression.evaluate(), case .Success = actual {
             return true
+        }
+        return false
+    }
+}
+
+func haveProfile(userId: String) -> MatcherFunc<Result<UserProfile, Authentication.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "have user profile for user id <\(userId)>"
+        if let actual = try expression.evaluate(), case .Success(let profile) = actual {
+            return profile.id == userId
         }
         return false
     }
