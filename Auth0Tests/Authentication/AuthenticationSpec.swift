@@ -392,10 +392,30 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should report failure") {
+            it("should report failure to get token info") {
                 stub(isTokenInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.tokenInfo(IdToken).start { result in
+                        expect(result).to(haveError(code: "invalid_token", description: "the token is invalid"))
+                        done()
+                    }
+                }
+            }
+
+            it("should return user information") {
+                stub(isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo() }.name = "user info"
+                waitUntil(timeout: Timeout) { done in
+                    auth.userInfo(AccessToken).start { result in
+                        expect(result).to(haveProfile(UserId))
+                        done()
+                    }
+                }
+            }
+
+            it("should report failure to get user info") {
+                stub(isUserInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
+                waitUntil(timeout: Timeout) { done in
+                    auth.userInfo(IdToken).start { result in
                         expect(result).to(haveError(code: "invalid_token", description: "the token is invalid"))
                         done()
                     }

@@ -79,6 +79,10 @@ func passwordless(email: String, verified: Bool) -> OHHTTPStubsResponse {
 }
 
 func tokenInfo() -> OHHTTPStubsResponse {
+    return userInfo()
+}
+
+func userInfo() -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(JSONObject: basicProfile(), statusCode: 200, headers: nil)
 }
 
