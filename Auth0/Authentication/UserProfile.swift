@@ -60,6 +60,19 @@ public struct UserProfile {
     public subscript(key: String) -> AnyObject? {
         return self.values[key]
     }
+
+    public func value<Type>(key: String) -> Type? {
+        return self[key] as? Type
+    }
+
+    public var userMetadata: [String: AnyObject] {
+        return self["user_metadata"] as? [String: AnyObject] ?? [:]
+    }
+
+    public var appMetadata: [String: AnyObject] {
+        return self["app_metadata"] as? [String: AnyObject] ?? [:]
+    }
+
 }
 
 private func fromSO8601(string: String) -> NSDate? {

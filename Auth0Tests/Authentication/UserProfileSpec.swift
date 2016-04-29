@@ -103,8 +103,87 @@ class UserProfileSpec: QuickSpec {
                 expect(profile?["my_custom_key"] as? String) == "custom_value"
             }
 
-
             ["user_id", "name", "nickname", "picture", "created_at"].forEach { key in itBehavesLike("invalid profile") { ["key": key] } }
+        }
+
+        describe("metadata") {
+
+            it("should have user_metadata") {
+                var info = basicProfile()
+                let metadata: [String: AnyObject] = [
+                    "first_name": "John",
+                    "last_name": "Doe"
+                ]
+                info["user_metadata"] = metadata
+
+                let profile = UserProfile(dictionary: info)
+                expect(profile?.userMetadata["first_name"] as? String) == "John"
+                expect(profile?.userMetadata["last_name"] as? String) == "Doe"
+            }
+
+            it("should at least return empty user_metadata") {
+                let info = basicProfile()
+                let profile = UserProfile(dictionary: info)
+                expect(profile?.userMetadata.isEmpty) == true
+            }
+
+            it("should have app_metadata") {
+                var info = basicProfile()
+                let metadata: [String: AnyObject] = [
+                    "subscription": "paid",
+                    "logins": 10,
+                    "verified": true
+                ]
+                info["app_metadata"] = metadata
+
+                let profile = UserProfile(dictionary: info)
+                expect(profile?.appMetadata["subscription"] as? String) == "paid"
+                expect(profile?.appMetadata["logins"] as? Int) == 10
+                expect(profile?.appMetadata["verified"] as? Bool) == true
+            }
+
+            it("should at least return empty app_metadata") {
+                let info = basicProfile()
+                let profile = UserProfile(dictionary: info)
+                expect(profile?.appMetadata.isEmpty) == true
+            }
+        }
+
+        describe("generic types") {
+
+            var profile: UserProfile!
+            let integer = 1986
+            let dictionary = ["key": "value"]
+            let list = [1, 2, 3, 4]
+
+            beforeEach {
+                var info = basicProfile()
+                let optional: [String: AnyObject] = [
+                    "integer": integer,
+                    "boolean": true,
+                    "dictionary": dictionary,
+                    "list": list
+                ]
+                optional.forEach { key, value in info[key] = value }
+                profile = UserProfile(dictionary: info)
+            }
+
+            it("should return integer") {
+                expect(profile.value("integer")) == integer
+            }
+
+            it("should return boolean") {
+                expect(profile.value("boolean")) == true
+            }
+
+            it("should return dictionary") {
+                expect(profile.value("dictionary")) == dictionary
+            }
+
+            it("should return list") {
+                expect(profile.value("list")) == list
+            }
+
         }
     }
 }
