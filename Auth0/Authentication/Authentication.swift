@@ -117,6 +117,17 @@ public struct Authentication {
         return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload)
     }
 
+    public func tokenInfo(token: String) -> Request<UserProfile, Authentication.Error> {
+        let payload: [String: AnyObject] = ["id_token": token]
+        let tokenInfo = NSURL(string: "/tokeninfo", relativeToURL: self.url)!
+        return Request(session: session, url: tokenInfo, method: "POST", handle: profile, payload: payload)
+    }
+
+    public func userInfo(token: String) -> Request<UserProfile, Authentication.Error> {
+        let userInfo = NSURL(string: "/userinfo", relativeToURL: self.url)!
+        return Request(session: session, url: userInfo, method: "GET", handle: profile, headers: ["Authorization": "Bearer \(token)"])
+    }
+
     public enum PasswordlessType: String {
         case Code = "code"
         case WebLink = "link"

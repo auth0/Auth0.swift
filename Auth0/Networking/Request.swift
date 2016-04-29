@@ -33,7 +33,17 @@ public struct Request<T, Error: ErrorType>: Requestable {
     let url: NSURL
     let method: String
     let handle: (Response, Callback) -> ()
-    var payload: [String: AnyObject] = [:]
+    let payload: [String: AnyObject]
+    let headers: [String: String]
+
+    init(session: NSURLSession, url: NSURL, method: String, handle: (Response, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:]) {
+        self.session = session
+        self.url = url
+        self.method = method
+        self.handle = handle
+        self.payload = payload
+        self.headers = headers
+    }
 
     var request: NSURLRequest {
         let request = NSMutableURLRequest(URL: url)
@@ -45,6 +55,7 @@ public struct Request<T, Error: ErrorType>: Requestable {
             #endif
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
         return request
     }
 

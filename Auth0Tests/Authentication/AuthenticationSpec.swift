@@ -30,8 +30,6 @@ private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 
 private let Phone = "+144444444444"
-private let SupportAtAuth0 = "support@auth0.com"
-private let Support = "support"
 private let ValidPassword = "I.O.U. a password"
 private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
@@ -381,6 +379,49 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+        }
+
+        context("user information") {
+            it("should return token information") {
+                stub(isTokenInfo(Domain) && hasAllOf(["id_token": IdToken])) { _ in return tokenInfo() }.name = "token info"
+                waitUntil(timeout: Timeout) { done in
+                    auth.tokenInfo(IdToken).start { result in
+                        expect(result).to(haveProfile(UserId))
+                        done()
+                    }
+                }
+            }
+
+            it("should report failure to get token info") {
+                stub(isTokenInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
+                waitUntil(timeout: Timeout) { done in
+                    auth.tokenInfo(IdToken).start { result in
+                        expect(result).to(haveError(code: "invalid_token", description: "the token is invalid"))
+                        done()
+                    }
+                }
+            }
+
+            it("should return user information") {
+                stub(isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo() }.name = "user info"
+                waitUntil(timeout: Timeout) { done in
+                    auth.userInfo(AccessToken).start { result in
+                        expect(result).to(haveProfile(UserId))
+                        done()
+                    }
+                }
+            }
+
+            it("should report failure to get user info") {
+                stub(isUserInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
+                waitUntil(timeout: Timeout) { done in
+                    auth.userInfo(IdToken).start { result in
+                        expect(result).to(haveError(code: "invalid_token", description: "the token is invalid"))
+                        done()
+                    }
+                }
+            }
+
         }
     }
 }
