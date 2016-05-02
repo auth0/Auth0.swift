@@ -35,7 +35,8 @@ private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
 private let AccessToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
 private let IdToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-
+private let FacebookToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+private let InvalidFacebookToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
 private let Timeout: NSTimeInterval = 2
 
 class AuthenticationSpec: QuickSpec {
@@ -423,5 +424,93 @@ class AuthenticationSpec: QuickSpec {
             }
 
         }
+
+        context("social login") {
+
+            beforeEach {
+                stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook", "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Facebook Auth OpenID"
+                stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook"]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Facebook Auth"
+                stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": InvalidFacebookToken])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
+            }
+
+            it("should login with social IdP token") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginSocial(FacebookToken, connection: "facebook").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should have an access_token") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginSocial(FacebookToken, connection: "facebook", scope: "read:users").start { result in
+                        expect(result).to(haveCredentials(AccessToken))
+                        done()
+                    }
+                }
+            }
+
+            it("should have both token when scope is 'openid'") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginSocial(FacebookToken, connection: "facebook", scope: "openid").start { result in
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
+                        done()
+                    }
+                }
+            }
+
+            it("should report when fails to login") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginSocial(InvalidFacebookToken, connection: "facebook").start { result in
+                        expect(result).toNot(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should provide error payload from auth api") {
+
+                waitUntil(timeout: Timeout) { done in
+                    let code = "invalid_token"
+                    let description = "Invalid token"
+                    let token = "return invalid token"
+                    stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(code: code, description: description) }
+                    auth.loginSocial(token, connection: "facebook").start { result in
+                        expect(result).to(haveError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+            it("should provide error payload from lock auth api") {
+
+                waitUntil(timeout: Timeout) { done in
+                    let code = "invalid_token"
+                    let description = "Invalid token"
+                    let token = "return invalid token"
+                    stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(error: code, description: description) }
+                    auth.loginSocial(token, connection: "facebook").start { result in
+                        expect(result).to(haveError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+            it("should send additional parameters") {
+                let accessToken = "special token for state"
+                let state = NSUUID().UUIDString
+                let token = NSUUID().UUIDString
+                stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token, "state": state])) { _ in return authResponse(accessToken: accessToken) }.name = "Custom Parameter Auth"
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginSocial(token, connection: "facebook", parameters: ["state": state]).start { result in
+                        expect(result).to(haveCredentials(accessToken))
+                        done()
+                    }
+                }
+            }
+            
+        }
+
     }
 }

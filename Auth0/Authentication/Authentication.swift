@@ -128,6 +128,18 @@ public struct Authentication {
         return Request(session: session, url: userInfo, method: "GET", handle: profile, headers: ["Authorization": "Bearer \(token)"])
     }
 
+    public func loginSocial(token: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, Error> {
+        var payload: [String: AnyObject] = [
+            "access_token": token,
+            "connection": connection,
+            "scope": scope,
+            "client_id": self.clientId,
+        ]
+        parameters.forEach { key, value in payload[key] = value }
+        let accessToken = NSURL(string: "/oauth/access_token", relativeToURL: self.url)!
+        return Request(session: session, url: accessToken, method: "POST", handle: credentials, payload: payload)
+    }
+
     public enum PasswordlessType: String {
         case Code = "code"
         case WebLink = "link"
