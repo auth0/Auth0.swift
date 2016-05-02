@@ -85,6 +85,10 @@ func isUserInfo(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodGET() && isHost(domain) && isPath("/userinfo")
 }
 
+func isOAuthAccessToken(domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/oauth/access_token")
+}
+
 func hasBearerToken(token: String) -> OHHTTPStubsTestBlock {
     return { request in
         return request.valueForHTTPHeaderField("Authorization") == "Bearer \(token)"
