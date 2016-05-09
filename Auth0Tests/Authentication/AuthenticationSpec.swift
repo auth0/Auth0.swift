@@ -198,7 +198,7 @@ class AuthenticationSpec: QuickSpec {
             it("should reset password") {
                 stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return resetPasswordResponse() }
                 waitUntil(timeout: Timeout) { done in
-                    auth.resetPassword(SupportAtAuth0, connection: ConnectionName).start { result in
+                    auth.changePassword(SupportAtAuth0, connection: ConnectionName).start { result in
                         guard case .Success = result else { return fail("Failed to reset password") }
                         done()
                     }
@@ -210,7 +210,7 @@ class AuthenticationSpec: QuickSpec {
                 let description = "failed reset password"
                 stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }
                 waitUntil(timeout: Timeout) { done in
-                    auth.resetPassword(SupportAtAuth0, connection: ConnectionName).start { result in
+                    auth.changePassword(SupportAtAuth0, connection: ConnectionName).start { result in
                         expect(result).to(haveError(code: code, description: description))
                         done()
                     }
