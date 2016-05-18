@@ -40,9 +40,19 @@ public struct Management {
         case RequestFailed(cause: ErrorType)
     }
 
-    public func user(identifier: String) -> Request<[String: AnyObject], Error> {
-        let user = NSURL(string: "/api/v2/users/\(identifier.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.alphanumericCharacterSet())!)", relativeToURL: self.url)!
-        return Request(session: session, url: user, method: "GET", handle: managementObject)
+    public func user(identifier: String, fields: [String] = [], include: Bool = true) -> Request<[String: AnyObject], Error> {
+        let userPath = "/api/v2/users/\(identifier)"
+        let url = self.url.URLByAppendingPathComponent(userPath)
+        let component = NSURLComponents(URL: url, resolvingAgainstBaseURL: true)!
+        let value = fields.joinWithSeparator(",")
+        if !value.isEmpty {
+            component.queryItems = [
+                NSURLQueryItem(name: "fields", value: value),
+                NSURLQueryItem(name: "include_fields", value: String(include))
+            ]
+        }
+
+        return Request(session: session, url: component.URL!, method: "GET", handle: managementObject)
     }
 }
 
@@ -66,7 +76,7 @@ private func managementError(data: NSData?, cause: Response.Error) -> Management
     case .ServerError(let status, let data) where (400...500).contains(status) && data != nil:
         if
             let json = try? NSJSONSerialization.JSONObjectWithData(data!, options: []),
-            let payload = json as? [String: AnyObject], let error = payload["error"] as? String, let message = payload["message"] as? String, let code = payload["errorCode"] as? String {
+            let payload = json as? [String: AnyObject], let error = payload["error"] as? String, let message = payload["description"] as? String, let code = payload["code"] as? String {
             return .Response(error: error, description: message, code: code, statusCode: status)
         } else {
             return .RequestFailed(cause: cause)

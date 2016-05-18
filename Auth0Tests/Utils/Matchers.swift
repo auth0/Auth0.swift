@@ -61,6 +61,19 @@ func hasNoneOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return !hasAtLeast(parameters)
 }
 
+func hasQueryParameters(parameters: [String: String]) -> OHHTTPStubsTestBlock {
+    return { request in
+        guard
+            let url = request.URL,
+            let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: true),
+            let items = components.queryItems
+            else { return false }
+        return items.count == parameters.count && items.reduce(true, combine: { (initial, item) -> Bool in
+            return initial && parameters[item.name] == item.value
+        })
+    }
+}
+
 func isResourceOwner(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
 }
@@ -110,6 +123,16 @@ func haveError<T>(code code: String, description: String) -> MatcherFunc<Result<
         failureMessage.postfixMessage = "an error response with code <\(code)> and description <\(description)>"
         if let actual = try expression.evaluate(), case .Failure(let cause) = actual, case .Response(let actualCode, let actualDescription) = cause {
             return code == actualCode && description == actualDescription
+        }
+        return false
+    }
+}
+
+func haveError<T>(error: String, description: String, code: String, statusCode: Int) -> MatcherFunc<Result<T, Management.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "an error response"
+        if let actual = try expression.evaluate(), case .Failure(let cause) = actual, case .Response(let actualError, let actualDescription, let actualCode, let actualStatusCode) = cause {
+            return error == actualError && code == actualCode && description == actualDescription && statusCode == actualStatusCode
         }
         return false
     }

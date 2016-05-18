@@ -67,15 +67,15 @@ func resetPasswordResponse() -> OHHTTPStubsResponse {
 }
 
 func authFailure(code code: String, description: String, name: String? = nil) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: ["Content-Type": "application/json"])
 }
 
 func authFailure(error error: String, description: String) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["error": error, "error_description": description], statusCode: 400, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: ["error": error, "error_description": description], statusCode: 400, headers: ["Content-Type": "application/json"])
 }
 
 func passwordless(email: String, verified: Bool) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
 func tokenInfo() -> OHHTTPStubsResponse {
@@ -92,4 +92,8 @@ func basicProfile(id: String = UserId, name: String = Support, nickname: String 
 
 func managementResponse(payload: [String: AnyObject]) -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(JSONObject: payload, statusCode: 200, headers: ["Content-Type": "application/json"])
+}
+
+func managementErrorResponse(error error: String, description: String, code: String, statusCode: Int = 400) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: Int32(statusCode), headers: ["Content-Type": "application/json"])
 }

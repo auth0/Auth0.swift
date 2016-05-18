@@ -28,6 +28,7 @@ import OHHTTPStubs
 
 private let Domain = "samples.auth0.com"
 private let Token = NSUUID().UUIDString
+private let NonExistentUser = "auth0|notfound"
 private let Timeout: NSTimeInterval = 2
 
 class ManagementSpec: QuickSpec {
@@ -38,21 +39,58 @@ class ManagementSpec: QuickSpec {
 
         afterEach {
             OHHTTPStubs.removeAllStubs()
-            stub(isHost(Domain)) { _ in
-                return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-                }.name = "YOU SHALL NOT PASS!"
+            stub(isHost(Domain)) { _ in OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }
+                .name = "YOU SHALL NOT PASS!"
         }
 
         describe("user by id") {
 
             beforeEach {
-                stub(isUsersPath(Domain, identifier: UserId)) { _ in managementResponse(["user_id": UserId, "email": SupportAtAuth0]) }
+                stub(isUsersPath(Domain, identifier: UserId))
+                { _ in managementResponse(["user_id": UserId, "email": SupportAtAuth0]) }
+                .name = "User Fetch"
+
+                stub(isUsersPath(Domain, identifier: UserId) && hasQueryParameters(["fields": "user_id", "include_fields": "true"]))
+                { _ in managementResponse(["user_id": UserId]) }
+                .name = "User Fetch including fields"
+
+                stub(isUsersPath(Domain, identifier: UserId) && hasQueryParameters(["fields": "user_id", "include_fields": "false"]))
+                { _ in managementResponse(["email": SupportAtAuth0]) }
+                    .name = "User Fetch excluding fields"
             }
 
             it("should return single user by id") {
                 waitUntil(timeout: Timeout) { done in
                     management.user(UserId).start { result in
                         expect(result).to(haveObjectWithAttributes(["user_id", "email"]))
+                        done()
+                    }
+                }
+            }
+
+            it("should return specified user fields") {
+                waitUntil(timeout: Timeout) { done in
+                    management.user(UserId, fields: ["user_id"]).start { result in
+                        expect(result).to(haveObjectWithAttributes(["user_id"]))
+                        done()
+                    }
+                }
+            }
+
+            it("should exclude specified user fields") {
+                waitUntil(timeout: Timeout) { done in
+                    management.user(UserId, fields: ["user_id"], include: false).start { result in
+                        expect(result).to(haveObjectWithAttributes(["email"]))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail request") {
+                stub(isUsersPath(Domain, identifier: NonExistentUser)) { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
+                waitUntil(timeout: Timeout) { done in
+                    management.user(NonExistentUser).start { result in
+                        expect(result).to(haveError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
                         done()
                     }
                 }
