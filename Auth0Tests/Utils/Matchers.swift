@@ -89,6 +89,16 @@ func isOAuthAccessToken(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/access_token")
 }
 
+func isUsersPath(domain: String, identifier: String? = nil) -> OHHTTPStubsTestBlock {
+    let path: String
+    if let identifier = identifier {
+        path = "/api/v2/users/\(identifier)"
+    } else {
+        path = "/api/v2/users/"
+    }
+    return isHost(domain) && isPath(path)
+}
+
 func hasBearerToken(token: String) -> OHHTTPStubsTestBlock {
     return { request in
         return request.valueForHTTPHeaderField("Authorization") == "Bearer \(token)"
@@ -147,6 +157,18 @@ func haveProfile(userId: String) -> MatcherFunc<Result<UserProfile, Authenticati
         failureMessage.postfixMessage = "have user profile for user id <\(userId)>"
         if let actual = try expression.evaluate(), case .Success(let profile) = actual {
             return profile.id == userId
+        }
+        return false
+    }
+}
+
+func haveObjectWithAttributes(attributes: [String]) -> MatcherFunc<Result<[String: AnyObject], Management.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "have attribues \(attributes)"
+        if let actual = try expression.evaluate(), case .Success(let value) = actual {
+            return Array(value.keys).reduce(true, combine: { (initial, value) -> Bool in
+                return initial && attributes.contains(value)
+            })
         }
         return false
     }

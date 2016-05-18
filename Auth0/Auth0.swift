@@ -35,3 +35,7 @@ func url(domain: String) -> NSURL {
 public func authentication(clientId clientId: String, domain: String) -> Authentication {
     return Authentication(clientId: clientId, url: url(domain))
 }
+
+public func management(token: String, domain: String) -> Management {
+    return Management(token: token, url: url(domain))
+}

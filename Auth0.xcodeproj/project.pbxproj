@@ -25,6 +25,8 @@
 		5F93BC081CC6ACA40031519F /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDC01CC571290011842B /* Nimble.framework */; };
 		5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
 		5F93BC0C1CC6B0DE0031519F /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
+		5FADB6031CEC0C3300D4BB50 /* ManagementSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB6021CEC0C3300D4BB50 /* ManagementSpec.swift */; };
+		5FADB6041CEC0C3300D4BB50 /* ManagementSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB6021CEC0C3300D4BB50 /* ManagementSpec.swift */; };
 		5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
 		5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
 		5FBBF03B1CC96AA70024D2AF /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
@@ -53,6 +55,8 @@
 		5FE2F8C41CD1498E003628F4 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8C21CD1498E003628F4 /* UserProfile.swift */; };
 		5FE2F8C61CD1522F003628F4 /* UserProfileSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8C51CD1522F003628F4 /* UserProfileSpec.swift */; };
 		5FE2F8C71CD1522F003628F4 /* UserProfileSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8C51CD1522F003628F4 /* UserProfileSpec.swift */; };
+		5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF465BB1CE2AC4500F7ED8C /* Management.swift */; };
+		5FF465BD1CE2AC4500F7ED8C /* Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF465BB1CE2AC4500F7ED8C /* Management.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,6 +119,7 @@
 		5F06DDC01CC571290011842B /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = Carthage/Build/Mac/Nimble.framework; sourceTree = "<group>"; };
 		5F06DDC81CC66B710011842B /* Auth0.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0.swift; sourceTree = "<group>"; };
 		5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0Spec.swift; sourceTree = "<group>"; };
+		5FADB6021CEC0C3300D4BB50 /* ManagementSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagementSpec.swift; sourceTree = "<group>"; };
 		5FBBF0371CC964BC0024D2AF /* Matchers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matchers.swift; sourceTree = "<group>"; };
 		5FBBF03A1CC96AA70024D2AF /* Responses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Responses.swift; sourceTree = "<group>"; };
 		5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
@@ -129,6 +134,7 @@
 		5FE2F8BD1CD0EC52003628F4 /* ResponseSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseSpec.swift; sourceTree = "<group>"; };
 		5FE2F8C21CD1498E003628F4 /* UserProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		5FE2F8C51CD1522F003628F4 /* UserProfileSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileSpec.swift; sourceTree = "<group>"; };
+		5FF465BB1CE2AC4500F7ED8C /* Management.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Management.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				5FBBF03D1CCA8FC20024D2AF /* Authentication */,
+				5FF465BA1CE2AC2800F7ED8C /* Management */,
 				5FE2F8C01CD0F9AF003628F4 /* Networking */,
 				5F049B6C1CB42C29006F6C05 /* Auth0.h */,
 				5F06DDC81CC66B710011842B /* Auth0.swift */,
@@ -207,6 +214,7 @@
 		5F06DD921CC451430011842B /* Auth0Tests */ = {
 			isa = PBXGroup;
 			children = (
+				5FADB6011CEC0C1600D4BB50 /* Management */,
 				5FBBF0411CCA901B0024D2AF /* Authentication */,
 				5FE2F8C11CD0FA11003628F4 /* Networking */,
 				5FBBF0331CC95FA40024D2AF /* Utils */,
@@ -243,6 +251,14 @@
 				5F06DDC01CC571290011842B /* Nimble.framework */,
 			);
 			name = OSX;
+			sourceTree = "<group>";
+		};
+		5FADB6011CEC0C1600D4BB50 /* Management */ = {
+			isa = PBXGroup;
+			children = (
+				5FADB6021CEC0C3300D4BB50 /* ManagementSpec.swift */,
+			);
+			name = Management;
 			sourceTree = "<group>";
 		};
 		5FBBF0331CC95FA40024D2AF /* Utils */ = {
@@ -292,6 +308,14 @@
 				5FE2F8BD1CD0EC52003628F4 /* ResponseSpec.swift */,
 			);
 			path = Networking;
+			sourceTree = "<group>";
+		};
+		5FF465BA1CE2AC2800F7ED8C /* Management */ = {
+			isa = PBXGroup;
+			children = (
+				5FF465BB1CE2AC4500F7ED8C /* Management.swift */,
+			);
+			path = Management;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -470,6 +494,7 @@
 			files = (
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
+				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
 				5FE2F8B21CCEAED8003628F4 /* Requestable.swift in Sources */,
 				5FE2F8B51CCEB1C0003628F4 /* Handlers.swift in Sources */,
@@ -486,6 +511,7 @@
 			files = (
 				5FE2F8BC1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */,
+				5FF465BD1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */,
 				5FE2F8B31CCEAED8003628F4 /* Requestable.swift in Sources */,
 				5FE2F8B61CCEB1C0003628F4 /* Handlers.swift in Sources */,
@@ -507,6 +533,7 @@
 				5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5FE2F8C61CD1522F003628F4 /* UserProfileSpec.swift in Sources */,
 				5FE2F8BE1CD0EC52003628F4 /* ResponseSpec.swift in Sources */,
+				5FADB6031CEC0C3300D4BB50 /* ManagementSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -521,6 +548,7 @@
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5FE2F8C71CD1522F003628F4 /* UserProfileSpec.swift in Sources */,
 				5FE2F8BF1CD0EC52003628F4 /* ResponseSpec.swift in Sources */,
+				5FADB6041CEC0C3300D4BB50 /* ManagementSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

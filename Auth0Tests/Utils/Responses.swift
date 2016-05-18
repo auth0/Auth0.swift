@@ -23,7 +23,7 @@
 import Foundation
 import OHHTTPStubs
 
-let UserId = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+let UserId = "auth0|\(NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: ""))"
 let SupportAtAuth0 = "support@auth0.com"
 let Support = "support"
 let Nickname = "sup"
@@ -46,7 +46,7 @@ func authResponse(accessToken accessToken: String, idToken: String? = nil) -> OH
     if let token = idToken {
         json["id_token"] = token
     }
-    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
 func createdUser(email email: String, username: String? = nil, verified: Bool = true) -> OHHTTPStubsResponse {
@@ -58,7 +58,7 @@ func createdUser(email email: String, username: String? = nil, verified: Bool = 
     if let username = username {
         json["username"] = username
     }
-    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
 func resetPasswordResponse() -> OHHTTPStubsResponse {
@@ -88,4 +88,8 @@ func userInfo() -> OHHTTPStubsResponse {
 
 func basicProfile(id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAt) -> [String: AnyObject] {
     return ["user_id": id, "name": name, "nickname": nickname, "picture": picture, "created_at": createdAt]
+}
+
+func managementResponse(payload: [String: AnyObject]) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(JSONObject: payload, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
