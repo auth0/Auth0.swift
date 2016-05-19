@@ -27,8 +27,7 @@ public struct Users {
 
     public func get(identifier: String, fields: [String] = [], include: Bool = true) -> Request<Management.Object, Management.Error> {
         let userPath = "/api/v2/users/\(identifier)"
-        let url = self.management.url.URLByAppendingPathComponent(userPath)
-        let component = NSURLComponents(URL: url, resolvingAgainstBaseURL: true)!
+        let component = components(self.management.url, path: userPath)
         let value = fields.joinWithSeparator(",")
         if !value.isEmpty {
             component.queryItems = [
@@ -40,4 +39,19 @@ public struct Users {
         return Request(session: self.management.session, url: component.URL!, method: "GET", handle: self.management.managementObject)
     }
 
+    public func patch(identifier: String, attributes: UserPatchAttributes) -> Request<Management.Object, Management.Error> {
+        let userPath = "/api/v2/users/\(identifier)"
+        let component = components(self.management.url, path: userPath)
+
+        return Request(session: self.management.session, url: component.URL!, method: "PATCH", handle: self.management.managementObject, payload: attributes.dictionary)
+    }
+
+    public func patch(identifier: String, userMetadata: [String: AnyObject]) -> Request<Management.Object, Management.Error> {
+        return patch(identifier, attributes: UserPatchAttributes().userMetadata(userMetadata))
+    }
+}
+
+private func components(baseURL: NSURL, path: String) -> NSURLComponents {
+    let url = baseURL.URLByAppendingPathComponent(path)
+    return NSURLComponents(URL: url, resolvingAgainstBaseURL: true)!
 }

@@ -43,18 +43,18 @@ class UsersSpec: QuickSpec {
                 .name = "YOU SHALL NOT PASS!"
         }
 
-        describe("user by id") {
+        describe("GET /users/:identifier") {
 
             beforeEach {
-                stub(isUsersPath(Domain, identifier: UserId))
+                stub(isUsersPath(Domain, identifier: UserId) && isMethodGET())
                 { _ in managementResponse(["user_id": UserId, "email": SupportAtAuth0]) }
                 .name = "User Fetch"
 
-                stub(isUsersPath(Domain, identifier: UserId) && hasQueryParameters(["fields": "user_id", "include_fields": "true"]))
+                stub(isUsersPath(Domain, identifier: UserId) && isMethodGET() && hasQueryParameters(["fields": "user_id", "include_fields": "true"]))
                 { _ in managementResponse(["user_id": UserId]) }
                 .name = "User Fetch including fields"
 
-                stub(isUsersPath(Domain, identifier: UserId) && hasQueryParameters(["fields": "user_id", "include_fields": "false"]))
+                stub(isUsersPath(Domain, identifier: UserId) && isMethodGET() && hasQueryParameters(["fields": "user_id", "include_fields": "false"]))
                 { _ in managementResponse(["email": SupportAtAuth0]) }
                     .name = "User Fetch excluding fields"
             }
@@ -87,7 +87,7 @@ class UsersSpec: QuickSpec {
             }
 
             it("should fail request") {
-                stub(isUsersPath(Domain, identifier: NonExistentUser)) { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
+                stub(isUsersPath(Domain, identifier: NonExistentUser) && isMethodGET()) { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
                 waitUntil(timeout: Timeout) { done in
                     users.get(NonExistentUser).start { result in
                         expect(result).to(haveError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
@@ -95,6 +95,48 @@ class UsersSpec: QuickSpec {
                     }
                 }
             }
+        }
+
+        describe("PATCH /users/:identifier") {
+
+            it("should send attributes") {
+                stub(isUsersPath(Domain, identifier: UserId) && isMethodPATCH() && hasAllOf(["username": Support, "connection": "facebook"]))
+                { _ in managementResponse(["user_id": UserId, "email": SupportAtAuth0, "username": Support, "connection": "facebook"]) }
+                .name = "User Patch"
+
+                waitUntil(timeout: Timeout) { done in
+                    let attributes = UserPatchAttributes().username(Support, connection: "facebook")
+                    users.patch(UserId, attributes: attributes).start { result in
+                        expect(result).to(haveObjectWithAttributes(["user_id", "email", "username", "connection"]))
+                        done()
+                    }
+                }
+            }
+
+            it("should patch userMetadata") {
+                let metadata = ["role": "admin"]
+                stub(isUsersPath(Domain, identifier: UserId) && isMethodPATCH() && hasUserMetadata(metadata))
+                { _ in managementResponse(["user_id": UserId, "email": SupportAtAuth0]) }
+                    .name = "User Patch user_metadata"
+
+                waitUntil(timeout: Timeout) { done in
+                    users.patch(UserId, userMetadata: metadata).start { result in
+                        expect(result).to(haveObjectWithAttributes(["user_id", "email"]))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail request") {
+                stub(isUsersPath(Domain, identifier: NonExistentUser) && isMethodPATCH()) { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
+                waitUntil(timeout: Timeout) { done in
+                    users.patch(NonExistentUser, attributes: UserPatchAttributes().blocked(true)).start { result in
+                        expect(result).to(haveError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
+                        done()
+                    }
+                }
+            }
+
         }
     }
 

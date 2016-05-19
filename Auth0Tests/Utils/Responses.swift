@@ -26,6 +26,7 @@ import OHHTTPStubs
 let UserId = "auth0|\(NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: ""))"
 let SupportAtAuth0 = "support@auth0.com"
 let Support = "support"
+let Auth0Phone = "+10123456789"
 let Nickname = "sup"
 let PictureURL = NSURL(string: "https://auth0.com")!
 let CreatedAt = "2016-04-27T17:59:00Z"
