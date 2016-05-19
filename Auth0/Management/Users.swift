@@ -51,23 +51,29 @@ public struct Users {
     }
 
     public func link(identifier: String, withSecondaryUserToken token: String) -> Request<[Management.Object], Management.Error> {
-        let identitiesPath = "/api/v2/users/\(identifier)/identities"
-        let component = components(self.management.url, path: identitiesPath)
-
-        return Request(session: self.management.session, url: component.URL!, method: "POST", handle: self.management.managementObjects, payload: ["link_with": token])
+        return link(identifier, payload: ["link_with": token])
     }
 
     public func link(identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[Management.Object], Management.Error> {
-        let identitiesPath = "/api/v2/users/\(identifier)/identities"
-        let component = components(self.management.url, path: identitiesPath)
-        var payload: [String: AnyObject] = [
+        var payload = [
             "user_id": userId,
             "provider": provider,
         ]
         payload["connection_id"] = connectionId
-        return Request(session: self.management.session, url: component.URL!, method: "POST", handle: self.management.managementObjects, payload: payload)
+        return link(identifier, payload: payload)
     }
 
+    private func link(identifier: String, payload: [String: String]) -> Request<[Management.Object], Management.Error> {
+        let identitiesPath = "/api/v2/users/\(identifier)/identities"
+        let url = components(self.management.url, path: identitiesPath).URL!
+        return Request(session: self.management.session, url: url, method: "POST", handle: self.management.managementObjects, payload: payload)
+    }
+
+    public func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[Management.Object], Management.Error> {
+        let identityPath = "/api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
+        let url = components(self.management.url, path: identityPath).URL!
+        return Request(session: self.management.session, url: url, method: "DELETE", handle: self.management.managementObjects)
+    }
 }
 
 private func components(baseURL: NSURL, path: String) -> NSURLComponents {
