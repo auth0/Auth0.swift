@@ -56,7 +56,7 @@ public struct Management {
         }
     }
 
-    func managementError(data: NSData?, cause: Response.Error) -> Error {
+    private func managementError(data: NSData?, cause: Response.Error) -> Error {
         switch cause {
         case .InvalidJSON(let data):
             return .InvalidResponse(response: data)

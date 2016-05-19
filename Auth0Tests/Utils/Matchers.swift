@@ -129,9 +129,8 @@ func haveError<T>(code code: String, description: String) -> MatcherFunc<Result<
 }
 
 func haveError<T>(error: String, description: String, code: String, statusCode: Int) -> MatcherFunc<Result<T, Management.Error>> {
-    return MatcherFunc { expression, failureMessage in
-        failureMessage.postfixMessage = "an error response"
-        if let actual = try expression.evaluate(), case .Failure(let cause) = actual, case .Response(let actualError, let actualDescription, let actualCode, let actualStatusCode) = cause {
+    return beFailure("server error response") { cause in
+        if case .Response(let actualError, let actualDescription, let actualCode, let actualStatusCode) = cause {
             return error == actualError && code == actualCode && description == actualDescription && statusCode == actualStatusCode
         }
         return false
@@ -170,6 +169,29 @@ func beSuccessfulResult<T>() -> MatcherFunc<Result<T, Authentication.Error>> {
         failureMessage.postfixMessage = "be a successful result"
         if let actual = try expression.evaluate(), case .Success = actual {
             return true
+        }
+        return false
+    }
+}
+
+func beInvalidResponse<T>() -> MatcherFunc<Result<T, Management.Error>> {
+    return beFailure("invalid response") { cause in
+        if case .InvalidResponse = cause {
+            return true
+        }
+        return false
+    }
+}
+
+func beFailure<T>(cause: String? = nil, predicate: Management.Error -> Bool = { _ in return true }) -> MatcherFunc<Result<T, Management.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        if let cause = cause {
+            failureMessage.postfixMessage = "be a failure result with cause \(cause)"
+        } else {
+            failureMessage.postfixMessage = "be a failure result from mgmt api"
+        }
+        if let actual = try expression.evaluate(), case .Failure(let cause) = actual {
+            return predicate(cause)
         }
         return false
     }
