@@ -91,7 +91,7 @@ func basicProfile(id: String = UserId, name: String = Support, nickname: String 
     return ["user_id": id, "name": name, "nickname": nickname, "picture": picture, "created_at": createdAt]
 }
 
-func managementResponse(payload: [String: AnyObject]) -> OHHTTPStubsResponse {
+func managementResponse(payload: AnyObject) -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(JSONObject: payload, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 

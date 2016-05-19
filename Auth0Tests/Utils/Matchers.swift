@@ -112,6 +112,10 @@ func isUsersPath(domain: String, identifier: String? = nil) -> OHHTTPStubsTestBl
     return isHost(domain) && isPath(path)
 }
 
+func isLinkPath(domain: String, identifier: String) -> OHHTTPStubsTestBlock {
+    return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")
+}
+
 func hasBearerToken(token: String) -> OHHTTPStubsTestBlock {
     return { request in
         return request.valueForHTTPHeaderField("Authorization") == "Bearer \(token)"
@@ -177,6 +181,16 @@ func beSuccessfulResult<T>() -> MatcherFunc<Result<T, Authentication.Error>> {
 func beInvalidResponse<T>() -> MatcherFunc<Result<T, Management.Error>> {
     return beFailure("invalid response") { cause in
         if case .InvalidResponse = cause {
+            return true
+        }
+        return false
+    }
+}
+
+func beSuccessful<T>() -> MatcherFunc<Result<T, Management.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "be a successful result"
+        if let actual = try expression.evaluate(), case .Success = actual {
             return true
         }
         return false

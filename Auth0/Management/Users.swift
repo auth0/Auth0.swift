@@ -49,6 +49,25 @@ public struct Users {
     public func patch(identifier: String, userMetadata: [String: AnyObject]) -> Request<Management.Object, Management.Error> {
         return patch(identifier, attributes: UserPatchAttributes().userMetadata(userMetadata))
     }
+
+    public func link(identifier: String, withSecondaryUserToken token: String) -> Request<[Management.Object], Management.Error> {
+        let identitiesPath = "/api/v2/users/\(identifier)/identities"
+        let component = components(self.management.url, path: identitiesPath)
+
+        return Request(session: self.management.session, url: component.URL!, method: "POST", handle: self.management.managementObjects, payload: ["link_with": token])
+    }
+
+    public func link(identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[Management.Object], Management.Error> {
+        let identitiesPath = "/api/v2/users/\(identifier)/identities"
+        let component = components(self.management.url, path: identitiesPath)
+        var payload: [String: AnyObject] = [
+            "user_id": userId,
+            "provider": provider,
+        ]
+        payload["connection_id"] = connectionId
+        return Request(session: self.management.session, url: component.URL!, method: "POST", handle: self.management.managementObjects, payload: payload)
+    }
+
 }
 
 private func components(baseURL: NSURL, path: String) -> NSURLComponents {

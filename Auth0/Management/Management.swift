@@ -56,6 +56,19 @@ public struct Management {
         }
     }
 
+    func managementObjects(response: Response, callback: Request<[Object], Error>.Callback) {
+        switch response.result {
+        case .Success(let payload):
+            if let list = payload as? [Object] {
+                callback(.Success(result: list))
+            } else {
+                callback(.Failure(error: .InvalidResponse(response: response.data)))
+            }
+        case .Failure(let cause):
+            callback(.Failure(error: managementError(response.data, cause: cause)))
+        }
+    }
+
     private func managementError(data: NSData?, cause: Response.Error) -> Error {
         switch cause {
         case .InvalidJSON(let data):

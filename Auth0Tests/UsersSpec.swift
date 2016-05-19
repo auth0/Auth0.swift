@@ -138,6 +138,54 @@ class UsersSpec: QuickSpec {
             }
 
         }
+
+        describe("PATCH /users/:identifier/identities") {
+
+            it("shoud link with just a token") {
+                stub(isLinkPath(Domain, identifier: UserId) && isMethodPOST() && hasAllOf(["link_with": "token"]))
+                { _ in managementResponse([["user_id": UserId, "email": SupportAtAuth0]])}
+                waitUntil(timeout: Timeout) { done in
+                    users.link(UserId, withSecondaryUserToken: "token").start { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("shoud link without a token") {
+                stub(isLinkPath(Domain, identifier: UserId) && isMethodPOST() && hasAllOf(["user_id": "other_id", "provider": "facebook"]))
+                { _ in managementResponse([["user_id": UserId, "email": SupportAtAuth0]])}
+                waitUntil(timeout: Timeout) { done in
+                    users.link(UserId, withUser: "other_id", provider: "facebook").start { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("shoud link without a token specifying a connection id") {
+                stub(isLinkPath(Domain, identifier: UserId) && isMethodPOST() && hasAllOf(["user_id": "other_id", "provider": "facebook", "connection_id": "conn_1"]))
+                { _ in managementResponse([["user_id": UserId, "email": SupportAtAuth0]])}
+                waitUntil(timeout: Timeout) { done in
+                    users.link(UserId, withUser: "other_id", provider: "facebook", connectionId: "conn_1").start { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail request") {
+                stub(isLinkPath(Domain, identifier: NonExistentUser) && isMethodPOST())
+                { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
+                waitUntil(timeout: Timeout) { done in
+                    users.link(NonExistentUser, withSecondaryUserToken: "token").start { result in
+                        expect(result).to(haveError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
+                        done()
+                    }
+                }
+            }
+
+        }
     }
 
 }
