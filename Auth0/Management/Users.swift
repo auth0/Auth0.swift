@@ -50,7 +50,7 @@ public struct Users {
         return patch(identifier, attributes: UserPatchAttributes().userMetadata(userMetadata))
     }
 
-    public func link(identifier: String, withSecondaryUserToken token: String) -> Request<[Management.Object], Management.Error> {
+    public func link(identifier: String, withUserUsingToken token: String) -> Request<[Management.Object], Management.Error> {
         return link(identifier, payload: ["link_with": token])
     }
 

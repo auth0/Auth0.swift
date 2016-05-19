@@ -145,7 +145,7 @@ class UsersSpec: QuickSpec {
                 stub(isLinkPath(Domain, identifier: UserId) && isMethodPOST() && hasAllOf(["link_with": "token"]))
                 { _ in managementResponse([["user_id": UserId, "email": SupportAtAuth0]])}
                 waitUntil(timeout: Timeout) { done in
-                    users.link(UserId, withSecondaryUserToken: "token").start { result in
+                    users.link(UserId, withUserUsingToken: "token").start { result in
                         expect(result).to(beSuccessful())
                         done()
                     }
@@ -178,7 +178,7 @@ class UsersSpec: QuickSpec {
                 stub(isLinkPath(Domain, identifier: NonExistentUser) && isMethodPOST())
                 { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
                 waitUntil(timeout: Timeout) { done in
-                    users.link(NonExistentUser, withSecondaryUserToken: "token").start { result in
+                    users.link(NonExistentUser, withUserUsingToken: "token").start { result in
                         expect(result).to(haveError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
                         done()
                     }
