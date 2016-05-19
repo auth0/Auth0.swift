@@ -1,4 +1,4 @@
-// ManagementSpec.swift
+// UsersSpec.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -31,11 +31,11 @@ private let Token = NSUUID().UUIDString
 private let NonExistentUser = "auth0|notfound"
 private let Timeout: NSTimeInterval = 2
 
-class ManagementSpec: QuickSpec {
+class UsersSpec: QuickSpec {
 
     override func spec() {
 
-        let management = Management(token: Token, url: NSURL(string: "https://\(Domain)")!)
+        let users = Auth0.users(Token, domain: Domain)
 
         afterEach {
             OHHTTPStubs.removeAllStubs()
@@ -61,7 +61,7 @@ class ManagementSpec: QuickSpec {
 
             it("should return single user by id") {
                 waitUntil(timeout: Timeout) { done in
-                    management.user(UserId).start { result in
+                    users.get(UserId).start { result in
                         expect(result).to(haveObjectWithAttributes(["user_id", "email"]))
                         done()
                     }
@@ -70,7 +70,7 @@ class ManagementSpec: QuickSpec {
 
             it("should return specified user fields") {
                 waitUntil(timeout: Timeout) { done in
-                    management.user(UserId, fields: ["user_id"]).start { result in
+                    users.get(UserId, fields: ["user_id"]).start { result in
                         expect(result).to(haveObjectWithAttributes(["user_id"]))
                         done()
                     }
@@ -79,7 +79,7 @@ class ManagementSpec: QuickSpec {
 
             it("should exclude specified user fields") {
                 waitUntil(timeout: Timeout) { done in
-                    management.user(UserId, fields: ["user_id"], include: false).start { result in
+                    users.get(UserId, fields: ["user_id"], include: false).start { result in
                         expect(result).to(haveObjectWithAttributes(["email"]))
                         done()
                     }
@@ -89,7 +89,7 @@ class ManagementSpec: QuickSpec {
             it("should fail request") {
                 stub(isUsersPath(Domain, identifier: NonExistentUser)) { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
                 waitUntil(timeout: Timeout) { done in
-                    management.user(NonExistentUser).start { result in
+                    users.get(NonExistentUser).start { result in
                         expect(result).to(haveError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
                         done()
                     }

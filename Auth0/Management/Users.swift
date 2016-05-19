@@ -1,4 +1,4 @@
-// Auth0.swift
+// Users.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,24 +22,22 @@
 
 import Foundation
 
-func url(domain: String) -> NSURL {
-    let urlString: String
-    if !domain.hasPrefix("https") {
-        urlString = "https://\(domain)"
-    } else {
-        urlString = domain
+public struct Users {
+    let management: Management
+
+    public func get(identifier: String, fields: [String] = [], include: Bool = true) -> Request<Management.Object, Management.Error> {
+        let userPath = "/api/v2/users/\(identifier)"
+        let url = self.management.url.URLByAppendingPathComponent(userPath)
+        let component = NSURLComponents(URL: url, resolvingAgainstBaseURL: true)!
+        let value = fields.joinWithSeparator(",")
+        if !value.isEmpty {
+            component.queryItems = [
+                NSURLQueryItem(name: "fields", value: value),
+                NSURLQueryItem(name: "include_fields", value: String(include))
+            ]
+        }
+
+        return Request(session: self.management.session, url: component.URL!, method: "GET", handle: self.management.managementObject)
     }
-    return NSURL(string: urlString)!
-}
 
-public func authentication(clientId clientId: String, domain: String) -> Authentication {
-    return Authentication(clientId: clientId, url: url(domain))
-}
-
-public func management(token: String, domain: String) -> Management {
-    return Management(token: token, url: url(domain))
-}
-
-public func users(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
-    return Management(token: token, url: url(domain), session: session).users()
 }

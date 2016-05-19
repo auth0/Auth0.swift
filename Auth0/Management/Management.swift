@@ -34,54 +34,42 @@ public struct Management {
         self.session = session
     }
 
+    public typealias Object = [String: AnyObject]
     public enum Error: ErrorType {
         case Response(error: String, description: String, code: String, statusCode: Int)
         case InvalidResponse(response: NSData?)
         case RequestFailed(cause: ErrorType)
     }
 
-    public func user(identifier: String, fields: [String] = [], include: Bool = true) -> Request<[String: AnyObject], Error> {
-        let userPath = "/api/v2/users/\(identifier)"
-        let url = self.url.URLByAppendingPathComponent(userPath)
-        let component = NSURLComponents(URL: url, resolvingAgainstBaseURL: true)!
-        let value = fields.joinWithSeparator(",")
-        if !value.isEmpty {
-            component.queryItems = [
-                NSURLQueryItem(name: "fields", value: value),
-                NSURLQueryItem(name: "include_fields", value: String(include))
-            ]
+    public func users() -> Users { return Users(management: self) }
+
+    func managementObject(response: Response, callback: Request<Object, Error>.Callback) {
+        switch response.result {
+        case .Success(let payload):
+            if let dictionary = payload as? Object {
+                callback(.Success(result: dictionary))
+            } else {
+                callback(.Failure(error: .InvalidResponse(response: response.data)))
+            }
+        case .Failure(let cause):
+            callback(.Failure(error: managementError(response.data, cause: cause)))
         }
-
-        return Request(session: session, url: component.URL!, method: "GET", handle: managementObject)
     }
-}
 
-private func managementObject(response: Response, callback: Request<[String: AnyObject], Management.Error>.Callback) {
-    switch response.result {
-    case .Success(let payload):
-        if let dictionary = payload as? [String: AnyObject] {
-            callback(.Success(result: dictionary))
-        } else {
-            callback(.Failure(error: .InvalidResponse(response: response.data)))
-        }
-    case .Failure(let cause):
-        callback(.Failure(error: managementError(response.data, cause: cause)))
-    }
-}
-
-private func managementError(data: NSData?, cause: Response.Error) -> Management.Error {
-    switch cause {
-    case .InvalidJSON(let data):
-        return .InvalidResponse(response: data)
-    case .ServerError(let status, let data) where (400...500).contains(status) && data != nil:
-        if
-            let json = try? NSJSONSerialization.JSONObjectWithData(data!, options: []),
-            let payload = json as? [String: AnyObject], let error = payload["error"] as? String, let message = payload["description"] as? String, let code = payload["code"] as? String {
-            return .Response(error: error, description: message, code: code, statusCode: status)
-        } else {
+    func managementError(data: NSData?, cause: Response.Error) -> Error {
+        switch cause {
+        case .InvalidJSON(let data):
+            return .InvalidResponse(response: data)
+        case .ServerError(let status, let data) where (400...500).contains(status) && data != nil:
+            if
+                let json = try? NSJSONSerialization.JSONObjectWithData(data!, options: []),
+                let payload = json as? [String: AnyObject], let error = payload["error"] as? String, let message = payload["description"] as? String, let code = payload["code"] as? String {
+                return .Response(error: error, description: message, code: code, statusCode: status)
+            } else {
+                return .RequestFailed(cause: cause)
+            }
+        default:
             return .RequestFailed(cause: cause)
         }
-    default:
-        return .RequestFailed(cause: cause)
     }
 }
