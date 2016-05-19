@@ -23,9 +23,10 @@
 import Foundation
 import OHHTTPStubs
 
-let UserId = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+let UserId = "auth0|\(NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: ""))"
 let SupportAtAuth0 = "support@auth0.com"
 let Support = "support"
+let Auth0Phone = "+10123456789"
 let Nickname = "sup"
 let PictureURL = NSURL(string: "https://auth0.com")!
 let CreatedAt = "2016-04-27T17:59:00Z"
@@ -46,7 +47,7 @@ func authResponse(accessToken accessToken: String, idToken: String? = nil) -> OH
     if let token = idToken {
         json["id_token"] = token
     }
-    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
 func createdUser(email email: String, username: String? = nil, verified: Bool = true) -> OHHTTPStubsResponse {
@@ -58,7 +59,7 @@ func createdUser(email email: String, username: String? = nil, verified: Bool = 
     if let username = username {
         json["username"] = username
     }
-    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
 func resetPasswordResponse() -> OHHTTPStubsResponse {
@@ -67,15 +68,15 @@ func resetPasswordResponse() -> OHHTTPStubsResponse {
 }
 
 func authFailure(code code: String, description: String, name: String? = nil) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: ["Content-Type": "application/json"])
 }
 
 func authFailure(error error: String, description: String) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["error": error, "error_description": description], statusCode: 400, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: ["error": error, "error_description": description], statusCode: 400, headers: ["Content-Type": "application/json"])
 }
 
 func passwordless(email: String, verified: Bool) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: nil)
+    return OHHTTPStubsResponse(JSONObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
 func tokenInfo() -> OHHTTPStubsResponse {
@@ -88,4 +89,12 @@ func userInfo() -> OHHTTPStubsResponse {
 
 func basicProfile(id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAt) -> [String: AnyObject] {
     return ["user_id": id, "name": name, "nickname": nickname, "picture": picture, "created_at": createdAt]
+}
+
+func managementResponse(payload: AnyObject) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(JSONObject: payload, statusCode: 200, headers: ["Content-Type": "application/json"])
+}
+
+func managementErrorResponse(error error: String, description: String, code: String, statusCode: Int = 400) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: Int32(statusCode), headers: ["Content-Type": "application/json"])
 }

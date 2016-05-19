@@ -61,6 +61,19 @@ func hasNoneOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return !hasAtLeast(parameters)
 }
 
+func hasQueryParameters(parameters: [String: String]) -> OHHTTPStubsTestBlock {
+    return { request in
+        guard
+            let url = request.URL,
+            let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: true),
+            let items = components.queryItems
+            else { return false }
+        return items.count == parameters.count && items.reduce(true, combine: { (initial, item) -> Bool in
+            return initial && parameters[item.name] == item.value
+        })
+    }
+}
+
 func isResourceOwner(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
 }
@@ -89,6 +102,20 @@ func isOAuthAccessToken(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/access_token")
 }
 
+func isUsersPath(domain: String, identifier: String? = nil) -> OHHTTPStubsTestBlock {
+    let path: String
+    if let identifier = identifier {
+        path = "/api/v2/users/\(identifier)"
+    } else {
+        path = "/api/v2/users/"
+    }
+    return isHost(domain) && isPath(path)
+}
+
+func isLinkPath(domain: String, identifier: String) -> OHHTTPStubsTestBlock {
+    return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")
+}
+
 func hasBearerToken(token: String) -> OHHTTPStubsTestBlock {
     return { request in
         return request.valueForHTTPHeaderField("Authorization") == "Bearer \(token)"
@@ -100,6 +127,15 @@ func haveError<T>(code code: String, description: String) -> MatcherFunc<Result<
         failureMessage.postfixMessage = "an error response with code <\(code)> and description <\(description)>"
         if let actual = try expression.evaluate(), case .Failure(let cause) = actual, case .Response(let actualCode, let actualDescription) = cause {
             return code == actualCode && description == actualDescription
+        }
+        return false
+    }
+}
+
+func haveError<T>(error: String, description: String, code: String, statusCode: Int) -> MatcherFunc<Result<T, Management.Error>> {
+    return beFailure("server error response") { cause in
+        if case .Response(let actualError, let actualDescription, let actualCode, let actualStatusCode) = cause {
+            return error == actualError && code == actualCode && description == actualDescription && statusCode == actualStatusCode
         }
         return false
     }
@@ -142,11 +178,56 @@ func beSuccessfulResult<T>() -> MatcherFunc<Result<T, Authentication.Error>> {
     }
 }
 
+func beInvalidResponse<T>() -> MatcherFunc<Result<T, Management.Error>> {
+    return beFailure("invalid response") { cause in
+        if case .InvalidResponse = cause {
+            return true
+        }
+        return false
+    }
+}
+
+func beSuccessful<T>() -> MatcherFunc<Result<T, Management.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "be a successful result"
+        if let actual = try expression.evaluate(), case .Success = actual {
+            return true
+        }
+        return false
+    }
+}
+
+func beFailure<T>(cause: String? = nil, predicate: Management.Error -> Bool = { _ in return true }) -> MatcherFunc<Result<T, Management.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        if let cause = cause {
+            failureMessage.postfixMessage = "be a failure result with cause \(cause)"
+        } else {
+            failureMessage.postfixMessage = "be a failure result from mgmt api"
+        }
+        if let actual = try expression.evaluate(), case .Failure(let cause) = actual {
+            return predicate(cause)
+        }
+        return false
+    }
+}
+
 func haveProfile(userId: String) -> MatcherFunc<Result<UserProfile, Authentication.Error>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have user profile for user id <\(userId)>"
         if let actual = try expression.evaluate(), case .Success(let profile) = actual {
             return profile.id == userId
+        }
+        return false
+    }
+}
+
+func haveObjectWithAttributes(attributes: [String]) -> MatcherFunc<Result<[String: AnyObject], Management.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "have attribues \(attributes)"
+        if let actual = try expression.evaluate(), case .Success(let value) = actual {
+            return Array(value.keys).reduce(true, combine: { (initial, value) -> Bool in
+                return initial && attributes.contains(value)
+            })
         }
         return false
     }

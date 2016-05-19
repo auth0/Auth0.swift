@@ -51,7 +51,7 @@ class AuthenticationSpec: QuickSpec {
                 }.name = "YOU SHALL NOT PASS!"
         }
 
-        context("login") {
+        describe("login") {
 
             beforeEach {
                 stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
@@ -138,7 +138,7 @@ class AuthenticationSpec: QuickSpec {
             
         }
 
-        context("create user") {
+        describe("create user") {
 
             beforeEach {
                 stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
@@ -193,7 +193,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        context("reset password") {
+        describe("reset password") {
 
             it("should reset password") {
                 stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return resetPasswordResponse() }
@@ -219,7 +219,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        context("create user and login") {
+        describe("create user and login") {
 
             it("should fail if create user fails") {
                 let code = "create_failed"
@@ -284,7 +284,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        context("passwordless email") {
+        describe("passwordless email") {
 
             it("should start with email with default values") {
                 stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless"
@@ -349,7 +349,7 @@ class AuthenticationSpec: QuickSpec {
             }
         }
 
-        context("passwordless sms") {
+        describe("passwordless sms") {
 
             it("should start with sms with default values") {
                 stub(isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "sms", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless"
@@ -382,7 +382,7 @@ class AuthenticationSpec: QuickSpec {
             }
         }
 
-        context("user information") {
+        describe("user information") {
             it("should return token information") {
                 stub(isTokenInfo(Domain) && hasAllOf(["id_token": IdToken])) { _ in return tokenInfo() }.name = "token info"
                 waitUntil(timeout: Timeout) { done in
@@ -425,7 +425,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        context("social login") {
+        describe("social login") {
 
             beforeEach {
                 stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook", "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Facebook Auth OpenID"

@@ -35,3 +35,11 @@ func url(domain: String) -> NSURL {
 public func authentication(clientId clientId: String, domain: String) -> Authentication {
     return Authentication(clientId: clientId, url: url(domain))
 }
+
+public func management(token: String, domain: String) -> Management {
+    return Management(token: token, url: url(domain))
+}
+
+public func users(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
+    return Management(token: token, url: url(domain), session: session).users()
+}
