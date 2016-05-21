@@ -32,14 +32,14 @@ func url(domain: String) -> NSURL {
     return NSURL(string: urlString)!
 }
 
-public func authentication(clientId clientId: String, domain: String) -> Authentication {
-    return Authentication(clientId: clientId, url: url(domain))
+public func authentication(clientId clientId: String, domain: String, session: NSURLSession = .sharedSession()) -> Authentication {
+    return Authentication(clientId: clientId, url: url(domain), session: session)
 }
 
-public func management(token: String, domain: String) -> Management {
-    return Management(token: token, url: url(domain))
+public func management(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Management {
+    return Management(token: token, url: url(domain), session: session)
 }
 
 public func users(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
-    return Management(token: token, url: url(domain), session: session).users()
+    return management(token, domain: domain, session: session).users()
 }
