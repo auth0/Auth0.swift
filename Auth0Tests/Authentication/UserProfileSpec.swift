@@ -22,7 +22,7 @@
 
 import Quick
 import Nimble
-import Auth0
+@testable import Auth0
 
 class ProfileSharedExamplesConfiguration: QuickConfiguration {
     override class func configure(configuration: Configuration) {
@@ -31,7 +31,7 @@ class ProfileSharedExamplesConfiguration: QuickConfiguration {
             it("should return nil when missing \(key)") {
                 var dict = basicProfile()
                 dict[key] = nil
-                let profile = UserProfile(dictionary: dict)
+                let profile = UserProfile(json: dict)
                 expect(profile).to(beNil())
             }
         }
@@ -43,7 +43,7 @@ class UserProfileSpec: QuickSpec {
         describe("init from dictionary") {
 
             it("should build with required values") {
-                let profile = UserProfile(dictionary: basicProfile())
+                let profile = UserProfile(json: basicProfile())
                 expect(profile).toNot(beNil())
                 expect(profile?.id) == UserId
                 expect(profile?.name) == Support
@@ -55,7 +55,7 @@ class UserProfileSpec: QuickSpec {
             it("should build with email") {
                 var info = basicProfile()
                 info["email"] = SupportAtAuth0
-                let profile = UserProfile(dictionary: info)
+                let profile = UserProfile(json: info)
                 expect(profile?.email) == SupportAtAuth0
             }
 
@@ -68,7 +68,7 @@ class UserProfileSpec: QuickSpec {
                     "family_name": "Doe"
                 ]
                 optional.forEach { key, value in info[key] = value }
-                let profile = UserProfile(dictionary: info)
+                let profile = UserProfile(json: info)
                 expect(profile?.email) == SupportAtAuth0
                 expect(profile?.emailVerified) == true
                 expect(profile?.givenName) == "John"
@@ -81,7 +81,7 @@ class UserProfileSpec: QuickSpec {
                     "my_custom_key": "custom_value"
                 ]
                 optional.forEach { key, value in info[key] = value }
-                let profile = UserProfile(dictionary: info)
+                let profile = UserProfile(json: info)
                 expect(profile?["my_custom_key"] as? String) == "custom_value"
             }
 
@@ -98,14 +98,14 @@ class UserProfileSpec: QuickSpec {
                 ]
                 info["user_metadata"] = metadata
 
-                let profile = UserProfile(dictionary: info)
+                let profile = UserProfile(json: info)
                 expect(profile?.userMetadata["first_name"] as? String) == "John"
                 expect(profile?.userMetadata["last_name"] as? String) == "Doe"
             }
 
             it("should at least return empty user_metadata") {
                 let info = basicProfile()
-                let profile = UserProfile(dictionary: info)
+                let profile = UserProfile(json: info)
                 expect(profile?.userMetadata.isEmpty) == true
             }
 
@@ -118,7 +118,7 @@ class UserProfileSpec: QuickSpec {
                 ]
                 info["app_metadata"] = metadata
 
-                let profile = UserProfile(dictionary: info)
+                let profile = UserProfile(json: info)
                 expect(profile?.appMetadata["subscription"] as? String) == "paid"
                 expect(profile?.appMetadata["logins"] as? Int) == 10
                 expect(profile?.appMetadata["verified"] as? Bool) == true
@@ -126,7 +126,7 @@ class UserProfileSpec: QuickSpec {
 
             it("should at least return empty app_metadata") {
                 let info = basicProfile()
-                let profile = UserProfile(dictionary: info)
+                let profile = UserProfile(json: info)
                 expect(profile?.appMetadata.isEmpty) == true
             }
         }
@@ -147,7 +147,7 @@ class UserProfileSpec: QuickSpec {
                     "list": list
                 ]
                 optional.forEach { key, value in info[key] = value }
-                profile = UserProfile(dictionary: info)
+                profile = UserProfile(json: info)
             }
 
             it("should return integer") {

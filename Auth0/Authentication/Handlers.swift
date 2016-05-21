@@ -49,7 +49,7 @@ func noBody(response: Response, callback: Request<Void, Authentication.Error>.Ca
 func credentials(response: Response, callback: Request<Credentials, Authentication.Error>.Callback) {
     switch response.result {
     case .Success(let payload):
-        if let dictionary = payload as? [String: String], let credentials = Credentials(dictionary: dictionary) {
+        if let dictionary = payload as? [String: String], let credentials = Credentials(json: dictionary) {
             callback(.Success(result: credentials))
         } else {
             callback(.Failure(error: .InvalidResponse(response: response.data)))
@@ -62,7 +62,7 @@ func credentials(response: Response, callback: Request<Credentials, Authenticati
 func profile(response: Response, callback: Request<UserProfile, Authentication.Error>.Callback) {
     switch response.result {
     case .Success(let payload):
-        if let dictionary = payload as? [String: AnyObject], let profile = UserProfile(dictionary: dictionary) {
+        if let dictionary = payload as? [String: AnyObject], let profile = UserProfile(json: dictionary) {
             callback(.Success(result: profile))
         } else {
             callback(.Failure(error: .InvalidResponse(response: response.data)))
