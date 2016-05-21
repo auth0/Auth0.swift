@@ -53,7 +53,7 @@ public struct Authentication {
             "client_id": self.clientId,
             ]
         parameters.forEach { key, value in payload[key] = value }
-        return Request(session: session, url: resourceOwner, method: "POST", handle: credentials, payload: payload)
+        return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload)
     }
 
 
@@ -120,12 +120,12 @@ public struct Authentication {
     public func tokenInfo(token: String) -> Request<UserProfile, Authentication.Error> {
         let payload: [String: AnyObject] = ["id_token": token]
         let tokenInfo = NSURL(string: "/tokeninfo", relativeToURL: self.url)!
-        return Request(session: session, url: tokenInfo, method: "POST", handle: profile, payload: payload)
+        return Request(session: session, url: tokenInfo, method: "POST", handle: authenticationObject, payload: payload)
     }
 
     public func userInfo(token: String) -> Request<UserProfile, Authentication.Error> {
         let userInfo = NSURL(string: "/userinfo", relativeToURL: self.url)!
-        return Request(session: session, url: userInfo, method: "GET", handle: profile, headers: ["Authorization": "Bearer \(token)"])
+        return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(token)"])
     }
 
     public func loginSocial(token: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, Error> {
@@ -137,7 +137,7 @@ public struct Authentication {
         ]
         parameters.forEach { key, value in payload[key] = value }
         let accessToken = NSURL(string: "/oauth/access_token", relativeToURL: self.url)!
-        return Request(session: session, url: accessToken, method: "POST", handle: credentials, payload: payload)
+        return Request(session: session, url: accessToken, method: "POST", handle: authenticationObject, payload: payload)
     }
 
     public enum PasswordlessType: String {

@@ -32,20 +32,20 @@ private let RefreshToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfStr
 class CredentialsSpec: QuickSpec {
     override func spec() {
 
-        describe("init from dictionary") {
+        describe("init from json") {
 
             it("should return nil when missing access_token") {
-                let credentials = Credentials(dictionary: ["token_type": Bearer])
+                let credentials = Credentials(json: ["token_type": Bearer])
                 expect(credentials).to(beNil())
             }
 
             it("should return nil when missing toke_type") {
-                let credentials = Credentials(dictionary: ["access_token": AccessToken])
+                let credentials = Credentials(json: ["access_token": AccessToken])
                 expect(credentials).to(beNil())
             }
 
             it("should have all tokens and token_type") {
-                let credentials = Credentials(dictionary: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken])
+                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken])
                 expect(credentials).toNot(beNil())
                 expect(credentials?.accessToken) == AccessToken
                 expect(credentials?.tokenType) == Bearer
@@ -54,7 +54,7 @@ class CredentialsSpec: QuickSpec {
             }
 
             it("should have only access_token and token_type") {
-                let credentials = Credentials(dictionary: ["access_token": AccessToken, "token_type": Bearer])
+                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer])
                 expect(credentials).toNot(beNil())
                 expect(credentials?.accessToken) == AccessToken
                 expect(credentials?.tokenType) == Bearer
@@ -62,12 +62,12 @@ class CredentialsSpec: QuickSpec {
             }
 
             it("should have id_token") {
-                let credentials = Credentials(dictionary: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken])
+                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken])
                 expect(credentials?.idToken) == IdToken
             }
 
             it("should have refresh_token") {
-                let credentials = Credentials(dictionary: ["access_token": AccessToken, "token_type": Bearer, "refresh_token": RefreshToken])
+                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "refresh_token": RefreshToken])
                 expect(credentials?.refreshToken) == RefreshToken
             }
 

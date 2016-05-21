@@ -35,30 +35,11 @@ public struct UserProfile {
     public let givenName: String?
     public let familyName: String?
 
-    let values: [String: AnyObject]
-
-    public init?(dictionary: [String: AnyObject]) {
-        guard
-            let id = dictionary["user_id"] as? String,
-            let name = dictionary["name"] as? String,
-            let nickname = dictionary["nickname"] as? String,
-            let picture = dictionary["picture"] as? String, let pictureURL = NSURL(string: picture),
-            let date = dictionary["created_at"] as? String, let createdAt = fromSO8601(date)
-            else { return nil }
-        self.id = id
-        self.name = name
-        self.nickname = nickname
-        self.pictureURL = pictureURL
-        self.createdAt = createdAt
-        self.email = dictionary["email"] as? String
-        self.emailVerified = dictionary["email_verified"] as? Bool ?? false
-        self.givenName = dictionary["given_name"] as? String
-        self.familyName = dictionary["family_name"] as? String
-        self.values = dictionary
-    }
+    public let additionalAttributes: [String: AnyObject]
+    public let identities: [UserIdentity]
 
     public subscript(key: String) -> AnyObject? {
-        return self.values[key]
+        return self.additionalAttributes[key]
     }
 
     public func value<Type>(key: String) -> Type? {
@@ -73,6 +54,36 @@ public struct UserProfile {
         return self["app_metadata"] as? [String: AnyObject] ?? [:]
     }
 
+}
+
+extension UserProfile: JSONObjectPayload {
+    init?(json: [String: AnyObject]) {
+        guard
+            let id = json["user_id"] as? String,
+            let name = json["name"] as? String,
+            let nickname = json["nickname"] as? String,
+            let picture = json["picture"] as? String, let pictureURL = NSURL(string: picture),
+            let date = json["created_at"] as? String, let createdAt = fromSO8601(date)
+            else { return nil }
+        self.id = id
+        self.name = name
+        self.nickname = nickname
+        self.pictureURL = pictureURL
+        self.createdAt = createdAt
+        self.email = json["email"] as? String
+        self.emailVerified = json["email_verified"] as? Bool ?? false
+        self.givenName = json["given_name"] as? String
+        self.familyName = json["family_name"] as? String
+        let identityValues = json["identities"] as? [[String: AnyObject]] ?? []
+        self.identities = identityValues.flatMap { UserIdentity(json: $0) }.filter { $0 != nil }
+        let keys = Set(["user_id", "name", "nickname", "picture", "created_at", "email", "email_verified", "given_name", "family_name", "identities"])
+        var values: [String: AnyObject] = [:]
+        json.forEach { key, value in
+            guard !keys.contains(key) else { return }
+            values[key] = value
+        }
+        self.additionalAttributes = values
+    }
 }
 
 private func fromSO8601(string: String) -> NSDate? {

@@ -1,4 +1,4 @@
-// Credentials.swift
+// JSONObjectPayload.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,26 +22,8 @@
 
 import Foundation
 
-public struct Credentials {
+protocol JSONObjectPayload {
 
-    public let accessToken: String
-    public let tokenType: String
-    public let idToken: String?
-    public let refreshToken: String?
-    
-}
-
-extension Credentials: JSONObjectPayload {
-
-    init?(json: [String: AnyObject]) {
-        guard
-            let token = json["access_token"] as? String,
-            let type = json["token_type"] as? String
-            else { return nil }
-        self.accessToken = token
-        self.tokenType = type
-        self.idToken = json["id_token"] as? String
-        self.refreshToken = json["refresh_token"] as? String
-    }
+    init?(json: [String: AnyObject])
 
 }
