@@ -50,6 +50,7 @@ class UserProfileSpec: QuickSpec {
                 expect(profile?.nickname) == Nickname
                 expect(profile?.pictureURL) == PictureURL
                 expect(profile?.createdAt) == dateFromISODate(CreatedAt)
+                expect(profile?.identities).to(beEmpty())
             }
 
             it("should build with email") {
@@ -83,6 +84,19 @@ class UserProfileSpec: QuickSpec {
                 optional.forEach { key, value in info[key] = value }
                 let profile = UserProfile(json: info)
                 expect(profile?["my_custom_key"] as? String) == "custom_value"
+            }
+
+            it("should build with identities") {
+                var info = basicProfile()
+                info["identities"] = [
+                    [
+                        "user_id": "1234567890",
+                        "connection": "facebook",
+                        "provider": "facebook"
+                    ]
+                ]
+                let profile = UserProfile(json: info)
+                expect(profile?.identities.first).toNot(beNil())
             }
 
             ["user_id", "name", "nickname", "picture", "created_at"].forEach { key in itBehavesLike("invalid profile") { ["key": key] } }

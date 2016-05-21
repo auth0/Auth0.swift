@@ -22,7 +22,7 @@
 
 import Foundation
 
-public struct UserIdentity {
+public struct UserIdentity: CustomDebugStringConvertible {
 
     public let identifier: String
     public let provider: String
@@ -34,6 +34,10 @@ public struct UserIdentity {
     public let accessToken: String?
     public let expiresIn: NSDate?
     public let accessTokenSecret: String?
+
+    public var debugDescription: String {
+        return "<identity: \(identifier) provider: \(provider) connection: \(connection)>"
+    }
 }
 
 extension UserIdentity: JSONObjectPayload {

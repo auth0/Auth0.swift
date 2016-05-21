@@ -36,6 +36,7 @@ public struct UserProfile {
     public let familyName: String?
 
     public let additionalAttributes: [String: AnyObject]
+    public let identities: [UserIdentity]
 
     public subscript(key: String) -> AnyObject? {
         return self.additionalAttributes[key]
@@ -73,14 +74,15 @@ extension UserProfile: JSONObjectPayload {
         self.emailVerified = json["email_verified"] as? Bool ?? false
         self.givenName = json["given_name"] as? String
         self.familyName = json["family_name"] as? String
-        let keys = ["user_id", "name", "nickname", "picture", "created_at", "email", "email_verified", "given_name", "family_name"]
+        let identityValues = json["identities"] as? [[String: AnyObject]] ?? []
+        self.identities = identityValues.flatMap { UserIdentity(json: $0) }.filter { $0 != nil }
+        let keys = Set(["user_id", "name", "nickname", "picture", "created_at", "email", "email_verified", "given_name", "family_name", "identities"])
         var values: [String: AnyObject] = [:]
         json.forEach { key, value in
             guard !keys.contains(key) else { return }
             values[key] = value
         }
         self.additionalAttributes = values
-
     }
 }
 
