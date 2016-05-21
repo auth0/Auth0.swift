@@ -22,6 +22,19 @@
 
 import Foundation
 
+func authenticationObject<T: JSONObjectPayload>(response: Response, callback: Request<T, Authentication.Error>.Callback) {
+    switch response.result {
+    case .Success(let payload):
+        if let dictionary = payload as? [String: AnyObject], let object = T(json: dictionary) {
+            callback(.Success(result: object))
+        } else {
+            callback(.Failure(error: .InvalidResponse(response: response.data)))
+        }
+    case .Failure(let cause):
+        callback(.Failure(error: authenticationError(response.data, cause: cause)))
+    }
+}
+
 func databaseUser(response: Response, callback: Request<DatabaseUser, Authentication.Error>.Callback) {
     switch response.result {
     case .Success(let payload):
@@ -41,32 +54,6 @@ func noBody(response: Response, callback: Request<Void, Authentication.Error>.Ca
     switch response.result {
     case .Success:
         callback(.Success(result: ()))
-    case .Failure(let cause):
-        callback(.Failure(error: authenticationError(response.data, cause: cause)))
-    }
-}
-
-func credentials(response: Response, callback: Request<Credentials, Authentication.Error>.Callback) {
-    switch response.result {
-    case .Success(let payload):
-        if let dictionary = payload as? [String: String], let credentials = Credentials(json: dictionary) {
-            callback(.Success(result: credentials))
-        } else {
-            callback(.Failure(error: .InvalidResponse(response: response.data)))
-        }
-    case .Failure(let cause):
-        callback(.Failure(error: authenticationError(response.data, cause: cause)))
-    }
-}
-
-func profile(response: Response, callback: Request<UserProfile, Authentication.Error>.Callback) {
-    switch response.result {
-    case .Success(let payload):
-        if let dictionary = payload as? [String: AnyObject], let profile = UserProfile(json: dictionary) {
-            callback(.Success(result: profile))
-        } else {
-            callback(.Failure(error: .InvalidResponse(response: response.data)))
-        }
     case .Failure(let cause):
         callback(.Failure(error: authenticationError(response.data, cause: cause)))
     }
