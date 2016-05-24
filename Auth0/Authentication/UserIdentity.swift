@@ -22,7 +22,8 @@
 
 import Foundation
 
-public struct UserIdentity: CustomDebugStringConvertible, JSONObjectPayload {
+@objc(A0UserIdentity)
+public class UserIdentity: NSObject, JSONObjectPayload {
 
     public let identifier: String
     public let provider: String
@@ -35,32 +36,40 @@ public struct UserIdentity: CustomDebugStringConvertible, JSONObjectPayload {
     public let expiresIn: NSDate?
     public let accessTokenSecret: String?
 
-    public var debugDescription: String {
+    override public var debugDescription: String {
         return "<identity: \(identifier) provider: \(provider) connection: \(connection)>"
     }
-    
-    init?(json: [String : AnyObject]) {
+
+    public required init(identifier: String, provider: String, connection: String, social: Bool, profileData: [String: AnyObject], accessToken: String?, expiresIn: NSDate?, accessTokenSecret: String?) {
+        self.identifier = identifier
+        self.provider = provider
+        self.connection = connection
+        self.social = social
+        self.profileData = profileData
+        self.accessToken = accessToken
+        self.expiresIn = expiresIn
+        self.accessTokenSecret = accessTokenSecret
+    }
+
+    convenience public required init?(json: [String : AnyObject]) {
 
         guard
             let identifier = json["user_id"] as? String,
             let provider = json["provider"] as? String,
             let connection = json["connection"] as? String
             else { return nil }
-        self.identifier = identifier
-        self.provider = provider
-        self.connection = connection
 
-        self.social = json["isSocial"] as? Bool ?? false
-        self.profileData = json["profileData"] as? [String: AnyObject] ?? [:]
+        let social = json["isSocial"] as? Bool ?? false
+        let profileData = json["profileData"] as? [String: AnyObject] ?? [:]
 
-        self.accessToken = json["access_token"] as? String
-        self.accessTokenSecret = json["access_token_secret"] as? String
+        let accessToken = json["access_token"] as? String
+        let accessTokenSecret = json["access_token_secret"] as? String
         let expiresIn: NSDate?
         if let expiresInSeconds = json["expires_in"] as? NSTimeInterval {
             expiresIn = NSDate(timeIntervalSince1970: expiresInSeconds)
         } else {
             expiresIn = nil
         }
-        self.expiresIn = expiresIn
+        self.init(identifier: identifier, provider: provider, connection: connection, social: social, profileData: profileData, accessToken: accessToken, expiresIn: expiresIn, accessTokenSecret: accessTokenSecret)
     }
 }

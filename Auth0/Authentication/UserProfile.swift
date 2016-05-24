@@ -22,7 +22,8 @@
 
 import Foundation
 
-public struct UserProfile {
+@objc(A0UserProfile)
+public class UserProfile: NSObject, JSONObjectPayload {
 
     public let id: String
     public let name: String
@@ -54,10 +55,23 @@ public struct UserProfile {
         return self["app_metadata"] as? [String: AnyObject] ?? [:]
     }
 
-}
+    required public init(id: String, name: String, nickname: String, pictureURL: NSURL, createdAt: NSDate, email: String?, emailVerified: Bool, givenName: String?, familyName: String?, attributes: [String: AnyObject], identities: [UserIdentity]) {
+        self.id = id
+        self.name = name
+        self.nickname = nickname
+        self.pictureURL = pictureURL
+        self.createdAt = createdAt
 
-extension UserProfile: JSONObjectPayload {
-    init?(json: [String: AnyObject]) {
+        self.email = email
+        self.emailVerified = emailVerified
+        self.givenName = givenName
+        self.familyName = familyName
+
+        self.additionalAttributes = attributes
+        self.identities = identities
+    }
+
+    convenience required public init?(json: [String: AnyObject]) {
         guard
             let id = json["user_id"] as? String,
             let name = json["name"] as? String,
@@ -65,25 +79,22 @@ extension UserProfile: JSONObjectPayload {
             let picture = json["picture"] as? String, let pictureURL = NSURL(string: picture),
             let date = json["created_at"] as? String, let createdAt = fromSO8601(date)
             else { return nil }
-        self.id = id
-        self.name = name
-        self.nickname = nickname
-        self.pictureURL = pictureURL
-        self.createdAt = createdAt
-        self.email = json["email"] as? String
-        self.emailVerified = json["email_verified"] as? Bool ?? false
-        self.givenName = json["given_name"] as? String
-        self.familyName = json["family_name"] as? String
+        let email = json["email"] as? String
+        let emailVerified = json["email_verified"] as? Bool ?? false
+        let givenName = json["given_name"] as? String
+        let familyName = json["family_name"] as? String
         let identityValues = json["identities"] as? [[String: AnyObject]] ?? []
-        self.identities = identityValues.flatMap { UserIdentity(json: $0) }.filter { $0 != nil }
+        let identities = identityValues.flatMap { UserIdentity(json: $0) }.filter { $0 != nil }
         let keys = Set(["user_id", "name", "nickname", "picture", "created_at", "email", "email_verified", "given_name", "family_name", "identities"])
         var values: [String: AnyObject] = [:]
         json.forEach { key, value in
             guard !keys.contains(key) else { return }
             values[key] = value
         }
-        self.additionalAttributes = values
+        let attributes = values
+        self.init(id: id, name: name, nickname: nickname, pictureURL: pictureURL, createdAt: createdAt, email: email, emailVerified: emailVerified, givenName: givenName, familyName: familyName, attributes: attributes, identities: identities)
     }
+
 }
 
 private func fromSO8601(string: String) -> NSDate? {
