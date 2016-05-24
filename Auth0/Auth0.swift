@@ -22,26 +22,29 @@
 
 import Foundation
 
-func url(domain: String) -> NSURL {
-    let urlString: String
-    if !domain.hasPrefix("https") {
-        urlString = "https://\(domain)"
-    } else {
-        urlString = domain
-    }
-    return NSURL(string: urlString)!
-}
-
 public func authentication(clientId clientId: String, domain: String, session: NSURLSession = .sharedSession()) -> Authentication {
-    return Authentication(clientId: clientId, url: url(domain), session: session)
+    return Authentication(clientId: clientId, url: .a0_url(domain), session: session)
 }
 
 public func management(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Management {
-    return Management(token: token, url: url(domain), session: session)
+    return Management(token: token, url: .a0_url(domain), session: session)
 }
 
 public func users(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
     return management(token, domain: domain, session: session).users()
+}
+
+public extension NSURL {
+    @objc(a0_URLWithDomain:)
+    public static func a0_url(domain: String) -> NSURL {
+        let urlString: String
+        if !domain.hasPrefix("https") {
+            urlString = "https://\(domain)"
+        } else {
+            urlString = domain
+        }
+        return NSURL(string: urlString)!
+    }
 }
 
 // MARK: - Xcode hacks
