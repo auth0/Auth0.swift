@@ -43,3 +43,11 @@ public func management(token: String, domain: String, session: NSURLSession = .s
 public func users(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
     return management(token, domain: domain, session: session).users()
 }
+
+// MARK: - Xcode hacks
+
+//Xcode issue that won't add these to Auth0-Swift.h file. 21/05/2016
+
+extension NSArray { }
+
+extension NSDictionary { }

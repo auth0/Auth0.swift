@@ -1,4 +1,4 @@
-// Credentials.swift
+// _ObjectiveAuthenticationAPI.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,27 +22,31 @@
 
 import Foundation
 
-@objc(A0Credentials)
-public class Credentials: NSObject, JSONObjectPayload {
+@objc(A0AuthenticationAPI)
+public class _ObjectiveAuthenticationAPI: NSObject {
 
-    public let accessToken: String
-    public let tokenType: String
-    public let idToken: String?
-    public let refreshToken: String?
+    private let authentication: Authentication
 
-    required public init(accessToken: String, tokenType: String, idToken: String? = nil, refreshToken: String? = nil) {
-        self.accessToken = accessToken
-        self.tokenType = tokenType
-        self.idToken = idToken
-        self.refreshToken = refreshToken
+    public convenience init(clientId: String, url: NSURL) {
+        self.init(clientId: clientId, url: url, session: NSURLSession.sharedSession())
     }
 
-    convenience required public init?(json: [String: AnyObject]) {
-        guard
-            let token = json["access_token"] as? String,
-            let type = json["token_type"] as? String
-            else { return nil }
-        self.init(accessToken: token, tokenType: type, idToken: json["id_token"] as? String, refreshToken: json["refresh_token"] as? String)
+    public init(clientId: String, url: NSURL, session: NSURLSession) {
+        self.authentication = Authentication(clientId: clientId, url: url, session: session)
+    }
+
+    @objc(loginWithUsername:password:connection:scope:parameters:callback:)
+    public func login(username: String, password: String, connection: String, scope: String, parameters: [String: AnyObject]?, callback: (NSError?, Credentials?) -> ()) {
+        self.authentication
+            .login(username, password: password, connection: connection, scope: scope, parameters: parameters ?? [:])
+            .start { result in
+                switch result {
+                case .Success(let credentials):
+                    callback(nil, credentials)
+                case .Failure(let cause):
+                    callback(cause.foundationError, nil)
+                }
+        }
     }
 
 }

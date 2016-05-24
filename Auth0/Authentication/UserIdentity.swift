@@ -22,7 +22,7 @@
 
 import Foundation
 
-public struct UserIdentity: CustomDebugStringConvertible {
+public struct UserIdentity: CustomDebugStringConvertible, JSONObjectPayload {
 
     public let identifier: String
     public let provider: String
@@ -38,9 +38,7 @@ public struct UserIdentity: CustomDebugStringConvertible {
     public var debugDescription: String {
         return "<identity: \(identifier) provider: \(provider) connection: \(connection)>"
     }
-}
-
-extension UserIdentity: JSONObjectPayload {
+    
     init?(json: [String : AnyObject]) {
 
         guard
