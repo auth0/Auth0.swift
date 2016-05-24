@@ -49,4 +49,52 @@ public class _ObjectiveAuthenticationAPI: NSObject {
         }
     }
 
+    @objc(createUserWithEmail:username:password:connection:userMetadata:callback:)
+    public func createUser(email: String, username: String?, password: String, connection: String, userMetadata: [String: AnyObject]?, callback: (NSError?, [String: AnyObject]?) -> ()) {
+        self.authentication
+            .createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
+            .start { result in
+                switch result {
+                case .Success(let user):
+                    var info: [String: AnyObject] = [
+                        "email": user.email,
+                        "verified": user.verified,
+                    ]
+                    if let username = user.username {
+                        info["username"] = username
+                    }
+                    callback(nil, info)
+                case .Failure(let cause):
+                    callback(cause.foundationError, nil)
+                }
+            }
+    }
+
+    @objc(resetPasswordWithEmail:connection:callback:)
+    public func resetPassword(email: String, connection: String, callback: NSError? -> ()) {
+        self.authentication
+            .resetPassword(email, connection: connection)
+            .start { result in
+                switch result {
+                case .Success:
+                    callback(nil)
+                case .Failure(let cause):
+                    callback(cause.foundationError)
+                }
+            }
+    }
+
+    @objc(signUpWithEmail:username:password:connection:userMetadata:scope:parameters:callback:)
+    public func signUp(email: String, username: String?, password: String, connection: String, userMetadata: [String: AnyObject]?, scope: String, parameters: [String: AnyObject]?, callback: (NSError?, Credentials?) -> ()) {
+        self.authentication
+            .signUp(email, username: username, password: password, connection: connection, userMetadata: userMetadata, scope: scope, parameters: parameters ?? [:])
+            .start { result in
+                switch result {
+                case .Success(let credentials):
+                    callback(nil, credentials)
+                case .Failure(let cause):
+                    callback(cause.foundationError, nil)
+                }
+            }
+    }
 }
