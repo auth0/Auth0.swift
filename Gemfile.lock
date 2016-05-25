@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/hzalaz/carthage_cache
-  revision: 5ac0619984f30cad3f2a7b59570c01066e0c447c
+  revision: ee9f5a5304dd0bd7860fd62b0480424126c51d1b
   branch: travis-for-oss-support
   specs:
     carthage_cache (0.4.0)
