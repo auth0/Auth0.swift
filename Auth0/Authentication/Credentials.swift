@@ -22,26 +22,27 @@
 
 import Foundation
 
-public struct Credentials {
+@objc(A0Credentials)
+public class Credentials: NSObject, JSONObjectPayload {
 
     public let accessToken: String
     public let tokenType: String
     public let idToken: String?
     public let refreshToken: String?
-    
-}
 
-extension Credentials: JSONObjectPayload {
+    required public init(accessToken: String, tokenType: String, idToken: String? = nil, refreshToken: String? = nil) {
+        self.accessToken = accessToken
+        self.tokenType = tokenType
+        self.idToken = idToken
+        self.refreshToken = refreshToken
+    }
 
-    init?(json: [String: AnyObject]) {
+    convenience required public init?(json: [String: AnyObject]) {
         guard
             let token = json["access_token"] as? String,
             let type = json["token_type"] as? String
             else { return nil }
-        self.accessToken = token
-        self.tokenType = type
-        self.idToken = json["id_token"] as? String
-        self.refreshToken = json["refresh_token"] as? String
+        self.init(accessToken: token, tokenType: type, idToken: json["id_token"] as? String, refreshToken: json["refresh_token"] as? String)
     }
 
 }

@@ -22,24 +22,35 @@
 
 import Foundation
 
-func url(domain: String) -> NSURL {
-    let urlString: String
-    if !domain.hasPrefix("https") {
-        urlString = "https://\(domain)"
-    } else {
-        urlString = domain
-    }
-    return NSURL(string: urlString)!
+public func authentication(clientId clientId: String, domain: String, session: NSURLSession = .sharedSession()) -> Authentication {
+    return Authentication(clientId: clientId, url: .a0_url(domain), session: session)
 }
 
-public func authentication(clientId clientId: String, domain: String) -> Authentication {
-    return Authentication(clientId: clientId, url: url(domain))
-}
-
-public func management(token: String, domain: String) -> Management {
-    return Management(token: token, url: url(domain))
+public func management(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Management {
+    return Management(token: token, url: .a0_url(domain), session: session)
 }
 
 public func users(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
-    return Management(token: token, url: url(domain), session: session).users()
+    return management(token, domain: domain, session: session).users()
 }
+
+public extension NSURL {
+    @objc(a0_URLWithDomain:)
+    public static func a0_url(domain: String) -> NSURL {
+        let urlString: String
+        if !domain.hasPrefix("https") {
+            urlString = "https://\(domain)"
+        } else {
+            urlString = domain
+        }
+        return NSURL(string: urlString)!
+    }
+}
+
+// MARK: - Xcode hacks
+
+//Xcode issue that won't add these to Auth0-Swift.h file. 21/05/2016
+
+extension NSArray { }
+
+extension NSDictionary { }

@@ -30,7 +30,7 @@ public struct Authentication {
 
     let session: NSURLSession
 
-    init(clientId: String, url: NSURL, session: NSURLSession = .sharedSession()) {
+    init(clientId: String, url: NSURL, session: NSURLSession = NSURLSession.sharedSession()) {
         self.clientId = clientId
         self.url = url
         self.session = session
@@ -76,7 +76,7 @@ public struct Authentication {
         return Request(session: session, url: createUser, method: "POST", handle: databaseUser, payload: payload)
     }
 
-    public func changePassword(email: String, connection: String) -> Request<Void, Error> {
+    public func resetPassword(email: String, connection: String) -> Request<Void, Error> {
         let payload = [
             "email": email,
             "connection": connection,
