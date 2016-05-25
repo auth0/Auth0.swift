@@ -1,16 +1,22 @@
+GIT
+  remote: https://github.com/hzalaz/carthage_cache
+  revision: 5ac0619984f30cad3f2a7b59570c01066e0c447c
+  branch: travis-for-oss-support
+  specs:
+    carthage_cache (0.4.0)
+      aws-sdk (~> 2.2.3)
+      commander (~> 4.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
-    aws-sdk (2.2.36)
-      aws-sdk-resources (= 2.2.36)
-    aws-sdk-core (2.2.36)
+    aws-sdk (2.2.37)
+      aws-sdk-resources (= 2.2.37)
+    aws-sdk-core (2.2.37)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.2.36)
-      aws-sdk-core (= 2.2.36)
-    carthage_cache (0.4.0)
-      aws-sdk (~> 2.2.3)
-      commander (~> 4.3.8)
-    commander (4.3.8)
+    aws-sdk-resources (2.2.37)
+      aws-sdk-core (= 2.2.37)
+    commander (4.4.0)
       highline (~> 1.7.2)
     highline (1.7.8)
     jmespath (1.2.4)
@@ -24,5 +30,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  carthage_cache
+  carthage_cache!
   xcpretty
