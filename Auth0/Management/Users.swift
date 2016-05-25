@@ -128,12 +128,7 @@ public struct Users {
     public func patch(identifier: String, attributes: UserPatchAttributes) -> Request<Management.Object, Management.Error> {
         let userPath = "/api/v2/users/\(identifier)"
         let component = components(self.management.url, path: userPath)
-
-        let attributes = UserPatchAttributes()
-            .email("support@auth0.com", verify: true, connection: "Username-Password-Authentication", clientId: "MyClientId")
-            .userMetadata(["first_name": "Juan", "last_name": "AuthZero"])
-            .appMetadata(["role": "admin"])
-
+        
         return Request(session: self.management.session, url: component.URL!, method: "PATCH", handle: self.management.managementObject, payload: attributes.dictionary)
     }
 
