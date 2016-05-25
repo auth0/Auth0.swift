@@ -22,6 +22,9 @@
 
 import Foundation
 
+/**
+ Auth0 user identity
+ */
 @objc(A0UserIdentity)
 public class UserIdentity: NSObject, JSONObjectPayload {
 

@@ -54,7 +54,7 @@ public class _ObjectiveManagementAPI: NSObject {
     public func linkUser(identifier: String, withUserUsingToken token: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
         self.management
             .users()
-            .link(identifier, withUserUsingToken: token)
+            .link(identifier, withOtherUserToken: token)
             .start { result in
                 switch result {
                 case .Success(let payload):

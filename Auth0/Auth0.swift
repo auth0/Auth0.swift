@@ -22,19 +22,73 @@
 
 import Foundation
 
+/**
+ Auth0 Authentication API to authenticate your user using a Database, Social, Enterprise or Passwordless connections
+
+ ```
+ Auth0.authentication(clientId, domain: "samples.auth0.com")
+ ```
+
+ - parameter clientId: of your Auth0 client/application
+ - parameter domain:   of your Auth0 account. e.g.: 'samples.auth0.com'
+ - parameter session:  of NSURLSession used for networking. By default it will used the shared session
+
+ - returns: Auth0 Authentication API
+ */
 public func authentication(clientId clientId: String, domain: String, session: NSURLSession = .sharedSession()) -> Authentication {
     return Authentication(clientId: clientId, url: .a0_url(domain), session: session)
 }
 
+/**
+ Auth0 Management API v2 to perform CRUD operation against your Users, Clients, Connections, etc.
+ 
+ ```
+ Auth0.management(token, domain: "samples.auth0.com")
+ ```
+
+ - parameter token:   of Management API v2 with the correct allowed scopes to perform the desired action
+ - parameter domain:  of your Auth0 account. e.g.: 'samples.auth0.com'
+ - parameter session:  of NSURLSession used for networking. By default it will used the shared session
+
+ - returns: Auth0 Management API v2
+ - important: Auth0.swift has yet to implement all endpoints. Now you can only perform some CRUD operations against Users
+ */
 public func management(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Management {
     return Management(token: token, url: .a0_url(domain), session: session)
 }
 
+/**
+ Auth0 Management Users API v2 that allows CRUD operations with the users endpoint.
+ 
+ ```
+ Auth0.users(token, domain: "samples.auth0.com")
+ ```
+
+ Currently you can only perform the following operations:
+ 
+ * Get an user by id
+ * Update an user, e.g. by adding `user_metadata`
+ * Link users
+ * Unlink users
+
+ - parameter token:   of Management API v2 with the correct allowed scopes to perform the desired action
+ - parameter domain:  of your Auth0 account. e.g.: 'samples.auth0.com'
+ - parameter session:  of NSURLSession used for networking. By default it will used the shared session
+
+ - returns: Auth0 Management API v2
+ */
 public func users(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
     return management(token, domain: domain, session: session).users()
 }
 
 public extension NSURL {
+    /**
+     Returns an Auth0 domain URL given a domain
+
+     - parameter domain: name of your Auth0 account
+
+     - returns: URL of your Auth0 account
+     */
     @objc(a0_URLWithDomain:)
     public static func a0_url(domain: String) -> NSURL {
         let urlString: String

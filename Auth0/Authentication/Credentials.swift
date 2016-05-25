@@ -22,6 +22,9 @@
 
 import Foundation
 
+/**
+ Auth0 users' credentials
+ */
 @objc(A0Credentials)
 public class Credentials: NSObject, JSONObjectPayload {
 

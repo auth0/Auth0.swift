@@ -6,11 +6,11 @@
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
 
-Swift toolkit for Auth0 API
+Swift toolkit for Auth0 API (Authentication & Management)
 
 ## Requirements
 
-iOS 8+ and Xcode 7 (Swift 2.0)
+iOS 9+ and Xcode 7.3 (Swift 2.2)
 
 ## Installation
 
@@ -20,7 +20,7 @@ Auth0.swift is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod "Auth0", '~> 0.2'
+pod "Auth0", '~> 1.0.0-beta.1'
 ```
 
 ###Carthage
@@ -31,95 +31,119 @@ In your Cartfile add this line
 github "auth0/Auth0.swift"
 ```
 
-###Manual installation
+## Auth0.swift
 
-Download `Auth0.framework` from [Releases](/releases) and add it to your project in Xcode.
+### Authentication API
 
-##Auth0.swift
-
-Before we start add your **Auth0** domain in your `Info.plist` file as the value of the key `Auth0Domain`, e.g.:
-
-`Auth0Domain`: `https://samples.auth0.com`
-
-Or create your own instance of Auth0
+#### Login with database connection
 
 ```swift
-let auth0 = Auth0(domain: "https://samples.auth0.com")
-```
-> If you choose to follow this path, you are responsible to keep this reference alive
-
-### Users
-
-####Update `user_metadata` with `id_token`
-
-```swift
-Auth0
-    .users(id_token)
-    .update(userMetadata: ["first_name": "John Doe"])
-    .responseJSON { error, userJSON in
-        //Do stuff...
-    }
+     Auth0
+        .authentication("ClientId", domain: "samples.auth0.com")
+        .login(
+            "support@auth0.com", 
+            password: "a secret password", 
+            connection: "Username-Password-Authentication"
+            )
+        .start { result in
+            switch result {
+            case .Success(let credentials):
+                print("access_token: \(credentials.accessToken)")
+            case .Failure(let error):
+                print(error)
+            }
+        }
 ```
 
-####Update User root attributes (including metadata) with `id_token`
+#### Passwordless Login
 
 ```swift
-Auth0
-    .users(id_token)
-    .update(parameter: [
-        "email": "support@auth0.com", 
-        "verify_email": true
-        ])
-    .responseJSON { error, userJSON in
-        //Do stuff...
-    }
+     Auth0
+        .authentication("ClientId", domain: "samples.auth0.com")
+        .startPasswordless(email: "support@auth0.com", connection: "email")
+        .start { result in
+            switch result {
+            case .Success:
+                print("Sent OTP to support@auth0.com!")
+            case .Failure(let error):
+                print(error)
+            }
+        }
 ```
 
-####Update `app_metadata` using API v2 JWT
 
 ```swift
-Auth0
-    .users(jwt)
-    .update(id: "auth0|1234567890", appMetadata: ["role": "admin"])
-    .responseJSON { error, userJSON in
-        //Do stuff...
-    }
+     Auth0
+        .authentication("ClientId", domain: "samples.auth0.com")
+        .login(
+            "support@auth0.com", 
+            password: "email OTP", 
+            connection: "email"
+            )
+        .start { result in
+            switch result {
+            case .Success(let credentials):
+                print("access_token: \(credentials.accessToken)")
+            case .Failure(let error):
+                print(error)
+            }
+        }
 ```
 
-####Update User root attributes (including metadata) using API v2 JWT
+
+#### Sign Up with database connection
 
 ```swift
-Auth0
-    .users(jwt)
-    .update(id: "auth0|1234567890", parameter: [
-        "email": "support@auth0.com", 
-        "verify_email": true
-        ])
-    .responseJSON { error, userJSON in
-        //Do stuff...
-    }
+     Auth0
+        .authentication("ClientId", domain: "samples.auth0.com")
+        .signUp(
+            "support@auth0.com", 
+            password: "a secret password", 
+            connection: "Username-Password-Authentication"
+            )
+        .start { result in
+            switch result {
+            case .Success(let credentials):
+                print("access_token: \(credentials.accessToken)")
+            case .Failure(let error):
+                print(error)
+            }
+        }
 ```
 
-####Fetch User using id_token
+
+#### Get user information
 
 ```swift
-Auth0
-    .users(id_token)
-    .find()
-    .responseJSON { error, userJSON in
-        //Do stuff...
-    }
+     Auth0
+        .authentication("ClientId", domain: "samples.auth0.com")
+        .tokenInfo("user id_token")
+        .start { result in
+            switch result {
+            case .Success(let profile):
+                print("profile email: \(profile.email)")
+            case .Failure(let error):
+                print(error)
+            }
+        }
 ```
 
-####Fetch User using API v2 JWT
+### Management API (Users)
+
+#### Update user_metadata
 
 ```swift
-Auth0
-    .users(id_token)
-    .find(id: "auth0|1234567890")
-    .responseJSON { error, userJSON in
-        //Do stuff...
-    }
+    Auth0
+        .users("user token", domain: "samples.auth0.com")
+        .patch("user identifier", userMetadata: ["first_name": "John", "last_name": "Doe"])
+        .start { result in
+            switch result {
+            case .Success(let userInfo):
+                print("user: \(userInfo)")
+            case .Failure(let error):
+                print(error)
+            }
+        }
 ```
 
 ## What is Auth0?

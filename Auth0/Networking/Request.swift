@@ -26,6 +26,16 @@ import Foundation
     let ParameterPropertyKey = "com.auth0.parameter"
 #endif
 
+/**
+ Auth0 API request
+
+ ```
+ let request: Request<Credentials, Authentication.Error> = //
+ request.start { result in
+    //handle result
+ }
+ ```
+ */
 public struct Request<T, Error: ErrorType>: Requestable {
     public typealias Callback = Result<T, Error> -> ()
 
@@ -59,21 +69,41 @@ public struct Request<T, Error: ErrorType>: Requestable {
         return request
     }
 
+    /**
+     Starts the request to the server
+
+     - parameter callback: called when the request finishes and yield it's result
+     */
     public func start(callback: Callback) {
         let handler = self.handle
         session.dataTaskWithRequest(request) { handler(Response(data: $0, response: $1, error: $2), callback) }.resume()
     }
 
+    /**
+     Starts another request after this request completes successfuly.
+
+     - parameter request: request to start next
+
+     - returns: a concatenated request that will yield the last request result
+     */
     public func concat<S>(request: Request<S, Error>) -> ConcatRequest<T, S, Error> {
         return ConcatRequest(first: self, second: request)
     }
     
 }
 
+/**
+ *  A concatenated request, if the first one fails it will yield it's error, otherwise it will return the last request outcome
+ */
 public struct ConcatRequest<F, S, Error: ErrorType>: Requestable {
     let first: Request<F, Error>
     let second: Request<S, Error>
 
+    /**
+     Starts the request to the server
+
+     - parameter callback: called when the request finishes and yield it's result
+     */
     func start(callback: Result<S, Error> -> ()) {
         let second = self.second
         first.start { result in

@@ -22,6 +22,9 @@
 
 import Foundation
 
+/**
+ *  Auth0 Management API
+ */
 public struct Management {
     public let token: String
     public let url: NSURL
@@ -35,12 +38,26 @@ public struct Management {
     }
 
     public typealias Object = [String: AnyObject]
+
+    /**
+     Types of errors that can be returned by Management API
+
+     - Response:        the request was not successful and Auth0 returned an error response with the reeason it failed
+     - InvalidResponse: the response returned by Auth0 was not valid
+     - RequestFailed:   the request failed
+     */
     public enum Error: ErrorType {
         case Response(error: String, description: String, code: String, statusCode: Int)
         case InvalidResponse(response: NSData?)
         case RequestFailed(cause: ErrorType)
     }
 
+
+    /**
+     Auth0 Users API v2
+
+     - returns: Users API endpoints
+     */
     public func users() -> Users { return Users(management: self) }
 
     func managementObject(response: Response, callback: Request<Object, Error>.Callback) {

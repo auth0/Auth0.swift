@@ -22,6 +22,12 @@
 
 import Foundation
 
+
+/**
+ Auth0 normalized user profile
+ 
+ - seeAlso: [Normalized User Profile](https://auth0.com/docs/user-profile/normalized)
+ */
 @objc(A0UserProfile)
 public class UserProfile: NSObject, JSONObjectPayload {
 
