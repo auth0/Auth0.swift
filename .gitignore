@@ -1,6 +1,9 @@
 # OS X
 .DS_Store
 
+# Auth0
+Auth0.plist
+
 # Xcode
 build/
 *.pbxuser

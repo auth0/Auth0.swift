@@ -17,6 +17,21 @@
 		5F1A02981CC7EED500D3F662 /* Quick.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBE1CC571290011842B /* Quick.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F1A02991CC7EED500D3F662 /* OHHTTPStubs.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBF1CC571290011842B /* OHHTTPStubs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F1A029A1CC7EED500D3F662 /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDC01CC571290011842B /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5F3965C21CF67CF000CDE7C0 /* OAuth2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C11CF67CF000CDE7C0 /* OAuth2.swift */; };
+		5F3965CA1CF67DD800CDE7C0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C91CF67DD800CDE7C0 /* AppDelegate.swift */; };
+		5F3965CC1CF67DD800CDE7C0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965CB1CF67DD800CDE7C0 /* ViewController.swift */; };
+		5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965CD1CF67DD800CDE7C0 /* Main.storyboard */; };
+		5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965D01CF67DD800CDE7C0 /* Assets.xcassets */; };
+		5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965D21CF67DD800CDE7C0 /* LaunchScreen.storyboard */; };
+		5F3965E71CF67DFB00CDE7C0 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
+		5F3965E81CF6840400CDE7C0 /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBA1CC571290011842B /* Quick.framework */; };
+		5F3965E91CF6840400CDE7C0 /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBB1CC571290011842B /* OHHTTPStubs.framework */; };
+		5F3965EA1CF6840400CDE7C0 /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBC1CC571290011842B /* Nimble.framework */; };
+		5F3965EC1CF6841500CDE7C0 /* Quick.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBA1CC571290011842B /* Quick.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5F3965ED1CF6841600CDE7C0 /* OHHTTPStubs.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBB1CC571290011842B /* OHHTTPStubs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5F3965EE1CF6841600CDE7C0 /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBC1CC571290011842B /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5F3965F11CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965F01CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift */; };
+		5F3965F31CF6857A00CDE7C0 /* ControllerModalPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */; };
 		5F74CB3D1CEE8E9100226823 /* UserIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */; };
 		5F74CB3E1CEE8E9100226823 /* UserIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */; };
 		5F74CB401CEFD5E600226823 /* JSONObjectPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3F1CEFD5E600226823 /* JSONObjectPayload.swift */; };
@@ -98,6 +113,13 @@
 			remoteGlobalIDString = 5F06DD841CC448C90011842B;
 			remoteInfo = Auth0.OSX;
 		};
+		5F3965DB1CF67DD800CDE7C0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5F3965C61CF67DD800CDE7C0;
+			remoteInfo = OAuth2;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -125,6 +147,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5F3965EB1CF6840D00CDE7C0 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5F3965EC1CF6841500CDE7C0 /* Quick.framework in CopyFiles */,
+				5F3965ED1CF6841600CDE7C0 /* OHHTTPStubs.framework in CopyFiles */,
+				5F3965EE1CF6841600CDE7C0 /* Nimble.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -142,6 +176,19 @@
 		5F06DDBF1CC571290011842B /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = Carthage/Build/Mac/OHHTTPStubs.framework; sourceTree = "<group>"; };
 		5F06DDC01CC571290011842B /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = Carthage/Build/Mac/Nimble.framework; sourceTree = "<group>"; };
 		5F06DDC81CC66B710011842B /* Auth0.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0.swift; sourceTree = "<group>"; };
+		5F3965C11CF67CF000CDE7C0 /* OAuth2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2.swift; sourceTree = "<group>"; };
+		5F3965C71CF67DD800CDE7C0 /* OAuth2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F3965C91CF67DD800CDE7C0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		5F3965CB1CF67DD800CDE7C0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		5F3965CE1CF67DD800CDE7C0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		5F3965D01CF67DD800CDE7C0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5F3965D31CF67DD800CDE7C0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		5F3965D51CF67DD800CDE7C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5F3965DA1CF67DD800CDE7C0 /* OAuth2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OAuth2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F3965E01CF67DD800CDE7C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5F3965EF1CF6845A00CDE7C0 /* OAuth2Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OAuth2Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		5F3965F01CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControllerModalPresenterSpec.swift; sourceTree = "<group>"; };
+		5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControllerModalPresenter.swift; sourceTree = "<group>"; };
 		5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserIdentity.swift; sourceTree = "<group>"; };
 		5F74CB3F1CEFD5E600226823 /* JSONObjectPayload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONObjectPayload.swift; sourceTree = "<group>"; };
 		5F74CB421CEFDFB800226823 /* UserIdentitySpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserIdentitySpec.swift; sourceTree = "<group>"; };
@@ -212,6 +259,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5F3965C41CF67DD800CDE7C0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F3965E71CF67DFB00CDE7C0 /* Auth0.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F3965D71CF67DD800CDE7C0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F3965E81CF6840400CDE7C0 /* Quick.framework in Frameworks */,
+				5F3965E91CF6840400CDE7C0 /* OHHTTPStubs.framework in Frameworks */,
+				5F3965EA1CF6840400CDE7C0 /* Nimble.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -220,6 +285,8 @@
 			children = (
 				5F049B6B1CB42C29006F6C05 /* Auth0 */,
 				5F06DD921CC451430011842B /* Auth0Tests */,
+				5F3965C81CF67DD800CDE7C0 /* OAuth2 */,
+				5F3965DD1CF67DD800CDE7C0 /* OAuth2Tests */,
 				5F06DDC21CC5712F0011842B /* Frameworks */,
 				5F049B6A1CB42C29006F6C05 /* Products */,
 			);
@@ -232,6 +299,8 @@
 				5F06DD851CC448C90011842B /* Auth0.framework */,
 				5F06DDA01CC451540011842B /* Auth0Tests.xctest */,
 				5F06DDAF1CC451700011842B /* Auth0Tests.xctest */,
+				5F3965C71CF67DD800CDE7C0 /* OAuth2.app */,
+				5F3965DA1CF67DD800CDE7C0 /* OAuth2Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -239,6 +308,7 @@
 		5F049B6B1CB42C29006F6C05 /* Auth0 */ = {
 			isa = PBXGroup;
 			children = (
+				5F3965C01CF679B500CDE7C0 /* OAuth2 */,
 				5FBBF03D1CCA8FC20024D2AF /* Authentication */,
 				5FF465BA1CE2AC2800F7ED8C /* Management */,
 				5FE2F8C01CD0F9AF003628F4 /* Networking */,
@@ -292,6 +362,38 @@
 				5F06DDC01CC571290011842B /* Nimble.framework */,
 			);
 			name = OSX;
+			sourceTree = "<group>";
+		};
+		5F3965C01CF679B500CDE7C0 /* OAuth2 */ = {
+			isa = PBXGroup;
+			children = (
+				5F3965C11CF67CF000CDE7C0 /* OAuth2.swift */,
+				5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */,
+			);
+			name = OAuth2;
+			sourceTree = "<group>";
+		};
+		5F3965C81CF67DD800CDE7C0 /* OAuth2 */ = {
+			isa = PBXGroup;
+			children = (
+				5F3965C91CF67DD800CDE7C0 /* AppDelegate.swift */,
+				5F3965CB1CF67DD800CDE7C0 /* ViewController.swift */,
+				5F3965CD1CF67DD800CDE7C0 /* Main.storyboard */,
+				5F3965D01CF67DD800CDE7C0 /* Assets.xcassets */,
+				5F3965D21CF67DD800CDE7C0 /* LaunchScreen.storyboard */,
+				5F3965D51CF67DD800CDE7C0 /* Info.plist */,
+			);
+			path = OAuth2;
+			sourceTree = "<group>";
+		};
+		5F3965DD1CF67DD800CDE7C0 /* OAuth2Tests */ = {
+			isa = PBXGroup;
+			children = (
+				5F3965E01CF67DD800CDE7C0 /* Info.plist */,
+				5F3965F01CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift */,
+				5F3965EF1CF6845A00CDE7C0 /* OAuth2Tests-Bridging-Header.h */,
+			);
+			path = OAuth2Tests;
 			sourceTree = "<group>";
 		};
 		5FADB6011CEC0C1600D4BB50 /* Management */ = {
@@ -488,6 +590,43 @@
 			productReference = 5F06DDAF1CC451700011842B /* Auth0Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		5F3965C61CF67DD800CDE7C0 /* OAuth2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5F3965E11CF67DD800CDE7C0 /* Build configuration list for PBXNativeTarget "OAuth2" */;
+			buildPhases = (
+				5F3965C31CF67DD800CDE7C0 /* Sources */,
+				5F3965C41CF67DD800CDE7C0 /* Frameworks */,
+				5F3965C51CF67DD800CDE7C0 /* Resources */,
+				5F53F5CB1CFCDC2500476A46 /* Auth0 */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OAuth2;
+			productName = OAuth2;
+			productReference = 5F3965C71CF67DD800CDE7C0 /* OAuth2.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5F3965D91CF67DD800CDE7C0 /* OAuth2Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5F3965E41CF67DD800CDE7C0 /* Build configuration list for PBXNativeTarget "OAuth2Tests" */;
+			buildPhases = (
+				5F3965D61CF67DD800CDE7C0 /* Sources */,
+				5F3965D71CF67DD800CDE7C0 /* Frameworks */,
+				5F3965D81CF67DD800CDE7C0 /* Resources */,
+				5F3965EB1CF6840D00CDE7C0 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5F3965DC1CF67DD800CDE7C0 /* PBXTargetDependency */,
+			);
+			name = OAuth2Tests;
+			productName = OAuth2Tests;
+			productReference = 5F3965DA1CF67DD800CDE7C0 /* OAuth2Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -510,6 +649,13 @@
 					5F06DDAE1CC451700011842B = {
 						CreatedOnToolsVersion = 7.3;
 					};
+					5F3965C61CF67DD800CDE7C0 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+					5F3965D91CF67DD800CDE7C0 = {
+						CreatedOnToolsVersion = 7.3.1;
+						TestTargetID = 5F3965C61CF67DD800CDE7C0;
+					};
 				};
 			};
 			buildConfigurationList = 5F049B631CB42C29006F6C05 /* Build configuration list for PBXProject "Auth0" */;
@@ -518,6 +664,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 5F049B5F1CB42C29006F6C05;
 			productRefGroup = 5F049B6A1CB42C29006F6C05 /* Products */;
@@ -528,6 +675,8 @@
 				5F06DD841CC448C90011842B /* Auth0.OSX */,
 				5F06DD9F1CC451540011842B /* Auth0Tests.iOS */,
 				5F06DDAE1CC451700011842B /* Auth0Tests.OSX */,
+				5F3965C61CF67DD800CDE7C0 /* OAuth2 */,
+				5F3965D91CF67DD800CDE7C0 /* OAuth2Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -561,13 +710,48 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5F3965C51CF67DD800CDE7C0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */,
+				5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */,
+				5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F3965D81CF67DD800CDE7C0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5F53F5CB1CFCDC2500476A46 /* Auth0 */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Auth0;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\nif [ -f $AUTH0_PLIST ];\nthen\ncp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nfi";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5F06DD731CC448B10011842B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F3965F31CF6857A00CDE7C0 /* ControllerModalPresenter.swift in Sources */,
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FCCC31C1CF51DF300901E2E /* _ObjectiveManagementAPI.swift in Sources */,
 				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
@@ -582,6 +766,7 @@
 				5F74CB401CEFD5E600226823 /* JSONObjectPayload.swift in Sources */,
 				5FE2F8B81CD0E910003628F4 /* Request.swift in Sources */,
 				5FE2F8A91CCE54F1003628F4 /* Result.swift in Sources */,
+				5F3965C21CF67CF000CDE7C0 /* OAuth2.swift in Sources */,
 				5FE2F8C31CD1498E003628F4 /* UserProfile.swift in Sources */,
 				5FCCC3151CF4DB4400901E2E /* NSError+Authentication.swift in Sources */,
 				5FBBF03F1CCA8FF40024D2AF /* Authentication.swift in Sources */,
@@ -652,6 +837,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5F3965C31CF67DD800CDE7C0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F3965CC1CF67DD800CDE7C0 /* ViewController.swift in Sources */,
+				5F3965CA1CF67DD800CDE7C0 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F3965D61CF67DD800CDE7C0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F3965F11CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -665,7 +867,31 @@
 			target = 5F06DD841CC448C90011842B /* Auth0.OSX */;
 			targetProxy = 5F06DDB51CC451700011842B /* PBXContainerItemProxy */;
 		};
+		5F3965DC1CF67DD800CDE7C0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5F3965C61CF67DD800CDE7C0 /* OAuth2 */;
+			targetProxy = 5F3965DB1CF67DD800CDE7C0 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		5F3965CD1CF67DD800CDE7C0 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5F3965CE1CF67DD800CDE7C0 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		5F3965D21CF67DD800CDE7C0 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5F3965D31CF67DD800CDE7C0 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		5F049B6F1CB42C29006F6C05 /* Debug */ = {
@@ -949,6 +1175,73 @@
 			};
 			name = Release;
 		};
+		5F3965E21CF67DD800CDE7C0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				INFOPLIST_FILE = OAuth2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		5F3965E31CF67DD800CDE7C0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				INFOPLIST_FILE = OAuth2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		5F3965E51CF67DD800CDE7C0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = OAuth2Tests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "OAuth2Tests/OAuth2Tests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2.app/OAuth2";
+			};
+			name = Debug;
+		};
+		5F3965E61CF67DD800CDE7C0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = OAuth2Tests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "OAuth2Tests/OAuth2Tests-Bridging-Header.h";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2.app/OAuth2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -993,6 +1286,24 @@
 			buildConfigurations = (
 				5F06DDB81CC451700011842B /* Debug */,
 				5F06DDB91CC451700011842B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5F3965E11CF67DD800CDE7C0 /* Build configuration list for PBXNativeTarget "OAuth2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F3965E21CF67DD800CDE7C0 /* Debug */,
+				5F3965E31CF67DD800CDE7C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5F3965E41CF67DD800CDE7C0 /* Build configuration list for PBXNativeTarget "OAuth2Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F3965E51CF67DD800CDE7C0 /* Debug */,
+				5F3965E61CF67DD800CDE7C0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
