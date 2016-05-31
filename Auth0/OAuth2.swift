@@ -33,21 +33,29 @@ public class OAuth2: NSObject {
     let url: NSURL
     let presenter: ControllerModalPresenter
 
+    public enum Error: ErrorType {
+        case WebControllerMissing
+        case UnrecognizedRedirectParameters
+    }
+
     public init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter()) {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter
     }
 
-    public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
+    public func start(callback: Result<Credentials, Authentication.Error> -> ()) -> OAuth2Session {
         let authorize = NSURL(string: "/authorize", relativeToURL: self.url)!
         let components = NSURLComponents(URL: authorize, resolvingAgainstBaseURL: true)!
+        let redirectURL = NSURL(string: "com.auth0.OAuth2://overmind.auth0.com/ios/com.auth0.OAuth2/callback")!
         components.queryItems = [
             NSURLQueryItem(name: "client_id", value: self.clientId),
             NSURLQueryItem(name: "response_type", value: "token"),
-            NSURLQueryItem(name: "redirect_uri", value: "https://localhost:3000/callback")
+            NSURLQueryItem(name: "redirect_uri", value: redirectURL.absoluteString)
         ]
         let safari = SFSafariViewController(URL: components.URL!)
+        let session = OAuth2Session(controller: safari, redirectURL: redirectURL, callback: callback)
         self.presenter.present(safari)
+        return session
     }
-}
+} 

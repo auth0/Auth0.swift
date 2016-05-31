@@ -33,6 +33,7 @@ public enum _AuthenticationErrorCode: Int {
     case ErrorResponse = 0
     case InvalidResponse = 1
     case RequestFailed = 2
+    case Cancelled = 3
 }
 
 extension Authentication.Error {
@@ -61,6 +62,9 @@ extension Authentication.Error {
                 NSLocalizedDescriptionKey: error.localizedDescription,
                 causeKey: error
             ]
+        case .Cancelled:
+            errorCode = .Cancelled
+            userInfo = [ NSLocalizedDescriptionKey: "User cancelled OAuth2 auth session"]
         }
 
         return NSError(

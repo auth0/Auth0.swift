@@ -23,7 +23,6 @@
 		5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965CD1CF67DD800CDE7C0 /* Main.storyboard */; };
 		5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965D01CF67DD800CDE7C0 /* Assets.xcassets */; };
 		5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965D21CF67DD800CDE7C0 /* LaunchScreen.storyboard */; };
-		5F3965E71CF67DFB00CDE7C0 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		5F3965E81CF6840400CDE7C0 /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBA1CC571290011842B /* Quick.framework */; };
 		5F3965E91CF6840400CDE7C0 /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBB1CC571290011842B /* OHHTTPStubs.framework */; };
 		5F3965EA1CF6840400CDE7C0 /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBC1CC571290011842B /* Nimble.framework */; };
@@ -32,6 +31,11 @@
 		5F3965EE1CF6841600CDE7C0 /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBC1CC571290011842B /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F3965F11CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965F01CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift */; };
 		5F3965F31CF6857A00CDE7C0 /* ControllerModalPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */; };
+		5F53F5CE1CFD157300476A46 /* OAuth2Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */; };
+		5F53F5D11CFD19A400476A46 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
+		5F53F5D31CFD474600476A46 /* OAuth2SessionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F53F5D21CFD474600476A46 /* OAuth2SessionSpec.swift */; };
+		5F53F5D41CFD59A300476A46 /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
+		5F53F5D51CFD59A300476A46 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
 		5F74CB3D1CEE8E9100226823 /* UserIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */; };
 		5F74CB3E1CEE8E9100226823 /* UserIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */; };
 		5F74CB401CEFD5E600226823 /* JSONObjectPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3F1CEFD5E600226823 /* JSONObjectPayload.swift */; };
@@ -120,6 +124,13 @@
 			remoteGlobalIDString = 5F3965C61CF67DD800CDE7C0;
 			remoteInfo = OAuth2;
 		};
+		5F53F5CF1CFD199700476A46 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5F06DD771CC448B10011842B;
+			remoteInfo = Auth0.iOS;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -189,6 +200,8 @@
 		5F3965EF1CF6845A00CDE7C0 /* OAuth2Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OAuth2Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		5F3965F01CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControllerModalPresenterSpec.swift; sourceTree = "<group>"; };
 		5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControllerModalPresenter.swift; sourceTree = "<group>"; };
+		5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2Session.swift; sourceTree = "<group>"; };
+		5F53F5D21CFD474600476A46 /* OAuth2SessionSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2SessionSpec.swift; sourceTree = "<group>"; };
 		5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserIdentity.swift; sourceTree = "<group>"; };
 		5F74CB3F1CEFD5E600226823 /* JSONObjectPayload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONObjectPayload.swift; sourceTree = "<group>"; };
 		5F74CB421CEFDFB800226823 /* UserIdentitySpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserIdentitySpec.swift; sourceTree = "<group>"; };
@@ -263,7 +276,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5F3965E71CF67DFB00CDE7C0 /* Auth0.framework in Frameworks */,
+				5F53F5D11CFD19A400476A46 /* Auth0.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,6 +382,7 @@
 			children = (
 				5F3965C11CF67CF000CDE7C0 /* OAuth2.swift */,
 				5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */,
+				5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */,
 			);
 			name = OAuth2;
 			sourceTree = "<group>";
@@ -392,6 +406,7 @@
 				5F3965E01CF67DD800CDE7C0 /* Info.plist */,
 				5F3965F01CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift */,
 				5F3965EF1CF6845A00CDE7C0 /* OAuth2Tests-Bridging-Header.h */,
+				5F53F5D21CFD474600476A46 /* OAuth2SessionSpec.swift */,
 			);
 			path = OAuth2Tests;
 			sourceTree = "<group>";
@@ -602,6 +617,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				5F53F5D01CFD199700476A46 /* PBXTargetDependency */,
 			);
 			name = OAuth2;
 			productName = OAuth2;
@@ -755,6 +771,7 @@
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FCCC31C1CF51DF300901E2E /* _ObjectiveManagementAPI.swift in Sources */,
 				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
+				5F53F5CE1CFD157300476A46 /* OAuth2Session.swift in Sources */,
 				5F74CB3D1CEE8E9100226823 /* UserIdentity.swift in Sources */,
 				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
@@ -850,6 +867,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F53F5D51CFD59A300476A46 /* Responses.swift in Sources */,
+				5F53F5D41CFD59A300476A46 /* Matchers.swift in Sources */,
+				5F53F5D31CFD474600476A46 /* OAuth2SessionSpec.swift in Sources */,
 				5F3965F11CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -871,6 +891,11 @@
 			isa = PBXTargetDependency;
 			target = 5F3965C61CF67DD800CDE7C0 /* OAuth2 */;
 			targetProxy = 5F3965DB1CF67DD800CDE7C0 /* PBXContainerItemProxy */;
+		};
+		5F53F5D01CFD199700476A46 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5F06DD771CC448B10011842B /* Auth0.iOS */;
+			targetProxy = 5F53F5CF1CFD199700476A46 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

@@ -23,13 +23,27 @@ class ViewController: UIViewController {
 
     @IBAction func startOAuth2(sender: AnyObject) {
         guard let client = self.client else { return }
-        Auth0
+        let session = Auth0
             .oauth2(clientId: client.clientId, domain: client.domain)
             .start { print($0) }
+        OAuth2.sharedInstance.currentSession = session
     }
 
 }
 
+class OAuth2 {
+    var currentSession: OAuth2Session? = nil
+
+    static let sharedInstance = OAuth2()
+
+    func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
+        let handled = self.currentSession?.resume(url, options: options) ?? false
+        if handled {
+            self.currentSession = nil
+        }
+        return handled
+    }
+}
 
 struct Client {
     let clientId: String

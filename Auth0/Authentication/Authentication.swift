@@ -45,12 +45,14 @@ public struct Authentication {
 
      - Response:        the request was not successful and Auth0 returned an error response with the reeason it failed
      - InvalidResponse: the response returned by Auth0 was not valid
-     - RequestFailed:   the request failed
+     - RequestFailed:   the request failed to be sent. The associated value has the cause of failure
+     - Cancelled:       the request was cancelled before it could be completed. e.g.: during OAuth2 authentication
      */
     public enum Error: ErrorType {
         case Response(code: String, description: String)
         case InvalidResponse(response: NSData?)
         case RequestFailed(cause: ErrorType)
+        case Cancelled
     }
 
     /**

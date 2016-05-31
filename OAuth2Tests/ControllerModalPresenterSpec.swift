@@ -31,6 +31,10 @@ class MockViewController: UIViewController {
     override var presentedViewController: UIViewController? {
         return presented ?? super.presentedViewController
     }
+
+    override func dismissViewControllerAnimated(flag: Bool, completion: (() -> Void)?) {
+        completion?()
+    }
 }
 
 class ControllerModalPresenterSpec: QuickSpec {

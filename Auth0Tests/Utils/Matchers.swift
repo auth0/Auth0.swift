@@ -197,6 +197,20 @@ func beSuccessful<T>() -> MatcherFunc<Result<T, Management.Error>> {
     }
 }
 
+func beFailure<T>(cause: String? = nil, predicate: Authentication.Error -> Bool = { _ in return true }) -> MatcherFunc<Result<T, Authentication.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        if let cause = cause {
+            failureMessage.postfixMessage = "be a failure result with cause \(cause)"
+        } else {
+            failureMessage.postfixMessage = "be a failure result from mgmt api"
+        }
+        if let actual = try expression.evaluate(), case .Failure(let cause) = actual {
+            return predicate(cause)
+        }
+        return false
+    }
+}
+
 func beFailure<T>(cause: String? = nil, predicate: Management.Error -> Bool = { _ in return true }) -> MatcherFunc<Result<T, Management.Error>> {
     return MatcherFunc { expression, failureMessage in
         if let cause = cause {
