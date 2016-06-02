@@ -78,6 +78,10 @@ func isResourceOwner(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
 }
 
+func isToken(domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/oauth/token")
+}
+
 func isSignUp(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/dbconnections/signup")
 }
