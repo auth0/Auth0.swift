@@ -75,7 +75,7 @@ class OAuth2SessionSpec: QuickSpec {
 
             it("should call callback with error when controller is not presented") {
                 controller.presenting = nil
-                session.resume(NSURL(string: "https://auth0.com")!)
+                session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
                 expect(result).toEventually(beFailure())
             }
 
