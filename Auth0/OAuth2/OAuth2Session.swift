@@ -45,7 +45,7 @@ public class OAuth2Session: NSObject {
                 self.callback(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
                 return false
             }
-        let items = values(components)
+        let items = components.a0_values
         guard self.state == nil || items["state"] == self.state else { return false }
         guard let credentials = Credentials(json: items) else {
             self.callback(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
@@ -84,31 +84,33 @@ extension OAuth2Session: SFSafariViewControllerDelegate {
     }
 }
 
-private func values(components: NSURLComponents) -> [String: String] {
-    if let fragment = components.fragment {
-        return fragmentDictionary(fragment)
-    } else {
-        return queryDictionary(components.queryItems)
+private extension NSURLComponents {
+    var a0_values: [String: String] {
+        if self.fragment != nil {
+            return self.a0_fragmentValues
+        } else {
+            return self.a0_queryValues
+        }
     }
-}
 
-private func fragmentDictionary(fragment: String) -> [String: String] {
-    var dict: [String: String] = [:]
-    let items = fragment.componentsSeparatedByString("&")
-    items.forEach { item in
-        let parts = item.componentsSeparatedByString("=")
-        guard
-            parts.count == 2,
-            let key = parts.first,
-            let value = parts.last
-        else { return }
-        dict[key] = value
+    var a0_fragmentValues: [String: String] {
+        var dict: [String: String] = [:]
+        let items = fragment?.componentsSeparatedByString("&")
+        items?.forEach { item in
+            let parts = item.componentsSeparatedByString("=")
+            guard
+                parts.count == 2,
+                let key = parts.first,
+                let value = parts.last
+                else { return }
+            dict[key] = value
+        }
+        return dict
     }
-    return dict
-}
 
-private func queryDictionary(queryItems: [NSURLQueryItem]?) -> [String: String] {
-    var dict: [String: String] = [:]
-    queryItems?.forEach { dict[$0.name] = $0.value }
-    return dict
+    var a0_queryValues: [String: String] {
+        var dict: [String: String] = [:]
+        self.queryItems?.forEach { dict[$0.name] = $0.value }
+        return dict
+    }
 }
