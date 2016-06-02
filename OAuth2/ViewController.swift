@@ -29,6 +29,14 @@ class ViewController: UIViewController {
         OAuth2.sharedInstance.currentSession = session
     }
 
+    @IBAction func startGoogleOAuth2(sender: AnyObject) {
+        guard let client = self.client else { return }
+        let session = Auth0
+            .oauth2(clientId: client.clientId, domain: client.domain)
+            .connection("google-oauth2")
+            .start { print($0) }
+        OAuth2.sharedInstance.currentSession = session
+    }
 }
 
 class OAuth2 {

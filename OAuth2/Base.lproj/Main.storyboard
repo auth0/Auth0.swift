@@ -27,9 +27,23 @@
                                     <action selector="startOAuth2:" destination="BYZ-38-t0r" eventType="touchUpInside" id="EAP-xs-ig7"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zcg-eY-U9Y">
+                                <rect key="frame" x="0.0" y="492" width="600" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="50" id="ab4-oz-fdI"/>
+                                    <constraint firstAttribute="height" constant="50" id="eQj-8L-WyL"/>
+                                </constraints>
+                                <state key="normal" title="Start OAuth2 with Google"/>
+                                <connections>
+                                    <action selector="startGoogleOAuth2:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mWx-q0-Sah"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="zcg-eY-U9Y" secondAttribute="trailing" id="3Wf-52-egg"/>
+                            <constraint firstItem="llV-hD-gxU" firstAttribute="top" secondItem="zcg-eY-U9Y" secondAttribute="bottom" constant="8" id="Agr-nz-wnS"/>
+                            <constraint firstItem="zcg-eY-U9Y" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Ldd-41-VDo"/>
                             <constraint firstAttribute="trailing" secondItem="llV-hD-gxU" secondAttribute="trailing" id="Y1q-6r-9Jf"/>
                             <constraint firstItem="llV-hD-gxU" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="krD-vv-P8h"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="llV-hD-gxU" secondAttribute="bottom" id="x2E-De-26s"/>

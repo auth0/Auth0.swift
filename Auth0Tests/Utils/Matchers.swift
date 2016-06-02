@@ -202,7 +202,7 @@ func beFailure<T>(cause: String? = nil, predicate: Authentication.Error -> Bool 
         if let cause = cause {
             failureMessage.postfixMessage = "be a failure result with cause \(cause)"
         } else {
-            failureMessage.postfixMessage = "be a failure result from mgmt api"
+            failureMessage.postfixMessage = "be a failure result from auth api"
         }
         if let actual = try expression.evaluate(), case .Failure(let cause) = actual {
             return predicate(cause)

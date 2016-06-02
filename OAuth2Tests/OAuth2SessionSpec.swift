@@ -41,19 +41,24 @@ class OAuth2SessionSpec: QuickSpec {
     override func spec() {
 
         var result: Result<Credentials, Authentication.Error>? = nil
+        let callback: Result<Credentials, Authentication.Error> -> () = { result = $0 }
         let controller = MockSafariViewController(URL: NSURL(string: "https://auth0.com")!)
-        let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, callback: {
-            result = $0
-        })
+        let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, callback: callback)
 
         beforeEach {
             result = nil
         }
 
         context("SFSafariViewControllerDelegate") {
+            var session: OAuth2Session!
+
+            beforeEach {
+                controller.delegate = nil
+                session = OAuth2Session(controller: controller, redirectURL: RedirectURL, callback: callback)
+            }
 
             it("should set itself as delegate") {
-                expect(controller.delegate as? OAuth2Session).to(equal(session))
+                expect(controller.delegate).toNot(beNil())
             }
 
             it("should send cancelled event") {
@@ -82,7 +87,6 @@ class OAuth2SessionSpec: QuickSpec {
                 expect(session.resume(NSURL(string: "https://auth0.com/mobile?access_token=ATOKEN&token_type=bearer")!)).to(beFalse())
             }
 
-
             it("should return credentials from query string") {
                 session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
                 expect(result).toEventually(haveCredentials())
@@ -93,6 +97,29 @@ class OAuth2SessionSpec: QuickSpec {
                 expect(result).toEventually(haveCredentials())
             }
 
+            it("should fail if values from fragment are invalid") {
+                session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=")!)
+                expect(result).toEventually(beFailure())
+            }
+
+            context("with state") {
+                let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, state: "state", callback: {
+                    result = $0
+                })
+
+                it("should not handle url when state in url is missing") {
+                    let handled = session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
+                    expect(handled).to(beFalse())
+                    expect(result).toEventually(beNil())
+                }
+
+                it("should not handle url when state in url does not match one in session") {
+                    let handled = session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer&state=another")!)
+                    expect(handled).to(beFalse())
+                    expect(result).toEventually(beNil())
+                }
+
+            }
         }
 
     }

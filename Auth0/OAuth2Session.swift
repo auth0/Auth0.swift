@@ -28,11 +28,13 @@ public class OAuth2Session: NSObject, SFSafariViewControllerDelegate {
 
     let callback: Result<Credentials, Authentication.Error> -> ()
     let redirectURL: NSURL
+    let state: String?
 
-    public init(controller: SFSafariViewController, redirectURL: NSURL, callback: Result<Credentials, Authentication.Error> -> ()) {
+    public init(controller: SFSafariViewController, redirectURL: NSURL, state: String? = nil, callback: Result<Credentials, Authentication.Error> -> ()) {
         self.controller = controller
         self.redirectURL = redirectURL
         self.callback = callback
+        self.state = state
         super.init()
         controller.delegate = self
     }
@@ -55,12 +57,13 @@ public class OAuth2Session: NSObject, SFSafariViewControllerDelegate {
         guard
             let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: true)
             else {
-                finish(.Failure(error: .RequestFailed(cause: OAuth2.Error.UnrecognizedRedirectParameters)))
+                finish(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
                 return false
             }
         let items = values(components)
+        guard self.state == nil || items["state"] == self.state else { return false }
         guard let credentials = Credentials(json: items) else {
-            finish(.Failure(error: .RequestFailed(cause: OAuth2.Error.UnrecognizedRedirectParameters)))
+            finish(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
             return false
         }
 
