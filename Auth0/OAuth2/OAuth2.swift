@@ -52,6 +52,11 @@ public class OAuth2: NSObject {
         return self
     }
 
+    public func scope(scope: String) -> OAuth2 {
+        self.parameters["scope"] = scope
+        return self
+    }
+
     public func state(state: String) -> OAuth2 {
         self.state = state
         return self

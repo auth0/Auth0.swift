@@ -105,6 +105,16 @@ class OAuth2Spec: QuickSpec {
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newOAuth2()
+                        .scope("openid")
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["scope": "openid"]),
+                    ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
                 let state = NSUUID().UUIDString
                 return [
                     "url": newOAuth2()
