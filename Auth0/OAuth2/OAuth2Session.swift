@@ -24,16 +24,19 @@ import UIKit
 import SafariServices
 
 public class OAuth2Session: NSObject {
+    public typealias FinishSession = Result<Credentials, Authentication.Error> -> ()
     weak var controller: UIViewController?
     let redirectURL: NSURL
     let state: String?
-    let callback: Result<Credentials, Authentication.Error> -> Bool
+    let finish: FinishSession
+    let handler: OAuth2ResponseHandler
 
-    init(controller: UIViewController, redirectURL: NSURL, state: String? = nil, callback: Result<Credentials, Authentication.Error> -> Bool) {
+    init(controller: UIViewController, redirectURL: NSURL, state: String? = nil, handler: OAuth2ResponseHandler, finish: FinishSession) {
         self.controller = controller
         self.redirectURL = redirectURL
         self.state = state
-        self.callback = callback
+        self.finish = finish
+        self.handler = handler
     }
 
     public func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
@@ -42,17 +45,12 @@ public class OAuth2Session: NSObject {
         guard
             let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: true)
             else {
-                self.callback(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
+                self.finish(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
                 return false
             }
         let items = components.a0_values
         guard self.state == nil || items["state"] == self.state else { return false }
-        guard let credentials = Credentials(json: items) else {
-            self.callback(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
-            return false
-        }
-
-        self.callback(.Success(result: credentials))
+        self.handler.credentials(items, callback: self.finish)
         return true
     }
 }
@@ -60,10 +58,9 @@ public class OAuth2Session: NSObject {
 extension OAuth2Session: SFSafariViewControllerDelegate {
     convenience init(controller: SFSafariViewController, redirectURL: NSURL, state: String? = nil, callback: Result<Credentials, Authentication.Error> -> ()) {
 
-        let finish = { [weak controller] (result: Result<Credentials, Authentication.Error>) -> Bool in
+        self.init(controller: controller, redirectURL: redirectURL, state: state, handler: ImplicitGrant()) { [weak controller] (result: Result<Credentials, Authentication.Error>) -> () in
             guard let presenting = controller?.presentingViewController else {
-                callback(Result.Failure(error: .RequestFailed(cause: OAuth2.Error.WebControllerMissing)))
-                return false
+                return callback(Result.Failure(error: .RequestFailed(cause: OAuth2.Error.WebControllerMissing)))
             }
 
             dispatch_async(dispatch_get_main_queue()) {
@@ -71,16 +68,12 @@ extension OAuth2Session: SFSafariViewControllerDelegate {
                     callback(result)
                 }
             }
-
-            return true
         }
-
-        self.init(controller: controller, redirectURL: redirectURL, state: state, callback: finish)
         controller.delegate = self
     }
 
     public func safariViewControllerDidFinish(controller: SFSafariViewController) {
-        self.callback(Result.Failure(error: .Cancelled))
+        self.finish(Result.Failure(error: .Cancelled))
     }
 }
 
