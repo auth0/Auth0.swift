@@ -126,6 +126,20 @@ class OAuth2Spec: QuickSpec {
             }
 
         }
+
+        describe("redirect uri") {
+
+            it("should build with custom scheme") {
+                let bundleId = NSBundle.mainBundle().bundleIdentifier!
+                expect(newOAuth2().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/ios/\(bundleId)/callback"
+            }
+
+            it("should build with universal link") {
+                let bundleId = NSBundle.mainBundle().bundleIdentifier!
+                expect(newOAuth2().universalLink(true).redirectURL?.absoluteString) == "https://\(Domain)/ios/\(bundleId)/callback"
+            }
+
+        }
     }
 
 }

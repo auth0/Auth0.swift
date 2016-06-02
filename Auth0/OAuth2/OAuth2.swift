@@ -35,6 +35,7 @@ public class OAuth2: NSObject {
     let presenter: ControllerModalPresenter
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
+    var universalLink: Bool = false
 
     public enum Error: ErrorType {
         case WebControllerMissing
@@ -45,6 +46,11 @@ public class OAuth2: NSObject {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter
+    }
+
+    public func universalLink(universalLink: Bool) -> OAuth2 {
+        self.universalLink = universalLink
+        return self
     }
 
     public func connection(connection: String) -> OAuth2 {
@@ -98,7 +104,7 @@ public class OAuth2: NSObject {
     var redirectURL: NSURL? {
         let bundleIdentifier = NSBundle.mainBundle().bundleIdentifier ?? OAuth2.NoBundleIdentifier
         let components = NSURLComponents(URL: self.url, resolvingAgainstBaseURL: true)
-        components?.scheme = bundleIdentifier
+        components?.scheme = self.universalLink ? "https" : bundleIdentifier
         return components?.URL?
             .URLByAppendingPathComponent("ios")
             .URLByAppendingPathComponent(bundleIdentifier)
