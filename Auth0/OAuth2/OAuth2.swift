@@ -29,7 +29,7 @@ public func oauth2(clientId clientId: String, domain: String) -> OAuth2 {
 
 public class OAuth2: NSObject {
 
-    private static let NoBundleIdentifier = "com.auth0.no-bundle"
+    private static let NoBundleIdentifier = "com.auth0.this-is-no-bundle"
     let clientId: String
     let url: NSURL
     let presenter: ControllerModalPresenter
