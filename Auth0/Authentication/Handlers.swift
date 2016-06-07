@@ -78,11 +78,14 @@ private func authenticationError(data: NSData?, cause: Response.Error) -> Authen
 
 private func payloadError(payload: [String: AnyObject], cause: ErrorType) -> Authentication.Error {
     if let code = payload["error"] as? String, let description = payload["error_description"] as? String {
-        return .Response(code: code, description: description)
+        return .Response(code: code, description: description, name: nil, extras: nil)
     }
 
     if let code = payload["code"] as? String, let description = payload["description"] as? String {
-        return .Response(code: code, description: description)
+        let name = payload["name"] as? String
+        var extras = payload
+        ["code", "description", "name"].forEach { extras.removeValueForKey($0) }
+        return .Response(code: code, description: description, name: name, extras: extras)
     }
 
     return .RequestFailed(cause: cause)

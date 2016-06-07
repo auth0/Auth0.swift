@@ -91,6 +91,15 @@ class OAuth2SessionSpec: QuickSpec {
                 session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=ATOKEN&token_type=bearer")!)
                 expect(result).toEventually(haveCredentials())
             }
+            it("should return error from query string") {
+                session.resume(NSURL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
+                expect(result).toEventually(haveError(code: "error", description: "description"))
+            }
+
+            it("should return error from fragment") {
+                session.resume(NSURL(string: "https://samples.auth0.com/callback#error=error&error_description=description")!)
+                expect(result).toEventually(haveError(code: "error", description: "description"))
+            }
 
             it("should fail if values from fragment are invalid") {
                 session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=")!)

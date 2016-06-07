@@ -52,7 +52,15 @@ public class OAuth2Session: NSObject {
             }
         let items = components.a0_values
         guard self.state == nil || items["state"] == self.state else { return false }
-        self.handler.credentials(items, callback: self.finish)
+        if let error = items["error"] {
+            guard let description = items["error_description"] else {
+                self.finish(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
+                return true
+            }
+            self.finish(.Failure(error: .Response(code: error, description: description, name: nil, extras: nil)))
+        } else {
+            self.handler.credentials(items, callback: self.finish)
+        }
         return true
     }
 }

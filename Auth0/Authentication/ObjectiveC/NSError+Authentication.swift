@@ -27,6 +27,8 @@ private let codeKey = "com.auth0.authentication.error.code"
 private let descriptionKey = "com.auth0.authentication.error.description"
 private let responseDataKey = "com.auth0.authentication.error.responseData"
 private let causeKey = "com.auth0.authentication.error.cause"
+private let nameKey = "com.auth0.authentication.error.name"
+private let extrasKey = "com.auth0.authentication.error.extras"
 
 @objc(A0AuthenticationErrorCode)
 public enum _AuthenticationErrorCode: Int {
@@ -42,13 +44,15 @@ extension Authentication.Error {
         var errorCode: _AuthenticationErrorCode
 
         switch self {
-        case .Response(let code, let description):
+        case .Response(let code, let description, let name, let extras):
             errorCode = .ErrorResponse
             userInfo = [
                 codeKey: code,
                 descriptionKey: description,
                 NSLocalizedDescriptionKey: description
             ]
+            userInfo[nameKey] = name
+            userInfo[extrasKey] = extras
         case .InvalidResponse(let data):
             errorCode = .InvalidResponse
             userInfo = [ NSLocalizedDescriptionKey: "Invalid response from Auth0 server"]

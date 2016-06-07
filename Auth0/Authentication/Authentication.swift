@@ -43,13 +43,13 @@ public struct Authentication {
     /**
      Types of errors that can be returned by Auth API
 
-     - Response:        the request was not successful and Auth0 returned an error response with a code and description
+     - Response:        the request was not successful and Auth0 returned an error response with a code and description. If the error has a `name` attribute it will be available too, any additional attribute will be in `extras`.
      - InvalidResponse: the response returned by Auth0 was not valid. It will include the JSON payload or the complete redirect URL when OAuth2 authorize was used, as NSData. It's recommended to just convert it to String.
      - RequestFailed:   the request failed to complete by an unexpected cause, e.g.: request timed out. The associated value has the cause of failure
      - Cancelled:       the request was cancelled before it could be completed. e.g.: during OAuth2 authentication
      */
     public enum Error: ErrorType {
-        case Response(code: String, description: String)
+        case Response(code: String, description: String, name: String?, extras: [String: AnyObject]?)
         case InvalidResponse(response: NSData?)
         case RequestFailed(cause: ErrorType)
         case Cancelled
