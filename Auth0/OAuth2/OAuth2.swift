@@ -81,24 +81,49 @@ public class OAuth2: NSObject {
                 callback(Result.Failure(error: .RequestFailed(cause: Error.NoBundleIdentifier)))
                 return nil
             }
-        let safari = SFSafariViewController(URL: buildAuthorizeURL(withRedirectURL: redirectURL))
-        let session = OAuth2Session(controller: safari, redirectURL: redirectURL, state: self.state, callback: callback)
-        self.presenter.present(safari)
+        let handler = self.handler(redirectURL)
+        let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
+        let (controller, finish) = newSafari(authorizeURL, callback: callback)
+        let session = OAuth2Session(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish)
+        controller.delegate = session
+        self.presenter.present(controller)
         return session
     }
 
-    func buildAuthorizeURL(withRedirectURL redirectURL: NSURL) -> NSURL {
+    func newSafari(authorizeURL: NSURL, callback: Result<Credentials, Authentication.Error> -> ()) -> (SFSafariViewController, Result<Credentials, Authentication.Error> -> ()) {
+        let controller = SFSafariViewController(URL: authorizeURL)
+        let finish: Result<Credentials, Authentication.Error> -> () = { [weak controller] (result: Result<Credentials, Authentication.Error>) -> () in
+            guard let presenting = controller?.presentingViewController else {
+                return callback(Result.Failure(error: .RequestFailed(cause: OAuth2.Error.WebControllerMissing)))
+            }
+
+            dispatch_async(dispatch_get_main_queue()) {
+                presenting.dismissViewControllerAnimated(true) {
+                    callback(result)
+                }
+            }
+        }
+        return (controller, finish)
+    }
+
+    func buildAuthorizeURL(withRedirectURL redirectURL: NSURL, defaults: [String: String]) -> NSURL {
         let authorize = NSURL(string: "/authorize", relativeToURL: self.url)!
         let components = NSURLComponents(URL: authorize, resolvingAgainstBaseURL: true)!
         var items = [
             NSURLQueryItem(name: "client_id", value: self.clientId),
-            NSURLQueryItem(name: "response_type", value: "token"),
             NSURLQueryItem(name: "redirect_uri", value: redirectURL.absoluteString),
-            NSURLQueryItem(name: "state", value: self.state),
-        ]
-        parameters.forEach { items.append(NSURLQueryItem(name: $0, value: $1)) }
+            NSURLQueryItem(name: "state", value: state),
+            ]
+
+        let addAll: (String, String) -> () = { items.append(NSURLQueryItem(name: $0, value: $1)) }
+        defaults.forEach(addAll)
+        self.parameters.forEach(addAll)
         components.queryItems = items
         return components.URL!
+    }
+
+    func handler(redirectURL: NSURL) -> OAuth2ResponseHandler {
+        return PKCE(clientId: clientId, url: url, redirectURL: redirectURL)
     }
 
     var redirectURL: NSURL? {
@@ -120,8 +145,8 @@ private func generateDefaultState() -> String? {
     return data.a0_encodeBase64URLSafe()
 }
 
-extension NSMutableData {
-    func a0_encodeBase64URLSafe() -> String? {
+public extension NSData {
+    public func a0_encodeBase64URLSafe() -> String? {
         return self
             .base64EncodedStringWithOptions([])
             .stringByReplacingOccurrencesOfString("+", withString: "-")

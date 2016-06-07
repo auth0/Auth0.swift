@@ -79,6 +79,8 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
     return query
 }
 
+private let defaults = ["response_type": "token"]
+
 class OAuth2Spec: QuickSpec {
 
     override func spec() {
@@ -88,7 +90,7 @@ class OAuth2Spec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newOAuth2()
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(),
                 ]
@@ -98,7 +100,7 @@ class OAuth2Spec: QuickSpec {
                 return [
                     "url": newOAuth2()
                         .connection("facebook")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection": "facebook"]),
                 ]
@@ -108,7 +110,7 @@ class OAuth2Spec: QuickSpec {
                 return [
                     "url": newOAuth2()
                         .scope("openid")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["scope": "openid"]),
                     ]
@@ -119,7 +121,7 @@ class OAuth2Spec: QuickSpec {
                 return [
                     "url": newOAuth2()
                         .parameters(["state": state])
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL),
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["state": state]),
                     ]
@@ -137,6 +139,24 @@ class OAuth2Spec: QuickSpec {
             it("should build with universal link") {
                 let bundleId = NSBundle.mainBundle().bundleIdentifier!
                 expect(newOAuth2().universalLink(true).redirectURL?.absoluteString) == "https://\(Domain)/ios/\(bundleId)/callback"
+            }
+
+        }
+
+        describe("safari") {
+
+            var result: Result<Credentials, Authentication.Error>?
+
+            beforeEach { result = nil }
+
+            it("should build new controller") {
+                expect(newOAuth2().newSafari(DomainURL, callback: {_ in}).0).toNot(beNil())
+            }
+
+            it("should fail if controller is not presented") {
+                let callback = newOAuth2().newSafari(DomainURL, callback: { result = $0 }).1
+                callback(.Success(result: Credentials(json: ["access_token": "at", "token_type": "bearer"])!))
+                expect(result).toEventually(beFailure())
             }
 
         }

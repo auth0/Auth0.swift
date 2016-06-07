@@ -11,6 +11,7 @@
 		5F06DDB41CC451700011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
 		5F06DDC91CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
 		5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
+		5F09C6A71D07532B00727E55 /* ChallengeGeneratorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F09C6A61D07532B00727E55 /* ChallengeGeneratorSpec.swift */; };
 		5F1A02941CC7EEC900D3F662 /* Quick.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBA1CC571290011842B /* Quick.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F1A02951CC7EEC900D3F662 /* OHHTTPStubs.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBB1CC571290011842B /* OHHTTPStubs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F1A02961CC7EEC900D3F662 /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBC1CC571290011842B /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -75,6 +76,9 @@
 		5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */; };
 		5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0451CCA99E90024D2AF /* Credentials.swift */; };
 		5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0451CCA99E90024D2AF /* Credentials.swift */; };
+		5FC34AF71D0101BF000F28F5 /* A0ChallengeGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5FC34AF81D0101BF000F28F5 /* A0ChallengeGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */; };
+		5FC34AFA1D010554000F28F5 /* Auth0.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F049B6C1CB42C29006F6C05 /* Auth0.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5FCCC3111CF4D4FF00901E2E /* AuthenticationAPISpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCC3101CF4D4FF00901E2E /* AuthenticationAPISpec.m */; };
 		5FCCC3121CF4D4FF00901E2E /* AuthenticationAPISpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCC3101CF4D4FF00901E2E /* AuthenticationAPISpec.m */; };
 		5FCCC3151CF4DB4400901E2E /* NSError+Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCC3141CF4DB4400901E2E /* NSError+Authentication.swift */; };
@@ -190,6 +194,7 @@
 		5F06DDBF1CC571290011842B /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = Carthage/Build/Mac/OHHTTPStubs.framework; sourceTree = "<group>"; };
 		5F06DDC01CC571290011842B /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = Carthage/Build/Mac/Nimble.framework; sourceTree = "<group>"; };
 		5F06DDC81CC66B710011842B /* Auth0.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0.swift; sourceTree = "<group>"; };
+		5F09C6A61D07532B00727E55 /* ChallengeGeneratorSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChallengeGeneratorSpec.swift; sourceTree = "<group>"; };
 		5F3965C11CF67CF000CDE7C0 /* OAuth2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2.swift; sourceTree = "<group>"; };
 		5F3965C71CF67DD800CDE7C0 /* OAuth2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F3965C91CF67DD800CDE7C0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -223,6 +228,8 @@
 		5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
 		5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationSpec.swift; sourceTree = "<group>"; };
 		5FBBF0451CCA99E90024D2AF /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
+		5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = A0ChallengeGenerator.h; path = OAuth2/A0ChallengeGenerator.h; sourceTree = "<group>"; };
+		5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = A0ChallengeGenerator.m; path = OAuth2/A0ChallengeGenerator.m; sourceTree = "<group>"; };
 		5FCCC3101CF4D4FF00901E2E /* AuthenticationAPISpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthenticationAPISpec.m; sourceTree = "<group>"; };
 		5FCCC3141CF4DB4400901E2E /* NSError+Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSError+Authentication.swift"; sourceTree = "<group>"; };
 		5FCCC3181CF51BBD00901E2E /* NSError+Management.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSError+Management.swift"; sourceTree = "<group>"; };
@@ -331,6 +338,7 @@
 				5FF465BA1CE2AC2800F7ED8C /* Management */,
 				5FE2F8C01CD0F9AF003628F4 /* Networking */,
 				5F3965C01CF679B500CDE7C0 /* OAuth2 */,
+				5FC34AF91D010448000F28F5 /* Auth0PKCE */,
 				5F049B6C1CB42C29006F6C05 /* Auth0.h */,
 				5F06DDC81CC66B710011842B /* Auth0.swift */,
 				5F049B6E1CB42C29006F6C05 /* Info.plist */,
@@ -416,6 +424,7 @@
 				5F53F5D61CFFAA4A00476A46 /* OAuth2Spec.swift */,
 				5F3965EF1CF6845A00CDE7C0 /* OAuth2Tests-Bridging-Header.h */,
 				5F4A1F971D00AEDF00C72242 /* OAuth2ResponseHandlerSpec.swift */,
+				5F09C6A61D07532B00727E55 /* ChallengeGeneratorSpec.swift */,
 			);
 			path = OAuth2Tests;
 			sourceTree = "<group>";
@@ -461,6 +470,15 @@
 				5FE2F8C51CD1522F003628F4 /* UserProfileSpec.swift */,
 			);
 			path = Authentication;
+			sourceTree = "<group>";
+		};
+		5FC34AF91D010448000F28F5 /* Auth0PKCE */ = {
+			isa = PBXGroup;
+			children = (
+				5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */,
+				5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */,
+			);
+			name = Auth0PKCE;
 			sourceTree = "<group>";
 		};
 		5FCCC30F1CF4D4D000901E2E /* ObjectiveC */ = {
@@ -527,6 +545,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FC34AFA1D010554000F28F5 /* Auth0.h in Headers */,
+				5FC34AF71D0101BF000F28F5 /* A0ChallengeGenerator.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -779,6 +799,7 @@
 				5F3965F31CF6857A00CDE7C0 /* ControllerModalPresenter.swift in Sources */,
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FCCC31C1CF51DF300901E2E /* _ObjectiveManagementAPI.swift in Sources */,
+				5FC34AF81D0101BF000F28F5 /* A0ChallengeGenerator.m in Sources */,
 				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F53F5CE1CFD157300476A46 /* OAuth2Session.swift in Sources */,
 				5F74CB3D1CEE8E9100226823 /* UserIdentity.swift in Sources */,
@@ -882,6 +903,7 @@
 				5F53F5D41CFD59A300476A46 /* Matchers.swift in Sources */,
 				5F53F5D71CFFAA4A00476A46 /* OAuth2Spec.swift in Sources */,
 				5F53F5D31CFD474600476A46 /* OAuth2SessionSpec.swift in Sources */,
+				5F09C6A71D07532B00727E55 /* ChallengeGeneratorSpec.swift in Sources */,
 				5F3965F11CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

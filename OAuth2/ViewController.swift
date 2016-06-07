@@ -12,6 +12,7 @@ import Auth0
 class ViewController: UIViewController {
 
     var client: Client? = nil
+    var onAuth: (Result<Credentials, Authentication.Error> -> ())!
 
     @IBOutlet weak var oauth2: UIButton!
     
@@ -19,13 +20,26 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         self.client = Client()
         self.oauth2.enabled = client != nil
+        self.onAuth = { [weak self] in
+            switch $0 {
+            case .Failure(let cause):
+                let alert = UIAlertController(title: "Auth Failed!", message: "\(cause)", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
+                self?.presentViewController(alert, animated: true, completion: nil)
+            case .Success(let credentials):
+                let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got access_token \(credentials.accessToken)", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
+                self?.presentViewController(alert, animated: true, completion: nil)
+            }
+            print($0)
+        }
     }
 
     @IBAction func startOAuth2(sender: AnyObject) {
         guard let client = self.client else { return }
         let session = Auth0
             .oauth2(clientId: client.clientId, domain: client.domain)
-            .start { print($0) }
+            .start(onAuth)
         OAuth2.sharedInstance.currentSession = session
     }
 
@@ -34,7 +48,7 @@ class ViewController: UIViewController {
         let session = Auth0
             .oauth2(clientId: client.clientId, domain: client.domain)
             .connection("google-oauth2")
-            .start { print($0) }
+            .start(onAuth)
         OAuth2.sharedInstance.currentSession = session
     }
 }

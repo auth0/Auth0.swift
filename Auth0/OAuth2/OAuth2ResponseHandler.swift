@@ -23,10 +23,13 @@
 import Foundation
 
 protocol OAuth2ResponseHandler {
+    var defaults: [String: String] { get }
     func credentials(values: [String: String], callback: Result<Credentials, Authentication.Error> -> ())
 }
 
 struct ImplicitGrant: OAuth2ResponseHandler {
+
+    let defaults: [String : String] = ["response_type": "token"]
 
     func credentials(values: [String : String], callback: Result<Credentials, Authentication.Error> -> ()) {
         guard let credentials = Credentials(json: values) else {
@@ -37,4 +40,41 @@ struct ImplicitGrant: OAuth2ResponseHandler {
         callback(.Success(result: credentials))
     }
 
+}
+
+struct PKCE: OAuth2ResponseHandler {
+
+    let clientId: String
+    let url: NSURL
+    let redirectURL: NSURL
+    let defaults: [String : String]
+    let verifier: String
+
+    init(clientId: String, url: NSURL, redirectURL: NSURL, generator: A0SHA256ChallengeGenerator = A0SHA256ChallengeGenerator()) {
+        self.init(clientId: clientId, url: url, redirectURL: redirectURL, verifier: generator.verifier, challenge: generator.challenge, method: generator.method)
+    }
+
+    init(clientId: String, url: NSURL, redirectURL: NSURL, verifier: String, challenge: String, method: String) {
+        self.clientId = clientId
+        self.url = url
+        self.redirectURL = redirectURL
+        self.defaults = [
+            "response_type": "code",
+            "code_challenge": challenge,
+            "code_challenge_method": method,
+        ]
+        self.verifier = verifier
+    }
+
+    func credentials(values: [String: String], callback: Result<Credentials, Authentication.Error> -> ()) {
+        guard
+            let code = values["code"]
+            else {
+                let data = try? NSJSONSerialization.dataWithJSONObject(values, options: [])
+                return callback(.Failure(error: .InvalidResponse(response: data)))
+            }
+        Authentication(clientId: clientId, url: url)
+            .exchangeCode(code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
+            .start(callback)
+    }
 }

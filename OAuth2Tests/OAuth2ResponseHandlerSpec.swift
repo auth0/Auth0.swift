@@ -22,6 +22,7 @@
 
 import Quick
 import Nimble
+import OHHTTPStubs
 
 @testable import Auth0
 
@@ -57,6 +58,73 @@ class OAuth2ResponseHandlerSpec: QuickSpec {
                 }
             }
 
+            it("should specify response type") {
+                expect(implicit.defaults["response_type"]) == "token"
+            }
+        }
+
+
+        describe("PKCE") {
+
+            let domain = NSURL.a0_url("samples.auth0.com")
+            let method = "S256"
+            let redirectURL = NSURL(string: "https://samples.auth0.com/callback")!
+            var verifier: String!
+            var challenge: String!
+            var pkce: PKCE!
+
+            beforeEach {
+                verifier = "\(arc4random())"
+                challenge = "\(arc4random())"
+                pkce = PKCE(clientId: "CLIENTID", url: domain, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method)
+            }
+
+            afterEach {
+                OHHTTPStubs.removeAllStubs()
+                stub(isHost(domain.host!)) { _ in
+                    return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                }.name = "YOU SHALL NOT PASS!"
+            }
+
+            it("shoud build credentials") {
+                let token = NSUUID().UUIDString
+                let code = NSUUID().UUIDString
+                let values = ["code": code]
+                stub(isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token) }.name = "Code Exchange Auth"
+                waitUntil { done in
+                    pkce.credentials(values) {
+                        expect($0).to(haveCredentials(token))
+                        done()
+                    }
+                }
+            }
+
+            it("shoud report error to get credentials") {
+                waitUntil { done in
+                    pkce.credentials([:]) {
+                        expect($0).to(beFailure())
+                        done()
+                    }
+                }
+            }
+
+            it("should specify response type") {
+                expect(pkce.defaults["response_type"]) == "code"
+            }
+
+            it("should specify pkce parameters") {
+                expect(pkce.defaults["code_challenge_method"]) == "S256"
+                expect(pkce.defaults["code_challenge"]) == challenge
+            }
+
+            it("should get values from generator") {
+                let generator = A0SHA256ChallengeGenerator()
+                pkce = PKCE(clientId: "CLIENTID", url: domain, redirectURL: redirectURL, generator: generator)
+
+                expect(pkce.defaults["code_challenge_method"]) == generator.method
+                expect(pkce.defaults["code_challenge"]) == generator.challenge
+                expect(pkce.verifier) == generator.verifier
+            }
         }
     }
 

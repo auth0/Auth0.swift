@@ -43,7 +43,8 @@ class OAuth2SessionSpec: QuickSpec {
         var result: Result<Credentials, Authentication.Error>? = nil
         let callback: Result<Credentials, Authentication.Error> -> () = { result = $0 }
         let controller = MockSafariViewController(URL: NSURL(string: "https://auth0.com")!)
-        let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, callback: callback)
+        let handler = ImplicitGrant()
+        let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
 
         beforeEach {
             result = nil
@@ -54,7 +55,7 @@ class OAuth2SessionSpec: QuickSpec {
 
             beforeEach {
                 controller.delegate = nil
-                session = OAuth2Session(controller: controller, redirectURL: RedirectURL, callback: callback)
+                session = OAuth2Session(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
             }
 
             it("should set itself as delegate") {
@@ -71,12 +72,6 @@ class OAuth2SessionSpec: QuickSpec {
 
             beforeEach {
                 controller.presenting = MockViewController()
-            }
-
-            it("should call callback with error when controller is not presented") {
-                controller.presenting = nil
-                session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
-                expect(result).toEventually(beFailure())
             }
 
             it("should return true if URL matches redirect URL") {
@@ -103,7 +98,7 @@ class OAuth2SessionSpec: QuickSpec {
             }
 
             context("with state") {
-                let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, state: "state", callback: {
+                let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, state: "state", handler: handler, finish: {
                     result = $0
                 })
 

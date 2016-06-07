@@ -31,12 +31,14 @@ public class OAuth2Session: NSObject {
     let finish: FinishSession
     let handler: OAuth2ResponseHandler
 
-    init(controller: UIViewController, redirectURL: NSURL, state: String? = nil, handler: OAuth2ResponseHandler, finish: FinishSession) {
+    init(controller: SFSafariViewController, redirectURL: NSURL, state: String? = nil, handler: OAuth2ResponseHandler, finish: FinishSession) {
         self.controller = controller
         self.redirectURL = redirectURL
         self.state = state
         self.finish = finish
         self.handler = handler
+        super.init()
+        controller.delegate = self
     }
 
     public func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
@@ -56,22 +58,6 @@ public class OAuth2Session: NSObject {
 }
 
 extension OAuth2Session: SFSafariViewControllerDelegate {
-    convenience init(controller: SFSafariViewController, redirectURL: NSURL, state: String? = nil, callback: Result<Credentials, Authentication.Error> -> ()) {
-
-        self.init(controller: controller, redirectURL: redirectURL, state: state, handler: ImplicitGrant()) { [weak controller] (result: Result<Credentials, Authentication.Error>) -> () in
-            guard let presenting = controller?.presentingViewController else {
-                return callback(Result.Failure(error: .RequestFailed(cause: OAuth2.Error.WebControllerMissing)))
-            }
-
-            dispatch_async(dispatch_get_main_queue()) {
-                presenting.dismissViewControllerAnimated(true) {
-                    callback(result)
-                }
-            }
-        }
-        controller.delegate = self
-    }
-
     public func safariViewControllerDidFinish(controller: SFSafariViewController) {
         self.finish(Result.Failure(error: .Cancelled))
     }
