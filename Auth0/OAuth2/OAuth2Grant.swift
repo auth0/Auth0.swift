@@ -1,4 +1,4 @@
-// OAuth2ResponseHandler.swift
+// OAuth2Grant.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,12 +22,12 @@
 
 import Foundation
 
-protocol OAuth2ResponseHandler {
+protocol OAuth2Grant {
     var defaults: [String: String] { get }
     func credentials(values: [String: String], callback: Result<Credentials, Authentication.Error> -> ())
 }
 
-struct ImplicitGrant: OAuth2ResponseHandler {
+struct ImplicitGrant: OAuth2Grant {
 
     let defaults: [String : String] = ["response_type": "token"]
 
@@ -42,7 +42,7 @@ struct ImplicitGrant: OAuth2ResponseHandler {
 
 }
 
-struct PKCE: OAuth2ResponseHandler {
+struct PKCE: OAuth2Grant {
 
     let clientId: String
     let url: NSURL

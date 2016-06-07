@@ -29,9 +29,9 @@ public class OAuth2Session: NSObject {
     let redirectURL: NSURL
     let state: String?
     let finish: FinishSession
-    let handler: OAuth2ResponseHandler
+    let handler: OAuth2Grant
 
-    init(controller: SFSafariViewController, redirectURL: NSURL, state: String? = nil, handler: OAuth2ResponseHandler, finish: FinishSession) {
+    init(controller: SFSafariViewController, redirectURL: NSURL, state: String? = nil, handler: OAuth2Grant, finish: FinishSession) {
         self.controller = controller
         self.redirectURL = redirectURL
         self.state = state

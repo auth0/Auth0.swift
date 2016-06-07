@@ -35,7 +35,8 @@ public class OAuth2: NSObject {
     let presenter: ControllerModalPresenter
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
-    var universalLink: Bool = false
+    var universalLink = false
+    var usePKCE = true
 
     public enum Error: ErrorType {
         case WebControllerMissing
@@ -70,6 +71,11 @@ public class OAuth2: NSObject {
 
     public func parameters(parameters: [String: String]) -> OAuth2 {
         parameters.forEach { self.parameters[$0] = $1 }
+        return self
+    }
+
+    public func usingImplicitGrant() -> OAuth2 {
+        self.usePKCE = false
         return self
     }
 
@@ -122,8 +128,8 @@ public class OAuth2: NSObject {
         return components.URL!
     }
 
-    func handler(redirectURL: NSURL) -> OAuth2ResponseHandler {
-        return PKCE(clientId: clientId, url: url, redirectURL: redirectURL)
+    func handler(redirectURL: NSURL) -> OAuth2Grant {
+        return self.usePKCE ? PKCE(clientId: clientId, url: url, redirectURL: redirectURL) : ImplicitGrant()
     }
 
     var redirectURL: NSURL? {

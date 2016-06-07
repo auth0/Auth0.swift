@@ -1,4 +1,4 @@
-// OAuth2ResponseHandlerSpec.swift
+// OAuth2GrantSpec.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -26,7 +26,7 @@ import OHHTTPStubs
 
 @testable import Auth0
 
-class OAuth2ResponseHandlerSpec: QuickSpec {
+class OAuth2GrantSpec: QuickSpec {
 
     override func spec() {
 
@@ -64,7 +64,7 @@ class OAuth2ResponseHandlerSpec: QuickSpec {
         }
 
 
-        describe("PKCE") {
+        describe("Authorization Code w/PKCE") {
 
             let domain = NSURL.a0_url("samples.auth0.com")
             let method = "S256"

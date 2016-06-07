@@ -32,8 +32,8 @@
 		5F3965EE1CF6841600CDE7C0 /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBC1CC571290011842B /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F3965F11CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965F01CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift */; };
 		5F3965F31CF6857A00CDE7C0 /* ControllerModalPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */; };
-		5F4A1F961D00AABC00C72242 /* OAuth2ResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A1F951D00AABC00C72242 /* OAuth2ResponseHandler.swift */; };
-		5F4A1F981D00AEDF00C72242 /* OAuth2ResponseHandlerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A1F971D00AEDF00C72242 /* OAuth2ResponseHandlerSpec.swift */; };
+		5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */; };
+		5F4A1F981D00AEDF00C72242 /* OAuth2GrantSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A1F971D00AEDF00C72242 /* OAuth2GrantSpec.swift */; };
 		5F53F5CE1CFD157300476A46 /* OAuth2Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */; };
 		5F53F5D11CFD19A400476A46 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		5F53F5D31CFD474600476A46 /* OAuth2SessionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F53F5D21CFD474600476A46 /* OAuth2SessionSpec.swift */; };
@@ -208,8 +208,8 @@
 		5F3965EF1CF6845A00CDE7C0 /* OAuth2Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OAuth2Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		5F3965F01CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControllerModalPresenterSpec.swift; sourceTree = "<group>"; };
 		5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControllerModalPresenter.swift; sourceTree = "<group>"; };
-		5F4A1F951D00AABC00C72242 /* OAuth2ResponseHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2ResponseHandler.swift; sourceTree = "<group>"; };
-		5F4A1F971D00AEDF00C72242 /* OAuth2ResponseHandlerSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2ResponseHandlerSpec.swift; sourceTree = "<group>"; };
+		5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2Grant.swift; sourceTree = "<group>"; };
+		5F4A1F971D00AEDF00C72242 /* OAuth2GrantSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2GrantSpec.swift; sourceTree = "<group>"; };
 		5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2Session.swift; sourceTree = "<group>"; };
 		5F53F5D21CFD474600476A46 /* OAuth2SessionSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2SessionSpec.swift; sourceTree = "<group>"; };
 		5F53F5D61CFFAA4A00476A46 /* OAuth2Spec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2Spec.swift; sourceTree = "<group>"; };
@@ -397,7 +397,7 @@
 				5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */,
 				5F3965C11CF67CF000CDE7C0 /* OAuth2.swift */,
 				5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */,
-				5F4A1F951D00AABC00C72242 /* OAuth2ResponseHandler.swift */,
+				5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */,
 			);
 			path = OAuth2;
 			sourceTree = "<group>";
@@ -423,7 +423,7 @@
 				5F53F5D21CFD474600476A46 /* OAuth2SessionSpec.swift */,
 				5F53F5D61CFFAA4A00476A46 /* OAuth2Spec.swift */,
 				5F3965EF1CF6845A00CDE7C0 /* OAuth2Tests-Bridging-Header.h */,
-				5F4A1F971D00AEDF00C72242 /* OAuth2ResponseHandlerSpec.swift */,
+				5F4A1F971D00AEDF00C72242 /* OAuth2GrantSpec.swift */,
 				5F09C6A61D07532B00727E55 /* ChallengeGeneratorSpec.swift */,
 			);
 			path = OAuth2Tests;
@@ -804,7 +804,7 @@
 				5F53F5CE1CFD157300476A46 /* OAuth2Session.swift in Sources */,
 				5F74CB3D1CEE8E9100226823 /* UserIdentity.swift in Sources */,
 				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
-				5F4A1F961D00AABC00C72242 /* OAuth2ResponseHandler.swift in Sources */,
+				5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */,
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
 				5FE2F8B21CCEAED8003628F4 /* Requestable.swift in Sources */,
 				5FCCC3191CF51BBD00901E2E /* NSError+Management.swift in Sources */,
@@ -899,7 +899,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F53F5D51CFD59A300476A46 /* Responses.swift in Sources */,
-				5F4A1F981D00AEDF00C72242 /* OAuth2ResponseHandlerSpec.swift in Sources */,
+				5F4A1F981D00AEDF00C72242 /* OAuth2GrantSpec.swift in Sources */,
 				5F53F5D41CFD59A300476A46 /* Matchers.swift in Sources */,
 				5F53F5D71CFFAA4A00476A46 /* OAuth2Spec.swift in Sources */,
 				5F53F5D31CFD474600476A46 /* OAuth2SessionSpec.swift in Sources */,

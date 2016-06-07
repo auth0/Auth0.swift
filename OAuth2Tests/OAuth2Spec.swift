@@ -143,6 +143,7 @@ class OAuth2Spec: QuickSpec {
 
         }
 
+        
         describe("safari") {
 
             var result: Result<Credentials, Authentication.Error>?
