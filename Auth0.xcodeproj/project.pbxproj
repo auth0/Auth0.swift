@@ -76,6 +76,8 @@
 		5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */; };
 		5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0451CCA99E90024D2AF /* Credentials.swift */; };
 		5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0451CCA99E90024D2AF /* Credentials.swift */; };
+		5FBEF3DC1D079F2100D90941 /* _ObjectiveOAuth2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBEF3DB1D079F2100D90941 /* _ObjectiveOAuth2.swift */; };
+		5FBEF3DE1D07A4B700D90941 /* A0OAuth2Spec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FBEF3DD1D07A4B700D90941 /* A0OAuth2Spec.m */; };
 		5FC34AF71D0101BF000F28F5 /* A0ChallengeGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5FC34AF81D0101BF000F28F5 /* A0ChallengeGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */; };
 		5FC34AFA1D010554000F28F5 /* Auth0.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F049B6C1CB42C29006F6C05 /* Auth0.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -228,6 +230,8 @@
 		5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
 		5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationSpec.swift; sourceTree = "<group>"; };
 		5FBBF0451CCA99E90024D2AF /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
+		5FBEF3DB1D079F2100D90941 /* _ObjectiveOAuth2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _ObjectiveOAuth2.swift; sourceTree = "<group>"; };
+		5FBEF3DD1D07A4B700D90941 /* A0OAuth2Spec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = A0OAuth2Spec.m; sourceTree = "<group>"; };
 		5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = A0ChallengeGenerator.h; path = OAuth2/A0ChallengeGenerator.h; sourceTree = "<group>"; };
 		5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = A0ChallengeGenerator.m; path = OAuth2/A0ChallengeGenerator.m; sourceTree = "<group>"; };
 		5FCCC3101CF4D4FF00901E2E /* AuthenticationAPISpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthenticationAPISpec.m; sourceTree = "<group>"; };
@@ -398,6 +402,7 @@
 				5F3965C11CF67CF000CDE7C0 /* OAuth2.swift */,
 				5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */,
 				5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */,
+				5FBEF3DB1D079F2100D90941 /* _ObjectiveOAuth2.swift */,
 			);
 			path = OAuth2;
 			sourceTree = "<group>";
@@ -425,6 +430,7 @@
 				5F3965EF1CF6845A00CDE7C0 /* OAuth2Tests-Bridging-Header.h */,
 				5F4A1F971D00AEDF00C72242 /* OAuth2GrantSpec.swift */,
 				5F09C6A61D07532B00727E55 /* ChallengeGeneratorSpec.swift */,
+				5FBEF3DD1D07A4B700D90941 /* A0OAuth2Spec.m */,
 			);
 			path = OAuth2Tests;
 			sourceTree = "<group>";
@@ -802,6 +808,7 @@
 				5FC34AF81D0101BF000F28F5 /* A0ChallengeGenerator.m in Sources */,
 				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F53F5CE1CFD157300476A46 /* OAuth2Session.swift in Sources */,
+				5FBEF3DC1D079F2100D90941 /* _ObjectiveOAuth2.swift in Sources */,
 				5F74CB3D1CEE8E9100226823 /* UserIdentity.swift in Sources */,
 				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */,
@@ -898,6 +905,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FBEF3DE1D07A4B700D90941 /* A0OAuth2Spec.m in Sources */,
 				5F53F5D51CFD59A300476A46 /* Responses.swift in Sources */,
 				5F4A1F981D00AEDF00C72242 /* OAuth2GrantSpec.swift in Sources */,
 				5F53F5D41CFD59A300476A46 /* Matchers.swift in Sources */,

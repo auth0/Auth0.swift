@@ -221,6 +221,7 @@ public class OAuth2 {
     }
 }
 
+
 private func failureCause(message: String) -> NSError {
     return NSError(domain: "com.auth0.oauth2", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
 }

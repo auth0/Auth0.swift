@@ -36,6 +36,7 @@ import SafariServices
  }
  ```
  */
+@objc(A0OAuth2Session)
 public class OAuth2Session: NSObject {
     public typealias FinishSession = Result<Credentials, Authentication.Error> -> ()
     weak var controller: UIViewController?
@@ -62,6 +63,7 @@ public class OAuth2Session: NSObject {
 
      - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
      */
+    @objc(resumeWithURL:options:)
     public func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
         guard url.absoluteString.lowercaseString.hasPrefix(self.redirectURL.absoluteString.lowercaseString) else { return false }
 

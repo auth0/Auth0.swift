@@ -138,7 +138,7 @@ class OAuth2Spec: QuickSpec {
 
             it("should build with universal link") {
                 let bundleId = NSBundle.mainBundle().bundleIdentifier!
-                expect(newOAuth2().universalLink(true).redirectURL?.absoluteString) == "https://\(Domain)/ios/\(bundleId)/callback"
+                expect(newOAuth2().useUniversalLink().redirectURL?.absoluteString) == "https://\(Domain)/ios/\(bundleId)/callback"
             }
 
         }
