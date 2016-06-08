@@ -61,22 +61,11 @@ extension Authentication.Error {
             }
         case .RequestFailed(let cause):
             errorCode = .RequestFailed
-            switch cause {
-            case OAuth2.Error.NoBundleIdentifier:
-                userInfo = [
-                    NSLocalizedDescriptionKey: "Cannot find iOS Application Bundle Identifier",
-                ]
-            case OAuth2.Error.WebControllerMissing:
-                userInfo = [
-                    NSLocalizedDescriptionKey: "Cannot find controller that triggered web flow",
-                ]
-            default:
-                let error = cause as NSError
-                userInfo = [
-                    NSLocalizedDescriptionKey: error.localizedDescription,
-                    causeKey: error
-                ]
-            }
+            let error = cause as NSError
+            userInfo = [
+                NSLocalizedDescriptionKey: error.localizedDescription,
+                causeKey: error
+            ]
         case .Cancelled:
             errorCode = .Cancelled
             userInfo = [ NSLocalizedDescriptionKey: "User cancelled OAuth2 auth session"]

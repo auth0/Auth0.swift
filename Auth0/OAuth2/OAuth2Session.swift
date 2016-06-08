@@ -23,6 +23,19 @@
 import UIKit
 import SafariServices
 
+/**
+ Represents an on going OAuth2 session with Auth0.
+ 
+ It will handle result from the redirect URL configured when the OAuth2 flow was started,
+ so we need to handle when the configured URL is opened in your Application's `AppDelegate`
+ 
+ ```
+ func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+    let session = //retrieve current OAuth2 session
+    return session.resume(url, options: options)
+ }
+ ```
+ */
 public class OAuth2Session: NSObject {
     public typealias FinishSession = Result<Credentials, Authentication.Error> -> ()
     weak var controller: UIViewController?
@@ -41,6 +54,14 @@ public class OAuth2Session: NSObject {
         controller.delegate = self
     }
 
+    /**
+     Tries to resume (and complete) the OAuth2 session from the received URL
+
+     - parameter url:     url received in application's AppDelegate
+     - parameter options: a dictionary of launch options received from application's AppDelegate
+
+     - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
+     */
     public func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
         guard url.absoluteString.lowercaseString.hasPrefix(self.redirectURL.absoluteString.lowercaseString) else { return false }
 
