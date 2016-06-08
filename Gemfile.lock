@@ -25,10 +25,12 @@ GEM
     rouge (1.10.1)
     xcpretty (0.2.2)
       rouge (~> 1.8)
+    xcpretty-travis-formatter (0.0.4)
+      xcpretty (~> 0.2, >= 0.0.7)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   carthage_cache!
-  xcpretty
+  xcpretty-travis-formatter
