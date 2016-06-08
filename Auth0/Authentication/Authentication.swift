@@ -43,14 +43,16 @@ public struct Authentication {
     /**
      Types of errors that can be returned by Auth API
 
-     - Response:        the request was not successful and Auth0 returned an error response with the reeason it failed
-     - InvalidResponse: the response returned by Auth0 was not valid
-     - RequestFailed:   the request failed
+     - Response:        the request was not successful and Auth0 returned an error response with a code and description. If the error has a `name` attribute it will be available too, any additional attribute will be in `extras`.
+     - InvalidResponse: the response returned by Auth0 was not valid. It will include the JSON payload or the complete redirect URL when OAuth2 authorize was used, as NSData. It's recommended to just convert it to String.
+     - RequestFailed:   the request failed to complete by an unexpected cause, e.g.: request timed out. The associated value has the cause of failure
+     - Cancelled:       the request was cancelled before it could be completed. e.g.: during OAuth2 authentication
      */
     public enum Error: ErrorType {
-        case Response(code: String, description: String)
+        case Response(code: String, description: String, name: String?, extras: [String: AnyObject]?)
         case InvalidResponse(response: NSData?)
         case RequestFailed(cause: ErrorType)
+        case Cancelled
     }
 
     /**
@@ -386,9 +388,9 @@ public struct Authentication {
      - parameter token:      token obtained from a social IdP
      - parameter connection: name of the social connection. Only works with 'google-oauth2', 'facebook' and 'twitter'
      - parameter scope:      requested scope value when authenticating the user. By default is 'openid'
-     - parameter parameters: addition parameters sent during authentication
+     - parameter parameters: additional parameters sent during authentication
 
-     - returns: a request that will yield Auth0 users credentials
+     - returns: a request that will yield Auth0 user's credentials
      */
     public func loginSocial(token: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, Error> {
         var payload: [String: AnyObject] = [
@@ -402,6 +404,58 @@ public struct Authentication {
         return Request(session: session, url: accessToken, method: "POST", handle: authenticationObject, payload: payload)
     }
 
+
+    /**
+     Perform a OAuth2 token request against Auth0.
+
+     ```
+     Auth0
+        .authentication(clientId, domain: "samples.auth0.com")
+        .token(["key": "value"])
+        .start { print($0) }
+     ```
+
+     - parameter parameters: request parameters
+
+     - returns: a request that will yield Auth0 user's credentials
+     - seeAlso: Authentication#exchangeCode(codeVerifier:redirectURI:) for PKCE
+     */
+    public func token(parameters: [String: AnyObject]) -> Request<Credentials, Error> {
+        var payload: [String: AnyObject] = [
+            "client_id": self.clientId
+        ]
+        parameters.forEach { payload[$0] = $1 }
+        let token = NSURL(string: "/oauth/token", relativeToURL: self.url)!
+        return Request(session: session, url: token, method: "POST", handle: authenticationObject, payload: payload)
+    }
+
+    /**
+     Performs the last step of Proof Key for Code Exchange [RFC 7636](https://tools.ietf.org/html/rfc7636).
+     
+     This will request User's token using the code and it's verifier after a request to `/oauth/authorize`
+
+     ```
+     Auth0
+        .authentication(clientId, domain: "samples.auth0.com")
+        .exchangeCode("a code", codeVerifier: "code verifier", redirectURI: "https://samples.auth0.com/callback")
+        .start { print($0) }
+     ```
+
+     - parameter code:         code returned after an `/oauth/authorize` request
+     - parameter codeVerifier: verifier used to generate the challenge sent in `/oauth/authorize` request
+     - parameter redirectURI:  redirect uri sent in `/oauth/authorize` request
+
+     - returns: a request that will yield Auth0 user's credentials
+     - seeAlso: https://tools.ietf.org/html/rfc7636
+     */
+    public func exchangeCode(code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, Error> {
+        return self.token([
+                "code": code,
+                "code_verifier": codeVerifier,
+                "redirect_uri": redirectURI,
+                "grant_type": "authorization_code"
+            ])
+    }
 
     /**
      Types of passwordless authentication

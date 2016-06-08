@@ -512,5 +512,43 @@ class AuthenticationSpec: QuickSpec {
             
         }
 
+        describe("code exchange") {
+
+            var code: String!
+            var codeVerifier: String!
+            let redirectURI = "https://samples.auth0.com/callback"
+
+            beforeEach {
+                code = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+                codeVerifier = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+            }
+
+
+            it("should exchange code for tokens") {
+                stub(isToken(Domain) && hasAtLeast(["code": code, "code_verifier": codeVerifier, "grant_type": "authorization_code", "redirect_uri": redirectURI])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Code Exchange Auth"
+                waitUntil(timeout: Timeout) { done in
+                    auth.exchangeCode(code, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
+                        done()
+                    }
+                }
+            }
+
+            it("should provide error payload from auth api") {
+
+                waitUntil(timeout: Timeout) { done in
+                    let code = "invalid_code"
+                    let description = "Invalid code"
+                    let invalidCode = "return invalid code"
+                    stub(isToken(Domain) && hasAtLeast(["code": invalidCode])) { _ in return authFailure(code: code, description: description) }.name = "Invalid Code"
+                    auth.exchangeCode(invalidCode, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
+                        expect(result).to(haveError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+        }
+
     }
 }

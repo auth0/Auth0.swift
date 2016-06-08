@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="OAuth2" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="llV-hD-gxU">
+                                <rect key="frame" x="0.0" y="550" width="600" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="K1g-Yy-Mio"/>
+                                </constraints>
+                                <state key="normal" title="Start OAuth2 authorize flow"/>
+                                <connections>
+                                    <action selector="startOAuth2:" destination="BYZ-38-t0r" eventType="touchUpInside" id="EAP-xs-ig7"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zcg-eY-U9Y">
+                                <rect key="frame" x="0.0" y="492" width="600" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="50" id="ab4-oz-fdI"/>
+                                    <constraint firstAttribute="height" constant="50" id="eQj-8L-WyL"/>
+                                </constraints>
+                                <state key="normal" title="Start OAuth2 with Google"/>
+                                <connections>
+                                    <action selector="startGoogleOAuth2:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mWx-q0-Sah"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="zcg-eY-U9Y" secondAttribute="trailing" id="3Wf-52-egg"/>
+                            <constraint firstItem="llV-hD-gxU" firstAttribute="top" secondItem="zcg-eY-U9Y" secondAttribute="bottom" constant="8" id="Agr-nz-wnS"/>
+                            <constraint firstItem="zcg-eY-U9Y" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Ldd-41-VDo"/>
+                            <constraint firstAttribute="trailing" secondItem="llV-hD-gxU" secondAttribute="trailing" id="Y1q-6r-9Jf"/>
+                            <constraint firstItem="llV-hD-gxU" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="krD-vv-P8h"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="llV-hD-gxU" secondAttribute="bottom" id="x2E-De-26s"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="oauth2" destination="llV-hD-gxU" id="3Y1-JB-EiO"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>

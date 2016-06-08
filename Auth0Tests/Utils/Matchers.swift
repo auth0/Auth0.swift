@@ -78,6 +78,10 @@ func isResourceOwner(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
 }
 
+func isToken(domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/oauth/token")
+}
+
 func isSignUp(domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/dbconnections/signup")
 }
@@ -125,7 +129,7 @@ func hasBearerToken(token: String) -> OHHTTPStubsTestBlock {
 func haveError<T>(code code: String, description: String) -> MatcherFunc<Result<T, Authentication.Error>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "an error response with code <\(code)> and description <\(description)>"
-        if let actual = try expression.evaluate(), case .Failure(let cause) = actual, case .Response(let actualCode, let actualDescription) = cause {
+        if let actual = try expression.evaluate(), case .Failure(let cause) = actual, case .Response(let actualCode, let actualDescription, _ , _) = cause {
             return code == actualCode && description == actualDescription
         }
         return false
@@ -192,6 +196,20 @@ func beSuccessful<T>() -> MatcherFunc<Result<T, Management.Error>> {
         failureMessage.postfixMessage = "be a successful result"
         if let actual = try expression.evaluate(), case .Success = actual {
             return true
+        }
+        return false
+    }
+}
+
+func beFailure<T>(cause: String? = nil, predicate: Authentication.Error -> Bool = { _ in return true }) -> MatcherFunc<Result<T, Authentication.Error>> {
+    return MatcherFunc { expression, failureMessage in
+        if let cause = cause {
+            failureMessage.postfixMessage = "be a failure result with cause \(cause)"
+        } else {
+            failureMessage.postfixMessage = "be a failure result from auth api"
+        }
+        if let actual = try expression.evaluate(), case .Failure(let cause) = actual {
+            return predicate(cause)
         }
         return false
     }

@@ -26,12 +26,12 @@ import Foundation
  Auth0 Authentication API to authenticate your user using a Database, Social, Enterprise or Passwordless connections
 
  ```
- Auth0.authentication(clientId, domain: "samples.auth0.com")
+ Auth0.authentication(clientId: clientId, domain: "samples.auth0.com")
  ```
 
- - parameter clientId: of your Auth0 client/application
- - parameter domain:   of your Auth0 account. e.g.: 'samples.auth0.com'
- - parameter session:  of NSURLSession used for networking. By default it will used the shared session
+ - parameter clientId: clientId of your Auth0 client/application
+ - parameter domain:   domain of your Auth0 account. e.g.: 'samples.auth0.com'
+ - parameter session:  instance of NSURLSession used for networking. By default it will use the shared NSURLSession
 
  - returns: Auth0 Authentication API
  */
@@ -43,12 +43,12 @@ public func authentication(clientId clientId: String, domain: String, session: N
  Auth0 Management API v2 to perform CRUD operation against your Users, Clients, Connections, etc.
  
  ```
- Auth0.management(token, domain: "samples.auth0.com")
+ Auth0.management(token: token, domain: "samples.auth0.com")
  ```
 
- - parameter token:   of Management API v2 with the correct allowed scopes to perform the desired action
- - parameter domain:  of your Auth0 account. e.g.: 'samples.auth0.com'
- - parameter session:  of NSURLSession used for networking. By default it will used the shared session
+ - parameter token:     token of Management API v2 with the correct allowed scopes to perform the desired action
+ - parameter domain:    domain of your Auth0 account. e.g.: 'samples.auth0.com'
+ - parameter session:   instance of NSURLSession used for networking. By default it will use the shared NSURLSession
 
  - returns: Auth0 Management API v2
  - important: Auth0.swift has yet to implement all endpoints. Now you can only perform some CRUD operations against Users
@@ -61,7 +61,7 @@ public func management(token: String, domain: String, session: NSURLSession = .s
  Auth0 Management Users API v2 that allows CRUD operations with the users endpoint.
  
  ```
- Auth0.users(token, domain: "samples.auth0.com")
+ Auth0.users(token: token, domain: "samples.auth0.com")
  ```
 
  Currently you can only perform the following operations:
@@ -71,9 +71,9 @@ public func management(token: String, domain: String, session: NSURLSession = .s
  * Link users
  * Unlink users
 
- - parameter token:   of Management API v2 with the correct allowed scopes to perform the desired action
- - parameter domain:  of your Auth0 account. e.g.: 'samples.auth0.com'
- - parameter session:  of NSURLSession used for networking. By default it will used the shared session
+ - parameter token:     token of Management API v2 with the correct allowed scopes to perform the desired action
+ - parameter domain:    domain of your Auth0 account. e.g.: 'samples.auth0.com'
+ - parameter session:   instance of NSURLSession used for networking. By default it will use the shared NSURLSession
 
  - returns: Auth0 Management API v2
  */
