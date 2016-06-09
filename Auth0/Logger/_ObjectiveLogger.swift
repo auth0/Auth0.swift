@@ -1,4 +1,4 @@
-// AppDelegate.swift
+// _ObjectiveLogger.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -20,21 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-import Auth0
+import Foundation
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+@objc(A0Logger)
+public class _ObjectiveLogger: NSObject {
+    /**
+     Turn on Auth0.swift debug logging of HTTP requests and OAuth2 flow (iOS only).
 
-    var window: UIWindow?
-
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        Auth0.enableLogging()
-        return true
+     - note: By default all logging is **disabled**
+     - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
+     */
+    public static func loggingEnabled() {
+        enableLogging(true)
     }
 
-    func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-        return Auth0.resumeAuth(url, options: options)
+    /**
+     Turn on/off Auth0.swift debug logging of HTTP requests and OAuth2 flow (iOS only).
+
+     - parameter enabled: flag to turn on/off logging
+     - note: By default all logging is **disabled**
+     - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
+     */
+    public static func loggingEnabled(enabled: Bool) {
+        enableLogging(enabled)
     }
 }
-

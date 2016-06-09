@@ -45,14 +45,16 @@ public struct Request<T, Error: ErrorType>: Requestable {
     let handle: (Response, Callback) -> ()
     let payload: [String: AnyObject]
     let headers: [String: String]
+    let logger: Logger?
 
-    init(session: NSURLSession, url: NSURL, method: String, handle: (Response, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:]) {
+    init(session: NSURLSession, url: NSURL, method: String, handle: (Response, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:], logger: Logger? = Auth0Logger.sharedInstance.logger) {
         self.session = session
         self.url = url
         self.method = method
         self.handle = handle
         self.payload = payload
         self.headers = headers
+        self.logger = logger
     }
 
     var request: NSURLRequest {
@@ -76,7 +78,18 @@ public struct Request<T, Error: ErrorType>: Requestable {
      */
     public func start(callback: Callback) {
         let handler = self.handle
-        session.dataTaskWithRequest(request) { handler(Response(data: $0, response: $1, error: $2), callback) }.resume()
+        let request = self.request
+        let logger = self.logger
+
+        logger?.trace(request, session: self.session)
+
+        let task = session.dataTaskWithRequest(request) { data, response, error in
+            if error == nil, let response = response {
+                logger?.trace(response, data: data)
+            }
+            handler(Response(data: data, response: response, error: error), callback)
+        }
+        task.resume()
     }
 
     /**

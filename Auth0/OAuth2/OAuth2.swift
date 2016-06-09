@@ -90,6 +90,7 @@ public class OAuth2 {
     let url: NSURL
     let presenter: ControllerModalPresenter
     let storage: SessionStorage
+    let logger: Logger?
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
@@ -99,11 +100,12 @@ public class OAuth2 {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance)
     }
 
-    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage) {
+    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage, logger: Logger? = Auth0Logger.sharedInstance.logger) {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter
         self.storage = storage
+        self.logger = logger
     }
     /**
      For redirect url instead of a custom scheme it will use `https` and iOS 9 Universal Links.
@@ -216,6 +218,7 @@ public class OAuth2 {
         let (controller, finish) = newSafari(authorizeURL, callback: callback)
         let session = OAuth2Session(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish)
         controller.delegate = session
+        logger?.trace(authorizeURL, source: "Safari")
         self.presenter.present(controller)
         self.storage.store(session)
     }
