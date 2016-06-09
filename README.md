@@ -198,12 +198,13 @@ Auth0
     }
 ```
 
-#### Authenticate with any Auth0 connection
+#### Specify scope
 
 ```swift
 Auth0
     .oauth2("ClientId", domain: "samples.auth0.com")
-    .connection("facebook")
+    .scope("openid email")
+    .connection("google-oauth2")
     .start { result in
         switch result {
         case .Success(let credentials):
