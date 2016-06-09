@@ -81,30 +81,30 @@ public func users(token token: String, domain: String, session: NSURLSession = .
     return management(token: token, domain: domain, session: session).users()
 }
 
-public extension NSURL {
-    /**
-     Returns an Auth0 domain URL given a domain
+/**
+ Auth0 iOS component for authenticating with OAuth2
 
-     - parameter domain: name of your Auth0 account
+ ```
+ Auth0.oauth2(clientId: clientId, domain: "samples.auth0.com")
+ ```
 
-     - returns: URL of your Auth0 account
-     */
-    @objc(a0_URLWithDomain:)
-    public static func a0_url(domain: String) -> NSURL {
-        let urlString: String
-        if !domain.hasPrefix("https") {
-            urlString = "https://\(domain)"
-        } else {
-            urlString = domain
-        }
-        return NSURL(string: urlString)!
-    }
+ - parameter clientId: id of your Auth0 client
+ - parameter domain:   name of your Auth0 domain
+
+ - returns: Auth0 OAuth2 component
+ */
+public func oauth2(clientId clientId: String, domain: String) -> OAuth2 {
+    return OAuth2(clientId: clientId, url: NSURL.a0_url(domain))
 }
 
-// MARK: - Xcode hacks
+/**
+ Resumes the current Auth session (if any).
 
-//Xcode issue that won't add these to Auth0-Swift.h file. 21/05/2016
+ - parameter url:     url received by iOS application in AppDelegate
+ - parameter options: dictionary with launch options received by iOS application in AppDelegate
 
-extension NSArray { }
-
-extension NSDictionary { }
+ - returns: if the url was handled by an on going session or not.
+ */
+public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
+    return SessionStorage.sharedInstance.resume(url, options: options)
+}

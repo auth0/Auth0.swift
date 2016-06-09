@@ -23,34 +23,6 @@
 import UIKit
 import SafariServices
 
-/**
- Auth0 iOS component for authenticating with OAuth2
- 
- ```
- Auth0.oauth2(clientId: clientId, domain: "samples.auth0.com")
- ```
-
- - parameter clientId: id of your Auth0 client
- - parameter domain:   name of your Auth0 domain
-
- - returns: Auth0 OAuth2 component
- */
-public func oauth2(clientId clientId: String, domain: String) -> OAuth2 {
-    return OAuth2(clientId: clientId, url: NSURL.a0_url(domain))
-}
-
-/**
- Resumes the current Auth session (if any).
-
- - parameter url:     url received by iOS application in AppDelegate
- - parameter options: dictionary with launch options received by iOS application in AppDelegate
-
- - returns: if the url was handled by an on going session or not.
- */
-public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
-    return SessionStorage.sharedInstance.resume(url, options: options)
-}
-
 /// OAuth2 Authentication using Auth0
 public class OAuth2 {
 
