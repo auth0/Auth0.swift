@@ -28,7 +28,8 @@ class SessionStorage {
 
     private var current: OAuth2Session? = nil
 
-    func resume(url: NSURL, options: [String: AnyObject]) -> Bool {
+    func resume(url: NSURL, options: [String: AnyObject], logger: Logger? = Auth0Logger.sharedInstance.logger) -> Bool {
+        logger?.trace(url, source: options[UIApplicationLaunchOptionsSourceApplicationKey] as? String)
         let resumed = self.current?.resume(url, options: options) ?? false
         if resumed {
             self.current = nil

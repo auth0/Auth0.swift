@@ -27,6 +27,8 @@
 		5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */; };
 		5F53F5CE1CFD157300476A46 /* OAuth2Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */; };
 		5F53F5D11CFD19A400476A46 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
+		5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6FAC621D09E98000D5B4EA /* Logger.swift */; };
+		5F6FAC641D09E98000D5B4EA /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6FAC621D09E98000D5B4EA /* Logger.swift */; };
 		5F74CB3D1CEE8E9100226823 /* UserIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */; };
 		5F74CB3E1CEE8E9100226823 /* UserIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */; };
 		5F74CB401CEFD5E600226823 /* JSONObjectPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3F1CEFD5E600226823 /* JSONObjectPayload.swift */; };
@@ -199,6 +201,7 @@
 		5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2Session.swift; sourceTree = "<group>"; };
 		5F53F5D21CFD474600476A46 /* OAuth2SessionSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2SessionSpec.swift; sourceTree = "<group>"; };
 		5F53F5D61CFFAA4A00476A46 /* OAuth2Spec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuth2Spec.swift; sourceTree = "<group>"; };
+		5F6FAC621D09E98000D5B4EA /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserIdentity.swift; sourceTree = "<group>"; };
 		5F74CB3F1CEFD5E600226823 /* JSONObjectPayload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONObjectPayload.swift; sourceTree = "<group>"; };
 		5F74CB421CEFDFB800226823 /* UserIdentitySpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserIdentitySpec.swift; sourceTree = "<group>"; };
@@ -315,6 +318,7 @@
 		5F049B6B1CB42C29006F6C05 /* Auth0 */ = {
 			isa = PBXGroup;
 			children = (
+				5F6FAC611D09E92800D5B4EA /* Logger */,
 				5FBBF03D1CCA8FC20024D2AF /* Authentication */,
 				5FCAB16E1D08FFE900331C84 /* Extensions */,
 				5FF465BA1CE2AC2800F7ED8C /* Management */,
@@ -406,6 +410,14 @@
 				5F3965E01CF67DD800CDE7C0 /* Info.plist */,
 			);
 			path = OAuth2Tests;
+			sourceTree = "<group>";
+		};
+		5F6FAC611D09E92800D5B4EA /* Logger */ = {
+			isa = PBXGroup;
+			children = (
+				5F6FAC621D09E98000D5B4EA /* Logger.swift */,
+			);
+			name = Logger;
 			sourceTree = "<group>";
 		};
 		5FADB6011CEC0C1600D4BB50 /* Management */ = {
@@ -782,6 +794,7 @@
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FCCC31C1CF51DF300901E2E /* _ObjectiveManagementAPI.swift in Sources */,
 				5FC34AF81D0101BF000F28F5 /* A0ChallengeGenerator.m in Sources */,
+				5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */,
 				5FBBF0461CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F53F5CE1CFD157300476A46 /* OAuth2Session.swift in Sources */,
 				5FBEF3DC1D079F2100D90941 /* _ObjectiveOAuth2.swift in Sources */,
@@ -816,6 +829,7 @@
 				5FCCC31D1CF51DF300901E2E /* _ObjectiveManagementAPI.swift in Sources */,
 				5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F74CB3E1CEE8E9100226823 /* UserIdentity.swift in Sources */,
+				5F6FAC641D09E98000D5B4EA /* Logger.swift in Sources */,
 				5FF465BD1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */,
 				5FE2F8B31CCEAED8003628F4 /* Requestable.swift in Sources */,

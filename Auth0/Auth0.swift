@@ -187,6 +187,17 @@ public func users(token token: String, domain: String, session: NSURLSession = .
     return management(token: token, domain: domain, session: session).users()
 }
 
+/**
+ Turn on/off Auth0.swift debug logging of HTTP requests and OAuth2 flow (iOS only).
+
+ - parameter enabled: optional flag to turn on/off logging
+ - note: By default all logging is **disabled**
+ - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
+ */
+public func enableLogging(enabled: Bool = true) {
+    Auth0Logger.sharedInstance.logger = enabled ? DefaultLogger() : nil
+}
+
 func plistValues() -> (clientId: String, domain: String)? {
     let bundle = NSBundle.mainBundle()
     guard
