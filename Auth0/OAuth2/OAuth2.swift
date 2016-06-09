@@ -23,6 +23,64 @@
 import UIKit
 import SafariServices
 
+/**
+ Auth0 iOS component for authenticating with OAuth2
+
+ ```
+ Auth0.oauth2()
+ ```
+
+ Auth0 domain is loaded from the file `Auth0.plist` in your main bundle with the following content:
+
+ ```
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ <plist version="1.0">
+ <dict>
+	<key>ClientId</key>
+	<string>{YOUR_CLIENT_ID}</string>
+	<key>Domain</key>
+	<string>{YOUR_DOMAIN}</string>
+ </dict>
+ </plist>
+ ```
+
+ - returns: Auth0 OAuth2 component
+ - important: Calling this method without a valid `Auth0.plist` will crash your application
+ */
+public func oauth2() -> OAuth2 {
+    let values = plistValues()!
+    return oauth2(clientId: values.clientId, domain: values.domain)
+}
+
+/**
+ Auth0 iOS component for authenticating with OAuth2
+
+ ```
+ Auth0.oauth2(clientId: clientId, domain: "samples.auth0.com")
+ ```
+
+ - parameter clientId: id of your Auth0 client
+ - parameter domain:   name of your Auth0 domain
+
+ - returns: Auth0 OAuth2 component
+ */
+public func oauth2(clientId clientId: String, domain: String) -> OAuth2 {
+    return OAuth2(clientId: clientId, url: .a0_url(domain))
+}
+
+/**
+ Resumes the current Auth session (if any).
+
+ - parameter url:     url received by iOS application in AppDelegate
+ - parameter options: dictionary with launch options received by iOS application in AppDelegate
+
+ - returns: if the url was handled by an on going session or not.
+ */
+public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
+    return SessionStorage.sharedInstance.resume(url, options: options)
+}
+
 /// OAuth2 Authentication using Auth0
 public class OAuth2 {
 
