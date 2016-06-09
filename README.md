@@ -38,94 +38,94 @@ github "auth0/Auth0.swift"
 #### Login with database connection
 
 ```swift
-     Auth0
-        .authentication("ClientId", domain: "samples.auth0.com")
-        .login(
-            "support@auth0.com", 
-            password: "a secret password", 
-            connection: "Username-Password-Authentication"
-            )
-        .start { result in
-            switch result {
-            case .Success(let credentials):
-                print("access_token: \(credentials.accessToken)")
-            case .Failure(let error):
-                print(error)
-            }
+ Auth0
+    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
+    .login(
+        "support@auth0.com", 
+        password: "a secret password", 
+        connection: "Username-Password-Authentication"
+        )
+    .start { result in
+        switch result {
+        case .Success(let credentials):
+            print("access_token: \(credentials.accessToken)")
+        case .Failure(let error):
+            print(error)
         }
+    }
 ```
 
 #### Passwordless Login
 
 ```swift
-     Auth0
-        .authentication("ClientId", domain: "samples.auth0.com")
-        .startPasswordless(email: "support@auth0.com", connection: "email")
-        .start { result in
-            switch result {
-            case .Success:
-                print("Sent OTP to support@auth0.com!")
-            case .Failure(let error):
-                print(error)
-            }
+ Auth0
+    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
+    .startPasswordless(email: "support@auth0.com", connection: "email")
+    .start { result in
+        switch result {
+        case .Success:
+            print("Sent OTP to support@auth0.com!")
+        case .Failure(let error):
+            print(error)
         }
+    }
 ```
 
 
 ```swift
-     Auth0
-        .authentication("ClientId", domain: "samples.auth0.com")
-        .login(
-            "support@auth0.com", 
-            password: "email OTP", 
-            connection: "email"
-            )
-        .start { result in
-            switch result {
-            case .Success(let credentials):
-                print("access_token: \(credentials.accessToken)")
-            case .Failure(let error):
-                print(error)
-            }
+ Auth0
+    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
+    .login(
+        "support@auth0.com", 
+        password: "email OTP", 
+        connection: "email"
+        )
+    .start { result in
+        switch result {
+        case .Success(let credentials):
+            print("access_token: \(credentials.accessToken)")
+        case .Failure(let error):
+            print(error)
         }
+    }
 ```
 
 
 #### Sign Up with database connection
 
 ```swift
-     Auth0
-        .authentication("ClientId", domain: "samples.auth0.com")
-        .signUp(
-            "support@auth0.com", 
-            password: "a secret password", 
-            connection: "Username-Password-Authentication"
-            )
-        .start { result in
-            switch result {
-            case .Success(let credentials):
-                print("access_token: \(credentials.accessToken)")
-            case .Failure(let error):
-                print(error)
-            }
+ Auth0
+    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
+    .signUp(
+        "support@auth0.com", 
+        password: "a secret password", 
+        connection: "Username-Password-Authentication"
+        )
+    .start { result in
+        switch result {
+        case .Success(let credentials):
+            print("access_token: \(credentials.accessToken)")
+        case .Failure(let error):
+            print(error)
         }
+    }
 ```
 
 
 #### Get user information
 
 ```swift
-     Auth0
-        .authentication("ClientId", domain: "samples.auth0.com")
-        .tokenInfo("user id_token")
-        .start { result in
-            switch result {
-            case .Success(let profile):
-                print("profile email: \(profile.email)")
-            case .Failure(let error):
-                print(error)
-            }
+ Auth0
+    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
+    .tokenInfo("user id_token")
+    .start { result in
+        switch result {
+        case .Success(let profile):
+            print("profile email: \(profile.email)")
+        case .Failure(let error):
+            print(error)
         }
+    }
 ```
 
 ### Management API (Users)
@@ -133,17 +133,17 @@ github "auth0/Auth0.swift"
 #### Update user_metadata
 
 ```swift
-    Auth0
-        .users("user token", domain: "samples.auth0.com")
-        .patch("user identifier", userMetadata: ["first_name": "John", "last_name": "Doe"])
-        .start { result in
-            switch result {
-            case .Success(let userInfo):
-                print("user: \(userInfo)")
-            case .Failure(let error):
-                print(error)
-            }
+Auth0
+    .users(token: "user token", domain: "samples.auth0.com")
+    .patch("user identifier", userMetadata: ["first_name": "John", "last_name": "Doe"])
+    .start { result in
+        switch result {
+        case .Success(let userInfo):
+            print("user: \(userInfo)")
+        case .Failure(let error):
+            print(error)
         }
+    }
 ```
 
 ### OAuth2 (iOS Only)
@@ -156,20 +156,20 @@ First go to [Auth0 Dashboard](https://manage.auth0.com/#/applications) and go to
 
 In your application's `Info.plist` file register your iOS Bundle Identifier as a custom scheme like this:
 
-```
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>None</string>
-            <key>CFBundleURLName</key>
-            <string>auth0</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>{YOUR_BUNDLE_IDENTIFIER}</string>
-            </array>
-        </dict>
-    </array>
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleTypeRole</key>
+        <string>None</string>
+        <key>CFBundleURLName</key>
+        <string>auth0</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>{YOUR_BUNDLE_IDENTIFIER}</string>
+        </array>
+    </dict>
+</array>
 ```
 
 > **Auth0.swift** will only handle URLs with your Auth0 domain as host, e.g. `com.auth0.OAuth2://samples.auth0.com/ios/com.auth0.OAuth2/callback`
@@ -177,56 +177,56 @@ In your application's `Info.plist` file register your iOS Bundle Identifier as a
 and add the following method in your application's `AppDelegate`
 
 ```swift
-    func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-        return Auth0.resumeAuth(url, options: options)
+func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+    return Auth0.resumeAuth(url, options: options)
+}
+```
+
+#### Authenticate with any Auth0 connection
+
+```swift
+Auth0
+    .oauth2("ClientId", domain: "samples.auth0.com")
+    .connection("facebook")
+    .start { result in
+        switch result {
+        case .Success(let credentials):
+            print("credentials: \(credentials)")
+        case .Failure(let error):
+            print(error)
+        }
     }
 ```
 
 #### Authenticate with any Auth0 connection
 
 ```swift
-    Auth0
-        .oauth2("ClientId", domain: "samples.auth0.com")
-        .connection("facebook")
-        .start { result in
-            switch result {
-            case .Success(let credentials):
-                print("credentials: \(credentials)")
-            case .Failure(let error):
-                print(error)
-            }
+Auth0
+    .oauth2("ClientId", domain: "samples.auth0.com")
+    .connection("facebook")
+    .start { result in
+        switch result {
+        case .Success(let credentials):
+            print("credentials: \(credentials)")
+        case .Failure(let error):
+            print(error)
         }
-```
-
-#### Authenticate with any Auth0 connection
-
-```swift
-    Auth0
-        .oauth2("ClientId", domain: "samples.auth0.com")
-        .connection("facebook")
-        .start { result in
-            switch result {
-            case .Success(let credentials):
-                print("credentials: \(credentials)")
-            case .Failure(let error):
-                print(error)
-            }
-        }
+    }
 ```
 
 #### Authenticate with Auth0 hosted login page
 
 ```swift
-    Auth0
-        .oauth2("ClientId", domain: "samples.auth0.com")
-        .start { result in
-            switch result {
-            case .Success(let credentials):
-                print("credentials: \(credentials)")
-            case .Failure(let error):
-                print(error)
-            }
+Auth0
+    .oauth2("ClientId", domain: "samples.auth0.com")
+    .start { result in
+        switch result {
+        case .Success(let credentials):
+            print("credentials: \(credentials)")
+        case .Failure(let error):
+            print(error)
         }
+    }
 ```
 
 ## What is Auth0?

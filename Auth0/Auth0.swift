@@ -53,7 +53,7 @@ public func authentication(clientId clientId: String, domain: String, session: N
  - returns: Auth0 Management API v2
  - important: Auth0.swift has yet to implement all endpoints. Now you can only perform some CRUD operations against Users
  */
-public func management(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Management {
+public func management(token token: String, domain: String, session: NSURLSession = .sharedSession()) -> Management {
     return Management(token: token, url: .a0_url(domain), session: session)
 }
 
@@ -77,8 +77,8 @@ public func management(token: String, domain: String, session: NSURLSession = .s
 
  - returns: Auth0 Management API v2
  */
-public func users(token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
-    return management(token, domain: domain, session: session).users()
+public func users(token token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
+    return management(token: token, domain: domain, session: session).users()
 }
 
 public extension NSURL {

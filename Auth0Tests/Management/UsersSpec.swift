@@ -35,7 +35,7 @@ class UsersSpec: QuickSpec {
 
     override func spec() {
 
-        let users = Auth0.users(Token, domain: Domain)
+        let users = Auth0.users(token: Token, domain: Domain)
 
         afterEach {
             OHHTTPStubs.removeAllStubs()
