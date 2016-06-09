@@ -1,4 +1,4 @@
-// AppDelegate.swift
+// NSURLComponents+OAuth2.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -20,21 +20,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-import Auth0
+import Foundation
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    var window: UIWindow?
-
-
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        return true
+extension NSURLComponents {
+    var a0_values: [String: String] {
+        if self.fragment != nil {
+            return self.a0_fragmentValues
+        } else {
+            return self.a0_queryValues
+        }
     }
 
-    func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-        return Auth0.resumeAuth(url, options: options)
+    var a0_fragmentValues: [String: String] {
+        var dict: [String: String] = [:]
+        let items = fragment?.componentsSeparatedByString("&")
+        items?.forEach { item in
+            let parts = item.componentsSeparatedByString("=")
+            guard
+                parts.count == 2,
+                let key = parts.first,
+                let value = parts.last
+                else { return }
+            dict[key] = value
+        }
+        return dict
+    }
+
+    var a0_queryValues: [String: String] {
+        var dict: [String: String] = [:]
+        self.queryItems?.forEach { dict[$0.name] = $0.value }
+        return dict
     }
 }
-

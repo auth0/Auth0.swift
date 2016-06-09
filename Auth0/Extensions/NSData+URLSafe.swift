@@ -1,4 +1,4 @@
-// AppDelegate.swift
+// NSData+URLSafe.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -20,21 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-import Auth0
+import Foundation
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    var window: UIWindow?
-
-
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        return true
-    }
-
-    func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-        return Auth0.resumeAuth(url, options: options)
+public extension NSData {
+    public func a0_encodeBase64URLSafe() -> String? {
+        return self
+            .base64EncodedStringWithOptions([])
+            .stringByReplacingOccurrencesOfString("+", withString: "-")
+            .stringByReplacingOccurrencesOfString("/", withString: "_")
+            .stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: "="))
     }
 }
-

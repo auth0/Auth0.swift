@@ -39,24 +39,42 @@ public func oauth2(clientId clientId: String, domain: String) -> OAuth2 {
     return OAuth2(clientId: clientId, url: NSURL.a0_url(domain))
 }
 
+/**
+ Resumes the current Auth session (if any).
+
+ - parameter url:     url received by iOS application in AppDelegate
+ - parameter options: dictionary with launch options received by iOS application in AppDelegate
+
+ - returns: if the url was handled by an on going session or not.
+ */
+public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
+    return SessionStorage.sharedInstance.resume(url, options: options)
+}
+
 /// OAuth2 Authentication using Auth0
 public class OAuth2 {
 
     private static let NoBundleIdentifier = "com.auth0.this-is-no-bundle"
+
     let clientId: String
     let url: NSURL
     let presenter: ControllerModalPresenter
+    let storage: SessionStorage
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
     var usePKCE = true
 
-    public init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter()) {
+    public convenience init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter()) {
+        self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance)
+    }
+
+    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage) {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter
+        self.storage = storage
     }
-
     /**
      For redirect url instead of a custom scheme it will use `https` and iOS 9 Universal Links.
      
@@ -136,34 +154,32 @@ public class OAuth2 {
      Starts the OAuth2 flow by modally presenting a ViewController in the top-most controller.
      
      ```
-     let session = Auth0
+     Auth0
         .oauth2(clientId: clientId, domain: "samples.auth0.com")
         .start { result in
             print(result)
         }
      ```
      
-     The returned session must be kept alive until the OAuth2 flow is completed and used from `AppDelegate` 
-     when the following method is called
+     Then from `AppDelegate` we just need to resume the OAuth2 Auth like this
      
      ```
      func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-        let session = //retrieve current OAuth2 session
-        return session.resume(url, options: options)
+        return Auth0.resumeAuth(url, options: options)
      }
      ```
 
-     - parameter callback: callback called with the result of the OAuth2 flow
+     Any on going OAuth2 Auth session will be automatically cancelled when starting a new one,
+     and it's corresponding callback with be called with a failure result of `Authentication.Error.Cancelled`
 
-     - returns: an object representing the current OAuth2 session.
+     - parameter callback: callback called with the result of the OAuth2 flow
      */
-    public func start(callback: Result<Credentials, Authentication.Error> -> ()) -> OAuth2Session? {
+    public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
         guard
             let redirectURL = self.redirectURL
             where !redirectURL.absoluteString.hasPrefix(OAuth2.NoBundleIdentifier)
             else {
-                callback(Result.Failure(error: .RequestFailed(cause: failureCause("Cannot find iOS Application Bundle Identifier"))))
-                return nil
+                return callback(Result.Failure(error: .RequestFailed(cause: failureCause("Cannot find iOS Application Bundle Identifier"))))
             }
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
@@ -171,7 +187,7 @@ public class OAuth2 {
         let session = OAuth2Session(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish)
         controller.delegate = session
         self.presenter.present(controller)
-        return session
+        self.storage.store(session)
     }
 
     func newSafari(authorizeURL: NSURL, callback: Result<Credentials, Authentication.Error> -> ()) -> (SFSafariViewController, Result<Credentials, Authentication.Error> -> ()) {
@@ -181,9 +197,15 @@ public class OAuth2 {
                 return callback(Result.Failure(error: .RequestFailed(cause: failureCause("Cannot find controller that triggered web flow"))))
             }
 
-            dispatch_async(dispatch_get_main_queue()) {
-                presenting.dismissViewControllerAnimated(true) {
+            if case .Failure(let cause) = result, .Cancelled = cause {
+                dispatch_async(dispatch_get_main_queue()) {
                     callback(result)
+                }
+            } else {
+                dispatch_async(dispatch_get_main_queue()) {
+                    presenting.dismissViewControllerAnimated(true) {
+                        callback(result)
+                    }
                 }
             }
         }
@@ -221,7 +243,6 @@ public class OAuth2 {
     }
 }
 
-
 private func failureCause(message: String) -> NSError {
     return NSError(domain: "com.auth0.oauth2", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
 }
@@ -232,14 +253,4 @@ private func generateDefaultState() -> String? {
         return nil
     }
     return data.a0_encodeBase64URLSafe()
-}
-
-public extension NSData {
-    public func a0_encodeBase64URLSafe() -> String? {
-        return self
-            .base64EncodedStringWithOptions([])
-            .stringByReplacingOccurrencesOfString("+", withString: "-")
-            .stringByReplacingOccurrencesOfString("/", withString: "_")
-            .stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: "="))
-    }
 }

@@ -85,7 +85,7 @@ public class _ObjectiveOAuth2: NSObject {
 
      ```
      A0OAuth2 *oauth2 = [[A0OAuth2 alloc] initWithClientId:clientId url: url];
-     A0OAuth2Session *session= [oauth2 startWithCallback:^(NSError *error, A0Credentials *credentials) {
+     [oauth2 startWithCallback:^(NSError *error, A0Credentials *credentials) {
         NSLog(@"error: %@, credetials: %@", error, credentials);
      }];
      ```
@@ -95,8 +95,7 @@ public class _ObjectiveOAuth2: NSObject {
 
      ```
      - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString *, id>)*options {
-        A0OAuth2Session *session = //retrieve current OAuth2 session
-        return [session resumeWithURL:url options:options];
+        return [A0OAuth2 resumeAuthWithURL:url options:options];
      }
      ```
 
@@ -104,8 +103,8 @@ public class _ObjectiveOAuth2: NSObject {
 
      - returns: an object representing the current OAuth2 session.
      */
-    public func start(callback: (NSError?, Credentials?) -> ()) -> OAuth2Session? {
-        return self.oauth2.start { result in
+    public func start(callback: (NSError?, Credentials?) -> ()) {
+        self.oauth2.start { result in
             switch result {
             case .Success(let credentials):
                 callback(nil, credentials)
@@ -113,5 +112,18 @@ public class _ObjectiveOAuth2: NSObject {
                 callback(cause.foundationError, nil)
             }
         }
+    }
+
+    /**
+     Resumes the current Auth session (if any).
+
+     - parameter url:     url received by iOS application in AppDelegate
+     - parameter options: dictionary with launch options received by iOS application in AppDelegate
+
+     - returns: if the url was handled by an on going session or not.
+     */
+    @objc(resumeAuthWithURL:options:)
+    public static func resume(url: NSURL, options: [String: AnyObject]) -> Bool {
+        return SessionStorage.sharedInstance.resume(url, options: options)
     }
 }

@@ -1,4 +1,4 @@
-// AppDelegate.swift
+// SessionStorage.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -20,21 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-import Auth0
+import Foundation
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+/// Keeps track of current Auth session (e.g. OAuth2)
+class SessionStorage {
+    static let sharedInstance = SessionStorage()
 
-    var window: UIWindow?
+    private var current: OAuth2Session? = nil
 
-
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        return true
+    func resume(url: NSURL, options: [String: AnyObject]) -> Bool {
+        let resumed = self.current?.resume(url, options: options) ?? false
+        if resumed {
+            self.current = nil
+        }
+        return resumed
     }
 
-    func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-        return Auth0.resumeAuth(url, options: options)
+    func store(session: OAuth2Session) {
+        self.current?.cancel()
+        self.current = session
+    }
+
+    func cancel(session: OAuth2Session) {
+        if self.current == session {
+            self.current?.cancel()
+            self.current = nil
+        }
     }
 }
-
