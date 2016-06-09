@@ -1583,15 +1583,17 @@
 				<string>5FCAB1771D0901BA00331C84</string>
 				<string>5FCAB16F1D09001100331C84</string>
 				<string>5F3965F21CF6857A00CDE7C0</string>
-				<string>5F3965C11CF67CF000CDE7C0</string>
 				<string>5F4A1F951D00AABC00C72242</string>
 				<string>5F53F5CD1CFD157300476A46</string>
 				<string>5FCAB1751D0900CF00331C84</string>
+				<string>5F3965C11CF67CF000CDE7C0</string>
 			</array>
 			<key>isa</key>
 			<string>PBXGroup</string>
+			<key>name</key>
+			<string>WebAuth</string>
 			<key>path</key>
-			<string>OAuth2</string>
+			<string>WebAuth</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 		</dict>
@@ -1604,7 +1606,7 @@
 			<key>lastKnownFileType</key>
 			<string>sourcecode.swift</string>
 			<key>path</key>
-			<string>OAuth2.swift</string>
+			<string>WebAuth.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 		</dict>
@@ -2099,7 +2101,7 @@ fi</string>
 			<key>lastKnownFileType</key>
 			<string>sourcecode.swift</string>
 			<key>path</key>
-			<string>OAuth2Spec.swift</string>
+			<string>WebAuthSpec.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 		</dict>
@@ -2112,8 +2114,6 @@ fi</string>
 			</array>
 			<key>isa</key>
 			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Logger</string>
 			<key>path</key>
 			<string>Logger</string>
 			<key>sourceTree</key>
@@ -2665,7 +2665,7 @@ fi</string>
 			<key>lastKnownFileType</key>
 			<string>sourcecode.swift</string>
 			<key>path</key>
-			<string>_ObjectiveOAuth2.swift</string>
+			<string>_ObjectiveWebAuth.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 		</dict>
@@ -2685,7 +2685,7 @@ fi</string>
 			<key>lastKnownFileType</key>
 			<string>sourcecode.c.objc</string>
 			<key>path</key>
-			<string>A0OAuth2Spec.m</string>
+			<string>A0WebAuthSpec.m</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 		</dict>

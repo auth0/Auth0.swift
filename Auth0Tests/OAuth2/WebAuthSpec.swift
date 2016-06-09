@@ -1,4 +1,4 @@
-// OAuth2Spec.swift
+// WebAuthSpec.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -37,7 +37,7 @@ extension NSURL {
 }
 
 private let ValidAuthorizeURLExample = "valid authorize url"
-class OAuth2SharedExamplesConfiguration: QuickConfiguration {
+class WebAuthSharedExamplesConfiguration: QuickConfiguration {
     override class func configure(configuration: Configuration) {
         sharedExamples(ValidAuthorizeURLExample) { (context: SharedExampleContext) in
             let attrs = context()
@@ -65,8 +65,8 @@ class OAuth2SharedExamplesConfiguration: QuickConfiguration {
     }
 }
 
-private func newOAuth2() -> OAuth2 {
-    return OAuth2(clientId: ClientId, url: DomainURL)
+private func newWebAuth() -> WebAuth {
+    return WebAuth(clientId: ClientId, url: DomainURL)
 }
 
 private func defaultQuery(withParameters parameters: [String: String] = [:]) -> [String: String] {
@@ -81,7 +81,7 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
 
 private let defaults = ["response_type": "token"]
 
-class OAuth2Spec: QuickSpec {
+class WebAuthSpec: QuickSpec {
 
     override func spec() {
 
@@ -89,7 +89,7 @@ class OAuth2Spec: QuickSpec {
 
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
-                    "url": newOAuth2()
+                    "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(),
@@ -98,7 +98,7 @@ class OAuth2Spec: QuickSpec {
 
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
-                    "url": newOAuth2()
+                    "url": newWebAuth()
                         .connection("facebook")
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
@@ -108,7 +108,7 @@ class OAuth2Spec: QuickSpec {
 
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
-                    "url": newOAuth2()
+                    "url": newWebAuth()
                         .scope("openid")
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
@@ -119,7 +119,7 @@ class OAuth2Spec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLExample) {
                 let state = NSUUID().UUIDString
                 return [
-                    "url": newOAuth2()
+                    "url": newWebAuth()
                         .parameters(["state": state])
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
@@ -133,12 +133,12 @@ class OAuth2Spec: QuickSpec {
 
             it("should build with custom scheme") {
                 let bundleId = NSBundle.mainBundle().bundleIdentifier!
-                expect(newOAuth2().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/ios/\(bundleId)/callback"
+                expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/ios/\(bundleId)/callback"
             }
 
             it("should build with universal link") {
                 let bundleId = NSBundle.mainBundle().bundleIdentifier!
-                expect(newOAuth2().useUniversalLink().redirectURL?.absoluteString) == "https://\(Domain)/ios/\(bundleId)/callback"
+                expect(newWebAuth().useUniversalLink().redirectURL?.absoluteString) == "https://\(Domain)/ios/\(bundleId)/callback"
             }
 
         }
@@ -151,11 +151,11 @@ class OAuth2Spec: QuickSpec {
             beforeEach { result = nil }
 
             it("should build new controller") {
-                expect(newOAuth2().newSafari(DomainURL, callback: {_ in}).0).toNot(beNil())
+                expect(newWebAuth().newSafari(DomainURL, callback: {_ in}).0).toNot(beNil())
             }
 
             it("should fail if controller is not presented") {
-                let callback = newOAuth2().newSafari(DomainURL, callback: { result = $0 }).1
+                let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
                 callback(.Success(result: Credentials(json: ["access_token": "at", "token_type": "bearer"])!))
                 expect(result).toEventually(beFailure())
             }
