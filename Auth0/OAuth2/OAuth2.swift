@@ -25,7 +25,37 @@ import SafariServices
 
 /**
  Auth0 iOS component for authenticating with OAuth2
- 
+
+ ```
+ Auth0.oauth2()
+ ```
+
+ Auth0 domain is loaded from the file `Auth0.plist` in your main bundle with the following content:
+
+ ```
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ <plist version="1.0">
+ <dict>
+	<key>ClientId</key>
+	<string>{YOUR_CLIENT_ID}</string>
+	<key>Domain</key>
+	<string>{YOUR_DOMAIN}</string>
+ </dict>
+ </plist>
+ ```
+
+ - returns: Auth0 OAuth2 component
+ - important: Calling this method without a valid `Auth0.plist` will crash your application
+ */
+public func oauth2() -> OAuth2 {
+    let values = plistValues()!
+    return oauth2(clientId: values.clientId, domain: values.domain)
+}
+
+/**
+ Auth0 iOS component for authenticating with OAuth2
+
  ```
  Auth0.oauth2(clientId: clientId, domain: "samples.auth0.com")
  ```
@@ -36,7 +66,7 @@ import SafariServices
  - returns: Auth0 OAuth2 component
  */
 public func oauth2(clientId clientId: String, domain: String) -> OAuth2 {
-    return OAuth2(clientId: clientId, url: NSURL.a0_url(domain))
+    return OAuth2(clientId: clientId, url: .a0_url(domain))
 }
 
 /**
