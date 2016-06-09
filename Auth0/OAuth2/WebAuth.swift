@@ -1,4 +1,4 @@
-// OAuth2.swift
+// WebAuth.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -24,10 +24,10 @@ import UIKit
 import SafariServices
 
 /**
- Auth0 iOS component for authenticating with OAuth2
+ Auth0 iOS component for authenticating with web-based flow
 
  ```
- Auth0.oauth2()
+ Auth0.webAuth()
  ```
 
  Auth0 domain is loaded from the file `Auth0.plist` in your main bundle with the following content:
@@ -45,28 +45,28 @@ import SafariServices
  </plist>
  ```
 
- - returns: Auth0 OAuth2 component
+ - returns: Auth0 WebAuth component
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func oauth2() -> OAuth2 {
+public func webAuth() -> WebAuth {
     let values = plistValues()!
-    return oauth2(clientId: values.clientId, domain: values.domain)
+    return webAuth(clientId: values.clientId, domain: values.domain)
 }
 
 /**
- Auth0 iOS component for authenticating with OAuth2
+ Auth0 iOS component for authenticating with web-based flow
 
  ```
- Auth0.oauth2(clientId: clientId, domain: "samples.auth0.com")
+ Auth0.webAuth(clientId: clientId, domain: "samples.auth0.com")
  ```
 
  - parameter clientId: id of your Auth0 client
  - parameter domain:   name of your Auth0 domain
 
- - returns: Auth0 OAuth2 component
+ - returns: Auth0 WebAuth component
  */
-public func oauth2(clientId clientId: String, domain: String) -> OAuth2 {
-    return OAuth2(clientId: clientId, url: .a0_url(domain))
+public func webAuth(clientId clientId: String, domain: String) -> WebAuth {
+    return WebAuth(clientId: clientId, url: .a0_url(domain))
 }
 
 /**
@@ -82,7 +82,7 @@ public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
 }
 
 /// OAuth2 Authentication using Auth0
-public class OAuth2 {
+public class WebAuth {
 
     private static let NoBundleIdentifier = "com.auth0.this-is-no-bundle"
 
@@ -114,7 +114,7 @@ public class OAuth2 {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    public func useUniversalLink() -> OAuth2 {
+    public func useUniversalLink() -> WebAuth {
         self.universalLink = true
         return self
     }
@@ -128,7 +128,7 @@ public class OAuth2 {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    public func connection(connection: String) -> OAuth2 {
+    public func connection(connection: String) -> WebAuth {
         self.parameters["connection"] = connection
         return self
     }
@@ -140,7 +140,7 @@ public class OAuth2 {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    public func scope(scope: String) -> OAuth2 {
+    public func scope(scope: String) -> WebAuth {
         self.parameters["scope"] = scope
         return self
     }
@@ -155,7 +155,7 @@ public class OAuth2 {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    public func state(state: String) -> OAuth2 {
+    public func state(state: String) -> WebAuth {
         self.state = state
         return self
     }
@@ -167,7 +167,7 @@ public class OAuth2 {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    public func parameters(parameters: [String: String]) -> OAuth2 {
+    public func parameters(parameters: [String: String]) -> WebAuth {
         parameters.forEach { self.parameters[$0] = $1 }
         return self
     }
@@ -177,7 +177,7 @@ public class OAuth2 {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    public func usingImplicitGrant() -> OAuth2 {
+    public func usingImplicitGrant() -> WebAuth {
         self.usePKCE = false
         return self
     }
@@ -209,7 +209,7 @@ public class OAuth2 {
     public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
         guard
             let redirectURL = self.redirectURL
-            where !redirectURL.absoluteString.hasPrefix(OAuth2.NoBundleIdentifier)
+            where !redirectURL.absoluteString.hasPrefix(WebAuth.NoBundleIdentifier)
             else {
                 return callback(Result.Failure(error: .RequestFailed(cause: failureCause("Cannot find iOS Application Bundle Identifier"))))
             }
@@ -266,7 +266,7 @@ public class OAuth2 {
     }
 
     var redirectURL: NSURL? {
-        let bundleIdentifier = NSBundle.mainBundle().bundleIdentifier ?? OAuth2.NoBundleIdentifier
+        let bundleIdentifier = NSBundle.mainBundle().bundleIdentifier ?? WebAuth.NoBundleIdentifier
         let components = NSURLComponents(URL: self.url, resolvingAgainstBaseURL: true)
         components?.scheme = self.universalLink ? "https" : bundleIdentifier
         return components?.URL?

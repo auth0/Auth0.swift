@@ -33,10 +33,10 @@ class ViewController: UIViewController {
     }
 
     @IBAction func startOAuth2(sender: AnyObject) {
-        Auth0.oauth2().start(onAuth)
+        Auth0.webAuth().start(onAuth)
     }
 
     @IBAction func startGoogleOAuth2(sender: AnyObject) {
-        Auth0.oauth2().connection("google-oauth2").start(onAuth)
+        Auth0.webAuth().connection("google-oauth2").start(onAuth)
     }
 }

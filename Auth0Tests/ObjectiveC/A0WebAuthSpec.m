@@ -1,4 +1,4 @@
-// A0OAuth2Spec.m
+// A0WebAuthSpec.m
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -26,29 +26,29 @@
 @import Nimble;
 @import Auth0;
 
-QuickSpecBegin(A0OAuth2Spec)
+QuickSpecBegin(A0WebAuthSpec)
 
 NSString *clientId = @"MyClientId";
 NSURL *domain = [NSURL a0_URLWithDomain:@"samples.auth0.com"];
 
 describe(@"init", ^{
     it(@"should create component", ^{
-        A0OAuth2 *oauth2 = [[A0OAuth2 alloc] initWithClientId:clientId url:domain];
+        A0WebAuth *oauth2 = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
         expect(oauth2).toNot(beNil());
     });
 
     it(@"should not have connection", ^{
-        A0OAuth2 *oauth2 = [[A0OAuth2 alloc] initWithClientId:clientId url:domain];
+        A0WebAuth *oauth2 = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
         expect(oauth2.connection).to(beNil());
     });
     
     it(@"should not have scope", ^{
-        A0OAuth2 *oauth2 = [[A0OAuth2 alloc] initWithClientId:clientId url:domain];
+        A0WebAuth *oauth2 = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
         expect(oauth2.scope).to(beNil());
     });
 
     it(@"should not use universal links", ^{
-        A0OAuth2 *oauth2 = [[A0OAuth2 alloc] initWithClientId:clientId url:domain];
+        A0WebAuth *oauth2 = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
         expect(@(oauth2.universalLink)).to(beFalsy());
     });
 });

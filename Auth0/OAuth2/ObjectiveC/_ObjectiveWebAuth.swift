@@ -1,4 +1,4 @@
-// _ObjectiveOAuth2.swift
+// _ObjectiveWebAuth.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,18 +22,18 @@
 
 import Foundation
 
-@objc(A0OAuth2)
-/// OAuth2 Auth with Auth0
+@objc(A0WebAuth)
+/// Web-based Auth with Auth0
 public class _ObjectiveOAuth2: NSObject {
 
-    private let oauth2: OAuth2
+    private let webAuth: WebAuth
 
     public init(clientId: String, url: NSURL) {
-        self.oauth2 = OAuth2(clientId: clientId, url: url)
+        self.webAuth = WebAuth(clientId: clientId, url: url)
     }
 
     func addParameters(parameters: [String: String]) {
-        self.oauth2.parameters(parameters)
+        self.webAuth.parameters(parameters)
     }
 
     /**
@@ -43,10 +43,10 @@ public class _ObjectiveOAuth2: NSObject {
     */
     public var universalLink: Bool {
         set {
-            self.oauth2.universalLink = newValue
+            self.webAuth.universalLink = newValue
         }
         get {
-            return self.oauth2.universalLink
+            return self.webAuth.universalLink
         }
     }
 
@@ -58,11 +58,11 @@ public class _ObjectiveOAuth2: NSObject {
     public var connection: String? {
         set {
             if let value = newValue {
-                self.oauth2.connection(value)
+                self.webAuth.connection(value)
             }
         }
         get {
-            return self.oauth2.parameters["connection"]
+            return self.webAuth.parameters["connection"]
         }
     }
 
@@ -72,26 +72,25 @@ public class _ObjectiveOAuth2: NSObject {
     public var scope: String? {
         set {
             if let value = newValue {
-                self.oauth2.scope(value)
+                self.webAuth.scope(value)
             }
         }
         get {
-            return self.oauth2.parameters["scope"]
+            return self.webAuth.parameters["scope"]
         }
     }
 
     /**
-     Starts the OAuth2 flow by modally presenting a ViewController in the top-most controller.
+     Starts the web-based auth flow by modally presenting a ViewController in the top-most controller.
 
      ```
-     A0OAuth2 *oauth2 = [[A0OAuth2 alloc] initWithClientId:clientId url: url];
-     [oauth2 startWithCallback:^(NSError *error, A0Credentials *credentials) {
+     A0WebAuth *auth = [[A0WebAuth alloc] initWithClientId:clientId url: url];
+     [auth startWithCallback:^(NSError *error, A0Credentials *credentials) {
         NSLog(@"error: %@, credetials: %@", error, credentials);
      }];
      ```
 
-     The returned session must be kept alive until the OAuth2 flow is completed and used from `AppDelegate`
-     when the following method is called
+     Then from `AppDelegate` we just need to resume the OAuth2 Auth like this
 
      ```
      - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString *, id>)*options {
@@ -104,7 +103,7 @@ public class _ObjectiveOAuth2: NSObject {
      - returns: an object representing the current OAuth2 session.
      */
     public func start(callback: (NSError?, Credentials?) -> ()) {
-        self.oauth2.start { result in
+        self.webAuth.start { result in
             switch result {
             case .Success(let credentials):
                 callback(nil, credentials)
