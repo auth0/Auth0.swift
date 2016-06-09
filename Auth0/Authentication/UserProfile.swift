@@ -106,6 +106,7 @@ public class UserProfile: NSObject, JSONObjectPayload {
 private func fromSO8601(string: String) -> NSDate? {
     let formatter = NSDateFormatter()
     formatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
-    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZ"
+    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    formatter.timeZone = NSTimeZone(name: "UTC")
     return formatter.dateFromString(string)
 }

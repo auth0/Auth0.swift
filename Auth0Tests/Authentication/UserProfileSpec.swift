@@ -49,7 +49,7 @@ class UserProfileSpec: QuickSpec {
                 expect(profile?.name) == Support
                 expect(profile?.nickname) == Nickname
                 expect(profile?.pictureURL) == PictureURL
-                expect(profile?.createdAt) == dateFromISODate(CreatedAt)
+                expect(profile?.createdAt.timeIntervalSince1970) == CreatedAtTimestamp
                 expect(profile?.identities).to(beEmpty())
             }
 

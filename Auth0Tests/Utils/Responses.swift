@@ -29,14 +29,8 @@ let Support = "support"
 let Auth0Phone = "+10123456789"
 let Nickname = "sup"
 let PictureURL = NSURL(string: "https://auth0.com")!
-let CreatedAt = "2016-04-27T17:59:00Z"
-
-func dateFromISODate(string: String) -> NSDate {
-    let dateFormatter = NSDateFormatter()
-    dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
-    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZ"
-    return dateFormatter.dateFromString(string)!
-}
+let CreatedAt = "2015-08-19T17:18:00.123Z"
+let CreatedAtTimestamp = 1440004680.123
 
 func authResponse(accessToken accessToken: String, idToken: String? = nil) -> OHHTTPStubsResponse {
     var json = [
