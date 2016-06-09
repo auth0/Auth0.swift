@@ -146,6 +146,89 @@ github "auth0/Auth0.swift"
         }
 ```
 
+### OAuth2 (iOS Only)
+
+First go to [Auth0 Dashboard](https://manage.auth0.com/#/applications) and go to application's settings. Make sure you have in *Allowed Callback URLs* a URL with the following format:
+
+```
+{YOUR_BUNDLE_IDENTIFIER}://{YOUR_AUTH0_DOMAIN}/ios/{YOUR_BUNDLE_IDENTIFIER}/callback
+```
+
+In your application's `Info.plist` file register your iOS Bundle Identifier as a custom scheme like this:
+
+```
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>None</string>
+            <key>CFBundleURLName</key>
+            <string>auth0</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>{YOUR_BUNDLE_IDENTIFIER}</string>
+            </array>
+        </dict>
+    </array>
+```
+
+> **Auth0.swift** will only handle URLs with your Auth0 domain as host, e.g. `com.auth0.OAuth2://samples.auth0.com/ios/com.auth0.OAuth2/callback`
+
+and add the following method in your application's `AppDelegate`
+
+```swift
+    func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+        return Auth0.resumeAuth(url, options: options)
+    }
+```
+
+#### Authenticate with any Auth0 connection
+
+```swift
+    Auth0
+        .oauth2("ClientId", domain: "samples.auth0.com")
+        .connection("facebook")
+        .start { result in
+            switch result {
+            case .Success(let credentials):
+                print("credentials: \(credentials)")
+            case .Failure(let error):
+                print(error)
+            }
+        }
+```
+
+#### Authenticate with any Auth0 connection
+
+```swift
+    Auth0
+        .oauth2("ClientId", domain: "samples.auth0.com")
+        .connection("facebook")
+        .start { result in
+            switch result {
+            case .Success(let credentials):
+                print("credentials: \(credentials)")
+            case .Failure(let error):
+                print(error)
+            }
+        }
+```
+
+#### Authenticate with Auth0 hosted login page
+
+```swift
+    Auth0
+        .oauth2("ClientId", domain: "samples.auth0.com")
+        .start { result in
+            switch result {
+            case .Success(let credentials):
+                print("credentials: \(credentials)")
+            case .Failure(let error):
+                print(error)
+            }
+        }
+```
+
 ## What is Auth0?
 
 Auth0 helps you to:
