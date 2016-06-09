@@ -165,7 +165,7 @@ Auth0
     }
 ```
 
-### OAuth2 (iOS Only)
+### Web-based Auth (iOS Only)
 
 First go to [Auth0 Dashboard](https://manage.auth0.com/#/applications) and go to application's settings. Make sure you have in *Allowed Callback URLs* a URL with the following format:
 
@@ -191,7 +191,7 @@ In your application's `Info.plist` file register your iOS Bundle Identifier as a
 </array>
 ```
 
-> **Auth0.swift** will only handle URLs with your Auth0 domain as host, e.g. `com.auth0.OAuth2://samples.auth0.com/ios/com.auth0.OAuth2/callback`
+> **Auth0.swift** will only handle URLs with your Auth0 domain as host, e.g. `com.auth0.MyApp://samples.auth0.com/ios/com.auth0.MyApp/callback`
 
 and add the following method in your application's `AppDelegate`
 
@@ -205,7 +205,7 @@ func application(app: UIApplication, openURL url: NSURL, options: [String : AnyO
 
 ```swift
 Auth0
-    .oauth2()
+    .webAuth()
     .connection("facebook")
     .start { result in
         switch result {
@@ -221,7 +221,7 @@ Auth0
 
 ```swift
 Auth0
-    .oauth2()
+    .webAuth()
     .scope("openid email")
     .connection("google-oauth2")
     .start { result in
@@ -238,7 +238,7 @@ Auth0
 
 ```swift
 Auth0
-    .oauth2()
+    .webAuth()
     .start { result in
         switch result {
         case .Success(let credentials):
@@ -261,11 +261,11 @@ Then for a OAuth2 authentication you'll see in the console:
 
 ```
 Safari: https://samples.auth0.com/authorize?.....
-URL: com.auth0.oauth2://samples.auth0.com/ios/com.auth0.OAuth2/callback?...
+URL: com.auth0.myapp://samples.auth0.com/ios/com.auth0.MyApp/callback?...
 POST https://samples.auth0.com/oauth/token HTTP/1.1
 Content-Type: application/json
 
-{"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.auth0.OAuth2:\/\/samples.auth0.com\/ios\/com.auth0.OAuth2\/callback","code_verifier":"..."}
+{"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.auth0.MyApp:\/\/samples.auth0.com\/ios\/com.auth0.MyApp\/callback","code_verifier":"..."}
 
 HTTP/1.1 200
 Pragma: no-cache
