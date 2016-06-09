@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.0.0-beta.2](https://github.com/auth0/Auth0.swift/tree/1.0.0-beta.2) (2016-06-09)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-beta.1...1.0.0-beta.2)
+
+**Merged pull requests:**
+
+- Rename OAuth2 related methods [\#24](https://github.com/auth0/Auth0.swift/pull/24) ([hzalaz](https://github.com/hzalaz))
+- Introduce simple logging for HTTP requests and OAuth2 flow [\#23](https://github.com/auth0/Auth0.swift/pull/23) ([hzalaz](https://github.com/hzalaz))
+- Correct new format of the date according to API [\#22](https://github.com/auth0/Auth0.swift/pull/22) ([hzalaz](https://github.com/hzalaz))
+- Load Auth0 values from plist in main bundle [\#21](https://github.com/auth0/Auth0.swift/pull/21) ([hzalaz](https://github.com/hzalaz))
+- Improve OAuth2 methods [\#20](https://github.com/auth0/Auth0.swift/pull/20) ([hzalaz](https://github.com/hzalaz))
+- OAuth2 auth components [\#19](https://github.com/auth0/Auth0.swift/pull/19) ([hzalaz](https://github.com/hzalaz))
+
 ## [1.0.0-beta.1](https://github.com/auth0/Auth0.swift/tree/1.0.0-beta.1) (2016-05-25)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/0.3.0...1.0.0-beta.1)
 
