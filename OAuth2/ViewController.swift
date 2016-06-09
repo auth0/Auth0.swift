@@ -37,33 +37,17 @@ class ViewController: UIViewController {
 
     @IBAction func startOAuth2(sender: AnyObject) {
         guard let client = self.client else { return }
-        let session = Auth0
+        Auth0
             .oauth2(clientId: client.clientId, domain: client.domain)
             .start(onAuth)
-        OAuth2.sharedInstance.currentSession = session
     }
 
     @IBAction func startGoogleOAuth2(sender: AnyObject) {
         guard let client = self.client else { return }
-        let session = Auth0
+        Auth0
             .oauth2(clientId: client.clientId, domain: client.domain)
             .connection("google-oauth2")
             .start(onAuth)
-        OAuth2.sharedInstance.currentSession = session
-    }
-}
-
-class OAuth2 {
-    var currentSession: OAuth2Session? = nil
-
-    static let sharedInstance = OAuth2()
-
-    func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
-        let handled = self.currentSession?.resume(url, options: options) ?? false
-        if handled {
-            self.currentSession = nil
-        }
-        return handled
     }
 }
 

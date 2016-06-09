@@ -23,18 +23,10 @@
 		5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965CD1CF67DD800CDE7C0 /* Main.storyboard */; };
 		5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965D01CF67DD800CDE7C0 /* Assets.xcassets */; };
 		5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965D21CF67DD800CDE7C0 /* LaunchScreen.storyboard */; };
-		5F3965E81CF6840400CDE7C0 /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBA1CC571290011842B /* Quick.framework */; };
-		5F3965E91CF6840400CDE7C0 /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBB1CC571290011842B /* OHHTTPStubs.framework */; };
-		5F3965EA1CF6840400CDE7C0 /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DDBC1CC571290011842B /* Nimble.framework */; };
-		5F3965EC1CF6841500CDE7C0 /* Quick.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBA1CC571290011842B /* Quick.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5F3965ED1CF6841600CDE7C0 /* OHHTTPStubs.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBB1CC571290011842B /* OHHTTPStubs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5F3965EE1CF6841600CDE7C0 /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DDBC1CC571290011842B /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F3965F31CF6857A00CDE7C0 /* ControllerModalPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */; };
 		5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */; };
 		5F53F5CE1CFD157300476A46 /* OAuth2Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F53F5CD1CFD157300476A46 /* OAuth2Session.swift */; };
 		5F53F5D11CFD19A400476A46 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
-		5F53F5D41CFD59A300476A46 /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
-		5F53F5D51CFD59A300476A46 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
 		5F74CB3D1CEE8E9100226823 /* UserIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */; };
 		5F74CB3E1CEE8E9100226823 /* UserIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3C1CEE8E9100226823 /* UserIdentity.swift */; };
 		5F74CB401CEFD5E600226823 /* JSONObjectPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3F1CEFD5E600226823 /* JSONObjectPayload.swift */; };
@@ -126,13 +118,6 @@
 			remoteGlobalIDString = 5F06DD841CC448C90011842B;
 			remoteInfo = Auth0.OSX;
 		};
-		5F3965DB1CF67DD800CDE7C0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5F3965C61CF67DD800CDE7C0;
-			remoteInfo = OAuth2;
-		};
 		5F53F5CF1CFD199700476A46 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
@@ -174,18 +159,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5F3965EB1CF6840D00CDE7C0 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				5F3965EC1CF6841500CDE7C0 /* Quick.framework in CopyFiles */,
-				5F3965ED1CF6841600CDE7C0 /* OHHTTPStubs.framework in CopyFiles */,
-				5F3965EE1CF6841600CDE7C0 /* Nimble.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -212,7 +185,6 @@
 		5F3965D01CF67DD800CDE7C0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5F3965D31CF67DD800CDE7C0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5F3965D51CF67DD800CDE7C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5F3965DA1CF67DD800CDE7C0 /* OAuth2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OAuth2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F3965E01CF67DD800CDE7C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F3965F01CF6845A00CDE7C0 /* ControllerModalPresenterSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControllerModalPresenterSpec.swift; sourceTree = "<group>"; };
 		5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControllerModalPresenter.swift; sourceTree = "<group>"; };
@@ -303,16 +275,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5F3965D71CF67DD800CDE7C0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5F3965E81CF6840400CDE7C0 /* Quick.framework in Frameworks */,
-				5F3965E91CF6840400CDE7C0 /* OHHTTPStubs.framework in Frameworks */,
-				5F3965EA1CF6840400CDE7C0 /* Nimble.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -336,7 +298,6 @@
 				5F06DDA01CC451540011842B /* Auth0Tests.xctest */,
 				5F06DDAF1CC451700011842B /* Auth0Tests.xctest */,
 				5F3965C71CF67DD800CDE7C0 /* OAuth2.app */,
-				5F3965DA1CF67DD800CDE7C0 /* OAuth2Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -673,25 +634,6 @@
 			productReference = 5F3965C71CF67DD800CDE7C0 /* OAuth2.app */;
 			productType = "com.apple.product-type.application";
 		};
-		5F3965D91CF67DD800CDE7C0 /* OAuth2Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 5F3965E41CF67DD800CDE7C0 /* Build configuration list for PBXNativeTarget "OAuth2Tests" */;
-			buildPhases = (
-				5F3965D61CF67DD800CDE7C0 /* Sources */,
-				5F3965D71CF67DD800CDE7C0 /* Frameworks */,
-				5F3965D81CF67DD800CDE7C0 /* Resources */,
-				5F3965EB1CF6840D00CDE7C0 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				5F3965DC1CF67DD800CDE7C0 /* PBXTargetDependency */,
-			);
-			name = OAuth2Tests;
-			productName = OAuth2Tests;
-			productReference = 5F3965DA1CF67DD800CDE7C0 /* OAuth2Tests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -718,10 +660,6 @@
 					5F3965C61CF67DD800CDE7C0 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
-					5F3965D91CF67DD800CDE7C0 = {
-						CreatedOnToolsVersion = 7.3.1;
-						TestTargetID = 5F3965C61CF67DD800CDE7C0;
-					};
 				};
 			};
 			buildConfigurationList = 5F049B631CB42C29006F6C05 /* Build configuration list for PBXProject "Auth0" */;
@@ -742,7 +680,6 @@
 				5F06DD9F1CC451540011842B /* Auth0Tests.iOS */,
 				5F06DDAE1CC451700011842B /* Auth0Tests.OSX */,
 				5F3965C61CF67DD800CDE7C0 /* OAuth2 */,
-				5F3965D91CF67DD800CDE7C0 /* OAuth2Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -783,13 +720,6 @@
 				5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */,
 				5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */,
 				5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		5F3965D81CF67DD800CDE7C0 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -922,15 +852,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5F3965D61CF67DD800CDE7C0 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5F53F5D51CFD59A300476A46 /* Responses.swift in Sources */,
-				5F53F5D41CFD59A300476A46 /* Matchers.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -943,11 +864,6 @@
 			isa = PBXTargetDependency;
 			target = 5F06DD841CC448C90011842B /* Auth0.OSX */;
 			targetProxy = 5F06DDB51CC451700011842B /* PBXContainerItemProxy */;
-		};
-		5F3965DC1CF67DD800CDE7C0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5F3965C61CF67DD800CDE7C0 /* OAuth2 */;
-			targetProxy = 5F3965DB1CF67DD800CDE7C0 /* PBXContainerItemProxy */;
 		};
 		5F53F5D01CFD199700476A46 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1294,47 +1210,6 @@
 			};
 			name = Release;
 		};
-		5F3965E51CF67DD800CDE7C0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ENABLE_MODULES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
-				INFOPLIST_FILE = OAuth2Tests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2Tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "OAuth2Tests/OAuth2Tests-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2.app/OAuth2";
-			};
-			name = Debug;
-		};
-		5F3965E61CF67DD800CDE7C0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ENABLE_MODULES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
-				INFOPLIST_FILE = OAuth2Tests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2Tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "OAuth2Tests/OAuth2Tests-Bridging-Header.h";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2.app/OAuth2";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1388,15 +1263,6 @@
 			buildConfigurations = (
 				5F3965E21CF67DD800CDE7C0 /* Debug */,
 				5F3965E31CF67DD800CDE7C0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		5F3965E41CF67DD800CDE7C0 /* Build configuration list for PBXNativeTarget "OAuth2Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5F3965E51CF67DD800CDE7C0 /* Debug */,
-				5F3965E61CF67DD800CDE7C0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

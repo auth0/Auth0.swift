@@ -56,6 +56,7 @@ class OAuth2SessionSpec: QuickSpec {
             beforeEach {
                 controller.delegate = nil
                 session = OAuth2Session(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
+                SessionStorage.sharedInstance.store(session)
             }
 
             it("should set itself as delegate") {

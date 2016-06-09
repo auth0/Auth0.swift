@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 import UIKit
+import Auth0
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -33,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-        return OAuth2.sharedInstance.resume(url, options: options)
+        return Auth0.resumeAuth(url, options: options)
     }
 }
 

@@ -43,20 +43,26 @@ public func oauth2(clientId clientId: String, domain: String) -> OAuth2 {
 public class OAuth2 {
 
     private static let NoBundleIdentifier = "com.auth0.this-is-no-bundle"
+
     let clientId: String
     let url: NSURL
     let presenter: ControllerModalPresenter
+    let storage: SessionStorage
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
     var usePKCE = true
 
-    public init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter()) {
+    public convenience init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter()) {
+        self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance)
+    }
+
+    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage) {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter
+        self.storage = storage
     }
-
     /**
      For redirect url instead of a custom scheme it will use `https` and iOS 9 Universal Links.
      
@@ -157,13 +163,12 @@ public class OAuth2 {
 
      - returns: an object representing the current OAuth2 session.
      */
-    public func start(callback: Result<Credentials, Authentication.Error> -> ()) -> OAuth2Session? {
+    public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
         guard
             let redirectURL = self.redirectURL
             where !redirectURL.absoluteString.hasPrefix(OAuth2.NoBundleIdentifier)
             else {
-                callback(Result.Failure(error: .RequestFailed(cause: failureCause("Cannot find iOS Application Bundle Identifier"))))
-                return nil
+                return callback(Result.Failure(error: .RequestFailed(cause: failureCause("Cannot find iOS Application Bundle Identifier"))))
             }
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
@@ -171,7 +176,7 @@ public class OAuth2 {
         let session = OAuth2Session(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish)
         controller.delegate = session
         self.presenter.present(controller)
-        return session
+        self.storage.store(session)
     }
 
     func newSafari(authorizeURL: NSURL, callback: Result<Credentials, Authentication.Error> -> ()) -> (SFSafariViewController, Result<Credentials, Authentication.Error> -> ()) {
@@ -181,9 +186,15 @@ public class OAuth2 {
                 return callback(Result.Failure(error: .RequestFailed(cause: failureCause("Cannot find controller that triggered web flow"))))
             }
 
-            dispatch_async(dispatch_get_main_queue()) {
-                presenting.dismissViewControllerAnimated(true) {
+            if case .Failure(let cause) = result, .Cancelled = cause {
+                dispatch_async(dispatch_get_main_queue()) {
                     callback(result)
+                }
+            } else {
+                dispatch_async(dispatch_get_main_queue()) {
+                    presenting.dismissViewControllerAnimated(true) {
+                        callback(result)
+                    }
                 }
             }
         }

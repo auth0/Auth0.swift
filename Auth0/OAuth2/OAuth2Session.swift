@@ -38,8 +38,11 @@ import SafariServices
  */
 @objc(A0OAuth2Session)
 public class OAuth2Session: NSObject {
+
     public typealias FinishSession = Result<Credentials, Authentication.Error> -> ()
+
     weak var controller: UIViewController?
+
     let redirectURL: NSURL
     let state: String?
     let finish: FinishSession
@@ -86,11 +89,45 @@ public class OAuth2Session: NSObject {
         }
         return true
     }
+
+    func cancel() {
+        self.finish(Result.Failure(error: .Cancelled))
+    }
+}
+
+class SessionStorage {
+    static let sharedInstance = SessionStorage()
+
+    private var current: OAuth2Session? = nil
+
+    func resume(url: NSURL, options: [String: AnyObject]) -> Bool {
+        let resumed = self.current?.resume(url, options: options) ?? false
+        if resumed {
+            self.current = nil
+        }
+        return resumed
+    }
+
+    func store(session: OAuth2Session) {
+        self.current?.cancel()
+        self.current = session
+    }
+
+    func cancel(session: OAuth2Session) {
+        if self.current == session {
+            self.current?.cancel()
+            self.current = nil
+        }
+    }
+}
+
+public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
+    return SessionStorage.sharedInstance.resume(url, options: options)
 }
 
 extension OAuth2Session: SFSafariViewControllerDelegate {
     public func safariViewControllerDidFinish(controller: SFSafariViewController) {
-        self.finish(Result.Failure(error: .Cancelled))
+        SessionStorage.sharedInstance.cancel(self)
     }
 }
 
