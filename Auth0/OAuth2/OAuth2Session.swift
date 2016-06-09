@@ -36,10 +36,9 @@ import SafariServices
  }
  ```
  */
-@objc(A0OAuth2Session)
-public class OAuth2Session: NSObject {
+class OAuth2Session: NSObject {
 
-    public typealias FinishSession = Result<Credentials, Authentication.Error> -> ()
+    typealias FinishSession = Result<Credentials, Authentication.Error> -> ()
 
     weak var controller: UIViewController?
 
@@ -66,8 +65,7 @@ public class OAuth2Session: NSObject {
 
      - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
      */
-    @objc(resumeWithURL:options:)
-    public func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
+    func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
         guard url.absoluteString.lowercaseString.hasPrefix(self.redirectURL.absoluteString.lowercaseString) else { return false }
 
         guard
@@ -95,69 +93,8 @@ public class OAuth2Session: NSObject {
     }
 }
 
-class SessionStorage {
-    static let sharedInstance = SessionStorage()
-
-    private var current: OAuth2Session? = nil
-
-    func resume(url: NSURL, options: [String: AnyObject]) -> Bool {
-        let resumed = self.current?.resume(url, options: options) ?? false
-        if resumed {
-            self.current = nil
-        }
-        return resumed
-    }
-
-    func store(session: OAuth2Session) {
-        self.current?.cancel()
-        self.current = session
-    }
-
-    func cancel(session: OAuth2Session) {
-        if self.current == session {
-            self.current?.cancel()
-            self.current = nil
-        }
-    }
-}
-
-public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
-    return SessionStorage.sharedInstance.resume(url, options: options)
-}
-
 extension OAuth2Session: SFSafariViewControllerDelegate {
-    public func safariViewControllerDidFinish(controller: SFSafariViewController) {
+    func safariViewControllerDidFinish(controller: SFSafariViewController) {
         SessionStorage.sharedInstance.cancel(self)
-    }
-}
-
-private extension NSURLComponents {
-    var a0_values: [String: String] {
-        if self.fragment != nil {
-            return self.a0_fragmentValues
-        } else {
-            return self.a0_queryValues
-        }
-    }
-
-    var a0_fragmentValues: [String: String] {
-        var dict: [String: String] = [:]
-        let items = fragment?.componentsSeparatedByString("&")
-        items?.forEach { item in
-            let parts = item.componentsSeparatedByString("=")
-            guard
-                parts.count == 2,
-                let key = parts.first,
-                let value = parts.last
-                else { return }
-            dict[key] = value
-        }
-        return dict
-    }
-
-    var a0_queryValues: [String: String] {
-        var dict: [String: String] = [:]
-        self.queryItems?.forEach { dict[$0.name] = $0.value }
-        return dict
     }
 }
