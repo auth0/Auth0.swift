@@ -14,11 +14,10 @@
 		<dict>
 			<key>children</key>
 			<array>
+				<string>5F3965C81CF67DD800CDE7C0</string>
 				<string>5F049B6B1CB42C29006F6C05</string>
 				<string>5F06DD921CC451430011842B</string>
 				<string>5F06DDC21CC5712F0011842B</string>
-				<string>5F3965C81CF67DD800CDE7C0</string>
-				<string>5F3965DD1CF67DD800CDE7C0</string>
 				<string>5F049B6A1CB42C29006F6C05</string>
 			</array>
 			<key>isa</key>
@@ -1590,8 +1589,6 @@
 			</array>
 			<key>isa</key>
 			<string>PBXGroup</string>
-			<key>name</key>
-			<string>WebAuth</string>
 			<key>path</key>
 			<string>WebAuth</string>
 			<key>sourceTree</key>
@@ -1713,8 +1710,10 @@
 			</array>
 			<key>isa</key>
 			<string>PBXGroup</string>
+			<key>name</key>
+			<string>App</string>
 			<key>path</key>
-			<string>OAuth2</string>
+			<string>App</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 		</dict>
@@ -1853,30 +1852,6 @@
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 		</dict>
-		<key>5F3965DD1CF67DD800CDE7C0</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5F3965E01CF67DD800CDE7C0</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>path</key>
-			<string>OAuth2Tests</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5F3965E01CF67DD800CDE7C0</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.xml</string>
-			<key>path</key>
-			<string>Info.plist</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
 		<key>5F3965E11CF67DD800CDE7C0</key>
 		<dict>
 			<key>buildConfigurations</key>
@@ -1900,7 +1875,7 @@
 				<key>CLANG_ANALYZER_NONNULL</key>
 				<string>YES</string>
 				<key>INFOPLIST_FILE</key>
-				<string>OAuth2/Info.plist</string>
+				<string>App/Info.plist</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
 				<string>9.0</string>
 				<key>LD_RUNPATH_SEARCH_PATHS</key>
@@ -1924,7 +1899,7 @@
 				<key>CLANG_ANALYZER_NONNULL</key>
 				<string>YES</string>
 				<key>INFOPLIST_FILE</key>
-				<string>OAuth2/Info.plist</string>
+				<string>App/Info.plist</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
 				<string>9.0</string>
 				<key>LD_RUNPATH_SEARCH_PATHS</key>
