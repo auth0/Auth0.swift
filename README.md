@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
 
-Swift toolkit for Auth0 API (Authentication & Management)
+Swift toolkit for Auth0 API
 
 ## Requirements
 
@@ -31,101 +31,120 @@ In your Cartfile add this line
 github "auth0/Auth0.swift"
 ```
 
-## Auth0.swift
+## Usage
+
+### Auth0.plist
+
+To avoid specifying clientId & domain you can add a `Auth0.plist` file to your main bundle. Here is an example of the file contents:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+   <key>ClientId</key>
+   <string>{YOUR_CLIENT_ID}</string>
+   <key>Domain</key>
+   <string>{YOUR_DOMAIN}</string>
+</dict>
+</plist>
+```
+
+> This will load clientId & domain in authentication API & OAuth2 methods, and only domain for management API methods.
 
 ### Authentication API
 
 #### Login with database connection
 
 ```swift
- Auth0
-    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
-    .login(
-        "support@auth0.com", 
-        password: "a secret password", 
-        connection: "Username-Password-Authentication"
-        )
-    .start { result in
-        switch result {
-        case .Success(let credentials):
-            print("access_token: \(credentials.accessToken)")
-        case .Failure(let error):
-            print(error)
-        }
-    }
+Auth0
+   .authentication()
+   .login(
+       "support@auth0.com", 
+       password: "a secret password", 
+       connection: "Username-Password-Authentication"
+       )
+   .start { result in
+       switch result {
+       case .Success(let credentials):
+           print("access_token: \(credentials.accessToken)")
+       case .Failure(let error):
+           print(error)
+       }
+   }
 ```
 
 #### Passwordless Login
 
 ```swift
- Auth0
-    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
-    .startPasswordless(email: "support@auth0.com", connection: "email")
-    .start { result in
-        switch result {
-        case .Success:
-            print("Sent OTP to support@auth0.com!")
-        case .Failure(let error):
-            print(error)
-        }
-    }
+Auth0
+   .authentication()
+   .startPasswordless(email: "support@auth0.com", connection: "email")
+   .start { result in
+       switch result {
+       case .Success:
+           print("Sent OTP to support@auth0.com!")
+       case .Failure(let error):
+           print(error)
+       }
+   }
 ```
 
 
 ```swift
- Auth0
-    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
-    .login(
-        "support@auth0.com", 
-        password: "email OTP", 
-        connection: "email"
-        )
-    .start { result in
-        switch result {
-        case .Success(let credentials):
-            print("access_token: \(credentials.accessToken)")
-        case .Failure(let error):
-            print(error)
-        }
-    }
+Auth0
+   .authentication()
+   .login(
+       "support@auth0.com", 
+       password: "email OTP", 
+       connection: "email"
+       )
+   .start { result in
+       switch result {
+       case .Success(let credentials):
+           print("access_token: \(credentials.accessToken)")
+       case .Failure(let error):
+           print(error)
+       }
+   }
 ```
 
 
 #### Sign Up with database connection
 
 ```swift
- Auth0
-    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
-    .signUp(
-        "support@auth0.com", 
-        password: "a secret password", 
-        connection: "Username-Password-Authentication"
-        )
-    .start { result in
-        switch result {
-        case .Success(let credentials):
-            print("access_token: \(credentials.accessToken)")
-        case .Failure(let error):
-            print(error)
-        }
-    }
+Auth0
+   .authentication()
+   .signUp(
+       "support@auth0.com", 
+       password: "a secret password", 
+       connection: "Username-Password-Authentication"
+       )
+   .start { result in
+       switch result {
+       case .Success(let credentials):
+           print("access_token: \(credentials.accessToken)")
+       case .Failure(let error):
+           print(error)
+       }
+   }
 ```
 
 
 #### Get user information
 
 ```swift
- Auth0
-    .authentication(clientId: "ClientId", domain: "samples.auth0.com")
-    .tokenInfo("user id_token")
-    .start { result in
-        switch result {
-        case .Success(let profile):
-            print("profile email: \(profile.email)")
-        case .Failure(let error):
-            print(error)
-        }
-    }
+Auth0
+   .authentication()
+   .tokenInfo("user id_token")
+   .start { result in
+       switch result {
+       case .Success(let profile):
+           print("profile email: \(profile.email)")
+       case .Failure(let error):
+           print(error)
+       }
+   }
 ```
 
 ### Management API (Users)
@@ -134,7 +153,7 @@ github "auth0/Auth0.swift"
 
 ```swift
 Auth0
-    .users(token: "user token", domain: "samples.auth0.com")
+    .users(token: "user token")
     .patch("user identifier", userMetadata: ["first_name": "John", "last_name": "Doe"])
     .start { result in
         switch result {
@@ -186,7 +205,7 @@ func application(app: UIApplication, openURL url: NSURL, options: [String : AnyO
 
 ```swift
 Auth0
-    .oauth2("ClientId", domain: "samples.auth0.com")
+    .oauth2()
     .connection("facebook")
     .start { result in
         switch result {
@@ -202,7 +221,7 @@ Auth0
 
 ```swift
 Auth0
-    .oauth2("ClientId", domain: "samples.auth0.com")
+    .oauth2()
     .scope("openid email")
     .connection("google-oauth2")
     .start { result in
@@ -219,7 +238,7 @@ Auth0
 
 ```swift
 Auth0
-    .oauth2("ClientId", domain: "samples.auth0.com")
+    .oauth2()
     .start { result in
         switch result {
         case .Success(let credentials):
