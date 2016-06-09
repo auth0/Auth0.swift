@@ -21,7 +21,7 @@ Auth0.swift is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod "Auth0", '~> 1.0.0-beta.1'
+pod "Auth0", '~> 1.0.0-beta.2'
 ```
 
 ###Carthage
