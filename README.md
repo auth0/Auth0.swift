@@ -166,6 +166,22 @@ Auth0
     }
 ```
 
+#### Link users
+
+```
+Auth0
+   .users(token: "user token")
+   .link(userId, withOtherUserToken: "another user token")
+   .start { result in
+      switch result {
+      case .Success(let userInfo):
+         print("user: \(userInfo)")
+      case .Failure(let error):
+         print(error)
+      }
+   }
+```
+
 ### Web-based Auth (iOS Only)
 
 First go to [Auth0 Dashboard](https://manage.auth0.com/#/applications) and go to application's settings. Make sure you have in *Allowed Callback URLs* a URL with the following format:
