@@ -3,35 +3,29 @@
 ## [1.0.0-beta.2](https://github.com/auth0/Auth0.swift/tree/1.0.0-beta.2) (2016-06-09)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-beta.1...1.0.0-beta.2)
 
-**Merged pull requests:**
+**Added:**
 
-- Rename OAuth2 related methods [\#24](https://github.com/auth0/Auth0.swift/pull/24) ([hzalaz](https://github.com/hzalaz))
-- Introduce simple logging for HTTP requests and OAuth2 flow [\#23](https://github.com/auth0/Auth0.swift/pull/23) ([hzalaz](https://github.com/hzalaz))
-- Correct new format of the date according to API [\#22](https://github.com/auth0/Auth0.swift/pull/22) ([hzalaz](https://github.com/hzalaz))
-- Load Auth0 values from plist in main bundle [\#21](https://github.com/auth0/Auth0.swift/pull/21) ([hzalaz](https://github.com/hzalaz))
-- Improve OAuth2 methods [\#20](https://github.com/auth0/Auth0.swift/pull/20) ([hzalaz](https://github.com/hzalaz))
-- OAuth2 auth components [\#19](https://github.com/auth0/Auth0.swift/pull/19) ([hzalaz](https://github.com/hzalaz))
+- Authenticate a user using web-based authentication with Auth0, e.g. social authentication. (iOS Only) [\#19](https://github.com/auth0/Auth0.swift/pull/19),[\#20](https://github.com/auth0/Auth0.swift/pull/20) & [\#24](https://github.com/auth0/Auth0.swift/pull/24) ([hzalaz](https://github.com/hzalaz))
+- Load Auth0 clientId & domain from a plist file [\#21](https://github.com/auth0/Auth0.swift/pull/21) ([hzalaz](https://github.com/hzalaz))
+
+**Fixed:**
+
+- Date parsing format in `UserProfile` [\#22](https://github.com/auth0/Auth0.swift/pull/22) ([srna](https://github.com/srna))
 
 ## [1.0.0-beta.1](https://github.com/auth0/Auth0.swift/tree/1.0.0-beta.1) (2016-05-25)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/0.3.0...1.0.0-beta.1)
 
-**Implemented enhancements:**
+**Added:**
 
-- Add linking account endpoint [\#3](https://github.com/auth0/Auth0.swift/issues/3)
+- Auth0 Authentication API endpoints, now you can use **Auth0.swift** to write your own login box.
 
-**Merged pull requests:**
+**Changed:**
 
-- ObjC support [\#17](https://github.com/auth0/Auth0.swift/pull/17) ([hzalaz](https://github.com/hzalaz))
-- Fetch UserIdentity from profile [\#16](https://github.com/auth0/Auth0.swift/pull/16) ([hzalaz](https://github.com/hzalaz))
-- Management API to GET, PATCH user & link/unlink identities [\#15](https://github.com/auth0/Auth0.swift/pull/15) ([hzalaz](https://github.com/hzalaz))
-- Rename resetPassword to changePassword [\#14](https://github.com/auth0/Auth0.swift/pull/14) ([hzalaz](https://github.com/hzalaz))
-- Add /oauth/access\_token endpoint [\#13](https://github.com/auth0/Auth0.swift/pull/13) ([hzalaz](https://github.com/hzalaz))
-- tokeninfo & userinfo endpoints [\#12](https://github.com/auth0/Auth0.swift/pull/12) ([hzalaz](https://github.com/hzalaz))
-- Passwordless endpoints [\#11](https://github.com/auth0/Auth0.swift/pull/11) ([hzalaz](https://github.com/hzalaz))
-- Use Foundation for networking [\#10](https://github.com/auth0/Auth0.swift/pull/10) ([hzalaz](https://github.com/hzalaz))
-- db connections methods [\#9](https://github.com/auth0/Auth0.swift/pull/9) ([hzalaz](https://github.com/hzalaz))
-- Refactor how requests are built [\#8](https://github.com/auth0/Auth0.swift/pull/8) ([hzalaz](https://github.com/hzalaz))
-- Login with username & password [\#6](https://github.com/auth0/Auth0.swift/pull/6) ([hzalaz](https://github.com/hzalaz))
+- Dropped support for iOS 8
+- Reworked Swift API and updated to Swift 2.2
+- Removed Alamofire as dependency, all networking is done with `NSURLSession` directly
+- Request callbacks, in Swift, have a single value of enum `Result<Payload,ErrorType>`
+- Improved code docs
 
 ## [0.3.0](https://github.com/auth0/Auth0.swift/tree/0.3.0) (2016-04-25)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/0.2.0...0.3.0)
