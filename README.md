@@ -168,7 +168,7 @@ Auth0
 
 #### Link users
 
-```
+```swift
 Auth0
    .users(token: "user token")
    .link(userId, withOtherUserToken: "another user token")
