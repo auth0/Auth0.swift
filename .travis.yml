@@ -19,10 +19,10 @@ before_install: true
 install: true
 script:
 - script/cibuild
+- sleep 3
 branches:
   only:
   - master
-  - development
 notifications:
   slack:
     secure: XLY5Matw/LaMdDWMkTu2t6OwOGfk9c6bvzW7MBRqHYV85W22VS2BbnbotTmRgVq4tY8EehJmuMVdBMJ04ojXwtw3tyPRdYrA0OyR+eis+OCN0M0wPDDbYNPihMD+nAmLf7MjRnCH/esV0ENJ1/x2oODX6NwwqThi8jgoxpnWAoZWUsneH6/YGtk66ZDbKs7MN637/x7Sd/uCpVpmrREA3yQARJwvrYD88JmGGQ7v1OOZWK09lGUC2L5omaVVeponUKMbX0VN2pkcVKxhiOhVWLVVcQxNvofAu3kdAde8Cde/wQQ1YbihZ7cZYp9BtSuhySTKygMfMRur9oACpA/Qx04ajTPV0m6vDJDCrWipmumJceKcNAk4xw568kwMzknnhLCAS36vMKxp1LvmQHkaRb6T+DkdIHoCBMOb/kOGSlLVyuaO2vOkbHZ0Gy9ZaQwFEwYM2+IUMu45hi8DSIUMEvRN9b5W39CecYLVvE9j//+eqCQbv1cYhqzImzo9/jjPU0YBeD+6LdYnNOR37jWJ7YzWJ1dybezfM1enj13K/+2Wum3qbc97Q+qp88nOFeFktg8KSTFOTz+XbSsLiXI40pYbNqkVpfyzC/mlEnJTZd751E2ZkOLpY9Hdx1ubrUOJjaiisleDNBJFrTsVkMHpVJBaYM5ZYO6XLmCgRJAxhCw=
