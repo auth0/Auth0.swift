@@ -594,9 +594,9 @@
 			productReference = 5F06DD781CC448B10011842B /* Auth0.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		5F06DD841CC448C90011842B /* Auth0.OSX */ = {
+		5F06DD841CC448C90011842B /* Auth0.macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5F06DD8A1CC448C90011842B /* Build configuration list for PBXNativeTarget "Auth0.OSX" */;
+			buildConfigurationList = 5F06DD8A1CC448C90011842B /* Build configuration list for PBXNativeTarget "Auth0.macOS" */;
 			buildPhases = (
 				5F06DD801CC448C90011842B /* Sources */,
 				5F06DD811CC448C90011842B /* Frameworks */,
@@ -607,7 +607,7 @@
 			);
 			dependencies = (
 			);
-			name = Auth0.OSX;
+			name = Auth0.macOS;
 			productName = Auth0.OSX;
 			productReference = 5F06DD851CC448C90011842B /* Auth0.framework */;
 			productType = "com.apple.product-type.framework";
@@ -632,9 +632,9 @@
 			productReference = 5F06DDA01CC451540011842B /* Auth0Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		5F06DDAE1CC451700011842B /* Auth0Tests.OSX */ = {
+		5F06DDAE1CC451700011842B /* Auth0Tests.macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5F06DDB71CC451700011842B /* Build configuration list for PBXNativeTarget "Auth0Tests.OSX" */;
+			buildConfigurationList = 5F06DDB71CC451700011842B /* Build configuration list for PBXNativeTarget "Auth0Tests.macOS" */;
 			buildPhases = (
 				5F06DDAB1CC451700011842B /* Sources */,
 				5F06DDAC1CC451700011842B /* Frameworks */,
@@ -646,7 +646,7 @@
 			dependencies = (
 				5F06DDB61CC451700011842B /* PBXTargetDependency */,
 			);
-			name = Auth0Tests.OSX;
+			name = Auth0Tests.macOS;
 			productName = Auth0Tests.OSX;
 			productReference = 5F06DDAF1CC451700011842B /* Auth0Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -712,9 +712,9 @@
 			projectRoot = "";
 			targets = (
 				5F06DD771CC448B10011842B /* Auth0.iOS */,
-				5F06DD841CC448C90011842B /* Auth0.OSX */,
+				5F06DD841CC448C90011842B /* Auth0.macOS */,
 				5F06DD9F1CC451540011842B /* Auth0Tests.iOS */,
-				5F06DDAE1CC451700011842B /* Auth0Tests.OSX */,
+				5F06DDAE1CC451700011842B /* Auth0Tests.macOS */,
 				5F3965C61CF67DD800CDE7C0 /* OAuth2 */,
 			);
 		};
@@ -908,7 +908,7 @@
 		};
 		5F06DDB61CC451700011842B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5F06DD841CC448C90011842B /* Auth0.OSX */;
+			target = 5F06DD841CC448C90011842B /* Auth0.macOS */;
 			targetProxy = 5F06DDB51CC451700011842B /* PBXContainerItemProxy */;
 		};
 		5F53F5D01CFD199700476A46 /* PBXTargetDependency */ = {
@@ -1287,7 +1287,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5F06DD8A1CC448C90011842B /* Build configuration list for PBXNativeTarget "Auth0.OSX" */ = {
+		5F06DD8A1CC448C90011842B /* Build configuration list for PBXNativeTarget "Auth0.macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5F06DD8B1CC448C90011842B /* Debug */,
@@ -1305,7 +1305,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5F06DDB71CC451700011842B /* Build configuration list for PBXNativeTarget "Auth0Tests.OSX" */ = {
+		5F06DDB71CC451700011842B /* Build configuration list for PBXNativeTarget "Auth0Tests.macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5F06DDB81CC451700011842B /* Debug */,
