@@ -20,6 +20,9 @@ scheme_destination ()
   *OSX) 
     destination=$OSX_DESTINATION
     ;;
+  *macOS) 
+    destination=$OSX_DESTINATION
+    ;;
   *) 
     destination=$IOS_DESTINATION
     ;;
