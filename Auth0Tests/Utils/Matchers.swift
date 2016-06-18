@@ -126,26 +126,26 @@ func hasBearerToken(token: String) -> OHHTTPStubsTestBlock {
     }
 }
 
-func haveError<T>(code code: String, description: String) -> MatcherFunc<Result<T, Authentication.Error>> {
+func haveAuthenticationError<T>(code code: String, description: String) -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "an error response with code <\(code)> and description <\(description)>"
-        if let actual = try expression.evaluate(), case .Failure(let cause) = actual, case .Response(let actualCode, let actualDescription, _ , _) = cause {
-            return code == actualCode && description == actualDescription
+        if let actual = try expression.evaluate(), case .Failure(let cause as AuthenticationError) = actual {
+            return code == cause.code && description == cause.description
         }
         return false
     }
 }
 
-func haveError<T>(error: String, description: String, code: String, statusCode: Int) -> MatcherFunc<Result<T, Management.Error>> {
-    return beFailure("server error response") { cause in
-        if case .Response(let actualError, let actualDescription, let actualCode, let actualStatusCode) = cause {
-            return error == actualError && code == actualCode && description == actualDescription && statusCode == actualStatusCode
-        }
-        return false
+func haveManagementError<T>(error: String, description: String, code: String, statusCode: Int) -> MatcherFunc<Result<T>> {
+    return beFailure("server error response") { (cause: ManagementError) in
+        return error == (cause.info["error"] as? String)
+            && code == (cause.info["code"] as? String)
+            && description == (cause.info["description"] as? String)
+            && statusCode == (cause.info["statusCode"] as? Int)
     }
 }
 
-func haveCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> MatcherFunc<Result<Credentials, Authentication.Error>> {
+func haveCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> MatcherFunc<Result<Credentials>> {
     return MatcherFunc { expression, failureMessage in
         var message = "a successful authentication result"
         if let accessToken = accessToken {
@@ -162,7 +162,7 @@ func haveCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> Ma
     }
 }
 
-func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Result<DatabaseUser, Authentication.Error>> {
+func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Result<DatabaseUser>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have created user with email <\(email)>"
         if let actual = try expression.evaluate(), case .Success(let created) = actual {
@@ -172,7 +172,7 @@ func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Resu
     }
 }
 
-func beSuccessfulResult<T>() -> MatcherFunc<Result<T, Authentication.Error>> {
+func beSuccessfulResult<T>() -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "be a successful result"
         if let actual = try expression.evaluate(), case .Success = actual {
@@ -182,16 +182,16 @@ func beSuccessfulResult<T>() -> MatcherFunc<Result<T, Authentication.Error>> {
     }
 }
 
-func beInvalidResponse<T>() -> MatcherFunc<Result<T, Management.Error>> {
-    return beFailure("invalid response") { cause in
-        if case .InvalidResponse = cause {
+func beInvalidResponse<T>() -> MatcherFunc<Result<T>> {
+    return beFailure("invalid response") { (cause: AuthenticationError) in
+        if cause.code == NonJSONError {
             return true
         }
         return false
     }
 }
 
-func beSuccessful<T>() -> MatcherFunc<Result<T, Management.Error>> {
+func beSuccessful<T>() -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "be a successful result"
         if let actual = try expression.evaluate(), case .Success = actual {
@@ -201,35 +201,49 @@ func beSuccessful<T>() -> MatcherFunc<Result<T, Management.Error>> {
     }
 }
 
-func beFailure<T>(cause: String? = nil, predicate: Authentication.Error -> Bool = { _ in return true }) -> MatcherFunc<Result<T, Authentication.Error>> {
+func beFailure<T>(cause: String? = nil) -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         if let cause = cause {
             failureMessage.postfixMessage = "be a failure result with cause \(cause)"
         } else {
             failureMessage.postfixMessage = "be a failure result from auth api"
         }
-        if let actual = try expression.evaluate(), case .Failure(let cause) = actual {
+        if let actual = try expression.evaluate(), case .Failure = actual {
+            return true
+        }
+        return false
+    }
+}
+
+func beFailure<T>(cause: String? = nil, predicate: AuthenticationError -> Bool) -> MatcherFunc<Result<T>> {
+    return MatcherFunc { expression, failureMessage in
+        if let cause = cause {
+            failureMessage.postfixMessage = "be a failure result with cause \(cause)"
+        } else {
+            failureMessage.postfixMessage = "be a failure result from auth api"
+        }
+        if let actual = try expression.evaluate(), case .Failure(let cause as AuthenticationError) = actual {
             return predicate(cause)
         }
         return false
     }
 }
 
-func beFailure<T>(cause: String? = nil, predicate: Management.Error -> Bool = { _ in return true }) -> MatcherFunc<Result<T, Management.Error>> {
+func beFailure<T>(cause: String? = nil, predicate: ManagementError -> Bool) -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         if let cause = cause {
             failureMessage.postfixMessage = "be a failure result with cause \(cause)"
         } else {
             failureMessage.postfixMessage = "be a failure result from mgmt api"
         }
-        if let actual = try expression.evaluate(), case .Failure(let cause) = actual {
+        if let actual = try expression.evaluate(), case .Failure(let cause as ManagementError) = actual {
             return predicate(cause)
         }
         return false
     }
 }
 
-func haveProfile(userId: String) -> MatcherFunc<Result<UserProfile, Authentication.Error>> {
+func haveProfile(userId: String) -> MatcherFunc<Result<UserProfile>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have user profile for user id <\(userId)>"
         if let actual = try expression.evaluate(), case .Success(let profile) = actual {
@@ -239,7 +253,7 @@ func haveProfile(userId: String) -> MatcherFunc<Result<UserProfile, Authenticati
     }
 }
 
-func haveObjectWithAttributes(attributes: [String]) -> MatcherFunc<Result<[String: AnyObject], Management.Error>> {
+func haveObjectWithAttributes(attributes: [String]) -> MatcherFunc<Result<[String: AnyObject]>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have attribues \(attributes)"
         if let actual = try expression.evaluate(), case .Success(let value) = actual {

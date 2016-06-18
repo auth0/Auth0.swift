@@ -90,7 +90,7 @@ class UsersSpec: QuickSpec {
                 stub(isUsersPath(Domain, identifier: NonExistentUser) && isMethodGET()) { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
                 waitUntil(timeout: Timeout) { done in
                     users.get(NonExistentUser).start { result in
-                        expect(result).to(haveError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
+                        expect(result).to(haveManagementError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
                         done()
                     }
                 }
@@ -131,7 +131,7 @@ class UsersSpec: QuickSpec {
                 stub(isUsersPath(Domain, identifier: NonExistentUser) && isMethodPATCH()) { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
                 waitUntil(timeout: Timeout) { done in
                     users.patch(NonExistentUser, attributes: UserPatchAttributes().blocked(true)).start { result in
-                        expect(result).to(haveError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
+                        expect(result).to(haveManagementError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
                         done()
                     }
                 }
@@ -179,7 +179,7 @@ class UsersSpec: QuickSpec {
                 { _ in managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)}
                 waitUntil(timeout: Timeout) { done in
                     users.link(NonExistentUser, withOtherUserToken: "token").start { result in
-                        expect(result).to(haveError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
+                        expect(result).to(haveManagementError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
                         done()
                     }
                 }

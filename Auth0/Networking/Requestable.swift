@@ -24,7 +24,6 @@ import Foundation
 
 protocol Requestable {
     associatedtype T
-    associatedtype E: ErrorType
 
-    func start(callback: Result<T, E> -> ())
+    func start(callback: Result<T> -> ())
 }

@@ -36,18 +36,18 @@ import Foundation
  }
  ```
  */
-public struct Request<T, Error: ErrorType>: Requestable {
-    public typealias Callback = Result<T, Error> -> ()
+public struct Request<T, E: ResponseError>: Requestable {
+    public typealias Callback = Result<T> -> ()
 
     let session: NSURLSession
     let url: NSURL
     let method: String
-    let handle: (Response, Callback) -> ()
+    let handle: (Response<E>, Callback) -> ()
     let payload: [String: AnyObject]
     let headers: [String: String]
     let logger: Logger?
 
-    init(session: NSURLSession, url: NSURL, method: String, handle: (Response, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:], logger: Logger? = Auth0Logger.sharedInstance.logger) {
+    init(session: NSURLSession, url: NSURL, method: String, handle: (Response<E>, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:], logger: Logger? = Auth0Logger.sharedInstance.logger) {
         self.session = session
         self.url = url
         self.method = method
@@ -92,32 +92,21 @@ public struct Request<T, Error: ErrorType>: Requestable {
         task.resume()
     }
 
-    /**
-     Starts another request after this request completes successfuly.
-
-     - parameter request: request to start next
-
-     - returns: a concatenated request that will yield the last request result
-     */
-    public func concat<S>(request: Request<S, Error>) -> ConcatRequest<T, S, Error> {
-        return ConcatRequest(first: self, second: request)
-    }
-    
 }
 
 /**
  *  A concatenated request, if the first one fails it will yield it's error, otherwise it will return the last request outcome
  */
-public struct ConcatRequest<F, S, Error: ErrorType>: Requestable {
-    let first: Request<F, Error>
-    let second: Request<S, Error>
+public struct ConcatRequest<F, S, E: ResponseError>: Requestable {
+    let first: Request<F, E>
+    let second: Request<S, E>
 
     /**
      Starts the request to the server
 
      - parameter callback: called when the request finishes and yield it's result
      */
-    func start(callback: Result<S, Error> -> ()) {
+    func start(callback: Result<S> -> ()) {
         let second = self.second
         first.start { result in
             switch result {

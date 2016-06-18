@@ -1,4 +1,4 @@
-// NSError+Authentication.swift
+// ManagementError.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,19 +22,30 @@
 
 import Foundation
 
-public extension NSError {
+public class ManagementError: ResponseError {
 
-    func a0_authenticationError() -> Bool {
-        return self.domain == AuthenticationError.Domain
+    static let Domain = "com.auth0.management"
+    static let UserInfoKey = "com.auth0.management.error.info"
+
+    let info: [String: AnyObject]
+    
+    public required init(string: String? = nil, statusCode: Int = 0) {
+        self.info = [
+            "code": string != nil ? NonJSONError : EmptyBodyError,
+            "description": string ?? "Empty response body",
+            "statusCode": statusCode
+            ]
     }
 
-    func a0_authenticationErrorWithCode(code: String) -> Bool {
-        return self.a0_authenticationError() && a0_authenticationErrorCode() == code
+    public required init(info: [String: AnyObject]) {
+        self.info = info
     }
 
-    func a0_authenticationErrorCode() -> String? {
-        guard let error = self.userInfo[AuthenticationError.UserInfoKey] as? AuthenticationError else { return nil }
-        return error.code
+    public var foundationError: NSError {
+        return NSError(domain: ManagementError.Domain, code: 1, userInfo: [
+            NSLocalizedDescriptionKey: "",
+            ManagementError.UserInfoKey: self,
+            ])
     }
 
 }

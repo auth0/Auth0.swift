@@ -22,71 +22,39 @@
 
 import Foundation
 
-func authenticationObject<T: JSONObjectPayload>(response: Response, callback: Request<T, Authentication.Error>.Callback) {
-    switch response.result {
-    case .Success(let payload):
-        if let dictionary = payload as? [String: AnyObject], let object = T(json: dictionary) {
+func authenticationObject<T: JSONObjectPayload>(response: Response<AuthenticationError>, callback: Request<T, AuthenticationError>.Callback) {
+    do {
+        if let dictionary = try response.result() as? [String: AnyObject], let object = T(json: dictionary) {
             callback(.Success(result: object))
         } else {
-            callback(.Failure(error: .InvalidResponse(response: response.data)))
+            callback(.Failure(error: AuthenticationError(string: string(response.data))))
         }
-    case .Failure(let cause):
-        callback(.Failure(error: authenticationError(response.data, cause: cause)))
+
+    } catch let error {
+        callback(.Failure(error: error))
     }
 }
 
-func databaseUser(response: Response, callback: Request<DatabaseUser, Authentication.Error>.Callback) {
-    switch response.result {
-    case .Success(let payload):
-        if let dictionary = payload as? [String: AnyObject], let email = dictionary["email"] as? String {
+func databaseUser(response: Response<AuthenticationError>, callback: Request<DatabaseUser, AuthenticationError>.Callback) {
+    do {
+        if let dictionary = try response.result() as? [String: AnyObject], let email = dictionary["email"] as? String {
             let username = dictionary["username"] as? String
             let verified = dictionary["email_verified"] as? Bool ?? false
             callback(.Success(result: (email: email, username: username, verified: verified)))
         } else {
-            callback(.Failure(error: .InvalidResponse(response: response.data)))
+            callback(.Failure(error: AuthenticationError(string: string(response.data))))
         }
-    case .Failure(let cause):
-        callback(.Failure(error: authenticationError(response.data, cause: cause)))
+
+    } catch let error {
+        callback(.Failure(error: error))
     }
 }
 
-func noBody(response: Response, callback: Request<Void, Authentication.Error>.Callback) {
-    switch response.result {
-    case .Success:
+func noBody(response: Response<AuthenticationError>, callback: Request<Void, AuthenticationError>.Callback) {
+    do {
+        let _ = try response.result()
         callback(.Success(result: ()))
-    case .Failure(let cause):
-        callback(.Failure(error: authenticationError(response.data, cause: cause)))
+    } catch let error {
+        callback(.Failure(error: error))
     }
-}
-
-private func authenticationError(data: NSData?, cause: Response.Error) -> Authentication.Error {
-    switch cause {
-    case .InvalidJSON(let data):
-        return .InvalidResponse(response: data)
-    case .ServerError(let status, let data) where (400...500).contains(status) && data != nil:
-        if
-            let json = try? NSJSONSerialization.JSONObjectWithData(data!, options: []),
-            let payload = json as? [String: AnyObject] {
-            return payloadError(payload, cause: cause)
-        } else {
-            return .RequestFailed(cause: cause)
-        }
-    default:
-        return .RequestFailed(cause: cause)
-    }
-}
-
-private func payloadError(payload: [String: AnyObject], cause: ErrorType) -> Authentication.Error {
-    if let code = payload["error"] as? String, let description = payload["error_description"] as? String {
-        return .Response(code: code, description: description, name: nil, extras: nil)
-    }
-
-    if let code = payload["code"] as? String, let description = payload["description"] as? String {
-        let name = payload["name"] as? String
-        var extras = payload
-        ["code", "description", "name"].forEach { extras.removeValueForKey($0) }
-        return .Response(code: code, description: description, name: name, extras: extras)
-    }
-
-    return .RequestFailed(cause: cause)
 }

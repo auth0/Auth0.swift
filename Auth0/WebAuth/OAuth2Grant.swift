@@ -24,17 +24,18 @@ import Foundation
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
-    func credentials(values: [String: String], callback: Result<Credentials, Authentication.Error> -> ())
+    func credentials(values: [String: String], callback: Result<Credentials> -> ())
 }
 
 struct ImplicitGrant: OAuth2Grant {
 
     let defaults: [String : String] = ["response_type": "token"]
 
-    func credentials(values: [String : String], callback: Result<Credentials, Authentication.Error> -> ()) {
+    func credentials(values: [String : String], callback: Result<Credentials> -> ()) {
         guard let credentials = Credentials(json: values) else {
-            let data = try? NSJSONSerialization.dataWithJSONObject(values, options: [])
-            callback(.Failure(error: .InvalidResponse(response: data)))
+            let data = try! NSJSONSerialization.dataWithJSONObject(values, options: [])
+            let string = String(data: data, encoding: NSUTF8StringEncoding)
+            callback(.Failure(error: AuthenticationError(string: string)))
             return
         }
         callback(.Success(result: credentials))
@@ -66,12 +67,13 @@ struct PKCE: OAuth2Grant {
         self.verifier = verifier
     }
 
-    func credentials(values: [String: String], callback: Result<Credentials, Authentication.Error> -> ()) {
+    func credentials(values: [String: String], callback: Result<Credentials> -> ()) {
         guard
             let code = values["code"]
             else {
-                let data = try? NSJSONSerialization.dataWithJSONObject(values, options: [])
-                return callback(.Failure(error: .InvalidResponse(response: data)))
+                let data = try! NSJSONSerialization.dataWithJSONObject(values, options: [])
+                let string = String(data: data, encoding: NSUTF8StringEncoding)
+                return callback(.Failure(error: AuthenticationError(string: string)))
             }
         Authentication(clientId: clientId, url: url)
             .exchangeCode(code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)

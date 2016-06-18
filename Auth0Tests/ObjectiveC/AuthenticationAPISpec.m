@@ -112,9 +112,8 @@ describe(@"login", ^{
                               expect(credentials).to(beNil());
                               expect(error).toNot(beNil());
                               expect(error.domain).to(equal(@"com.auth0.authentication"));
-                              expect(@(error.code)).to(equal(@(A0AuthenticationErrorCodeErrorResponse)));
                               expect(error.a0_authenticationErrorCode).to(equal(@"invalid_username_password"));
-                              expect(error.a0_authenticationErrorDescription).to(equal(@"invalid password"));
+                              expect(error.localizedDescription).to(equal(@"invalid password"));
                               done();
                           }];
         });
@@ -172,9 +171,8 @@ describe(@"create user", ^{
                                 expect(databaseUser).to(beNil());
                                 expect(error).toNot(beNil());
                                 expect(error.domain).to(equal(@"com.auth0.authentication"));
-                                expect(@(error.code)).to(equal(@(A0AuthenticationErrorCodeErrorResponse)));
                                 expect(error.a0_authenticationErrorCode).to(equal(@"invalid_username_password"));
-                                expect(error.a0_authenticationErrorDescription).to(equal(@"invalid password"));
+                                expect(error.localizedDescription).to(equal(@"invalid password"));
                                 done();
                             }];
         });
@@ -224,9 +222,8 @@ describe(@"reset password", ^{
                                callback:^(NSError * _Nullable error) {
                                    expect(error).toNot(beNil());
                                    expect(error.domain).to(equal(@"com.auth0.authentication"));
-                                   expect(@(error.code)).to(equal(@(A0AuthenticationErrorCodeErrorResponse)));
                                    expect(error.a0_authenticationErrorCode).to(equal(@"invalid_username_password"));
-                                   expect(error.a0_authenticationErrorDescription).to(equal(@"invalid password"));
+                                   expect(error.localizedDescription).to(equal(@"invalid password"));
                                    done();
                                }];
         });
@@ -296,9 +293,8 @@ describe(@"signup", ^{
                             expect(credentials).to(beNil());
                             expect(error).toNot(beNil());
                             expect(error.domain).to(equal(@"com.auth0.authentication"));
-                            expect(@(error.code)).to(equal(@(A0AuthenticationErrorCodeErrorResponse)));
                             expect(error.a0_authenticationErrorCode).to(equal(@"invalid_username_password"));
-                            expect(error.a0_authenticationErrorDescription).to(equal(@"invalid password"));
+                            expect(error.localizedDescription).to(equal(@"invalid password"));
                             done();
                         }];
         });

@@ -60,46 +60,28 @@ public struct Management {
      */
     public func users() -> Users { return Users(management: self) }
 
-    func managementObject(response: Response, callback: Request<Object, Error>.Callback) {
-        switch response.result {
-        case .Success(let payload):
-            if let dictionary = payload as? Object {
+    func managementObject(response: Response<ManagementError>, callback: Request<Object, ManagementError>.Callback) {
+        do {
+            if let dictionary = try response.result() as? Object {
                 callback(.Success(result: dictionary))
             } else {
-                callback(.Failure(error: .InvalidResponse(response: response.data)))
+                callback(.Failure(error: ManagementError(string: string(response.data))))
             }
-        case .Failure(let cause):
-            callback(.Failure(error: managementError(response.data, cause: cause)))
+        } catch let error {
+            callback(.Failure(error: error))
         }
     }
 
-    func managementObjects(response: Response, callback: Request<[Object], Error>.Callback) {
-        switch response.result {
-        case .Success(let payload):
-            if let list = payload as? [Object] {
+    func managementObjects(response: Response<ManagementError>, callback: Request<[Object], ManagementError>.Callback) {
+        do {
+            if let list = try response.result() as? [Object] {
                 callback(.Success(result: list))
             } else {
-                callback(.Failure(error: .InvalidResponse(response: response.data)))
+                callback(.Failure(error: ManagementError(string: string(response.data))))
             }
-        case .Failure(let cause):
-            callback(.Failure(error: managementError(response.data, cause: cause)))
+        } catch let error {
+            callback(.Failure(error: error))
         }
     }
-
-    private func managementError(data: NSData?, cause: Response.Error) -> Error {
-        switch cause {
-        case .InvalidJSON(let data):
-            return .InvalidResponse(response: data)
-        case .ServerError(let status, let data) where (400...500).contains(status) && data != nil:
-            if
-                let json = try? NSJSONSerialization.JSONObjectWithData(data!, options: []),
-                let payload = json as? [String: AnyObject], let error = payload["error"] as? String, let message = payload["description"] as? String, let code = payload["code"] as? String {
-                return .Response(error: error, description: message, code: code, statusCode: status)
-            } else {
-                return .RequestFailed(cause: cause)
-            }
-        default:
-            return .RequestFailed(cause: cause)
-        }
-    }
+    
 }

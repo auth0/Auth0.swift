@@ -57,8 +57,10 @@ public class _ObjectiveAuthenticationAPI: NSObject {
                         info["username"] = username
                     }
                     callback(nil, info)
-                case .Failure(let cause):
+                case .Failure(let cause as ResponseError):
                     callback(cause.foundationError, nil)
+                case .Failure(let cause):
+                    callback(cause as NSError, nil)
                 }
             }
     }
@@ -125,21 +127,27 @@ public class _ObjectiveAuthenticationAPI: NSObject {
 
 }
 
-private func handleResult<T>(callback: (NSError?, T?) -> ()) -> Result<T, Authentication.Error> -> () {
+private func handleResult<T>(callback: (NSError?, T?) -> ()) -> Result<T> -> () {
     return { result in
         switch result {
         case .Success(let payload):
             callback(nil, payload)
-        case .Failure(let cause):
+        case .Failure(let cause as ResponseError):
             callback(cause.foundationError, nil)
+        case .Failure(let cause):
+            callback(cause as NSError, nil)
         }
     }
 }
 
-private func handleResult(callback: (NSError?) -> ()) -> Result<Void, Authentication.Error> -> () {
+private func handleResult(callback: (NSError?) -> ()) -> Result<Void> -> () {
     return { result in
-        if case .Failure(let cause) = result {
+        if case .Failure(let cause as ResponseError) = result {
             callback(cause.foundationError)
+            return
+        }
+        if case .Failure(let cause) = result {
+            callback(cause as NSError)
             return
         }
         callback(nil)

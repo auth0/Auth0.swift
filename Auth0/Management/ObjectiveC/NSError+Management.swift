@@ -22,76 +22,19 @@
 
 import Foundation
 
-private let domain = "com.auth0.management"
-private let errorKey = "com.auth0.management.error.error"
-private let descriptionKey = "com.auth0.management.error.description"
-private let codeKey = "com.auth0.management.error.code"
-private let statusCodeKey = "com.auth0.management.error.statusCode"
-private let responseDataKey = "com.auth0.management.error.responseData"
-private let causeKey = "com.auth0.management.error.cause"
-
-@objc(A0ManagementErrorCode)
-public enum _ManagementErrorCode: Int {
-    case ErrorResponse = 0
-    case InvalidResponse = 1
-    case RequestFailed = 2
-}
-
-extension Management.Error {
-    var foundationError: NSError {
-        var userInfo: [NSObject: AnyObject]
-        var errorCode: _ManagementErrorCode
-
-        switch self {
-        case .Response(let error, let description, let code, let statusCode):
-            errorCode = .ErrorResponse
-            userInfo = [
-                codeKey: code,
-                errorKey: error,
-                statusCodeKey: statusCode,
-                descriptionKey: description,
-                NSLocalizedDescriptionKey: description
-            ]
-        case .InvalidResponse(let data):
-            errorCode = .InvalidResponse
-            userInfo = [ NSLocalizedDescriptionKey: "Invalid JSON response from Auth0 server"]
-            if let data = data {
-                userInfo[responseDataKey] = data
-            }
-        case .RequestFailed(let cause):
-            errorCode = .RequestFailed
-            let error = cause as NSError
-            userInfo = [
-                NSLocalizedDescriptionKey: error.localizedDescription,
-                causeKey: error
-            ]
-        }
-
-        return NSError(
-            domain: domain,
-            code: errorCode.rawValue,
-            userInfo: userInfo
-        )
-
-    }
-}
-
 public extension NSError {
 
     func a0_managementError() -> Bool {
         return self.domain == domain
     }
 
-    func a0_managementErrorWithCode(code: Int) -> Bool {
-        return self.a0_authenticationError() && self.code == code
+    func a0_managementErrorWithCode(code: String) -> Bool {
+        return self.a0_authenticationError() && a0_managementErrorCode() == code
     }
 
     func a0_managementErrorCode() -> String? {
-        return self.userInfo[codeKey] as? String
+        guard let error = self.userInfo[ManagementError.UserInfoKey] as? ManagementError else { return nil }
+        return error.info["code"] as? String
     }
 
-    func a0_managementDescription() -> String? {
-        return self.userInfo[descriptionKey] as? String
-    }
-    
 }

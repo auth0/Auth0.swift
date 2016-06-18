@@ -28,7 +28,7 @@ import Foundation
  - Success: request completed successfuly with it's response body
  - Failure: request failed with a specific error
  */
-public enum Result<T, E: ErrorType> {
+public enum Result<T> {
     case Success(result: T)
-    case Failure(error: E)
+    case Failure(error: ErrorType)
 }

@@ -22,14 +22,17 @@
 
 import Foundation
 
+let UnknownCode = "a0.internal_error.unknown"
+let NonJSONError = "a0.internal_error.plain"
+let EmptyBodyError = "a0.internal_error.empty"
+
 /**
  *  Represents an error during a request to Auth0 Authentication API
  */
-public struct AuthenticationError: ErrorType, CustomStringConvertible {
+public class AuthenticationError: ResponseError, CustomStringConvertible {
 
-    static let UnknownCode = "a0.internal_error.unknown"
-    static let NonJSONError = "a0.internal_error.plain"
-    static let EmptyBodyError = "a0.internal_error.empty"
+    static let Domain = "com.auth0.authentication"
+    static let UserInfoKey = "com.auth0.authentication.error.info"
 
     /**
      Additional information about the error
@@ -37,15 +40,15 @@ public struct AuthenticationError: ErrorType, CustomStringConvertible {
      */
     public let info: [String: AnyObject]
 
-    init(string: String? = nil, statusCode: Int = 0) {
-        self.init(info: [
-            "code": string != nil ? AuthenticationError.NonJSONError : AuthenticationError.EmptyBodyError,
+    public required init(string: String? = nil, statusCode: Int = 0) {
+        self.info = [
+            "code": string != nil ? NonJSONError : EmptyBodyError,
             "description": string ?? "Empty response body",
             "statusCode": statusCode
-        ])
+        ]
     }
 
-    init(info: [String: AnyObject]) {
+    public required init(info: [String: AnyObject]) {
         self.info = info
     }
 
@@ -54,7 +57,7 @@ public struct AuthenticationError: ErrorType, CustomStringConvertible {
      */
     public var code: String {
         let code = self.info["error"] ?? self.info["code"]
-        return code as? String ?? AuthenticationError.UnknownCode
+        return code as? String ?? UnknownCode
     }
 
     /**
@@ -67,8 +70,15 @@ public struct AuthenticationError: ErrorType, CustomStringConvertible {
             return string
         }
 
-        guard self.code == AuthenticationError.UnknownCode else { return "Received error with code \(self.code)" }
+        guard self.code == UnknownCode else { return "Received error with code \(self.code)" }
 
         return "Failed with unknown error \(self.info)"
+    }
+
+    public var foundationError: NSError {
+        return NSError(domain: AuthenticationError.Domain, code: 1, userInfo: [
+            NSLocalizedDescriptionKey: self.description,
+            AuthenticationError.UserInfoKey: self,
+            ])
     }
 }

@@ -146,7 +146,7 @@ class WebAuthSpec: QuickSpec {
         
         describe("safari") {
 
-            var result: Result<Credentials, Authentication.Error>?
+            var result: Result<Credentials>?
 
             beforeEach { result = nil }
 
