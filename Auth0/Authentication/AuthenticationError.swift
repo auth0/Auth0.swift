@@ -25,7 +25,7 @@ import Foundation
 /**
  *  Represents an error during a request to Auth0 Authentication API
  */
-public class AuthenticationError: Auth0Error, CustomStringConvertible {
+public class AuthenticationError: NSObject, Auth0Error {
 
     /**
      Additional information about the error
@@ -72,7 +72,7 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
      Description of the error
      - important: You should avoid displaying description to the user, it's meant for debugging only.
      */
-    public var description: String {
+    public override var description: String {
         let description = self.info["description"] ?? self.info["error_description"]
         if let string = description as? String {
             return string
@@ -134,8 +134,8 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
 }
 
 extension AuthenticationError: FoundationErrorConvertible {
-    static let FoundationDomain = "com.auth0.authentication"
-    static let FoundationUserInfoKey = "com.auth0.authentication.error.info"
+    @nonobjc static let FoundationDomain = "com.auth0.authentication"
+    @nonobjc static let FoundationUserInfoKey = "com.auth0.authentication.error.info"
     
     public func newFoundationError() -> NSError {
         return NSError(domain: AuthenticationError.FoundationDomain, code: 1, userInfo: [

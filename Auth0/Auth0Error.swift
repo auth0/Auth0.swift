@@ -38,9 +38,6 @@ public protocol Auth0Error: ErrorType {
     /// The code of the error as a String
     var code: String { get }
     
-    /// A basic description of the error.
-    var description: String { get }
-
 }
 
 internal protocol FoundationErrorConvertible {

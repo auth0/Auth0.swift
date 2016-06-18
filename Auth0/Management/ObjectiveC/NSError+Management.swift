@@ -24,17 +24,23 @@ import Foundation
 
 public extension NSError {
 
-    func a0_managementError() -> Bool {
-        return self.domain == domain
+    /**
+     Check if the NSError was created from an ManagementError
+
+     - returns: if it's an management error from Auth0
+     */
+    func a0_isManagementError() -> Bool {
+        return self.domain == ManagementError.FoundationDomain
     }
 
-    func a0_managementErrorWithCode(code: String) -> Bool {
-        return self.a0_authenticationError() && a0_managementErrorCode() == code
-    }
+    /**
+     Returns the Auth0 Managenent Error
 
-    func a0_managementErrorCode() -> String? {
-        guard let error = self.userInfo[ManagementError.FoundationUserInfoKey] as? ManagementError else { return nil }
-        return error.info["code"] as? String
+     - returns: management error
+     - seeAlso: ManagementError
+     */
+    func a0_managementError() -> ManagementError? {
+        return self.userInfo[ManagementError.FoundationUserInfoKey] as? ManagementError
     }
-
+    
 }

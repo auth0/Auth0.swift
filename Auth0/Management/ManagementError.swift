@@ -25,7 +25,7 @@ import Foundation
 /**
  *  Represents an error during a request to Auth0 Management API
  */
-public class ManagementError: Auth0Error {
+public class ManagementError: NSObject, Auth0Error {
 
     /**
      Additional information about the error
@@ -69,7 +69,7 @@ public class ManagementError: Auth0Error {
      Description of the error
      - important: You should avoid displaying description to the user, it's meant for debugging only.
      */
-    public var description: String {
+    public override var description: String {
         if let string = self.info["description"] as? String {
             return string
         }
@@ -79,8 +79,8 @@ public class ManagementError: Auth0Error {
 }
 
 extension ManagementError: FoundationErrorConvertible {
-    static let FoundationDomain = "com.auth0.management"
-    static let FoundationUserInfoKey = "com.auth0.management.error.info"
+    @nonobjc static let FoundationDomain = "com.auth0.management"
+    @nonobjc static let FoundationUserInfoKey = "com.auth0.management.error.info"
     
     func newFoundationError() -> NSError {
         return NSError(domain: ManagementError.FoundationDomain, code: 1, userInfo: [

@@ -24,17 +24,23 @@ import Foundation
 
 public extension NSError {
 
-    func a0_authenticationError() -> Bool {
+    /**
+     Check if the NSError was created from an AuthenticationError
+
+     - returns: if it's an authentication error from Auth0
+     */
+    func a0_isAuthenticationError() -> Bool {
         return self.domain == AuthenticationError.FoundationDomain
     }
 
-    func a0_authenticationErrorWithCode(code: String) -> Bool {
-        return self.a0_authenticationError() && a0_authenticationErrorCode() == code
-    }
+    /**
+     Returns the Auth0 Authentication Error
 
-    func a0_authenticationErrorCode() -> String? {
-        guard let error = self.userInfo[AuthenticationError.FoundationUserInfoKey] as? AuthenticationError else { return nil }
-        return error.code
+     - returns: authentication error
+     - seeAlso: AuthenticationError
+     */
+    func a0_authenticationError() -> AuthenticationError? {
+        return self.userInfo[AuthenticationError.FoundationUserInfoKey] as? AuthenticationError
     }
 
 }
