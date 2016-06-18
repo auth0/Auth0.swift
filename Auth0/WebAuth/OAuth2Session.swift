@@ -85,7 +85,7 @@ class OAuth2Session: NSObject {
     }
 
     func cancel() {
-        self.finish(Result.Failure(error: AuthenticationError()))
+        self.finish(Result.Failure(error: WebAuthError.UserCancelled))
     }
 }
 

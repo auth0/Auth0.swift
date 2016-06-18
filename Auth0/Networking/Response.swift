@@ -33,7 +33,7 @@ func string(data: NSData?) -> String? {
     return String(data: data, encoding: NSUTF8StringEncoding)
 }
 
-struct Response<E: ResponseError> {
+struct Response<E: Auth0Error> {
     let data: NSData?
     let response: NSURLResponse?
     let error: NSError?
@@ -64,11 +64,3 @@ struct Response<E: ResponseError> {
         }
     }
 }
-
-public protocol ResponseError: ErrorType {
-    init(string: String?, statusCode: Int)
-    init(info: [String: AnyObject])
-
-    var foundationError: NSError { get }
-}
-

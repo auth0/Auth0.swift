@@ -1,4 +1,4 @@
-// ManagementError.swift
+// WebAuthError.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,41 +22,36 @@
 
 import Foundation
 
-public class ManagementError: Auth0Error {
-
-    public let info: [String: AnyObject]
-    
-    public required init(string: String? = nil, statusCode: Int = 0) {
-        self.info = [
-            "code": string != nil ? NonJSONError : EmptyBodyError,
-            "description": string ?? "Empty response body",
-            "statusCode": statusCode
-            ]
-    }
-
-    public required init(info: [String: AnyObject]) {
-        self.info = info
-    }
-
-    public var code: String { return self.info["code"] as? String ?? UnknownError }
-
-    public var description: String {
-        if let string = self.info["description"] as? String {
-            return string
-        }
-        return "Failed with unknown error \(self.info)"
-    }
-
+public enum WebAuthError: ErrorType {
+    case NoBundleIdentifierFound
+    case CannotDismissWebAuthController
+    case UserCancelled
 }
 
-extension ManagementError: FoundationErrorConvertible {
-    static let FoundationDomain = "com.auth0.management"
-    static let FoundationUserInfoKey = "com.auth0.management.error.info"
-    
+extension WebAuthError: FoundationErrorConvertible {
+    static let FoundationDomain = "com.auth0.webauth"
+    static let FoundationUserInfoKey = "com.auth0.webauth.error.info"
+    static let GenericFoundationCode = 1
+    static let CancelledFoundationCode = 0
+
     func newFoundationError() -> NSError {
-        return NSError(domain: ManagementError.FoundationDomain, code: 1, userInfo: [
-            NSLocalizedDescriptionKey: self.description,
-            ManagementError.FoundationUserInfoKey: self,
-            ])
+        if case .UserCancelled = self {
+            return NSError(
+                domain: WebAuthError.FoundationDomain,
+                code: WebAuthError.CancelledFoundationCode,
+                userInfo: [
+                    NSLocalizedDescriptionKey: "User Cancelled Web Authentication",
+                    WebAuthError.FoundationUserInfoKey: self as NSError
+                ]
+            )
+        }
+        return NSError(
+            domain: WebAuthError.FoundationDomain,
+            code: WebAuthError.GenericFoundationCode,
+            userInfo: [
+                NSLocalizedDescriptionKey: (self as NSError).localizedDescription,
+                WebAuthError.FoundationUserInfoKey: self as NSError
+            ]
+        )
     }
 }

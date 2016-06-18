@@ -45,7 +45,7 @@ public class _ObjectiveManagementAPI: NSObject {
                 case .Success(let payload):
                     callback(nil, payload)
                 case .Failure(let cause as ManagementError):
-                    callback(cause.foundationError, nil)
+                    callback(cause.newFoundationError(), nil)
                 case .Failure(let cause):
                     callback(cause as NSError, nil)
                 }
@@ -62,7 +62,7 @@ public class _ObjectiveManagementAPI: NSObject {
                 case .Success(let payload):
                     callback(nil, payload)
                 case .Failure(let cause as ManagementError):
-                    callback(cause.foundationError, nil)
+                    callback(cause.newFoundationError(), nil)
                 case .Failure(let cause):
                     callback(cause as NSError, nil)
                 }

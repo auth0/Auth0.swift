@@ -1,4 +1,4 @@
-// NSError+Management.swift
+// Auth0Error.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,19 +22,23 @@
 
 import Foundation
 
-public extension NSError {
+let UnknownError = "a0.sdk.internal_error.unknown"
+let NonJSONError = "a0.sdk.internal_error.plain"
+let EmptyBodyError = "a0.sdk.internal_error.empty"
 
-    func a0_managementError() -> Bool {
-        return self.domain == domain
-    }
+public protocol Auth0Error: ErrorType {
 
-    func a0_managementErrorWithCode(code: String) -> Bool {
-        return self.a0_authenticationError() && a0_managementErrorCode() == code
-    }
+    init(string: String?, statusCode: Int)
+    init(info: [String: AnyObject])
 
-    func a0_managementErrorCode() -> String? {
-        guard let error = self.userInfo[ManagementError.FoundationUserInfoKey] as? ManagementError else { return nil }
-        return error.info["code"] as? String
-    }
+    var code: String { get }
+    var description: String { get }
 
+}
+
+internal protocol FoundationErrorConvertible {
+    static var FoundationDomain: String { get }
+    static var FoundationUserInfoKey: String { get }
+
+    func newFoundationError() -> NSError
 }

@@ -22,17 +22,10 @@
 
 import Foundation
 
-let UnknownCode = "a0.internal_error.unknown"
-let NonJSONError = "a0.internal_error.plain"
-let EmptyBodyError = "a0.internal_error.empty"
-
 /**
  *  Represents an error during a request to Auth0 Authentication API
  */
-public class AuthenticationError: ResponseError, CustomStringConvertible {
-
-    static let Domain = "com.auth0.authentication"
-    static let UserInfoKey = "com.auth0.authentication.error.info"
+public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
     /**
      Additional information about the error
@@ -57,7 +50,7 @@ public class AuthenticationError: ResponseError, CustomStringConvertible {
      */
     public var code: String {
         let code = self.info["error"] ?? self.info["code"]
-        return code as? String ?? UnknownCode
+        return code as? String ?? UnknownError
     }
 
     /**
@@ -70,15 +63,21 @@ public class AuthenticationError: ResponseError, CustomStringConvertible {
             return string
         }
 
-        guard self.code == UnknownCode else { return "Received error with code \(self.code)" }
+        guard self.code == UnknownError else { return "Received error with code \(self.code)" }
 
         return "Failed with unknown error \(self.info)"
     }
 
-    public var foundationError: NSError {
-        return NSError(domain: AuthenticationError.Domain, code: 1, userInfo: [
+}
+
+extension AuthenticationError: FoundationErrorConvertible {
+    static let FoundationDomain = "com.auth0.authentication"
+    static let FoundationUserInfoKey = "com.auth0.authentication.error.info"
+    
+    public func newFoundationError() -> NSError {
+        return NSError(domain: AuthenticationError.FoundationDomain, code: 1, userInfo: [
             NSLocalizedDescriptionKey: self.description,
-            AuthenticationError.UserInfoKey: self,
+            AuthenticationError.FoundationUserInfoKey: self,
             ])
     }
 }

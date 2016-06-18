@@ -107,8 +107,8 @@ public class _ObjectiveOAuth2: NSObject {
             switch result {
             case .Success(let credentials):
                 callback(nil, credentials)
-            case .Failure(let cause as ResponseError):
-                callback(cause.foundationError, nil)
+            case .Failure(let cause as FoundationErrorConvertible):
+                callback(cause.newFoundationError(), nil)
             case .Failure(let cause):
                 callback(cause as NSError, nil)
             }

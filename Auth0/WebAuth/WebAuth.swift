@@ -211,7 +211,7 @@ public class WebAuth {
             let redirectURL = self.redirectURL
             where !redirectURL.absoluteString.hasPrefix(WebAuth.NoBundleIdentifier)
             else {
-                return callback(Result.Failure(error: failureCause("Cannot find iOS Application Bundle Identifier")))
+                return callback(Result.Failure(error: WebAuthError.NoBundleIdentifierFound))
             }
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
@@ -227,10 +227,10 @@ public class WebAuth {
         let controller = SFSafariViewController(URL: authorizeURL)
         let finish: Result<Credentials> -> () = { [weak controller] (result: Result<Credentials>) -> () in
             guard let presenting = controller?.presentingViewController else {
-                return callback(Result.Failure(error: failureCause("Cannot find controller that triggered web flow")))
+                return callback(Result.Failure(error: WebAuthError.CannotDismissWebAuthController))
             }
 
-            if case .Failure(let cause as AuthenticationError) = result where cause.code == "CANCELLED" {
+            if case .Failure(let cause as WebAuthError) = result, case .UserCancelled = cause {
                 dispatch_async(dispatch_get_main_queue()) {
                     callback(result)
                 }
@@ -274,10 +274,6 @@ public class WebAuth {
             .URLByAppendingPathComponent(bundleIdentifier)
             .URLByAppendingPathComponent("callback")
     }
-}
-
-private func failureCause(message: String) -> NSError {
-    return NSError(domain: "com.auth0.oauth2", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
 }
 
 private func generateDefaultState() -> String? {

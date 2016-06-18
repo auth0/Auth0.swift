@@ -25,7 +25,7 @@ import Foundation
 public extension NSError {
 
     func a0_authenticationError() -> Bool {
-        return self.domain == AuthenticationError.Domain
+        return self.domain == AuthenticationError.FoundationDomain
     }
 
     func a0_authenticationErrorWithCode(code: String) -> Bool {
@@ -33,7 +33,7 @@ public extension NSError {
     }
 
     func a0_authenticationErrorCode() -> String? {
-        guard let error = self.userInfo[AuthenticationError.UserInfoKey] as? AuthenticationError else { return nil }
+        guard let error = self.userInfo[AuthenticationError.FoundationUserInfoKey] as? AuthenticationError else { return nil }
         return error.code
     }
 

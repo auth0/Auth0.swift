@@ -36,7 +36,7 @@ import Foundation
  }
  ```
  */
-public struct Request<T, E: ResponseError>: Requestable {
+public struct Request<T, E: Auth0Error>: Requestable {
     public typealias Callback = Result<T> -> ()
 
     let session: NSURLSession
@@ -97,7 +97,7 @@ public struct Request<T, E: ResponseError>: Requestable {
 /**
  *  A concatenated request, if the first one fails it will yield it's error, otherwise it will return the last request outcome
  */
-public struct ConcatRequest<F, S, E: ResponseError>: Requestable {
+public struct ConcatRequest<F, S, E: Auth0Error>: Requestable {
     let first: Request<F, E>
     let second: Request<S, E>
 
