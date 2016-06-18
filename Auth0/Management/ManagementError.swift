@@ -22,10 +22,25 @@
 
 import Foundation
 
+/**
+ *  Represents an error during a request to Auth0 Management API
+ */
 public class ManagementError: Auth0Error {
 
+    /**
+     Additional information about the error
+     - seeAlso: `code` & `description` properties
+     */
     public let info: [String: AnyObject]
     
+    /**
+     Creates a Auth0 Management API error when the request's response is not JSON
+
+     - parameter string:     string representation of the response (or nil)
+     - parameter statusCode: response status code
+
+     - returns: a newly created ManagementError
+     */
     public required init(string: String? = nil, statusCode: Int = 0) {
         self.info = [
             "code": string != nil ? NonJSONError : EmptyBodyError,
@@ -34,12 +49,26 @@ public class ManagementError: Auth0Error {
             ]
     }
 
+    /**
+     Creates a Auth0 Management API error from a JSON response
+
+     - parameter info: JSON response from Auth0
+
+     - returns: a newly created ManagementError
+     */
     public required init(info: [String: AnyObject]) {
         self.info = info
     }
 
+    /**
+     Auth0 error code if the server returned one or an internal library code (e.g.: when the server could not be reached)
+     */
     public var code: String { return self.info["code"] as? String ?? UnknownError }
 
+    /**
+     Description of the error
+     - important: You should avoid displaying description to the user, it's meant for debugging only.
+     */
     public var description: String {
         if let string = self.info["description"] as? String {
             return string

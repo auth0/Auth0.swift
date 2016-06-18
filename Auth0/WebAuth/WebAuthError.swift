@@ -22,6 +22,13 @@
 
 import Foundation
 
+/**
+ List of possible web-based authentication errors
+
+ - NoBundleIdentifierFound:        Cannot get the App's Bundle Identifier to use for redirect_uri.
+ - CannotDismissWebAuthController: When trying to dismiss WebAuth controller, no presenter controller could be found.
+ - UserCancelled:                  User cancelled the web-based authentication, e.g. tapped the "Done" button in SFSafariViewController
+ */
 public enum WebAuthError: ErrorType {
     case NoBundleIdentifierFound
     case CannotDismissWebAuthController

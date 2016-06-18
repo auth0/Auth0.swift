@@ -33,6 +33,14 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
      */
     public let info: [String: AnyObject]
 
+    /**
+     Creates a Auth0 Auth API error when the request's response is not JSON
+
+     - parameter string:     string representation of the response (or nil)
+     - parameter statusCode: response status code
+
+     - returns: a newly created AuthenticationError
+     */
     public required init(string: String? = nil, statusCode: Int = 0) {
         self.info = [
             "code": string != nil ? NonJSONError : EmptyBodyError,
@@ -41,6 +49,13 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
         ]
     }
 
+    /**
+     Creates a Auth0 Auth API error from a JSON response
+
+     - parameter info: JSON response from Auth0
+
+     - returns: a newly created AuthenticationError
+     */
     public required init(info: [String: AnyObject]) {
         self.info = info
     }
