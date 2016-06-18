@@ -55,6 +55,11 @@ class AuthenticationErrorSpec: QuickSpec {
                 ]
             }
 
+            it("should detect access_denied") {
+                let error = AuthenticationError(info: ["error": "access_denied"])
+                expect(error.isAccessDenied) == true
+            }
+
         }
 
         describe("unknown error structure") {
@@ -76,13 +81,74 @@ class AuthenticationErrorSpec: QuickSpec {
 
             itBehavesLike(Auth0ErrorExample) { return [
                     ExampleCodeKey: "invalid_password",
-                    ExampleDescriptionKey: "You may not reuse any of the last 2 passwords. This password was     used a day ago.",
+                    ExampleDescriptionKey: "You may not reuse any of the last 2 passwords. This password was used a day ago.",
                     ExampleExtraKey: [
                         "name": "PasswordHistoryError",
-                        "message":"Password has previously been used",
+                        "message": "Password has previously been used",
                     ]
                 ]
             }
+
+            it("should detect password already used") {
+                let values = [
+                    "code": "invalid_password",
+                    "description": "You may not reuse any of the last 2 passwords. This password was used a day ago.",
+                    "name": "PasswordHistoryError",
+                    "message":"Password has previously been used",
+                    "statusCode": 400,
+                ]
+                let error = AuthenticationError(info: values)
+                expect(error.isPasswordAlreadyUsed) == true
+            }
+
+            it("should detect password already used") {
+                let values = [
+                    "code": "invalid_password",
+                    "description": "You may not reuse any of the last 2 passwords. This password was used a day ago.",
+                    "name": "PasswordHistoryError",
+                    "message":"Password has previously been used",
+                    "statusCode": 400,
+                    ]
+                let error = AuthenticationError(info: values)
+                expect(error.isPasswordAlreadyUsed) == true
+            }
+
+            it("should detect rule error") {
+                let values = [
+                    "error": "unauthorized",
+                    "error_description": "user is blocked"
+                ]
+                let error = AuthenticationError(info: values)
+                expect(error.isRuleError) == true
+            }
+
+            it("should detect mfa required") {
+                let values = [
+                    "error": "a0.mfa_required",
+                    "error_description": "missing mfa_code parameter"
+                ]
+                let error = AuthenticationError(info: values)
+                expect(error.isMultifactorRequired) == true
+            }
+
+            it("should detect mfa enrolled required") {
+                let values = [
+                    "error": "a0.mfa_registration_required",
+                    "error_description": "User is not enrolled with google-authenticator"
+                ]
+                let error = AuthenticationError(info: values)
+                expect(error.isMultifactorEnrollRequired) == true
+            }
+
+            it("should detect mfa invalid code") {
+                let values = [
+                    "error": "a0.mfa_invalid_code",
+                    "error_description": "Wrong or expired code."
+                ]
+                let error = AuthenticationError(info: values)
+                expect(error.isMultifactorCodeInvalid) == true
+            }
+
         }
 
     }
@@ -116,6 +182,14 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
             it("should return all values") {
                 expect(error.info.count) == values.count
             }
+
+            it("should not match any custom error") {
+                expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
+                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")
+                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match pwd history")
+                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid creds")
+            }
+
         }
 
         sharedExamples(Auth0ErrorExample) { (context: SharedExampleContext) in
@@ -161,6 +235,17 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
 
             it("should return all values") {
                 expect(error.info.count) == values.count
+            }
+
+            it("should not match any known error") {
+                expect(error.isMultifactorCodeInvalid).to(beFalse(), description: "should not match mfa invalid")
+                expect(error.isMultifactorEnrollRequired).to(beFalse(), description: "should not match mfa enroll")
+                expect(error.isMultifactorRequired).to(beFalse(), description: "should not match mfa missing")
+                expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
+                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")
+                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match pwd history")
+                expect(error.isAccessDenied).to(beFalse(), description: "should not match acces denied")
+                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid creds")
             }
         }
 

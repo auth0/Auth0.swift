@@ -83,6 +83,54 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
         return "Failed with unknown error \(self.info)"
     }
 
+    /// When MFA code is required to authenticate
+    public var isMultifactorRequired: Bool {
+        return self.code == "a0.mfa_required"
+    }
+
+    /// When MFA is required and the user is not enrolled
+    public var isMultifactorEnrollRequired: Bool {
+        return self.code == "a0.mfa_registration_required"
+    }
+
+    /// When MFA code sent is invalid or expired
+    public var isMultifactorCodeInvalid: Bool {
+        return self.code == "a0.mfa_invalid_code"
+    }
+
+    /// When password used for SignUp does not match connection's strength requirements. More info will be available in `info`
+    public var isPasswordNotStrongEnough: Bool {
+        return self.code == "invalid_password" &&  self.value("name") == "PasswordStrengthError"
+    }
+
+    /// When password used for SignUp was already used before (Reported when password history feature is enabled). More info will be available in `info`
+    public var isPasswordAlreadyUsed: Bool {
+        return self.code == "invalid_password" &&  self.value("name") == "PasswordHistoryError"
+    }
+
+    /// When Auth0 rule returns an error. The message returned by the rull will be in `description`
+    public var isRuleError: Bool {
+        return self.code == "unauthorized"
+    }
+
+    /// When username and/or password used for authentication are invalid
+    public var isInvalidCredentials: Bool {
+        return self.code == "invalid_user_password"
+    }
+
+    /// When authenticating with web-based authentication and the resource server denied access per OAuth2 spec
+    public var isAccessDenied: Bool {
+        return self.code == "access_denied"
+    }
+
+    /**
+     Returns a value from error `info` dictionary
+
+     - parameter key: key of the value to return
+
+     - returns: the value of key or nil if cannot be found or is of the wrong type.
+     */
+    public func value<T>(key: String) -> T? { return self.info[key] as? T }
 }
 
 extension AuthenticationError: FoundationErrorConvertible {
