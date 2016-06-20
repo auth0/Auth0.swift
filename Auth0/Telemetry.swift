@@ -22,7 +22,6 @@
 
 import Foundation
 
-
 class Telemetry: NSObject {
 
     static let NameKey = "name"
