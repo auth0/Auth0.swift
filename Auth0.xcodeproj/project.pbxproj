@@ -120,6 +120,10 @@
 		5FE2F8C71CD1522F003628F4 /* UserProfileSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8C51CD1522F003628F4 /* UserProfileSpec.swift */; };
 		5FE686A11D1877C10075874C /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5FE686A01D1877C10075874C /* Auth0.plist */; };
 		5FE686A21D1877C10075874C /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5FE686A01D1877C10075874C /* Auth0.plist */; };
+		5FE686A61D188DEF0075874C /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE686A51D188DEF0075874C /* Telemetry.swift */; };
+		5FE686A71D188DEF0075874C /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE686A51D188DEF0075874C /* Telemetry.swift */; };
+		5FE686AA1D1894AA0075874C /* TelemetrySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE686A91D1894AA0075874C /* TelemetrySpec.swift */; };
+		5FE686AB1D1894AA0075874C /* TelemetrySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE686A91D1894AA0075874C /* TelemetrySpec.swift */; };
 		5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF465BB1CE2AC4500F7ED8C /* Management.swift */; };
 		5FF465BD1CE2AC4500F7ED8C /* Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF465BB1CE2AC4500F7ED8C /* Management.swift */; };
 /* End PBXBuildFile section */
@@ -257,6 +261,8 @@
 		5FE2F8C21CD1498E003628F4 /* UserProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		5FE2F8C51CD1522F003628F4 /* UserProfileSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileSpec.swift; sourceTree = "<group>"; };
 		5FE686A01D1877C10075874C /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
+		5FE686A51D188DEF0075874C /* Telemetry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
+		5FE686A91D1894AA0075874C /* TelemetrySpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TelemetrySpec.swift; sourceTree = "<group>"; };
 		5FF346491CEFEC04000799DE /* Auth0Tests.iOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auth0Tests.iOS-Bridging-Header.h"; sourceTree = "<group>"; };
 		5FF3464A1CEFEC04000799DE /* Auth0Tests.OSX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auth0Tests.OSX-Bridging-Header.h"; sourceTree = "<group>"; };
 		5FF465BB1CE2AC4500F7ED8C /* Management.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Management.swift; sourceTree = "<group>"; };
@@ -336,6 +342,7 @@
 		5F049B6B1CB42C29006F6C05 /* Auth0 */ = {
 			isa = PBXGroup;
 			children = (
+				5FE686A41D188DA50075874C /* Telemetry */,
 				5FBBF03D1CCA8FC20024D2AF /* Authentication */,
 				5FCAB16E1D08FFE900331C84 /* Extensions */,
 				5F6FAC611D09E92800D5B4EA /* Logger */,
@@ -353,6 +360,7 @@
 		5F06DD921CC451430011842B /* Auth0Tests */ = {
 			isa = PBXGroup;
 			children = (
+				5FE686A81D1894990075874C /* Telemetry */,
 				5FBBF0411CCA901B0024D2AF /* Authentication */,
 				5FADB6011CEC0C1600D4BB50 /* Management */,
 				5FE2F8C11CD0FA11003628F4 /* Networking */,
@@ -563,6 +571,22 @@
 				5FE2F8BD1CD0EC52003628F4 /* ResponseSpec.swift */,
 			);
 			path = Networking;
+			sourceTree = "<group>";
+		};
+		5FE686A41D188DA50075874C /* Telemetry */ = {
+			isa = PBXGroup;
+			children = (
+				5FE686A51D188DEF0075874C /* Telemetry.swift */,
+			);
+			name = Telemetry;
+			sourceTree = "<group>";
+		};
+		5FE686A81D1894990075874C /* Telemetry */ = {
+			isa = PBXGroup;
+			children = (
+				5FE686A91D1894AA0075874C /* TelemetrySpec.swift */,
+			);
+			name = Telemetry;
 			sourceTree = "<group>";
 		};
 		5FF465BA1CE2AC2800F7ED8C /* Management */ = {
@@ -821,6 +845,7 @@
 				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */,
 				5FCAB1731D09009600331C84 /* NSData+URLSafe.swift in Sources */,
+				5FE686A61D188DEF0075874C /* Telemetry.swift in Sources */,
 				5FD255BA1D14F70B00387ECB /* WebAuthError.swift in Sources */,
 				5FD255B71D14F00900387ECB /* Auth0Error.swift in Sources */,
 				5FD255AE1D14A4A300387ECB /* AuthenticationError.swift in Sources */,
@@ -854,6 +879,7 @@
 				5FBBF0471CCA99E90024D2AF /* Credentials.swift in Sources */,
 				5F74CB3E1CEE8E9100226823 /* UserIdentity.swift in Sources */,
 				5F6FAC641D09E98000D5B4EA /* Logger.swift in Sources */,
+				5FE686A71D188DEF0075874C /* Telemetry.swift in Sources */,
 				5FF465BD1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */,
 				5FD255B81D14F00900387ECB /* Auth0Error.swift in Sources */,
@@ -881,6 +907,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE686AA1D1894AA0075874C /* TelemetrySpec.swift in Sources */,
 				5FCAB1691D07AC3500331C84 /* A0WebAuthSpec.m in Sources */,
 				5FBBF03B1CC96AA70024D2AF /* Responses.swift in Sources */,
 				5FCAB1681D07AC2700331C84 /* ControllerModalPresenterSpec.swift in Sources */,
@@ -907,6 +934,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE686AB1D1894AA0075874C /* TelemetrySpec.swift in Sources */,
 				5FBBF03C1CC96AA70024D2AF /* Responses.swift in Sources */,
 				5FADB6101CED7E5200D4BB50 /* UserPatchAttributesSpec.swift in Sources */,
 				5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */,
