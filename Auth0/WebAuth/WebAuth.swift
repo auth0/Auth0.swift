@@ -45,11 +45,13 @@ import SafariServices
  </plist>
  ```
 
+ - parameter bundle:    bundle used to locate the `Auth0.plist` file. By default is the main bundle
+
  - returns: Auth0 WebAuth component
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func webAuth() -> WebAuth {
-    let values = plistValues()!
+public func webAuth(bundle bundle: NSBundle = NSBundle.mainBundle()) -> WebAuth {
+    let values = plistValues(bundle: bundle)!
     return webAuth(clientId: values.clientId, domain: values.domain)
 }
 

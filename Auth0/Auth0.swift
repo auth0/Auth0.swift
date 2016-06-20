@@ -62,12 +62,13 @@ public func authentication(clientId clientId: String, domain: String, session: N
  ```
 
  - parameter session:  instance of NSURLSession used for networking. By default it will use the shared NSURLSession
+ - parameter bundle:    bundle used to locate the `Auth0.plist` file. By default is the main bundle
 
  - returns: Auth0 Authentication API
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func authentication(session session: NSURLSession = .sharedSession()) -> Authentication {
-    let values = plistValues()!
+public func authentication(session session: NSURLSession = .sharedSession(), bundle: NSBundle = NSBundle.mainBundle()) -> Authentication {
+    let values = plistValues(bundle: bundle)!
     return authentication(clientId: values.clientId, domain: values.domain, session: session)
 }
 
@@ -95,13 +96,14 @@ public func authentication(session session: NSURLSession = .sharedSession()) -> 
 
  - parameter token:     token of Management API v2 with the correct allowed scopes to perform the desired action
  - parameter session:   instance of NSURLSession used for networking. By default it will use the shared NSURLSession
+ - parameter bundle:    bundle used to locate the `Auth0.plist` file. By default is the main bundle
 
  - returns: Auth0 Management API v2
  - important: Auth0.swift has yet to implement all endpoints. Now you can only perform some CRUD operations against Users
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func management(token token: String, session: NSURLSession = .sharedSession()) -> Management {
-    let values = plistValues()!
+public func management(token token: String, session: NSURLSession = .sharedSession(), bundle: NSBundle = NSBundle.mainBundle()) -> Management {
+    let values = plistValues(bundle: bundle)!
     return management(token: token, domain: values.domain, session: session)
 }
 
@@ -154,12 +156,13 @@ public func management(token token: String, domain: String, session: NSURLSessio
 
  - parameter token:     token of Management API v2 with the correct allowed scopes to perform the desired action
  - parameter session:   instance of NSURLSession used for networking. By default it will use the shared NSURLSession
+ - parameter bundle:    bundle used to locate the `Auth0.plist` file. By default is the main bundle
 
  - returns: Auth0 Management API v2
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func users(token token: String, session: NSURLSession = .sharedSession()) -> Users {
-    let values = plistValues()!
+public func users(token token: String, session: NSURLSession = .sharedSession(), bundle: NSBundle = NSBundle.mainBundle()) -> Users {
+    let values = plistValues(bundle: bundle)!
     return users(token: token, domain: values.domain, session: session)
 }
 
@@ -198,8 +201,7 @@ public func enableLogging(enabled enabled: Bool = true) {
     Auth0Logger.sharedInstance.logger = enabled ? DefaultLogger() : nil
 }
 
-func plistValues() -> (clientId: String, domain: String)? {
-    let bundle = NSBundle.mainBundle()
+func plistValues(bundle bundle: NSBundle) -> (clientId: String, domain: String)? {
     guard
         let path = bundle.pathForResource("Auth0", ofType: "plist"),
         let values = NSDictionary(contentsOfFile: path) as? [String: AnyObject]

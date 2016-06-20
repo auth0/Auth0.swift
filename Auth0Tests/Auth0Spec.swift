@@ -64,30 +64,22 @@ class Auth0Spec: QuickSpec {
 
         describe("plist loading") {
 
-            var clientId: String!
-            var domain: String!
-
-            beforeEach {
-                let bundle = NSBundle.mainBundle()
-                let info = NSDictionary(contentsOfFile: bundle.pathForResource("Auth0", ofType: "plist")!)
-                clientId = info?["ClientId"] as? String
-                domain = info?["Domain"] as? String ?? ""
-            }
+            let bundle = NSBundle(forClass: Auth0Spec.classForCoder())
 
             it("should return authentication endpoint with account from plist") {
-                let auth = Auth0.authentication()
-                expect(auth.url.absoluteString) == "https://\(domain)"
-                expect(auth.clientId) == clientId
+                let auth = Auth0.authentication(bundle: bundle)
+                expect(auth.url.absoluteString) == "https://samples.auth0.com"
+                expect(auth.clientId) == "CLIENT_ID"
             }
 
             it("should return management endpoint with domain from plist") {
-                let management = Auth0.management(token: "TOKEN")
-                expect(management.url.absoluteString) == "https://\(domain)"
+                let management = Auth0.management(token: "TOKEN", bundle: bundle)
+                expect(management.url.absoluteString) == "https://samples.auth0.com"
             }
 
             it("should return users endpoint with domain from plist") {
-                let users = Auth0.users(token: "TOKEN")
-                expect(users.management.url.absoluteString) == "https://\(domain)"
+                let users = Auth0.users(token: "TOKEN", bundle: bundle)
+                expect(users.management.url.absoluteString) == "https://samples.auth0.com"
             }
 
         }
