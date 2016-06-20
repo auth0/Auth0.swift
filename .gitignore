@@ -3,6 +3,7 @@
 
 # Auth0
 Auth0.plist
+!Auth0Tests/Auth0.plist
 
 # Xcode
 build/
