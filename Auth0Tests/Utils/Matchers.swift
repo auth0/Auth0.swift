@@ -273,6 +273,20 @@ func haveObjectWithAttributes(attributes: [String]) -> MatcherFunc<Result<[Strin
     }
 }
 
+func beURLSafeBase64() -> MatcherFunc<String> {
+    return MatcherFunc { expression, failureMessage in
+        failureMessage.postfixMessage = "be url safe base64"
+        let set = NSMutableCharacterSet()
+        set.formUnionWithCharacterSet(.alphanumericCharacterSet())
+        set.addCharactersInString("-_/")
+        set.invert()
+        if let actual = try expression.evaluate() where actual.rangeOfCharacterFromSet(set) == nil {
+            return true
+        }
+        return false
+    }
+}
+
 extension NSURLRequest {
     var a0_payload: [String: AnyObject]? {
         return NSURLProtocol.propertyForKey(ParameterPropertyKey, inRequest: self) as? [String: AnyObject]
