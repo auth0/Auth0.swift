@@ -112,6 +112,25 @@ class TelemetrySpec: QuickSpec {
                 expect(info?["name"]) == "Lock.iOS"
             }
         }
+
+        describe("telemetry header") {
+
+            let telemetry = Telemetry()
+
+            it("should set telemetry header") {
+                let request = NSMutableURLRequest()
+                telemetry.addTelemetryHeader(request: request)
+                expect(request.valueForHTTPHeaderField("Auth0-Client")) == telemetry.value
+            }
+
+            it("should not set telemetry header when disabled") {
+                let request = NSMutableURLRequest()
+                telemetry.enabled = false
+                telemetry.addTelemetryHeader(request: request)
+                expect(request.valueForHTTPHeaderField("Auth0-Client")).to(beNil())
+            }
+
+        }
     }
 
 }

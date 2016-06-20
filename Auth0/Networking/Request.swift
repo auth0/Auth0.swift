@@ -46,8 +46,9 @@ public struct Request<T, E: Auth0Error>: Requestable {
     let payload: [String: AnyObject]
     let headers: [String: String]
     let logger: Logger?
+    let telemetry: Telemetry
 
-    init(session: NSURLSession, url: NSURL, method: String, handle: (Response<E>, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:], logger: Logger? = Auth0Logger.sharedInstance.logger) {
+    init(session: NSURLSession, url: NSURL, method: String, handle: (Response<E>, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:], logger: Logger? = Auth0Logger.sharedInstance.logger, telemetry: Telemetry = Telemetry.sharedInstance) {
         self.session = session
         self.url = url
         self.method = method
@@ -55,6 +56,7 @@ public struct Request<T, E: Auth0Error>: Requestable {
         self.payload = payload
         self.headers = headers
         self.logger = logger
+        self.telemetry = telemetry
     }
 
     var request: NSURLRequest {
@@ -68,6 +70,7 @@ public struct Request<T, E: Auth0Error>: Requestable {
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
+        telemetry.addTelemetryHeader(request: request)
         return request
     }
 

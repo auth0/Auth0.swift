@@ -58,6 +58,14 @@ class Telemetry: NSObject {
         self.info = Telemetry.generateValue(fromInfo: wrapped)
     }
 
+    func addTelemetryHeader(request request: NSMutableURLRequest) {
+        if let value = self.value {
+            request.setValue(value, forHTTPHeaderField: "Auth0-Client")
+        } else {
+            request.setValue(nil, forHTTPHeaderField: "Auth0-Client")
+        }
+    }
+
     static func versionInformation(bundle bundle: NSBundle = NSBundle(forClass: Telemetry.classForCoder())) -> [String: String] {
         let version = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? Telemetry.NoVersion
         let dict = [
