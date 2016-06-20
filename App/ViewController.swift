@@ -11,7 +11,7 @@ import Auth0
 
 class ViewController: UIViewController {
 
-    var onAuth: (Result<Credentials, Authentication.Error> -> ())!
+    var onAuth: (Result<Credentials> -> ())!
 
     @IBOutlet weak var oauth2: UIButton!
     

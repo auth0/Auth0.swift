@@ -206,12 +206,12 @@ public class WebAuth {
 
      - parameter callback: callback called with the result of the OAuth2 flow
      */
-    public func start(callback: Result<Credentials, Authentication.Error> -> ()) {
+    public func start(callback: Result<Credentials> -> ()) {
         guard
             let redirectURL = self.redirectURL
             where !redirectURL.absoluteString.hasPrefix(WebAuth.NoBundleIdentifier)
             else {
-                return callback(Result.Failure(error: .RequestFailed(cause: failureCause("Cannot find iOS Application Bundle Identifier"))))
+                return callback(Result.Failure(error: WebAuthError.NoBundleIdentifierFound))
             }
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
@@ -223,14 +223,14 @@ public class WebAuth {
         self.storage.store(session)
     }
 
-    func newSafari(authorizeURL: NSURL, callback: Result<Credentials, Authentication.Error> -> ()) -> (SFSafariViewController, Result<Credentials, Authentication.Error> -> ()) {
+    func newSafari(authorizeURL: NSURL, callback: Result<Credentials> -> ()) -> (SFSafariViewController, Result<Credentials> -> ()) {
         let controller = SFSafariViewController(URL: authorizeURL)
-        let finish: Result<Credentials, Authentication.Error> -> () = { [weak controller] (result: Result<Credentials, Authentication.Error>) -> () in
+        let finish: Result<Credentials> -> () = { [weak controller] (result: Result<Credentials>) -> () in
             guard let presenting = controller?.presentingViewController else {
-                return callback(Result.Failure(error: .RequestFailed(cause: failureCause("Cannot find controller that triggered web flow"))))
+                return callback(Result.Failure(error: WebAuthError.CannotDismissWebAuthController))
             }
 
-            if case .Failure(let cause) = result, .Cancelled = cause {
+            if case .Failure(let cause as WebAuthError) = result, case .UserCancelled = cause {
                 dispatch_async(dispatch_get_main_queue()) {
                     callback(result)
                 }
@@ -274,10 +274,6 @@ public class WebAuth {
             .URLByAppendingPathComponent(bundleIdentifier)
             .URLByAppendingPathComponent("callback")
     }
-}
-
-private func failureCause(message: String) -> NSError {
-    return NSError(domain: "com.auth0.oauth2", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
 }
 
 private func generateDefaultState() -> String? {

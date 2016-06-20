@@ -103,7 +103,7 @@ class AuthenticationSpec: QuickSpec {
                     let password = "return invalid password"
                     stub(isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }
                     auth.login(SupportAtAuth0, password: password, connection: ConnectionName).start { result in
-                        expect(result).to(haveError(code: code, description: description))
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
                 }
@@ -117,7 +117,7 @@ class AuthenticationSpec: QuickSpec {
                     let password = "return invalid password"
                     stub(isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(error: code, description: description) }
                     auth.login(SupportAtAuth0, password: password, connection: ConnectionName).start { result in
-                        expect(result).to(haveError(code: code, description: description))
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
                 }
@@ -172,7 +172,7 @@ class AuthenticationSpec: QuickSpec {
                     let password = "return invalid password"
                     stub(isSignUp(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }
                     auth.createUser(SupportAtAuth0, password: password, connection: ConnectionName).start { result in
-                        expect(result).to(haveError(code: code, description: description))
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
                 }
@@ -211,7 +211,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }
                 waitUntil(timeout: Timeout) { done in
                     auth.resetPassword(SupportAtAuth0, connection: ConnectionName).start { result in
-                        expect(result).to(haveError(code: code, description: description))
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
                 }
@@ -227,7 +227,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "User w/email"
                 waitUntil(timeout: Timeout) { done in
                     auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
-                        expect(result).to(haveError(code: code, description: description))
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
                 }
@@ -240,7 +240,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authFailure(code: code, description: description) }.name = "OpenID Auth"
                 waitUntil(timeout: Timeout) { done in
                     auth.signUp(SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
-                        expect(result).to(haveError(code: code, description: description))
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
                 }
@@ -342,7 +342,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0).start { result in
-                        expect(result).to(haveError(code: "error", description: "description"))
+                        expect(result).to(haveAuthenticationError(code: "error", description: "description"))
                         done()
                     }
                 }
@@ -375,7 +375,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone).start { result in
-                        expect(result).to(haveError(code: "error", description: "description"))
+                        expect(result).to(haveAuthenticationError(code: "error", description: "description"))
                         done()
                     }
                 }
@@ -397,7 +397,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(isTokenInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.tokenInfo(IdToken).start { result in
-                        expect(result).to(haveError(code: "invalid_token", description: "the token is invalid"))
+                        expect(result).to(haveAuthenticationError(code: "invalid_token", description: "the token is invalid"))
                         done()
                     }
                 }
@@ -417,7 +417,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(isUserInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.userInfo(IdToken).start { result in
-                        expect(result).to(haveError(code: "invalid_token", description: "the token is invalid"))
+                        expect(result).to(haveAuthenticationError(code: "invalid_token", description: "the token is invalid"))
                         done()
                     }
                 }
@@ -477,7 +477,7 @@ class AuthenticationSpec: QuickSpec {
                     let token = "return invalid token"
                     stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(code: code, description: description) }
                     auth.loginSocial(token, connection: "facebook").start { result in
-                        expect(result).to(haveError(code: code, description: description))
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
                 }
@@ -491,7 +491,7 @@ class AuthenticationSpec: QuickSpec {
                     let token = "return invalid token"
                     stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(error: code, description: description) }
                     auth.loginSocial(token, connection: "facebook").start { result in
-                        expect(result).to(haveError(code: code, description: description))
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
                 }
@@ -542,7 +542,7 @@ class AuthenticationSpec: QuickSpec {
                     let invalidCode = "return invalid code"
                     stub(isToken(Domain) && hasAtLeast(["code": invalidCode])) { _ in return authFailure(code: code, description: description) }.name = "Invalid Code"
                     auth.exchangeCode(invalidCode, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
-                        expect(result).to(haveError(code: code, description: description))
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
                 }

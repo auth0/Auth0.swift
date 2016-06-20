@@ -40,8 +40,8 @@ class OAuth2SessionSpec: QuickSpec {
 
     override func spec() {
 
-        var result: Result<Credentials, Authentication.Error>? = nil
-        let callback: Result<Credentials, Authentication.Error> -> () = { result = $0 }
+        var result: Result<Credentials>? = nil
+        let callback: Result<Credentials> -> () = { result = $0 }
         let controller = MockSafariViewController(URL: NSURL(string: "https://auth0.com")!)
         let handler = ImplicitGrant()
         let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
@@ -94,12 +94,12 @@ class OAuth2SessionSpec: QuickSpec {
             }
             it("should return error from query string") {
                 session.resume(NSURL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
-                expect(result).toEventually(haveError(code: "error", description: "description"))
+                expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
             }
 
             it("should return error from fragment") {
                 session.resume(NSURL(string: "https://samples.auth0.com/callback#error=error&error_description=description")!)
-                expect(result).toEventually(haveError(code: "error", description: "description"))
+                expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
             }
 
             it("should fail if values from fragment are invalid") {

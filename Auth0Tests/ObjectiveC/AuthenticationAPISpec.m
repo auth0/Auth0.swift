@@ -97,7 +97,7 @@ describe(@"login", ^{
         [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/oauth/ro"];
         } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_username_password", @"error_description": @"invalid password"}
+            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_user_password", @"error_description": @"invalid password"}
                                                     statusCode:401
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -112,9 +112,10 @@ describe(@"login", ^{
                               expect(credentials).to(beNil());
                               expect(error).toNot(beNil());
                               expect(error.domain).to(equal(@"com.auth0.authentication"));
-                              expect(@(error.code)).to(equal(@(A0AuthenticationErrorCodeErrorResponse)));
-                              expect(error.a0_authenticationErrorCode).to(equal(@"invalid_username_password"));
-                              expect(error.a0_authenticationErrorDescription).to(equal(@"invalid password"));
+                              expect(@(error.a0_isManagementError)).to(beFalse());
+                              expect(@(error.a0_isAuthenticationError)).to(beTrue());
+                              expect(error.localizedDescription).to(equal(@"invalid password"));
+                              expect(@([error.a0_authenticationError isInvalidCredentials])).to(beTrue());
                               done();
                           }];
         });
@@ -157,7 +158,7 @@ describe(@"create user", ^{
         [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/dbconnections/signup"];
         } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_username_password", @"error_description": @"invalid password"}
+            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_user_password", @"error_description": @"invalid password"}
                                                     statusCode:401
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -172,9 +173,10 @@ describe(@"create user", ^{
                                 expect(databaseUser).to(beNil());
                                 expect(error).toNot(beNil());
                                 expect(error.domain).to(equal(@"com.auth0.authentication"));
-                                expect(@(error.code)).to(equal(@(A0AuthenticationErrorCodeErrorResponse)));
-                                expect(error.a0_authenticationErrorCode).to(equal(@"invalid_username_password"));
-                                expect(error.a0_authenticationErrorDescription).to(equal(@"invalid password"));
+                                expect(@(error.a0_isManagementError)).to(beFalse());
+                                expect(@(error.a0_isAuthenticationError)).to(beTrue());
+                                expect(error.localizedDescription).to(equal(@"invalid password"));
+                                expect(@([error.a0_authenticationError isInvalidCredentials])).to(beTrue());
                                 done();
                             }];
         });
@@ -213,7 +215,7 @@ describe(@"reset password", ^{
         [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/dbconnections/change_password"];
         } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_username_password", @"error_description": @"invalid password"}
+            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_user_password", @"error_description": @"invalid password"}
                                                     statusCode:401
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -224,9 +226,10 @@ describe(@"reset password", ^{
                                callback:^(NSError * _Nullable error) {
                                    expect(error).toNot(beNil());
                                    expect(error.domain).to(equal(@"com.auth0.authentication"));
-                                   expect(@(error.code)).to(equal(@(A0AuthenticationErrorCodeErrorResponse)));
-                                   expect(error.a0_authenticationErrorCode).to(equal(@"invalid_username_password"));
-                                   expect(error.a0_authenticationErrorDescription).to(equal(@"invalid password"));
+                                   expect(@(error.a0_isManagementError)).to(beFalse());
+                                   expect(@(error.a0_isAuthenticationError)).to(beTrue());
+                                   expect(error.localizedDescription).to(equal(@"invalid password"));
+                                   expect(@([error.a0_authenticationError isInvalidCredentials])).to(beTrue());
                                    done();
                                }];
         });
@@ -279,7 +282,7 @@ describe(@"signup", ^{
         [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/dbconnections/signup"];
         } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_username_password", @"error_description": @"invalid password"}
+            return [OHHTTPStubsResponse responseWithJSONObject:@{@"code": @"invalid_password", @"description": @"invalid password", @"name": @"PasswordStrengthError"}
                                                     statusCode:401
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -296,9 +299,10 @@ describe(@"signup", ^{
                             expect(credentials).to(beNil());
                             expect(error).toNot(beNil());
                             expect(error.domain).to(equal(@"com.auth0.authentication"));
-                            expect(@(error.code)).to(equal(@(A0AuthenticationErrorCodeErrorResponse)));
-                            expect(error.a0_authenticationErrorCode).to(equal(@"invalid_username_password"));
-                            expect(error.a0_authenticationErrorDescription).to(equal(@"invalid password"));
+                            expect(@(error.a0_isManagementError)).to(beFalse());
+                            expect(@(error.a0_isAuthenticationError)).to(beTrue());
+                            expect(error.localizedDescription).to(equal(@"invalid password"));
+                            expect(@([error.a0_authenticationError isPasswordNotStrongEnough])).to(beTrue());
                             done();
                         }];
         });

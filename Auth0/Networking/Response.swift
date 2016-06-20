@@ -22,38 +22,45 @@
 
 import Foundation
 
-struct Response {
+func json<T>(data: NSData?) -> T? {
+    guard let data = data else { return nil }
+    let object = try? NSJSONSerialization.JSONObjectWithData(data, options: [])
+    return object as? T
+}
+
+func string(data: NSData?) -> String? {
+    guard let data = data else { return nil }
+    return String(data: data, encoding: NSUTF8StringEncoding)
+}
+
+struct Response<E: Auth0Error> {
     let data: NSData?
     let response: NSURLResponse?
     let error: NSError?
 
-    var result: Result {
-        guard error == nil else { return .Failure(.RequestFailed(error)) }
-        guard let response = self.response as? NSHTTPURLResponse else { return .Failure(.RequestFailed(nil)) }
-        guard (200...300).contains(response.statusCode) else { return .Failure(.ServerError(response.statusCode, data)) }
-        guard let data = self.data else { return response.statusCode == 204 ? .Success(nil) : .Failure(.NoResponse) }
-        do {
-            let json = try NSJSONSerialization.JSONObjectWithData(data, options: [])
-            return .Success(json)
-        } catch {
-            // This piece of code is dedicated to our friends the backend devs :)
-            if response.URL?.lastPathComponent == "change_password" {
-                return .Success(nil)
-            } else {
-                return .Failure(.InvalidJSON(data))
+    func result() throws -> AnyObject? {
+        guard error == nil else { throw error! }
+        guard let response = self.response as? NSHTTPURLResponse else { throw E(string: nil, statusCode: 0) }
+        guard (200...300).contains(response.statusCode) else {
+            if let json: [String: AnyObject] = json(data) {
+                throw E(info: json)
             }
+            throw E(string: string(data), statusCode: response.statusCode)
         }
-    }
-
-    enum Result {
-        case Success(AnyObject?)
-        case Failure(Error)
-    }
-
-    enum Error: ErrorType {
-        case RequestFailed(NSError?)
-        case ServerError(Int, NSData?)
-        case NoResponse
-        case InvalidJSON(NSData)
+        guard let data = self.data else {
+            if response.statusCode == 204 {
+                return nil
+            }
+            throw E(string: nil, statusCode: response.statusCode)
+        }
+        if let json: AnyObject = json(data) {
+            return json
+        }
+        // This piece of code is dedicated to our friends the backend devs :)
+        if response.URL?.lastPathComponent == "change_password" {
+            return nil
+        } else {
+            throw E(string: string(data), statusCode: response.statusCode)
+        }
     }
 }

@@ -103,7 +103,7 @@ public struct Authentication {
      - returns: authentication request that will yield Auth0 User Credentials
      - seeAlso: Credentials
      */
-    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, Error> {
+    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         var payload: [String: AnyObject] = [
             "username": username,
@@ -154,7 +154,7 @@ public struct Authentication {
 
      - returns: request that will yield a created database user (just email, username and email verified flag)
      */
-    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> Request<DatabaseUser, Error> {
+    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         var payload: [String: AnyObject] = [
             "email": email,
             "password": password,
@@ -188,7 +188,7 @@ public struct Authentication {
 
      - returns: request to reset password
      */
-    public func resetPassword(email: String, connection: String) -> Request<Void, Error> {
+    public func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError> {
         let payload = [
             "email": email,
             "connection": connection,
@@ -245,9 +245,10 @@ public struct Authentication {
 
      - returns: an authentication request that will yield Auth0 user credentials after creating the user.
      */
-    public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials, Error> {
-        return createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
-            .concat(login(email, password: password, connection: connection, scope: scope, parameters: parameters))
+    public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError> {
+        let first = createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
+        let second = login(email, password: password, connection: connection, scope: scope, parameters: parameters)
+        return ConcatRequest(first: first, second: second)
     }
 
     /**
@@ -276,7 +277,7 @@ public struct Authentication {
 
      - returns: a request
      */
-    public func startPasswordless(email email: String, type: PasswordlessType = .Code, connection: String = "email", parameters: [String: AnyObject] = [:]) -> Request<Void, Authentication.Error> {
+    public func startPasswordless(email email: String, type: PasswordlessType = .Code, connection: String = "email", parameters: [String: AnyObject] = [:]) -> Request<Void, AuthenticationError> {
         var payload: [String: AnyObject] = [
             "email": email,
             "connection": connection,
@@ -316,7 +317,7 @@ public struct Authentication {
 
      - returns: a request
      */
-    public func startPasswordless(phoneNumber phoneNumber: String, type: PasswordlessType = .Code, connection: String = "sms") -> Request<Void, Authentication.Error> {
+    public func startPasswordless(phoneNumber phoneNumber: String, type: PasswordlessType = .Code, connection: String = "sms") -> Request<Void, AuthenticationError> {
         let payload: [String: AnyObject] = [
             "phone_number": phoneNumber,
             "connection": connection,
@@ -341,7 +342,7 @@ public struct Authentication {
 
      - returns: a request that will yield token information
      */
-    public func tokenInfo(token: String) -> Request<UserProfile, Authentication.Error> {
+    public func tokenInfo(token: String) -> Request<UserProfile, AuthenticationError> {
         let payload: [String: AnyObject] = ["id_token": token]
         let tokenInfo = NSURL(string: "/tokeninfo", relativeToURL: self.url)!
         return Request(session: session, url: tokenInfo, method: "POST", handle: authenticationObject, payload: payload)
@@ -361,7 +362,7 @@ public struct Authentication {
 
      - returns: a request that will yield user information
      */
-    public func userInfo(token: String) -> Request<UserProfile, Authentication.Error> {
+    public func userInfo(token: String) -> Request<UserProfile, AuthenticationError> {
         let userInfo = NSURL(string: "/userinfo", relativeToURL: self.url)!
         return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(token)"])
     }
@@ -392,7 +393,7 @@ public struct Authentication {
 
      - returns: a request that will yield Auth0 user's credentials
      */
-    public func loginSocial(token: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, Error> {
+    public func loginSocial(token: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
         var payload: [String: AnyObject] = [
             "access_token": token,
             "connection": connection,
@@ -420,7 +421,7 @@ public struct Authentication {
      - returns: a request that will yield Auth0 user's credentials
      - seeAlso: Authentication#exchangeCode(codeVerifier:redirectURI:) for PKCE
      */
-    public func token(parameters: [String: AnyObject]) -> Request<Credentials, Error> {
+    public func token(parameters: [String: AnyObject]) -> Request<Credentials, AuthenticationError> {
         var payload: [String: AnyObject] = [
             "client_id": self.clientId
         ]
@@ -448,7 +449,7 @@ public struct Authentication {
      - returns: a request that will yield Auth0 user's credentials
      - seeAlso: https://tools.ietf.org/html/rfc7636
      */
-    public func exchangeCode(code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, Error> {
+    public func exchangeCode(code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
         return self.token([
                 "code": code,
                 "code_verifier": codeVerifier,

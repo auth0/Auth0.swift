@@ -38,7 +38,7 @@ import SafariServices
  */
 class OAuth2Session: NSObject {
 
-    typealias FinishSession = Result<Credentials, Authentication.Error> -> ()
+    typealias FinishSession = Result<Credentials> -> ()
 
     weak var controller: UIViewController?
 
@@ -71,17 +71,13 @@ class OAuth2Session: NSObject {
         guard
             let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: true)
             else {
-                self.finish(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
+                self.finish(.Failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
                 return false
             }
         let items = components.a0_values
         guard self.state == nil || items["state"] == self.state else { return false }
-        if let error = items["error"] {
-            guard let description = items["error_description"] else {
-                self.finish(.Failure(error: .InvalidResponse(response: url.absoluteString.dataUsingEncoding(NSUTF8StringEncoding))))
-                return true
-            }
-            self.finish(.Failure(error: .Response(code: error, description: description, name: nil, extras: nil)))
+        if let _ = items["error"] {
+            self.finish(.Failure(error: AuthenticationError(info: items)))
         } else {
             self.handler.credentials(items, callback: self.finish)
         }
@@ -89,7 +85,7 @@ class OAuth2Session: NSObject {
     }
 
     func cancel() {
-        self.finish(Result.Failure(error: .Cancelled))
+        self.finish(Result.Failure(error: WebAuthError.UserCancelled))
     }
 }
 
