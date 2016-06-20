@@ -66,6 +66,14 @@ class Telemetry: NSObject {
         }
     }
 
+    func queryItemsWithTelemetry(queryItems queryItems: [NSURLQueryItem]) -> [NSURLQueryItem] {
+        var items = queryItems
+        if let value = self.value {
+            items.append(NSURLQueryItem(name: "auth0Client", value: value))
+        }
+        return items
+    }
+
     static func versionInformation(bundle bundle: NSBundle = NSBundle(forClass: Telemetry.classForCoder())) -> [String: String] {
         let version = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? Telemetry.NoVersion
         let dict = [

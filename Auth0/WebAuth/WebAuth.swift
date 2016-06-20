@@ -93,6 +93,7 @@ public class WebAuth {
     let presenter: ControllerModalPresenter
     let storage: SessionStorage
     let logger: Logger?
+    let telemetry: Telemetry
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
@@ -102,13 +103,15 @@ public class WebAuth {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance)
     }
 
-    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage, logger: Logger? = Auth0Logger.sharedInstance.logger) {
+    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage, logger: Logger? = Auth0Logger.sharedInstance.logger, telemetry: Telemetry = Telemetry.sharedInstance) {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter
         self.storage = storage
         self.logger = logger
+        self.telemetry = telemetry
     }
+
     /**
      For redirect url instead of a custom scheme it will use `https` and iOS 9 Universal Links.
      
@@ -259,7 +262,7 @@ public class WebAuth {
         let addAll: (String, String) -> () = { items.append(NSURLQueryItem(name: $0, value: $1)) }
         defaults.forEach(addAll)
         self.parameters.forEach(addAll)
-        components.queryItems = items
+        components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
         return components.URL!
     }
 
