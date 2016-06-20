@@ -66,7 +66,7 @@ public func authentication(clientId clientId: String, domain: String, session: N
  - returns: Auth0 Authentication API
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func authentication(session: NSURLSession = .sharedSession()) -> Authentication {
+public func authentication(session session: NSURLSession = .sharedSession()) -> Authentication {
     let values = plistValues()!
     return authentication(clientId: values.clientId, domain: values.domain, session: session)
 }
@@ -194,7 +194,7 @@ public func users(token token: String, domain: String, session: NSURLSession = .
  - note: By default all logging is **disabled**
  - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
  */
-public func enableLogging(enabled: Bool = true) {
+public func enableLogging(enabled enabled: Bool = true) {
     Auth0Logger.sharedInstance.logger = enabled ? DefaultLogger() : nil
 }
 

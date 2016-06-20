@@ -76,7 +76,7 @@ struct PKCE: OAuth2Grant {
                 return callback(.Failure(error: AuthenticationError(string: string)))
             }
         Authentication(clientId: clientId, url: url)
-            .exchangeCode(code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
+            .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
             .start(callback)
     }
 }

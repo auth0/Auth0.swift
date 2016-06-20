@@ -41,27 +41,12 @@ public struct Authentication {
     }
 
     /**
-     Types of errors that can be returned by Auth API
-
-     - Response:        the request was not successful and Auth0 returned an error response with a code and description. If the error has a `name` attribute it will be available too, any additional attribute will be in `extras`.
-     - InvalidResponse: the response returned by Auth0 was not valid. It will include the JSON payload or the complete redirect URL when OAuth2 authorize was used, as NSData. It's recommended to just convert it to String.
-     - RequestFailed:   the request failed to complete by an unexpected cause, e.g.: request timed out. The associated value has the cause of failure
-     - Cancelled:       the request was cancelled before it could be completed. e.g.: during OAuth2 authentication
-     */
-    public enum Error: ErrorType {
-        case Response(code: String, description: String, name: String?, extras: [String: AnyObject]?)
-        case InvalidResponse(response: NSData?)
-        case RequestFailed(cause: ErrorType)
-        case Cancelled
-    }
-
-    /**
      Logs in an user using email|username and password using a Database and Passwordless connection
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .login("support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(emailOrUsername: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
         .start { result in
             switch result {
             case .Success(let credentials):
@@ -76,8 +61,8 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .login("support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(emailOrUsername: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
         .start { print($0) }
      ```
 
@@ -85,8 +70,8 @@ public struct Authentication {
      
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .login("+4599134762367", password: "123456", connection: "sms", scope: "openid email", parameters: ["state": "a random state"])
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(usernameOrEmail: "+4599134762367", password: "123456", connection: "sms", scope: "openid email", parameters: ["state": "a random state"])
         .start { print($0) }
      ```
 
@@ -94,16 +79,16 @@ public struct Authentication {
 
      When result is `Successful`, a `Credentials` object will be in it's associated value with at least an `access_token` (depending on the scopes used to authenticate)
 
-     - parameter username:   username or email used of the user to authenticate
-     - parameter password:   password of the user or one time password (OTP) for passwordless
-     - parameter connection: name of any of your configured database or passwordless connections
-     - parameter scope:      scope value requested when authenticating the user. Default is 'openid'
-     - parameter parameters: additional parameters that are optionally sent with the authentication request
+     - parameter usernameOrEmail:   username or email used of the user to authenticate, e.g. in email in Database connections or phone number for SMS connections.
+     - parameter password:          password of the user or one time password (OTP) for passwordless connection users
+     - parameter connection:        name of any of your configured database or passwordless connections
+     - parameter scope:             scope value requested when authenticating the user. Default is 'openid'
+     - parameter parameters:        additional parameters that are optionally sent with the authentication request
 
      - returns: authentication request that will yield Auth0 User Credentials
      - seeAlso: Credentials
      */
-    public func login(username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
+    public func login(usernameOrEmail username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         var payload: [String: AnyObject] = [
             "username": username,
@@ -123,8 +108,8 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .createUser("support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
         .start { print($0) }
      ```
      
@@ -132,8 +117,8 @@ public struct Authentication {
      
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .createUser("support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
         .start { print($0) }
      ```
      
@@ -142,7 +127,7 @@ public struct Authentication {
      ```
      Auth0
         .authentication(clientId, domain: "samples.auth0.com")
-        .createUser("support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
+        .createUser(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
         .start { print($0) }
      ```
 
@@ -154,7 +139,7 @@ public struct Authentication {
 
      - returns: request that will yield a created database user (just email, username and email verified flag)
      */
-    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+    public func createUser(email email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         var payload: [String: AnyObject] = [
             "email": email,
             "password": password,
@@ -178,8 +163,8 @@ public struct Authentication {
      
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .resetPassword("support@auth0.com", connection: "Username-Password-Authentication")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .resetPassword(email: "support@auth0.com", connection: "Username-Password-Authentication")
         .start { print($0) }
      ```
 
@@ -188,7 +173,7 @@ public struct Authentication {
 
      - returns: request to reset password
      */
-    public func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError> {
+    public func resetPassword(email email: String, connection: String) -> Request<Void, AuthenticationError> {
         let payload = [
             "email": email,
             "connection": connection,
@@ -203,8 +188,8 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .signUp("support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
      .start { print($0) }
      ```
 
@@ -212,8 +197,8 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .signUp("support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
         .start { print($0) }
      ```
 
@@ -221,8 +206,8 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .signUp("support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
         .start { print($0) }
      ```
 
@@ -230,8 +215,8 @@ public struct Authentication {
      
      ```
      Auth0
-     .authentication(clientId, domain: "samples.auth0.com")
-        .signUp("support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
         .start { print($0) }
      ```
 
@@ -245,9 +230,9 @@ public struct Authentication {
 
      - returns: an authentication request that will yield Auth0 user credentials after creating the user.
      */
-    public func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError> {
-        let first = createUser(email, username: username, password: password, connection: connection, userMetadata: userMetadata)
-        let second = login(email, password: password, connection: connection, scope: scope, parameters: parameters)
+    public func signUp(email email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError> {
+        let first = createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
+        let second = login(usernameOrEmail: email, password: password, connection: connection, scope: scope, parameters: parameters)
         return ConcatRequest(first: first, second: second)
     }
 
@@ -256,7 +241,7 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
         .startPasswordless(email: "support@auth0.com")
         .start { print($0) }
      ```
@@ -265,7 +250,7 @@ public struct Authentication {
      
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
         .startPasswordless(email: "support@auth0.com", type: .iOSLink)
         .start { print($0) }
      ```
@@ -297,7 +282,7 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
         .startPasswordless(phoneNumber: "support@auth0.com")
         .start { print($0) }
      ```
@@ -306,7 +291,7 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
         .startPasswordless(phoneNumber: "support@auth0.com", type: .iOSLink)
         .start { print($0) }
      ```
@@ -333,8 +318,8 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .tokenInfo(token)
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .tokenInfo(token: token)
         .start { print($0) }
      ```
 
@@ -342,7 +327,7 @@ public struct Authentication {
 
      - returns: a request that will yield token information
      */
-    public func tokenInfo(token: String) -> Request<UserProfile, AuthenticationError> {
+    public func tokenInfo(token token: String) -> Request<UserProfile, AuthenticationError> {
         let payload: [String: AnyObject] = ["id_token": token]
         let tokenInfo = NSURL(string: "/tokeninfo", relativeToURL: self.url)!
         return Request(session: session, url: tokenInfo, method: "POST", handle: authenticationObject, payload: payload)
@@ -354,7 +339,7 @@ public struct Authentication {
      ```
      Auth0
         .authentication(clientId, domain: "samples.auth0.com")
-        .userInfo(token)
+        .userInfo(token: token)
         .start { print($0) }
      ```
 
@@ -362,7 +347,7 @@ public struct Authentication {
 
      - returns: a request that will yield user information
      */
-    public func userInfo(token: String) -> Request<UserProfile, AuthenticationError> {
+    public func userInfo(token token: String) -> Request<UserProfile, AuthenticationError> {
         let userInfo = NSURL(string: "/userinfo", relativeToURL: self.url)!
         return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(token)"])
     }
@@ -372,8 +357,8 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .loginSocial(fbToken, connection: "facebook")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .loginSocial(token: fbToken, connection: "facebook")
         .start { print($0) }
      ```
 
@@ -381,8 +366,8 @@ public struct Authentication {
      
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .loginSocial(fbToken, connection: "facebook", scope: "openid email", parameters: ["state": "a random state"])
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .loginSocial(token: fbToken, connection: "facebook", scope: "openid email", parameters: ["state": "a random state"])
         .start { print($0) }
      ```
 
@@ -393,7 +378,7 @@ public struct Authentication {
 
      - returns: a request that will yield Auth0 user's credentials
      */
-    public func loginSocial(token: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
+    public func loginSocial(token token: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
         var payload: [String: AnyObject] = [
             "access_token": token,
             "connection": connection,
@@ -411,8 +396,8 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .token(["key": "value"])
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .tokenExchange(withParameters: ["key": "value"])
         .start { print($0) }
      ```
 
@@ -421,7 +406,7 @@ public struct Authentication {
      - returns: a request that will yield Auth0 user's credentials
      - seeAlso: Authentication#exchangeCode(codeVerifier:redirectURI:) for PKCE
      */
-    public func token(parameters: [String: AnyObject]) -> Request<Credentials, AuthenticationError> {
+    public func tokenExchange(withParameters parameters: [String: AnyObject]) -> Request<Credentials, AuthenticationError> {
         var payload: [String: AnyObject] = [
             "client_id": self.clientId
         ]
@@ -437,8 +422,8 @@ public struct Authentication {
 
      ```
      Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .exchangeCode("a code", codeVerifier: "code verifier", redirectURI: "https://samples.auth0.com/callback")
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .tokenExchange(withCode: "a code", codeVerifier: "code verifier", redirectURI: "https://samples.auth0.com/callback")
         .start { print($0) }
      ```
 
@@ -449,8 +434,8 @@ public struct Authentication {
      - returns: a request that will yield Auth0 user's credentials
      - seeAlso: https://tools.ietf.org/html/rfc7636
      */
-    public func exchangeCode(code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
-        return self.token([
+    public func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
+        return self.tokenExchange(withParameters: [
                 "code": code,
                 "code_verifier": codeVerifier,
                 "redirect_uri": redirectURI,

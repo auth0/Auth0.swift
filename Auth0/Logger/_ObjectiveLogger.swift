@@ -31,7 +31,7 @@ public class _ObjectiveLogger: NSObject {
      - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
      */
     public static func loggingEnabled() {
-        enableLogging(true)
+        enableLogging(enabled: true)
     }
 
     /**
@@ -42,6 +42,6 @@ public class _ObjectiveLogger: NSObject {
      - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
      */
     public static func loggingEnabled(enabled: Bool) {
-        enableLogging(enabled)
+        enableLogging(enabled: enabled)
     }
 }

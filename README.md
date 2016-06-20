@@ -61,7 +61,7 @@ To avoid specifying clientId & domain you can add a `Auth0.plist` file to your m
 Auth0
    .authentication()
    .login(
-       "support@auth0.com", 
+       emailOrUsername: "support@auth0.com", 
        password: "a secret password", 
        connection: "Username-Password-Authentication"
        )
@@ -96,7 +96,7 @@ Auth0
 Auth0
    .authentication()
    .login(
-       "support@auth0.com", 
+       emailOrUsername: "support@auth0.com", 
        password: "email OTP", 
        connection: "email"
        )
@@ -117,7 +117,7 @@ Auth0
 Auth0
    .authentication()
    .signUp(
-       "support@auth0.com", 
+       email: "support@auth0.com", 
        password: "a secret password", 
        connection: "Username-Password-Authentication"
        )
@@ -137,7 +137,7 @@ Auth0
 ```swift
 Auth0
    .authentication()
-   .tokenInfo("user id_token")
+   .tokenInfo(token: "user id_token")
    .start { result in
        switch result {
        case .Success(let profile):

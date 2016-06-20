@@ -36,7 +36,7 @@ public struct Users {
 
      ```
      Auth0
-        .users(token, domain: "samples.auth0.com")
+        .users(token: token, domain: "samples.auth0.com")
         .get(userId)
         .start { print($0) }
      ```
@@ -45,7 +45,7 @@ public struct Users {
 
      ```
      Auth0
-        .users(token, domain: "samples.auth0.com")
+        .users(token: token, domain: "samples.auth0.com")
         .get(userId, fields: ["email", "user_id"])
         .start { print($0) }
      ```
@@ -54,7 +54,7 @@ public struct Users {
      
      ```
      Auth0
-        .users(token, domain: "samples.auth0.com")
+        .users(token token, domain: "samples.auth0.com")
         .get(userId, fields: ["identities", "app_metadata"], include: false)
         .start { print($0) }
      ```
@@ -112,7 +112,7 @@ public struct Users {
 
      ```
      Auth0
-        .users(token, domain: "samples.auth0.com")
+        .users(token: token, domain: "samples.auth0.com")
         .patch(userId, attributes: attributes)
         .start { print($0) }
      ```
@@ -138,7 +138,7 @@ public struct Users {
 
      ```
      Auth0
-        .users(token, domain: "samples.auth0.com")
+        .users(token: token, domain: "samples.auth0.com")
         .patch(userId, userMetadata: ["first_name": "Juan", "last_name": "AuthZero"])
         .start { print($0) }
      ```
@@ -160,7 +160,7 @@ public struct Users {
 
      ```
      Auth0
-        .users(token, domain: "samples.auth0.com")
+        .users(token: token, domain: "samples.auth0.com")
         .link(userId, withOtherUserToken: anotherToken)
         .start { print($0) }
      ```
@@ -183,7 +183,7 @@ public struct Users {
 
      ```
      Auth0
-        .users(token, domain: "samples.auth0.com")
+        .users(token: token, domain: "samples.auth0.com")
         .link(userId, userId: anotherUserId, provider: "auth0", connectionId: "AConnectionID")
         .start { print($0) }
      ```
@@ -218,8 +218,8 @@ public struct Users {
 
      ```
      Auth0
-        .users(token, domain: "samples.auth0.com")
-        .unlink("an_idenitity_id", provider: "facebook", fromUserId: "a_user_identifier")
+        .users(token: token, domain: "samples.auth0.com")
+        .unlink(identityId: "an_idenitity_id", provider: "facebook", fromUserId: "a_user_identifier")
         .start { print($0) }
      ```
 
@@ -232,7 +232,7 @@ public struct Users {
      - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
      - important: The token must have the following scope `update:users`
      */
-    public func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[Management.Object], ManagementError> {
+    public func unlink(identityId identityId: String, provider: String, fromUserId identifier: String) -> Request<[Management.Object], ManagementError> {
         let identityPath = "/api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
         let url = components(self.management.url, path: identityPath).URL!
         return Request(session: self.management.session, url: url, method: "DELETE", handle: self.management.managementObjects)
