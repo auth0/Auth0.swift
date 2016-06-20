@@ -118,6 +118,8 @@
 		5FE2F8C41CD1498E003628F4 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8C21CD1498E003628F4 /* UserProfile.swift */; };
 		5FE2F8C61CD1522F003628F4 /* UserProfileSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8C51CD1522F003628F4 /* UserProfileSpec.swift */; };
 		5FE2F8C71CD1522F003628F4 /* UserProfileSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8C51CD1522F003628F4 /* UserProfileSpec.swift */; };
+		5FE686A11D1877C10075874C /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5FE686A01D1877C10075874C /* Auth0.plist */; };
+		5FE686A21D1877C10075874C /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5FE686A01D1877C10075874C /* Auth0.plist */; };
 		5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF465BB1CE2AC4500F7ED8C /* Management.swift */; };
 		5FF465BD1CE2AC4500F7ED8C /* Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF465BB1CE2AC4500F7ED8C /* Management.swift */; };
 /* End PBXBuildFile section */
@@ -254,6 +256,7 @@
 		5FE2F8BD1CD0EC52003628F4 /* ResponseSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseSpec.swift; sourceTree = "<group>"; };
 		5FE2F8C21CD1498E003628F4 /* UserProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		5FE2F8C51CD1522F003628F4 /* UserProfileSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserProfileSpec.swift; sourceTree = "<group>"; };
+		5FE686A01D1877C10075874C /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
 		5FF346491CEFEC04000799DE /* Auth0Tests.iOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auth0Tests.iOS-Bridging-Header.h"; sourceTree = "<group>"; };
 		5FF3464A1CEFEC04000799DE /* Auth0Tests.OSX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auth0Tests.OSX-Bridging-Header.h"; sourceTree = "<group>"; };
 		5FF465BB1CE2AC4500F7ED8C /* Management.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Management.swift; sourceTree = "<group>"; };
@@ -360,6 +363,7 @@
 				5FF3464A1CEFEC04000799DE /* Auth0Tests.OSX-Bridging-Header.h */,
 				5FF346491CEFEC04000799DE /* Auth0Tests.iOS-Bridging-Header.h */,
 				5F06DD951CC451430011842B /* Info.plist */,
+				5FE686A01D1877C10075874C /* Auth0.plist */,
 			);
 			path = Auth0Tests;
 			sourceTree = "<group>";
@@ -758,6 +762,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE686A11D1877C10075874C /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -765,6 +770,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FE686A21D1877C10075874C /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

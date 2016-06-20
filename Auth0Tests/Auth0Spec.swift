@@ -45,7 +45,49 @@ class Auth0Spec: QuickSpec {
             it("should return authentication endpoint with domain url") {
                 let domain = "https://mycustomdomain.com"
                 let auth = Auth0.authentication(clientId: ClientId, domain: domain)
-                expect(auth.url.absoluteString).to(equal(domain))
+                expect(auth.url.absoluteString) == domain
+            }
+
+            it("should return management endopoint") {
+                let management = Auth0.management(token: "token", domain: Domain)
+                expect(management.token) == "token"
+                expect(management.url.absoluteString) == "https://\(Domain)"
+            }
+
+            it("should return users endopoint") {
+                let users = Auth0.users(token: "token", domain: Domain)
+                expect(users.management.token) == "token"
+                expect(users.management.url.absoluteString) == "https://\(Domain)"
+            }
+
+        }
+
+        describe("plist loading") {
+
+            var clientId: String!
+            var domain: String!
+
+            beforeEach {
+                let bundle = NSBundle.mainBundle()
+                let info = NSDictionary(contentsOfFile: bundle.pathForResource("Auth0", ofType: "plist")!)
+                clientId = info?["ClientId"] as? String
+                domain = info?["Domain"] as? String ?? ""
+            }
+
+            it("should return authentication endpoint with account from plist") {
+                let auth = Auth0.authentication()
+                expect(auth.url.absoluteString) == "https://\(domain)"
+                expect(auth.clientId) == clientId
+            }
+
+            it("should return management endpoint with domain from plist") {
+                let management = Auth0.management(token: "TOKEN")
+                expect(management.url.absoluteString) == "https://\(domain)"
+            }
+
+            it("should return users endpoint with domain from plist") {
+                let users = Auth0.users(token: "TOKEN")
+                expect(users.management.url.absoluteString) == "https://\(domain)"
             }
 
         }

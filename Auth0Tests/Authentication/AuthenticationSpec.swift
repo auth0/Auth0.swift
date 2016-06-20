@@ -571,7 +571,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            fit("should login with multifactor") {
+            it("should login with multifactor") {
                 waitUntil(timeout: Timeout) { done in
                     auth
                         .login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, multifactorCode: code, connection: ConnectionName)
