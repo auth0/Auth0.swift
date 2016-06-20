@@ -28,11 +28,13 @@ import Foundation
  - NoBundleIdentifierFound:        Cannot get the App's Bundle Identifier to use for redirect_uri.
  - CannotDismissWebAuthController: When trying to dismiss WebAuth controller, no presenter controller could be found.
  - UserCancelled:                  User cancelled the web-based authentication, e.g. tapped the "Done" button in SFSafariViewController
+ - PKCENotAllowed:                 PKCE for the supplied Auth0 ClientId was not allowed. You need to set the `Token Endpoint Authentication Method` to `None` in your Auth0 Dashboard
  */
 public enum WebAuthError: ErrorType {
     case NoBundleIdentifierFound
     case CannotDismissWebAuthController
     case UserCancelled
+    case PKCENotAllowed(String)
 }
 
 extension WebAuthError: FoundationErrorConvertible {
@@ -48,6 +50,16 @@ extension WebAuthError: FoundationErrorConvertible {
                 code: WebAuthError.CancelledFoundationCode,
                 userInfo: [
                     NSLocalizedDescriptionKey: "User Cancelled Web Authentication",
+                    WebAuthError.FoundationUserInfoKey: self as NSError
+                ]
+            )
+        }
+        if case .PKCENotAllowed(let message) = self {
+            return NSError(
+                domain: WebAuthError.FoundationDomain,
+                code: WebAuthError.GenericFoundationCode,
+                userInfo: [
+                    NSLocalizedDescriptionKey: message,
                     WebAuthError.FoundationUserInfoKey: self as NSError
                 ]
             )
