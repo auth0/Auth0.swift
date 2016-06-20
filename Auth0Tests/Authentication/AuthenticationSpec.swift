@@ -550,5 +550,39 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        describe("resource owner multifactor") {
+
+            var code: String!
+
+            beforeEach {
+                code = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["mfa_code"])) { _ in return authFailure(error: "a0.mfa_required", description: "need multifactor") }.name = "MFA Required"
+                stub(isResourceOwner(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "mfa_code": code])) { _ in return authResponse(accessToken: AccessToken) }.name = "MFA Login"
+            }
+
+            it("should report multifactor is required") {
+                waitUntil(timeout: Timeout) { done in
+                    auth
+                        .login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, connection: ConnectionName)
+                        .start { result in
+                            expect(result).to(beFailure { (error: AuthenticationError) in return error.isMultifactorRequired })
+                            done()
+                        }
+                }
+            }
+
+            fit("should login with multifactor") {
+                waitUntil(timeout: Timeout) { done in
+                    auth
+                        .login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, multifactorCode: code, connection: ConnectionName)
+                        .start { result in
+                            expect(result).to(haveCredentials())
+                            done()
+                    }
+                }
+            }
+
+        }
+
     }
 }

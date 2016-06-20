@@ -37,7 +37,8 @@ func hasAllOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
 func hasAtLeast(parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload else { return false }
-        return parameters.filter { (key, _) in payload.contains { (name, _) in  key == name } }.reduce(true, combine: { (initial, entry) -> Bool in
+        let entries = parameters.filter { (key, _) in payload.contains { (name, _) in  key == name } }
+        return entries.count == parameters.count && entries.reduce(true, combine: { (initial, entry) -> Bool in
             return initial && payload[entry.0] as? String == entry.1
         })
     }
@@ -54,6 +55,13 @@ func hasObjectAttribute(name: String, value: [String: String]) -> OHHTTPStubsTes
             guard let value = actualValue[entry.0] as? String else { return false }
             return initial && value == entry.1
         })
+    }
+}
+
+func hasNoneOf(names: [String]) -> OHHTTPStubsTestBlock {
+    return { request in
+        guard let payload = request.a0_payload else { return false }
+        return payload.filter { names.contains($0.0) }.isEmpty
     }
 }
 

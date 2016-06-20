@@ -81,6 +81,7 @@ public struct Authentication {
 
      - parameter usernameOrEmail:   username or email used of the user to authenticate, e.g. in email in Database connections or phone number for SMS connections.
      - parameter password:          password of the user or one time password (OTP) for passwordless connection users
+     - parameter multifactorCode:   multifactor code if the user has enrolled one. e.g. Guardian. By default is `nil` and no code is sent.
      - parameter connection:        name of any of your configured database or passwordless connections
      - parameter scope:             scope value requested when authenticating the user. Default is 'openid'
      - parameter parameters:        additional parameters that are optionally sent with the authentication request
@@ -88,7 +89,7 @@ public struct Authentication {
      - returns: authentication request that will yield Auth0 User Credentials
      - seeAlso: Credentials
      */
-    public func login(usernameOrEmail username: String, password: String, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
+    public func login(usernameOrEmail username: String, password: String, multifactorCode: String? = nil, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
         var payload: [String: AnyObject] = [
             "username": username,
@@ -98,6 +99,7 @@ public struct Authentication {
             "scope": scope,
             "client_id": self.clientId,
             ]
+        payload["mfa_code"] = multifactorCode
         parameters.forEach { key, value in payload[key] = value }
         return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload)
     }
@@ -131,11 +133,11 @@ public struct Authentication {
         .start { print($0) }
      ```
 
-     - parameter email:        email of the user to create
-     - parameter username:     username of the user if the connection requires username. By default is 'nil'
-     - parameter password:     password for the new user
-     - parameter connection:   name where the user will be created (Database connection)
-     - parameter userMetadata: additional userMetadata parameters that will be added to the newly created user.
+     - parameter email:             email of the user to create
+     - parameter username:          username of the user if the connection requires username. By default is 'nil'
+     - parameter password:          password for the new user
+     - parameter connection:        name where the user will be created (Database connection)
+     - parameter userMetadata:      additional userMetadata parameters that will be added to the newly created user.
 
      - returns: request that will yield a created database user (just email, username and email verified flag)
      */
@@ -146,13 +148,8 @@ public struct Authentication {
             "connection": connection,
             "client_id": self.clientId,
         ]
-        if let username = username {
-            payload["username"] = username
-        }
-
-        if let userMetadata = userMetadata {
-            payload["user_metadata"] = userMetadata
-        }
+        payload["username"] = username
+        payload["user_metadata"] = userMetadata
 
         let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
         return Request(session: session, url: createUser, method: "POST", handle: databaseUser, payload: payload)
