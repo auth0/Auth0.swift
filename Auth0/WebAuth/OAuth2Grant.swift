@@ -75,8 +75,17 @@ struct PKCE: OAuth2Grant {
                 let string = String(data: data, encoding: NSUTF8StringEncoding)
                 return callback(.Failure(error: AuthenticationError(string: string)))
             }
+        let clientId = self.clientId
         Authentication(clientId: clientId, url: url)
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
-            .start(callback)
+            .start { result in
+                // FIXME: Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
+                if case .Failure(let cause as AuthenticationError) = result where cause.description == "Unauthorized" {
+                    let error = WebAuthError.PKCENotAllowed("Please go to 'https://manage.auth0.com/#/applications/\(clientId)/settings' and set 'Token Endpoint Authentication Method' to 'None' to enable PKCE.")
+                    callback(Result.Failure(error: error))
+                } else {
+                    callback(result)
+                }
+            }
     }
 }
