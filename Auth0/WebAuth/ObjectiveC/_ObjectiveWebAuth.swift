@@ -127,4 +127,14 @@ public class _ObjectiveOAuth2: NSObject {
     public static func resume(url: NSURL, options: [String: AnyObject]) -> Bool {
         return SessionStorage.sharedInstance.resume(url, options: options)
     }
+
+    /**
+     Avoid Auth0.swift sending its version on every request to Auth0 API.
+     By default we collect our libraries and SDKs versions to help us during support and evaluate usage.
+
+     - parameter enabled: if Auth0.swift should send it's version on every request.
+     */
+    public func setTelemetryEnabled(enabled: Bool) {
+        Telemetry.sharedInstance.enabled = enabled
+    }
 }

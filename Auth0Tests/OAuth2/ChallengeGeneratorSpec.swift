@@ -71,17 +71,3 @@ class ChallengeGeneratorSpec: QuickSpec {
 
     }
 }
-
-func beURLSafeBase64() -> MatcherFunc<String> {
-    return MatcherFunc { expression, failureMessage in
-        failureMessage.postfixMessage = "be url safe base64"
-        let set = NSMutableCharacterSet()
-        set.formUnionWithCharacterSet(.alphanumericCharacterSet())
-        set.addCharactersInString("-_/")
-        set.invert()
-        if let actual = try expression.evaluate() where actual.rangeOfCharacterFromSet(set) == nil {
-            return true
-        }
-        return false
-    }
-}
