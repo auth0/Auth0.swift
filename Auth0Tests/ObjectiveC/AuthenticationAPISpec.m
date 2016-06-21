@@ -79,17 +79,17 @@ describe(@"login", ^{
         }];
 
         waitUntilTimeout(3000, ^(void(^done)()) {
-            [api loginWithUsername:@"support@auth0.com"
-                          password:@"random password"
-                        connection:@"Username-Password-Authentication"
-                             scope:@"openid"
-                        parameters:nil
-                          callback:^(NSError * _Nullable error, A0Credentials * _Nullable credentials) {
-                              expect(credentials.accessToken).to(equal(token));
-                              expect(credentials.tokenType).to(equal(bearer));
-                              expect(error).to(beNil());
-                              done();
-                          }];
+            [api loginWithUsernameOrEmail:@"support@auth0.com"
+                                 password:@"random password"
+                               connection:@"Username-Password-Authentication"
+                                    scope:@"openid"
+                               parameters:nil
+                                 callback:^(NSError * _Nullable error, A0Credentials * _Nullable credentials) {
+                                     expect(credentials.accessToken).to(equal(token));
+                                     expect(credentials.tokenType).to(equal(bearer));
+                                     expect(error).to(beNil());
+                                     done();
+                                 }];
         });
     });
 
@@ -103,21 +103,21 @@ describe(@"login", ^{
         }];
 
         waitUntilTimeout(3000, ^(void(^done)()) {
-            [api loginWithUsername:@"support@auth0.com"
-                          password:@"random password"
-                        connection:@"Username-Password-Authentication"
-                             scope:@"openid"
-                        parameters:nil
-                          callback:^(NSError * _Nullable error, A0Credentials * _Nullable credentials) {
-                              expect(credentials).to(beNil());
-                              expect(error).toNot(beNil());
-                              expect(error.domain).to(equal(@"com.auth0.authentication"));
-                              expect(@(error.a0_isManagementError)).to(beFalse());
-                              expect(@(error.a0_isAuthenticationError)).to(beTrue());
-                              expect(error.localizedDescription).to(equal(@"invalid password"));
-                              expect(@([error.a0_authenticationError isInvalidCredentials])).to(beTrue());
-                              done();
-                          }];
+            [api loginWithUsernameOrEmail:@"support@auth0.com"
+                                 password:@"random password"
+                               connection:@"Username-Password-Authentication"
+                                    scope:@"openid"
+                               parameters:nil
+                                 callback:^(NSError * _Nullable error, A0Credentials * _Nullable credentials) {
+                                     expect(credentials).to(beNil());
+                                     expect(error).toNot(beNil());
+                                     expect(error.domain).to(equal(@"com.auth0.authentication"));
+                                     expect(@(error.a0_isManagementError)).to(beFalse());
+                                     expect(@(error.a0_isAuthenticationError)).to(beTrue());
+                                     expect(error.localizedDescription).to(equal(@"invalid password"));
+                                     expect(@([error.a0_authenticationError isInvalidCredentials])).to(beTrue());
+                                     done();
+                                 }];
         });
     });
 

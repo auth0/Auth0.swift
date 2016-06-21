@@ -35,7 +35,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
         self.authentication = Authentication(clientId: clientId, url: url, session: session)
     }
 
-    @objc(loginWithUsername:password:connection:scope:parameters:callback:)
+    @objc(loginWithUsernameOrEmail:password:connection:scope:parameters:callback:)
     public func login(username: String, password: String, connection: String, scope: String, parameters: [String: AnyObject]?, callback: (NSError?, Credentials?) -> ()) {
         self.authentication
             .login(usernameOrEmail: username, password: password, connection: connection, scope: scope, parameters: parameters ?? [:])
