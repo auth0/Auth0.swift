@@ -1,5 +1,76 @@
 # Change Log
 
+## [1.0.0-beta.3](https://github.com/auth0/Auth0.swift/tree/1.0.0-beta.3) (2016-06-20)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-beta.2...1.0.0-beta.3)
+
+**Added:**
+
+- Show better error when PKCE is not enabled in client [\#30](https://github.com/auth0/Auth0.swift/pull/30) ([hzalaz](https://github.com/hzalaz))
+- Auth0 telemetry information [\#29](https://github.com/auth0/Auth0.swift/pull/29) ([hzalaz](https://github.com/hzalaz))
+- Multifactor support for `/oauth/ro` [\#28](https://github.com/auth0/Auth0.swift/pull/28) ([hzalaz](https://github.com/hzalaz))
+
+**Changed:**
+
+- Added parameter labels in Authentication API methods [\#27](https://github.com/auth0/Auth0.swift/pull/27) ([hzalaz](https://github.com/hzalaz))
+- Reworked Error handling [\#26](https://github.com/auth0/Auth0.swift/pull/26) ([hzalaz](https://github.com/hzalaz))
+
+**Breaking changes:**
+
+Most of the Authentication API methods first parameters labels are required so for example this call:
+
+```swift
+Auth0
+    .login("mail@mail.com", password: "secret", connection: "connection")
+```
+
+now needs to have the `usernameOrEmail` parameter label
+
+```swift
+Auth0
+    .login(usernameOrEmail: "mail@mail.com", password: "secret", connection: "connection")
+```
+
+Now all `Result` object return `ErrorType` instead of a specific error, this means that OS errors like no network, or connection could not be established are not wrapped in any Auth0 error anymore.
+
+Also the error types that **Auth0.swift** API clients can return are no longer an enum but a simple object:
+
+* Authentication API: `AuthenticationError`
+* Management API: `ManagementError`
+
+Each of them has it's own values according at what each api returns when the request fails. Now to handle **Auth0.swift** errors in your callback, you can do the following:
+
+```swift
+Auth0
+    .login(usernameOrEmail: "mail@mail.com", password: "secret", connection: "connection")
+    .start { result in
+        switch result {
+        case .Success(let credentials):
+            print(credentials)
+        case .Failure(let cause as AuthenticationError):
+            print("Auth0 error was \(cause)")
+        case .Failure(let cause):
+            print("Unknown error: \(cause)")
+        }
+    }
+```
+
+Also, `AuthenticationError` has some helper methods to check for common failures:
+
+```swift
+Auth0
+    .login(usernameOrEmail: "mail@mail.com", password: "secret", connection: "connection")
+    .start { result in
+        switch result {
+        case .Success(let credentials):
+            print(credentials)
+        case .Failure(let cause as AuthenticationError) where cause.isMultifactorRequired:
+            print("Need to ask the user for his mfa code!")
+        case .Failure(let cause):
+            print("Login failed with error: \(cause)")
+        }
+    }
+```
+
 ## [1.0.0-beta.2](https://github.com/auth0/Auth0.swift/tree/1.0.0-beta.2) (2016-06-09)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-beta.1...1.0.0-beta.2)
 
