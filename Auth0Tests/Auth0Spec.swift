@@ -83,5 +83,23 @@ class Auth0Spec: QuickSpec {
             }
 
         }
+
+        describe("telemetry") {
+
+            it("should toggle telemetry") {
+                let telemetry = Telemetry.sharedInstance
+                Auth0.enableTelemetry(enabled: false)
+                expect(telemetry.enabled) == false
+                Auth0.enableTelemetry(enabled: true)
+                expect(telemetry.enabled) == true
+            }
+
+            it("should mark it as used inside other library") {
+                let telemetry = Telemetry.sharedInstance
+                let info = telemetry.info
+                Auth0.using(inLibrary: "Lock.swift", version: "2.0.0-alpha.0")
+                expect(telemetry.info) != info
+            }
+        }
     }
 }
