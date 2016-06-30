@@ -44,6 +44,10 @@ class ManagementSpec: QuickSpec {
                 expect(management).toNot(beNil())
             }
 
+            it("should have bearer token in authorization header") {
+                let management = Management(token: Token, url: DomainURL)
+                expect(management.defaultHeaders["Authorization"]) == "Bearer \(Token)"
+            }
         }
 
         describe("object response handling") {
@@ -116,6 +120,7 @@ class ManagementSpec: QuickSpec {
                 }
 
             }
+
         }
     }
 }

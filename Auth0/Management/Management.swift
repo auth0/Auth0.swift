@@ -69,5 +69,10 @@ public struct Management {
             callback(.Failure(error: error))
         }
     }
-    
+
+    var defaultHeaders: [String: String] {
+        return [
+            "Authorization": "Bearer \(token)"
+        ]
+    }
 }

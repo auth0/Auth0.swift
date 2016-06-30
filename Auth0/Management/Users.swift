@@ -78,7 +78,7 @@ public struct Users {
             ]
         }
 
-        return Request(session: self.management.session, url: component.URL!, method: "GET", handle: self.management.managementObject)
+        return Request(session: self.management.session, url: component.URL!, method: "GET", handle: self.management.managementObject, headers: self.management.defaultHeaders)
     }
 
     /**
@@ -129,7 +129,7 @@ public struct Users {
         let userPath = "/api/v2/users/\(identifier)"
         let component = components(self.management.url, path: userPath)
         
-        return Request(session: self.management.session, url: component.URL!, method: "PATCH", handle: self.management.managementObject, payload: attributes.dictionary)
+        return Request(session: self.management.session, url: component.URL!, method: "PATCH", handle: self.management.managementObject, payload: attributes.dictionary, headers: self.management.defaultHeaders)
     }
 
     /**
@@ -210,7 +210,7 @@ public struct Users {
     private func link(identifier: String, payload: [String: String]) -> Request<[Management.Object], ManagementError> {
         let identitiesPath = "/api/v2/users/\(identifier)/identities"
         let url = components(self.management.url, path: identitiesPath).URL!
-        return Request(session: self.management.session, url: url, method: "POST", handle: self.management.managementObjects, payload: payload)
+        return Request(session: self.management.session, url: url, method: "POST", handle: self.management.managementObjects, payload: payload, headers: self.management.defaultHeaders)
     }
 
     /**
@@ -235,7 +235,7 @@ public struct Users {
     public func unlink(identityId identityId: String, provider: String, fromUserId identifier: String) -> Request<[Management.Object], ManagementError> {
         let identityPath = "/api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
         let url = components(self.management.url, path: identityPath).URL!
-        return Request(session: self.management.session, url: url, method: "DELETE", handle: self.management.managementObjects)
+        return Request(session: self.management.session, url: url, method: "DELETE", handle: self.management.managementObjects, headers: self.management.defaultHeaders)
     }
 }
 
