@@ -109,7 +109,7 @@ public struct ConcatRequest<F, S, E: Auth0Error>: Requestable {
 
      - parameter callback: called when the request finishes and yield it's result
      */
-    func start(callback: Result<S> -> ()) {
+    public func start(callback: Result<S> -> ()) {
         let second = self.second
         first.start { result in
             switch result {
