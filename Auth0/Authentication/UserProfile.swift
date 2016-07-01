@@ -28,8 +28,8 @@ import Foundation
  
  - seeAlso: [Normalized User Profile](https://auth0.com/docs/user-profile/normalized)
  */
-@objc(A0UserProfile)
-public class UserProfile: NSObject, JSONObjectPayload {
+@objc(A0Profile)
+public class Profile: NSObject, JSONObjectPayload {
 
     public let id: String
     public let name: String

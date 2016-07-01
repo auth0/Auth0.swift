@@ -324,7 +324,7 @@ public struct Authentication {
 
      - returns: a request that will yield token information
      */
-    public func tokenInfo(token token: String) -> Request<UserProfile, AuthenticationError> {
+    public func tokenInfo(token token: String) -> Request<Profile, AuthenticationError> {
         let payload: [String: AnyObject] = ["id_token": token]
         let tokenInfo = NSURL(string: "/tokeninfo", relativeToURL: self.url)!
         return Request(session: session, url: tokenInfo, method: "POST", handle: authenticationObject, payload: payload)
@@ -344,7 +344,7 @@ public struct Authentication {
 
      - returns: a request that will yield user information
      */
-    public func userInfo(token token: String) -> Request<UserProfile, AuthenticationError> {
+    public func userInfo(token token: String) -> Request<Profile, AuthenticationError> {
         let userInfo = NSURL(string: "/userinfo", relativeToURL: self.url)!
         return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(token)"])
     }
