@@ -1,4 +1,4 @@
-// UserIdentitySpec.swift
+// IdentitySpec.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -38,7 +38,7 @@ class UserIdentitySharedExamplesConfiguration: QuickConfiguration {
             it("should return nil when missing \(key)") {
                 var dict = required
                 dict[key] = nil
-                let identity = UserIdentity(json: dict)
+                let identity = Identity(json: dict)
                 expect(identity).to(beNil())
             }
         }
@@ -54,7 +54,7 @@ class UserIdentitySpec: QuickSpec {
             let secret = NSUUID().UUIDString
 
             it("should build with required values") {
-                let identity = UserIdentity(json: required)
+                let identity = Identity(json: required)
                 expect(identity?.identifier) == UserId
                 expect(identity?.connection) == "MyConnection"
                 expect(identity?.provider) == "auth0"
@@ -65,14 +65,14 @@ class UserIdentitySpec: QuickSpec {
             it("should have social flag") {
                 var json = required
                 json["isSocial"] = true
-                let identity = UserIdentity(json: json)
+                let identity = Identity(json: json)
                 expect(identity?.social) == true
             }
 
             it("should have profile data") {
                 var json = required
                 json["profileData"] = ["key": "value"]
-                let identity = UserIdentity(json: json)
+                let identity = Identity(json: json)
                 expect(identity?.profileData["key"] as? String) == "value"
             }
 
@@ -80,7 +80,7 @@ class UserIdentitySpec: QuickSpec {
                 var json = required
                 json["access_token"] = token
                 json["access_token_secret"] = secret
-                let identity = UserIdentity(json: json)
+                let identity = Identity(json: json)
                 expect(identity?.accessToken) == token
                 expect(identity?.accessTokenSecret) == secret
             }
@@ -90,12 +90,12 @@ class UserIdentitySpec: QuickSpec {
                 let interval = date.timeIntervalSince1970
                 var json = required
                 json["expires_in"] = interval
-                let identity = UserIdentity(json: json)
+                let identity = Identity(json: json)
                 expect(identity?.expiresIn?.timeIntervalSince1970) == interval
             }
 
             it("should return nil with empty json") {
-                let identity = UserIdentity(json: [:])
+                let identity = Identity(json: [:])
                 expect(identity).to(beNil())
             }
 
