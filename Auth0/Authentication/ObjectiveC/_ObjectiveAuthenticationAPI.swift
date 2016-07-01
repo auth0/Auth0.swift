@@ -108,12 +108,12 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     }
 
     @objc(tokenInfoFromToken:callback:)
-    public func tokenInfo(token: String, callback: (NSError?, UserProfile?) -> ()) {
+    public func tokenInfo(token: String, callback: (NSError?, Profile?) -> ()) {
         self.authentication.tokenInfo(token: token).start(handleResult(callback))
     }
 
     @objc(userInfoWithToken:callback:)
-    public func userInfo(token: String, callback: (NSError?, UserProfile?) -> ()) {
+    public func userInfo(token: String, callback: (NSError?, Profile?) -> ()) {
         self.authentication.userInfo(token: token).start(handleResult(callback))
     }
 

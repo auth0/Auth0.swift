@@ -251,7 +251,7 @@ func beFailure<T>(cause: String? = nil, predicate: ManagementError -> Bool) -> M
     }
 }
 
-func haveProfile(userId: String) -> MatcherFunc<Result<UserProfile>> {
+func haveProfile(userId: String) -> MatcherFunc<Result<Profile>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have user profile for user id <\(userId)>"
         if let actual = try expression.evaluate(), case .Success(let profile) = actual {
