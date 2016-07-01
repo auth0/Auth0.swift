@@ -1,4 +1,4 @@
-// UserIdentity.swift
+// Identity.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -25,8 +25,8 @@ import Foundation
 /**
  Auth0 user identity
  */
-@objc(A0UserIdentity)
-public class UserIdentity: NSObject, JSONObjectPayload {
+@objc(A0Identity)
+public class Identity: NSObject, JSONObjectPayload {
 
     public let identifier: String
     public let provider: String

@@ -1,4 +1,4 @@
-// UserProfile.swift
+// Profile.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -43,7 +43,7 @@ public class Profile: NSObject, JSONObjectPayload {
     public let familyName: String?
 
     public let additionalAttributes: [String: AnyObject]
-    public let identities: [UserIdentity]
+    public let identities: [Identity]
 
     public subscript(key: String) -> AnyObject? {
         return self.additionalAttributes[key]
@@ -61,7 +61,7 @@ public class Profile: NSObject, JSONObjectPayload {
         return self["app_metadata"] as? [String: AnyObject] ?? [:]
     }
 
-    required public init(id: String, name: String, nickname: String, pictureURL: NSURL, createdAt: NSDate, email: String?, emailVerified: Bool, givenName: String?, familyName: String?, attributes: [String: AnyObject], identities: [UserIdentity]) {
+    required public init(id: String, name: String, nickname: String, pictureURL: NSURL, createdAt: NSDate, email: String?, emailVerified: Bool, givenName: String?, familyName: String?, attributes: [String: AnyObject], identities: [Identity]) {
         self.id = id
         self.name = name
         self.nickname = nickname
@@ -90,7 +90,7 @@ public class Profile: NSObject, JSONObjectPayload {
         let givenName = json["given_name"] as? String
         let familyName = json["family_name"] as? String
         let identityValues = json["identities"] as? [[String: AnyObject]] ?? []
-        let identities = identityValues.flatMap { UserIdentity(json: $0) }.filter { $0 != nil }
+        let identities = identityValues.flatMap { Identity(json: $0) }.filter { $0 != nil }
         let keys = Set(["user_id", "name", "nickname", "picture", "created_at", "email", "email_verified", "given_name", "family_name", "identities"])
         var values: [String: AnyObject] = [:]
         json.forEach { key, value in
