@@ -68,6 +68,24 @@ public class _ObjectiveManagementAPI: NSObject {
                 }
         }
     }
+    
+    @objc(unlinkUserWithIdentifier:provider:fromUserId:callback:)
+    public func unlink(identifier: String, provider provider: String, fromUserId userId: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
+        self.management
+            .users()
+            .unlink(identityId: identifier, provider: provider, fromUserId:userId)
+            .start { result in
+                switch result {
+                case .Success(let payload):
+                    callback(nil, payload)
+                case .Failure(let cause as ManagementError):
+                    callback(cause.newFoundationError(), nil)
+                case .Failure(let cause):
+                    callback(cause as NSError, nil)
+                }
+        }
+    }
+
 
     /**
      Avoid Auth0.swift sending its version on every request to Auth0 API.
