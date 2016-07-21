@@ -69,8 +69,8 @@ public class _ObjectiveManagementAPI: NSObject {
         }
     }
     
-    @objc(unlinkUserWithIdentifier:withProvider:fromUserId:callback:)
-    public func unlink(identifier: String, withProvider provider: String, fromUserId userId: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
+    @objc(unlinkUserWithIdentifier:provider:fromUserId:callback:)
+    public func unlink(identifier: String, provider provider: String, fromUserId userId: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
         self.management
             .users()
             .unlink(identityId: identifier, provider: provider, fromUserId:userId)
