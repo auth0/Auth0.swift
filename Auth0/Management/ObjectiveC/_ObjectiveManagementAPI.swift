@@ -27,6 +27,10 @@ public class _ObjectiveManagementAPI: NSObject {
 
     private let management: Management
 
+    public init(token: String) {
+        self.management = Auth0.management(token: token)
+    }
+
     public convenience init(token: String, url: NSURL) {
         self.init(token: token, url: url, session: NSURLSession.sharedSession())
     }
@@ -70,7 +74,7 @@ public class _ObjectiveManagementAPI: NSObject {
     }
     
     @objc(unlinkUserWithIdentifier:provider:fromUserId:callback:)
-    public func unlink(identifier: String, provider provider: String, fromUserId userId: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
+    public func unlink(identifier: String, provider: String, fromUserId userId: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
         self.management
             .users()
             .unlink(identityId: identifier, provider: provider, fromUserId:userId)

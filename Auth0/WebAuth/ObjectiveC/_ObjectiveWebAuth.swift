@@ -28,6 +28,10 @@ public class _ObjectiveOAuth2: NSObject {
 
     private let webAuth: WebAuth
 
+    public override init() {
+        self.webAuth = Auth0.webAuth()
+    }
+
     public init(clientId: String, url: NSURL) {
         self.webAuth = WebAuth(clientId: clientId, url: url)
     }
