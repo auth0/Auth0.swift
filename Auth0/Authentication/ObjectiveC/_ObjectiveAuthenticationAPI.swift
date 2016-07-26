@@ -27,6 +27,10 @@ public class _ObjectiveAuthenticationAPI: NSObject {
 
     private let authentication: Authentication
 
+    public override init () {
+        self.authentication = Auth0.authentication()
+    }
+
     public convenience init(clientId: String, url: NSURL) {
         self.init(clientId: clientId, url: url, session: NSURLSession.sharedSession())
     }
