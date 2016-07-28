@@ -87,7 +87,7 @@ class TelemetrySpec: QuickSpec {
 
         describe("wrapping") {
 
-            let telemetry = Telemetry()
+            var telemetry = Telemetry()
             let version = Telemetry.versionInformation()["version"] ?? Telemetry.NoVersion
 
             beforeEach {
@@ -115,7 +115,7 @@ class TelemetrySpec: QuickSpec {
 
         describe("telemetry header") {
 
-            let telemetry = Telemetry()
+            var telemetry = Telemetry()
 
             it("should set telemetry header") {
                 let request = NSMutableURLRequest()
@@ -166,6 +166,31 @@ class TelemetrySpec: QuickSpec {
                 expect(items).to(contain(item))
             }
 
+        }
+
+        describe("trackable") {
+            struct MockTrackable: Trackable {
+                var telemetry: Telemetry
+            }
+
+            var trackable: Trackable!
+
+            beforeEach {
+                trackable = MockTrackable(telemetry: telemetry)
+            }
+
+            it("should toggle telemetry") {
+                trackable.enableTelemetry(enabled: false)
+                expect(trackable.telemetry.enabled) == false
+                trackable.enableTelemetry(enabled: true)
+                expect(trackable.telemetry.enabled) == true
+            }
+
+            it("should mark it as used inside other library") {
+                let info = trackable.telemetry.info
+                trackable.using(inLibrary: "Lock.swift", version: "2.0.0-alpha.0")
+                expect(trackable.telemetry.info) != info
+            }
         }
 
     }

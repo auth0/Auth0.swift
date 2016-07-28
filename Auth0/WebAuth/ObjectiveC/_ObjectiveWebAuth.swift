@@ -26,7 +26,7 @@ import Foundation
 /// Web-based Auth with Auth0
 public class _ObjectiveOAuth2: NSObject {
 
-    private let webAuth: WebAuth
+    private var webAuth: WebAuth
 
     public override init() {
         self.webAuth = Auth0.webAuth()
@@ -139,6 +139,6 @@ public class _ObjectiveOAuth2: NSObject {
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
     public func setTelemetryEnabled(enabled: Bool) {
-        Telemetry.sharedInstance.enabled = enabled
+        self.webAuth.enableTelemetry(enabled: enabled)
     }
 }

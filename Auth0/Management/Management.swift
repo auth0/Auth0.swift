@@ -25,16 +25,18 @@ import Foundation
 /**
  *  Auth0 Management API
  */
-public struct Management {
+public struct Management: Trackable {
     public let token: String
     public let url: NSURL
+    public var telemetry: Telemetry
 
     let session: NSURLSession
 
-    init(token: String, url: NSURL, session: NSURLSession = .sharedSession()) {
+    init(token: String, url: NSURL, session: NSURLSession = .sharedSession(), telemetry: Telemetry = Telemetry()) {
         self.token = token
         self.url = url
         self.session = session
+        self.telemetry = telemetry
     }
 
     public typealias Object = [String: AnyObject]
@@ -44,7 +46,7 @@ public struct Management {
 
      - returns: Users API endpoints
      */
-    public func users() -> Users { return Users(management: self) }
+    public func users() -> Users { return Users(management: self, telemetry: self.telemetry) }
 
     func managementObject(response: Response<ManagementError>, callback: Request<Object, ManagementError>.Callback) {
         do {

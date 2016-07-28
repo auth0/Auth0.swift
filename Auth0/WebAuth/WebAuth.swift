@@ -84,26 +84,27 @@ public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
 }
 
 /// OAuth2 Authentication using Auth0
-public class WebAuth {
+public class WebAuth: Trackable {
 
     private static let NoBundleIdentifier = "com.auth0.this-is-no-bundle"
 
-    let clientId: String
-    let url: NSURL
+    public let clientId: String
+    public let url: NSURL
+    public var telemetry: Telemetry
+
     let presenter: ControllerModalPresenter
     let storage: SessionStorage
     let logger: Logger?
-    let telemetry: Telemetry
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
     var usePKCE = true
 
-    public convenience init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter()) {
-        self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance)
+    public convenience init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
+        self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance, telemetry: telemetry)
     }
 
-    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage, logger: Logger? = Auth0Logger.sharedInstance.logger, telemetry: Telemetry = Telemetry.sharedInstance) {
+    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage, logger: Logger? = Auth0Logger.sharedInstance.logger, telemetry: Telemetry) {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter
@@ -267,7 +268,7 @@ public class WebAuth {
     }
 
     func handler(redirectURL: NSURL) -> OAuth2Grant {
-        return self.usePKCE ? PKCE(clientId: clientId, url: url, redirectURL: redirectURL) : ImplicitGrant()
+        return self.usePKCE ? PKCE(authentication: Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry), redirectURL: redirectURL) : ImplicitGrant()
     }
 
     var redirectURL: NSURL? {
