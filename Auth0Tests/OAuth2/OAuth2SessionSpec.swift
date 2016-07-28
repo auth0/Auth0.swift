@@ -44,19 +44,18 @@ class OAuth2SessionSpec: QuickSpec {
         let callback: Result<Credentials> -> () = { result = $0 }
         let controller = MockSafariViewController(URL: NSURL(string: "https://auth0.com")!)
         let handler = ImplicitGrant()
-        let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
+        let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
 
         beforeEach {
             result = nil
         }
 
         context("SFSafariViewControllerDelegate") {
-            var session: OAuth2Session!
+            var session: SafariSession!
 
             beforeEach {
                 controller.delegate = nil
-                session = OAuth2Session(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
-                SessionStorage.sharedInstance.store(session)
+                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
             }
 
             it("should set itself as delegate") {
@@ -108,7 +107,7 @@ class OAuth2SessionSpec: QuickSpec {
             }
 
             context("with state") {
-                let session = OAuth2Session(controller: controller, redirectURL: RedirectURL, state: "state", handler: handler, finish: {
+                let session = SafariSession(controller: controller, redirectURL: RedirectURL, state: "state", handler: handler, finish: {
                     result = $0
                 })
 

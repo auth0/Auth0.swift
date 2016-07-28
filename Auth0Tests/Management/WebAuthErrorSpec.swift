@@ -1,4 +1,4 @@
-// SessionStorage.swift
+// WebAuthErrorSpec.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -20,32 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import Foundation
+import Quick
+import Nimble
 
-/// Keeps track of current Auth session (e.g. OAuth2)
-class SessionStorage {
-    static let sharedInstance = SessionStorage()
+@testable import Auth0
 
-    private var current: OAuth2Session? = nil
 
-    func resume(url: NSURL, options: [String: AnyObject], logger: Logger? = Auth0Logger.sharedInstance.logger) -> Bool {
-        logger?.trace(url, source: options[UIApplicationLaunchOptionsSourceApplicationKey] as? String)
-        let resumed = self.current?.resume(url, options: options) ?? false
-        if resumed {
-            self.current = nil
-        }
-        return resumed
-    }
+class WebAuthErrorSpec: QuickSpec {
 
-    func store(session: OAuth2Session) {
-        self.current?.cancel()
-        self.current = session
-    }
+    override func spec() {
 
-    func cancel(session: OAuth2Session) {
-        session.cancel()
-        if self.current?.state == session.state {
-            self.current = nil
+        describe("foundation error") {
+
+            it("should build generic NSError") {
+                let error = WebAuthError.NoBundleIdentifierFound.newFoundationError()
+                expect(error.domain) == "com.auth0.webauth"
+                expect(error.code) == 1
+            }
+
+            it("should build error for PKCE not allowed") {
+                let message = "Not Allowed"
+                let error = WebAuthError.PKCENotAllowed(message).newFoundationError()
+                expect(error.domain) == "com.auth0.webauth"
+                expect(error.code) == 1
+                expect(error.localizedDescription) == message
+            }
+
+            it("should build error for user cancelled") {
+                let error = WebAuthError.UserCancelled.newFoundationError()
+                expect(error.domain) == "com.auth0.webauth"
+                expect(error.code) == 0
+            }
         }
     }
 }
