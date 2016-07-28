@@ -14,8 +14,10 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '9.0'
   s.osx.deployment_target = '10.10'
+  s.watchos.deployment_target = '2.0'
   s.requires_arc = true
 
   s.ios.source_files = 'Auth0/**/*.{swift,h,m}'
-  s.osx.source_files = ['Auth0/*.swift', 'Auth0/{Authentication,Extensions,Logger,Management,Networking}/*.{swift,h,m}']
+  s.osx.source_files = ['Auth0/*.swift', 'Auth0/{Authentication,Extensions,Logger,Management,Networking,Crypto}/*.{swift,h,m}']
+  s.watchos.source_files = ['Auth0/*.swift', 'Auth0/{Authentication,Extensions,Logger,Management,Networking,Crypto}/*.{swift,h,m}']
 end
