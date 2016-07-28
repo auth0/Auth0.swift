@@ -25,7 +25,7 @@ import Foundation
 @objc(A0ManagementAPI)
 public class _ObjectiveManagementAPI: NSObject {
 
-    private let management: Management
+    private var management: Management
 
     public init(token: String) {
         self.management = Auth0.management(token: token)
@@ -98,6 +98,6 @@ public class _ObjectiveManagementAPI: NSObject {
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
     public func setTelemetryEnabled(enabled: Bool) {
-        Telemetry.sharedInstance.enabled = enabled
+        self.management.enableTelemetry(enabled: enabled)
     }
 }

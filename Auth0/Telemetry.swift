@@ -22,7 +22,7 @@
 
 import Foundation
 
-class Telemetry: NSObject {
+public struct Telemetry {
 
     static let NameKey = "name"
     static let VersionKey = "version"
@@ -30,8 +30,6 @@ class Telemetry: NSObject {
 
     static let NoVersion = "0.0.0"
     static let LibraryName = "Auth0.swift"
-
-    static let sharedInstance = Telemetry()
 
     var enabled: Bool = true
 
@@ -43,11 +41,11 @@ class Telemetry: NSObject {
         }
     }
 
-    override init() {
+    init() {
         self.info = Telemetry.generateValue()
     }
 
-    func wrapped(inLibrary name: String, version: String) {
+    mutating func wrapped(inLibrary name: String, version: String) {
         let info = Telemetry.versionInformation()
         let wrapped = [
             Telemetry.NameKey: name,
@@ -73,7 +71,7 @@ class Telemetry: NSObject {
         return items
     }
 
-    static func versionInformation(bundle bundle: NSBundle = NSBundle(forClass: Telemetry.classForCoder())) -> [String: String] {
+    static func versionInformation(bundle bundle: NSBundle = NSBundle(forClass: Credentials.classForCoder())) -> [String: String] {
         let version = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? Telemetry.NoVersion
         let dict = [
             Telemetry.NameKey: Telemetry.LibraryName,
@@ -85,5 +83,34 @@ class Telemetry: NSObject {
     static func generateValue(fromInfo info: [String: String] = Telemetry.versionInformation()) -> String? {
         let data = try? NSJSONSerialization.dataWithJSONObject(info, options: [])
         return data?.a0_encodeBase64URLSafe()
+    }
+}
+
+public protocol Trackable {
+
+    var telemetry: Telemetry { get set }
+
+}
+
+
+extension Trackable {
+    /**
+     Avoid Auth0.swift sending its version on every request to Auth0 API.
+     By default we collect our libraries and SDKs versions to help us during support and evaluate usage.
+
+     - parameter enabled: if Auth0.swift should send it's version on every request.
+     */
+    public mutating func enableTelemetry(enabled enabled: Bool) {
+        self.telemetry.enabled = enabled
+    }
+
+    /**
+     Send the library/framework, that has Auth0.swift as dependency, when sending telemetry information
+
+     - parameter name:    name of library or framework that uses Auth0.swift
+     - parameter version: version of library or framework
+     */
+    public mutating func using(inLibrary name: String, version: String) {
+        self.telemetry.wrapped(inLibrary: name, version: version)
     }
 }

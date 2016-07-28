@@ -201,26 +201,6 @@ public func enableLogging(enabled enabled: Bool = true) {
     Auth0Logger.sharedInstance.logger = enabled ? DefaultLogger() : nil
 }
 
-/**
- Avoid Auth0.swift sending its version on every request to Auth0 API.
- By default we collect our libraries and SDKs versions to help us during support and evaluate usage.
-
- - parameter enabled: if Auth0.swift should send it's version on every request.
- */
-public func enableTelemetry(enabled enabled: Bool) {
-    Telemetry.sharedInstance.enabled = enabled
-}
-
-/**
- Send the library/framework, that has Auth0.swift as dependency, when sending telemetry information
-
- - parameter name:    name of library or framework that uses Auth0.swift
- - parameter version: version of library or framework
- */
-public func using(inLibrary name: String, version: String) {
-    Telemetry.sharedInstance.wrapped(inLibrary: name, version: version)
-}
-
 func plistValues(bundle bundle: NSBundle) -> (clientId: String, domain: String)? {
     guard
         let path = bundle.pathForResource("Auth0", ofType: "plist"),

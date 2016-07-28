@@ -25,7 +25,7 @@ import Foundation
 @objc(A0AuthenticationAPI)
 public class _ObjectiveAuthenticationAPI: NSObject {
 
-    private let authentication: Authentication
+    private var authentication: Authentication
 
     public override init () {
         self.authentication = Auth0.authentication()
@@ -136,7 +136,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
     public func setTelemetryEnabled(enabled: Bool) {
-        Telemetry.sharedInstance.enabled = enabled
+        self.authentication.enableTelemetry(enabled: enabled)
     }
 }
 

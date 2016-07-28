@@ -45,19 +45,17 @@ struct ImplicitGrant: OAuth2Grant {
 
 struct PKCE: OAuth2Grant {
 
-    let clientId: String
-    let url: NSURL
+    let authentication: Authentication
     let redirectURL: NSURL
     let defaults: [String : String]
     let verifier: String
 
-    init(clientId: String, url: NSURL, redirectURL: NSURL, generator: A0SHA256ChallengeGenerator = A0SHA256ChallengeGenerator()) {
-        self.init(clientId: clientId, url: url, redirectURL: redirectURL, verifier: generator.verifier, challenge: generator.challenge, method: generator.method)
+    init(authentication: Authentication, redirectURL: NSURL, generator: A0SHA256ChallengeGenerator = A0SHA256ChallengeGenerator()) {
+        self.init(authentication: authentication, redirectURL: redirectURL, verifier: generator.verifier, challenge: generator.challenge, method: generator.method)
     }
 
-    init(clientId: String, url: NSURL, redirectURL: NSURL, verifier: String, challenge: String, method: String) {
-        self.clientId = clientId
-        self.url = url
+    init(authentication: Authentication, redirectURL: NSURL, verifier: String, challenge: String, method: String) {
+        self.authentication = authentication
         self.redirectURL = redirectURL
         self.defaults = [
             "response_type": "code",
@@ -75,8 +73,8 @@ struct PKCE: OAuth2Grant {
                 let string = String(data: data, encoding: NSUTF8StringEncoding)
                 return callback(.Failure(error: AuthenticationError(string: string)))
             }
-        let clientId = self.clientId
-        Authentication(clientId: clientId, url: url)
+        let clientId = self.authentication.clientId
+        self.authentication
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
             .start { result in
                 // FIXME: Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
