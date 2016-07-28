@@ -74,6 +74,7 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
         "client_id": ClientId,
         "response_type": "token",
         "redirect_uri": RedirectURL.absoluteString,
+        "scope": "openid",
         ]
     parameters.forEach { query[$0] = $1 }
     return query
@@ -109,10 +110,10 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newWebAuth()
-                        .scope("openid")
+                        .scope("openid email")
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
-                    "query": defaultQuery(withParameters: ["scope": "openid"]),
+                    "query": defaultQuery(withParameters: ["scope": "openid email"]),
                     ]
             }
 
@@ -127,6 +128,12 @@ class WebAuthSpec: QuickSpec {
                     ]
             }
 
+            it("should override default values") {
+                let auth = newWebAuth()
+                let state = auth.state!
+                let url = auth.parameters(["state": "value"]).buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults)
+                expect(url.a0_components?.queryItems).toNot(containItem(withName: "state", value: state))
+            }
         }
 
         describe("redirect uri") {
