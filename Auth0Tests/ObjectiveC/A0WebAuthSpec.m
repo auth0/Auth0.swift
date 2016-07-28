@@ -24,6 +24,7 @@
 
 @import Quick;
 @import Nimble;
+
 @import Auth0;
 
 QuickSpecBegin(A0WebAuthSpec)
@@ -33,23 +34,65 @@ NSURL *domain = [NSURL a0_URLWithDomain:@"samples.auth0.com"];
 
 describe(@"init", ^{
     it(@"should create component", ^{
-        A0WebAuth *oauth2 = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
-        expect(oauth2).toNot(beNil());
+        A0WebAuth *webAuth = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
+        expect(webAuth).toNot(beNil());
     });
 
     it(@"should not have connection", ^{
-        A0WebAuth *oauth2 = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
-        expect(oauth2.connection).to(beNil());
+        A0WebAuth *webAuth = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
+        expect(webAuth.connection).to(beNil());
     });
     
     it(@"should not have scope", ^{
-        A0WebAuth *oauth2 = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
-        expect(oauth2.scope).to(beNil());
+        A0WebAuth *webAuth = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
+        expect(webAuth.scope).to(beNil());
     });
 
     it(@"should not use universal links", ^{
-        A0WebAuth *oauth2 = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
-        expect(@(oauth2.universalLink)).to(beFalsy());
+        A0WebAuth *webAuth = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
+        expect(@(webAuth.universalLink)).to(beFalsy());
     });
+});
+
+describe(@"options", ^{
+
+    __block A0WebAuth *webAuth;
+
+    beforeEach(^{
+        webAuth = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
+    });
+
+    it(@"should add parameters", ^{
+        NSDictionary *parameters = @{@"key" : @"value"};
+        [webAuth addParameters: parameters];
+    });
+
+    it(@"should set universal link flag", ^{
+        webAuth.universalLink = YES;
+        expect(@(webAuth.universalLink)).to(beTruthy());
+    });
+
+    it(@"should set connection", ^{
+        webAuth.connection = @"connection";
+        expect(webAuth.connection).to(equal(@"connection"));
+    });
+
+    it(@"should set connection if is non-nil", ^{
+        webAuth.connection = @"connection";
+        webAuth.connection = nil;
+        expect(webAuth.connection).to(equal(@"connection"));
+    });
+
+    it(@"should set scope", ^{
+        webAuth.scope = @"openid";
+        expect(webAuth.scope).to(equal(@"openid"));
+    });
+
+    it(@"should set connection if is non-nil", ^{
+        webAuth.scope = @"openid";
+        webAuth.scope = nil;
+        expect(webAuth.scope).to(equal(@"openid"));
+    });
+
 });
 QuickSpecEnd

@@ -222,7 +222,7 @@ public class WebAuth: Trackable {
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
         let (controller, finish) = newSafari(authorizeURL, callback: callback)
-        let session = OAuth2Session(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish)
+        let session = SafariSession(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish)
         controller.delegate = session
         logger?.trace(authorizeURL, source: "Safari")
         self.presenter.present(controller)
@@ -254,15 +254,15 @@ public class WebAuth: Trackable {
     func buildAuthorizeURL(withRedirectURL redirectURL: NSURL, defaults: [String: String]) -> NSURL {
         let authorize = NSURL(string: "/authorize", relativeToURL: self.url)!
         let components = NSURLComponents(URL: authorize, resolvingAgainstBaseURL: true)!
-        var items = [
-            NSURLQueryItem(name: "client_id", value: self.clientId),
-            NSURLQueryItem(name: "redirect_uri", value: redirectURL.absoluteString),
-            NSURLQueryItem(name: "state", value: state),
-            ]
+        var items: [NSURLQueryItem] = []
+        var entries = defaults
+        entries["client_id"] = self.clientId
+        entries["redirect_uri"] = redirectURL.absoluteString
+        entries["scope"] = "openid"
+        entries["state"] = self.state
+        self.parameters.forEach { entries[$0] = $1 }
 
-        let addAll: (String, String) -> () = { items.append(NSURLQueryItem(name: $0, value: $1)) }
-        defaults.forEach(addAll)
-        self.parameters.forEach(addAll)
+        entries.forEach { items.append(NSURLQueryItem(name: $0, value: $1)) }
         components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
         return components.URL!
     }

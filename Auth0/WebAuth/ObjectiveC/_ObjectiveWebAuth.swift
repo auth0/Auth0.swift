@@ -26,7 +26,7 @@ import Foundation
 /// Web-based Auth with Auth0
 public class _ObjectiveOAuth2: NSObject {
 
-    private var webAuth: WebAuth
+    private(set) var webAuth: WebAuth
 
     public override init() {
         self.webAuth = Auth0.webAuth()
@@ -36,7 +36,7 @@ public class _ObjectiveOAuth2: NSObject {
         self.webAuth = WebAuth(clientId: clientId, url: url)
     }
 
-    func addParameters(parameters: [String: String]) {
+    public func addParameters(parameters: [String: String]) {
         self.webAuth.parameters(parameters)
     }
 
