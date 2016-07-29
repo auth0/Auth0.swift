@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.0.0-beta.7](https://github.com/auth0/Auth0.swift/tree/1.0.0-beta.7) (2016-07-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-beta.6...1.0.0-beta.7)
+
+**Added:**
+
+- Add tvOS & watchOS targets [\#40](https://github.com/auth0/Auth0.swift/pull/40) ([hzalaz](https://github.com/hzalaz)
+
+**Changed:**
+
+- Improve error handling and Auth session management [\#39](https://github.com/auth0/Auth0.swift/pull/39) ([hzalaz](https://github.com/hzalaz)
+- Avoid using global telemetry. [\#38](https://github.com/auth0/Auth0.swift/pull/38) ([hzalaz](https://github.com/hzalaz)
+
 ## [1.0.0-beta.6](https://github.com/auth0/Auth0.swift/tree/1.0.0-beta.6) (2016-07-26)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-beta.5...1.0.0-beta.6)
 
