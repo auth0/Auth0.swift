@@ -44,8 +44,53 @@
 		5F23E6EC1D4ACDD200C3F2D9 /* A0ChallengeGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */; };
 		5F23E6EF1D4B872000C3F2D9 /* A0ChallengeGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */; };
 		5F23E6F01D4B873D00C3F2D9 /* A0ChallengeGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5F23E6FE1D4B88C500C3F2D9 /* Auth0.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F049B6C1CB42C29006F6C05 /* Auth0.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5F23E6FF1D4B88D400C3F2D9 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE686A51D188DEF0075874C /* Telemetry.swift */; };
+		5F23E7001D4B88DB00C3F2D9 /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */; };
+		5F23E7011D4B88DB00C3F2D9 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0451CCA99E90024D2AF /* Credentials.swift */; };
+		5F23E7021D4B88DB00C3F2D9 /* Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B41CCEB1C0003628F4 /* Handlers.swift */; };
+		5F23E7031D4B88DB00C3F2D9 /* Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3C1CEE8E9100226823 /* Identity.swift */; };
+		5F23E7041D4B88DB00C3F2D9 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8C21CD1498E003628F4 /* Profile.swift */; };
+		5F23E7051D4B88DB00C3F2D9 /* AuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255AD1D14A4A300387ECB /* AuthenticationError.swift */; };
+		5F23E7061D4B88EA00C3F2D9 /* NSData+URLSafe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCAB1721D09009600331C84 /* NSData+URLSafe.swift */; };
+		5F23E7071D4B88EA00C3F2D9 /* NSURL+Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCAB1781D09124D00331C84 /* NSURL+Auth0.swift */; };
+		5F23E7081D4B88F000C3F2D9 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6FAC621D09E98000D5B4EA /* Logger.swift */; };
+		5F23E7091D4B88F600C3F2D9 /* Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF465BB1CE2AC4500F7ED8C /* Management.swift */; };
+		5F23E70A1D4B88F600C3F2D9 /* UserPatchAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB60B1CED7E0800D4BB50 /* UserPatchAttributes.swift */; };
+		5F23E70B1D4B88F600C3F2D9 /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB6051CED27FB00D4BB50 /* Users.swift */; };
+		5F23E70C1D4B88F600C3F2D9 /* ManagementError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B31D14DD2600387ECB /* ManagementError.swift */; };
+		5F23E70D1D4B88FC00C3F2D9 /* JSONObjectPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB3F1CEFD5E600226823 /* JSONObjectPayload.swift */; };
+		5F23E70E1D4B88FC00C3F2D9 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B71CD0E910003628F4 /* Request.swift */; };
+		5F23E70F1D4B88FC00C3F2D9 /* Requestable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8B11CCEAED8003628F4 /* Requestable.swift */; };
+		5F23E7101D4B88FC00C3F2D9 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8BA1CD0EAAD003628F4 /* Response.swift */; };
+		5F23E7111D4B88FC00C3F2D9 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A81CCE54F1003628F4 /* Result.swift */; };
+		5F23E7121D4B890000C3F2D9 /* A0ChallengeGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5F23E7131D4B890500C3F2D9 /* A0ChallengeGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */; };
+		5F23E71A1D4B891E00C3F2D9 /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
+		5F23E71B1D4B891E00C3F2D9 /* Auth0Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B61D14F00900387ECB /* Auth0Error.swift */; };
 		5F2BD4041D09F7B700B5F7D2 /* _ObjectiveLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2BD4031D09F7B700B5F7D2 /* _ObjectiveLogger.swift */; };
 		5F2BD4051D09F7B700B5F7D2 /* _ObjectiveLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2BD4031D09F7B700B5F7D2 /* _ObjectiveLogger.swift */; };
+		5F331AFE1D4BB24C00AE4382 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F23E6F61D4B87F000C3F2D9 /* Auth0.framework */; };
+		5F331B041D4BB78C00AE4382 /* TelemetrySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE686A91D1894AA0075874C /* TelemetrySpec.swift */; };
+		5F331B051D4BB7D400AE4382 /* AuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */; };
+		5F331B061D4BB7DA00AE4382 /* CredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */; };
+		5F331B071D4BB7E300AE4382 /* IdentitySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F74CB421CEFDFB800226823 /* IdentitySpec.swift */; };
+		5F331B081D4BB7EA00AE4382 /* ProfileSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8C51CD1522F003628F4 /* ProfileSpec.swift */; };
+		5F331B091D4BB7EE00AE4382 /* AuthenticationErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B01D14A9E000387ECB /* AuthenticationErrorSpec.swift */; };
+		5F331B0A1D4BB7F900AE4382 /* ManagementSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB6081CED500900D4BB50 /* ManagementSpec.swift */; };
+		5F331B0B1D4BB7F900AE4382 /* UserPatchAttributesSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB60E1CED7E5200D4BB50 /* UserPatchAttributesSpec.swift */; };
+		5F331B0C1D4BB7F900AE4382 /* UsersSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB6021CEC0C3300D4BB50 /* UsersSpec.swift */; };
+		5F331B0D1D4BB7FE00AE4382 /* ResponseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2F8BD1CD0EC52003628F4 /* ResponseSpec.swift */; };
+		5F331B0E1D4BB80700AE4382 /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
+		5F331B0F1D4BB80700AE4382 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
+		5F331B101D4BB80700AE4382 /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
+		5F331B1B1D4BCBDB00AE4382 /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F331B121D4BCBD400AE4382 /* Quick.framework */; };
+		5F331B1C1D4BCBDB00AE4382 /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F331B131D4BCBD400AE4382 /* Nimble.framework */; };
+		5F331B1D1D4BCBDB00AE4382 /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F331B141D4BCBD400AE4382 /* OHHTTPStubs.framework */; };
+		5F331B1E1D4BCBF800AE4382 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5FE686A01D1877C10075874C /* Auth0.plist */; };
+		5F331B201D4BCC1500AE4382 /* Quick.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F331B121D4BCBD400AE4382 /* Quick.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5F331B211D4BCC1500AE4382 /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F331B131D4BCBD400AE4382 /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5F331B221D4BCC1500AE4382 /* OHHTTPStubs.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F331B141D4BCBD400AE4382 /* OHHTTPStubs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F3965C21CF67CF000CDE7C0 /* WebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */; };
 		5F3965CA1CF67DD800CDE7C0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C91CF67DD800CDE7C0 /* AppDelegate.swift */; };
 		5F3965CC1CF67DD800CDE7C0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965CB1CF67DD800CDE7C0 /* ViewController.swift */; };
@@ -172,6 +217,13 @@
 			remoteGlobalIDString = 5F06DD841CC448C90011842B;
 			remoteInfo = Auth0.OSX;
 		};
+		5F331AFF1D4BB24C00AE4382 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5F23E6F51D4B87F000C3F2D9;
+			remoteInfo = Auth0.tvOS;
+		};
 		5F53F5CF1CFD199700476A46 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
@@ -213,6 +265,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5F331B1F1D4BCBFD00AE4382 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5F331B201D4BCC1500AE4382 /* Quick.framework in CopyFiles */,
+				5F331B211D4BCC1500AE4382 /* Nimble.framework in CopyFiles */,
+				5F331B221D4BCC1500AE4382 /* OHHTTPStubs.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -232,7 +296,13 @@
 		5F06DDC81CC66B710011842B /* Auth0.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0.swift; sourceTree = "<group>"; };
 		5F09C6A61D07532B00727E55 /* ChallengeGeneratorSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChallengeGeneratorSpec.swift; sourceTree = "<group>"; };
 		5F23E6B91D4ACA7100C3F2D9 /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F23E6F61D4B87F000C3F2D9 /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F23E6FA1D4B87F000C3F2D9 /* Info-tvOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info-tvOS.plist"; path = "Auth0/Info-tvOS.plist"; sourceTree = SOURCE_ROOT; };
 		5F2BD4031D09F7B700B5F7D2 /* _ObjectiveLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _ObjectiveLogger.swift; sourceTree = "<group>"; };
+		5F331AF91D4BB24C00AE4382 /* Auth0Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Auth0Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F331B121D4BCBD400AE4382 /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quick.framework; path = Carthage/Build/tvOS/Quick.framework; sourceTree = "<group>"; };
+		5F331B131D4BCBD400AE4382 /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = Carthage/Build/tvOS/Nimble.framework; sourceTree = "<group>"; };
+		5F331B141D4BCBD400AE4382 /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = Carthage/Build/tvOS/OHHTTPStubs.framework; sourceTree = "<group>"; };
 		5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebAuth.swift; sourceTree = "<group>"; };
 		5F3965C71CF67DD800CDE7C0 /* OAuth2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F3965C91CF67DD800CDE7C0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -344,6 +414,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5F23E6F21D4B87F000C3F2D9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F331AF61D4BB24C00AE4382 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F331B1C1D4BCBDB00AE4382 /* Nimble.framework in Frameworks */,
+				5F331B1D1D4BCBDB00AE4382 /* OHHTTPStubs.framework in Frameworks */,
+				5F331B1B1D4BCBDB00AE4382 /* Quick.framework in Frameworks */,
+				5F331AFE1D4BB24C00AE4382 /* Auth0.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5F3965C41CF67DD800CDE7C0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -375,6 +463,8 @@
 				5F06DDAF1CC451700011842B /* Auth0Tests.xctest */,
 				5F3965C71CF67DD800CDE7C0 /* OAuth2.app */,
 				5F23E6B91D4ACA7100C3F2D9 /* Auth0.framework */,
+				5F23E6F61D4B87F000C3F2D9 /* Auth0.framework */,
+				5F331AF91D4BB24C00AE4382 /* Auth0Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -393,6 +483,7 @@
 				5F3965C01CF679B500CDE7C0 /* WebAuth */,
 				5F06DDC81CC66B710011842B /* Auth0.swift */,
 				5F049B6E1CB42C29006F6C05 /* Info.plist */,
+				5F23E6FA1D4B87F000C3F2D9 /* Info-tvOS.plist */,
 				5FD255B61D14F00900387ECB /* Auth0Error.swift */,
 			);
 			path = Auth0;
@@ -420,6 +511,7 @@
 		5F06DDC21CC5712F0011842B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5F331B111D4BB8D700AE4382 /* tvOS */,
 				5F06DDC31CC571480011842B /* iOS */,
 				5F06DDC41CC5714F0011842B /* OSX */,
 			);
@@ -444,6 +536,16 @@
 				5F06DDC01CC571290011842B /* Nimble.framework */,
 			);
 			name = OSX;
+			sourceTree = "<group>";
+		};
+		5F331B111D4BB8D700AE4382 /* tvOS */ = {
+			isa = PBXGroup;
+			children = (
+				5F331B121D4BCBD400AE4382 /* Quick.framework */,
+				5F331B131D4BCBD400AE4382 /* Nimble.framework */,
+				5F331B141D4BCBD400AE4382 /* OHHTTPStubs.framework */,
+			);
+			name = tvOS;
 			sourceTree = "<group>";
 		};
 		5F3965C01CF679B500CDE7C0 /* WebAuth */ = {
@@ -673,6 +775,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5F23E6F31D4B87F000C3F2D9 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F23E6FE1D4B88C500C3F2D9 /* Auth0.h in Headers */,
+				5F23E7121D4B890000C3F2D9 /* A0ChallengeGenerator.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -769,6 +880,43 @@
 			productReference = 5F23E6B91D4ACA7100C3F2D9 /* Auth0.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		5F23E6F51D4B87F000C3F2D9 /* Auth0.tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5F23E6FB1D4B87F000C3F2D9 /* Build configuration list for PBXNativeTarget "Auth0.tvOS" */;
+			buildPhases = (
+				5F23E6F11D4B87F000C3F2D9 /* Sources */,
+				5F23E6F21D4B87F000C3F2D9 /* Frameworks */,
+				5F23E6F31D4B87F000C3F2D9 /* Headers */,
+				5F23E6F41D4B87F000C3F2D9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Auth0.tvOS;
+			productName = Auth0.tvOS;
+			productReference = 5F23E6F61D4B87F000C3F2D9 /* Auth0.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		5F331AF81D4BB24C00AE4382 /* Auth0Tests.tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5F331B031D4BB24C00AE4382 /* Build configuration list for PBXNativeTarget "Auth0Tests.tvOS" */;
+			buildPhases = (
+				5F331AF51D4BB24C00AE4382 /* Sources */,
+				5F331AF61D4BB24C00AE4382 /* Frameworks */,
+				5F331AF71D4BB24C00AE4382 /* Resources */,
+				5F331B1F1D4BCBFD00AE4382 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5F331B001D4BB24C00AE4382 /* PBXTargetDependency */,
+			);
+			name = Auth0Tests.tvOS;
+			productName = Auth0Tests.tvOS;
+			productReference = 5F331AF91D4BB24C00AE4382 /* Auth0Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		5F3965C61CF67DD800CDE7C0 /* OAuth2 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5F3965E11CF67DD800CDE7C0 /* Build configuration list for PBXNativeTarget "OAuth2" */;
@@ -814,6 +962,12 @@
 					5F23E6B81D4ACA7100C3F2D9 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
+					5F23E6F51D4B87F000C3F2D9 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+					5F331AF81D4BB24C00AE4382 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 					5F3965C61CF67DD800CDE7C0 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
@@ -835,8 +989,10 @@
 				5F06DD771CC448B10011842B /* Auth0.iOS */,
 				5F06DD841CC448C90011842B /* Auth0.macOS */,
 				5F23E6B81D4ACA7100C3F2D9 /* Auth0.watchOS */,
+				5F23E6F51D4B87F000C3F2D9 /* Auth0.tvOS */,
 				5F06DD9F1CC451540011842B /* Auth0Tests.iOS */,
 				5F06DDAE1CC451700011842B /* Auth0Tests.macOS */,
+				5F331AF81D4BB24C00AE4382 /* Auth0Tests.tvOS */,
 				5F3965C61CF67DD800CDE7C0 /* OAuth2 */,
 			);
 		};
@@ -877,6 +1033,21 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F23E6F41D4B87F000C3F2D9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F331AF71D4BB24C00AE4382 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F331B1E1D4BCBF800AE4382 /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1065,6 +1236,55 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5F23E6F11D4B87F000C3F2D9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F23E7051D4B88DB00C3F2D9 /* AuthenticationError.swift in Sources */,
+				5F23E70E1D4B88FC00C3F2D9 /* Request.swift in Sources */,
+				5F23E7111D4B88FC00C3F2D9 /* Result.swift in Sources */,
+				5F23E7071D4B88EA00C3F2D9 /* NSURL+Auth0.swift in Sources */,
+				5F23E7131D4B890500C3F2D9 /* A0ChallengeGenerator.m in Sources */,
+				5F23E7011D4B88DB00C3F2D9 /* Credentials.swift in Sources */,
+				5F23E71A1D4B891E00C3F2D9 /* Auth0.swift in Sources */,
+				5F23E7101D4B88FC00C3F2D9 /* Response.swift in Sources */,
+				5F23E7091D4B88F600C3F2D9 /* Management.swift in Sources */,
+				5F23E7041D4B88DB00C3F2D9 /* Profile.swift in Sources */,
+				5F23E6FF1D4B88D400C3F2D9 /* Telemetry.swift in Sources */,
+				5F23E70A1D4B88F600C3F2D9 /* UserPatchAttributes.swift in Sources */,
+				5F23E71B1D4B891E00C3F2D9 /* Auth0Error.swift in Sources */,
+				5F23E7081D4B88F000C3F2D9 /* Logger.swift in Sources */,
+				5F23E7031D4B88DB00C3F2D9 /* Identity.swift in Sources */,
+				5F23E70B1D4B88F600C3F2D9 /* Users.swift in Sources */,
+				5F23E70D1D4B88FC00C3F2D9 /* JSONObjectPayload.swift in Sources */,
+				5F23E7021D4B88DB00C3F2D9 /* Handlers.swift in Sources */,
+				5F23E7001D4B88DB00C3F2D9 /* Authentication.swift in Sources */,
+				5F23E7061D4B88EA00C3F2D9 /* NSData+URLSafe.swift in Sources */,
+				5F23E70F1D4B88FC00C3F2D9 /* Requestable.swift in Sources */,
+				5F23E70C1D4B88F600C3F2D9 /* ManagementError.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F331AF51D4BB24C00AE4382 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F331B0F1D4BB80700AE4382 /* Responses.swift in Sources */,
+				5F331B061D4BB7DA00AE4382 /* CredentialsSpec.swift in Sources */,
+				5F331B0B1D4BB7F900AE4382 /* UserPatchAttributesSpec.swift in Sources */,
+				5F331B051D4BB7D400AE4382 /* AuthenticationSpec.swift in Sources */,
+				5F331B0C1D4BB7F900AE4382 /* UsersSpec.swift in Sources */,
+				5F331B0E1D4BB80700AE4382 /* Matchers.swift in Sources */,
+				5F331B071D4BB7E300AE4382 /* IdentitySpec.swift in Sources */,
+				5F331B0A1D4BB7F900AE4382 /* ManagementSpec.swift in Sources */,
+				5F331B091D4BB7EE00AE4382 /* AuthenticationErrorSpec.swift in Sources */,
+				5F331B101D4BB80700AE4382 /* Auth0Spec.swift in Sources */,
+				5F331B041D4BB78C00AE4382 /* TelemetrySpec.swift in Sources */,
+				5F331B081D4BB7EA00AE4382 /* ProfileSpec.swift in Sources */,
+				5F331B0D1D4BB7FE00AE4382 /* ResponseSpec.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5F3965C31CF67DD800CDE7C0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1086,6 +1306,11 @@
 			isa = PBXTargetDependency;
 			target = 5F06DD841CC448C90011842B /* Auth0.macOS */;
 			targetProxy = 5F06DDB51CC451700011842B /* PBXContainerItemProxy */;
+		};
+		5F331B001D4BB24C00AE4382 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5F23E6F51D4B87F000C3F2D9 /* Auth0.tvOS */;
+			targetProxy = 5F331AFF1D4BB24C00AE4382 /* PBXContainerItemProxy */;
 		};
 		5F53F5D01CFD199700476A46 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1225,6 +1450,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
 				);
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1252,6 +1478,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
 				);
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1456,6 +1683,91 @@
 			};
 			name = Release;
 		};
+		5F23E6FC1D4B87F000C3F2D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = "Auth0/Info-tvOS.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "-DDEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.auth0.Auth0-tvOS";
+				PRODUCT_NAME = Auth0;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.2;
+			};
+			name = Debug;
+		};
+		5F23E6FD1D4B87F000C3F2D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = "Auth0/Info-tvOS.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.auth0.Auth0-tvOS";
+				PRODUCT_NAME = Auth0;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.2;
+			};
+			name = Release;
+		};
+		5F331B011D4BB24C00AE4382 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = Auth0Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
+				PRODUCT_MODULE_NAME = Auth0Tests;
+				PRODUCT_NAME = Auth0Tests;
+				SDKROOT = appletvos;
+				TVOS_DEPLOYMENT_TARGET = 9.2;
+			};
+			name = Debug;
+		};
+		5F331B021D4BB24C00AE4382 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = Auth0Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
+				PRODUCT_MODULE_NAME = Auth0Tests;
+				PRODUCT_NAME = Auth0Tests;
+				SDKROOT = appletvos;
+				TVOS_DEPLOYMENT_TARGET = 9.2;
+			};
+			name = Release;
+		};
 		5F3965E21CF67DD800CDE7C0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1540,6 +1852,23 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		5F23E6FB1D4B87F000C3F2D9 /* Build configuration list for PBXNativeTarget "Auth0.tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F23E6FC1D4B87F000C3F2D9 /* Debug */,
+				5F23E6FD1D4B87F000C3F2D9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5F331B031D4BB24C00AE4382 /* Build configuration list for PBXNativeTarget "Auth0Tests.tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F331B011D4BB24C00AE4382 /* Debug */,
+				5F331B021D4BB24C00AE4382 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		5F3965E11CF67DD800CDE7C0 /* Build configuration list for PBXNativeTarget "OAuth2" */ = {
 			isa = XCConfigurationList;
