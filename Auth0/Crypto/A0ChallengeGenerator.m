@@ -22,7 +22,6 @@
 
 #import "A0ChallengeGenerator.h"
 #import <CommonCrypto/CommonCrypto.h>
-#import <Auth0/Auth0-Swift.h>
 
 const NSUInteger kVerifierSize = 32;
 
@@ -37,7 +36,10 @@ const NSUInteger kVerifierSize = 32;
 - (instancetype)initWithVerifier:(NSData *)verifier {
     self = [super init];
     if (self) {
-        _verifier = [verifier a0_encodeBase64URLSafe];
+        _verifier = [[[[verifier base64EncodedStringWithOptions:0]
+                       stringByReplacingOccurrencesOfString:@"+" withString:@"-"]
+                      stringByReplacingOccurrencesOfString:@"/" withString:@"_"]
+                     stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"="]];
         _method = @"S256";
     }
     return self;
@@ -61,6 +63,9 @@ const NSUInteger kVerifierSize = 32;
         free(hashBytes);
     }
 
-    return [hash a0_encodeBase64URLSafe];
+    return [[[[hash base64EncodedStringWithOptions:0]
+              stringByReplacingOccurrencesOfString:@"+" withString:@"-"]
+             stringByReplacingOccurrencesOfString:@"/" withString:@"_"]
+            stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"="]];
 }
 @end

@@ -23,6 +23,9 @@ scheme_destination ()
   *macOS) 
     destination=$OSX_DESTINATION
     ;;
+  *tvOS) 
+    destination="'platform=tvOS Simulator,name=Apple TV 1080p'"
+    ;;    
   *) 
     destination=$IOS_DESTINATION
     ;;
