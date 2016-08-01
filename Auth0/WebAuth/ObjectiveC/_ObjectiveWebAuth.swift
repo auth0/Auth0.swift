@@ -26,14 +26,15 @@ import Foundation
 /// Web-based Auth with Auth0
 public class _ObjectiveOAuth2: NSObject {
 
-    private(set) var webAuth: WebAuth
+    private(set) var webAuth: _WebAuth
 
     public override init() {
-        self.webAuth = Auth0.webAuth()
+        let values = plistValues(bundle: NSBundle.mainBundle())!
+        self.webAuth = _WebAuth(clientId: values.clientId, url: .a0_url(values.domain))
     }
 
     public init(clientId: String, url: NSURL) {
-        self.webAuth = WebAuth(clientId: clientId, url: url)
+        self.webAuth = _WebAuth(clientId: clientId, url: url)
     }
 
     public func addParameters(parameters: [String: String]) {
