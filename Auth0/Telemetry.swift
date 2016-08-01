@@ -41,7 +41,7 @@ public struct Telemetry {
         }
     }
 
-    init() {
+    public init() {
         self.info = Telemetry.generateValue()
     }
 
