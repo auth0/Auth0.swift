@@ -68,7 +68,7 @@ public func webAuth(bundle bundle: NSBundle = NSBundle.mainBundle()) -> WebAuth 
  - returns: Auth0 WebAuth component
  */
 public func webAuth(clientId clientId: String, domain: String) -> WebAuth {
-    return WebAuth(clientId: clientId, url: .a0_url(domain))
+    return _WebAuth(clientId: clientId, url: .a0_url(domain))
 }
 
 /**
@@ -84,13 +84,102 @@ public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
 }
 
 /// OAuth2 Authentication using Auth0
-public class WebAuth: Trackable {
+public protocol WebAuth: Trackable {
+    var clientId: String { get }
+    var url: NSURL { get }
+    var telemetry: Telemetry { get set }
+
+    /**
+     For redirect url instead of a custom scheme it will use `https` and iOS 9 Universal Links.
+
+     Before enabling this flag you'll need to configure Universal Links
+
+     - returns: the same OAuth2 instance to allow method chaining
+     */
+    func useUniversalLink() -> Self
+
+    /**
+     Specify a connection name to be used to authenticate.
+
+     By default no connection is specified, so the hosted login page will be displayed
+
+     - parameter connection: name of the connection to use
+
+     - returns: the same OAuth2 instance to allow method chaining
+     */
+    func connection(connection: String) -> Self
+
+    /**
+     Scopes that will be requested during auth
+
+     - parameter scope: a scope value like: `openid email`
+
+     - returns: the same OAuth2 instance to allow method chaining
+     */
+    func scope(scope: String) -> Self
+
+    /**
+     State value that will be echoed after authentication
+     in order to check that the response is from your request and not other.
+
+     By default a random value is used.
+
+     - parameter state: a state value to send with the auth request
+
+     - returns: the same OAuth2 instance to allow method chaining
+     */
+    func state(state: String) -> Self
+
+    /**
+     Send additional parameters for authentication.
+
+     - parameter parameters: additional auth parameters
+
+     - returns: the same OAuth2 instance to allow method chaining
+     */
+    func parameters(parameters: [String: String]) -> Self
+
+    /**
+     Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)
+
+     - returns: the same OAuth2 instance to allow method chaining
+     */
+    func usingImplicitGrant() -> Self
+
+    /**
+     Starts the OAuth2 flow by modally presenting a ViewController in the top-most controller.
+
+     ```
+     Auth0
+     .oauth2(clientId: clientId, domain: "samples.auth0.com")
+     .start { result in
+        print(result)
+     }
+     ```
+
+     Then from `AppDelegate` we just need to resume the OAuth2 Auth like this
+
+     ```
+     func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+        return Auth0.resumeAuth(url, options: options)
+     }
+     ```
+
+     Any on going OAuth2 Auth session will be automatically cancelled when starting a new one,
+     and it's corresponding callback with be called with a failure result of `Authentication.Error.Cancelled`
+
+     - parameter callback: callback called with the result of the OAuth2 flow
+     */
+    func start(callback: Result<Credentials> -> ())
+}
+
+class _WebAuth: WebAuth {
 
     private static let NoBundleIdentifier = "com.auth0.this-is-no-bundle"
 
-    public let clientId: String
-    public let url: NSURL
-    public var telemetry: Telemetry
+    let clientId: String
+    let url: NSURL
+    var telemetry: Telemetry
 
     let presenter: ControllerModalPresenter
     let storage: SessionStorage
@@ -100,7 +189,7 @@ public class WebAuth: Trackable {
     var universalLink = false
     var usePKCE = true
 
-    public convenience init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
+    convenience init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance, telemetry: telemetry)
     }
 
@@ -113,109 +202,40 @@ public class WebAuth: Trackable {
         self.telemetry = telemetry
     }
 
-    /**
-     For redirect url instead of a custom scheme it will use `https` and iOS 9 Universal Links.
-     
-     Before enabling this flag you'll need to configure Universal Links
-
-     - returns: the same OAuth2 instance to allow method chaining
-     */
-    public func useUniversalLink() -> WebAuth {
+    func useUniversalLink() -> Self {
         self.universalLink = true
         return self
     }
 
-    /**
-     Specify a connection name to be used to authenticate.
-     
-     By default no connection is specified, so the hosted login page will be displayed
-
-     - parameter connection: name of the connection to use
-
-     - returns: the same OAuth2 instance to allow method chaining
-     */
-    public func connection(connection: String) -> WebAuth {
+    func connection(connection: String) -> Self {
         self.parameters["connection"] = connection
         return self
     }
 
-    /**
-     Scopes that will be requested during auth
-
-     - parameter scope: a scope value like: `openid email`
-
-     - returns: the same OAuth2 instance to allow method chaining
-     */
-    public func scope(scope: String) -> WebAuth {
+    func scope(scope: String) -> Self {
         self.parameters["scope"] = scope
         return self
     }
 
-    /**
-     State value that will be echoed after authentication 
-     in order to check that the response is from your request and not other.
-     
-     By default a random value is used.
-
-     - parameter state: a state value to send with the auth request
-
-     - returns: the same OAuth2 instance to allow method chaining
-     */
-    public func state(state: String) -> WebAuth {
+    func state(state: String) -> Self {
         self.state = state
         return self
     }
 
-    /**
-     Send additional parameters for authentication.
-
-     - parameter parameters: additional auth parameters
-
-     - returns: the same OAuth2 instance to allow method chaining
-     */
-    public func parameters(parameters: [String: String]) -> WebAuth {
+    func parameters(parameters: [String: String]) -> Self {
         parameters.forEach { self.parameters[$0] = $1 }
         return self
     }
 
-    /**
-     Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)
-
-     - returns: the same OAuth2 instance to allow method chaining
-     */
-    public func usingImplicitGrant() -> WebAuth {
+    func usingImplicitGrant() -> Self {
         self.usePKCE = false
         return self
     }
 
-    /**
-     Starts the OAuth2 flow by modally presenting a ViewController in the top-most controller.
-     
-     ```
-     Auth0
-        .oauth2(clientId: clientId, domain: "samples.auth0.com")
-        .start { result in
-            print(result)
-        }
-     ```
-     
-     Then from `AppDelegate` we just need to resume the OAuth2 Auth like this
-     
-     ```
-     func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-        return Auth0.resumeAuth(url, options: options)
-     }
-     ```
-
-     Any on going OAuth2 Auth session will be automatically cancelled when starting a new one,
-     and it's corresponding callback with be called with a failure result of `Authentication.Error.Cancelled`
-
-     - parameter callback: callback called with the result of the OAuth2 flow
-     */
-    public func start(callback: Result<Credentials> -> ()) {
+    func start(callback: Result<Credentials> -> ()) {
         guard
             let redirectURL = self.redirectURL
-            where !redirectURL.absoluteString.hasPrefix(WebAuth.NoBundleIdentifier)
+            where !redirectURL.absoluteString.hasPrefix(_WebAuth.NoBundleIdentifier)
             else {
                 return callback(Result.Failure(error: WebAuthError.NoBundleIdentifierFound))
             }
@@ -272,7 +292,7 @@ public class WebAuth: Trackable {
     }
 
     var redirectURL: NSURL? {
-        let bundleIdentifier = NSBundle.mainBundle().bundleIdentifier ?? WebAuth.NoBundleIdentifier
+        let bundleIdentifier = NSBundle.mainBundle().bundleIdentifier ?? _WebAuth.NoBundleIdentifier
         let components = NSURLComponents(URL: self.url, resolvingAgainstBaseURL: true)
         components?.scheme = self.universalLink ? "https" : bundleIdentifier
         return components?.URL?
