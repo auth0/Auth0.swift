@@ -149,6 +149,15 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isMultifactorCodeInvalid) == true
             }
 
+            it("should detect too many attempts") {
+                let values = [
+                    "error": "too_many_attempts",
+                    "error_description": "too many attempts"
+                ]
+                let error = AuthenticationError(info: values)
+                expect(error.isTooManyAttempts) == true
+            }
+
         }
 
     }

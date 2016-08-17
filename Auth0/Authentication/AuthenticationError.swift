@@ -123,6 +123,11 @@ public class AuthenticationError: NSObject, Auth0Error {
         return self.code == "access_denied"
     }
 
+    /// When you reached the maximum amount of request for the API
+    public var isTooManyAttempts: Bool {
+        return self.code == "too_many_attempts"
+    }
+
     /**
      Returns a value from error `info` dictionary
 
