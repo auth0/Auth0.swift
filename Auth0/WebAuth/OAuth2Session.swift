@@ -83,7 +83,7 @@ class SafariSession: NSObject, OAuth2Session {
         let items = components.a0_values
         guard self.state == nil || items["state"] == self.state else { return false }
         if let _ = items["error"] {
-            self.finish(.Failure(error: AuthenticationError(info: items)))
+            self.finish(.Failure(error: AuthenticationError(info: items, statusCode: 0)))
         } else {
             self.handler.credentials(items, callback: self.finish)
         }

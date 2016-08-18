@@ -52,12 +52,15 @@ public class ManagementError: NSObject, Auth0Error {
     /**
      Creates a Auth0 Management API error from a JSON response
 
-     - parameter info: JSON response from Auth0
+     - parameter info:          JSON response from Auth0
+     - parameter statusCode:    Http Status Code of the Response
 
      - returns: a newly created ManagementError
      */
-    public required init(info: [String: AnyObject]) {
-        self.info = info
+    public required init(info: [String: AnyObject], statusCode: Int) {
+        var values = info
+        values["statusCode"] = statusCode
+        self.info = values
     }
 
     /**

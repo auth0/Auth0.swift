@@ -33,7 +33,7 @@ let EmptyBodyError = "a0.sdk.internal_error.empty"
 public protocol Auth0Error: ErrorType {
 
     init(string: String?, statusCode: Int)
-    init(info: [String: AnyObject])
+    init(info: [String: AnyObject], statusCode: Int)
 
     /// The code of the error as a String
     var code: String { get }

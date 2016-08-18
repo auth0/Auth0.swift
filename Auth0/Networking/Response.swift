@@ -43,7 +43,7 @@ struct Response<E: Auth0Error> {
         guard let response = self.response as? NSHTTPURLResponse else { throw E(string: nil, statusCode: 0) }
         guard (200...300).contains(response.statusCode) else {
             if let json: [String: AnyObject] = json(data) {
-                throw E(info: json)
+                throw E(info: json, statusCode: response.statusCode)
             }
             throw E(string: string(data), statusCode: response.statusCode)
         }
