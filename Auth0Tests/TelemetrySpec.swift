@@ -102,14 +102,20 @@ class TelemetrySpec: QuickSpec {
                 let value = telemetry.value!
                     .stringByReplacingOccurrencesOfString("-", withString: "+")
                     .stringByReplacingOccurrencesOfString("_", withString: "/")
-                let padding = value.characters.count + (4 - (value.characters.count % 4));
-                let padded = value.stringByPaddingToLength(padding, withString: "=", startingAtIndex: 0)
+                let paddedLength: Int
+                let padding = value.characters.count % 4
+                if padding > 0 {
+                    paddedLength = value.characters.count + (4 - padding)
+                } else {
+                    paddedLength = value.characters.count
+                }
+                let padded = value.stringByPaddingToLength(paddedLength, withString: "=", startingAtIndex: 0)
 
-                let data = NSData(base64EncodedString: padded, options: [])
-                let info = try? NSJSONSerialization.JSONObjectWithData(data!, options: []) as! [String: String]
-                expect(info?["version"]) == "1.0.0-alpha.4"
-                expect(info?["lib_version"]) == version
-                expect(info?["name"]) == "Lock.iOS"
+                let data = NSData(base64EncodedString: padded, options: [NSDataBase64DecodingOptions.IgnoreUnknownCharacters])
+                let info = try! NSJSONSerialization.JSONObjectWithData(data!, options: []) as! [String: String]
+                expect(info["version"]) == "1.0.0-alpha.4"
+                expect(info["lib_version"]) == version
+                expect(info["name"]) == "Lock.iOS"
             }
         }
 
