@@ -33,6 +33,9 @@ public class AuthenticationError: NSObject, Auth0Error {
      */
     public let info: [String: AnyObject]
 
+    /// Http Status Code of the response
+    public let statusCode: Int
+
     /**
      Creates a Auth0 Auth API error when the request's response is not JSON
 
@@ -47,16 +50,19 @@ public class AuthenticationError: NSObject, Auth0Error {
             "description": string ?? "Empty response body",
             "statusCode": statusCode
         ]
+        self.statusCode = statusCode
     }
 
     /**
      Creates a Auth0 Auth API error from a JSON response
 
      - parameter info: JSON response from Auth0
+     - parameter statusCode:    Http Status Code of the Response
 
      - returns: a newly created AuthenticationError
      */
-    public required init(info: [String: AnyObject]) {
+    public required init(info: [String: AnyObject], statusCode: Int) {
+        self.statusCode = statusCode
         self.info = info
     }
 

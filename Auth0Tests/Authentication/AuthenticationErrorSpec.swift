@@ -56,7 +56,7 @@ class AuthenticationErrorSpec: QuickSpec {
             }
 
             it("should detect access_denied") {
-                let error = AuthenticationError(info: ["error": "access_denied"])
+                let error = AuthenticationError(info: ["error": "access_denied"], statusCode: 401)
                 expect(error.isAccessDenied) == true
             }
 
@@ -89,6 +89,17 @@ class AuthenticationErrorSpec: QuickSpec {
                 ]
             }
 
+            it("should have status code") {
+                let values = [
+                    "code": "invalid_password",
+                    "description": "You may not reuse any of the last 2 passwords. This password was used a day ago.",
+                    "name": "PasswordHistoryError",
+                    "message":"Password has previously been used",
+                    ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.statusCode) == 400
+            }
+
             it("should detect password already used") {
                 let values = [
                     "code": "invalid_password",
@@ -97,7 +108,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "message":"Password has previously been used",
                     "statusCode": 400,
                 ]
-                let error = AuthenticationError(info: values)
+                let error = AuthenticationError(info: values, statusCode: 400)
                 expect(error.isPasswordAlreadyUsed) == true
             }
 
@@ -109,7 +120,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "message":"Password has previously been used",
                     "statusCode": 400,
                     ]
-                let error = AuthenticationError(info: values)
+                let error = AuthenticationError(info: values, statusCode: 400)
                 expect(error.isPasswordAlreadyUsed) == true
             }
 
@@ -118,7 +129,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "error": "unauthorized",
                     "error_description": "user is blocked"
                 ]
-                let error = AuthenticationError(info: values)
+                let error = AuthenticationError(info: values, statusCode: 401)
                 expect(error.isRuleError) == true
             }
 
@@ -127,7 +138,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "error": "a0.mfa_required",
                     "error_description": "missing mfa_code parameter"
                 ]
-                let error = AuthenticationError(info: values)
+                let error = AuthenticationError(info: values, statusCode: 401)
                 expect(error.isMultifactorRequired) == true
             }
 
@@ -136,7 +147,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "error": "a0.mfa_registration_required",
                     "error_description": "User is not enrolled with google-authenticator"
                 ]
-                let error = AuthenticationError(info: values)
+                let error = AuthenticationError(info: values, statusCode: 401)
                 expect(error.isMultifactorEnrollRequired) == true
             }
 
@@ -145,7 +156,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "error": "a0.mfa_invalid_code",
                     "error_description": "Wrong or expired code."
                 ]
-                let error = AuthenticationError(info: values)
+                let error = AuthenticationError(info: values, statusCode: 401)
                 expect(error.isMultifactorCodeInvalid) == true
             }
 
@@ -154,7 +165,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "error": "too_many_attempts",
                     "error_description": "too many attempts"
                 ]
-                let error = AuthenticationError(info: values)
+                let error = AuthenticationError(info: values, statusCode: 429)
                 expect(error.isTooManyAttempts) == true
             }
 
@@ -172,7 +183,7 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 "error": code,
             ]
             values["error_description"] = description
-            let error = AuthenticationError(info: values)
+            let error = AuthenticationError(info: values, statusCode: 401)
 
             it("should have code \(code)") {
                 expect(error.code) == code
@@ -188,9 +199,12 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 }
             }
 
-            it("should return all values") {
-                expect(error.info.count) == values.count
+            values.forEach { key, value in
+                it("should contain \(key)") {
+                    expect(error.info[key] as? String) == value
+                }
             }
+
 
             it("should not match any custom error") {
                 expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
@@ -210,7 +224,7 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 "description": description,
                 ]
             extras?.forEach { values[$0] = $1 }
-            let error = AuthenticationError(info: values)
+            let error = AuthenticationError(info: values, statusCode: 401)
 
             it("should have code \(code)") {
                 expect(error.code) == code
@@ -220,8 +234,10 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.description) == description
             }
 
-            it("should return all values") {
-                expect(error.info.count) == values.count
+            values.forEach { key, value in
+                it("should contain \(key)") {
+                    expect(error.info[key] as? String) == value
+                }
             }
 
             extras?.forEach { key, value in
@@ -233,7 +249,7 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
 
         sharedExamples(UnknownErrorExample) { (context: SharedExampleContext) in
             let values = context()[ExampleValuesKey] as! [String: AnyObject]
-            let error = AuthenticationError(info: values)
+            let error = AuthenticationError(info: values, statusCode: 401)
             it("should have unknown error code") {
                 expect(error.code) == UnknownError
             }
@@ -242,8 +258,10 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.description).toNot(beNil())
             }
 
-            it("should return all values") {
-                expect(error.info.count) == values.count
+            values.forEach { key, value in
+                it("should contain \(key)") {
+                    expect(error.info[key]).toNot(beNil())
+                }
             }
 
             it("should not match any known error") {
