@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.0.0-rc.1](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.1) (2016-08-17)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-beta.7...1.0.0-rc.1)
+
+**Added:**
+
+- Handle too many attempts error [\#42](https://github.com/auth0/Auth0.swift/pull/42) ([hzalaz](https://github.com/hzalaz))
+- Add WebAuth protocol [\#41](https://github.com/auth0/Auth0.swift/pull/41) ([hzalaz](https://github.com/hzalaz))
+
 ## [1.0.0-beta.7](https://github.com/auth0/Auth0.swift/tree/1.0.0-beta.7) (2016-07-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-beta.6...1.0.0-beta.7)
 
