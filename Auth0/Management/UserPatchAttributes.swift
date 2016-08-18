@@ -25,7 +25,18 @@ import Foundation
 /// Atributes of the user allowed to update using `patch()` method of `Users`
 public class UserPatchAttributes {
 
-    private(set) var dictionary: [String: AnyObject] = [:]
+    private(set) var dictionary: [String: AnyObject]
+
+    /**
+     Creates a new attributes
+
+     - parameter dictionary: default attribute values
+
+     - returns: new attributes
+     */
+    public init(dictionary: [String: AnyObject] = [:]) {
+        self.dictionary = dictionary
+    }
 
     /**
      Mark/Unmark a user as blocked
