@@ -52,13 +52,15 @@ class SafariSession: NSObject, OAuth2Session {
     let state: String?
     let finish: FinishSession
     let handler: OAuth2Grant
+    let logger: Logger?
 
-    init(controller: SFSafariViewController, redirectURL: NSURL, state: String? = nil, handler: OAuth2Grant, finish: FinishSession) {
+    init(controller: SFSafariViewController, redirectURL: NSURL, state: String? = nil, handler: OAuth2Grant, finish: FinishSession, logger: Logger?) {
         self.controller = controller
         self.redirectURL = redirectURL
         self.state = state
         self.finish = finish
         self.handler = handler
+        self.logger = logger
         super.init()
         controller.delegate = self
     }
@@ -72,6 +74,7 @@ class SafariSession: NSObject, OAuth2Session {
      - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
      */
     func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
+        self.logger?.trace(url, source: "iOS Safari") // FIXME: better source name
         guard url.absoluteString.lowercaseString.hasPrefix(self.redirectURL.absoluteString.lowercaseString) else { return false }
 
         guard

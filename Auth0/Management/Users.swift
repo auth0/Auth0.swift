@@ -26,9 +26,10 @@ import Foundation
  Users endpoints of Auth0 Management API v2
  - seeAlso: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users)
  */
-public struct Users: Trackable {
+public struct Users: Trackable, Loggable {
     let management: Management
     public var telemetry: Telemetry
+    public var logger: Logger?
 
     init(management: Management, telemetry: Telemetry) {
         self.management = management
@@ -84,7 +85,7 @@ public struct Users: Trackable {
             ]
         }
 
-        return Request(session: self.management.session, url: component.URL!, method: "GET", handle: self.management.managementObject, headers: self.management.defaultHeaders, telemetry: self.telemetry)
+        return Request(session: self.management.session, url: component.URL!, method: "GET", handle: self.management.managementObject, headers: self.management.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
@@ -135,7 +136,7 @@ public struct Users: Trackable {
         let userPath = "/api/v2/users/\(identifier)"
         let component = components(self.management.url, path: userPath)
         
-        return Request(session: self.management.session, url: component.URL!, method: "PATCH", handle: self.management.managementObject, payload: attributes.dictionary, headers: self.management.defaultHeaders, telemetry: self.telemetry)
+        return Request(session: self.management.session, url: component.URL!, method: "PATCH", handle: self.management.managementObject, payload: attributes.dictionary, headers: self.management.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
@@ -216,7 +217,7 @@ public struct Users: Trackable {
     private func link(identifier: String, payload: [String: String]) -> Request<[Management.Object], ManagementError> {
         let identitiesPath = "/api/v2/users/\(identifier)/identities"
         let url = components(self.management.url, path: identitiesPath).URL!
-        return Request(session: self.management.session, url: url, method: "POST", handle: self.management.managementObjects, payload: payload, headers: self.management.defaultHeaders, telemetry: self.telemetry)
+        return Request(session: self.management.session, url: url, method: "POST", handle: self.management.managementObjects, payload: payload, headers: self.management.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
@@ -241,7 +242,7 @@ public struct Users: Trackable {
     public func unlink(identityId identityId: String, provider: String, fromUserId identifier: String) -> Request<[Management.Object], ManagementError> {
         let identityPath = "/api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
         let url = components(self.management.url, path: identityPath).URL!
-        return Request(session: self.management.session, url: url, method: "DELETE", handle: self.management.managementObjects, headers: self.management.defaultHeaders, telemetry: self.telemetry)
+        return Request(session: self.management.session, url: url, method: "DELETE", handle: self.management.managementObjects, headers: self.management.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 }
 

@@ -22,12 +22,6 @@
 
 import Foundation
 
-class Auth0Logger {
-    static let sharedInstance = Auth0Logger()
-
-    var logger: Logger? = nil
-}
-
 public protocol Logger {
     func trace(request: NSURLRequest, session: NSURLSession)
     func trace(response: NSURLResponse, data: NSData?)

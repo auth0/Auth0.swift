@@ -28,10 +28,11 @@ public typealias DatabaseUser = (email: String, username: String?, verified: Boo
  Auth endpoints of Auth0
  - seeAlso: [Auth0 Auth API docs](https://auth0.com/docs/api/authentication)
  */
-public struct Authentication: Trackable {
+public struct Authentication: Trackable, Loggable {
     public let clientId: String
     public let url: NSURL
     public var telemetry: Telemetry
+    public var logger: Logger?
 
     let session: NSURLSession
 
@@ -103,7 +104,7 @@ public struct Authentication: Trackable {
             ]
         payload["mfa_code"] = multifactorCode
         parameters.forEach { key, value in payload[key] = value }
-        return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, telemetry: self.telemetry)
+        return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
 
@@ -154,7 +155,7 @@ public struct Authentication: Trackable {
         payload["user_metadata"] = userMetadata
 
         let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
-        return Request(session: session, url: createUser, method: "POST", handle: databaseUser, payload: payload, telemetry: self.telemetry)
+        return Request(session: session, url: createUser, method: "POST", handle: databaseUser, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
@@ -179,7 +180,7 @@ public struct Authentication: Trackable {
             "client_id": self.clientId
         ]
         let resetPassword = NSURL(string: "/dbconnections/change_password", relativeToURL: self.url)!
-        return Request(session: session, url: resetPassword, method: "POST", handle: noBody, payload: payload, telemetry: self.telemetry)
+        return Request(session: session, url: resetPassword, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
@@ -273,7 +274,7 @@ public struct Authentication: Trackable {
         }
 
         let start = NSURL(string: "/passwordless/start", relativeToURL: self.url)!
-        return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload, telemetry: self.telemetry)
+        return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
@@ -309,7 +310,7 @@ public struct Authentication: Trackable {
             "client_id": self.clientId,
             ]
         let start = NSURL(string: "/passwordless/start", relativeToURL: self.url)!
-        return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload, telemetry: self.telemetry)
+        return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
@@ -329,7 +330,7 @@ public struct Authentication: Trackable {
     public func tokenInfo(token token: String) -> Request<Profile, AuthenticationError> {
         let payload: [String: AnyObject] = ["id_token": token]
         let tokenInfo = NSURL(string: "/tokeninfo", relativeToURL: self.url)!
-        return Request(session: session, url: tokenInfo, method: "POST", handle: authenticationObject, payload: payload, telemetry: self.telemetry)
+        return Request(session: session, url: tokenInfo, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
@@ -348,7 +349,7 @@ public struct Authentication: Trackable {
      */
     public func userInfo(token token: String) -> Request<Profile, AuthenticationError> {
         let userInfo = NSURL(string: "/userinfo", relativeToURL: self.url)!
-        return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(token)"], telemetry: self.telemetry)
+        return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(token)"], logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
@@ -386,7 +387,7 @@ public struct Authentication: Trackable {
         ]
         parameters.forEach { key, value in payload[key] = value }
         let accessToken = NSURL(string: "/oauth/access_token", relativeToURL: self.url)!
-        return Request(session: session, url: accessToken, method: "POST", handle: authenticationObject, payload: payload, telemetry: self.telemetry)
+        return Request(session: session, url: accessToken, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
 
@@ -411,7 +412,7 @@ public struct Authentication: Trackable {
         ]
         parameters.forEach { payload[$0] = $1 }
         let token = NSURL(string: "/oauth/token", relativeToURL: self.url)!
-        return Request(session: session, url: token, method: "POST", handle: authenticationObject, payload: payload, telemetry: self.telemetry)
+        return Request(session: session, url: token, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
