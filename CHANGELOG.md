@@ -1,5 +1,36 @@
 # Change Log
 
+## [1.0.0-rc.2](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.2) (2016-09-09)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-rc.1...1.0.0-rc.2)
+
+**Changed:**
+
+- Rework Logging [\#43](https://github.com/auth0/Auth0.swift/pull/43) ([hzalaz](https://github.com/hzalaz))
+
+**Breaking changes:**
+
+The function `enableLogging()` was removed, so now to enable logging in the library you should enable it per-client instead of globally.
+
+For Auth API
+```swift
+var auth = Auth0.authentication()
+auth.logging(enabled: true)
+```
+
+For Users API
+```swift
+var users = Auth0.users(token: "token")
+users.logging(enabled: true)
+```
+
+Also now you can provide a custom Logger to replace the default one (which just uses Swift `print`). It only needs to implement the protocol `Logger`
+
+```swift
+let logger = MyCustomLogger()
+var auth = Auth0.authentication()
+auth.usingLogger(logger)
+```
+
 ## [1.0.0-rc.1](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.1) (2016-08-17)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-beta.7...1.0.0-rc.1)
 
