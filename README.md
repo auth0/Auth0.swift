@@ -268,10 +268,11 @@ Auth0
 
 ### Logging
 
-To enable Auth0.swift to log HTTP request and OAuth2 flow for debugging just add the following:
+To enable Auth0.swift to log HTTP request and OAuth2 flow for debugging you can call the following method in either `WebAuth`, `Authentication` or `Users` object:
 
 ```swift
-Auth0.enableLogging()
+var auth0 = Auth0.authentication()
+auth0.logging(emnabled: true)
 ```
 
 Then for a OAuth2 authentication you'll see in the console:
