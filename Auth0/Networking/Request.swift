@@ -48,7 +48,7 @@ public struct Request<T, E: Auth0Error>: Requestable {
     let logger: Logger?
     let telemetry: Telemetry
 
-    init(session: NSURLSession, url: NSURL, method: String, handle: (Response<E>, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:], logger: Logger? = Auth0Logger.sharedInstance.logger, telemetry: Telemetry) {
+    init(session: NSURLSession, url: NSURL, method: String, handle: (Response<E>, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
         self.session = session
         self.url = url
         self.method = method

@@ -44,7 +44,7 @@ class OAuth2SessionSpec: QuickSpec {
         let callback: Result<Credentials> -> () = { result = $0 }
         let controller = MockSafariViewController(URL: NSURL(string: "https://auth0.com")!)
         let handler = ImplicitGrant()
-        let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
+        let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
 
         beforeEach {
             result = nil
@@ -55,7 +55,7 @@ class OAuth2SessionSpec: QuickSpec {
 
             beforeEach {
                 controller.delegate = nil
-                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback)
+                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
             }
 
             it("should set itself as delegate") {
@@ -109,7 +109,7 @@ class OAuth2SessionSpec: QuickSpec {
             context("with state") {
                 let session = SafariSession(controller: controller, redirectURL: RedirectURL, state: "state", handler: handler, finish: {
                     result = $0
-                })
+                }, logger: nil)
 
                 it("should not handle url when state in url is missing") {
                     let handled = session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)

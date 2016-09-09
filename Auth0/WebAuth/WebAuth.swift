@@ -84,7 +84,7 @@ public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
 }
 
 /// OAuth2 Authentication using Auth0
-public protocol WebAuth: Trackable {
+public protocol WebAuth: Trackable, Loggable {
     var clientId: String { get }
     var url: NSURL { get }
     var telemetry: Telemetry { get set }
@@ -183,7 +183,7 @@ class _WebAuth: WebAuth {
 
     let presenter: ControllerModalPresenter
     let storage: SessionStorage
-    let logger: Logger?
+    var logger: Logger?
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
@@ -193,12 +193,11 @@ class _WebAuth: WebAuth {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance, telemetry: telemetry)
     }
 
-    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage, logger: Logger? = Auth0Logger.sharedInstance.logger, telemetry: Telemetry) {
+    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage, telemetry: Telemetry) {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter
         self.storage = storage
-        self.logger = logger
         self.telemetry = telemetry
     }
 
@@ -242,7 +241,7 @@ class _WebAuth: WebAuth {
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
         let (controller, finish) = newSafari(authorizeURL, callback: callback)
-        let session = SafariSession(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish)
+        let session = SafariSession(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish, logger: self.logger)
         controller.delegate = session
         logger?.trace(authorizeURL, source: "Safari")
         self.presenter.present(controller)
@@ -288,7 +287,13 @@ class _WebAuth: WebAuth {
     }
 
     func handler(redirectURL: NSURL) -> OAuth2Grant {
-        return self.usePKCE ? PKCE(authentication: Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry), redirectURL: redirectURL) : ImplicitGrant()
+        if self.usePKCE {
+            var authentication = Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+            authentication.logger = self.logger
+            return PKCE(authentication: authentication, redirectURL: redirectURL)
+        } else {
+            return ImplicitGrant()
+        }
     }
 
     var redirectURL: NSURL? {

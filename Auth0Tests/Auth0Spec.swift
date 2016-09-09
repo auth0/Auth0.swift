@@ -32,6 +32,40 @@ private let Domain = "samples.auth0.com"
 class Auth0Spec: QuickSpec {
     override func spec() {
 
+        describe("logging") {
+
+            it("should have no logging for auth by default") {
+                expect(Auth0.authentication(clientId: ClientId, domain: Domain).logger).to(beNil())
+            }
+
+            it("should have no logging for management by default") {
+                expect(Auth0.users(token: "token", domain: Domain).logger).to(beNil())
+            }
+
+            it("should enable default logger for auth") {
+                var auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                expect(auth.logging(enabled: true).logger).toNot(beNil())
+            }
+
+            it("should enable default logger for users") {
+                var users = Auth0.users(token: "token", domain: Domain)
+                expect(users.logging(enabled: true).logger).toNot(beNil())
+            }
+
+            it("should enable custom logger for auth") {
+                let logger = MockLogger()
+                var auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                expect(auth.usingLogger(logger).logger).toNot(beNil())
+            }
+
+            it("should enable custom logger for users") {
+                let logger = MockLogger()
+                var users = Auth0.users(token: "token", domain: Domain)
+                expect(users.usingLogger(logger).logger).toNot(beNil())
+            }
+
+        }
+
         describe("endpoints") {
 
             it("should return authentication endpoint with clientId and domain") {
@@ -83,6 +117,21 @@ class Auth0Spec: QuickSpec {
             }
 
         }
+
+    }
+}
+
+class MockLogger: Logger {
+
+    func trace(url: NSURL, source: String?) {
+
+    }
+
+    func trace(response: NSURLResponse, data: NSData?) {
+
+    }
+
+    func trace(request: NSURLRequest, session: NSURLSession) {
 
     }
 }

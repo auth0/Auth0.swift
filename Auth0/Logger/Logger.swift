@@ -22,48 +22,58 @@
 
 import Foundation
 
-class Auth0Logger {
-    static let sharedInstance = Auth0Logger()
-
-    var logger: Logger? = nil
-}
-
 public protocol Logger {
     func trace(request: NSURLRequest, session: NSURLSession)
     func trace(response: NSURLResponse, data: NSData?)
     func trace(url: NSURL, source: String?)
 }
 
+protocol LoggerOutput {
+    func message(message: String)
+    func newLine()
+}
+
+struct DefaultOutput: LoggerOutput {
+    func message(message: String) { print(message) }
+    func newLine() { print() }
+}
+
 struct DefaultLogger: Logger {
+
+    let output: LoggerOutput
+
+    init(output: LoggerOutput = DefaultOutput()) {
+        self.output = output
+    }
 
     func trace(request: NSURLRequest, session: NSURLSession) {
         guard
             let method = request.HTTPMethod,
             let url = request.URL
             else { return }
-        print("\(method) \(url.absoluteString) HTTP/1.1")
-        session.configuration.HTTPAdditionalHeaders?.forEach { key, value in print("\(key): \(value)") }
-        request.allHTTPHeaderFields?.forEach { key, value in print("\(key): \(value)") }
+        output.message("\(method) \(url.absoluteString) HTTP/1.1")
+        session.configuration.HTTPAdditionalHeaders?.forEach { key, value in output.message("\(key): \(value)") }
+        request.allHTTPHeaderFields?.forEach { key, value in output.message("\(key): \(value)") }
         if let data = request.HTTPBody, let string = String(data: data, encoding: NSUTF8StringEncoding) {
-            print()
-            print(string)
+            output.newLine()
+            output.message(string)
         }
-        print()
+        output.newLine()
     }
 
     func trace(response: NSURLResponse, data: NSData?) {
         if let http = response as? NSHTTPURLResponse {
-            print("HTTP/1.1 \(http.statusCode)")
-            http.allHeaderFields.forEach { key, value in print("\(key): \(value)") }
+            output.message("HTTP/1.1 \(http.statusCode)")
+            http.allHeaderFields.forEach { key, value in output.message("\(key): \(value)") }
             if let data = data, let string = String(data: data, encoding: NSUTF8StringEncoding) {
-                print()
-                print(string)
+                output.newLine()
+                output.message(string)
             }
-            print()
+            output.newLine()
         }
     }
 
     func trace(url: NSURL, source: String?) {
-        print("\(source ?? "URL"): \(url.absoluteString)")
+        output.message("\(source ?? "URL"): \(url.absoluteString)")
     }
 }
