@@ -136,6 +136,7 @@
 		5FADB60D1CED7E0800D4BB50 /* UserPatchAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB60B1CED7E0800D4BB50 /* UserPatchAttributes.swift */; };
 		5FADB60F1CED7E5200D4BB50 /* UserPatchAttributesSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB60E1CED7E5200D4BB50 /* UserPatchAttributesSpec.swift */; };
 		5FADB6101CED7E5200D4BB50 /* UserPatchAttributesSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FADB60E1CED7E5200D4BB50 /* UserPatchAttributesSpec.swift */; };
+		5FAE9C911D8878D400A871CE /* SafariWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAE9C901D8878D400A871CE /* SafariWebAuth.swift */; };
 		5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
 		5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF0371CC964BC0024D2AF /* Matchers.swift */; };
 		5FBBF03B1CC96AA70024D2AF /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
@@ -337,6 +338,16 @@
 		5FADB6081CED500900D4BB50 /* ManagementSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagementSpec.swift; sourceTree = "<group>"; };
 		5FADB60B1CED7E0800D4BB50 /* UserPatchAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserPatchAttributes.swift; sourceTree = "<group>"; };
 		5FADB60E1CED7E5200D4BB50 /* UserPatchAttributesSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserPatchAttributesSpec.swift; sourceTree = "<group>"; };
+		5FAE9C871D88731500A871CE /* Cartfile.resolved */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile.resolved; sourceTree = "<group>"; };
+		5FAE9C881D88731500A871CE /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		5FAE9C891D88731500A871CE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		5FAE9C8A1D88731500A871CE /* Gemfile.lock */ = {isa = PBXFileReference; lastKnownFileType = text; path = Gemfile.lock; sourceTree = "<group>"; };
+		5FAE9C8B1D88731500A871CE /* Gemfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Gemfile; sourceTree = "<group>"; };
+		5FAE9C8C1D88731500A871CE /* Auth0.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Auth0.podspec; sourceTree = "<group>"; };
+		5FAE9C8D1D88731500A871CE /* codecov.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = codecov.yml; sourceTree = "<group>"; };
+		5FAE9C8E1D88731500A871CE /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		5FAE9C8F1D88731500A871CE /* Cartfile.private */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile.private; sourceTree = "<group>"; };
+		5FAE9C901D8878D400A871CE /* SafariWebAuth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariWebAuth.swift; sourceTree = "<group>"; };
 		5FBBF0371CC964BC0024D2AF /* Matchers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matchers.swift; sourceTree = "<group>"; };
 		5FBBF03A1CC96AA70024D2AF /* Responses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Responses.swift; sourceTree = "<group>"; };
 		5FBBF03E1CCA8FF40024D2AF /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
@@ -452,11 +463,12 @@
 		5F049B5F1CB42C29006F6C05 = {
 			isa = PBXGroup;
 			children = (
-				5F3965C81CF67DD800CDE7C0 /* App */,
 				5F049B6B1CB42C29006F6C05 /* Auth0 */,
 				5F06DD921CC451430011842B /* Auth0Tests */,
+				5F3965C81CF67DD800CDE7C0 /* App */,
 				5F06DDC21CC5712F0011842B /* Frameworks */,
 				5F049B6A1CB42C29006F6C05 /* Products */,
+				5FAE9C861D8872E900A871CE /* Supporting Files */,
 			);
 			sourceTree = "<group>";
 		};
@@ -573,6 +585,7 @@
 				5FCAB1751D0900CF00331C84 /* SessionStorage.swift */,
 				5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */,
 				5FD255B91D14F70B00387ECB /* WebAuthError.swift */,
+				5FAE9C901D8878D400A871CE /* SafariWebAuth.swift */,
 			);
 			path = WebAuth;
 			sourceTree = "<group>";
@@ -607,6 +620,22 @@
 				5FADB6021CEC0C3300D4BB50 /* UsersSpec.swift */,
 			);
 			path = Management;
+			sourceTree = "<group>";
+		};
+		5FAE9C861D8872E900A871CE /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				5FAE9C871D88731500A871CE /* Cartfile.resolved */,
+				5FAE9C8F1D88731500A871CE /* Cartfile.private */,
+				5FAE9C881D88731500A871CE /* CHANGELOG.md */,
+				5FAE9C891D88731500A871CE /* README.md */,
+				5FAE9C8A1D88731500A871CE /* Gemfile.lock */,
+				5FAE9C8B1D88731500A871CE /* Gemfile */,
+				5FAE9C8C1D88731500A871CE /* Auth0.podspec */,
+				5FAE9C8D1D88731500A871CE /* codecov.yml */,
+				5FAE9C8E1D88731500A871CE /* LICENSE */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		5FBBF0331CC95FA40024D2AF /* Utils */ = {
@@ -1145,6 +1174,7 @@
 				5F3965C21CF67CF000CDE7C0 /* WebAuth.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* SessionStorage.swift in Sources */,
 				5FE2F8C31CD1498E003628F4 /* Profile.swift in Sources */,
+				5FAE9C911D8878D400A871CE /* SafariWebAuth.swift in Sources */,
 				5FCCC3151CF4DB4400901E2E /* NSError+Authentication.swift in Sources */,
 				5FBBF03F1CCA8FF40024D2AF /* Authentication.swift in Sources */,
 				5FADB6061CED27FB00D4BB50 /* Users.swift in Sources */,
