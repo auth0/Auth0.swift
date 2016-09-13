@@ -138,7 +138,7 @@ class SafariWebAuth: WebAuth {
 
     func handler(redirectURL: NSURL) -> OAuth2Grant {
         if self.usePKCE {
-            var authentication = Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+            var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
             authentication.logger = self.logger
             return PKCE(authentication: authentication, redirectURL: redirectURL)
         } else {

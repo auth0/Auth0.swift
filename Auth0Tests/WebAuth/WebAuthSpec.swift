@@ -65,8 +65,8 @@ class WebAuthSharedExamplesConfiguration: QuickConfiguration {
     }
 }
 
-private func newWebAuth() -> _WebAuth {
-    return _WebAuth(clientId: ClientId, url: DomainURL)
+private func newWebAuth() -> SafariWebAuth {
+    return SafariWebAuth(clientId: ClientId, url: DomainURL)
 }
 
 private func defaultQuery(withParameters parameters: [String: String] = [:]) -> [String: String] {

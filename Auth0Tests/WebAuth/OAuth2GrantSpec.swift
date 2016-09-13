@@ -76,7 +76,7 @@ class OAuth2GrantSpec: QuickSpec {
             beforeEach {
                 verifier = "\(arc4random())"
                 challenge = "\(arc4random())"
-                let authentication = Authentication(clientId: "CLIENT_ID", url: domain)
+                let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method)
             }
 
@@ -120,7 +120,7 @@ class OAuth2GrantSpec: QuickSpec {
 
             it("should get values from generator") {
                 let generator = A0SHA256ChallengeGenerator()
-                let authentication = Authentication(clientId: "CLIENT_ID", url: domain)
+                let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, generator: generator)
 
                 expect(pkce.defaults["code_challenge_method"]) == generator.method

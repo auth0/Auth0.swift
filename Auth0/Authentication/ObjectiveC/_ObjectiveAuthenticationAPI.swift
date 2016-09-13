@@ -36,7 +36,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     }
 
     public init(clientId: String, url: NSURL, session: NSURLSession) {
-        self.authentication = Authentication(clientId: clientId, url: url, session: session)
+        self.authentication = Auth0Authentication(clientId: clientId, url: url, session: session)
     }
 
     @objc(loginWithUsernameOrEmail:password:connection:scope:parameters:callback:)
