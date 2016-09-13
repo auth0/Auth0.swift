@@ -75,7 +75,7 @@ struct PKCE: OAuth2Grant {
             }
         let clientId = self.authentication.clientId
         self.authentication
-            .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
+            .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString!)
             .start { result in
                 // FIXME: Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
                 if case .Failure(let cause as AuthenticationError) = result where cause.description == "Unauthorized" {
