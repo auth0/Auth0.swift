@@ -967,6 +967,7 @@
 					};
 					5F06DD841CC448C90011842B = {
 						CreatedOnToolsVersion = 7.3;
+						LastSwiftMigration = 0800;
 					};
 					5F06DD9F1CC451540011842B = {
 						CreatedOnToolsVersion = 7.3;
@@ -976,6 +977,7 @@
 					};
 					5F06DDAE1CC451700011842B = {
 						CreatedOnToolsVersion = 7.3;
+						LastSwiftMigration = 0800;
 					};
 					5F23E6B81D4ACA7100C3F2D9 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -983,10 +985,12 @@
 					5F23E6F51D4B87F000C3F2D9 = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = 86WQXF56BC;
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Manual;
 					};
 					5F331AF81D4BB24C00AE4382 = {
 						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Manual;
 					};
 					5F3965C61CF67DD800CDE7C0 = {
@@ -1556,6 +1560,7 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -1584,6 +1589,7 @@
 				PRODUCT_NAME = Auth0;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
@@ -1659,6 +1665,7 @@
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0Tests.OSX-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -1682,6 +1689,7 @@
 				PRODUCT_NAME = Auth0Tests;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0Tests.OSX-Bridging-Header.h";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
@@ -1751,6 +1759,7 @@
 				PRODUCT_NAME = Auth0;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 2.3;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.2;
 			};
@@ -1777,6 +1786,7 @@
 				PRODUCT_NAME = Auth0;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 2.3;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.2;
 			};
@@ -1798,6 +1808,7 @@
 				PRODUCT_MODULE_NAME = Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
 				SDKROOT = appletvos;
+				SWIFT_VERSION = 2.3;
 				TVOS_DEPLOYMENT_TARGET = 9.2;
 			};
 			name = Debug;
@@ -1818,6 +1829,7 @@
 				PRODUCT_MODULE_NAME = Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
 				SDKROOT = appletvos;
+				SWIFT_VERSION = 2.3;
 				TVOS_DEPLOYMENT_TARGET = 9.2;
 			};
 			name = Release;
