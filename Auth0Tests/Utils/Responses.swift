@@ -81,7 +81,7 @@ func userInfo() -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(JSONObject: basicProfile(), statusCode: 200, headers: nil)
 }
 
-func basicProfile(id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAt) -> [String: AnyObject] {
+func basicProfile(id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString!, createdAt: String = CreatedAt) -> [String: AnyObject] {
     return ["user_id": id, "name": name, "nickname": nickname, "picture": picture, "created_at": createdAt]
 }
 

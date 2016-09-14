@@ -234,7 +234,7 @@ class _WebAuth: WebAuth {
     func start(callback: Result<Credentials> -> ()) {
         guard
             let redirectURL = self.redirectURL
-            where !redirectURL.absoluteString.hasPrefix(_WebAuth.NoBundleIdentifier)
+            where !redirectURL.absoluteString!.hasPrefix(_WebAuth.NoBundleIdentifier)
             else {
                 return callback(Result.Failure(error: WebAuthError.NoBundleIdentifierFound))
             }
@@ -301,8 +301,8 @@ class _WebAuth: WebAuth {
         let components = NSURLComponents(URL: self.url, resolvingAgainstBaseURL: true)
         components?.scheme = self.universalLink ? "https" : bundleIdentifier
         return components?.URL?
-            .URLByAppendingPathComponent("ios")
-            .URLByAppendingPathComponent(bundleIdentifier)
+            .URLByAppendingPathComponent("ios")!
+            .URLByAppendingPathComponent(bundleIdentifier)!
             .URLByAppendingPathComponent("callback")
     }
 }

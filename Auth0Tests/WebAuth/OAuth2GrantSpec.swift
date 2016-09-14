@@ -91,7 +91,7 @@ class OAuth2GrantSpec: QuickSpec {
                 let token = NSUUID().UUIDString
                 let code = NSUUID().UUIDString
                 let values = ["code": code]
-                stub(isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token) }.name = "Code Exchange Auth"
+                stub(isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString!])) { _ in return authResponse(accessToken: token) }.name = "Code Exchange Auth"
                 waitUntil { done in
                     pkce.credentials(values) {
                         expect($0).to(haveCredentials(token))

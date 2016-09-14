@@ -75,7 +75,7 @@ class SafariSession: NSObject, OAuth2Session {
      */
     func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
         self.logger?.trace(url, source: "iOS Safari") // FIXME: better source name
-        guard url.absoluteString.lowercaseString.hasPrefix(self.redirectURL.absoluteString.lowercaseString) else { return false }
+        guard url.absoluteString!.lowercaseString.hasPrefix(self.redirectURL.absoluteString!.lowercaseString) else { return false }
 
         guard
             let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: true)

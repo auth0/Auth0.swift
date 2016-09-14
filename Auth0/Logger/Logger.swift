@@ -49,9 +49,9 @@ struct DefaultLogger: Logger {
     func trace(request: NSURLRequest, session: NSURLSession) {
         guard
             let method = request.HTTPMethod,
-            let url = request.URL
+            let url = request.URL?.absoluteString
             else { return }
-        output.message("\(method) \(url.absoluteString) HTTP/1.1")
+        output.message("\(method) \(url) HTTP/1.1")
         session.configuration.HTTPAdditionalHeaders?.forEach { key, value in output.message("\(key): \(value)") }
         request.allHTTPHeaderFields?.forEach { key, value in output.message("\(key): \(value)") }
         if let data = request.HTTPBody, let string = String(data: data, encoding: NSUTF8StringEncoding) {
@@ -74,6 +74,6 @@ struct DefaultLogger: Logger {
     }
 
     func trace(url: NSURL, source: String?) {
-        output.message("\(source ?? "URL"): \(url.absoluteString)")
+        output.message("\(source ?? "URL"): \(url.absoluteString ?? url)")
     }
 }

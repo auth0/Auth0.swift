@@ -29,7 +29,7 @@ const NSUInteger kVerifierSize = 32;
 
 - (instancetype)init {
     NSMutableData *data = [NSMutableData dataWithLength:kVerifierSize];
-    SecRandomCopyBytes(kSecRandomDefault, kVerifierSize, data.mutableBytes);
+    int result __attribute__((unused)) = SecRandomCopyBytes(kSecRandomDefault, kVerifierSize, data.mutableBytes);
     return [self initWithVerifier:data];
 }
 
