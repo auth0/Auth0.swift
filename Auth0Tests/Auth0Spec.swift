@@ -82,16 +82,10 @@ class Auth0Spec: QuickSpec {
                 expect(auth.url.absoluteString) == domain
             }
 
-            it("should return management endopoint") {
-                let management = Auth0.management(token: "token", domain: Domain)
-                expect(management.token) == "token"
-                expect(management.url.absoluteString) == "https://\(Domain)"
-            }
-
             it("should return users endopoint") {
                 let users = Auth0.users(token: "token", domain: Domain)
-                expect(users.management.token) == "token"
-                expect(users.management.url.absoluteString) == "https://\(Domain)"
+                expect(users.token) == "token"
+                expect(users.url.absoluteString) == "https://\(Domain)"
             }
 
         }
@@ -106,14 +100,9 @@ class Auth0Spec: QuickSpec {
                 expect(auth.clientId) == "CLIENT_ID"
             }
 
-            it("should return management endpoint with domain from plist") {
-                let management = Auth0.management(token: "TOKEN", bundle: bundle)
-                expect(management.url.absoluteString) == "https://samples.auth0.com"
-            }
-
             it("should return users endpoint with domain from plist") {
                 let users = Auth0.users(token: "TOKEN", bundle: bundle)
-                expect(users.management.url.absoluteString) == "https://samples.auth0.com"
+                expect(users.url.absoluteString) == "https://samples.auth0.com"
             }
 
         }
