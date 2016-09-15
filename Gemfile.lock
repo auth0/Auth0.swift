@@ -253,7 +253,7 @@ PLATFORMS
 
 DEPENDENCIES
   carthage_cache!
-  fastlane
+  fastlane (= 1.103.0)
 
 BUNDLED WITH
    1.12.5
