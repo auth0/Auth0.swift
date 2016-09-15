@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.0.0-rc.3](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.3) (2016-09-14)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-rc.2...1.0.0-rc.3)
+
+**Closed issues:**
+
+- Xcode 8 Support? [\#44](https://github.com/auth0/Auth0.swift/issues/44) ([gbejarano01](https://github.com/gbejarano01))
+
+**Changed:**
+
+- Update for Swift 2.3 & Xcode 8 [\#46](https://github.com/auth0/Auth0.swift/pull/46) ([hzalaz](https://github.com/hzalaz))
+
 ## [1.0.0-rc.2](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.2) (2016-09-09)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-rc.1...1.0.0-rc.2)
 

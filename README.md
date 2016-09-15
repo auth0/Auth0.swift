@@ -6,12 +6,13 @@
 [![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
+![Swift 2.3](https://img.shields.io/badge/Swift-2.3-orange.svg?style=flat-square)
 
 Swift toolkit for Auth0 API
 
 ## Requirements
 
-iOS 9+ and Xcode 7.3 (Swift 2.2)
+iOS 9+ and Xcode 8 (Swift 2.3)
 
 ## Installation
 
@@ -21,7 +22,7 @@ Auth0.swift is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod "Auth0", '1.0.0-rc.2'
+pod "Auth0", '1.0.0-rc.3'
 ```
 
 ###Carthage
@@ -29,7 +30,7 @@ pod "Auth0", '1.0.0-rc.2'
 In your Cartfile add this line
 
 ```
-github "auth0/Auth0.swift" "1.0.0-rc.2"
+github "auth0/Auth0.swift" "1.0.0-rc.3"
 ```
 
 ## Usage
