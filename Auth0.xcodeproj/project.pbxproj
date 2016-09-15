@@ -236,13 +236,6 @@
 			remoteGlobalIDString = 5F23E6F51D4B87F000C3F2D9;
 			remoteInfo = Auth0.tvOS;
 		};
-		5F53F5CF1CFD199700476A46 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5F06DD771CC448B10011842B;
-			remoteInfo = Auth0.iOS;
-		};
 		5FCAB1641D07ABC000331C84 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
@@ -981,7 +974,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				5F53F5D01CFD199700476A46 /* PBXTargetDependency */,
 			);
 			name = OAuth2;
 			productName = OAuth2;
@@ -1388,11 +1380,6 @@
 			isa = PBXTargetDependency;
 			target = 5F23E6F51D4B87F000C3F2D9 /* Auth0.tvOS */;
 			targetProxy = 5F331AFF1D4BB24C00AE4382 /* PBXContainerItemProxy */;
-		};
-		5F53F5D01CFD199700476A46 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5F06DD771CC448B10011842B /* Auth0.iOS */;
-			targetProxy = 5F53F5CF1CFD199700476A46 /* PBXContainerItemProxy */;
 		};
 		5FCAB1651D07ABC000331C84 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
