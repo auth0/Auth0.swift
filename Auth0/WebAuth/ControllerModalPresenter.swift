@@ -22,7 +22,7 @@
 
 import UIKit
 
-public struct ControllerModalPresenter {
+struct ControllerModalPresenter {
 
     let rootViewController: UIViewController?
 
