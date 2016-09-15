@@ -22,13 +22,16 @@
 
 import Foundation
 
+public typealias ManagementObject = [String: AnyObject]
+
 /**
  *  Auth0 Management API
  */
-public struct Management: Trackable {
-    public let token: String
-    public let url: NSURL
-    public var telemetry: Telemetry
+struct Management: Trackable, Loggable {
+    let token: String
+    let url: NSURL
+    var telemetry: Telemetry
+    var logger: Logger?
 
     let session: NSURLSession
 
@@ -39,18 +42,9 @@ public struct Management: Trackable {
         self.telemetry = telemetry
     }
 
-    public typealias Object = [String: AnyObject]
-
-    /**
-     Auth0 Users API v2
-
-     - returns: Users API endpoints
-     */
-    public func users() -> Users { return Users(management: self, telemetry: self.telemetry) }
-
-    func managementObject(response: Response<ManagementError>, callback: Request<Object, ManagementError>.Callback) {
+    func managementObject(response: Response<ManagementError>, callback: Request<ManagementObject, ManagementError>.Callback) {
         do {
-            if let dictionary = try response.result() as? Object {
+            if let dictionary = try response.result() as? ManagementObject {
                 callback(.Success(result: dictionary))
             } else {
                 callback(.Failure(error: ManagementError(string: string(response.data))))
@@ -60,9 +54,9 @@ public struct Management: Trackable {
         }
     }
 
-    func managementObjects(response: Response<ManagementError>, callback: Request<[Object], ManagementError>.Callback) {
+    func managementObjects(response: Response<ManagementError>, callback: Request<[ManagementObject], ManagementError>.Callback) {
         do {
-            if let list = try response.result() as? [Object] {
+            if let list = try response.result() as? [ManagementObject] {
                 callback(.Success(result: list))
             } else {
                 callback(.Failure(error: ManagementError(string: string(response.data))))

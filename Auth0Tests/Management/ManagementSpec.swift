@@ -59,7 +59,7 @@ class ManagementSpec: QuickSpec {
 
                 it("should yield success with payload") {
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
-                    var actual: Result<Management.Object>? = nil
+                    var actual: Result<ManagementObject>? = nil
                     management.managementObject(response) { actual = $0 }
                     expect(actual).toEventually(haveObjectWithAttributes(["key"]))
                 }
@@ -71,7 +71,7 @@ class ManagementSpec: QuickSpec {
                     let data = "NOT JSON".dataUsingEncoding(NSUTF8StringEncoding)!
                     let http = NSHTTPURLResponse(URL: DomainURL, statusCode: 200, HTTPVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
-                    var actual: Result<Management.Object>? = nil
+                    var actual: Result<ManagementObject>? = nil
                     management.managementObject(response) { actual = $0 }
                     expect(actual).toEventually(beFailure())
                 }
@@ -80,7 +80,7 @@ class ManagementSpec: QuickSpec {
                     let data = "[{\"key\": \"value\"}]".dataUsingEncoding(NSUTF8StringEncoding)!
                     let http = NSHTTPURLResponse(URL: DomainURL, statusCode: 200, HTTPVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
-                    var actual: Result<Management.Object>? = nil
+                    var actual: Result<ManagementObject>? = nil
                     management.managementObject(response) { actual = $0 }
                     expect(actual).toEventually(beFailure())
                 }
@@ -89,7 +89,7 @@ class ManagementSpec: QuickSpec {
                     let data = "[{\"key\": \"value\"}]".dataUsingEncoding(NSUTF8StringEncoding)!
                     let http = NSHTTPURLResponse(URL: DomainURL, statusCode: 400, HTTPVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
-                    var actual: Result<Management.Object>? = nil
+                    var actual: Result<ManagementObject>? = nil
                     management.managementObject(response) { actual = $0 }
                     expect(actual).toEventually(beFailure())
                 }
@@ -99,7 +99,7 @@ class ManagementSpec: QuickSpec {
                     let data = try? NSJSONSerialization.dataWithJSONObject(error, options: [])
                     let http = NSHTTPURLResponse(URL: DomainURL, statusCode: 400, HTTPVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
-                    var actual: Result<Management.Object>? = nil
+                    var actual: Result<ManagementObject>? = nil
                     management.managementObject(response) { actual = $0 }
                     expect(actual).toEventually(haveManagementError("error", description: "description", code: "code", statusCode: 400))
                 }
@@ -107,14 +107,14 @@ class ManagementSpec: QuickSpec {
                 it("should yield generic failure when no payload") {
                     let http = NSHTTPURLResponse(URL: DomainURL, statusCode: 400, HTTPVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: nil, response: http, error: nil)
-                    var actual: Result<Management.Object>? = nil
+                    var actual: Result<ManagementObject>? = nil
                     management.managementObject(response) { actual = $0 }
                     expect(actual).toEventually(beFailure())
                 }
 
                 it("should yield generic failure") {
                     let response = Response<ManagementError>(data: nil, response: nil, error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-                    var actual: Result<Management.Object>? = nil
+                    var actual: Result<ManagementObject>? = nil
                     management.managementObject(response) { actual = $0 }
                     expect(actual).toEventually(beFailure())
                 }

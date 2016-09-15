@@ -42,7 +42,7 @@ private let Timeout: NSTimeInterval = 2
 class AuthenticationSpec: QuickSpec {
     override func spec() {
 
-        let auth = Authentication(clientId: ClientId, url: NSURL(string: "https://\(Domain)")!)
+        let auth = Auth0Authentication(clientId: ClientId, url: NSURL(string: "https://\(Domain)")!)
 
         afterEach {
             OHHTTPStubs.removeAllStubs()

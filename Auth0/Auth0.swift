@@ -36,7 +36,7 @@ import Foundation
  - returns: Auth0 Authentication API
  */
 public func authentication(clientId clientId: String, domain: String, session: NSURLSession = .sharedSession()) -> Authentication {
-    return Authentication(clientId: clientId, url: .a0_url(domain), session: session)
+    return Auth0Authentication(clientId: clientId, url: .a0_url(domain), session: session)
 }
 
 /**
@@ -70,59 +70,6 @@ public func authentication(clientId clientId: String, domain: String, session: N
 public func authentication(session session: NSURLSession = .sharedSession(), bundle: NSBundle = NSBundle.mainBundle()) -> Authentication {
     let values = plistValues(bundle: bundle)!
     return authentication(clientId: values.clientId, domain: values.domain, session: session)
-}
-
-/**
- Auth0 Management API v2 to perform CRUD operation against your Users, Clients, Connections, etc.
-
- ```
- Auth0.management(token: token)
- ```
-
- Auth0 domain is loaded from the file `Auth0.plist` in your main bundle with the following content:
-
- ```
- <?xml version="1.0" encoding="UTF-8"?>
- <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
- <plist version="1.0">
- <dict>
-	<key>ClientId</key>
-	<string>{YOUR_CLIENT_ID}</string>
-	<key>Domain</key>
-	<string>{YOUR_DOMAIN}</string>
- </dict>
- </plist>
- ```
-
- - parameter token:     token of Management API v2 with the correct allowed scopes to perform the desired action
- - parameter session:   instance of NSURLSession used for networking. By default it will use the shared NSURLSession
- - parameter bundle:    bundle used to locate the `Auth0.plist` file. By default is the main bundle
-
- - returns: Auth0 Management API v2
- - important: Auth0.swift has yet to implement all endpoints. Now you can only perform some CRUD operations against Users
- - important: Calling this method without a valid `Auth0.plist` will crash your application
- */
-public func management(token token: String, session: NSURLSession = .sharedSession(), bundle: NSBundle = NSBundle.mainBundle()) -> Management {
-    let values = plistValues(bundle: bundle)!
-    return management(token: token, domain: values.domain, session: session)
-}
-
-/**
- Auth0 Management API v2 to perform CRUD operation against your Users, Clients, Connections, etc.
- 
- ```
- Auth0.management(token: token, domain: "samples.auth0.com")
- ```
-
- - parameter token:     token of Management API v2 with the correct allowed scopes to perform the desired action
- - parameter domain:    domain of your Auth0 account. e.g.: 'samples.auth0.com'
- - parameter session:   instance of NSURLSession used for networking. By default it will use the shared NSURLSession
-
- - returns: Auth0 Management API v2
- - important: Auth0.swift has yet to implement all endpoints. Now you can only perform some CRUD operations against Users
- */
-public func management(token token: String, domain: String, session: NSURLSession = .sharedSession()) -> Management {
-    return Management(token: token, url: .a0_url(domain), session: session)
 }
 
 /**
@@ -187,7 +134,7 @@ public func users(token token: String, session: NSURLSession = .sharedSession(),
  - returns: Auth0 Management API v2
  */
 public func users(token token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
-    return management(token: token, domain: domain, session: session).users()
+    return Management(token: token, url: .a0_url(domain), session: session)
 }
 
 func plistValues(bundle bundle: NSBundle) -> (clientId: String, domain: String)? {

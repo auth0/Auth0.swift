@@ -25,10 +25,10 @@ import Foundation
 @objc(A0ManagementAPI)
 public class _ObjectiveManagementAPI: NSObject {
 
-    private var management: Management
+    private var users: Users
 
     public init(token: String) {
-        self.management = Auth0.management(token: token)
+        self.users = Auth0.users(token: token)
     }
 
     public convenience init(token: String, url: NSURL) {
@@ -36,13 +36,12 @@ public class _ObjectiveManagementAPI: NSObject {
     }
 
     public init(token: String, url: NSURL, session: NSURLSession) {
-        self.management = Management(token: token, url: url, session: session)
+        self.users = Management(token: token, url: url, session: session)
     }
 
     @objc(patchUserWithIdentifier:userMetadata:callback:)
     public func patchUser(identifier: String, userMetadata: [String: AnyObject], callback: (NSError?, [String: AnyObject]?) -> ()) {
-        self.management
-            .users()
+        self.users
             .patch(identifier, attributes: UserPatchAttributes().userMetadata(userMetadata))
             .start { result in
                 switch result {
@@ -58,8 +57,7 @@ public class _ObjectiveManagementAPI: NSObject {
 
     @objc(linkUserWithIdentifier:withUserUsingToken:callback:)
     public func linkUser(identifier: String, withUserUsingToken token: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
-        self.management
-            .users()
+        self.users
             .link(identifier, withOtherUserToken: token)
             .start { result in
                 switch result {
@@ -75,8 +73,7 @@ public class _ObjectiveManagementAPI: NSObject {
     
     @objc(unlinkUserWithIdentifier:provider:fromUserId:callback:)
     public func unlink(identifier: String, provider: String, fromUserId userId: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
-        self.management
-            .users()
+        self.users
             .unlink(identityId: identifier, provider: provider, fromUserId:userId)
             .start { result in
                 switch result {
@@ -98,6 +95,6 @@ public class _ObjectiveManagementAPI: NSObject {
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
     public func setTelemetryEnabled(enabled: Bool) {
-        self.management.enableTelemetry(enabled: enabled)
+        self.users.enableTelemetry(enabled: enabled)
     }
 }
