@@ -1,0 +1,49 @@
+# Customise this file, documentation can be found here:
+# https://github.com/fastlane/fastlane/tree/master/fastlane/docs
+# All available actions: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md
+# can also be listed using the `fastlane actions` command
+
+# Change the syntax highlighting to Ruby
+# All lines starting with a # are ignored when running `fastlane`
+
+# If you want to automatically update fastlane if a new version is available:
+# update_fastlane
+
+# This is the minimum version number required.
+# Update this, if you use features of a newer version
+fastlane_version "1.103.0"
+
+default_platform :ios
+
+platform :ios do
+
+  desc "Install dependencies from cache"
+  lane :prepare_cache do
+    Dir.chdir ".." do
+      sh "export AWS_REGION=#{ENV["AWS_REGION"]};carthage_cache install --bucket-name #{ENV["CARTHAGE_CACHE_BUCKET_NAME"]}"
+    end
+  end
+
+  desc "Runs all the tests"
+  lane :test do |options|
+    scheme = options[:scheme]
+    device = options[:device]
+    scan(
+      scheme: scheme,
+      device: device,
+      clean: true
+      )
+  end
+
+  desc "Runs all the tests in a CI environment"
+  lane :ci do
+    scheme = ENV["SCHEME"]
+    UI.user_error!("You must supply a valid scheme in 'SCHEME' env variable") if scheme.nil?
+    options = {
+      scheme: scheme,
+      device: ENV["DEVICE"]
+    }
+    prepare_cache
+    test(options)
+  end
+end
