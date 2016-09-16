@@ -100,7 +100,7 @@ extension Trackable {
 
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
-    public mutating func enableTelemetry(enabled: Bool) {
+    public mutating func tracking(enabled: Bool) {
         self.telemetry.enabled = enabled
     }
 

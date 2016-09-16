@@ -64,7 +64,7 @@ class LoggerSpec: QuickSpec {
 
             it("should log request body") {
                 let json = "{key: \"\(UUID().uuidString)\"}"
-                request.httpBody = json.data(using: String.Encoding.utf8)
+                request.httpBody = json.data(using: .utf8)
                 logger.trace(request: request, session: URLSession.shared)
                 expect(output.messages).to(contain(json))
             }
@@ -91,7 +91,7 @@ class LoggerSpec: QuickSpec {
 
             it("should log response body") {
                 let json = "{key: \"\(UUID().uuidString)\"}"
-                logger.trace(response: response, data: json.data(using: String.Encoding.utf8))
+                logger.trace(response: response, data: json.data(using: .utf8))
                 expect(output.messages).to(contain(json))
             }
 

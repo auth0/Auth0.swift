@@ -39,10 +39,3 @@ public protocol Auth0Error: Error {
     var code: String { get }
     
 }
-
-internal protocol FoundationErrorConvertible {
-    static var FoundationDomain: String { get }
-    static var FoundationUserInfoKey: String { get }
-
-    func newFoundationError() -> NSError
-}

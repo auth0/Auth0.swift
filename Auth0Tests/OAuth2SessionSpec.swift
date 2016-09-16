@@ -83,26 +83,26 @@ class OAuth2SessionSpec: QuickSpec {
             }
 
             it("should return credentials from query string") {
-                session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
+                let _ = session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
                 expect(result).toEventually(haveCredentials())
             }
 
             it("should return credentials from fragment") {
-                session.resume(URL(string: "https://samples.auth0.com/callback#access_token=ATOKEN&token_type=bearer")!)
+                let _ = session.resume(URL(string: "https://samples.auth0.com/callback#access_token=ATOKEN&token_type=bearer")!)
                 expect(result).toEventually(haveCredentials())
             }
             it("should return error from query string") {
-                session.resume(URL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
+                let _ = session.resume(URL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
                 expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
             }
 
             it("should return error from fragment") {
-                session.resume(URL(string: "https://samples.auth0.com/callback#error=error&error_description=description")!)
+                let _ = session.resume(URL(string: "https://samples.auth0.com/callback#error=error&error_description=description")!)
                 expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
             }
 
             it("should fail if values from fragment are invalid") {
-                session.resume(URL(string: "https://samples.auth0.com/callback#access_token=")!)
+                let _ = session.resume(URL(string: "https://samples.auth0.com/callback#access_token=")!)
                 expect(result).toEventually(beFailure())
             }
 

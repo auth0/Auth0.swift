@@ -47,7 +47,7 @@ class ResponseSpec: QuickSpec {
             }
 
             it("should handle string as json for reset password") {
-                let data = "A simple String".data(using: String.Encoding.utf8)
+                let data = "A simple String".data(using: .utf8)
                 let response = Response<AuthenticationError>(data: data, response: http(200, url: Foundation.URL(string: "https://samples.auth0.com/dbconnections/change_password")!), error: nil)
                 expect(try? response.result()).toNot(beNil())
             }
@@ -71,7 +71,7 @@ class ResponseSpec: QuickSpec {
             }
 
             it("should fail with invalid JSON") {
-                let data = "A simple String".data(using: String.Encoding.utf8)
+                let data = "A simple String".data(using: .utf8)
                 let response = Response<AuthenticationError>(data: data, response: http(200), error: nil)
                 expect(try? response.result()).to(beNil())
             }

@@ -50,7 +50,7 @@ func hasUserMetadata(_ metadata: [String: String]) -> OHHTTPStubsTestBlock {
 
 func hasObjectAttribute(_ name: String, value: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
-        guard let payload = request.a0_payload, let actualValue = payload[name] as? [String: AnyObject] else { return false }
+        guard let payload = request.a0_payload, let actualValue = payload[name] as? [String: Any] else { return false }
         return value.count == actualValue.count && value.reduce(true, { (initial, entry) -> Bool in
             guard let value = actualValue[entry.0] as? String else { return false }
             return initial && value == entry.1
@@ -261,7 +261,7 @@ func haveProfile(_ userId: String) -> MatcherFunc<Result<Profile>> {
     }
 }
 
-func haveObjectWithAttributes(_ attributes: [String]) -> MatcherFunc<Result<[String: AnyObject]>> {
+func haveObjectWithAttributes(_ attributes: [String]) -> MatcherFunc<Result<[String: Any]>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have attribues \(attributes)"
         if let actual = try expression.evaluate(), case .success(let value) = actual {

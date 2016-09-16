@@ -159,7 +159,7 @@ public protocol WebAuth: Trackable, Loggable {
      Then from `AppDelegate` we just need to resume the OAuth2 Auth like this
 
      ```
-     func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+     func application(app: UIApplication, openURL url: NSURL, options: [String : Any]) -> Bool {
         return Auth0.resumeAuth(url, options: options)
      }
      ```

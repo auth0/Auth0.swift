@@ -30,7 +30,7 @@ func json<T>(_ data: Data?) -> T? {
 
 func string(_ data: Data?) -> String? {
     guard let data = data else { return nil }
-    return String(data: data, encoding: String.Encoding.utf8)
+    return String(data: data, encoding: .utf8)
 }
 
 struct Response<E: Auth0Error> {

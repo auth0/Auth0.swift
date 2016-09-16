@@ -60,8 +60,8 @@ struct Auth0Authentication: Authentication {
             "connection": connection,
             "client_id": self.clientId,
             ]
-        payload["username"] = username as AnyObject?
-        payload["user_metadata"] = userMetadata as AnyObject?
+        payload["username"] = username
+        payload["user_metadata"] = userMetadata
 
         let createUser = URL(string: "/dbconnections/signup", relativeTo: self.url)!
         return Request(session: session, url: createUser, method: "POST", handle: databaseUser, payload: payload, logger: self.logger, telemetry: self.telemetry)
@@ -143,10 +143,10 @@ struct Auth0Authentication: Authentication {
 
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
         return self.tokenExchange(withParameters: [
-            "code": code as AnyObject,
-            "code_verifier": codeVerifier as AnyObject,
-            "redirect_uri": redirectURI as AnyObject,
-            "grant_type": "authorization_code" as AnyObject
+            "code": code,
+            "code_verifier": codeVerifier,
+            "redirect_uri": redirectURI,
+            "grant_type": "authorization_code",
             ])
     }
 }

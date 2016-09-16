@@ -54,7 +54,7 @@ class ManagementSpec: QuickSpec {
             let management = Management(token: Token, url: URL(string: "https://\(Domain)")!)
 
             context("success") {
-                let data = "{\"key\": \"value\"}".data(using: String.Encoding.utf8)!
+                let data = "{\"key\": \"value\"}".data(using: .utf8)!
                 let http = HTTPURLResponse(url: DomainURL, statusCode: 200, httpVersion: nil, headerFields: nil)
 
                 it("should yield success with payload") {
@@ -68,7 +68,7 @@ class ManagementSpec: QuickSpec {
             context("failure") {
 
                 it("should yield invalid json response") {
-                    let data = "NOT JSON".data(using: String.Encoding.utf8)!
+                    let data = "NOT JSON".data(using: .utf8)!
                     let http = HTTPURLResponse(url: DomainURL, statusCode: 200, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: Result<ManagementObject>? = nil
@@ -77,7 +77,7 @@ class ManagementSpec: QuickSpec {
                 }
 
                 it("should yield invalid response") {
-                    let data = "[{\"key\": \"value\"}]".data(using: String.Encoding.utf8)!
+                    let data = "[{\"key\": \"value\"}]".data(using: .utf8)!
                     let http = HTTPURLResponse(url: DomainURL, statusCode: 200, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: Result<ManagementObject>? = nil
@@ -86,7 +86,7 @@ class ManagementSpec: QuickSpec {
                 }
 
                 it("should yield generic failure when error response is unknown") {
-                    let data = "[{\"key\": \"value\"}]".data(using: String.Encoding.utf8)!
+                    let data = "[{\"key\": \"value\"}]".data(using: .utf8)!
                     let http = HTTPURLResponse(url: DomainURL, statusCode: 400, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: Result<ManagementObject>? = nil

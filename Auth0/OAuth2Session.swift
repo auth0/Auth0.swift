@@ -30,7 +30,7 @@ import SafariServices
  so we need to handle when the configured URL is opened in your Application's `AppDelegate`
 
  ```
- func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+ func application(app: UIApplication, openURL url: NSURL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
  let session = //retrieve current OAuth2 session
  return session.resume(url, options: options)
  }

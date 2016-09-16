@@ -54,7 +54,7 @@ struct DefaultLogger: Logger {
         output.log(message: "\(method) \(url) HTTP/1.1")
         session.configuration.httpAdditionalHeaders?.forEach { key, value in output.log(message: "\(key): \(value)") }
         request.allHTTPHeaderFields?.forEach { key, value in output.log(message: "\(key): \(value)") }
-        if let data = request.httpBody, let string = String(data: data, encoding: String.Encoding.utf8) {
+        if let data = request.httpBody, let string = String(data: data, encoding: .utf8) {
             output.newLine()
             output.log(message:string)
         }
@@ -65,7 +65,7 @@ struct DefaultLogger: Logger {
         if let http = response as? HTTPURLResponse {
             output.log(message: "HTTP/1.1 \(http.statusCode)")
             http.allHeaderFields.forEach { key, value in output.log(message: "\(key): \(value)") }
-            if let data = data, let string = String(data: data, encoding: String.Encoding.utf8) {
+            if let data = data, let string = String(data: data, encoding: .utf8) {
                 output.newLine()
                 output.log(message: string)
             }

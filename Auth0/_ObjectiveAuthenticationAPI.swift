@@ -40,14 +40,14 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     }
 
     @objc(loginWithUsernameOrEmail:password:connection:scope:parameters:callback:)
-    public func login(withUsernameOrEmail username: String, password: String, connection: String, scope: String, parameters: [String: AnyObject]?, callback: @escaping (NSError?, Credentials?) -> ()) {
+    public func login(withUsernameOrEmail username: String, password: String, connection: String, scope: String, parameters: [String: Any]?, callback: @escaping (NSError?, Credentials?) -> ()) {
         self.authentication
             .login(usernameOrEmail: username, password: password, connection: connection, scope: scope, parameters: parameters ?? [:])
             .start(handleResult(callback: callback))
     }
 
     @objc(createUserWithEmail:username:password:connection:userMetadata:callback:)
-    public func createUser(withEmail email: String, username: String?, password: String, connection: String, userMetadata: [String: AnyObject]?, callback: @escaping (NSError?, [String: Any]?) -> ()) {
+    public func createUser(withEmail email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, callback: @escaping (NSError?, [String: Any]?) -> ()) {
         self.authentication
             .createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
             .start { result in
@@ -61,8 +61,6 @@ public class _ObjectiveAuthenticationAPI: NSObject {
                         info["username"] = username
                     }
                     callback(nil, info)
-                case .failure(let cause as FoundationErrorConvertible):
-                    callback(cause.newFoundationError(), nil)
                 case .failure(let cause):
                     callback(cause as NSError, nil)
                 }
@@ -77,7 +75,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     }
 
     @objc(signUpWithEmail:username:password:connection:userMetadata:scope:parameters:callback:)
-    public func signUp(withEmail email: String, username: String?, password: String, connection: String, userMetadata: [String: AnyObject]?, scope: String, parameters: [String: AnyObject]?, callback: @escaping (NSError?, Credentials?) -> ()) {
+    public func signUp(withEmail email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, scope: String, parameters: [String: Any]?, callback: @escaping (NSError?, Credentials?) -> ()) {
         self.authentication
             .signUp(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, scope: scope, parameters: parameters ?? [:])
             .start(handleResult(callback: callback))
@@ -136,7 +134,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
     public func setTelemetryEnabled(enabled: Bool) {
-        self.authentication.enableTelemetry(enabled: enabled)
+        self.authentication.tracking(enabled: enabled)
     }
 }
 
@@ -145,8 +143,6 @@ private func handleResult<T>(callback: @escaping (NSError?, T?) -> ()) -> (Resul
         switch result {
         case .success(let payload):
             callback(nil, payload)
-        case .failure(let cause as FoundationErrorConvertible):
-            callback(cause.newFoundationError(), nil)
         case .failure(let cause):
             callback(cause as NSError, nil)
         }
@@ -155,10 +151,6 @@ private func handleResult<T>(callback: @escaping (NSError?, T?) -> ()) -> (Resul
 
 private func handleResult(callback: @escaping (NSError?) -> ()) -> (Result<Void>) -> () {
     return { result in
-        if case .failure(let cause as FoundationErrorConvertible) = result {
-            callback(cause.newFoundationError())
-            return
-        }
         if case .failure(let cause) = result {
             callback(cause as NSError)
             return

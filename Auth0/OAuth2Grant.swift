@@ -32,9 +32,9 @@ struct ImplicitGrant: OAuth2Grant {
     let defaults: [String : String] = ["response_type": "token"]
 
     func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
-        guard let credentials = Credentials(json: values as [String : AnyObject]) else {
+        guard let credentials = Credentials(json: values as [String : Any]) else {
             let data = try! JSONSerialization.data(withJSONObject: values, options: [])
-            let string = String(data: data, encoding: String.Encoding.utf8)
+            let string = String(data: data, encoding: .utf8)
             callback(.failure(error: AuthenticationError(string: string)))
             return
         }
@@ -70,7 +70,7 @@ struct PKCE: OAuth2Grant {
             let code = values["code"]
             else {
                 let data = try! JSONSerialization.data(withJSONObject: values, options: [])
-                let string = String(data: data, encoding: String.Encoding.utf8)
+                let string = String(data: data, encoding: .utf8)
                 return callback(.failure(error: AuthenticationError(string: string)))
             }
         let clientId = self.authentication.clientId

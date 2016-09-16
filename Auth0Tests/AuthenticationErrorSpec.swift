@@ -248,7 +248,7 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
         }
 
         sharedExamples(UnknownErrorExample) { (context: SharedExampleContext) in
-            let values = context()[ExampleValuesKey] as! [String: AnyObject]
+            let values = context()[ExampleValuesKey] as! [String: Any]
             let error = AuthenticationError(info: values, statusCode: 401)
             it("should have unknown error code") {
                 expect(error.code) == UnknownError

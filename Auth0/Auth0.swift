@@ -140,7 +140,7 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
 func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
     guard
         let path = bundle.path(forResource: "Auth0", ofType: "plist"),
-        let values = NSDictionary(contentsOfFile: path) as? [String: AnyObject]
+        let values = NSDictionary(contentsOfFile: path) as? [String: Any]
         else {
             print("Missing Auth0.plist file with 'ClientId' and 'Domain' entries in main bundle!")
             return nil

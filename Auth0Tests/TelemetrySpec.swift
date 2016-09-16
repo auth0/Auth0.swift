@@ -186,9 +186,9 @@ class TelemetrySpec: QuickSpec {
             }
 
             it("should toggle telemetry") {
-                trackable.enableTelemetry(enabled: false)
+                trackable.tracking(enabled: false)
                 expect(trackable.telemetry.enabled) == false
-                trackable.enableTelemetry(enabled: true)
+                trackable.tracking(enabled: true)
                 expect(trackable.telemetry.enabled) == true
             }
 

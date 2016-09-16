@@ -25,16 +25,16 @@ import Foundation
 /**
  *  Represents an error during a request to Auth0 Authentication API
  */
-public class AuthenticationError: NSObject, Auth0Error {
+public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
     /**
      Additional information about the error
      - seeAlso: `code` & `description` properties
      */
-    open let info: [String: Any]
+    public let info: [String: Any]
 
     /// Http Status Code of the response
-    open let statusCode: Int
+    public let statusCode: Int
 
     /**
      Creates a Auth0 Auth API error when the request's response is not JSON
@@ -69,7 +69,7 @@ public class AuthenticationError: NSObject, Auth0Error {
     /**
      Auth0 error code if the server returned one or an internal library code (e.g.: when the server could not be reached)
      */
-    open var code: String {
+    public var code: String {
         let code = self.info["error"] ?? self.info["code"]
         return code as? String ?? UnknownError
     }
@@ -78,7 +78,7 @@ public class AuthenticationError: NSObject, Auth0Error {
      Description of the error
      - important: You should avoid displaying description to the user, it's meant for debugging only.
      */
-    open override var description: String {
+    public var description: String {
         let description = self.info["description"] ?? self.info["error_description"]
         if let string = description as? String {
             return string
@@ -90,47 +90,47 @@ public class AuthenticationError: NSObject, Auth0Error {
     }
 
     /// When MFA code is required to authenticate
-    open var isMultifactorRequired: Bool {
+    public var isMultifactorRequired: Bool {
         return self.code == "a0.mfa_required"
     }
 
     /// When MFA is required and the user is not enrolled
-    open var isMultifactorEnrollRequired: Bool {
+    public var isMultifactorEnrollRequired: Bool {
         return self.code == "a0.mfa_registration_required"
     }
 
     /// When MFA code sent is invalid or expired
-    open var isMultifactorCodeInvalid: Bool {
+    public var isMultifactorCodeInvalid: Bool {
         return self.code == "a0.mfa_invalid_code"
     }
 
     /// When password used for SignUp does not match connection's strength requirements. More info will be available in `info`
-    open var isPasswordNotStrongEnough: Bool {
+    public var isPasswordNotStrongEnough: Bool {
         return self.code == "invalid_password" &&  self.value("name") == "PasswordStrengthError"
     }
 
     /// When password used for SignUp was already used before (Reported when password history feature is enabled). More info will be available in `info`
-    open var isPasswordAlreadyUsed: Bool {
+    public var isPasswordAlreadyUsed: Bool {
         return self.code == "invalid_password" &&  self.value("name") == "PasswordHistoryError"
     }
 
     /// When Auth0 rule returns an error. The message returned by the rull will be in `description`
-    open var isRuleError: Bool {
+    public var isRuleError: Bool {
         return self.code == "unauthorized"
     }
 
     /// When username and/or password used for authentication are invalid
-    open var isInvalidCredentials: Bool {
+    public var isInvalidCredentials: Bool {
         return self.code == "invalid_user_password"
     }
 
     /// When authenticating with web-based authentication and the resource server denied access per OAuth2 spec
-    open var isAccessDenied: Bool {
+    public var isAccessDenied: Bool {
         return self.code == "access_denied"
     }
 
     /// When you reached the maximum amount of request for the API
-    open var isTooManyAttempts: Bool {
+    public var isTooManyAttempts: Bool {
         return self.code == "too_many_attempts"
     }
 
@@ -141,17 +141,18 @@ public class AuthenticationError: NSObject, Auth0Error {
 
      - returns: the value of key or nil if cannot be found or is of the wrong type.
      */
-    open func value<T>(_ key: String) -> T? { return self.info[key] as? T }
+    public func value<T>(_ key: String) -> T? { return self.info[key] as? T }
 }
 
-extension AuthenticationError: FoundationErrorConvertible {
-    @nonobjc static let FoundationDomain = "com.auth0.authentication"
-    @nonobjc static let FoundationUserInfoKey = "com.auth0.authentication.error.info"
-    
-    public func newFoundationError() -> NSError {
-        return NSError(domain: AuthenticationError.FoundationDomain, code: 1, userInfo: [
+extension AuthenticationError: CustomNSError {
+
+    public static let infoKey = "com.auth0.authentication.error.info"
+    public static var errorDomain: String { return "com.auth0.authentication" }
+    public var errorCode: Int { return 1 }
+    public var errorUserInfo: [String : Any] {
+        return [
             NSLocalizedDescriptionKey: self.description,
-            AuthenticationError.FoundationUserInfoKey: self,
-            ])
+            AuthenticationError.infoKey: self,
+        ]
     }
 }

@@ -1,4 +1,4 @@
-// NSError+Management.swift
+// NSError+Helper.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -23,24 +23,6 @@
 import Foundation
 
 public extension NSError {
-
-    /**
-     Check if the NSError was created from an ManagementError
-
-     - returns: if it's an management error from Auth0
-     */
-    func a0_isManagementError() -> Bool {
-        return self.domain == ManagementError.FoundationDomain
-    }
-
-    /**
-     Returns the Auth0 Managenent Error
-
-     - returns: management error
-     - seeAlso: ManagementError
-     */
-    func a0_managementError() -> ManagementError? {
-        return self.userInfo[ManagementError.FoundationUserInfoKey] as? ManagementError
-    }
-    
+    public var a0_isManagementError: Bool { return self.domain == ManagementError.errorDomain }
+    public var a0_isAuthenticationError: Bool { return self.domain == AuthenticationError.errorDomain }
 }

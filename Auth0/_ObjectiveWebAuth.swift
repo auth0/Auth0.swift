@@ -24,9 +24,9 @@ import UIKit
 
 @objc(A0WebAuth)
 /// Web-based Auth with Auth0
-open class _ObjectiveOAuth2: NSObject {
+public class _ObjectiveOAuth2: NSObject {
 
-    fileprivate(set) var webAuth: SafariWebAuth
+    private(set) var webAuth: SafariWebAuth
 
     public override init() {
         let values = plistValues(bundle: Bundle.main)!
@@ -37,7 +37,7 @@ open class _ObjectiveOAuth2: NSObject {
         self.webAuth = SafariWebAuth(clientId: clientId, url: url)
     }
 
-    open func addParameters(_ parameters: [String: String]) {
+    public func addParameters(_ parameters: [String: String]) {
         let _ = self.webAuth.parameters(parameters)
     }
 
@@ -46,7 +46,7 @@ open class _ObjectiveOAuth2: NSObject {
 
      Before enabling this flag you'll need to configure Universal Links
     */
-    open var universalLink: Bool {
+    public var universalLink: Bool {
         set {
             self.webAuth.universalLink = newValue
         }
@@ -60,7 +60,7 @@ open class _ObjectiveOAuth2: NSObject {
 
      By default no connection is specified, so the hosted login page will be displayed
     */
-    open var connection: String? {
+    public var connection: String? {
         set {
             if let value = newValue {
                 let _ = self.webAuth.connection(value)
@@ -74,7 +74,7 @@ open class _ObjectiveOAuth2: NSObject {
     /**
      Scopes that will be requested during auth
     */
-    open var scope: String? {
+    public var scope: String? {
         set {
             if let value = newValue {
                 let _ = self.webAuth.scope(value)
@@ -107,13 +107,11 @@ open class _ObjectiveOAuth2: NSObject {
 
      - returns: an object representing the current OAuth2 session.
      */
-    open func start(_ callback: @escaping (NSError?, Credentials?) -> ()) {
+    public func start(_ callback: @escaping (NSError?, Credentials?) -> ()) {
         self.webAuth.start { result in
             switch result {
             case .success(let credentials):
                 callback(nil, credentials)
-            case .failure(let cause as FoundationErrorConvertible):
-                callback(cause.newFoundationError(), nil)
             case .failure(let cause):
                 callback(cause as NSError, nil)
             }
@@ -129,7 +127,7 @@ open class _ObjectiveOAuth2: NSObject {
      - returns: if the url was handled by an on going session or not.
      */
     @objc(resumeAuthWithURL:options:)
-    open static func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: AnyObject]) -> Bool {
+    public static func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
         return SessionStorage.sharedInstance.resume(url, options: options)
     }
 
@@ -139,7 +137,7 @@ open class _ObjectiveOAuth2: NSObject {
 
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
-    open func setTelemetryEnabled(_ enabled: Bool) {
-        self.webAuth.enableTelemetry(enabled: enabled)
+    public func setTelemetryEnabled(_ enabled: Bool) {
+        self.webAuth.tracking(enabled: enabled)
     }
 }

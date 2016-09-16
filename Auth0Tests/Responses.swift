@@ -57,7 +57,7 @@ func createdUser(email: String, username: String? = nil, verified: Bool = true) 
 }
 
 func resetPasswordResponse() -> OHHTTPStubsResponse {
-    let data = "We've just sent you an email to reset your password.".data(using: String.Encoding.utf8)!
+    let data = "We've just sent you an email to reset your password.".data(using: .utf8)!
     return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 

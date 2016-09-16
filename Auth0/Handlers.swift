@@ -22,7 +22,7 @@
 
 import Foundation
 
-func authenticationObject<T: JSONObjectPayload>(_ response: Response<AuthenticationError>, callback: Request<T, AuthenticationError>.Callback) {
+func authenticationObject<T: JSONObjectPayload>(from response: Response<AuthenticationError>, callback: Request<T, AuthenticationError>.Callback) {
     do {
         if let dictionary = try response.result() as? [String: Any], let object = T(json: dictionary) {
             callback(.success(result: object))
@@ -35,7 +35,7 @@ func authenticationObject<T: JSONObjectPayload>(_ response: Response<Authenticat
     }
 }
 
-func databaseUser(_ response: Response<AuthenticationError>, callback: Request<DatabaseUser, AuthenticationError>.Callback) {
+func databaseUser(from response: Response<AuthenticationError>, callback: Request<DatabaseUser, AuthenticationError>.Callback) {
     do {
         if let dictionary = try response.result() as? [String: Any], let email = dictionary["email"] as? String {
             let username = dictionary["username"] as? String
@@ -50,7 +50,7 @@ func databaseUser(_ response: Response<AuthenticationError>, callback: Request<D
     }
 }
 
-func noBody(_ response: Response<AuthenticationError>, callback: Request<Void, AuthenticationError>.Callback) {
+func noBody(from response: Response<AuthenticationError>, callback: Request<Void, AuthenticationError>.Callback) {
     do {
         let _ = try response.result()
         callback(.success(result: ()))

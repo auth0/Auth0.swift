@@ -37,34 +37,34 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .login(emailOrUsername: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { result in
-     switch result {
-     case .Success(let credentials):
-     print(credentials)
-     case .Failure(let error):
-     print(error)
-     }
-     }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(emailOrUsername: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .start { result in
+            switch result {
+            case .Success(let credentials):
+                print(credentials)
+            case .Failure(let error):
+                print(error)
+            }
+        }
      ```
 
      you can also specify scope and additional parameters
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .login(emailOrUsername: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(emailOrUsername: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
+        .start { print($0) }
      ```
 
      for passwordless connections
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .login(usernameOrEmail: "+4599134762367", password: "123456", connection: "sms", scope: "openid email", parameters: ["state": "a random state"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(usernameOrEmail: "+4599134762367", password: "123456", connection: "sms", scope: "openid email", parameters: ["state": "a random state"])
+        .start { print($0) }
      ```
 
      Also some enterprise connections, like Active Directory (AD), allows authentication using username/password without using the web flow.
@@ -88,27 +88,27 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .start { print($0) }
      ```
 
      you can also add additional attributes when creating the user
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
+        .start { print($0) }
      ```
 
      and if the database connection requires a username
 
      ```
      Auth0
-     .authentication(clientId, domain: "samples.auth0.com")
-     .createUser(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { print($0) }
+        .authentication(clientId, domain: "samples.auth0.com")
+        .createUser(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
+        .start { print($0) }
      ```
 
      - parameter email:             email of the user to create
@@ -126,9 +126,9 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .resetPassword(email: "support@auth0.com", connection: "Username-Password-Authentication")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .resetPassword(email: "support@auth0.com", connection: "Username-Password-Authentication")
+        .start { print($0) }
      ```
 
      - parameter email:      email of the database user
@@ -143,18 +143,18 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .start { print($0) }
      ```
 
      you can also add additional attributes when creating the user
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
+        .start { print($0) }
      ```
 
      and if the database connection requires a username
@@ -170,9 +170,9 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
+        .start { print($0) }
      ```
 
      - parameter email:        email of the new user
@@ -192,18 +192,18 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .startPasswordless(email: "support@auth0.com")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .startPasswordless(email: "support@auth0.com")
+        .start { print($0) }
      ```
 
      or if you have configured iOS Universal Links
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .startPasswordless(email: "support@auth0.com", type: .iOSLink)
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .startPasswordless(email: "support@auth0.com", type: .iOSLink)
+        .start { print($0) }
      ```
 
      - parameter email:      email where to send the code or link
@@ -220,18 +220,18 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .startPasswordless(phoneNumber: "support@auth0.com")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .startPasswordless(phoneNumber: "support@auth0.com")
+        .start { print($0) }
      ```
 
      or if you have configured iOS Universal Links
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .startPasswordless(phoneNumber: "support@auth0.com", type: .iOSLink)
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .startPasswordless(phoneNumber: "support@auth0.com", type: .iOSLink)
+        .start { print($0) }
      ```
 
      - parameter phoneNumber:   phone number where to send the sms with code or link
@@ -247,9 +247,9 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .tokenInfo(token: token)
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .tokenInfo(token: token)
+        .start { print($0) }
      ```
 
      - parameter token: token obtained by authenticating the user
@@ -263,9 +263,9 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId, domain: "samples.auth0.com")
-     .userInfo(token: token)
-     .start { print($0) }
+        .authentication(clientId, domain: "samples.auth0.com")
+        .userInfo(token: token)
+        .start { print($0) }
      ```
 
      - parameter token: token obtained by authenticating the user
@@ -279,18 +279,18 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .loginSocial(token: fbToken, connection: "facebook")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .loginSocial(token: fbToken, connection: "facebook")
+        .start { print($0) }
      ```
 
      and if you need to specify a scope or add additional parameters
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .loginSocial(token: fbToken, connection: "facebook", scope: "openid email", parameters: ["state": "a random state"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .loginSocial(token: fbToken, connection: "facebook", scope: "openid email", parameters: ["state": "a random state"])
+        .start { print($0) }
      ```
 
      - parameter token:      token obtained from a social IdP
@@ -307,9 +307,9 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .tokenExchange(withParameters: ["key": "value"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .tokenExchange(withParameters: ["key": "value"])
+        .start { print($0) }
      ```
 
      - parameter parameters: request parameters
@@ -326,9 +326,9 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .tokenExchange(withCode: "a code", codeVerifier: "code verifier", redirectURI: "https://samples.auth0.com/callback")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .tokenExchange(withCode: "a code", codeVerifier: "code verifier", redirectURI: "https://samples.auth0.com/callback")
+        .start { print($0) }
      ```
 
      - parameter code:         code returned after an `/oauth/authorize` request
@@ -363,34 +363,34 @@ extension Authentication {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .login(emailOrUsername: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { result in
-     switch result {
-     case .Success(let credentials):
-     print(credentials)
-     case .Failure(let error):
-     print(error)
-     }
-     }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(emailOrUsername: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .start { result in
+            switch result {
+            case .Success(let credentials):
+                print(credentials)
+            case .Failure(let error):
+                print(error)
+            }
+        }
      ```
 
      you can also specify scope and additional parameters
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .login(emailOrUsername: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(emailOrUsername: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
+        .start { print($0) }
      ```
 
      for passwordless connections
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .login(usernameOrEmail: "+4599134762367", password: "123456", connection: "sms", scope: "openid email", parameters: ["state": "a random state"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(usernameOrEmail: "+4599134762367", password: "123456", connection: "sms", scope: "openid email", parameters: ["state": "a random state"])
+        .start { print($0) }
      ```
 
      Also some enterprise connections, like Active Directory (AD), allows authentication using username/password without using the web flow.
@@ -416,27 +416,27 @@ extension Authentication {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .start { print($0) }
      ```
 
      you can also add additional attributes when creating the user
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
+        .start { print($0) }
      ```
 
      and if the database connection requires a username
 
      ```
      Auth0
-     .authentication(clientId, domain: "samples.auth0.com")
-     .createUser(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { print($0) }
+        .authentication(clientId, domain: "samples.auth0.com")
+        .createUser(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
+        .start { print($0) }
      ```
 
      - parameter email:             email of the user to create
@@ -456,36 +456,36 @@ extension Authentication {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .start { print($0) }
      ```
 
      you can also add additional attributes when creating the user
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
+        .start { print($0) }
      ```
 
      and if the database connection requires a username
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .signUp(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
+        .start { print($0) }
      ```
 
      or specifying the scope and parameters used for authentication
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
+        .start { print($0) }
      ```
 
      - parameter email:        email of the new user
@@ -507,18 +507,18 @@ extension Authentication {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .startPasswordless(email: "support@auth0.com")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .startPasswordless(email: "support@auth0.com")
+        .start { print($0) }
      ```
 
      or if you have configured iOS Universal Links
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .startPasswordless(email: "support@auth0.com", type: .iOSLink)
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .startPasswordless(email: "support@auth0.com", type: .iOSLink)
+        .start { print($0) }
      ```
 
      - parameter email:      email where to send the code or link
@@ -537,18 +537,18 @@ extension Authentication {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .startPasswordless(phoneNumber: "support@auth0.com")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .startPasswordless(phoneNumber: "support@auth0.com")
+        .start { print($0) }
      ```
 
      or if you have configured iOS Universal Links
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .startPasswordless(phoneNumber: "support@auth0.com", type: .iOSLink)
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .startPasswordless(phoneNumber: "support@auth0.com", type: .iOSLink)
+        .start { print($0) }
      ```
 
      - parameter phoneNumber:   phone number where to send the sms with code or link
@@ -566,18 +566,18 @@ extension Authentication {
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .loginSocial(token: fbToken, connection: "facebook")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .loginSocial(token: fbToken, connection: "facebook")
+        .start { print($0) }
      ```
 
      and if you need to specify a scope or add additional parameters
 
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .loginSocial(token: fbToken, connection: "facebook", scope: "openid email", parameters: ["state": "a random state"])
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .loginSocial(token: fbToken, connection: "facebook", scope: "openid email", parameters: ["state": "a random state"])
+        .start { print($0) }
      ```
 
      - parameter token:      token obtained from a social IdP
