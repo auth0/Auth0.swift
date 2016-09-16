@@ -95,6 +95,6 @@ public class _ObjectiveManagementAPI: NSObject {
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
     public func setTelemetryEnabled(enabled: Bool) {
-        self.users.enableTelemetry(enabled: enabled)
+        self.users.tracking(enabled: enabled)
     }
 }

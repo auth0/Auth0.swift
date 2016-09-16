@@ -140,6 +140,6 @@ public class _ObjectiveOAuth2: NSObject {
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
     public func setTelemetryEnabled(enabled: Bool) {
-        self.webAuth.enableTelemetry(enabled: enabled)
+        self.webAuth.tracking(enabled: enabled)
     }
 }

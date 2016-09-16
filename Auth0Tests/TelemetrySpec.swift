@@ -91,7 +91,7 @@ class TelemetrySpec: QuickSpec {
             let version = Telemetry.versionInformation()["version"] ?? Telemetry.NoVersion
 
             beforeEach {
-                telemetry.wrapped(inLibrary: "Lock.iOS", version: "1.0.0-alpha.4")
+                telemetry.wrapped(in: "Lock.iOS", version: "1.0.0-alpha.4")
             }
 
             it("should have a valid base64 value") {
@@ -186,15 +186,15 @@ class TelemetrySpec: QuickSpec {
             }
 
             it("should toggle telemetry") {
-                trackable.enableTelemetry(enabled: false)
+                trackable.tracking(enabled: false)
                 expect(trackable.telemetry.enabled) == false
-                trackable.enableTelemetry(enabled: true)
+                trackable.tracking(enabled: true)
                 expect(trackable.telemetry.enabled) == true
             }
 
             it("should mark it as used inside other library") {
                 let info = trackable.telemetry.info
-                trackable.using(inLibrary: "Lock.swift", version: "2.0.0-alpha.0")
+                trackable.using(in: "Lock.swift", version: "2.0.0-alpha.0")
                 expect(trackable.telemetry.info) != info
             }
         }
