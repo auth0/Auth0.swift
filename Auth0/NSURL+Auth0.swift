@@ -22,7 +22,7 @@
 
 import Foundation
 
-public extension NSURL {
+public extension URL {
     /**
      Returns an Auth0 domain URL given a domain
 
@@ -30,14 +30,13 @@ public extension NSURL {
 
      - returns: URL of your Auth0 account
      */
-    @objc(a0_URLWithDomain:)
-    public static func a0_url(domain: String) -> NSURL {
+    public static func a0_url(_ domain: String) -> URL {
         let urlString: String
         if !domain.hasPrefix("https") {
             urlString = "https://\(domain)"
         } else {
             urlString = domain
         }
-        return NSURL(string: urlString)!
+        return URL(string: urlString)!
     }
 }

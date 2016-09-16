@@ -33,20 +33,20 @@ private let Phone = "+144444444444"
 private let ValidPassword = "I.O.U. a password"
 private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
-private let AccessToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-private let IdToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-private let FacebookToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-private let InvalidFacebookToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-private let Timeout: NSTimeInterval = 2
+private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let Timeout: TimeInterval = 2
 
 class AuthenticationSpec: QuickSpec {
     override func spec() {
 
-        let auth = Auth0Authentication(clientId: ClientId, url: NSURL(string: "https://\(Domain)")!)
+        let auth = Auth0Authentication(clientId: ClientId, url: URL(string: "https://\(Domain)")!)
 
         afterEach {
             OHHTTPStubs.removeAllStubs()
-            stub(isHost(Domain)) { _ in
+            stub(condition: isHost(Domain)) { _ in
                 return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
                 }.name = "YOU SHALL NOT PASS!"
         }
@@ -54,9 +54,9 @@ class AuthenticationSpec: QuickSpec {
         describe("login") {
 
             beforeEach {
-                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
-                stub(isResourceOwner(Domain) && hasAtLeast(["password": InvalidPassword])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": InvalidPassword])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
             }
 
             it("should login with username and password") {
@@ -101,7 +101,7 @@ class AuthenticationSpec: QuickSpec {
                     let code = "invalid_username_password"
                     let description = "Invalid password"
                     let password = "return invalid password"
-                    stub(isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }
+                    stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }.name = "invalid password"
                     auth.login(usernameOrEmail: SupportAtAuth0, password: password, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
@@ -115,7 +115,7 @@ class AuthenticationSpec: QuickSpec {
                     let code = "invalid_username_password"
                     let description = "Invalid password"
                     let password = "return invalid password"
-                    stub(isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(error: code, description: description) }
+                    stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(error: code, description: description) }.name = "invalid password"
                     auth.login(usernameOrEmail: SupportAtAuth0, password: password, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
@@ -125,9 +125,9 @@ class AuthenticationSpec: QuickSpec {
 
             it("should send additional parameters") {
                 let token = "special token for state"
-                let state = NSUUID().UUIDString
-                let password = NSUUID().UUIDString
-                stub(isResourceOwner(Domain) && hasAtLeast(["password": password, "state": state])) { _ in return authResponse(accessToken: token) }.name = "Custom Parameter Auth"
+                let state = UUID().uuidString
+                let password = UUID().uuidString
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": password, "state": state])) { _ in return authResponse(accessToken: token) }.name = "Custom Parameter Auth"
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: "mail@auth0.com", password: password, connection: ConnectionName, parameters: ["state": state]).start { result in
                         expect(result).to(haveCredentials(token))
@@ -141,8 +141,8 @@ class AuthenticationSpec: QuickSpec {
         describe("create user") {
 
             beforeEach {
-                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
-                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "username": Support, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0, username: Support) }.name = "User w/username"
+                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "username": Support, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0, username: Support) }.name = "User w/username"
             }
 
             it("should create a user with email & password") {
@@ -170,7 +170,7 @@ class AuthenticationSpec: QuickSpec {
                     let code = "invalid_username_password"
                     let description = "Invalid password"
                     let password = "return invalid password"
-                    stub(isSignUp(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }
+                    stub(condition: isSignUp(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }.name = "invalid password"
                     auth.createUser(email: SupportAtAuth0, password: password, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
@@ -182,7 +182,7 @@ class AuthenticationSpec: QuickSpec {
                 let country = "Argentina"
                 let email = "metadata@auth0.com"
                 let metadata = ["country": country]
-                stub(isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: email) }.name = "User w/metadata"
+                stub(condition: isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: email) }.name = "User w/metadata"
                 waitUntil(timeout: Timeout) { done in
                     auth.createUser(email: email, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
                         expect(result).to(haveCreatedUser(email))
@@ -196,10 +196,10 @@ class AuthenticationSpec: QuickSpec {
         describe("reset password") {
 
             it("should reset password") {
-                stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return resetPasswordResponse() }
+                stub(condition: isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return resetPasswordResponse() }.name = "reset request sent"
                 waitUntil(timeout: Timeout) { done in
                     auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName).start { result in
-                        guard case .Success = result else { return fail("Failed to reset password") }
+                        guard case .success = result else { return fail("Failed to reset password") }
                         done()
                     }
                 }
@@ -208,7 +208,7 @@ class AuthenticationSpec: QuickSpec {
             it("should handle errors") {
                 let code = "reset_failed"
                 let description = "failed reset password"
-                stub(isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }
+                stub(condition: isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "reset failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
@@ -224,7 +224,7 @@ class AuthenticationSpec: QuickSpec {
             it("should fail if create user fails") {
                 let code = "create_failed"
                 let description = "failed create user"
-                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "User w/email"
+                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "User w/email"
                 waitUntil(timeout: Timeout) { done in
                     auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
@@ -236,8 +236,8 @@ class AuthenticationSpec: QuickSpec {
             it("should fail if login fails") {
                 let code = "invalid_password_failed"
                 let description = "failed to login"
-                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
-                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authFailure(code: code, description: description) }.name = "OpenID Auth"
+                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authFailure(code: code, description: description) }.name = "OpenID Auth"
                 waitUntil(timeout: Timeout) { done in
                     auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
@@ -247,8 +247,8 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should create user and login") {
-                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
-                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
                 waitUntil(timeout: Timeout) { done in
                     auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
@@ -258,9 +258,9 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should login with custom parameters") {
-                let state = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-                stub(isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
-                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "state": state])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                let state = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "state": state])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
                 waitUntil(timeout: Timeout) { done in
                     auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, parameters: ["state": state]).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
@@ -272,8 +272,8 @@ class AuthenticationSpec: QuickSpec {
             it("should create user with metadata") {
                 let country = "Argentina"
                 let metadata = ["country": country]
-                stub(isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
-                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                stub(condition: isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
                 waitUntil(timeout: Timeout) { done in
                     auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
@@ -287,7 +287,7 @@ class AuthenticationSpec: QuickSpec {
         describe("passwordless email") {
 
             it("should start with email with default values") {
-                stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless"
+                stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0).start { result in
                         expect(result).to(beSuccessfulResult())
@@ -297,7 +297,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should start with email") {
-                stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "custom_email", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless custom"
+                stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "custom_email", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless custom"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .iOSLink, connection: "custom_email").start { result in
                         expect(result).to(beSuccessfulResult())
@@ -308,7 +308,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should start with email and authParameters for web link") {
                 let params = ["scope": "openid"]
-                stub(isPasswordless(Domain) && hasAtLeast(["email": SupportAtAuth0]) && hasObjectAttribute("authParams", value: params)) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless web link with parameters"
+                stub(condition: isPasswordless(Domain) && hasAtLeast(["email": SupportAtAuth0]) && hasObjectAttribute("authParams", value: params)) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless web link with parameters"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .WebLink, parameters: params).start { result in
                         expect(result).to(beSuccessfulResult())
@@ -319,7 +319,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should not send params if type is not web link") {
                 let params = ["scope": "openid"]
-                stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
+                stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: params).start { result in
                         expect(result).to(beSuccessfulResult())
@@ -329,7 +329,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should not add params attr if they are empty") {
-                stub(isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
+                stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: [:]).start { result in
                         expect(result).to(beSuccessfulResult())
@@ -339,7 +339,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should report failure") {
-                stub(isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
+                stub(condition: isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0).start { result in
                         expect(result).to(haveAuthenticationError(code: "error", description: "description"))
@@ -352,7 +352,7 @@ class AuthenticationSpec: QuickSpec {
         describe("passwordless sms") {
 
             it("should start with sms with default values") {
-                stub(isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "sms", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless"
+                stub(condition: isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "sms", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone).start { result in
                         expect(result).to(beSuccessfulResult())
@@ -362,7 +362,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should start with sms") {
-                stub(isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "custom_sms", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless custom"
+                stub(condition: isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "custom_sms", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless custom"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone, type: .iOSLink, connection: "custom_sms").start { result in
                         expect(result).to(beSuccessfulResult())
@@ -372,7 +372,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should report failure") {
-                stub(isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
+                stub(condition: isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone).start { result in
                         expect(result).to(haveAuthenticationError(code: "error", description: "description"))
@@ -384,7 +384,7 @@ class AuthenticationSpec: QuickSpec {
 
         describe("user information") {
             it("should return token information") {
-                stub(isTokenInfo(Domain) && hasAllOf(["id_token": IdToken])) { _ in return tokenInfo() }.name = "token info"
+                stub(condition: isTokenInfo(Domain) && hasAllOf(["id_token": IdToken])) { _ in return tokenInfo() }.name = "token info"
                 waitUntil(timeout: Timeout) { done in
                     auth.tokenInfo(token: IdToken).start { result in
                         expect(result).to(haveProfile(UserId))
@@ -394,7 +394,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should report failure to get token info") {
-                stub(isTokenInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
+                stub(condition: isTokenInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.tokenInfo(token: IdToken).start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_token", description: "the token is invalid"))
@@ -404,7 +404,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should return user information") {
-                stub(isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo() }.name = "user info"
+                stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo() }.name = "user info"
                 waitUntil(timeout: Timeout) { done in
                     auth.userInfo(token: AccessToken).start { result in
                         expect(result).to(haveProfile(UserId))
@@ -414,7 +414,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should report failure to get user info") {
-                stub(isUserInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
+                stub(condition: isUserInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.userInfo(token: IdToken).start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_token", description: "the token is invalid"))
@@ -428,9 +428,9 @@ class AuthenticationSpec: QuickSpec {
         describe("social login") {
 
             beforeEach {
-                stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook", "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Facebook Auth OpenID"
-                stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook"]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Facebook Auth"
-                stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": InvalidFacebookToken])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
+                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook", "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Facebook Auth OpenID"
+                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook"]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Facebook Auth"
+                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": InvalidFacebookToken])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
             }
 
             it("should login with social IdP token") {
@@ -475,7 +475,7 @@ class AuthenticationSpec: QuickSpec {
                     let code = "invalid_token"
                     let description = "Invalid token"
                     let token = "return invalid token"
-                    stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(code: code, description: description) }
+                    stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(code: code, description: description) }.name = "invalid token"
                     auth.loginSocial(token: token, connection: "facebook").start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
@@ -489,7 +489,7 @@ class AuthenticationSpec: QuickSpec {
                     let code = "invalid_token"
                     let description = "Invalid token"
                     let token = "return invalid token"
-                    stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(error: code, description: description) }
+                    stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(error: code, description: description) }.name = "invalid token"
                     auth.loginSocial(token: token, connection: "facebook").start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
@@ -499,9 +499,9 @@ class AuthenticationSpec: QuickSpec {
 
             it("should send additional parameters") {
                 let accessToken = "special token for state"
-                let state = NSUUID().UUIDString
-                let token = NSUUID().UUIDString
-                stub(isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token, "state": state])) { _ in return authResponse(accessToken: accessToken) }.name = "Custom Parameter Auth"
+                let state = UUID().uuidString
+                let token = UUID().uuidString
+                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token, "state": state])) { _ in return authResponse(accessToken: accessToken) }.name = "Custom Parameter Auth"
                 waitUntil(timeout: Timeout) { done in
                     auth.loginSocial(token: token, connection: "facebook", parameters: ["state": state]).start { result in
                         expect(result).to(haveCredentials(accessToken))
@@ -519,13 +519,13 @@ class AuthenticationSpec: QuickSpec {
             let redirectURI = "https://samples.auth0.com/callback"
 
             beforeEach {
-                code = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-                codeVerifier = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+                code = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+                codeVerifier = UUID().uuidString.replacingOccurrences(of: "-", with: "")
             }
 
 
             it("should exchange code for tokens") {
-                stub(isToken(Domain) && hasAtLeast(["code": code, "code_verifier": codeVerifier, "grant_type": "authorization_code", "redirect_uri": redirectURI])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Code Exchange Auth"
+                stub(condition: isToken(Domain) && hasAtLeast(["code": code, "code_verifier": codeVerifier, "grant_type": "authorization_code", "redirect_uri": redirectURI])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Code Exchange Auth"
                 waitUntil(timeout: Timeout) { done in
                     auth.tokenExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
@@ -540,7 +540,7 @@ class AuthenticationSpec: QuickSpec {
                     let code = "invalid_code"
                     let description = "Invalid code"
                     let invalidCode = "return invalid code"
-                    stub(isToken(Domain) && hasAtLeast(["code": invalidCode])) { _ in return authFailure(code: code, description: description) }.name = "Invalid Code"
+                    stub(condition: isToken(Domain) && hasAtLeast(["code": invalidCode])) { _ in return authFailure(code: code, description: description) }.name = "Invalid Code"
                     auth.tokenExchange(withCode: invalidCode, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
@@ -555,9 +555,9 @@ class AuthenticationSpec: QuickSpec {
             var code: String!
 
             beforeEach {
-                code = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-                stub(isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["mfa_code"])) { _ in return authFailure(error: "a0.mfa_required", description: "need multifactor") }.name = "MFA Required"
-                stub(isResourceOwner(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "mfa_code": code])) { _ in return authResponse(accessToken: AccessToken) }.name = "MFA Login"
+                code = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["mfa_code"])) { _ in return authFailure(error: "a0.mfa_required", description: "need multifactor") }.name = "MFA Required"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "mfa_code": code])) { _ in return authResponse(accessToken: AccessToken) }.name = "MFA Login"
             }
 
             it("should report multifactor is required") {

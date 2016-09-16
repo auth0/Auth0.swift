@@ -29,6 +29,6 @@ import Foundation
  - Failure: request failed with a specific error
  */
 public enum Result<T> {
-    case Success(result: T)
-    case Failure(error: ErrorType)
+    case success(result: T)
+    case failure(error: Error)
 }

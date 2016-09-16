@@ -30,7 +30,7 @@
 QuickSpecBegin(AuthenticationAPISpec)
 
 NSString *clientId = @"MyClientId";
-NSURL *domain = [NSURL a0_URLWithDomain:@"samples.auth0.com"];
+NSURL *domain = [NSURL URLWithString:@"https://samples.auth0.com"];
 NSString *token = @"A TOKEN";
 NSString *bearer = @"bearer";
 

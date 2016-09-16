@@ -22,12 +22,12 @@
 
 import Foundation
 
-public extension NSData {
+public extension Data {
     public func a0_encodeBase64URLSafe() -> String? {
         return self
-            .base64EncodedStringWithOptions([])
-            .stringByReplacingOccurrencesOfString("+", withString: "-")
-            .stringByReplacingOccurrencesOfString("/", withString: "_")
-            .stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: "="))
+            .base64EncodedString(options: [])
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .trimmingCharacters(in: CharacterSet(charactersIn: "="))
     }
 }

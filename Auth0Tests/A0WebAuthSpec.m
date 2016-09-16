@@ -30,7 +30,7 @@
 QuickSpecBegin(A0WebAuthSpec)
 
 NSString *clientId = @"MyClientId";
-NSURL *domain = [NSURL a0_URLWithDomain:@"samples.auth0.com"];
+NSURL *domain = [NSURL URLWithString:@"https://samples.auth0.com"];
 
 describe(@"init", ^{
     it(@"should create component", ^{

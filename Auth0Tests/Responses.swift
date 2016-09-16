@@ -23,16 +23,16 @@
 import Foundation
 import OHHTTPStubs
 
-let UserId = "auth0|\(NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: ""))"
+let UserId = "auth0|\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
 let SupportAtAuth0 = "support@auth0.com"
 let Support = "support"
 let Auth0Phone = "+10123456789"
 let Nickname = "sup"
-let PictureURL = NSURL(string: "https://auth0.com")!
+let PictureURL = URL(string: "https://auth0.com")!
 let CreatedAt = "2015-08-19T17:18:00.123Z"
 let CreatedAtTimestamp = 1440004680.123
 
-func authResponse(accessToken accessToken: String, idToken: String? = nil) -> OHHTTPStubsResponse {
+func authResponse(accessToken: String, idToken: String? = nil) -> OHHTTPStubsResponse {
     var json = [
         "access_token": accessToken,
         "token_type": "bearer",
@@ -41,11 +41,11 @@ func authResponse(accessToken accessToken: String, idToken: String? = nil) -> OH
     if let token = idToken {
         json["id_token"] = token
     }
-    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
+    return OHHTTPStubsResponse(jsonObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
-func createdUser(email email: String, username: String? = nil, verified: Bool = true) -> OHHTTPStubsResponse {
-    var json: [String: AnyObject] = [
+func createdUser(email: String, username: String? = nil, verified: Bool = true) -> OHHTTPStubsResponse {
+    var json: [String: Any] = [
         "email": email,
         "email_verified": verified ? "true" : "false",
         ]
@@ -53,24 +53,24 @@ func createdUser(email email: String, username: String? = nil, verified: Bool = 
     if let username = username {
         json["username"] = username
     }
-    return OHHTTPStubsResponse(JSONObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
+    return OHHTTPStubsResponse(jsonObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
 func resetPasswordResponse() -> OHHTTPStubsResponse {
-    let data = "We've just sent you an email to reset your password.".dataUsingEncoding(NSUTF8StringEncoding)!
+    let data = "We've just sent you an email to reset your password.".data(using: String.Encoding.utf8)!
     return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
-func authFailure(code code: String, description: String, name: String? = nil) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: ["Content-Type": "application/json"])
+func authFailure(code: String, description: String, name: String? = nil) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(jsonObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: ["Content-Type": "application/json"])
 }
 
-func authFailure(error error: String, description: String) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["error": error, "error_description": description], statusCode: 400, headers: ["Content-Type": "application/json"])
+func authFailure(error: String, description: String) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(jsonObject: ["error": error, "error_description": description], statusCode: 400, headers: ["Content-Type": "application/json"])
 }
 
-func passwordless(email: String, verified: Bool) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: ["Content-Type": "application/json"])
+func passwordless(_ email: String, verified: Bool) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(jsonObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
 func tokenInfo() -> OHHTTPStubsResponse {
@@ -78,17 +78,17 @@ func tokenInfo() -> OHHTTPStubsResponse {
 }
 
 func userInfo() -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: basicProfile(), statusCode: 200, headers: nil)
+    return OHHTTPStubsResponse(jsonObject: basicProfile(), statusCode: 200, headers: nil)
 }
 
-func basicProfile(id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString!, createdAt: String = CreatedAt) -> [String: AnyObject] {
+func basicProfile(_ id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAt) -> [String: Any] {
     return ["user_id": id, "name": name, "nickname": nickname, "picture": picture, "created_at": createdAt]
 }
 
-func managementResponse(payload: AnyObject) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: payload, statusCode: 200, headers: ["Content-Type": "application/json"])
+func managementResponse(_ payload: Any) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(jsonObject: payload, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
-func managementErrorResponse(error error: String, description: String, code: String, statusCode: Int = 400) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(JSONObject: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: Int32(statusCode), headers: ["Content-Type": "application/json"])
+func managementErrorResponse(error: String, description: String, code: String, statusCode: Int = 400) -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(jsonObject: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: Int32(statusCode), headers: ["Content-Type": "application/json"])
 }

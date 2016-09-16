@@ -55,7 +55,7 @@ public struct Telemetry {
         self.info = Telemetry.generateValue(fromInfo: wrapped)
     }
 
-    func addTelemetryHeader(request request: NSMutableURLRequest) {
+    func addTelemetryHeader(request: NSMutableURLRequest) {
         if let value = self.value {
             request.setValue(value, forHTTPHeaderField: "Auth0-Client")
         } else {
@@ -63,15 +63,15 @@ public struct Telemetry {
         }
     }
 
-    func queryItemsWithTelemetry(queryItems queryItems: [NSURLQueryItem]) -> [NSURLQueryItem] {
+    func queryItemsWithTelemetry(queryItems: [URLQueryItem]) -> [URLQueryItem] {
         var items = queryItems
         if let value = self.value {
-            items.append(NSURLQueryItem(name: "auth0Client", value: value))
+            items.append(URLQueryItem(name: "auth0Client", value: value))
         }
         return items
     }
 
-    static func versionInformation(bundle bundle: NSBundle = NSBundle(forClass: Credentials.classForCoder())) -> [String: String] {
+    static func versionInformation(bundle: Bundle = Bundle(for: Credentials.classForCoder())) -> [String: String] {
         let version = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? Telemetry.NoVersion
         let dict = [
             Telemetry.NameKey: Telemetry.LibraryName,
@@ -81,7 +81,7 @@ public struct Telemetry {
     }
 
     static func generateValue(fromInfo info: [String: String] = Telemetry.versionInformation()) -> String? {
-        let data = try? NSJSONSerialization.dataWithJSONObject(info, options: [])
+        let data = try? JSONSerialization.data(withJSONObject: info, options: [])
         return data?.a0_encodeBase64URLSafe()
     }
 }
@@ -100,7 +100,7 @@ extension Trackable {
 
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
-    public mutating func enableTelemetry(enabled enabled: Bool) {
+    public mutating func enableTelemetry(enabled: Bool) {
         self.telemetry.enabled = enabled
     }
 

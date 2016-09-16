@@ -31,29 +31,29 @@ public class _ObjectiveAuthenticationAPI: NSObject {
         self.authentication = Auth0.authentication()
     }
 
-    public convenience init(clientId: String, url: NSURL) {
-        self.init(clientId: clientId, url: url, session: NSURLSession.sharedSession())
+    public convenience init(clientId: String, url: URL) {
+        self.init(clientId: clientId, url: url, session: .shared)
     }
 
-    public init(clientId: String, url: NSURL, session: NSURLSession) {
+    public init(clientId: String, url: URL, session: URLSession) {
         self.authentication = Auth0Authentication(clientId: clientId, url: url, session: session)
     }
 
     @objc(loginWithUsernameOrEmail:password:connection:scope:parameters:callback:)
-    public func login(username: String, password: String, connection: String, scope: String, parameters: [String: AnyObject]?, callback: (NSError?, Credentials?) -> ()) {
+    public func login(withUsernameOrEmail username: String, password: String, connection: String, scope: String, parameters: [String: AnyObject]?, callback: @escaping (NSError?, Credentials?) -> ()) {
         self.authentication
             .login(usernameOrEmail: username, password: password, connection: connection, scope: scope, parameters: parameters ?? [:])
-            .start(handleResult(callback))
+            .start(handleResult(callback: callback))
     }
 
     @objc(createUserWithEmail:username:password:connection:userMetadata:callback:)
-    public func createUser(email: String, username: String?, password: String, connection: String, userMetadata: [String: AnyObject]?, callback: (NSError?, [String: AnyObject]?) -> ()) {
+    public func createUser(withEmail email: String, username: String?, password: String, connection: String, userMetadata: [String: AnyObject]?, callback: @escaping (NSError?, [String: Any]?) -> ()) {
         self.authentication
             .createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
             .start { result in
                 switch result {
-                case .Success(let user):
-                    var info: [String: AnyObject] = [
+                case .success(let user):
+                    var info: [String: Any] = [
                         "email": user.email,
                         "verified": user.verified,
                     ]
@@ -61,72 +61,72 @@ public class _ObjectiveAuthenticationAPI: NSObject {
                         info["username"] = username
                     }
                     callback(nil, info)
-                case .Failure(let cause as FoundationErrorConvertible):
+                case .failure(let cause as FoundationErrorConvertible):
                     callback(cause.newFoundationError(), nil)
-                case .Failure(let cause):
+                case .failure(let cause):
                     callback(cause as NSError, nil)
                 }
             }
     }
 
     @objc(resetPasswordWithEmail:connection:callback:)
-    public func resetPassword(email: String, connection: String, callback: NSError? -> ()) {
+    public func resetPassword(withEmail email: String, connection: String, callback: @escaping (NSError?) -> ()) {
         self.authentication
             .resetPassword(email: email, connection: connection)
-            .start(handleResult(callback))
+            .start(handleResult(callback: callback))
     }
 
     @objc(signUpWithEmail:username:password:connection:userMetadata:scope:parameters:callback:)
-    public func signUp(email: String, username: String?, password: String, connection: String, userMetadata: [String: AnyObject]?, scope: String, parameters: [String: AnyObject]?, callback: (NSError?, Credentials?) -> ()) {
+    public func signUp(withEmail email: String, username: String?, password: String, connection: String, userMetadata: [String: AnyObject]?, scope: String, parameters: [String: AnyObject]?, callback: @escaping (NSError?, Credentials?) -> ()) {
         self.authentication
             .signUp(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, scope: scope, parameters: parameters ?? [:])
-            .start(handleResult(callback))
+            .start(handleResult(callback: callback))
     }
 
     @objc(startPasswordlessWithCodeToEmail:connection:callback:)
-    public func startPasswordlessCode(email email: String, connection: String, callback: NSError? -> ()) {
+    public func startPasswordlessCode(email: String, connection: String, callback: @escaping (NSError?) -> ()) {
         self.authentication
             .startPasswordless(email: email, type: .Code, connection: connection)
-            .start(handleResult(callback))
+            .start(handleResult(callback: callback))
     }
 
     @objc(startPasswordlessWithLinkToEmail:connection:callback:)
-    public func startPasswordlessLink(email email: String, connection: String, callback: NSError? -> ()) {
+    public func startPasswordlessLink(email: String, connection: String, callback: @escaping (NSError?) -> ()) {
         self.authentication
             .startPasswordless(email: email, type: .iOSLink, connection: connection)
-            .start(handleResult(callback))
+            .start(handleResult(callback: callback))
     }
 
     @objc(startPasswordlessWithCodeToPhoneNumber:connection:callback:)
-    public func startPasswordlessCode(phoneNumber phoneNumber: String, connection: String, callback: NSError? -> ()) {
+    public func startPasswordlessCode(phoneNumber: String, connection: String, callback: @escaping (NSError?) -> ()) {
         self.authentication
             .startPasswordless(phoneNumber: phoneNumber, type: .Code, connection: connection)
-            .start(handleResult(callback))
+            .start(handleResult(callback: callback))
     }
 
     @objc(startPasswordlessWithLinkToPhoneNumber:connection:callback:)
-    public func startPasswordlessLink(phoneNumber phoneNumber: String, connection: String, callback: NSError? -> ()) {
+    public func startPasswordlessLink(phoneNumber: String, connection: String, callback: @escaping  (NSError?) -> ()) {
         self.authentication
             .startPasswordless(phoneNumber: phoneNumber, type: .iOSLink, connection: connection)
-            .start(handleResult(callback))
+            .start(handleResult(callback: callback))
     }
 
     @objc(tokenInfoFromToken:callback:)
-    public func tokenInfo(token: String, callback: (NSError?, Profile?) -> ()) {
-        self.authentication.tokenInfo(token: token).start(handleResult(callback))
+    public func tokenInfo(fromToken token: String, callback: @escaping (NSError?, Profile?) -> ()) {
+        self.authentication.tokenInfo(token: token).start(handleResult(callback: callback))
     }
 
     @objc(userInfoWithToken:callback:)
-    public func userInfo(token: String, callback: (NSError?, Profile?) -> ()) {
-        self.authentication.userInfo(token: token).start(handleResult(callback))
+    public func userInfo(withToken token: String, callback: @escaping (NSError?, Profile?) -> ()) {
+        self.authentication.userInfo(token: token).start(handleResult(callback: callback))
     }
 
     @objc(loginSocialWithToken:connection:scope:parameters:callback:)
-    public func loginSocial(token: String, connection: String, scope: String, parameters: [String: AnyObject]?, callback: (NSError?, Credentials?) -> ()) {
+    public func loginSocial(withToken token: String, connection: String, scope: String, parameters: [String: Any]?, callback: @escaping (NSError?, Credentials?) -> ()) {
 
         self.authentication
             .loginSocial(token: token, connection: connection, scope: scope, parameters: parameters ?? [:])
-            .start(handleResult(callback))
+            .start(handleResult(callback: callback))
     }
 
     /**
@@ -140,26 +140,26 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     }
 }
 
-private func handleResult<T>(callback: (NSError?, T?) -> ()) -> Result<T> -> () {
+private func handleResult<T>(callback: @escaping (NSError?, T?) -> ()) -> (Result<T>) -> () {
     return { result in
         switch result {
-        case .Success(let payload):
+        case .success(let payload):
             callback(nil, payload)
-        case .Failure(let cause as FoundationErrorConvertible):
+        case .failure(let cause as FoundationErrorConvertible):
             callback(cause.newFoundationError(), nil)
-        case .Failure(let cause):
+        case .failure(let cause):
             callback(cause as NSError, nil)
         }
     }
 }
 
-private func handleResult(callback: (NSError?) -> ()) -> Result<Void> -> () {
+private func handleResult(callback: @escaping (NSError?) -> ()) -> (Result<Void>) -> () {
     return { result in
-        if case .Failure(let cause as FoundationErrorConvertible) = result {
+        if case .failure(let cause as FoundationErrorConvertible) = result {
             callback(cause.newFoundationError())
             return
         }
-        if case .Failure(let cause) = result {
+        if case .failure(let cause) = result {
             callback(cause as NSError)
             return
         }

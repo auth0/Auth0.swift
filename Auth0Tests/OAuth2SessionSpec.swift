@@ -34,15 +34,15 @@ class MockSafariViewController: SFSafariViewController {
     }
 }
 
-private let RedirectURL = NSURL(string: "https://samples.auth0.com/callback")!
+private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 
 class OAuth2SessionSpec: QuickSpec {
 
     override func spec() {
 
         var result: Result<Credentials>? = nil
-        let callback: Result<Credentials> -> () = { result = $0 }
-        let controller = MockSafariViewController(URL: NSURL(string: "https://auth0.com")!)
+        let callback: (Result<Credentials>) -> () = { result = $0 }
+        let controller = MockSafariViewController(url: URL(string: "https://auth0.com")!)
         let handler = ImplicitGrant()
         let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
 
@@ -75,34 +75,34 @@ class OAuth2SessionSpec: QuickSpec {
             }
 
             it("should return true if URL matches redirect URL") {
-                expect(session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)).to(beTrue())
+                expect(session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)).to(beTrue())
             }
 
             it("should return false when URL does not match redirect URL") {
-                expect(session.resume(NSURL(string: "https://auth0.com/mobile?access_token=ATOKEN&token_type=bearer")!)).to(beFalse())
+                expect(session.resume(URL(string: "https://auth0.com/mobile?access_token=ATOKEN&token_type=bearer")!)).to(beFalse())
             }
 
             it("should return credentials from query string") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
+                session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
                 expect(result).toEventually(haveCredentials())
             }
 
             it("should return credentials from fragment") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=ATOKEN&token_type=bearer")!)
+                session.resume(URL(string: "https://samples.auth0.com/callback#access_token=ATOKEN&token_type=bearer")!)
                 expect(result).toEventually(haveCredentials())
             }
             it("should return error from query string") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
+                session.resume(URL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
                 expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
             }
 
             it("should return error from fragment") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback#error=error&error_description=description")!)
+                session.resume(URL(string: "https://samples.auth0.com/callback#error=error&error_description=description")!)
                 expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
             }
 
             it("should fail if values from fragment are invalid") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=")!)
+                session.resume(URL(string: "https://samples.auth0.com/callback#access_token=")!)
                 expect(result).toEventually(beFailure())
             }
 
@@ -112,13 +112,13 @@ class OAuth2SessionSpec: QuickSpec {
                 }, logger: nil)
 
                 it("should not handle url when state in url is missing") {
-                    let handled = session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
+                    let handled = session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
                     expect(handled).to(beFalse())
                     expect(result).toEventually(beNil())
                 }
 
                 it("should not handle url when state in url does not match one in session") {
-                    let handled = session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer&state=another")!)
+                    let handled = session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer&state=another")!)
                     expect(handled).to(beFalse())
                     expect(result).toEventually(beNil())
                 }

@@ -37,18 +37,18 @@ import Foundation
  ```
  */
 public struct Request<T, E: Auth0Error>: Requestable {
-    public typealias Callback = Result<T> -> ()
+    public typealias Callback = (Result<T>) -> ()
 
-    let session: NSURLSession
-    let url: NSURL
+    let session: URLSession
+    let url: URL
     let method: String
     let handle: (Response<E>, Callback) -> ()
-    let payload: [String: AnyObject]
+    let payload: [String: Any]
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
 
-    init(session: NSURLSession, url: NSURL, method: String, handle: (Response<E>, Callback) -> (), payload: [String: AnyObject] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
+    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> (), payload: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
         self.session = session
         self.url = url
         self.method = method
@@ -59,19 +59,19 @@ public struct Request<T, E: Auth0Error>: Requestable {
         self.telemetry = telemetry
     }
 
-    var request: NSURLRequest {
-        let request = NSMutableURLRequest(URL: url)
-        request.HTTPMethod = method
+    var request: URLRequest {
+        let request = NSMutableURLRequest(url: url)
+        request.httpMethod = method
         if !payload.isEmpty {
-            request.HTTPBody = try! NSJSONSerialization.dataWithJSONObject(payload, options: [])
+            request.httpBody = try! JSONSerialization.data(withJSONObject: payload, options: [])
             #if DEBUG
-            NSURLProtocol.setProperty(payload, forKey: ParameterPropertyKey, inRequest: request)
+            URLProtocol.setProperty(payload, forKey: ParameterPropertyKey, in: request)
             #endif
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
         telemetry.addTelemetryHeader(request: request)
-        return request
+        return request as URLRequest
     }
 
     /**
@@ -79,19 +79,19 @@ public struct Request<T, E: Auth0Error>: Requestable {
 
      - parameter callback: called when the request finishes and yield it's result
      */
-    public func start(callback: Callback) {
+    public func start(_ callback: @escaping Callback) {
         let handler = self.handle
         let request = self.request
         let logger = self.logger
 
-        logger?.trace(request, session: self.session)
+        logger?.trace(request: request, session: self.session)
 
-        let task = session.dataTaskWithRequest(request) { data, response, error in
+        let task = session.dataTask(with: request, completionHandler: { data, response, error in
             if error == nil, let response = response {
-                logger?.trace(response, data: data)
+                logger?.trace(response: response, data: data)
             }
             handler(Response(data: data, response: response, error: error), callback)
-        }
+        }) 
         task.resume()
     }
 
@@ -104,18 +104,20 @@ public struct ConcatRequest<F, S, E: Auth0Error>: Requestable {
     let first: Request<F, E>
     let second: Request<S, E>
 
+    public typealias T = S
+
     /**
      Starts the request to the server
 
      - parameter callback: called when the request finishes and yield it's result
      */
-    public func start(callback: Result<S> -> ()) {
+    public func start(_ callback: @escaping (Result<T>) -> ()) {
         let second = self.second
         first.start { result in
             switch result {
-            case .Failure(let cause):
-                callback(.Failure(error: cause))
-            case .Success:
+            case .failure(let cause):
+                callback(.failure(error: cause))
+            case .success:
                 second.start(callback)
             }
         }

@@ -30,11 +30,11 @@ import Foundation
  - UserCancelled:                  User cancelled the web-based authentication, e.g. tapped the "Done" button in SFSafariViewController
  - PKCENotAllowed:                 PKCE for the supplied Auth0 ClientId was not allowed. You need to set the `Token Endpoint Authentication Method` to `None` in your Auth0 Dashboard
  */
-public enum WebAuthError: ErrorType {
-    case NoBundleIdentifierFound
-    case CannotDismissWebAuthController
-    case UserCancelled
-    case PKCENotAllowed(String)
+public enum WebAuthError: Error {
+    case noBundleIdentifierFound
+    case cannotDismissWebAuthController
+    case userCancelled
+    case pkceNotAllowed(String)
 }
 
 extension WebAuthError: FoundationErrorConvertible {
@@ -44,7 +44,7 @@ extension WebAuthError: FoundationErrorConvertible {
     static let CancelledFoundationCode = 0
 
     func newFoundationError() -> NSError {
-        if case .UserCancelled = self {
+        if case .userCancelled = self {
             return NSError(
                 domain: WebAuthError.FoundationDomain,
                 code: WebAuthError.CancelledFoundationCode,
@@ -54,7 +54,7 @@ extension WebAuthError: FoundationErrorConvertible {
                 ]
             )
         }
-        if case .PKCENotAllowed(let message) = self {
+        if case .pkceNotAllowed(let message) = self {
             return NSError(
                 domain: WebAuthError.FoundationDomain,
                 code: WebAuthError.GenericFoundationCode,

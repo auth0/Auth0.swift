@@ -44,66 +44,60 @@ class LoggerSpec: QuickSpec {
 
         describe("request") {
 
-            var request: NSMutableURLRequest!
+            var request: URLRequest!
 
             beforeEach {
-                request = NSMutableURLRequest(URL: NSURL(string: "https://auth0.com")!)
-                request.HTTPMethod = "POST"
+                request = URLRequest(url: URL(string: "https://auth0.com")!)
+                request.httpMethod = "POST"
                 request.allHTTPHeaderFields = ["Content-Type": "application/json"]
             }
 
             it("should log request basic info") {
-                logger.trace(request, session: NSURLSession.sharedSession())
+                logger.trace(request: request, session: URLSession.shared)
                 expect(output.messages.first) == "POST https://auth0.com HTTP/1.1"
             }
 
             it("should log request header") {
-                logger.trace(request, session: NSURLSession.sharedSession())
+                logger.trace(request: request, session: URLSession.shared)
                 expect(output.messages).to(contain("Content-Type: application/json"))
             }
 
             it("should log request body") {
-                let json = "{key: \"\(NSUUID().UUIDString)\"}"
-                request.HTTPBody = json.dataUsingEncoding(NSUTF8StringEncoding)
-                logger.trace(request, session: NSURLSession.sharedSession())
+                let json = "{key: \"\(UUID().uuidString)\"}"
+                request.httpBody = json.data(using: String.Encoding.utf8)
+                logger.trace(request: request, session: URLSession.shared)
                 expect(output.messages).to(contain(json))
-            }
-
-            it("should log nothing without URL") {
-                let request = NSURLRequest()
-                logger.trace(request, session: NSURLSession.sharedSession())
-                expect(output.messages).to(beEmpty())
             }
 
         }
 
         describe("response") {
 
-            var response: NSURLResponse!
+            var response: HTTPURLResponse!
 
             beforeEach {
-                response = NSHTTPURLResponse(URL: NSURL(string: "https://auth0.com")!, statusCode: 200, HTTPVersion: nil, headerFields: ["Content-Type": "application/json"])
+                response = HTTPURLResponse(url: URL(string: "https://auth0.com")!, statusCode: 200, httpVersion: nil, headerFields: ["Content-Type": "application/json"])
             }
 
             it("should log response basic info") {
-                logger.trace(response, data: nil)
+                logger.trace(response: response, data: nil)
                 expect(output.messages.first) == "HTTP/1.1 200"
             }
 
             it("should log response header") {
-                logger.trace(response, data: nil)
+                logger.trace(response: response, data: nil)
                 expect(output.messages).to(contain("Content-Type: application/json"))
             }
 
             it("should log response body") {
-                let json = "{key: \"\(NSUUID().UUIDString)\"}"
-                logger.trace(response, data: json.dataUsingEncoding(NSUTF8StringEncoding))
+                let json = "{key: \"\(UUID().uuidString)\"}"
+                logger.trace(response: response, data: json.data(using: String.Encoding.utf8))
                 expect(output.messages).to(contain(json))
             }
 
             it("should log nothing for non http response") {
-                let response = NSURLResponse()
-                logger.trace(response, data: nil)
+                let response = URLResponse()
+                logger.trace(response: response, data: nil)
                 expect(output.messages).to(beEmpty())
             }
 
@@ -112,12 +106,12 @@ class LoggerSpec: QuickSpec {
         describe("url") {
 
             it("should log url") {
-                logger.trace(NSURL(string: "https://samples.auth0.com/callback")!, source: nil)
+                logger.trace(url: URL(string: "https://samples.auth0.com/callback")!, source: nil)
                 expect(output.messages.first) == "URL: https://samples.auth0.com/callback"
             }
 
             it("should log url with source") {
-                logger.trace(NSURL(string: "https://samples.auth0.com/callback")!, source: "Safari")
+                logger.trace(url: URL(string: "https://samples.auth0.com/callback")!, source: "Safari")
                 expect(output.messages.first) == "Safari: https://samples.auth0.com/callback"
             }
 
@@ -128,7 +122,7 @@ class LoggerSpec: QuickSpec {
 class MockOutput: LoggerOutput {
     var messages: [String] = []
 
-    func message(message: String) {
+    func log(message: String) {
         messages.append(message)
     }
 

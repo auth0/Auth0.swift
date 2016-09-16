@@ -38,23 +38,23 @@ import SafariServices
  */
 protocol OAuth2Session {
     var state: String? { get }
-    func resume(url: NSURL, options: [String: AnyObject]) -> Bool
+    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool
     func cancel()
 }
 
 class SafariSession: NSObject, OAuth2Session {
 
-    typealias FinishSession = Result<Credentials> -> ()
+    typealias FinishSession = (Result<Credentials>) -> ()
 
     weak var controller: UIViewController?
 
-    let redirectURL: NSURL
+    let redirectURL: URL
     let state: String?
     let finish: FinishSession
     let handler: OAuth2Grant
     let logger: Logger?
 
-    init(controller: SFSafariViewController, redirectURL: NSURL, state: String? = nil, handler: OAuth2Grant, finish: FinishSession, logger: Logger?) {
+    init(controller: SFSafariViewController, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
         self.controller = controller
         self.redirectURL = redirectURL
         self.state = state
@@ -73,33 +73,33 @@ class SafariSession: NSObject, OAuth2Session {
 
      - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
      */
-    func resume(url: NSURL, options: [String: AnyObject] = [:]) -> Bool {
-        self.logger?.trace(url, source: "iOS Safari") // FIXME: better source name
-        guard url.absoluteString!.lowercaseString.hasPrefix(self.redirectURL.absoluteString!.lowercaseString) else { return false }
+    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any] = [:]) -> Bool {
+        self.logger?.trace(url: url, source: "iOS Safari") // FIXME: better source name
+        guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
 
         guard
-            let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: true)
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
             else {
-                self.finish(.Failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
+                self.finish(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
                 return false
             }
         let items = components.a0_values
         guard self.state == nil || items["state"] == self.state else { return false }
         if let _ = items["error"] {
-            self.finish(.Failure(error: AuthenticationError(info: items, statusCode: 0)))
+            self.finish(.failure(error: AuthenticationError(info: items, statusCode: 0)))
         } else {
-            self.handler.credentials(items, callback: self.finish)
+            self.handler.credentials(from: items, callback: self.finish)
         }
         return true
     }
 
     func cancel() {
-        self.finish(Result.Failure(error: WebAuthError.UserCancelled))
+        self.finish(Result.failure(error: WebAuthError.userCancelled))
     }
 }
 
 extension SafariSession: SFSafariViewControllerDelegate {
-    func safariViewControllerDidFinish(controller: SFSafariViewController) {
+    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         SessionStorage.sharedInstance.cancel(self)
     }
 }

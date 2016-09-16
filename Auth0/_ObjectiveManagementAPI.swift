@@ -25,63 +25,63 @@ import Foundation
 @objc(A0ManagementAPI)
 public class _ObjectiveManagementAPI: NSObject {
 
-    private var users: Users
+    fileprivate var users: Users
 
     public init(token: String) {
         self.users = Auth0.users(token: token)
     }
 
-    public convenience init(token: String, url: NSURL) {
-        self.init(token: token, url: url, session: NSURLSession.sharedSession())
+    public convenience init(token: String, url: URL) {
+        self.init(token: token, url: url, session: URLSession.shared)
     }
 
-    public init(token: String, url: NSURL, session: NSURLSession) {
+    public init(token: String, url: URL, session: URLSession) {
         self.users = Management(token: token, url: url, session: session)
     }
 
     @objc(patchUserWithIdentifier:userMetadata:callback:)
-    public func patchUser(identifier: String, userMetadata: [String: AnyObject], callback: (NSError?, [String: AnyObject]?) -> ()) {
+    public func patchUser(withIdentifier identifier: String, userMetadata: [String: Any], callback: @escaping (NSError?, [String: Any]?) -> ()) {
         self.users
-            .patch(identifier, attributes: UserPatchAttributes().userMetadata(userMetadata))
+            .patch(withIdentifier: identifier, attributes: UserPatchAttributes().userMetadata(userMetadata))
             .start { result in
                 switch result {
-                case .Success(let payload):
+                case .success(let payload):
                     callback(nil, payload)
-                case .Failure(let cause as ManagementError):
+                case .failure(let cause as ManagementError):
                     callback(cause.newFoundationError(), nil)
-                case .Failure(let cause):
+                case .failure(let cause):
                     callback(cause as NSError, nil)
                 }
         }
     }
 
     @objc(linkUserWithIdentifier:withUserUsingToken:callback:)
-    public func linkUser(identifier: String, withUserUsingToken token: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
+    public func linkUser(withIdentifier identifier: String, withUserUsingToken token: String, callback: @escaping (NSError?, [[String: Any]]?) -> ()) {
         self.users
-            .link(identifier, withOtherUserToken: token)
+            .link(withIdentifier: identifier, withOtherUserToken: token)
             .start { result in
                 switch result {
-                case .Success(let payload):
+                case .success(let payload):
                     callback(nil, payload)
-                case .Failure(let cause as ManagementError):
+                case .failure(let cause as ManagementError):
                     callback(cause.newFoundationError(), nil)
-                case .Failure(let cause):
+                case .failure(let cause):
                     callback(cause as NSError, nil)
                 }
         }
     }
     
     @objc(unlinkUserWithIdentifier:provider:fromUserId:callback:)
-    public func unlink(identifier: String, provider: String, fromUserId userId: String, callback: (NSError?, [[String: AnyObject]]?) -> ()) {
+    public func unlink(WithIdentifier identifier: String, provider: String, fromUserId userId: String, callback: @escaping (NSError?, [[String: Any]]?) -> ()) {
         self.users
             .unlink(identityId: identifier, provider: provider, fromUserId:userId)
             .start { result in
                 switch result {
-                case .Success(let payload):
+                case .success(let payload):
                     callback(nil, payload)
-                case .Failure(let cause as ManagementError):
+                case .failure(let cause as ManagementError):
                     callback(cause.newFoundationError(), nil)
-                case .Failure(let cause):
+                case .failure(let cause):
                     callback(cause as NSError, nil)
                 }
         }
@@ -94,7 +94,7 @@ public class _ObjectiveManagementAPI: NSObject {
 
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
-    public func setTelemetryEnabled(enabled: Bool) {
+    public func setTelemetry(enabled: Bool) {
         self.users.enableTelemetry(enabled: enabled)
     }
 }

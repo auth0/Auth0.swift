@@ -24,10 +24,10 @@ import Quick
 import Nimble
 @testable import Auth0
 
-private let AccessToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let Bearer = "bearer"
-private let IdToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
-private let RefreshToken = NSUUID().UUIDString.stringByReplacingOccurrencesOfString("-", withString: "")
+private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 
 class CredentialsSpec: QuickSpec {
     override func spec() {

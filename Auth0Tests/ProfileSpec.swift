@@ -25,7 +25,7 @@ import Nimble
 @testable import Auth0
 
 class ProfileSharedExamplesConfiguration: QuickConfiguration {
-    override class func configure(configuration: Configuration) {
+    override class func configure(_ configuration: Configuration) {
         sharedExamples("invalid profile") { (context: SharedExampleContext) in
             let key = context()["key"] as! String
             it("should return nil when missing \(key)") {
@@ -62,7 +62,7 @@ class UserProfileSpec: QuickSpec {
 
             it("should build with optional values") {
                 var info = basicProfile()
-                let optional: [String: AnyObject] = [
+                let optional: [String: Any] = [
                     "email": SupportAtAuth0,
                     "email_verified": true,
                     "given_name": "John",
@@ -78,7 +78,7 @@ class UserProfileSpec: QuickSpec {
 
             it("should build with extra values") {
                 var info = basicProfile()
-                let optional: [String: AnyObject] = [
+                let optional: [String: Any] = [
                     "my_custom_key": "custom_value"
                 ]
                 optional.forEach { key, value in info[key] = value }
@@ -106,7 +106,7 @@ class UserProfileSpec: QuickSpec {
 
             it("should have user_metadata") {
                 var info = basicProfile()
-                let metadata: [String: AnyObject] = [
+                let metadata: [String: Any] = [
                     "first_name": "John",
                     "last_name": "Doe"
                 ]
@@ -125,7 +125,7 @@ class UserProfileSpec: QuickSpec {
 
             it("should have app_metadata") {
                 var info = basicProfile()
-                let metadata: [String: AnyObject] = [
+                let metadata: [String: Any] = [
                     "subscription": "paid",
                     "logins": 10,
                     "verified": true
@@ -154,7 +154,7 @@ class UserProfileSpec: QuickSpec {
 
             beforeEach {
                 var info = basicProfile()
-                let optional: [String: AnyObject] = [
+                let optional: [String: Any] = [
                     "integer": integer,
                     "boolean": true,
                     "dictionary": dictionary,
