@@ -34,34 +34,34 @@ public class Profile: NSObject, JSONObjectPayload {
     public let id: String
     public let name: String
     public let nickname: String
-    public let pictureURL: NSURL
-    public let createdAt: NSDate
+    public let pictureURL: URL
+    public let createdAt: Date
 
     public let email: String?
     public let emailVerified: Bool
     public let givenName: String?
     public let familyName: String?
 
-    public let additionalAttributes: [String: AnyObject]
+    public let additionalAttributes: [String: Any]
     public let identities: [Identity]
 
-    public subscript(key: String) -> AnyObject? {
+    public subscript(key: String) -> Any? {
         return self.additionalAttributes[key]
     }
 
-    public func value<Type>(key: String) -> Type? {
+    public func value<Type>(_ key: String) -> Type? {
         return self[key] as? Type
     }
 
-    public var userMetadata: [String: AnyObject] {
-        return self["user_metadata"] as? [String: AnyObject] ?? [:]
+    public var userMetadata: [String: Any] {
+        return self["user_metadata"] as? [String: Any] ?? [:]
     }
 
-    public var appMetadata: [String: AnyObject] {
-        return self["app_metadata"] as? [String: AnyObject] ?? [:]
+    public var appMetadata: [String: Any] {
+        return self["app_metadata"] as? [String: Any] ?? [:]
     }
 
-    required public init(id: String, name: String, nickname: String, pictureURL: NSURL, createdAt: NSDate, email: String?, emailVerified: Bool, givenName: String?, familyName: String?, attributes: [String: AnyObject], identities: [Identity]) {
+    required public init(id: String, name: String, nickname: String, pictureURL: URL, createdAt: Date, email: String?, emailVerified: Bool, givenName: String?, familyName: String?, attributes: [String: Any], identities: [Identity]) {
         self.id = id
         self.name = name
         self.nickname = nickname
@@ -77,22 +77,22 @@ public class Profile: NSObject, JSONObjectPayload {
         self.identities = identities
     }
 
-    convenience required public init?(json: [String: AnyObject]) {
+    convenience required public init?(json: [String: Any]) {
         guard
             let id = json["user_id"] as? String,
             let name = json["name"] as? String,
             let nickname = json["nickname"] as? String,
-            let picture = json["picture"] as? String, let pictureURL = NSURL(string: picture),
+            let picture = json["picture"] as? String, let pictureURL = URL(string: picture),
             let date = json["created_at"] as? String, let createdAt = fromSO8601(date)
             else { return nil }
         let email = json["email"] as? String
         let emailVerified = json["email_verified"] as? Bool ?? false
         let givenName = json["given_name"] as? String
         let familyName = json["family_name"] as? String
-        let identityValues = json["identities"] as? [[String: AnyObject]] ?? []
-        let identities = identityValues.flatMap { Identity(json: $0) }.filter { $0 != nil }
+        let identityValues = json["identities"] as? [[String: Any]] ?? []
+        let identities = identityValues.flatMap { Identity(json: $0) }
         let keys = Set(["user_id", "name", "nickname", "picture", "created_at", "email", "email_verified", "given_name", "family_name", "identities"])
-        var values: [String: AnyObject] = [:]
+        var values: [String: Any] = [:]
         json.forEach { key, value in
             guard !keys.contains(key) else { return }
             values[key] = value
@@ -103,10 +103,10 @@ public class Profile: NSObject, JSONObjectPayload {
 
 }
 
-private func fromSO8601(string: String) -> NSDate? {
-    let formatter = NSDateFormatter()
-    formatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+private func fromSO8601(_ string: String) -> Date? {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
     formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-    formatter.timeZone = NSTimeZone(name: "UTC")
-    return formatter.dateFromString(string)
+    formatter.timeZone = TimeZone(identifier: "UTC")
+    return formatter.date(from: string)
 }

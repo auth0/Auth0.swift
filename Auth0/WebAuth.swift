@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import Foundation
+import UIKit
 
 /**
  Auth0 iOS component for authenticating with web-based flow
@@ -49,7 +49,7 @@ import Foundation
  - returns: Auth0 WebAuth component
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func webAuth(bundle bundle: NSBundle = NSBundle.mainBundle()) -> WebAuth {
+public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
     let values = plistValues(bundle: bundle)!
     return webAuth(clientId: values.clientId, domain: values.domain)
 }
@@ -66,7 +66,7 @@ public func webAuth(bundle bundle: NSBundle = NSBundle.mainBundle()) -> WebAuth 
 
  - returns: Auth0 WebAuth component
  */
-public func webAuth(clientId clientId: String, domain: String) -> WebAuth {
+public func webAuth(clientId: String, domain: String) -> WebAuth {
     return SafariWebAuth(clientId: clientId, url: .a0_url(domain))
 }
 
@@ -78,14 +78,14 @@ public func webAuth(clientId clientId: String, domain: String) -> WebAuth {
 
  - returns: if the url was handled by an on going session or not.
  */
-public func resumeAuth(url: NSURL, options: [String: AnyObject]) -> Bool {
+public func resumeAuth(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
     return SessionStorage.sharedInstance.resume(url, options: options)
 }
 
 /// OAuth2 Authentication using Auth0
 public protocol WebAuth: Trackable, Loggable {
     var clientId: String { get }
-    var url: NSURL { get }
+    var url: URL { get }
     var telemetry: Telemetry { get set }
 
     /**
@@ -106,7 +106,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    func connection(connection: String) -> Self
+    func connection(_ connection: String) -> Self
 
     /**
      Scopes that will be requested during auth
@@ -115,7 +115,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    func scope(scope: String) -> Self
+    func scope(_ scope: String) -> Self
 
     /**
      State value that will be echoed after authentication
@@ -127,7 +127,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    func state(state: String) -> Self
+    func state(_ state: String) -> Self
 
     /**
      Send additional parameters for authentication.
@@ -136,7 +136,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
-    func parameters(parameters: [String: String]) -> Self
+    func parameters(_ parameters: [String: String]) -> Self
 
     /**
      Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)
@@ -159,7 +159,7 @@ public protocol WebAuth: Trackable, Loggable {
      Then from `AppDelegate` we just need to resume the OAuth2 Auth like this
 
      ```
-     func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+     func application(app: UIApplication, openURL url: NSURL, options: [String : Any]) -> Bool {
         return Auth0.resumeAuth(url, options: options)
      }
      ```
@@ -169,5 +169,5 @@ public protocol WebAuth: Trackable, Loggable {
 
      - parameter callback: callback called with the result of the OAuth2 flow
      */
-    func start(callback: Result<Credentials> -> ())
+    func start(_ callback: @escaping (Result<Credentials>) -> ())
 }

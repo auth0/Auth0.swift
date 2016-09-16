@@ -32,7 +32,7 @@ class MockViewController: UIViewController {
         return presented ?? super.presentedViewController
     }
 
-    override func dismissViewControllerAnimated(flag: Bool, completion: (() -> Void)?) {
+    override func dismiss(animated flag: Bool, completion: (() -> Void)?) {
         completion?()
     }
 }
@@ -45,7 +45,7 @@ class ControllerModalPresenterSpec: QuickSpec {
 
             it("should get root controller from UIApplication") {
                 let presenter = ControllerModalPresenter()
-                expect(presenter.rootViewController) == UIApplication.sharedApplication().keyWindow?.rootViewController
+                expect(presenter.rootViewController) == UIApplication.shared.keyWindow?.rootViewController
             }
 
             it("should accept specific controller") {

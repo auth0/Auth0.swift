@@ -77,7 +77,7 @@ class SessionStorageSpec: QuickSpec {
 
         describe("resume") {
 
-            let url = NSURL(string: "https://auth0.com")!
+            let url = URL(string: "https://auth0.com")!
 
             beforeEach {
                 storage.store(session)
@@ -109,7 +109,7 @@ class MockSession: OAuth2Session {
         self.cancelled = true
     }
 
-    func resume(url: NSURL, options: [String : AnyObject]) -> Bool {
+    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
         return self.resumeResult
     }
 }

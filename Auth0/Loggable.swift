@@ -37,7 +37,7 @@ public extension Loggable {
      - note: By default all logging is **disabled**
      - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
      */
-    mutating func usingLogger(logger: Logger) -> Self {
+    mutating func using(logger: Logger) -> Self {
         self.logger = logger
         return self
     }
@@ -49,7 +49,7 @@ public extension Loggable {
      - note: By default all logging is **disabled**
      - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
      */
-    mutating func logging(enabled enabled: Bool) -> Self {
+    mutating func logging(enabled: Bool) -> Self {
         if enabled {
             self.logger = DefaultLogger()
         } else {

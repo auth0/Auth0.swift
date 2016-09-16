@@ -40,7 +40,7 @@ public class Credentials: NSObject, JSONObjectPayload {
         self.refreshToken = refreshToken
     }
 
-    convenience required public init?(json: [String: AnyObject]) {
+    convenience required public init?(json: [String: Any]) {
         guard
             let token = json["access_token"] as? String,
             let type = json["token_type"] as? String

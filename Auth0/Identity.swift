@@ -33,17 +33,17 @@ public class Identity: NSObject, JSONObjectPayload {
     public let connection: String
 
     public let social: Bool
-    public let profileData: [String: AnyObject]
+    public let profileData: [String: Any]
 
     public let accessToken: String?
-    public let expiresIn: NSDate?
+    public let expiresIn: Date?
     public let accessTokenSecret: String?
 
     override public var debugDescription: String {
         return "<identity: \(identifier) provider: \(provider) connection: \(connection)>"
     }
 
-    public required init(identifier: String, provider: String, connection: String, social: Bool, profileData: [String: AnyObject], accessToken: String?, expiresIn: NSDate?, accessTokenSecret: String?) {
+    public required init(identifier: String, provider: String, connection: String, social: Bool, profileData: [String: Any], accessToken: String?, expiresIn: Date?, accessTokenSecret: String?) {
         self.identifier = identifier
         self.provider = provider
         self.connection = connection
@@ -54,7 +54,7 @@ public class Identity: NSObject, JSONObjectPayload {
         self.accessTokenSecret = accessTokenSecret
     }
 
-    convenience public required init?(json: [String : AnyObject]) {
+    convenience public required init?(json: [String : Any]) {
 
         guard
             let identifier = json["user_id"] as? String,
@@ -63,13 +63,13 @@ public class Identity: NSObject, JSONObjectPayload {
             else { return nil }
 
         let social = json["isSocial"] as? Bool ?? false
-        let profileData = json["profileData"] as? [String: AnyObject] ?? [:]
+        let profileData = json["profileData"] as? [String: Any] ?? [:]
 
         let accessToken = json["access_token"] as? String
         let accessTokenSecret = json["access_token_secret"] as? String
-        let expiresIn: NSDate?
-        if let expiresInSeconds = json["expires_in"] as? NSTimeInterval {
-            expiresIn = NSDate(timeIntervalSince1970: expiresInSeconds)
+        let expiresIn: Date?
+        if let expiresInSeconds = json["expires_in"] as? TimeInterval {
+            expiresIn = Date(timeIntervalSince1970: expiresInSeconds)
         } else {
             expiresIn = nil
         }

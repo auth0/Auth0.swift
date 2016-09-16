@@ -22,27 +22,27 @@
 
 import Foundation
 
-func json<T>(data: NSData?) -> T? {
+func json<T>(_ data: Data?) -> T? {
     guard let data = data else { return nil }
-    let object = try? NSJSONSerialization.JSONObjectWithData(data, options: [])
+    let object = try? JSONSerialization.jsonObject(with: data, options: [])
     return object as? T
 }
 
-func string(data: NSData?) -> String? {
+func string(_ data: Data?) -> String? {
     guard let data = data else { return nil }
-    return String(data: data, encoding: NSUTF8StringEncoding)
+    return String(data: data, encoding: .utf8)
 }
 
 struct Response<E: Auth0Error> {
-    let data: NSData?
-    let response: NSURLResponse?
-    let error: NSError?
+    let data: Data?
+    let response: URLResponse?
+    let error: Error?
 
-    func result() throws -> AnyObject? {
+    func result() throws -> Any? {
         guard error == nil else { throw error! }
-        guard let response = self.response as? NSHTTPURLResponse else { throw E(string: nil, statusCode: 0) }
+        guard let response = self.response as? HTTPURLResponse else { throw E(string: nil, statusCode: 0) }
         guard (200...300).contains(response.statusCode) else {
-            if let json: [String: AnyObject] = json(data) {
+            if let json: [String: Any] = json(data) {
                 throw E(info: json, statusCode: response.statusCode)
             }
             throw E(string: string(data), statusCode: response.statusCode)
@@ -53,11 +53,11 @@ struct Response<E: Auth0Error> {
             }
             throw E(string: nil, statusCode: response.statusCode)
         }
-        if let json: AnyObject = json(data) {
+        if let json: Any = json(data) {
             return json
         }
         // This piece of code is dedicated to our friends the backend devs :)
-        if response.URL?.lastPathComponent == "change_password" {
+        if response.url?.lastPathComponent == "change_password" {
             return nil
         } else {
             throw E(string: string(data), statusCode: response.statusCode)

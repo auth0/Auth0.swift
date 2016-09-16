@@ -25,13 +25,13 @@ import Foundation
 /**
  *  Represents an error during a request to Auth0 Authentication API
  */
-public class AuthenticationError: NSObject, Auth0Error {
+public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
     /**
      Additional information about the error
      - seeAlso: `code` & `description` properties
      */
-    public let info: [String: AnyObject]
+    public let info: [String: Any]
 
     /// Http Status Code of the response
     public let statusCode: Int
@@ -61,7 +61,7 @@ public class AuthenticationError: NSObject, Auth0Error {
 
      - returns: a newly created AuthenticationError
      */
-    public required init(info: [String: AnyObject], statusCode: Int) {
+    public required init(info: [String: Any], statusCode: Int) {
         self.statusCode = statusCode
         self.info = info
     }
@@ -78,7 +78,7 @@ public class AuthenticationError: NSObject, Auth0Error {
      Description of the error
      - important: You should avoid displaying description to the user, it's meant for debugging only.
      */
-    public override var description: String {
+    public var description: String {
         let description = self.info["description"] ?? self.info["error_description"]
         if let string = description as? String {
             return string
@@ -141,17 +141,18 @@ public class AuthenticationError: NSObject, Auth0Error {
 
      - returns: the value of key or nil if cannot be found or is of the wrong type.
      */
-    public func value<T>(key: String) -> T? { return self.info[key] as? T }
+    public func value<T>(_ key: String) -> T? { return self.info[key] as? T }
 }
 
-extension AuthenticationError: FoundationErrorConvertible {
-    @nonobjc static let FoundationDomain = "com.auth0.authentication"
-    @nonobjc static let FoundationUserInfoKey = "com.auth0.authentication.error.info"
-    
-    public func newFoundationError() -> NSError {
-        return NSError(domain: AuthenticationError.FoundationDomain, code: 1, userInfo: [
+extension AuthenticationError: CustomNSError {
+
+    public static let infoKey = "com.auth0.authentication.error.info"
+    public static var errorDomain: String { return "com.auth0.authentication" }
+    public var errorCode: Int { return 1 }
+    public var errorUserInfo: [String : Any] {
+        return [
             NSLocalizedDescriptionKey: self.description,
-            AuthenticationError.FoundationUserInfoKey: self,
-            ])
+            AuthenticationError.infoKey: self,
+        ]
     }
 }

@@ -25,96 +25,96 @@ import OHHTTPStubs
 import Nimble
 @testable import Auth0
 
-func hasAllOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
+func hasAllOf(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload else { return false }
-        return parameters.count == payload.count && parameters.reduce(true, combine: { (initial, entry) -> Bool in
+        return parameters.count == payload.count && parameters.reduce(true, { (initial, entry) -> Bool in
             return initial && payload[entry.0] as? String == entry.1
         })
     }
 }
 
-func hasAtLeast(parameters: [String: String]) -> OHHTTPStubsTestBlock {
+func hasAtLeast(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload else { return false }
         let entries = parameters.filter { (key, _) in payload.contains { (name, _) in  key == name } }
-        return entries.count == parameters.count && entries.reduce(true, combine: { (initial, entry) -> Bool in
+        return entries.count == parameters.count && entries.reduce(true, { (initial, entry) -> Bool in
             return initial && payload[entry.0] as? String == entry.1
         })
     }
 }
 
-func hasUserMetadata(metadata: [String: String]) -> OHHTTPStubsTestBlock {
+func hasUserMetadata(_ metadata: [String: String]) -> OHHTTPStubsTestBlock {
     return hasObjectAttribute("user_metadata", value: metadata)
 }
 
-func hasObjectAttribute(name: String, value: [String: String]) -> OHHTTPStubsTestBlock {
+func hasObjectAttribute(_ name: String, value: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
-        guard let payload = request.a0_payload, actualValue = payload[name] as? [String: AnyObject] else { return false }
-        return value.count == actualValue.count && value.reduce(true, combine: { (initial, entry) -> Bool in
+        guard let payload = request.a0_payload, let actualValue = payload[name] as? [String: Any] else { return false }
+        return value.count == actualValue.count && value.reduce(true, { (initial, entry) -> Bool in
             guard let value = actualValue[entry.0] as? String else { return false }
             return initial && value == entry.1
         })
     }
 }
 
-func hasNoneOf(names: [String]) -> OHHTTPStubsTestBlock {
+func hasNoneOf(_ names: [String]) -> OHHTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload else { return false }
         return payload.filter { names.contains($0.0) }.isEmpty
     }
 }
 
-func hasNoneOf(parameters: [String: String]) -> OHHTTPStubsTestBlock {
+func hasNoneOf(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return !hasAtLeast(parameters)
 }
 
-func hasQueryParameters(parameters: [String: String]) -> OHHTTPStubsTestBlock {
+func hasQueryParameters(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
     return { request in
         guard
-            let url = request.URL,
-            let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: true),
+            let url = request.url,
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
             let items = components.queryItems
             else { return false }
-        return items.count == parameters.count && items.reduce(true, combine: { (initial, item) -> Bool in
+        return items.count == parameters.count && items.reduce(true, { (initial, item) -> Bool in
             return initial && parameters[item.name] == item.value
         })
     }
 }
 
-func isResourceOwner(domain: String) -> OHHTTPStubsTestBlock {
+func isResourceOwner(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
 }
 
-func isToken(domain: String) -> OHHTTPStubsTestBlock {
+func isToken(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/token")
 }
 
-func isSignUp(domain: String) -> OHHTTPStubsTestBlock {
+func isSignUp(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/dbconnections/signup")
 }
 
-func isResetPassword(domain: String) -> OHHTTPStubsTestBlock {
+func isResetPassword(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/dbconnections/change_password")
 }
 
-func isPasswordless(domain: String) -> OHHTTPStubsTestBlock {
+func isPasswordless(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/passwordless/start")
 }
 
-func isTokenInfo(domain: String) -> OHHTTPStubsTestBlock {
+func isTokenInfo(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/tokeninfo")
 }
 
-func isUserInfo(domain: String) -> OHHTTPStubsTestBlock {
+func isUserInfo(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodGET() && isHost(domain) && isPath("/userinfo")
 }
 
-func isOAuthAccessToken(domain: String) -> OHHTTPStubsTestBlock {
+func isOAuthAccessToken(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/access_token")
 }
 
-func isUsersPath(domain: String, identifier: String? = nil) -> OHHTTPStubsTestBlock {
+func isUsersPath(_ domain: String, identifier: String? = nil) -> OHHTTPStubsTestBlock {
     let path: String
     if let identifier = identifier {
         path = "/api/v2/users/\(identifier)"
@@ -124,27 +124,27 @@ func isUsersPath(domain: String, identifier: String? = nil) -> OHHTTPStubsTestBl
     return isHost(domain) && isPath(path)
 }
 
-func isLinkPath(domain: String, identifier: String) -> OHHTTPStubsTestBlock {
+func isLinkPath(_ domain: String, identifier: String) -> OHHTTPStubsTestBlock {
     return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")
 }
 
-func hasBearerToken(token: String) -> OHHTTPStubsTestBlock {
+func hasBearerToken(_ token: String) -> OHHTTPStubsTestBlock {
     return { request in
-        return request.valueForHTTPHeaderField("Authorization") == "Bearer \(token)"
+        return request.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)"
     }
 }
 
-func haveAuthenticationError<T>(code code: String, description: String) -> MatcherFunc<Result<T>> {
+func haveAuthenticationError<T>(code: String, description: String) -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "an error response with code <\(code)> and description <\(description)>"
-        if let actual = try expression.evaluate(), case .Failure(let cause as AuthenticationError) = actual {
+        if let actual = try expression.evaluate(), case .failure(let cause as AuthenticationError) = actual {
             return code == cause.code && description == cause.description
         }
         return false
     }
 }
 
-func haveManagementError<T>(error: String, description: String, code: String, statusCode: Int) -> MatcherFunc<Result<T>> {
+func haveManagementError<T>(_ error: String, description: String, code: String, statusCode: Int) -> MatcherFunc<Result<T>> {
     return beFailure("server error response") { (cause: ManagementError) in
         return error == (cause.info["error"] as? String)
             && code == (cause.info["code"] as? String)
@@ -153,27 +153,27 @@ func haveManagementError<T>(error: String, description: String, code: String, st
     }
 }
 
-func haveCredentials(accessToken: String? = nil, _ idToken: String? = nil) -> MatcherFunc<Result<Credentials>> {
+func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> MatcherFunc<Result<Credentials>> {
     return MatcherFunc { expression, failureMessage in
         var message = "a successful authentication result"
         if let accessToken = accessToken {
-            message = message.stringByAppendingString(" <access_token: \(accessToken)>")
+            message = message + " <access_token: \(accessToken)>"
         }
         if let idToken = idToken {
-            message = message.stringByAppendingString(" <id_token: \(idToken)>")
+            message = message + " <id_token: \(idToken)>"
         }
         failureMessage.postfixMessage = message
-        if let actual = try expression.evaluate(), case .Success(let credentials) = actual {
+        if let actual = try expression.evaluate(), case .success(let credentials) = actual {
             return (accessToken == nil || credentials.accessToken == accessToken) && (idToken == nil || credentials.idToken == idToken)
         }
         return false
     }
 }
 
-func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Result<DatabaseUser>> {
+func haveCreatedUser(_ email: String, username: String? = nil) -> MatcherFunc<Result<DatabaseUser>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have created user with email <\(email)>"
-        if let actual = try expression.evaluate(), case .Success(let created) = actual {
+        if let actual = try expression.evaluate(), case .success(let created) = actual {
             return created.email == email && (username == nil || created.username == username)
         }
         return false
@@ -183,7 +183,7 @@ func haveCreatedUser(email: String, username: String? = nil) -> MatcherFunc<Resu
 func beSuccessfulResult<T>() -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "be a successful result"
-        if let actual = try expression.evaluate(), case .Success = actual {
+        if let actual = try expression.evaluate(), case .success = actual {
             return true
         }
         return false
@@ -202,70 +202,70 @@ func beInvalidResponse<T>() -> MatcherFunc<Result<T>> {
 func beSuccessful<T>() -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "be a successful result"
-        if let actual = try expression.evaluate(), case .Success = actual {
+        if let actual = try expression.evaluate(), case .success = actual {
             return true
         }
         return false
     }
 }
 
-func beFailure<T>(cause: String? = nil) -> MatcherFunc<Result<T>> {
+func beFailure<T>(_ cause: String? = nil) -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         if let cause = cause {
             failureMessage.postfixMessage = "be a failure result with cause \(cause)"
         } else {
             failureMessage.postfixMessage = "be a failure result from auth api"
         }
-        if let actual = try expression.evaluate(), case .Failure = actual {
+        if let actual = try expression.evaluate(), case .failure = actual {
             return true
         }
         return false
     }
 }
 
-func beFailure<T>(cause: String? = nil, predicate: AuthenticationError -> Bool) -> MatcherFunc<Result<T>> {
+func beFailure<T>(_ cause: String? = nil, predicate: @escaping (AuthenticationError) -> Bool) -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         if let cause = cause {
             failureMessage.postfixMessage = "be a failure result with cause \(cause)"
         } else {
             failureMessage.postfixMessage = "be a failure result from auth api"
         }
-        if let actual = try expression.evaluate(), case .Failure(let cause as AuthenticationError) = actual {
+        if let actual = try expression.evaluate(), case .failure(let cause as AuthenticationError) = actual {
             return predicate(cause)
         }
         return false
     }
 }
 
-func beFailure<T>(cause: String? = nil, predicate: ManagementError -> Bool) -> MatcherFunc<Result<T>> {
+func beFailure<T>(_ cause: String? = nil, predicate: @escaping (ManagementError) -> Bool) -> MatcherFunc<Result<T>> {
     return MatcherFunc { expression, failureMessage in
         if let cause = cause {
             failureMessage.postfixMessage = "be a failure result with cause \(cause)"
         } else {
             failureMessage.postfixMessage = "be a failure result from mgmt api"
         }
-        if let actual = try expression.evaluate(), case .Failure(let cause as ManagementError) = actual {
+        if let actual = try expression.evaluate(), case .failure(let cause as ManagementError) = actual {
             return predicate(cause)
         }
         return false
     }
 }
 
-func haveProfile(userId: String) -> MatcherFunc<Result<Profile>> {
+func haveProfile(_ userId: String) -> MatcherFunc<Result<Profile>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have user profile for user id <\(userId)>"
-        if let actual = try expression.evaluate(), case .Success(let profile) = actual {
+        if let actual = try expression.evaluate(), case .success(let profile) = actual {
             return profile.id == userId
         }
         return false
     }
 }
 
-func haveObjectWithAttributes(attributes: [String]) -> MatcherFunc<Result<[String: AnyObject]>> {
+func haveObjectWithAttributes(_ attributes: [String]) -> MatcherFunc<Result<[String: Any]>> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "have attribues \(attributes)"
-        if let actual = try expression.evaluate(), case .Success(let value) = actual {
-            return Array(value.keys).reduce(true, combine: { (initial, value) -> Bool in
+        if let actual = try expression.evaluate(), case .success(let value) = actual {
+            return Array(value.keys).reduce(true, { (initial, value) -> Bool in
                 return initial && attributes.contains(value)
             })
         }
@@ -276,32 +276,21 @@ func haveObjectWithAttributes(attributes: [String]) -> MatcherFunc<Result<[Strin
 func beURLSafeBase64() -> MatcherFunc<String> {
     return MatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "be url safe base64"
-        let set = NSMutableCharacterSet()
-        set.formUnionWithCharacterSet(.alphanumericCharacterSet())
-        set.addCharactersInString("-_/")
+        var set = CharacterSet()
+        set.formUnion(.alphanumerics)
+        set.insert(charactersIn: "-_/")
         set.invert()
-        if let actual = try expression.evaluate() where actual.rangeOfCharacterFromSet(set) == nil {
+        if let actual = try expression.evaluate() , actual.rangeOfCharacter(from: set) == nil {
             return true
         }
         return false
     }
 }
 
-extension NSURLRequest {
-    var a0_payload: [String: AnyObject]? {
-        return NSURLProtocol.propertyForKey(ParameterPropertyKey, inRequest: self) as? [String: AnyObject]
-    }
-}
-
-extension NSMutableURLRequest {
-    override var a0_payload: [String: AnyObject]? {
+extension URLRequest {
+    var a0_payload: [String: Any]? {
         get {
-            return NSURLProtocol.propertyForKey(ParameterPropertyKey, inRequest: self) as? [String: AnyObject]
-        }
-        set(newValue) {
-            if let parameters = newValue {
-                NSURLProtocol.setProperty(parameters, forKey: ParameterPropertyKey, inRequest: self)
-            }
+            return URLProtocol.property(forKey: ParameterPropertyKey, in: self) as? [String: Any]
         }
     }
 }

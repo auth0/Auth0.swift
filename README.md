@@ -6,13 +6,13 @@
 [![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
-![Swift 2.3](https://img.shields.io/badge/Swift-2.3-orange.svg?style=flat-square)
+![Swift 3.0](https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat-square)
 
 Swift toolkit for Auth0 API
 
 ## Requirements
 
-iOS 9+ and Xcode 8 (Swift 2.3)
+iOS 9+ and Xcode 8 (Swift 3.0)
 
 ## Installation
 
@@ -22,7 +22,7 @@ Auth0.swift is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod "Auth0", '1.0.0-rc.3'
+pod "Auth0", '1.0.0'
 ```
 
 ###Carthage
@@ -30,7 +30,7 @@ pod "Auth0", '1.0.0-rc.3'
 In your Cartfile add this line
 
 ```
-github "auth0/Auth0.swift" "1.0.0-rc.3"
+github "auth0/Auth0.swift" "1.0.0"
 ```
 
 ## Usage
@@ -214,7 +214,7 @@ In your application's `Info.plist` file register your iOS Bundle Identifier as a
 and add the following method in your application's `AppDelegate`
 
 ```swift
-func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+func application(app: UIApplication, openURL url: NSURL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
     return Auth0.resumeAuth(url, options: options)
 }
 ```
@@ -273,7 +273,7 @@ To enable Auth0.swift to log HTTP request and OAuth2 flow for debugging you can 
 
 ```swift
 var auth0 = Auth0.authentication()
-auth0.logging(emnabled: true)
+auth0.logging(enabled: true)
 ```
 
 Then for a OAuth2 authentication you'll see in the console:

@@ -30,7 +30,7 @@
 QuickSpecBegin(AuthenticationAPISpec)
 
 NSString *clientId = @"MyClientId";
-NSURL *domain = [NSURL a0_URLWithDomain:@"samples.auth0.com"];
+NSURL *domain = [NSURL URLWithString:@"https://samples.auth0.com"];
 NSString *token = @"A TOKEN";
 NSString *bearer = @"bearer";
 
@@ -115,7 +115,6 @@ describe(@"login", ^{
                                      expect(@(error.a0_isManagementError)).to(beFalse());
                                      expect(@(error.a0_isAuthenticationError)).to(beTrue());
                                      expect(error.localizedDescription).to(equal(@"invalid password"));
-                                     expect(@([error.a0_authenticationError isInvalidCredentials])).to(beTrue());
                                      done();
                                  }];
         });
@@ -176,7 +175,6 @@ describe(@"create user", ^{
                                 expect(@(error.a0_isManagementError)).to(beFalse());
                                 expect(@(error.a0_isAuthenticationError)).to(beTrue());
                                 expect(error.localizedDescription).to(equal(@"invalid password"));
-                                expect(@([error.a0_authenticationError isInvalidCredentials])).to(beTrue());
                                 done();
                             }];
         });
@@ -229,7 +227,6 @@ describe(@"reset password", ^{
                                    expect(@(error.a0_isManagementError)).to(beFalse());
                                    expect(@(error.a0_isAuthenticationError)).to(beTrue());
                                    expect(error.localizedDescription).to(equal(@"invalid password"));
-                                   expect(@([error.a0_authenticationError isInvalidCredentials])).to(beTrue());
                                    done();
                                }];
         });
@@ -302,7 +299,6 @@ describe(@"signup", ^{
                             expect(@(error.a0_isManagementError)).to(beFalse());
                             expect(@(error.a0_isAuthenticationError)).to(beTrue());
                             expect(error.localizedDescription).to(equal(@"invalid password"));
-                            expect(@([error.a0_authenticationError isPasswordNotStrongEnough])).to(beTrue());
                             done();
                         }];
         });

@@ -35,7 +35,7 @@ import Foundation
 
  - returns: Auth0 Authentication API
  */
-public func authentication(clientId clientId: String, domain: String, session: NSURLSession = .sharedSession()) -> Authentication {
+public func authentication(clientId: String, domain: String, session: URLSession = .shared) -> Authentication {
     return Auth0Authentication(clientId: clientId, url: .a0_url(domain), session: session)
 }
 
@@ -67,7 +67,7 @@ public func authentication(clientId clientId: String, domain: String, session: N
  - returns: Auth0 Authentication API
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func authentication(session session: NSURLSession = .sharedSession(), bundle: NSBundle = NSBundle.mainBundle()) -> Authentication {
+public func authentication(session: URLSession = .shared, bundle: Bundle = .main) -> Authentication {
     let values = plistValues(bundle: bundle)!
     return authentication(clientId: values.clientId, domain: values.domain, session: session)
 }
@@ -108,7 +108,7 @@ public func authentication(session session: NSURLSession = .sharedSession(), bun
  - returns: Auth0 Management API v2
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func users(token token: String, session: NSURLSession = .sharedSession(), bundle: NSBundle = NSBundle.mainBundle()) -> Users {
+public func users(token: String, session: URLSession = .shared, bundle: Bundle = .main) -> Users {
     let values = plistValues(bundle: bundle)!
     return users(token: token, domain: values.domain, session: session)
 }
@@ -133,14 +133,14 @@ public func users(token token: String, session: NSURLSession = .sharedSession(),
 
  - returns: Auth0 Management API v2
  */
-public func users(token token: String, domain: String, session: NSURLSession = .sharedSession()) -> Users {
+public func users(token: String, domain: String, session: URLSession = .shared) -> Users {
     return Management(token: token, url: .a0_url(domain), session: session)
 }
 
-func plistValues(bundle bundle: NSBundle) -> (clientId: String, domain: String)? {
+func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
     guard
-        let path = bundle.pathForResource("Auth0", ofType: "plist"),
-        let values = NSDictionary(contentsOfFile: path) as? [String: AnyObject]
+        let path = bundle.path(forResource: "Auth0", ofType: "plist"),
+        let values = NSDictionary(contentsOfFile: path) as? [String: Any]
         else {
             print("Missing Auth0.plist file with 'ClientId' and 'Domain' entries in main bundle!")
             return nil

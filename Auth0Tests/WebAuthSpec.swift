@@ -27,21 +27,21 @@ import Nimble
 
 private let ClientId = "ClientId"
 private let Domain = "samples.auth0.com"
-private let DomainURL = NSURL.a0_url(Domain)
-private let RedirectURL = NSURL(string: "https://samples.auth0.com/callback")!
+private let DomainURL = URL.a0_url(Domain)
+private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 
-extension NSURL {
-    var a0_components: NSURLComponents? {
-        return NSURLComponents(URL: self, resolvingAgainstBaseURL: true)
+extension URL {
+    var a0_components: URLComponents? {
+        return URLComponents(url: self, resolvingAgainstBaseURL: true)
     }
 }
 
 private let ValidAuthorizeURLExample = "valid authorize url"
 class WebAuthSharedExamplesConfiguration: QuickConfiguration {
-    override class func configure(configuration: Configuration) {
+    override class func configure(_ configuration: Configuration) {
         sharedExamples(ValidAuthorizeURLExample) { (context: SharedExampleContext) in
             let attrs = context()
-            let url = attrs["url"] as! NSURL
+            let url = attrs["url"] as! URL
             let params = attrs["query"] as! [String: String]
             let domain = attrs["domain"] as! String
             let components = url.a0_components
@@ -73,7 +73,7 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
     var query = [
         "client_id": ClientId,
         "response_type": "token",
-        "redirect_uri": RedirectURL.absoluteString!,
+        "redirect_uri": RedirectURL.absoluteString,
         "scope": "openid",
         ]
     parameters.forEach { query[$0] = $1 }
@@ -118,7 +118,7 @@ class WebAuthSpec: QuickSpec {
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
-                let state = NSUUID().UUIDString
+                let state = UUID().uuidString
                 return [
                     "url": newWebAuth()
                         .parameters(["state": state])
@@ -139,12 +139,12 @@ class WebAuthSpec: QuickSpec {
         describe("redirect uri") {
 
             it("should build with custom scheme") {
-                let bundleId = NSBundle.mainBundle().bundleIdentifier!
+                let bundleId = Bundle.main.bundleIdentifier!
                 expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/ios/\(bundleId)/callback"
             }
 
             it("should build with universal link") {
-                let bundleId = NSBundle.mainBundle().bundleIdentifier!
+                let bundleId = Bundle.main.bundleIdentifier!
                 expect(newWebAuth().useUniversalLink().redirectURL?.absoluteString) == "https://\(Domain)/ios/\(bundleId)/callback"
             }
 
@@ -163,7 +163,7 @@ class WebAuthSpec: QuickSpec {
 
             it("should fail if controller is not presented") {
                 let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
-                callback(.Success(result: Credentials(json: ["access_token": "at", "token_type": "bearer"])!))
+                callback(.success(result: Credentials(json: ["access_token": "at", "token_type": "bearer"])!))
                 expect(result).toEventually(beFailure())
             }
 
@@ -172,7 +172,7 @@ class WebAuthSpec: QuickSpec {
 
 }
 
-func containItem(withName name: String, value: String? = nil) -> NonNilMatcherFunc<[NSURLQueryItem]> {
+func containItem(withName name: String, value: String? = nil) -> NonNilMatcherFunc<[URLQueryItem]> {
     return NonNilMatcherFunc { expression, failureMessage in
         failureMessage.postfixMessage = "contain item with name <\(name)>"
         guard let items = try expression.evaluate() else { return false }

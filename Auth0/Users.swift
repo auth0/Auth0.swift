@@ -29,7 +29,7 @@ import Foundation
 public protocol Users: Trackable, Loggable {
 
     var token: String { get }
-    var url: NSURL { get }
+    var url: URL { get }
 
     /**
      Fetch a user using the it's identifier.
@@ -69,7 +69,7 @@ public protocol Users: Trackable, Loggable {
      - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id)
      - important: The token must have the scope `read:users` scope
      */
-    func get(identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError>
+    func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError>
 
     /**
      Updates a user's root values (those who are allowed to be updated).
@@ -115,7 +115,7 @@ public protocol Users: Trackable, Loggable {
      - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      - important: The token must have one of  the following scopes: `update:users`, `update:users_app_metadata`
      */
-    func patch(identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError>
+    func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError>
 
     /**
      Updates only the user's userMetadata field
@@ -135,7 +135,7 @@ public protocol Users: Trackable, Loggable {
      - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      - important: The token must have one of  the following scopes: `update:users`, `update:users_app_metadata`
      */
-    func patch(identifier: String, userMetadata: [String: AnyObject]) -> Request<ManagementObject, ManagementError>
+    func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError>
 
     /**
      Links a user given it's identifier with a secondary user identifier it's token.
@@ -156,7 +156,7 @@ public protocol Users: Trackable, Loggable {
      - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
      - important: The token must have the following scope `update:current_user_identities`
      */
-    func link(identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError>
+    func link(_ identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError>
 
     /**
      Links a user given it's identifier with a secondary user identified by it's id, provider and connection identifier.
@@ -178,7 +178,7 @@ public protocol Users: Trackable, Loggable {
      - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
      - important: The token must have the following scope `update:users`
      */
-    func link(identifier: String, withUser userId: String, provider: String, connectionId: String?) -> Request<[ManagementObject], ManagementError>
+    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String?) -> Request<[ManagementObject], ManagementError>
 
     /**
      Removes one identity from a user.
@@ -199,7 +199,7 @@ public protocol Users: Trackable, Loggable {
      - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
      - important: The token must have the following scope `update:users`
      */
-    func unlink(identityId identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError>
+    func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError>
 }
 
 extension Users {
@@ -229,7 +229,7 @@ extension Users {
 
      ```
      Auth0
-     .users(token token, domain: "samples.auth0.com")
+     .users(token: token, domain: "samples.auth0.com")
      .get(userId, fields: ["identities", "app_metadata"], include: false)
      .start { print($0) }
      ```
@@ -242,7 +242,7 @@ extension Users {
      - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id)
      - important: The token must have the scope `read:users` scope
      */
-    public func get(identifier: String, fields: [String] = [], include: Bool = true) -> Request<ManagementObject, ManagementError> {
+    public func get(_ identifier: String, fields: [String] = [], include: Bool = true) -> Request<ManagementObject, ManagementError> {
         return self.get(identifier, fields: fields, include: include)
     }
 
@@ -266,44 +266,45 @@ extension Users {
      - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
      - important: The token must have the following scope `update:users`
      */
-    public func link(identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
+    public func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
         return self.link(identifier, withUser: userId, provider: provider, connectionId: connectionId)
     }
 }
 
 extension Management: Users {
 
-    func get(identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError> {
+    func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError> {
         let userPath = "/api/v2/users/\(identifier)"
-        let component = components(self.url, path: userPath)
-        let value = fields.joinWithSeparator(",")
+        var component = components(baseURL: self.url as URL, path: userPath)
+        let value = fields.joined(separator: ",")
         if !value.isEmpty {
             component.queryItems = [
-                NSURLQueryItem(name: "fields", value: value),
-                NSURLQueryItem(name: "include_fields", value: String(include))
+                URLQueryItem(name: "fields", value: value),
+                URLQueryItem(name: "include_fields", value: String(include))
             ]
         }
 
-        return Request(session: self.session, url: component.URL!, method: "GET", handle: self.managementObject, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session, url: component.url!, method: "GET", handle: self.managementObject, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func patch(identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError> {
+    func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError> {
         let userPath = "/api/v2/users/\(identifier)"
-        let component = components(self.url, path: userPath)
+        let component = components(baseURL: self.url as URL, path: userPath)
         
-        return Request(session: self.session, url: component.URL!, method: "PATCH", handle: self.managementObject, payload: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session, url: component.url!, method: "PATCH", handle: self.managementObject, payload: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func patch(identifier: String, userMetadata: [String: AnyObject]) -> Request<ManagementObject, ManagementError> {
-        return patch(identifier, attributes: UserPatchAttributes().userMetadata(userMetadata))
+    func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError> {
+        let attributes = UserPatchAttributes().userMetadata(userMetadata)
+        return patch(identifier, attributes: attributes)
     }
 
-    func link(identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError> {
+    func link(_ identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError> {
         return link(identifier, payload: ["link_with": token])
     }
 
 
-    func link(identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
+    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
         var payload = [
             "user_id": userId,
             "provider": provider,
@@ -312,20 +313,20 @@ extension Management: Users {
         return link(identifier, payload: payload)
     }
 
-    private func link(identifier: String, payload: [String: String]) -> Request<[ManagementObject], ManagementError> {
+    private func link(_ identifier: String, payload: [String: Any]) -> Request<[ManagementObject], ManagementError> {
         let identitiesPath = "/api/v2/users/\(identifier)/identities"
-        let url = components(self.url, path: identitiesPath).URL!
+        let url = components(baseURL: self.url as URL, path: identitiesPath).url!
         return Request(session: self.session, url: url, method: "POST", handle: self.managementObjects, payload: payload, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func unlink(identityId identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError> {
+    func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError> {
         let identityPath = "/api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
-        let url = components(self.url, path: identityPath).URL!
+        let url = components(baseURL: self.url as URL, path: identityPath).url!
         return Request(session: self.session, url: url, method: "DELETE", handle: self.managementObjects, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 }
 
-private func components(baseURL: NSURL, path: String) -> NSURLComponents {
-    let url = baseURL.URLByAppendingPathComponent(path)
-    return NSURLComponents(URL: url!, resolvingAgainstBaseURL: true)!
+private func components(baseURL: URL, path: String) -> URLComponents {
+    let url = baseURL.appendingPathComponent(path)
+    return URLComponents(url: url, resolvingAgainstBaseURL: true)!
 }

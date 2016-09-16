@@ -25,13 +25,13 @@ import Foundation
 /**
  *  Represents an error during a request to Auth0 Management API
  */
-public class ManagementError: NSObject, Auth0Error {
+public class ManagementError: Auth0Error, CustomStringConvertible {
 
     /**
      Additional information about the error
      - seeAlso: `code` & `description` properties
      */
-    public let info: [String: AnyObject]
+    public let info: [String: Any]
     
     /**
      Creates a Auth0 Management API error when the request's response is not JSON
@@ -57,7 +57,7 @@ public class ManagementError: NSObject, Auth0Error {
 
      - returns: a newly created ManagementError
      */
-    public required init(info: [String: AnyObject], statusCode: Int) {
+    public required init(info: [String: Any], statusCode: Int) {
         var values = info
         values["statusCode"] = statusCode
         self.info = values
@@ -72,7 +72,7 @@ public class ManagementError: NSObject, Auth0Error {
      Description of the error
      - important: You should avoid displaying description to the user, it's meant for debugging only.
      */
-    public override var description: String {
+    public var description: String {
         if let string = self.info["description"] as? String {
             return string
         }
@@ -81,14 +81,15 @@ public class ManagementError: NSObject, Auth0Error {
 
 }
 
-extension ManagementError: FoundationErrorConvertible {
-    @nonobjc static let FoundationDomain = "com.auth0.management"
-    @nonobjc static let FoundationUserInfoKey = "com.auth0.management.error.info"
-    
-    func newFoundationError() -> NSError {
-        return NSError(domain: ManagementError.FoundationDomain, code: 1, userInfo: [
+extension ManagementError: CustomNSError {
+
+    public static let infoKey = "com.auth0.management.error.info"
+    public static var errorDomain: String { return "com.auth0.management" }
+    public var errorCode: Int { return 1 }
+    public var errorUserInfo: [String : Any] {
+        return [
             NSLocalizedDescriptionKey: self.description,
-            ManagementError.FoundationUserInfoKey: self,
-            ])
+            ManagementError.infoKey: self,
+        ]
     }
 }

@@ -22,20 +22,20 @@
 
 import Foundation
 
-public typealias ManagementObject = [String: AnyObject]
+public typealias ManagementObject = [String: Any]
 
 /**
  *  Auth0 Management API
  */
 struct Management: Trackable, Loggable {
     let token: String
-    let url: NSURL
+    let url: URL
     var telemetry: Telemetry
     var logger: Logger?
 
-    let session: NSURLSession
+    let session: URLSession
 
-    init(token: String, url: NSURL, session: NSURLSession = .sharedSession(), telemetry: Telemetry = Telemetry()) {
+    init(token: String, url: URL, session: URLSession = .shared, telemetry: Telemetry = Telemetry()) {
         self.token = token
         self.url = url
         self.session = session
@@ -45,24 +45,24 @@ struct Management: Trackable, Loggable {
     func managementObject(response: Response<ManagementError>, callback: Request<ManagementObject, ManagementError>.Callback) {
         do {
             if let dictionary = try response.result() as? ManagementObject {
-                callback(.Success(result: dictionary))
+                callback(.success(result: dictionary))
             } else {
-                callback(.Failure(error: ManagementError(string: string(response.data))))
+                callback(.failure(error: ManagementError(string: string(response.data))))
             }
         } catch let error {
-            callback(.Failure(error: error))
+            callback(.failure(error: error))
         }
     }
 
     func managementObjects(response: Response<ManagementError>, callback: Request<[ManagementObject], ManagementError>.Callback) {
         do {
             if let list = try response.result() as? [ManagementObject] {
-                callback(.Success(result: list))
+                callback(.success(result: list))
             } else {
-                callback(.Failure(error: ManagementError(string: string(response.data))))
+                callback(.failure(error: ManagementError(string: string(response.data))))
             }
         } catch let error {
-            callback(.Failure(error: error))
+            callback(.failure(error: error))
         }
     }
 

@@ -22,7 +22,7 @@
 
 import Foundation
 
-extension NSURLComponents {
+extension URLComponents {
     var a0_values: [String: String] {
         if self.fragment != nil {
             return self.a0_fragmentValues
@@ -33,9 +33,9 @@ extension NSURLComponents {
 
     var a0_fragmentValues: [String: String] {
         var dict: [String: String] = [:]
-        let items = fragment?.componentsSeparatedByString("&")
+        let items = fragment?.components(separatedBy: "&")
         items?.forEach { item in
-            let parts = item.componentsSeparatedByString("=")
+            let parts = item.components(separatedBy: "=")
             guard
                 parts.count == 2,
                 let key = parts.first,

@@ -24,6 +24,6 @@ import Foundation
 
 protocol JSONObjectPayload {
 
-    init?(json: [String: AnyObject])
+    init?(json: [String: Any])
 
 }

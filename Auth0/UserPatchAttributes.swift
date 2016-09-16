@@ -25,7 +25,7 @@ import Foundation
 /// Atributes of the user allowed to update using `patch()` method of `Users`
 public class UserPatchAttributes {
 
-    private(set) var dictionary: [String: AnyObject]
+    private(set) var dictionary: [String: Any]
 
     /**
      Creates a new attributes
@@ -34,7 +34,7 @@ public class UserPatchAttributes {
 
      - returns: new attributes
      */
-    public init(dictionary: [String: AnyObject] = [:]) {
+    public init(dictionary: [String: Any] = [:]) {
         self.dictionary = dictionary
     }
 
@@ -45,7 +45,7 @@ public class UserPatchAttributes {
 
      - returns: itself
      */
-    public func blocked(blocked: Bool) -> UserPatchAttributes {
+    public func blocked(_ blocked: Bool) -> UserPatchAttributes {
         dictionary["blocked"] = blocked
         return self
     }
@@ -61,7 +61,7 @@ public class UserPatchAttributes {
 
      - returns: itself
      */
-    public func email(email: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
+    public func email(_ email: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
         dictionary["email"] = email
         dictionary["verify_email"] = verify
         dictionary["email_verified"] = verified
@@ -78,7 +78,7 @@ public class UserPatchAttributes {
 
      - returns: itself
      */
-    public func emailVerified(verified: Bool, connection: String) -> UserPatchAttributes {
+    public func emailVerified(_ verified: Bool, connection: String) -> UserPatchAttributes {
         dictionary["email_verified"] = verified
         dictionary["connection"] = connection
         return self
@@ -95,7 +95,7 @@ public class UserPatchAttributes {
 
      - returns: itself
      */
-    public func phoneNumber(phoneNumber: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
+    public func phoneNumber(_ phoneNumber: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
         dictionary["phone_number"] = phoneNumber
         dictionary["verify_phone_number"] = verify
         dictionary["phone_verified"] = verified
@@ -112,7 +112,7 @@ public class UserPatchAttributes {
 
      - returns: itself
      */
-    public func phoneVerified(verified: Bool, connection: String) -> UserPatchAttributes {
+    public func phoneVerified(_ verified: Bool, connection: String) -> UserPatchAttributes {
         dictionary["phone_verified"] = verified
         dictionary["connection"] = connection
         return self
@@ -127,7 +127,7 @@ public class UserPatchAttributes {
 
      - returns: itself
      */
-    public func password(password: String, verify: Bool? = nil, connection: String) -> UserPatchAttributes {
+    public func password(_ password: String, verify: Bool? = nil, connection: String) -> UserPatchAttributes {
         dictionary["password"] = password
         dictionary["connection"] = connection
         dictionary["verify_password"] = verify
@@ -142,7 +142,7 @@ public class UserPatchAttributes {
 
      - returns: itself
      */
-    public func username(username: String, connection: String) -> UserPatchAttributes {
+    public func username(_ username: String, connection: String) -> UserPatchAttributes {
         dictionary["username"] = username
         dictionary["connection"] = connection
         return self
@@ -155,7 +155,7 @@ public class UserPatchAttributes {
 
      - returns: itself
      */
-    public func userMetadata(metadata: [String: AnyObject]) -> UserPatchAttributes {
+    public func userMetadata(_ metadata: [String: Any]) -> UserPatchAttributes {
         dictionary["user_metadata"] = metadata
         return self
     }
@@ -167,7 +167,7 @@ public class UserPatchAttributes {
 
      - returns: itself
      */
-    public func appMetadata(metadata: [String: AnyObject]) -> UserPatchAttributes {
+    public func appMetadata(_ metadata: [String: Any]) -> UserPatchAttributes {
         dictionary["app_metadata"] = metadata
         return self
     }

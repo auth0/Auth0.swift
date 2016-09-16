@@ -101,7 +101,7 @@ class AuthenticationErrorSpec: QuickSpec {
             }
 
             it("should detect password already used") {
-                let values = [
+                let values: [String: Any] = [
                     "code": "invalid_password",
                     "description": "You may not reuse any of the last 2 passwords. This password was used a day ago.",
                     "name": "PasswordHistoryError",
@@ -113,7 +113,7 @@ class AuthenticationErrorSpec: QuickSpec {
             }
 
             it("should detect password already used") {
-                let values = [
+                let values: [String: Any] = [
                     "code": "invalid_password",
                     "description": "You may not reuse any of the last 2 passwords. This password was used a day ago.",
                     "name": "PasswordHistoryError",
@@ -175,7 +175,7 @@ class AuthenticationErrorSpec: QuickSpec {
 }
 
 class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
-    override class func configure(configuration: Configuration) {
+    override class func configure(_ configuration: Configuration) {
         sharedExamples(OAuthErrorExample) { (context: SharedExampleContext) in
             let code = context()[ExampleCodeKey] as! String
             let description = context()[ExampleDescriptionKey] as? String
@@ -248,7 +248,7 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
         }
 
         sharedExamples(UnknownErrorExample) { (context: SharedExampleContext) in
-            let values = context()[ExampleValuesKey] as! [String: AnyObject]
+            let values = context()[ExampleValuesKey] as! [String: Any]
             let error = AuthenticationError(info: values, statusCode: 401)
             it("should have unknown error code") {
                 expect(error.code) == UnknownError

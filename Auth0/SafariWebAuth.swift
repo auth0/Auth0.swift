@@ -25,10 +25,10 @@ import SafariServices
 
 class SafariWebAuth: WebAuth {
 
-    private static let NoBundleIdentifier = "com.auth0.this-is-no-bundle"
+    fileprivate static let NoBundleIdentifier = "com.auth0.this-is-no-bundle"
 
     let clientId: String
-    let url: NSURL
+    let url: URL
     var telemetry: Telemetry
 
     let presenter: ControllerModalPresenter
@@ -39,11 +39,11 @@ class SafariWebAuth: WebAuth {
     var universalLink = false
     var usePKCE = true
 
-    convenience init(clientId: String, url: NSURL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
+    convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance, telemetry: telemetry)
     }
 
-    init(clientId: String, url: NSURL, presenter: ControllerModalPresenter, storage: SessionStorage, telemetry: Telemetry) {
+    init(clientId: String, url: URL, presenter: ControllerModalPresenter, storage: SessionStorage, telemetry: Telemetry) {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter
@@ -56,22 +56,22 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
-    func connection(connection: String) -> Self {
+    func connection(_ connection: String) -> Self {
         self.parameters["connection"] = connection
         return self
     }
 
-    func scope(scope: String) -> Self {
+    func scope(_ scope: String) -> Self {
         self.parameters["scope"] = scope
         return self
     }
 
-    func state(state: String) -> Self {
+    func state(_ state: String) -> Self {
         self.state = state
         return self
     }
 
-    func parameters(parameters: [String: String]) -> Self {
+    func parameters(_ parameters: [String: String]) -> Self {
         parameters.forEach { self.parameters[$0] = $1 }
         return self
     }
@@ -81,37 +81,37 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
-    func start(callback: Result<Credentials> -> ()) {
+    func start(_ callback: @escaping (Result<Credentials>) -> ()) {
         guard
             let redirectURL = self.redirectURL
-            where !redirectURL.absoluteString!.hasPrefix(SafariWebAuth.NoBundleIdentifier)
+            , !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
             else {
-                return callback(Result.Failure(error: WebAuthError.NoBundleIdentifierFound))
+                return callback(Result.failure(error: WebAuthError.noBundleIdentifierFound))
         }
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
         let (controller, finish) = newSafari(authorizeURL, callback: callback)
         let session = SafariSession(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish, logger: self.logger)
         controller.delegate = session
-        logger?.trace(authorizeURL, source: "Safari")
+        logger?.trace(url: authorizeURL, source: "Safari")
         self.presenter.present(controller)
         self.storage.store(session)
     }
 
-    func newSafari(authorizeURL: NSURL, callback: Result<Credentials> -> ()) -> (SFSafariViewController, Result<Credentials> -> ()) {
-        let controller = SFSafariViewController(URL: authorizeURL)
-        let finish: Result<Credentials> -> () = { [weak controller] (result: Result<Credentials>) -> () in
+    func newSafari(_ authorizeURL: URL, callback: @escaping (Result<Credentials>) -> ()) -> (SFSafariViewController, (Result<Credentials>) -> ()) {
+        let controller = SFSafariViewController(url: authorizeURL)
+        let finish: (Result<Credentials>) -> () = { [weak controller] (result: Result<Credentials>) -> () in
             guard let presenting = controller?.presentingViewController else {
-                return callback(Result.Failure(error: WebAuthError.CannotDismissWebAuthController))
+                return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
             }
 
-            if case .Failure(let cause as WebAuthError) = result, case .UserCancelled = cause {
-                dispatch_async(dispatch_get_main_queue()) {
+            if case .failure(let cause as WebAuthError) = result, case .userCancelled = cause {
+                DispatchQueue.main.async {
                     callback(result)
                 }
             } else {
-                dispatch_async(dispatch_get_main_queue()) {
-                    presenting.dismissViewControllerAnimated(true) {
+                DispatchQueue.main.async {
+                    presenting.dismiss(animated: true) {
                         callback(result)
                     }
                 }
@@ -120,10 +120,10 @@ class SafariWebAuth: WebAuth {
         return (controller, finish)
     }
 
-    func buildAuthorizeURL(withRedirectURL redirectURL: NSURL, defaults: [String: String]) -> NSURL {
-        let authorize = NSURL(string: "/authorize", relativeToURL: self.url)!
-        let components = NSURLComponents(URL: authorize, resolvingAgainstBaseURL: true)!
-        var items: [NSURLQueryItem] = []
+    func buildAuthorizeURL(withRedirectURL redirectURL: URL, defaults: [String: String]) -> URL {
+        let authorize = URL(string: "/authorize", relativeTo: self.url)!
+        var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true)!
+        var items: [URLQueryItem] = []
         var entries = defaults
         entries["client_id"] = self.clientId
         entries["redirect_uri"] = redirectURL.absoluteString
@@ -131,12 +131,12 @@ class SafariWebAuth: WebAuth {
         entries["state"] = self.state
         self.parameters.forEach { entries[$0] = $1 }
 
-        entries.forEach { items.append(NSURLQueryItem(name: $0, value: $1)) }
+        entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
         components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
-        return components.URL!
+        return components.url!
     }
 
-    func handler(redirectURL: NSURL) -> OAuth2Grant {
+    func handler(_ redirectURL: URL) -> OAuth2Grant {
         if self.usePKCE {
             var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
             authentication.logger = self.logger
@@ -146,21 +146,24 @@ class SafariWebAuth: WebAuth {
         }
     }
 
-    var redirectURL: NSURL? {
-        let bundleIdentifier = NSBundle.mainBundle().bundleIdentifier ?? SafariWebAuth.NoBundleIdentifier
-        let components = NSURLComponents(URL: self.url, resolvingAgainstBaseURL: true)
+    var redirectURL: URL? {
+        let bundleIdentifier = Bundle.main.bundleIdentifier ?? SafariWebAuth.NoBundleIdentifier
+        var components = URLComponents(url: self.url, resolvingAgainstBaseURL: true)
         components?.scheme = self.universalLink ? "https" : bundleIdentifier
-        return components?.URL?
-            .URLByAppendingPathComponent("ios")!
-            .URLByAppendingPathComponent(bundleIdentifier)!
-            .URLByAppendingPathComponent("callback")
+        return components?.url?
+            .appendingPathComponent("ios")
+            .appendingPathComponent(bundleIdentifier)
+            .appendingPathComponent("callback")
     }
 }
 
 private func generateDefaultState() -> String? {
-    guard let data = NSMutableData(length: 32) else { return nil }
-    if SecRandomCopyBytes(kSecRandomDefault, data.length, UnsafeMutablePointer<UInt8>(data.mutableBytes)) != 0 {
-        return nil
+    var data = Data(count: 32)
+
+    let result = data.withUnsafeMutableBytes { (bytes: UnsafeMutablePointer<UInt8>) -> Int in
+        return Int(SecRandomCopyBytes(kSecRandomDefault, data.count, bytes))
     }
+
+    guard result == 0 else { return nil }
     return data.a0_encodeBase64URLSafe()
 }

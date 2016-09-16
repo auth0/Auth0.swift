@@ -24,22 +24,22 @@ import Foundation
 
 struct Auth0Authentication: Authentication {
     let clientId: String
-    let url: NSURL
+    let url: URL
     var telemetry: Telemetry
     var logger: Logger?
 
-    let session: NSURLSession
+    let session: URLSession
 
-    init(clientId: String, url: NSURL, session: NSURLSession = NSURLSession.sharedSession(), telemetry: Telemetry = Telemetry()) {
+    init(clientId: String, url: URL, session: URLSession = URLSession.shared, telemetry: Telemetry = Telemetry()) {
         self.clientId = clientId
         self.url = url
         self.session = session
         self.telemetry = telemetry
     }
 
-    func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: AnyObject]) -> Request<Credentials, AuthenticationError> {
-        let resourceOwner = NSURL(string: "/oauth/ro", relativeToURL: self.url)!
-        var payload: [String: AnyObject] = [
+    func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
+        let resourceOwner = URL(string: "/oauth/ro", relativeTo: self.url)!
+        var payload: [String: Any] = [
             "username": username,
             "password": password,
             "connection": connection,
@@ -53,8 +53,8 @@ struct Auth0Authentication: Authentication {
     }
 
 
-    func createUser(email email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> Request<DatabaseUser, AuthenticationError> {
-        var payload: [String: AnyObject] = [
+    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+        var payload: [String: Any] = [
             "email": email,
             "password": password,
             "connection": connection,
@@ -63,81 +63,81 @@ struct Auth0Authentication: Authentication {
         payload["username"] = username
         payload["user_metadata"] = userMetadata
 
-        let createUser = NSURL(string: "/dbconnections/signup", relativeToURL: self.url)!
+        let createUser = URL(string: "/dbconnections/signup", relativeTo: self.url)!
         return Request(session: session, url: createUser, method: "POST", handle: databaseUser, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func resetPassword(email email: String, connection: String) -> Request<Void, AuthenticationError> {
+    func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError> {
         let payload = [
             "email": email,
             "connection": connection,
             "client_id": self.clientId
         ]
-        let resetPassword = NSURL(string: "/dbconnections/change_password", relativeToURL: self.url)!
+        let resetPassword = URL(string: "/dbconnections/change_password", relativeTo: self.url)!
         return Request(session: session, url: resetPassword, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func signUp(email email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]?, scope: String, parameters: [String: AnyObject]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError> {
+    func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]?, scope: String, parameters: [String: Any]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError> {
         let first = createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
         let second = login(usernameOrEmail: email, password: password, connection: connection, scope: scope, parameters: parameters)
         return ConcatRequest(first: first, second: second)
     }
 
-    func startPasswordless(email email: String, type: PasswordlessType, connection: String, parameters: [String: AnyObject]) -> Request<Void, AuthenticationError> {
-        var payload: [String: AnyObject] = [
+    func startPasswordless(email: String, type: PasswordlessType, connection: String, parameters: [String: Any]) -> Request<Void, AuthenticationError> {
+        var payload: [String: Any] = [
             "email": email,
             "connection": connection,
             "send": type.rawValue,
             "client_id": self.clientId,
             ]
-        if case .WebLink = type where !parameters.isEmpty {
+        if case .WebLink = type , !parameters.isEmpty {
             payload["authParams"] = parameters
         }
 
-        let start = NSURL(string: "/passwordless/start", relativeToURL: self.url)!
+        let start = URL(string: "/passwordless/start", relativeTo: self.url)!
         return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func startPasswordless(phoneNumber phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError> {
-        let payload: [String: AnyObject] = [
+    func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError> {
+        let payload: [String: Any] = [
             "phone_number": phoneNumber,
             "connection": connection,
             "send": type.rawValue,
             "client_id": self.clientId,
             ]
-        let start = NSURL(string: "/passwordless/start", relativeToURL: self.url)!
+        let start = URL(string: "/passwordless/start", relativeTo: self.url)!
         return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func tokenInfo(token token: String) -> Request<Profile, AuthenticationError> {
-        let payload: [String: AnyObject] = ["id_token": token]
-        let tokenInfo = NSURL(string: "/tokeninfo", relativeToURL: self.url)!
+    func tokenInfo(token: String) -> Request<Profile, AuthenticationError> {
+        let payload: [String: Any] = ["id_token": token]
+        let tokenInfo = URL(string: "/tokeninfo", relativeTo: self.url)!
         return Request(session: session, url: tokenInfo, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func userInfo(token token: String) -> Request<Profile, AuthenticationError> {
-        let userInfo = NSURL(string: "/userinfo", relativeToURL: self.url)!
+    func userInfo(token: String) -> Request<Profile, AuthenticationError> {
+        let userInfo = URL(string: "/userinfo", relativeTo: self.url)!
         return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(token)"], logger: self.logger, telemetry: self.telemetry)
     }
 
-    func loginSocial(token token: String, connection: String, scope: String, parameters: [String: AnyObject]) -> Request<Credentials, AuthenticationError> {
-        var payload: [String: AnyObject] = [
+    func loginSocial(token: String, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
+        var payload: [String: Any] = [
             "access_token": token,
             "connection": connection,
             "scope": scope,
             "client_id": self.clientId,
             ]
         parameters.forEach { key, value in payload[key] = value }
-        let accessToken = NSURL(string: "/oauth/access_token", relativeToURL: self.url)!
+        let accessToken = URL(string: "/oauth/access_token", relativeTo: self.url)!
         return Request(session: session, url: accessToken, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func tokenExchange(withParameters parameters: [String: AnyObject]) -> Request<Credentials, AuthenticationError> {
-        var payload: [String: AnyObject] = [
-            "client_id": self.clientId
+    func tokenExchange(withParameters parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
+        var payload: [String: Any] = [
+            "client_id": self.clientId,
         ]
         parameters.forEach { payload[$0] = $1 }
-        let token = NSURL(string: "/oauth/token", relativeToURL: self.url)!
+        let token = URL(string: "/oauth/token", relativeTo: self.url)!
         return Request(session: session, url: token, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
@@ -146,7 +146,7 @@ struct Auth0Authentication: Authentication {
             "code": code,
             "code_verifier": codeVerifier,
             "redirect_uri": redirectURI,
-            "grant_type": "authorization_code"
+            "grant_type": "authorization_code",
             ])
     }
 }

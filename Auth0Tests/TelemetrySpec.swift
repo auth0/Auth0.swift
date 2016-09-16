@@ -100,8 +100,8 @@ class TelemetrySpec: QuickSpec {
 
             it("should have correct info") {
                 let value = telemetry.value!
-                    .stringByReplacingOccurrencesOfString("-", withString: "+")
-                    .stringByReplacingOccurrencesOfString("_", withString: "/")
+                    .replacingOccurrences(of: "-", with: "+")
+                    .replacingOccurrences(of: "_", with: "/")
                 let paddedLength: Int
                 let padding = value.characters.count % 4
                 if padding > 0 {
@@ -109,10 +109,10 @@ class TelemetrySpec: QuickSpec {
                 } else {
                     paddedLength = value.characters.count
                 }
-                let padded = value.stringByPaddingToLength(paddedLength, withString: "=", startingAtIndex: 0)
+                let padded = value.padding(toLength: paddedLength, withPad: "=", startingAt: 0)
 
-                let data = NSData(base64EncodedString: padded, options: [NSDataBase64DecodingOptions.IgnoreUnknownCharacters])
-                let info = try! NSJSONSerialization.JSONObjectWithData(data!, options: []) as! [String: String]
+                let data = Data(base64Encoded: padded, options: [NSData.Base64DecodingOptions.ignoreUnknownCharacters])
+                let info = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String: String]
                 expect(info["version"]) == "1.0.0-alpha.4"
                 expect(info["lib_version"]) == version
                 expect(info["name"]) == "Lock.iOS"
@@ -126,14 +126,14 @@ class TelemetrySpec: QuickSpec {
             it("should set telemetry header") {
                 let request = NSMutableURLRequest()
                 telemetry.addTelemetryHeader(request: request)
-                expect(request.valueForHTTPHeaderField("Auth0-Client")) == telemetry.value
+                expect(request.value(forHTTPHeaderField: "Auth0-Client")) == telemetry.value
             }
 
             it("should not set telemetry header when disabled") {
                 let request = NSMutableURLRequest()
                 telemetry.enabled = false
                 telemetry.addTelemetryHeader(request: request)
-                expect(request.valueForHTTPHeaderField("Auth0-Client")).to(beNil())
+                expect(request.value(forHTTPHeaderField: "Auth0-Client")).to(beNil())
             }
 
         }
@@ -148,7 +148,7 @@ class TelemetrySpec: QuickSpec {
 
             it("should set telemetry header") {
                 let items = telemetry.queryItemsWithTelemetry(queryItems: [])
-                expect(items.first) == NSURLQueryItem(name: "auth0Client", value: telemetry.value)
+                expect(items.first) == URLQueryItem(name: "auth0Client", value: telemetry.value)
             }
 
             it("should not set telemetry header when disabled") {
@@ -158,17 +158,17 @@ class TelemetrySpec: QuickSpec {
             }
 
             it("should keep items already in list when adding item") {
-                let item = NSURLQueryItem(name: "key", value: "value")
+                let item = URLQueryItem(name: "key", value: "value")
                 let items = telemetry.queryItemsWithTelemetry(queryItems: [item])
-                expect(items).to(contain(NSURLQueryItem(name: "auth0Client", value: telemetry.value)))
+                expect(items).to(contain(URLQueryItem(name: "auth0Client", value: telemetry.value)))
                 expect(items).to(contain(item))
             }
 
             it("should keep items already in list when skipping telemetry") {
                 telemetry.enabled = false
-                let item = NSURLQueryItem(name: "key", value: "value")
+                let item = URLQueryItem(name: "key", value: "value")
                 let items = telemetry.queryItemsWithTelemetry(queryItems: [item])
-                expect(items).toNot(contain(NSURLQueryItem(name: "auth0Client", value: telemetry.value)))
+                expect(items).toNot(contain(URLQueryItem(name: "auth0Client", value: telemetry.value)))
                 expect(items).to(contain(item))
             }
 
@@ -186,9 +186,9 @@ class TelemetrySpec: QuickSpec {
             }
 
             it("should toggle telemetry") {
-                trackable.enableTelemetry(enabled: false)
+                trackable.tracking(enabled: false)
                 expect(trackable.telemetry.enabled) == false
-                trackable.enableTelemetry(enabled: true)
+                trackable.tracking(enabled: true)
                 expect(trackable.telemetry.enabled) == true
             }
 
@@ -204,11 +204,11 @@ class TelemetrySpec: QuickSpec {
 }
 
 
-class MockedBundle: NSBundle {
+class MockedBundle: Bundle {
 
     var version: String? = nil
 
-    override var infoDictionary: [String : AnyObject]? {
+    override var infoDictionary: [String : Any]? {
         if let version = self.version {
             return [
                 "CFBundleShortVersionString": version

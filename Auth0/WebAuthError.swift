@@ -30,47 +30,44 @@ import Foundation
  - UserCancelled:                  User cancelled the web-based authentication, e.g. tapped the "Done" button in SFSafariViewController
  - PKCENotAllowed:                 PKCE for the supplied Auth0 ClientId was not allowed. You need to set the `Token Endpoint Authentication Method` to `None` in your Auth0 Dashboard
  */
-public enum WebAuthError: ErrorType {
-    case NoBundleIdentifierFound
-    case CannotDismissWebAuthController
-    case UserCancelled
-    case PKCENotAllowed(String)
-}
+public enum WebAuthError: CustomNSError {
+    case noBundleIdentifierFound
+    case cannotDismissWebAuthController
+    case userCancelled
+    case pkceNotAllowed(String)
 
-extension WebAuthError: FoundationErrorConvertible {
-    static let FoundationDomain = "com.auth0.webauth"
-    static let FoundationUserInfoKey = "com.auth0.webauth.error.info"
-    static let GenericFoundationCode = 1
-    static let CancelledFoundationCode = 0
+    static let genericFoundationCode = 1
+    static let cancelledFoundationCode = 0
 
-    func newFoundationError() -> NSError {
-        if case .UserCancelled = self {
-            return NSError(
-                domain: WebAuthError.FoundationDomain,
-                code: WebAuthError.CancelledFoundationCode,
-                userInfo: [
-                    NSLocalizedDescriptionKey: "User Cancelled Web Authentication",
-                    WebAuthError.FoundationUserInfoKey: self as NSError
-                ]
-            )
+    public static let infoKey = "com.auth0.webauth.error.info"
+    public static let errorDomain: String = "com.auth0.webauth"
+
+    public var errorCode: Int {
+        switch self {
+        case .userCancelled:
+            return WebAuthError.cancelledFoundationCode
+        default:
+            return WebAuthError.genericFoundationCode
         }
-        if case .PKCENotAllowed(let message) = self {
-            return NSError(
-                domain: WebAuthError.FoundationDomain,
-                code: WebAuthError.GenericFoundationCode,
-                userInfo: [
-                    NSLocalizedDescriptionKey: message,
-                    WebAuthError.FoundationUserInfoKey: self as NSError
-                ]
-            )
-        }
-        return NSError(
-            domain: WebAuthError.FoundationDomain,
-            code: WebAuthError.GenericFoundationCode,
-            userInfo: [
-                NSLocalizedDescriptionKey: (self as NSError).localizedDescription,
-                WebAuthError.FoundationUserInfoKey: self as NSError
+    }
+
+    public var errorUserInfo: [String : Any] {
+        switch self {
+        case .userCancelled:
+            return [
+                NSLocalizedDescriptionKey: "User Cancelled Web Authentication",
+                WebAuthError.infoKey: self
             ]
-        )
+        case .pkceNotAllowed(let message):
+            return [
+                NSLocalizedDescriptionKey: message,
+                WebAuthError.infoKey: self
+            ]
+        default:
+            return [
+                NSLocalizedDescriptionKey: "Failed to perform webAuth",
+                WebAuthError.infoKey: self
+            ]
+        }
     }
 }

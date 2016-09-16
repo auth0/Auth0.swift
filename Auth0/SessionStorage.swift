@@ -26,9 +26,9 @@ import UIKit
 class SessionStorage {
     static let sharedInstance = SessionStorage()
 
-    private var current: OAuth2Session? = nil
+    fileprivate var current: OAuth2Session? = nil
 
-    func resume(url: NSURL, options: [String: AnyObject]) -> Bool {
+    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
         let resumed = self.current?.resume(url, options: options) ?? false
         if resumed {
             self.current = nil
@@ -36,12 +36,12 @@ class SessionStorage {
         return resumed
     }
 
-    func store(session: OAuth2Session) {
+    func store(_ session: OAuth2Session) {
         self.current?.cancel()
         self.current = session
     }
 
-    func cancel(session: OAuth2Session) {
+    func cancel(_ session: OAuth2Session) {
         session.cancel()
         if self.current?.state == session.state {
             self.current = nil

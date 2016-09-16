@@ -39,10 +39,10 @@ class OAuth2GrantSpec: QuickSpec {
             }
 
             it("shoud build credentials") {
-                let token = NSUUID().UUIDString
+                let token = UUID().uuidString
                 let values = ["access_token": token, "token_type": "bearer"]
                 waitUntil { done in
-                    implicit.credentials(values) {
+                    implicit.credentials(from: values) {
                         expect($0).to(haveCredentials(token))
                         done()
                     }
@@ -51,7 +51,7 @@ class OAuth2GrantSpec: QuickSpec {
 
             it("shoud report error to get credentials") {
                 waitUntil { done in
-                    implicit.credentials([:]) {
+                    implicit.credentials(from: [:]) {
                         expect($0).to(beFailure())
                         done()
                     }
@@ -66,9 +66,9 @@ class OAuth2GrantSpec: QuickSpec {
 
         describe("Authorization Code w/PKCE") {
 
-            let domain = NSURL.a0_url("samples.auth0.com")
+            let domain = URL.a0_url("samples.auth0.com")
             let method = "S256"
-            let redirectURL = NSURL(string: "https://samples.auth0.com/callback")!
+            let redirectURL = URL(string: "https://samples.auth0.com/callback")!
             var verifier: String!
             var challenge: String!
             var pkce: PKCE!
@@ -82,18 +82,18 @@ class OAuth2GrantSpec: QuickSpec {
 
             afterEach {
                 OHHTTPStubs.removeAllStubs()
-                stub(isHost(domain.host!)) { _ in
+                stub(condition: isHost(domain.host!)) { _ in
                     return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
                 }.name = "YOU SHALL NOT PASS!"
             }
 
             it("shoud build credentials") {
-                let token = NSUUID().UUIDString
-                let code = NSUUID().UUIDString
+                let token = UUID().uuidString
+                let code = UUID().uuidString
                 let values = ["code": code]
-                stub(isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString!])) { _ in return authResponse(accessToken: token) }.name = "Code Exchange Auth"
+                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token) }.name = "Code Exchange Auth"
                 waitUntil { done in
-                    pkce.credentials(values) {
+                    pkce.credentials(from: values) {
                         expect($0).to(haveCredentials(token))
                         done()
                     }
@@ -102,7 +102,7 @@ class OAuth2GrantSpec: QuickSpec {
 
             it("shoud report error to get credentials") {
                 waitUntil { done in
-                    pkce.credentials([:]) {
+                    pkce.credentials(from: [:]) {
                         expect($0).to(beFailure())
                         done()
                     }

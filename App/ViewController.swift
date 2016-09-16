@@ -11,7 +11,7 @@ import Auth0
 
 class ViewController: UIViewController {
 
-    var onAuth: (Result<Credentials> -> ())!
+    var onAuth: ((Result<Credentials>) -> ())!
 
     @IBOutlet weak var oauth2: UIButton!
     
@@ -19,27 +19,27 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         self.onAuth = { [weak self] in
             switch $0 {
-            case .Failure(let cause):
-                let alert = UIAlertController(title: "Auth Failed!", message: "\(cause)", preferredStyle: .Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
-                self?.presentViewController(alert, animated: true, completion: nil)
-            case .Success(let credentials):
-                let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got access_token \(credentials.accessToken)", preferredStyle: .Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
-                self?.presentViewController(alert, animated: true, completion: nil)
+            case .failure(let cause):
+                let alert = UIAlertController(title: "Auth Failed!", message: "\(cause)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                self?.present(alert, animated: true, completion: nil)
+            case .success(let credentials):
+                let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got access_token \(credentials.accessToken)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                self?.present(alert, animated: true, completion: nil)
             }
             print($0)
         }
     }
 
-    @IBAction func startOAuth2(sender: AnyObject) {
+    @IBAction func startOAuth2(_ sender: Any) {
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
             .start(onAuth)
     }
 
-    @IBAction func startGoogleOAuth2(sender: AnyObject) {
+    @IBAction func startGoogleOAuth2(_ sender: Any) {
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)

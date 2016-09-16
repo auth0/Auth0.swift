@@ -26,12 +26,12 @@ struct ControllerModalPresenter {
 
     let rootViewController: UIViewController?
 
-    init(rootViewController: UIViewController? = UIApplication.sharedApplication().keyWindow?.rootViewController) {
+    init(rootViewController: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) {
         self.rootViewController = rootViewController
     }
     
-    func present(controller: UIViewController) {
-        topViewController?.presentViewController(controller, animated: true, completion: nil)
+    func present(_ controller: UIViewController) {
+        topViewController?.present(controller, animated: true, completion: nil)
     }
 
     var topViewController: UIViewController? {
@@ -39,7 +39,7 @@ struct ControllerModalPresenter {
         return findTopViewController(root)
     }
 
-    private func findTopViewController(root: UIViewController) -> UIViewController? {
+    fileprivate func findTopViewController(_ root: UIViewController) -> UIViewController? {
         if let presented = root.presentedViewController { return findTopViewController(presented) }
         switch root {
         case let split as UISplitViewController:

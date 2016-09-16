@@ -24,21 +24,21 @@ import Foundation
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
-    func credentials(values: [String: String], callback: Result<Credentials> -> ())
+    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> ())
 }
 
 struct ImplicitGrant: OAuth2Grant {
 
     let defaults: [String : String] = ["response_type": "token"]
 
-    func credentials(values: [String : String], callback: Result<Credentials> -> ()) {
-        guard let credentials = Credentials(json: values) else {
-            let data = try! NSJSONSerialization.dataWithJSONObject(values, options: [])
-            let string = String(data: data, encoding: NSUTF8StringEncoding)
-            callback(.Failure(error: AuthenticationError(string: string)))
+    func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
+        guard let credentials = Credentials(json: values as [String : Any]) else {
+            let data = try! JSONSerialization.data(withJSONObject: values, options: [])
+            let string = String(data: data, encoding: .utf8)
+            callback(.failure(error: AuthenticationError(string: string)))
             return
         }
-        callback(.Success(result: credentials))
+        callback(.success(result: credentials))
     }
 
 }
@@ -46,15 +46,15 @@ struct ImplicitGrant: OAuth2Grant {
 struct PKCE: OAuth2Grant {
 
     let authentication: Authentication
-    let redirectURL: NSURL
+    let redirectURL: URL
     let defaults: [String : String]
     let verifier: String
 
-    init(authentication: Authentication, redirectURL: NSURL, generator: A0SHA256ChallengeGenerator = A0SHA256ChallengeGenerator()) {
+    init(authentication: Authentication, redirectURL: URL, generator: A0SHA256ChallengeGenerator = A0SHA256ChallengeGenerator()) {
         self.init(authentication: authentication, redirectURL: redirectURL, verifier: generator.verifier, challenge: generator.challenge, method: generator.method)
     }
 
-    init(authentication: Authentication, redirectURL: NSURL, verifier: String, challenge: String, method: String) {
+    init(authentication: Authentication, redirectURL: URL, verifier: String, challenge: String, method: String) {
         self.authentication = authentication
         self.redirectURL = redirectURL
         self.defaults = [
@@ -65,22 +65,22 @@ struct PKCE: OAuth2Grant {
         self.verifier = verifier
     }
 
-    func credentials(values: [String: String], callback: Result<Credentials> -> ()) {
+    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> ()) {
         guard
             let code = values["code"]
             else {
-                let data = try! NSJSONSerialization.dataWithJSONObject(values, options: [])
-                let string = String(data: data, encoding: NSUTF8StringEncoding)
-                return callback(.Failure(error: AuthenticationError(string: string)))
+                let data = try! JSONSerialization.data(withJSONObject: values, options: [])
+                let string = String(data: data, encoding: .utf8)
+                return callback(.failure(error: AuthenticationError(string: string)))
             }
         let clientId = self.authentication.clientId
         self.authentication
-            .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString!)
+            .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
             .start { result in
                 // FIXME: Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
-                if case .Failure(let cause as AuthenticationError) = result where cause.description == "Unauthorized" {
-                    let error = WebAuthError.PKCENotAllowed("Please go to 'https://manage.auth0.com/#/applications/\(clientId)/settings' and make sure 'Client Type' is 'Native' to enable PKCE.")
-                    callback(Result.Failure(error: error))
+                if case .failure(let cause as AuthenticationError) = result , cause.description == "Unauthorized" {
+                    let error = WebAuthError.pkceNotAllowed("Please go to 'https://manage.auth0.com/#/applications/\(clientId)/settings' and make sure 'Client Type' is 'Native' to enable PKCE.")
+                    callback(Result.failure(error: error))
                 } else {
                     callback(result)
                 }

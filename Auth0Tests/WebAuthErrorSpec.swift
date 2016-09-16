@@ -33,21 +33,21 @@ class WebAuthErrorSpec: QuickSpec {
         describe("foundation error") {
 
             it("should build generic NSError") {
-                let error = WebAuthError.NoBundleIdentifierFound.newFoundationError()
+                let error = WebAuthError.noBundleIdentifierFound as NSError
                 expect(error.domain) == "com.auth0.webauth"
                 expect(error.code) == 1
             }
 
             it("should build error for PKCE not allowed") {
                 let message = "Not Allowed"
-                let error = WebAuthError.PKCENotAllowed(message).newFoundationError()
+                let error = WebAuthError.pkceNotAllowed(message) as NSError
                 expect(error.domain) == "com.auth0.webauth"
                 expect(error.code) == 1
                 expect(error.localizedDescription) == message
             }
 
             it("should build error for user cancelled") {
-                let error = WebAuthError.UserCancelled.newFoundationError()
+                let error = WebAuthError.userCancelled as NSError
                 expect(error.domain) == "com.auth0.webauth"
                 expect(error.code) == 0
             }

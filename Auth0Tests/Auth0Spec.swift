@@ -55,13 +55,13 @@ class Auth0Spec: QuickSpec {
             it("should enable custom logger for auth") {
                 let logger = MockLogger()
                 var auth = Auth0.authentication(clientId: ClientId, domain: Domain)
-                expect(auth.usingLogger(logger).logger).toNot(beNil())
+                expect(auth.using(logger: logger).logger).toNot(beNil())
             }
 
             it("should enable custom logger for users") {
                 let logger = MockLogger()
                 var users = Auth0.users(token: "token", domain: Domain)
-                expect(users.usingLogger(logger).logger).toNot(beNil())
+                expect(users.using(logger: logger).logger).toNot(beNil())
             }
 
         }
@@ -92,7 +92,7 @@ class Auth0Spec: QuickSpec {
 
         describe("plist loading") {
 
-            let bundle = NSBundle(forClass: Auth0Spec.classForCoder())
+            let bundle = Bundle(for: Auth0Spec.classForCoder())
 
             it("should return authentication endpoint with account from plist") {
                 let auth = Auth0.authentication(bundle: bundle)
@@ -112,15 +112,15 @@ class Auth0Spec: QuickSpec {
 
 class MockLogger: Logger {
 
-    func trace(url: NSURL, source: String?) {
+    func trace(url: URL, source: String?) {
 
     }
 
-    func trace(response: NSURLResponse, data: NSData?) {
+    func trace(response: URLResponse, data: Data?) {
 
     }
 
-    func trace(request: NSURLRequest, session: NSURLSession) {
+    func trace(request: URLRequest, session: URLSession) {
 
     }
 }
