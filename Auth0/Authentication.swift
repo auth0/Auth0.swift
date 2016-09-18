@@ -356,7 +356,7 @@ public enum PasswordlessType: String {
     case AndroidLink = "link_android"
 }
 
-extension Authentication {
+public extension Authentication {
 
     /**
      Logs in an user using email|username and password using a Database and Passwordless connection
@@ -407,7 +407,7 @@ extension Authentication {
      - returns: authentication request that will yield Auth0 User Credentials
      - seeAlso: Credentials
      */
-    func login(usernameOrEmail username: String, password: String, multifactorCode: String? = nil, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
+    public func login(usernameOrEmail username: String, password: String, multifactorCode: String? = nil, connection: String, scope: String = "openid", parameters: [String: AnyObject] = [:]) -> Request<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, multifactorCode: multifactorCode, connection: connection, scope: scope, parameters: parameters)
     }
 
@@ -447,7 +447,7 @@ extension Authentication {
 
      - returns: request that will yield a created database user (just email, username and email verified flag)
      */
-    func createUser(email email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+    public func createUser(email email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: AnyObject]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         return self.createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
     }
 
