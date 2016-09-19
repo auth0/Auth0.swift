@@ -72,10 +72,12 @@ public struct Telemetry {
     }
 
     static func versionInformation(bundle: Bundle = Bundle(for: Credentials.classForCoder())) -> [String: String] {
-        let version = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? Telemetry.NoVersion
+//        let version = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? Telemetry.NoVersion
+        let version = "1.0.0-rc.4"
         let dict = [
             Telemetry.NameKey: Telemetry.LibraryName,
             Telemetry.VersionKey: version,
+            "swift-version": "3.0"
             ]
         return dict
     }

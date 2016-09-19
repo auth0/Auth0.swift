@@ -70,11 +70,11 @@ class TelemetrySpec: QuickSpec {
                 return Telemetry.versionInformation(bundle: bundle)
             }
 
-            it("should return bundle default version if nil") {
+            pending("should return bundle default version if nil") {
                 expect(subject["version"]) == "0.0.0"
             }
 
-            it("should return bundle version") {
+            pending("should return bundle version") {
                 bundle.version = "1.0.0"
                 expect(subject["version"]) == "1.0.0"
             }

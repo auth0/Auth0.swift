@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.0.0-rc.4](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.4) (2016-09-18)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-rc.3...1.0.0-rc.4)
+
+This version (and future ones) requires Xcode 8 and Swift 3. For Swift 2.3 please check the branch [v1@swift-2.3](https://github.com/auth0/Auth0.swift/tree/v1@swift-2.3)
+
+**Closed issues:**
+- Auth0 Swift 3 support [\#45](https://github.com/auth0/Auth0.swift/issues/45) ([aqeelb](https://github.com/aqeelb))
+
+**Changed:**
+- Swift 3 [\#49](https://github.com/auth0/Auth0.swift/pull/49) ([hzalaz](https://github.com/hzalaz))
+- Use protocols [\#47](https://github.com/auth0/Auth0.swift/pull/47) ([hzalaz](https://github.com/hzalaz))
+
 ## [1.0.0-rc.3](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.3) (2016-09-14)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-rc.2...1.0.0-rc.3)
 
