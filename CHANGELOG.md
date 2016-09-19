@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.0-rc.4](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.4@swift-2.3) (2016-09-14)
+## [1.0.0-rc.4@swift-2.3](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.4@swift-2.3) (2016-09-14)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-rc.2...1.0.0-rc.4@swift-2.3)
 
 Normalize Telemetry methods to make migration to Swift 3 easier
