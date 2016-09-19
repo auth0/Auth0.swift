@@ -17,10 +17,13 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = '2.0'
   s.tvos.deployment_target = '9.0'
   s.requires_arc = true
-  s.ios.frameworks = 'UIKit', 'SafariServices'
 
-  s.ios.source_files = 'Auth0/**/*.{swift,h,m}'
-  s.osx.source_files = ['Auth0/*.swift', 'Auth0/{Authentication,Extensions,Logger,Management,Networking,Crypto}/*.{swift,h,m}']
-  s.watchos.source_files = ['Auth0/*.swift', 'Auth0/{Authentication,Extensions,Logger,Management,Networking,Crypto}/*.{swift,h,m}']
-  s.tvos.source_files = ['Auth0/*.swift', 'Auth0/{Authentication,Extensions,Logger,Management,Networking,Crypto}/*.{swift,h,m}']
+  s.ios.source_files = 'Auth0/*.{swift,h,m}'
+  s.ios.frameworks = 'UIKit', 'SafariServices'
+  s.osx.source_files = 'Auth0/*.swift'
+  s.osx.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/OAuth2Session.swift', 'Auth0/SessionStorage.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift'
+  s.watchos.source_files = 'Auth0/*.swift'
+  s.watchos.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/OAuth2Session.swift', 'Auth0/SessionStorage.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift'
+  s.tvos.source_files = 'Auth0/*.swift'
+  s.tvos.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/OAuth2Session.swift', 'Auth0/SessionStorage.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift'
 end

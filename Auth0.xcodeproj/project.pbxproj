@@ -352,6 +352,7 @@
 		5FBEF3DD1D07A4B700D90941 /* A0WebAuthSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = A0WebAuthSpec.m; path = Auth0Tests/A0WebAuthSpec.m; sourceTree = SOURCE_ROOT; };
 		5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = A0ChallengeGenerator.h; path = Auth0/A0ChallengeGenerator.h; sourceTree = SOURCE_ROOT; };
 		5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = A0ChallengeGenerator.m; path = Auth0/A0ChallengeGenerator.m; sourceTree = SOURCE_ROOT; };
+		5FC539D71D8F78F3002CAABB /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
 		5FCAB1701D09005A00331C84 /* NSURLComponents+OAuth2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSURLComponents+OAuth2.swift"; path = "Auth0/NSURLComponents+OAuth2.swift"; sourceTree = SOURCE_ROOT; };
 		5FCAB1721D09009600331C84 /* NSData+URLSafe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSData+URLSafe.swift"; path = "Auth0/NSData+URLSafe.swift"; sourceTree = SOURCE_ROOT; };
 		5FCAB1751D0900CF00331C84 /* SessionStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SessionStorage.swift; path = Auth0/SessionStorage.swift; sourceTree = SOURCE_ROOT; };
@@ -527,6 +528,7 @@
 		5F06DDC21CC5712F0011842B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5FC539D71D8F78F3002CAABB /* SafariServices.framework */,
 				5F331B111D4BB8D700AE4382 /* tvOS */,
 				5F06DDC31CC571480011842B /* iOS */,
 				5F06DDC41CC5714F0011842B /* OSX */,
