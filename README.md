@@ -70,9 +70,9 @@ Auth0
        )
    .start { result in
        switch result {
-       case .Success(let credentials):
+       case .success(let credentials):
            print("access_token: \(credentials.accessToken)")
-       case .Failure(let error):
+       case .failure(let error):
            print(error)
        }
    }
@@ -86,9 +86,9 @@ Auth0
    .startPasswordless(email: "support@auth0.com", connection: "email")
    .start { result in
        switch result {
-       case .Success:
+       case .success:
            print("Sent OTP to support@auth0.com!")
-       case .Failure(let error):
+       case .failure(let error):
            print(error)
        }
    }
@@ -105,9 +105,9 @@ Auth0
        )
    .start { result in
        switch result {
-       case .Success(let credentials):
+       case .success(let credentials):
            print("access_token: \(credentials.accessToken)")
-       case .Failure(let error):
+       case .failure(let error):
            print(error)
        }
    }
@@ -126,9 +126,9 @@ Auth0
        )
    .start { result in
        switch result {
-       case .Success(let credentials):
+       case .success(let credentials):
            print("access_token: \(credentials.accessToken)")
-       case .Failure(let error):
+       case .failure(let error):
            print(error)
        }
    }
@@ -143,9 +143,9 @@ Auth0
    .tokenInfo(token: "user id_token")
    .start { result in
        switch result {
-       case .Success(let profile):
+       case .success(let profile):
            print("profile email: \(profile.email)")
-       case .Failure(let error):
+       case .failure(let error):
            print(error)
        }
    }
@@ -161,9 +161,9 @@ Auth0
     .patch("user identifier", userMetadata: ["first_name": "John", "last_name": "Doe"])
     .start { result in
         switch result {
-        case .Success(let userInfo):
+        case .success(let userInfo):
             print("user: \(userInfo)")
-        case .Failure(let error):
+        case .failure(let error):
             print(error)
         }
     }
@@ -177,9 +177,9 @@ Auth0
    .link(userId, withOtherUserToken: "another user token")
    .start { result in
       switch result {
-      case .Success(let userInfo):
+      case .success(let userInfo):
          print("user: \(userInfo)")
-      case .Failure(let error):
+      case .failure(let error):
          print(error)
       }
    }
@@ -216,8 +216,8 @@ In your application's `Info.plist` file register your iOS Bundle Identifier as a
 and add the following method in your application's `AppDelegate`
 
 ```swift
-func application(app: UIApplication, openURL url: NSURL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
-    return Auth0.resumeAuth(url, options: options)
+func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+    return Auth0.resumeAuth(url, options:options)
 }
 ```
 
@@ -229,9 +229,9 @@ Auth0
     .connection("facebook")
     .start { result in
         switch result {
-        case .Success(let credentials):
+        case .success(let credentials):
             print("credentials: \(credentials)")
-        case .Failure(let error):
+        case .failure(let error):
             print(error)
         }
     }
@@ -246,9 +246,9 @@ Auth0
     .connection("google-oauth2")
     .start { result in
         switch result {
-        case .Success(let credentials):
+        case .success(let credentials):
             print("credentials: \(credentials)")
-        case .Failure(let error):
+        case .failure(let error):
             print(error)
         }
     }
@@ -261,9 +261,9 @@ Auth0
     .webAuth()
     .start { result in
         switch result {
-        case .Success(let credentials):
+        case .success(let credentials):
             print("credentials: \(credentials)")
-        case .Failure(let error):
+        case .failure(let error):
             print(error)
         }
     }
