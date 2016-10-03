@@ -23,8 +23,12 @@
 import Quick
 import Nimble
 import SafariServices
+import OHHTTPStubs
 
 @testable import Auth0
+
+private let ClientId = "CLIENT_ID"
+private let Domain = NSURL(string: "https://samples.auth0.com")!
 
 class MockSafariViewController: SFSafariViewController {
     var presenting: UIViewController? = nil
@@ -82,34 +86,83 @@ class OAuth2SessionSpec: QuickSpec {
                 expect(session.resume(NSURL(string: "https://auth0.com/mobile?access_token=ATOKEN&token_type=bearer")!)).to(beFalse())
             }
 
-            it("should return credentials from query string") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
-                expect(result).toEventually(haveCredentials())
+            context("response_type=token") {
+
+                let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: ImplicitGrant(), finish: callback, logger: nil)
+
+                it("should not return credentials from query string") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
+                    expect(result).toEventuallyNot(haveCredentials())
+                }
+
+                it("should return credentials from fragment") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=ATOKEN&token_type=bearer")!)
+                    expect(result).toEventually(haveCredentials())
+                }
+
+                it("should not return error from query string") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
+                    expect(result).toEventuallyNot(haveAuthenticationError(code: "error", description: "description"))
+                }
+
+                it("should return error from fragment") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback#error=error&error_description=description")!)
+                    expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
+                }
+
+                it("should fail if values from fragment are invalid") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=")!)
+                    expect(result).toEventually(beFailure())
+                }
             }
 
-            it("should return credentials from query when fragment is available") {
-                let _ = session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer#_=_")!)
-                expect(result).toEventually(haveCredentials())
-            }
+            context("response_type=code") {
 
-            it("should return credentials from fragment") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=ATOKEN&token_type=bearer")!)
-                expect(result).toEventually(haveCredentials())
-            }
+                let generator = A0SHA256ChallengeGenerator()
+                let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: PKCE(authentication: Auth0Authentication(clientId: ClientId, url: Domain), redirectURL: RedirectURL, generator: generator), finish: callback, logger: nil)
+                let code = "123456"
 
-            it("should return error from query string") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
-                expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
-            }
+                beforeEach {
+                    stub(isToken("samples.auth0.com") && hasAtLeast(["code": code, "code_verifier": generator.verifier, "grant_type": "authorization_code", "redirect_uri": RedirectURL.absoluteString!])) { _ in return authResponse(accessToken: "AT", idToken: "IDT") }.name = "Code Exchange Auth"
 
-            it("should return error from fragment") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback#error=error&error_description=description")!)
-                expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
-            }
+                }
 
-            it("should fail if values from fragment are invalid") {
-                session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=")!)
-                expect(result).toEventually(beFailure())
+                afterEach {
+                    OHHTTPStubs.removeAllStubs()
+                    stub(isHost("samples.auth0.com")) { _ in
+                        return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                        }.name = "YOU SHALL NOT PASS!"
+                }
+
+                it("should return credentials from query string") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback?code=\(code)")!)
+                    expect(result).toEventually(haveCredentials())
+                }
+
+                it("should return credentials from query when fragment is available") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback?code=\(code)#_=_")!)
+                    expect(result).toEventually(haveCredentials())
+                }
+
+                it("should return credentials from fragment") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback#code=\(code)")!)
+                    expect(result).toEventually(haveCredentials())
+                }
+
+                it("should return error from query string") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
+                    expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
+                }
+
+                it("should return error from fragment") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback#error=error&error_description=description")!)
+                    expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
+                }
+
+                it("should fail if values from fragment are invalid") {
+                    let _ = session.resume(NSURL(string: "https://samples.auth0.com/callback#code=")!)
+                    expect(result).toEventually(beFailure())
+                }
             }
 
             context("with state") {

@@ -25,6 +25,7 @@ import Foundation
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
     func credentials(values: [String: String], callback: Result<Credentials> -> ())
+    func values(fromComponents components: NSURLComponents) -> [String: String]
 }
 
 struct ImplicitGrant: OAuth2Grant {
@@ -41,6 +42,9 @@ struct ImplicitGrant: OAuth2Grant {
         callback(.Success(result: credentials))
     }
 
+    func values(fromComponents components: NSURLComponents) -> [String : String] {
+        return components.a0_fragmentValues
+    }
 }
 
 struct PKCE: OAuth2Grant {
@@ -85,5 +89,11 @@ struct PKCE: OAuth2Grant {
                     callback(result)
                 }
             }
+    }
+
+    func values(fromComponents components: NSURLComponents) -> [String : String] {
+        var items = components.a0_fragmentValues
+        components.a0_queryValues.forEach { items[$0] = $1 }
+        return items
     }
 }
