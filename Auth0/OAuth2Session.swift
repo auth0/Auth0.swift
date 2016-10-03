@@ -83,8 +83,9 @@ class SafariSession: NSObject, OAuth2Session {
                 self.finish(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
                 return false
             }
-        let items = components.a0_values
-        guard self.state == nil || items["state"] == self.state else { return false }
+        var items = components.a0_fragmentValues
+        components.a0_queryValues.forEach { items[$0] = $1 }
+        guard has(state: self.state, inItems: items) else { return false }
         if let _ = items["error"] {
             self.finish(.failure(error: AuthenticationError(info: items, statusCode: 0)))
         } else {
@@ -95,6 +96,10 @@ class SafariSession: NSObject, OAuth2Session {
 
     func cancel() {
         self.finish(Result.failure(error: WebAuthError.userCancelled))
+    }
+
+    private func has(state: String?, inItems items: [String: String]) -> Bool {
+        return state == nil || items["state"] == state
     }
 }
 
