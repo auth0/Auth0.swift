@@ -23,14 +23,6 @@
 import Foundation
 
 extension NSURLComponents {
-    var a0_values: [String: String] {
-        if self.fragment != nil {
-            return self.a0_fragmentValues
-        } else {
-            return self.a0_queryValues
-        }
-    }
-
     var a0_fragmentValues: [String: String] {
         var dict: [String: String] = [:]
         let items = fragment?.componentsSeparatedByString("&")

@@ -87,10 +87,16 @@ class OAuth2SessionSpec: QuickSpec {
                 expect(result).toEventually(haveCredentials())
             }
 
+            it("should return credentials from query when fragment is available") {
+                let _ = session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer#_=_")!)
+                expect(result).toEventually(haveCredentials())
+            }
+
             it("should return credentials from fragment") {
                 session.resume(NSURL(string: "https://samples.auth0.com/callback#access_token=ATOKEN&token_type=bearer")!)
                 expect(result).toEventually(haveCredentials())
             }
+
             it("should return error from query string") {
                 session.resume(NSURL(string: "https://samples.auth0.com/callback?error=error&error_description=description")!)
                 expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
