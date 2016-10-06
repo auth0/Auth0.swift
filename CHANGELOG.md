@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.0.0](https://github.com/auth0/Auth0.swift/tree/1.0.0) (2016-10-06)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-rc.4...1.0.0)
+
+**Closed issues**
+- Facebook Login web page does not redirect to the application at the first login [\#51](https://github.com/auth0/Auth0.swift/issues/51)
+
+**Fixed**
+- Properly parse authorize response [\#56](https://github.com/auth0/Auth0.swift/pull/56) ([hzalaz](https://github.com/hzalaz))
+
 ## [1.0.0-rc.4](https://github.com/auth0/Auth0.swift/tree/1.0.0-rc.4) (2016-09-18)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-rc.3...1.0.0-rc.4)
 
