@@ -22,7 +22,7 @@ Auth0.swift is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod "Auth0", :git => 'https://github.com/auth0/Auth0.swift.git', :branch => '1.0.0-rc.4@swift-2.3'
+pod "Auth0", :git => 'https://github.com/auth0/Auth0.swift.git', :branch => 'v1@swift-2.3'
 ```
 
 ###Carthage
@@ -30,7 +30,7 @@ pod "Auth0", :git => 'https://github.com/auth0/Auth0.swift.git', :branch => '1.0
 In your Cartfile add this line
 
 ```
-github "auth0/Auth0.swift" "1.0.0-rc.4@swift-2.3"
+github "auth0/Auth0.swift" "v1@swift-2.3"
 ```
 
 ## Usage
