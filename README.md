@@ -16,12 +16,14 @@ iOS 9+ and Xcode 8 (Swift 3.0)
 
 > For Swift 2.3 you need to use [v1@swift-2.3](https://github.com/auth0/Auth0.swift/tree/v1@swift-2.3) branch
 
+If using CocoaPods we recommend version 1.1.0 or later.
+
 ## Installation
 
 ###CocoaPods
 
-Auth0.swift is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+Auth0.swift is available through [CocoaPods](http://cocoapods.org). 
+To install it, simply add the following line to your Podfile:
 
 ```ruby
 pod "Auth0", '1.0.0'
