@@ -356,7 +356,7 @@ public enum PasswordlessType: String {
     case AndroidLink = "link_android"
 }
 
-extension Authentication {
+public extension Authentication {
 
     /**
      Logs in an user using email|username and password using a Database and Passwordless connection
@@ -364,7 +364,7 @@ extension Authentication {
      ```
      Auth0
         .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(emailOrUsername: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .login(usernameOrEmail: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
         .start { result in
             switch result {
             case .Success(let credentials):
@@ -380,7 +380,7 @@ extension Authentication {
      ```
      Auth0
         .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(emailOrUsername: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
+        .login(usernameOrEmail: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
         .start { print($0) }
      ```
 
@@ -407,7 +407,7 @@ extension Authentication {
      - returns: authentication request that will yield Auth0 User Credentials
      - seeAlso: Credentials
      */
-    func login(usernameOrEmail username: String, password: String, multifactorCode: String? = nil, connection: String, scope: String = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
+    public func login(usernameOrEmail username: String, password: String, multifactorCode: String? = nil, connection: String, scope: String = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, multifactorCode: multifactorCode, connection: connection, scope: scope, parameters: parameters)
     }
 
@@ -447,7 +447,7 @@ extension Authentication {
 
      - returns: request that will yield a created database user (just email, username and email verified flag)
      */
-    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+    public func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         return self.createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
     }
 
