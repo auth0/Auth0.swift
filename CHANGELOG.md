@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.0.1](https://github.com/auth0/Auth0.swift/tree/1.0.1) (2016-11-23)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0...1.0.1)
+
+**Fixed**
+- Expose authentication wrapper [\#60](https://github.com/auth0/Auth0.swift/pull/60) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.0.0](https://github.com/auth0/Auth0.swift/tree/1.0.0) (2016-10-06)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0-rc.4...1.0.0)
 
