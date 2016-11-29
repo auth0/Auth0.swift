@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */; };
 		5F06DDA51CC451540011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		5F06DDB41CC451700011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
 		5F06DDC91CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
@@ -283,6 +284,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResponseType.swift; path = Auth0/ResponseType.swift; sourceTree = SOURCE_ROOT; };
 		5F049B6C1CB42C29006F6C05 /* Auth0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Auth0.h; path = Auth0/Auth0.h; sourceTree = "<group>"; };
 		5F049B6E1CB42C29006F6C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Auth0/Info.plist; sourceTree = "<group>"; };
 		5F06DD781CC448B10011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -457,6 +459,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5BD4A9CC1DEC6ECE00D6D7AE /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
 		5F049B5F1CB42C29006F6C05 = {
 			isa = PBXGroup;
 			children = (
@@ -580,6 +590,7 @@
 		5F3965C01CF679B500CDE7C0 /* WebAuth */ = {
 			isa = PBXGroup;
 			children = (
+				5BD4A9CC1DEC6ECE00D6D7AE /* Models */,
 				5FCAB1771D0901BA00331C84 /* ObjectiveC */,
 				5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */,
 				5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */,
@@ -1170,6 +1181,7 @@
 				5FDE87511D8A424700EA27DC /* _ObjectiveAuthenticationAPI.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* SessionStorage.swift in Sources */,
 				5FDE87611D8A424700EA27DC /* Identity.swift in Sources */,
+				5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */,
 				5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */,
 				5FAE9C911D8878D400A871CE /* SafariWebAuth.swift in Sources */,
 				5FDE875D1D8A424700EA27DC /* AuthenticationError.swift in Sources */,

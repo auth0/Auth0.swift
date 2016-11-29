@@ -51,6 +51,12 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error.domain) == "com.auth0.webauth"
                 expect(error.code) == 0
             }
+
+            it("should build error for no nonce supplied") {
+                let error = WebAuthError.noNonceProvided as NSError
+                expect(error.domain) == "com.auth0.webauth"
+                expect(error.code) == 1
+            }
         }
     }
 }

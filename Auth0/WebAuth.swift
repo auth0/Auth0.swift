@@ -138,6 +138,19 @@ public protocol WebAuth: Trackable, Loggable {
      */
     func parameters(_ parameters: [String: String]) -> Self
 
+    /// Setup the response types to be used for authentcation
+    ///
+    /// - Parameter responseType: Array of response types
+    /// - Returns: the same OAuth2 instance to allow method chaining
+    func responseType(_ responseType: [ResponseType]) -> Self
+
+    /// Add nonce paramater for authentication, this is a requirement for
+    /// when response type .id_token is specified.
+    ///
+    /// - Parameter nonce: nonce string
+    /// - Returns: the same OAuth2 instance to allow method chaining
+    func nonce(_ nonce: String) -> Self
+
     /**
      Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)
 

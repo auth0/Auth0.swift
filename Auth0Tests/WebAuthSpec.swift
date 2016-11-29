@@ -94,7 +94,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(),
-                ]
+                    ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -104,7 +104,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection": "facebook"]),
-                ]
+                    ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -125,7 +125,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["state": state]),
-                    ]
+                ]
             }
 
             it("should override default values") {
@@ -133,6 +133,34 @@ class WebAuthSpec: QuickSpec {
                 let state = auth.state!
                 let url = auth.parameters(["state": "value"]).buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults)
                 expect(url.a0_components?.queryItems).toNot(containItem(withName: "state", value: state))
+            }
+
+            context("response types") {
+
+                itBehavesLike(ValidAuthorizeURLExample) {
+                    return [
+                        "url": newWebAuth()
+                            .responseType([.id_token])
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                        "domain": Domain,
+                        "query": defaultQuery(withParameters: ["response_type": "id_token"]),
+                        ]
+                }
+
+            }
+
+            context("nonce") {
+
+                itBehavesLike(ValidAuthorizeURLExample) {
+                    return [
+                        "url": newWebAuth()
+                            .nonce("12345678")
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                        "domain": Domain,
+                        "query": defaultQuery(withParameters: ["nonce": "12345678"]),
+                        ]
+                }
+                
             }
         }
 
@@ -150,7 +178,7 @@ class WebAuthSpec: QuickSpec {
 
         }
 
-        
+
         describe("safari") {
 
             var result: Result<Credentials>?

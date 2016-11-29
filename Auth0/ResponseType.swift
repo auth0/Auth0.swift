@@ -1,4 +1,4 @@
-// Credentials.swift
+// ResponseType.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,30 +22,8 @@
 
 import Foundation
 
-/**
- Auth0 users' credentials
- */
-@objc(A0Credentials)
-public class Credentials: NSObject, JSONObjectPayload {
-
-    public let accessToken: String?
-    public let tokenType: String?
-    public let idToken: String?
-    public let refreshToken: String?
-    public var hasToken: Bool {
-        if self.idToken != nil || ( self.accessToken != nil && self.tokenType != nil) { return true }
-        return false
-    }
-
-    required public init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil) {
-        self.accessToken = accessToken
-        self.tokenType = tokenType
-        self.idToken = idToken
-        self.refreshToken = refreshToken
-    }
-
-    convenience required public init?(json: [String: Any]) {
-        self.init(accessToken: json["access_token"] as? String, tokenType: json["token_type"] as? String, idToken: json["id_token"] as? String, refreshToken: json["refresh_token"] as? String)
-    }
-
+public enum ResponseType: String {
+    case token = "token"
+    case id_token = "id_token"
+    case code = "code"
 }

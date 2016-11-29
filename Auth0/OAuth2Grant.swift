@@ -33,7 +33,7 @@ struct ImplicitGrant: OAuth2Grant {
     let defaults: [String : String] = ["response_type": "token"]
 
     func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
-        guard let credentials = Credentials(json: values as [String : Any]) else {
+        guard let credentials = Credentials(json: values as [String : Any]), credentials.hasToken else {
             let data = try! JSONSerialization.data(withJSONObject: values, options: [])
             let string = String(data: data, encoding: .utf8)
             callback(.failure(error: AuthenticationError(string: string)))

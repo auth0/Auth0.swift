@@ -76,6 +76,20 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
+    func responseType(_ responseType: [ResponseType]) -> Self {
+        if !responseType.contains(.code) {
+            _ = self.usingImplicitGrant()
+        }
+        let response = responseType.reduce(String()) { $0 + $1.rawValue + " "}
+        self.parameters["response_type"] = String(response.characters.dropLast(1))
+        return self
+    }
+
+    func nonce(_ nonce: String) -> Self {
+        self.parameters["nonce"] = nonce
+        return self
+    }
+
     func usingImplicitGrant() -> Self {
         self.usePKCE = false
         return self
@@ -87,6 +101,11 @@ class SafariWebAuth: WebAuth {
             , !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
             else {
                 return callback(Result.failure(error: WebAuthError.noBundleIdentifierFound))
+        }
+        if let response = self.parameters["response_type"], response.contains(ResponseType.id_token.rawValue) {
+            guard self.parameters["nonce"] != nil else {
+                return callback(Result.failure(error: WebAuthError.noNonceProvided))
+            }
         }
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
@@ -163,7 +182,7 @@ private func generateDefaultState() -> String? {
     let result = data.withUnsafeMutableBytes { (bytes: UnsafeMutablePointer<UInt8>) -> Int in
         return Int(SecRandomCopyBytes(kSecRandomDefault, data.count, bytes))
     }
-
+    
     guard result == 0 else { return nil }
     return data.a0_encodeBase64URLSafe()
 }

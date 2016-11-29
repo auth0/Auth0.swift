@@ -36,12 +36,12 @@ class CredentialsSpec: QuickSpec {
 
             it("should return nil when missing access_token") {
                 let credentials = Credentials(json: ["token_type": Bearer])
-                expect(credentials).to(beNil())
+                expect(credentials?.hasToken).to(beFalse())
             }
 
             it("should return nil when missing toke_type") {
                 let credentials = Credentials(json: ["access_token": AccessToken])
-                expect(credentials).to(beNil())
+                expect(credentials?.hasToken).to(beFalse())
             }
 
             it("should have all tokens and token_type") {

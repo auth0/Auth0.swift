@@ -29,12 +29,14 @@ import Foundation
  - CannotDismissWebAuthController: When trying to dismiss WebAuth controller, no presenter controller could be found.
  - UserCancelled:                  User cancelled the web-based authentication, e.g. tapped the "Done" button in SFSafariViewController
  - PKCENotAllowed:                 PKCE for the supplied Auth0 ClientId was not allowed. You need to set the `Token Endpoint Authentication Method` to `None` in your Auth0 Dashboard
+ - noNonceProvided:                A nonce value must be provided to use the response type of id_token
  */
 public enum WebAuthError: CustomNSError {
     case noBundleIdentifierFound
     case cannotDismissWebAuthController
     case userCancelled
     case pkceNotAllowed(String)
+    case noNonceProvided
 
     static let genericFoundationCode = 1
     static let cancelledFoundationCode = 0
@@ -61,6 +63,11 @@ public enum WebAuthError: CustomNSError {
         case .pkceNotAllowed(let message):
             return [
                 NSLocalizedDescriptionKey: message,
+                WebAuthError.infoKey: self
+            ]
+        case .noNonceProvided:
+            return [
+                NSLocalizedDescriptionKey: "You must provide a nonce value for the id_token response type",
                 WebAuthError.infoKey: self
             ]
         default:
