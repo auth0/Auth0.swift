@@ -22,8 +22,26 @@
 
 import Foundation
 
-public enum ResponseType: String {
-    case token = "token"
-    case id_token = "id_token"
-    case code = "code"
+public struct ResponseOptions: OptionSet {
+    public let rawValue: Int
+    public let label: String?
+
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+        self.label = nil
+    }
+
+    init(rawValue: Int, label: String) {
+        self.rawValue = rawValue
+        self.label = label
+    }
+
+    public static let token     = ResponseOptions(rawValue: 1 << 0, label: "token")
+    public static let id_token  = ResponseOptions(rawValue: 1 << 1, label: "id_token")
+    public static let code      = ResponseOptions(rawValue: 1 << 2, label: "code")
+}
+
+// TODO: Expand with descriptive error messages
+public enum ResponseError: Error {
+    case idTokenMissing, tokenDecodeFailed, nonceDoesNotMatch, tokenIssue
 }

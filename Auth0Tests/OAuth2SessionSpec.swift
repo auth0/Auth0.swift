@@ -88,7 +88,7 @@ class OAuth2SessionSpec: QuickSpec {
 
             context("response_type=token") {
 
-                let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: ImplicitGrant(), finish: callback, logger: nil)
+                let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: ImplicitGrant() , finish: callback, logger: nil)
 
                 it("should not return credentials from query string") {
                     let _ = session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)

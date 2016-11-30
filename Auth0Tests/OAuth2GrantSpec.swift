@@ -59,7 +59,7 @@ class OAuth2GrantSpec: QuickSpec {
             }
 
             it("should specify response type") {
-                expect(implicit.defaults["response_type"]) == "token"
+                expect(implicit.response.contains(.token)).to(beTrue())
             }
         }
 

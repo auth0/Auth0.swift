@@ -140,9 +140,9 @@ public protocol WebAuth: Trackable, Loggable {
 
     /// Setup the response types to be used for authentcation
     ///
-    /// - Parameter responseType: Array of response types
+    /// - Parameter response: Array of ResponseOptions
     /// - Returns: the same OAuth2 instance to allow method chaining
-    func responseType(_ responseType: [ResponseType]) -> Self
+    func response(_ response: [ResponseOptions]) -> Self
 
     /// Add nonce paramater for authentication, this is a requirement for
     /// when response type .id_token is specified.
@@ -156,6 +156,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - returns: the same OAuth2 instance to allow method chaining
      */
+    @available(*, deprecated, message: "use response([.token])")
     func usingImplicitGrant() -> Self
 
     /**

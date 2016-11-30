@@ -32,10 +32,6 @@ public class Credentials: NSObject, JSONObjectPayload {
     public let tokenType: String?
     public let idToken: String?
     public let refreshToken: String?
-    public var hasToken: Bool {
-        if self.idToken != nil || ( self.accessToken != nil && self.tokenType != nil) { return true }
-        return false
-    }
 
     required public init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil) {
         self.accessToken = accessToken

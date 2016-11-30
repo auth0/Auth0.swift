@@ -134,34 +134,6 @@ class WebAuthSpec: QuickSpec {
                 let url = auth.parameters(["state": "value"]).buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults)
                 expect(url.a0_components?.queryItems).toNot(containItem(withName: "state", value: state))
             }
-
-            context("response types") {
-
-                itBehavesLike(ValidAuthorizeURLExample) {
-                    return [
-                        "url": newWebAuth()
-                            .responseType([.id_token])
-                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
-                        "domain": Domain,
-                        "query": defaultQuery(withParameters: ["response_type": "id_token"]),
-                        ]
-                }
-
-            }
-
-            context("nonce") {
-
-                itBehavesLike(ValidAuthorizeURLExample) {
-                    return [
-                        "url": newWebAuth()
-                            .nonce("12345678")
-                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
-                        "domain": Domain,
-                        "query": defaultQuery(withParameters: ["nonce": "12345678"]),
-                        ]
-                }
-                
-            }
         }
 
         describe("redirect uri") {

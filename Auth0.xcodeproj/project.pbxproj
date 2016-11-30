@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */; };
+		5BA968F41DEE31A00012E862 /* JWTDecode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BA968F31DEE31A00012E862 /* JWTDecode.framework */; };
+		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseOptions.swift */; };
 		5F06DDA51CC451540011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		5F06DDB41CC451700011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
 		5F06DDC91CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
@@ -284,7 +285,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResponseType.swift; path = Auth0/ResponseType.swift; sourceTree = SOURCE_ROOT; };
+		5BA968F31DEE31A00012E862 /* JWTDecode.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JWTDecode.framework; path = Carthage/Build/iOS/JWTDecode.framework; sourceTree = "<group>"; };
+		5BD4A9CD1DEC6EFA00D6D7AE /* ResponseOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResponseOptions.swift; path = Auth0/ResponseOptions.swift; sourceTree = SOURCE_ROOT; };
 		5F049B6C1CB42C29006F6C05 /* Auth0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Auth0.h; path = Auth0/Auth0.h; sourceTree = "<group>"; };
 		5F049B6E1CB42C29006F6C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Auth0/Info.plist; sourceTree = "<group>"; };
 		5F06DD781CC448B10011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -452,6 +454,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5BA968F41DEE31A00012E862 /* JWTDecode.framework in Frameworks */,
 				5F53F5D11CFD19A400476A46 /* Auth0.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -462,7 +465,7 @@
 		5BD4A9CC1DEC6ECE00D6D7AE /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */,
+				5BD4A9CD1DEC6EFA00D6D7AE /* ResponseOptions.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -544,6 +547,7 @@
 		5F06DDC31CC571480011842B /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				5BA968F31DEE31A00012E862 /* JWTDecode.framework */,
 				5F06DDBA1CC571290011842B /* Quick.framework */,
 				5F06DDBB1CC571290011842B /* OHHTTPStubs.framework */,
 				5F06DDBC1CC571290011842B /* Nimble.framework */,
@@ -976,6 +980,7 @@
 				5F3965C31CF67DD800CDE7C0 /* Sources */,
 				5F3965C41CF67DD800CDE7C0 /* Frameworks */,
 				5F3965C51CF67DD800CDE7C0 /* Resources */,
+				5BA968F61DEE33190012E862 /* Carthage */,
 				5F53F5CB1CFCDC2500476A46 /* Auth0 */,
 			);
 			buildRules = (
@@ -1128,6 +1133,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5BA968F61DEE33190012E862 /* Carthage */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/JWTDecode.framework",
+			);
+			name = Carthage;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
 		5F53F5CB1CFCDC2500476A46 /* Auth0 */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1181,7 +1201,7 @@
 				5FDE87511D8A424700EA27DC /* _ObjectiveAuthenticationAPI.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* SessionStorage.swift in Sources */,
 				5FDE87611D8A424700EA27DC /* Identity.swift in Sources */,
-				5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */,
+				5BD4A9CE1DEC6EFA00D6D7AE /* ResponseOptions.swift in Sources */,
 				5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */,
 				5FAE9C911D8878D400A871CE /* SafariWebAuth.swift in Sources */,
 				5FDE875D1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
@@ -1880,6 +1900,10 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 86WQXF56BC;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1898,6 +1922,10 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

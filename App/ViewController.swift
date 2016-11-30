@@ -37,7 +37,7 @@ class ViewController: UIViewController {
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
-            .usingImplicitGrant()
+            .response([.token])
             .start(onAuth)
     }
 
@@ -54,8 +54,8 @@ class ViewController: UIViewController {
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
-            .responseType([.id_token])
-            .nonce("abc1234")
+            .response([.token, .id_token])
+            .nonce("cba321")
             .start(onAuth)
     }
 }

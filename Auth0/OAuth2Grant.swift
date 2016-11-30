@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 import Foundation
+import JWTDecode
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
@@ -30,10 +31,50 @@ protocol OAuth2Grant {
 
 struct ImplicitGrant: OAuth2Grant {
 
-    let defaults: [String : String] = ["response_type": "token"]
+    let defaults: [String : String]
+    let response: [ResponseOptions]
+
+    // Expected default behaviour in Unit Tests
+    init() {
+        self.init(response: [.token])
+    }
+
+    init(response: [ResponseOptions], nonce: String? = nil) {
+        self.response = response
+        if let nonce = nonce {
+            self.defaults = [ "response_type" : self.response.map { $0.label! }.joined(separator: " "),
+                              "nonce" : nonce]
+        } else {
+            self.defaults = [ "response_type" : self.response.map { $0.label! }.joined(separator: " ") ]
+        }
+    }
 
     func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
-        guard let credentials = Credentials(json: values as [String : Any]), credentials.hasToken else {
+        // id token reponse expectations and JWT validation, nonce validation
+        if response.contains(.id_token) {
+            guard let id_token = values["id_token"] else {
+                return callback(.failure(error: ResponseError.idTokenMissing))
+            }
+
+            do {
+                let jwt = try decode(jwt: id_token)
+                guard let nonceClaim = jwt.claim(name: "nonce").string, let nonce = self.defaults["nonce"],
+                    nonceClaim == nonce else {
+                        return callback(.failure(error: ResponseError.nonceDoesNotMatch))
+                }
+            } catch {
+                return callback(.failure(error: ResponseError.tokenDecodeFailed))
+            }
+        }
+
+        // token response expectations
+        if response.contains(.token) {
+            guard values["access_token"] != nil && values["token_type"] != nil else {
+                return callback(.failure(error: ResponseError.tokenIssue))
+            }
+        }
+
+        guard let credentials = Credentials(json: values as [String : Any]) else {
             let data = try! JSONSerialization.data(withJSONObject: values, options: [])
             let string = String(data: data, encoding: .utf8)
             callback(.failure(error: AuthenticationError(string: string)))
@@ -45,6 +86,7 @@ struct ImplicitGrant: OAuth2Grant {
     func values(fromComponents components: URLComponents) -> [String : String] {
         return components.a0_fragmentValues
     }
+
 }
 
 struct PKCE: OAuth2Grant {
@@ -76,7 +118,7 @@ struct PKCE: OAuth2Grant {
                 let data = try! JSONSerialization.data(withJSONObject: values, options: [])
                 let string = String(data: data, encoding: .utf8)
                 return callback(.failure(error: AuthenticationError(string: string)))
-            }
+        }
         let clientId = self.authentication.clientId
         self.authentication
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
@@ -88,7 +130,7 @@ struct PKCE: OAuth2Grant {
                 } else {
                     callback(result)
                 }
-            }
+        }
     }
 
     func values(fromComponents components: URLComponents) -> [String : String] {

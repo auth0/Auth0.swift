@@ -38,6 +38,8 @@ class SafariWebAuth: WebAuth {
     var parameters: [String: String] = [:]
     var universalLink = false
     var usePKCE = true
+    var response: [ResponseOptions] = []
+    var nonce: String?
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance, telemetry: telemetry)
@@ -76,23 +78,19 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
-    func responseType(_ responseType: [ResponseType]) -> Self {
-        if !responseType.contains(.code) {
-            _ = self.usingImplicitGrant()
-        }
-        let response = responseType.reduce(String()) { $0 + $1.rawValue + " "}
-        self.parameters["response_type"] = String(response.characters.dropLast(1))
+    func response(_ response: [ResponseOptions]) -> Self {
+        if response.contains(.id_token) || response.contains(.token) { self.usePKCE = false }
+        self.response = response
         return self
     }
 
     func nonce(_ nonce: String) -> Self {
-        self.parameters["nonce"] = nonce
+        self.nonce = nonce
         return self
     }
 
     func usingImplicitGrant() -> Self {
-        self.usePKCE = false
-        return self
+        return self.response([.token])
     }
 
     func start(_ callback: @escaping (Result<Credentials>) -> ()) {
@@ -102,10 +100,8 @@ class SafariWebAuth: WebAuth {
             else {
                 return callback(Result.failure(error: WebAuthError.noBundleIdentifierFound))
         }
-        if let response = self.parameters["response_type"], response.contains(ResponseType.id_token.rawValue) {
-            guard self.parameters["nonce"] != nil else {
-                return callback(Result.failure(error: WebAuthError.noNonceProvided))
-            }
+        if self.response.contains(.id_token) {
+            guard self.nonce != nil else { return callback(Result.failure(error: WebAuthError.noNonceProvided)) }
         }
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
@@ -161,7 +157,11 @@ class SafariWebAuth: WebAuth {
             authentication.logger = self.logger
             return PKCE(authentication: authentication, redirectURL: redirectURL)
         } else {
-            return ImplicitGrant()
+            if let nonce = self.nonce, self.response.contains(.id_token) {
+                return ImplicitGrant(response: self.response, nonce: nonce)
+            } else {
+                return ImplicitGrant(response: self.response)
+            }
         }
     }
 
