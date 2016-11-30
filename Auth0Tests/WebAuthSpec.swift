@@ -72,7 +72,7 @@ private func newWebAuth() -> SafariWebAuth {
 private func defaultQuery(withParameters parameters: [String: String] = [:]) -> [String: String] {
     var query = [
         "client_id": ClientId,
-        "response_type": "token",
+        "response_type": "code",
         "redirect_uri": RedirectURL.absoluteString,
         "scope": "openid",
         ]
@@ -80,7 +80,7 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
     return query
 }
 
-private let defaults = ["response_type": "token"]
+private let defaults = ["response_type": "code"]
 
 class WebAuthSpec: QuickSpec {
 
@@ -133,6 +133,47 @@ class WebAuthSpec: QuickSpec {
                 let state = auth.state!
                 let url = auth.parameters(["state": "value"]).buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults)
                 expect(url.a0_components?.queryItems).toNot(containItem(withName: "state", value: state))
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .response([.id_token])
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["response_type": "id_token"]),
+                    ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .response([.token])
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["response_type": "token"]),
+                    ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .response([.id_token, .token])
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["response_type": "id_token token"]),
+                    ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .response([.id_token])
+                        .nonce("abc1234")
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["nonce": "abc1234", "response_type" : "id_token"]),
+                    ]
             }
         }
 

@@ -54,8 +54,8 @@ class ViewController: UIViewController {
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
-            .response([.token, .id_token])
-            .nonce("cba321")
+            .response([.id_token, .token])
+            .nonce("abc1234")
             .start(onAuth)
     }
 }

@@ -38,7 +38,7 @@ class SafariWebAuth: WebAuth {
     var parameters: [String: String] = [:]
     var universalLink = false
     var usePKCE = true
-    var response: [ResponseOptions] = []
+    var response: [ResponseOptions] = [.code]
     var nonce: String?
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
@@ -79,7 +79,7 @@ class SafariWebAuth: WebAuth {
     }
 
     func response(_ response: [ResponseOptions]) -> Self {
-        if response.contains(.id_token) || response.contains(.token) { self.usePKCE = false }
+        if !response.contains(.code) { self.usePKCE = false }
         self.response = response
         return self
     }
@@ -144,6 +144,10 @@ class SafariWebAuth: WebAuth {
         entries["redirect_uri"] = redirectURL.absoluteString
         entries["scope"] = "openid"
         entries["state"] = self.state
+        entries["response_type"] = self.response.map { $0.label! }.joined(separator: " ")
+        if self.response.contains(.id_token) {
+            entries["nonce"] = self.nonce
+        }
         self.parameters.forEach { entries[$0] = $1 }
 
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }

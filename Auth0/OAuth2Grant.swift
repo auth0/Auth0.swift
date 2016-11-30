@@ -34,18 +34,12 @@ struct ImplicitGrant: OAuth2Grant {
     let defaults: [String : String]
     let response: [ResponseOptions]
 
-    // Expected default behaviour in Unit Tests
-    init() {
-        self.init(response: [.token])
-    }
-
-    init(response: [ResponseOptions], nonce: String? = nil) {
+    init(response: [ResponseOptions] = [.token], nonce: String? = nil) {
         self.response = response
         if let nonce = nonce {
-            self.defaults = [ "response_type" : self.response.map { $0.label! }.joined(separator: " "),
-                              "nonce" : nonce]
+            self.defaults = [ "nonce" : nonce]
         } else {
-            self.defaults = [ "response_type" : self.response.map { $0.label! }.joined(separator: " ") ]
+            self.defaults = [:]
         }
     }
 

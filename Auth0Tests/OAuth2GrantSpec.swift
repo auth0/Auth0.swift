@@ -33,6 +33,7 @@ class OAuth2GrantSpec: QuickSpec {
         describe("ImplicitGrant") {
 
             var implicit: ImplicitGrant!
+            let idToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2JydWNrZS5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTQwODYzMzgzMTQyMjM5NDk2MzMiLCJhdWQiOiJZTjlTQ0hwcWY4dUxScFpia0xmZWhnbXFsQU9iUGdYTCIsImV4cCI6MTQ4MDU1NDg0MywiaWF0IjoxNDgwNTE4ODQzLCJub25jZSI6ImNiYTMyMSJ9.msDkQLVNK_urtbJJjb8h2ku-a9GVYgUFN9MvTTlO-v0"
 
             beforeEach {
                 implicit = ImplicitGrant()
@@ -61,6 +62,56 @@ class OAuth2GrantSpec: QuickSpec {
             it("should specify response type") {
                 expect(implicit.response.contains(.token)).to(beTrue())
             }
+
+            describe("ImplicitGrant with id_token") {
+
+                beforeEach {
+                    implicit = ImplicitGrant(response: [.id_token], nonce: "cba321")
+                }
+
+                it("should build credentials") {
+                    let values = ["id_token": idToken]
+                    waitUntil { done in
+                        implicit.credentials(from: values) {
+                            expect($0).to(haveCredentials())
+                            done()
+                        }
+                    }
+                }
+
+                it("should fail as invalid token") {
+                    let idToken = "notarealtoken"
+                    let values = ["id_token": idToken]
+                    waitUntil { done in
+                        implicit.credentials(from: values) {
+                            expect($0).to(beFailure())
+                            done()
+                        }
+                    }
+                }
+
+                it("should fail as no token") {
+                    let values = ["": ""]
+                    waitUntil { done in
+                        implicit.credentials(from: values) {
+                            expect($0).to(beFailure())
+                            done()
+                        }
+                    }
+                }
+
+                it("should fail as no nonce does not match") {
+                    implicit = ImplicitGrant(response: [.id_token], nonce: "nomatch")
+                    let values = ["id_token": idToken]
+                    waitUntil { done in
+                        implicit.credentials(from: values) {
+                            expect($0).to(beFailure())
+                            done()
+                        }
+                    }
+                }
+
+            }
         }
 
 
@@ -84,7 +135,7 @@ class OAuth2GrantSpec: QuickSpec {
                 OHHTTPStubs.removeAllStubs()
                 stub(condition: isHost(domain.host!)) { _ in
                     return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-                }.name = "YOU SHALL NOT PASS!"
+                    }.name = "YOU SHALL NOT PASS!"
             }
 
             it("shoud build credentials") {
@@ -122,12 +173,12 @@ class OAuth2GrantSpec: QuickSpec {
                 let generator = A0SHA256ChallengeGenerator()
                 let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, generator: generator)
-
+                
                 expect(pkce.defaults["code_challenge_method"]) == generator.method
                 expect(pkce.defaults["code_challenge"]) == generator.challenge
                 expect(pkce.verifier) == generator.verifier
             }
         }
     }
-
+    
 }
