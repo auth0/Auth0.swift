@@ -41,7 +41,3 @@ public struct ResponseOptions: OptionSet {
     public static let code      = ResponseOptions(rawValue: 1 << 2, label: "code")
 }
 
-// TODO: Expand with descriptive error messages and test for them
-public enum ResponseError: Error {
-    case idTokenMissing, tokenDecodeFailed, nonceDoesNotMatch, tokenIssue
-}

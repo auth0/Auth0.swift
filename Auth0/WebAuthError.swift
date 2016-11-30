@@ -38,6 +38,8 @@ public enum WebAuthError: CustomNSError {
     case pkceNotAllowed(String)
     case noNonceProvided
     case missingResponseParam(String)
+    case idTokenValidationFailed
+    case tokenValidationFailed
 
     static let genericFoundationCode = 1
     static let cancelledFoundationCode = 0
@@ -69,6 +71,16 @@ public enum WebAuthError: CustomNSError {
         case .noNonceProvided:
             return [
                 NSLocalizedDescriptionKey: "A nonce value must be supplied when response_type includes id_token in order to prevent replay attacks",
+                WebAuthError.infoKey: self
+            ]
+        case .idTokenValidationFailed:
+            return [
+                NSLocalizedDescriptionKey: "Could not validate the id_token",
+                WebAuthError.infoKey: self
+            ]
+        case .tokenValidationFailed:
+            return [
+                NSLocalizedDescriptionKey: "Could not validate the token",
                 WebAuthError.infoKey: self
             ]
         default:

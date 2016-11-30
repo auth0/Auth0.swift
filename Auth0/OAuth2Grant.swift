@@ -37,7 +37,7 @@ struct ImplicitGrant: OAuth2Grant {
     init(response: [ResponseOptions] = [.token], nonce: String? = nil) {
         self.response = response
         if let nonce = nonce {
-            self.defaults = [ "nonce" : nonce]
+            self.defaults = ["nonce" : nonce]
         } else {
             self.defaults = [:]
         }
@@ -46,25 +46,16 @@ struct ImplicitGrant: OAuth2Grant {
     func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
         // id token reponse expectations and JWT validation, nonce validation
         if response.contains(.id_token) {
-            guard let id_token = values["id_token"] else {
-                return callback(.failure(error: ResponseError.idTokenMissing))
-            }
-
-            do {
-                let jwt = try decode(jwt: id_token)
-                guard let nonceClaim = jwt.claim(name: "nonce").string, let nonce = self.defaults["nonce"],
-                    nonceClaim == nonce else {
-                        return callback(.failure(error: ResponseError.nonceDoesNotMatch))
-                }
-            } catch {
-                return callback(.failure(error: ResponseError.tokenDecodeFailed))
+            guard let id_token = values["id_token"], let nonce = self.defaults["nonce"],
+            validate(token: id_token, nonce: nonce) else {
+                return callback(.failure(error: WebAuthError.idTokenValidationFailed))
             }
         }
 
         // token response expectations
         if response.contains(.token) {
             guard values["access_token"] != nil && values["token_type"] != nil else {
-                return callback(.failure(error: ResponseError.tokenIssue))
+                return callback(.failure(error: WebAuthError.tokenValidationFailed))
             }
         }
 
@@ -132,4 +123,17 @@ struct PKCE: OAuth2Grant {
         components.a0_queryValues.forEach { items[$0] = $1 }
         return items
     }
+}
+
+private func validate(token: String, nonce: String) -> Bool {
+    do {
+        let jwt = try decode(jwt: token)
+        guard let nonceClaim = jwt.claim(name: "nonce").string,
+            nonceClaim == nonce else {
+                return false
+        }
+    } catch {
+        return false
+    }
+    return true
 }

@@ -39,7 +39,7 @@ class SafariWebAuth: WebAuth {
     var universalLink = false
     var usePKCE = true
     var response: [ResponseOptions] = [.code]
-    var nonce: String?
+    var nonce: String? = nil
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance, telemetry: telemetry)
@@ -161,11 +161,7 @@ class SafariWebAuth: WebAuth {
             authentication.logger = self.logger
             return PKCE(authentication: authentication, redirectURL: redirectURL)
         } else {
-            if let nonce = self.nonce, self.response.contains(.id_token) {
-                return ImplicitGrant(response: self.response, nonce: nonce)
-            } else {
-                return ImplicitGrant(response: self.response)
-            }
+            return ImplicitGrant(response: self.response, nonce: self.nonce)
         }
     }
 
