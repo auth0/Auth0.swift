@@ -66,7 +66,7 @@ To avoid specifying clientId & domain you can add a `Auth0.plist` file to your m
 Auth0
    .authentication()
    .login(
-       emailOrUsername: "support@auth0.com", 
+       usernameOrEmail: "support@auth0.com", 
        password: "a secret password", 
        connection: "Username-Password-Authentication"
        )
@@ -101,7 +101,7 @@ Auth0
 Auth0
    .authentication()
    .login(
-       emailOrUsername: "support@auth0.com", 
+       usernameOrEmail: "support@auth0.com", 
        password: "email OTP", 
        connection: "email"
        )

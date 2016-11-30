@@ -38,7 +38,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
         .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(emailOrUsername: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+        .login(usernameOrEmail: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
         .start { result in
             switch result {
             case .Success(let credentials):
@@ -54,7 +54,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
         .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(emailOrUsername: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
+        .login(usernameOrEmail: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
         .start { print($0) }
      ```
 
