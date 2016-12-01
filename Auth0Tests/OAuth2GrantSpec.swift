@@ -66,7 +66,7 @@ class OAuth2GrantSpec: QuickSpec {
             describe("ImplicitGrant with id_token") {
 
                 beforeEach {
-                    implicit = ImplicitGrant(responseType: [.id_token], nonce: "cba321")
+                    implicit = ImplicitGrant(responseType: [.idToken], nonce: "cba321")
                 }
 
                 it("should build credentials") {
@@ -101,7 +101,7 @@ class OAuth2GrantSpec: QuickSpec {
                 }
 
                 it("should fail as no nonce does not match") {
-                    implicit = ImplicitGrant(responseType: [.id_token], nonce: "nomatch")
+                    implicit = ImplicitGrant(responseType: [.idToken], nonce: "nomatch")
                     let values = ["id_token": idToken]
                     waitUntil { done in
                         implicit.credentials(from: values) {

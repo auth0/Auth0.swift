@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5BA968F41DEE31A00012E862 /* JWTDecode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BA968F31DEE31A00012E862 /* JWTDecode.framework */; };
-		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseOptions.swift */; };
+		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */; };
 		5F06DDA51CC451540011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		5F06DDB41CC451700011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
 		5F06DDC91CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
@@ -286,7 +286,7 @@
 
 /* Begin PBXFileReference section */
 		5BA968F31DEE31A00012E862 /* JWTDecode.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JWTDecode.framework; path = Carthage/Build/iOS/JWTDecode.framework; sourceTree = "<group>"; };
-		5BD4A9CD1DEC6EFA00D6D7AE /* ResponseOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResponseOptions.swift; path = Auth0/ResponseOptions.swift; sourceTree = SOURCE_ROOT; };
+		5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResponseType.swift; path = Auth0/ResponseType.swift; sourceTree = SOURCE_ROOT; };
 		5F049B6C1CB42C29006F6C05 /* Auth0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Auth0.h; path = Auth0/Auth0.h; sourceTree = "<group>"; };
 		5F049B6E1CB42C29006F6C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Auth0/Info.plist; sourceTree = "<group>"; };
 		5F06DD781CC448B10011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -465,7 +465,7 @@
 		5BD4A9CC1DEC6ECE00D6D7AE /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				5BD4A9CD1DEC6EFA00D6D7AE /* ResponseOptions.swift */,
+				5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -1201,7 +1201,7 @@
 				5FDE87511D8A424700EA27DC /* _ObjectiveAuthenticationAPI.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* SessionStorage.swift in Sources */,
 				5FDE87611D8A424700EA27DC /* Identity.swift in Sources */,
-				5BD4A9CE1DEC6EFA00D6D7AE /* ResponseOptions.swift in Sources */,
+				5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */,
 				5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */,
 				5FAE9C911D8878D400A871CE /* SafariWebAuth.swift in Sources */,
 				5FDE875D1D8A424700EA27DC /* AuthenticationError.swift in Sources */,

@@ -142,7 +142,7 @@ public protocol WebAuth: Trackable, Loggable {
     ///
     /// - Parameter response: Array of ResponseOptions
     /// - Returns: the same WebAuth instance to allow method chaining
-    func responseType(_ response: [ResponseOptions]) -> Self
+    func responseType(_ response: [ResponseType]) -> Self
 
     /// Add nonce paramater for authentication, this is a requirement for
     /// when response type .id_token is specified.

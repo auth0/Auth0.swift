@@ -32,9 +32,9 @@ protocol OAuth2Grant {
 struct ImplicitGrant: OAuth2Grant {
 
     let defaults: [String : String]
-    let responseType: [ResponseOptions]
+    let responseType: [ResponseType]
 
-    init(responseType: [ResponseOptions] = [.token], nonce: String? = nil) {
+    init(responseType: [ResponseType] = [.token], nonce: String? = nil) {
         self.responseType = responseType
         if let nonce = nonce {
             self.defaults = ["nonce" : nonce]
@@ -44,28 +44,15 @@ struct ImplicitGrant: OAuth2Grant {
     }
 
     func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
-        // id token reponse expectations and JWT validation, nonce validation
-        if responseType.contains(.id_token) {
-            guard let id_token = values["id_token"], let nonce = self.defaults["nonce"],
-            validate(token: id_token, nonce: nonce) else {
-                return callback(.failure(error: WebAuthError.idTokenValidationFailed))
-            }
+        guard validate(responseType: self.responseType, token: values["id_token"], nonce: self.defaults["nonce"]) else {
+            return callback(.failure(error: WebAuthError.invalidIdTokenNonce))
         }
 
-        // token response expectations
-        if responseType.contains(.token) {
-            guard values["access_token"] != nil && values["token_type"] != nil else {
-                return callback(.failure(error: WebAuthError.tokenValidationFailed))
-            }
+        guard !responseType.contains(.token) || values["access_token"] != nil else {
+            return callback(.failure(error: WebAuthError.missingAccessToken))
         }
 
-        guard let credentials = Credentials(json: values as [String : Any]) else {
-            let data = try! JSONSerialization.data(withJSONObject: values, options: [])
-            let string = String(data: data, encoding: .utf8)
-            callback(.failure(error: AuthenticationError(string: string)))
-            return
-        }
-        callback(.success(result: credentials))
+        callback(.success(result: Credentials(json: values as [String : Any])))
     }
 
     func values(fromComponents components: URLComponents) -> [String : String] {
@@ -125,8 +112,9 @@ struct PKCE: OAuth2Grant {
     }
 }
 
-private func validate(token: String, nonce: String) -> Bool {
-    guard let jwt = try? decode(jwt: token) else { return false }
+private func validate(responseType: [ResponseType], token: String?, nonce: String?) -> Bool {
+    guard responseType.contains(.idToken) else { return true }
+    guard let token = token, let nonce = nonce, let jwt = try? decode(jwt: token) else { return false }
     let tokenNonce = jwt.claim(name: "nonce").string
     return tokenNonce == nonce
 }

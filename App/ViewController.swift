@@ -63,7 +63,7 @@ class ViewController: UIViewController {
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
-            .responseType([.id_token])
+            .responseType([.idToken])
             .nonce("abc1234")
             .start(onAuth)
     }
@@ -73,7 +73,7 @@ class ViewController: UIViewController {
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
-            .responseType([.token, .id_token])
+            .responseType([.token, .idToken])
             .nonce("abc1234")
             .start(onAuth)
     }

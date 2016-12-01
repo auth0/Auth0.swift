@@ -37,7 +37,7 @@ class SafariWebAuth: WebAuth {
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
-    var responseType: [ResponseOptions] = [.code]
+    var responseType: [ResponseType] = [.code]
     var nonce: String? = nil
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
@@ -77,7 +77,7 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
-    func responseType(_ responseType: [ResponseOptions]) -> Self {
+    func responseType(_ responseType: [ResponseType]) -> Self {
         self.responseType = responseType
         return self
     }
@@ -98,7 +98,7 @@ class SafariWebAuth: WebAuth {
             else {
                 return callback(Result.failure(error: WebAuthError.noBundleIdentifierFound))
         }
-        if self.responseType.contains(.id_token) {
+        if self.responseType.contains(.idToken) {
             guard self.nonce != nil else { return callback(Result.failure(error: WebAuthError.noNonceProvided)) }
         }
         let handler = self.handler(redirectURL)
@@ -143,7 +143,7 @@ class SafariWebAuth: WebAuth {
         entries["scope"] = "openid"
         entries["state"] = self.state
         entries["response_type"] = self.responseType.map { $0.label! }.joined(separator: " ")
-        if self.responseType.contains(.id_token) {
+        if self.responseType.contains(.idToken) {
             entries["nonce"] = self.nonce
         }
         self.parameters.forEach { entries[$0] = $1 }

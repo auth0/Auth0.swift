@@ -50,7 +50,7 @@
                                         </constraints>
                                         <state key="normal" title="OAuth2 Google Token"/>
                                         <connections>
-                                            <action selector="startImplicitGoogleOAuth2:" destination="dkx-z0-nzr" eventType="touchUpInside" id="5OR-Xk-9oD"/>
+                                            <action selector="startTokenGoogleOAuth2:" destination="dkx-z0-nzr" eventType="touchUpInside" id="vxw-EM-p02"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6NK-qX-0S3">

@@ -22,24 +22,34 @@
 
 import Foundation
 
-public struct ResponseOptions: OptionSet {
+///
+///  List of supported response_types
+///  ImplicitGrant
+///  [.token]
+///  [.id_token]
+///  [.token, .id_token]
+///
+///  PKCE
+///  [.code]
+///
+public struct ResponseType: OptionSet {
     public let rawValue: Int
 
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
 
-    public static let token     = ResponseOptions(rawValue: 1 << 0)
-    public static let id_token  = ResponseOptions(rawValue: 1 << 1)
-    public static let code      = ResponseOptions(rawValue: 1 << 2)
+    public static let token     = ResponseType(rawValue: 1 << 0)
+    public static let idToken   = ResponseType(rawValue: 1 << 1)
+    public static let code      = ResponseType(rawValue: 1 << 2)
 
     var label: String? {
         switch self.rawValue {
-        case ResponseOptions.token.rawValue:
+        case ResponseType.token.rawValue:
             return "token"
-        case ResponseOptions.id_token.rawValue:
+        case ResponseType.idToken.rawValue:
             return "id_token"
-        case ResponseOptions.code.rawValue:
+        case ResponseType.code.rawValue:
             return "code"
         default:
             return nil

@@ -110,10 +110,6 @@ class OAuth2SessionSpec: QuickSpec {
                     expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
                 }
 
-                it("should fail if values from fragment are invalid") {
-                    let _ = session.resume(URL(string: "https://samples.auth0.com/callback#access_token=")!)
-                    expect(result).toEventually(beFailure())
-                }
             }
 
             context("response_type=code") {

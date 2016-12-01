@@ -30,8 +30,8 @@ import Foundation
  - UserCancelled:                  User cancelled the web-based authentication, e.g. tapped the "Done" button in SFSafariViewController
  - PKCENotAllowed:                 PKCE for the supplied Auth0 ClientId was not allowed. You need to set the `Token Endpoint Authentication Method` to `None` in your Auth0 Dashboard
  - noNonceProvided:                A nonce value must be provided to use the response option of id_token
- - idTokenValidationFailed:        id_token failed during decode and/or nonce comparison
- - tokenValidationFailed:          Response did not return the necessary token params
+ - invalidIdTokenNonce:            Failed to match token nonce with request nonce
+ - missingAccessToken:             access_token missing in response
  */
 public enum WebAuthError: CustomNSError {
     case noBundleIdentifierFound
@@ -40,8 +40,8 @@ public enum WebAuthError: CustomNSError {
     case pkceNotAllowed(String)
     case noNonceProvided
     case missingResponseParam(String)
-    case idTokenValidationFailed
-    case tokenValidationFailed
+    case invalidIdTokenNonce
+    case missingAccessToken
 
     static let genericFoundationCode = 1
     static let cancelledFoundationCode = 0
@@ -75,12 +75,12 @@ public enum WebAuthError: CustomNSError {
                 NSLocalizedDescriptionKey: "A nonce value must be supplied when response_type includes id_token in order to prevent replay attacks",
                 WebAuthError.infoKey: self
             ]
-        case .idTokenValidationFailed:
+        case .invalidIdTokenNonce:
             return [
                 NSLocalizedDescriptionKey: "Could not validate the id_token",
                 WebAuthError.infoKey: self
             ]
-        case .tokenValidationFailed:
+        case .missingAccessToken:
             return [
                 NSLocalizedDescriptionKey: "Could not validate the token",
                 WebAuthError.infoKey: self
