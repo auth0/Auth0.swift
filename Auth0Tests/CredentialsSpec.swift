@@ -37,28 +37,28 @@ class CredentialsSpec: QuickSpec {
             it("should have all tokens and token_type") {
                 let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken])
                 expect(credentials).toNot(beNil())
-                expect(credentials?.accessToken) == AccessToken
-                expect(credentials?.tokenType) == Bearer
-                expect(credentials?.idToken) == IdToken
-                expect(credentials?.refreshToken) == RefreshToken
+                expect(credentials.accessToken) == AccessToken
+                expect(credentials.tokenType) == Bearer
+                expect(credentials.idToken) == IdToken
+                expect(credentials.refreshToken) == RefreshToken
             }
 
             it("should have only access_token and token_type") {
                 let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer])
                 expect(credentials).toNot(beNil())
-                expect(credentials?.accessToken) == AccessToken
-                expect(credentials?.tokenType) == Bearer
-                expect(credentials?.idToken).to(beNil())
+                expect(credentials.accessToken) == AccessToken
+                expect(credentials.tokenType) == Bearer
+                expect(credentials.idToken).to(beNil())
             }
 
             it("should have id_token") {
                 let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken])
-                expect(credentials?.idToken) == IdToken
+                expect(credentials.idToken) == IdToken
             }
 
             it("should have refresh_token") {
                 let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "refresh_token": RefreshToken])
-                expect(credentials?.refreshToken) == RefreshToken
+                expect(credentials.refreshToken) == RefreshToken
             }
 
         }
