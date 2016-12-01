@@ -30,6 +30,8 @@ import Foundation
  - UserCancelled:                  User cancelled the web-based authentication, e.g. tapped the "Done" button in SFSafariViewController
  - PKCENotAllowed:                 PKCE for the supplied Auth0 ClientId was not allowed. You need to set the `Token Endpoint Authentication Method` to `None` in your Auth0 Dashboard
  - noNonceProvided:                A nonce value must be provided to use the response option of id_token
+ - idTokenValidationFailed:        id_token failed during decode and/or nonce comparison
+ - tokenValidationFailed:          Response did not return the necessary token params
  */
 public enum WebAuthError: CustomNSError {
     case noBundleIdentifierFound

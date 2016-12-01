@@ -32,10 +32,10 @@ protocol OAuth2Grant {
 struct ImplicitGrant: OAuth2Grant {
 
     let defaults: [String : String]
-    let response: [ResponseOptions]
+    let responseType: [ResponseOptions]
 
-    init(response: [ResponseOptions] = [.token], nonce: String? = nil) {
-        self.response = response
+    init(responseType: [ResponseOptions] = [.token], nonce: String? = nil) {
+        self.responseType = responseType
         if let nonce = nonce {
             self.defaults = ["nonce" : nonce]
         } else {
@@ -45,7 +45,7 @@ struct ImplicitGrant: OAuth2Grant {
 
     func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
         // id token reponse expectations and JWT validation, nonce validation
-        if response.contains(.id_token) {
+        if responseType.contains(.id_token) {
             guard let id_token = values["id_token"], let nonce = self.defaults["nonce"],
             validate(token: id_token, nonce: nonce) else {
                 return callback(.failure(error: WebAuthError.idTokenValidationFailed))
@@ -53,7 +53,7 @@ struct ImplicitGrant: OAuth2Grant {
         }
 
         // token response expectations
-        if response.contains(.token) {
+        if responseType.contains(.token) {
             guard values["access_token"] != nil && values["token_type"] != nil else {
                 return callback(.failure(error: WebAuthError.tokenValidationFailed))
             }
@@ -126,14 +126,7 @@ struct PKCE: OAuth2Grant {
 }
 
 private func validate(token: String, nonce: String) -> Bool {
-    do {
-        let jwt = try decode(jwt: token)
-        guard let nonceClaim = jwt.claim(name: "nonce").string,
-            nonceClaim == nonce else {
-                return false
-        }
-    } catch {
-        return false
-    }
-    return true
+    guard let jwt = try? decode(jwt: token) else { return false }
+    let tokenNonce = jwt.claim(name: "nonce").string
+    return tokenNonce == nonce
 }

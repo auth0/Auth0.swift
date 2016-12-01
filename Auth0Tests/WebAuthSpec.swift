@@ -138,7 +138,7 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newWebAuth()
-                        .response([.id_token])
+                        .responseType([.id_token])
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["response_type": "id_token"]),
@@ -148,7 +148,7 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newWebAuth()
-                        .response([.token])
+                        .responseType([.token])
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["response_type": "token"]),
@@ -158,7 +158,7 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newWebAuth()
-                        .response([.id_token, .token])
+                        .responseType([.id_token, .token])
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["response_type": "id_token token"]),
@@ -168,7 +168,7 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newWebAuth()
-                        .response([.id_token])
+                        .responseType([.id_token])
                         .nonce("abc1234")
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,

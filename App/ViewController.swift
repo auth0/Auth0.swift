@@ -37,7 +37,7 @@ class ViewController: UIViewController {
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
-            .response([.token])
+            .responseType([.token])
             .start(onAuth)
     }
 
@@ -49,12 +49,31 @@ class ViewController: UIViewController {
             .start(onAuth)
     }
 
-    @IBAction func startImplicitGoogleOAuth2(_ sender: Any) {
+    @IBAction func startTokenGoogleOAuth2(_ sender: Any) {
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
-            .response([.id_token, .token])
+            .responseType([.token])
+            .start(onAuth)
+    }
+
+    @IBAction func startIDTokenGoogleOAuth2(_ sender: Any) {
+        var auth0 = Auth0.webAuth()
+        auth0
+            .logging(enabled: true)
+            .connection("google-oauth2")
+            .responseType([.id_token])
+            .nonce("abc1234")
+            .start(onAuth)
+    }
+
+    @IBAction func startTokenIDTokenGoogleOAuth2(_ sender: Any) {
+        var auth0 = Auth0.webAuth()
+        auth0
+            .logging(enabled: true)
+            .connection("google-oauth2")
+            .responseType([.token, .id_token])
             .nonce("abc1234")
             .start(onAuth)
     }

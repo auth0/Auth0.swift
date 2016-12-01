@@ -24,20 +24,27 @@ import Foundation
 
 public struct ResponseOptions: OptionSet {
     public let rawValue: Int
-    public let label: String?
 
     public init(rawValue: Int) {
         self.rawValue = rawValue
-        self.label = nil
     }
 
-    init(rawValue: Int, label: String) {
-        self.rawValue = rawValue
-        self.label = label
-    }
+    public static let token     = ResponseOptions(rawValue: 1 << 0)
+    public static let id_token  = ResponseOptions(rawValue: 1 << 1)
+    public static let code      = ResponseOptions(rawValue: 1 << 2)
 
-    public static let token     = ResponseOptions(rawValue: 1 << 0, label: "token")
-    public static let id_token  = ResponseOptions(rawValue: 1 << 1, label: "id_token")
-    public static let code      = ResponseOptions(rawValue: 1 << 2, label: "code")
+    var label: String? {
+        switch self.rawValue {
+        case ResponseOptions.token.rawValue:
+            return "token"
+        case ResponseOptions.id_token.rawValue:
+            return "id_token"
+        case ResponseOptions.code.rawValue:
+            return "code"
+        default:
+            return nil
+        }
+    }
+    
 }
 

@@ -60,13 +60,13 @@ class OAuth2GrantSpec: QuickSpec {
             }
 
             it("should specify response type") {
-                expect(implicit.response.contains(.token)).to(beTrue())
+                expect(implicit.responseType.contains(.token)).to(beTrue())
             }
 
             describe("ImplicitGrant with id_token") {
 
                 beforeEach {
-                    implicit = ImplicitGrant(response: [.id_token], nonce: "cba321")
+                    implicit = ImplicitGrant(responseType: [.id_token], nonce: "cba321")
                 }
 
                 it("should build credentials") {
@@ -101,7 +101,7 @@ class OAuth2GrantSpec: QuickSpec {
                 }
 
                 it("should fail as no nonce does not match") {
-                    implicit = ImplicitGrant(response: [.id_token], nonce: "nomatch")
+                    implicit = ImplicitGrant(responseType: [.id_token], nonce: "nomatch")
                     let values = ["id_token": idToken]
                     waitUntil { done in
                         implicit.credentials(from: values) {
