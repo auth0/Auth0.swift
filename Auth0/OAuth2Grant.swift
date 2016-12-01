@@ -67,20 +67,28 @@ struct PKCE: OAuth2Grant {
     let redirectURL: URL
     let defaults: [String : String]
     let verifier: String
+    let responseType: [ResponseType]
 
-    init(authentication: Authentication, redirectURL: URL, generator: A0SHA256ChallengeGenerator = A0SHA256ChallengeGenerator()) {
-        self.init(authentication: authentication, redirectURL: redirectURL, verifier: generator.verifier, challenge: generator.challenge, method: generator.method)
+    init(authentication: Authentication, redirectURL: URL, generator: A0SHA256ChallengeGenerator = A0SHA256ChallengeGenerator(), reponseType: [ResponseType] = [.code], nonce: String? = nil) {
+        self.init(authentication: authentication, redirectURL: redirectURL, verifier: generator.verifier, challenge: generator.challenge, method: generator.method, responseType: reponseType, nonce: nonce)
     }
 
-    init(authentication: Authentication, redirectURL: URL, verifier: String, challenge: String, method: String) {
+    init(authentication: Authentication, redirectURL: URL, verifier: String, challenge: String, method: String, responseType: [ResponseType], nonce: String? = nil) {
         self.authentication = authentication
         self.redirectURL = redirectURL
-        self.defaults = [
-            "response_type": "code",
+        self.verifier = verifier
+        self.responseType = responseType
+
+        var newDefaults: [String: String] = [
             "code_challenge": challenge,
             "code_challenge_method": method,
         ]
-        self.verifier = verifier
+
+        if let nonce = nonce {
+            newDefaults["nonce"] = nonce
+        }
+
+        self.defaults = newDefaults
     }
 
     func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> ()) {
@@ -90,6 +98,9 @@ struct PKCE: OAuth2Grant {
                 let data = try! JSONSerialization.data(withJSONObject: values, options: [])
                 let string = String(data: data, encoding: .utf8)
                 return callback(.failure(error: AuthenticationError(string: string)))
+        }
+        guard validate(responseType: self.responseType, token: values["id_token"], nonce: self.defaults["nonce"]) else {
+            return callback(.failure(error: WebAuthError.invalidIdTokenNonce))
         }
         let clientId = self.authentication.clientId
         self.authentication

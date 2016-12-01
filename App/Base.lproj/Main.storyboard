@@ -21,7 +21,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="dou-iM-i9N">
-                                <rect key="frame" x="0.0" y="208.5" width="375" height="250"/>
+                                <rect key="frame" x="0.0" y="183.5" width="375" height="300"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="llV-hD-gxU">
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
@@ -68,9 +68,19 @@
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="FMK-mf-ew7"/>
                                         </constraints>
-                                        <state key="normal" title="OAuth2 Google Token + ID Token"/>
+                                        <state key="normal" title="OAuth2 Google Token, ID Token"/>
                                         <connections>
                                             <action selector="startTokenIDTokenGoogleOAuth2:" destination="dkx-z0-nzr" eventType="touchUpInside" id="e9l-Rj-FKl"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1cD-4W-zdw">
+                                        <rect key="frame" x="0.0" y="250" width="375" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="nnu-iB-OEO"/>
+                                        </constraints>
+                                        <state key="normal" title="OAuth2 Google Code, IDToken"/>
+                                        <connections>
+                                            <action selector="startCodeIDTokenGoogleOAuth2:" destination="dkx-z0-nzr" eventType="touchUpInside" id="GPs-41-F5E"/>
                                         </connections>
                                     </button>
                                 </subviews>

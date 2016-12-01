@@ -77,4 +77,15 @@ class ViewController: UIViewController {
             .nonce("abc1234")
             .start(onAuth)
     }
+
+    @IBAction func startCodeIDTokenGoogleOAuth2(_ sender: Any) {
+        var auth0 = Auth0.webAuth()
+        auth0
+            .logging(enabled: true)
+            .connection("google-oauth2")
+            .scope("read:entity")
+            .responseType([.code , .idToken])
+            .nonce("abc1234")
+            .start(onAuth)
+    }
 }
