@@ -157,7 +157,7 @@ class SafariWebAuth: WebAuth {
         if self.responseType.contains([.code]){
             var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
             authentication.logger = self.logger
-            return PKCE(authentication: authentication, redirectURL: redirectURL)
+            return PKCE(authentication: authentication, redirectURL: redirectURL, reponseType: self.responseType, nonce: self.nonce)
         } else {
             return ImplicitGrant(responseType: self.responseType, nonce: self.nonce)
         }

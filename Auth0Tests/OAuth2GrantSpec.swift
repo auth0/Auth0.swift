@@ -123,12 +123,13 @@ class OAuth2GrantSpec: QuickSpec {
             var verifier: String!
             var challenge: String!
             var pkce: PKCE!
+            let response: [ResponseType] = [.code]
 
             beforeEach {
                 verifier = "\(arc4random())"
                 challenge = "\(arc4random())"
                 let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
-                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method)
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response)
             }
 
             afterEach {
@@ -161,7 +162,7 @@ class OAuth2GrantSpec: QuickSpec {
             }
 
             it("should specify response type") {
-                expect(pkce.defaults["response_type"]) == "code"
+                expect(pkce.responseType.contains(.code)).to(beTrue())
             }
 
             it("should specify pkce parameters") {
@@ -172,8 +173,92 @@ class OAuth2GrantSpec: QuickSpec {
             it("should get values from generator") {
                 let generator = A0SHA256ChallengeGenerator()
                 let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
-                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, generator: generator)
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, generator: generator, reponseType: response)
                 
+                expect(pkce.defaults["code_challenge_method"]) == generator.method
+                expect(pkce.defaults["code_challenge"]) == generator.challenge
+                expect(pkce.verifier) == generator.verifier
+            }
+        }
+
+        describe("Authorization Code w/PKCE and idToken") {
+
+            let domain = URL.a0_url("samples.auth0.com")
+            let method = "S256"
+            let redirectURL = URL(string: "https://samples.auth0.com/callback")!
+            var verifier: String!
+            var challenge: String!
+            var pkce: PKCE!
+            let response: [ResponseType] = [.code, .idToken]
+            let nonce = "abc123"
+            let idToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsIm5vbmNlIjoiYWJjMTIzIn0.l5K4au9Uq_NMImvuM2xigQNPa6S6LCKAqWs5c4_wrjQ"
+            var authentication: Auth0Authentication!
+
+            beforeEach {
+                verifier = "\(arc4random())"
+                challenge = "\(arc4random())"
+                authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response, nonce: nonce)
+            }
+
+            afterEach {
+                OHHTTPStubs.removeAllStubs()
+                stub(condition: isHost(domain.host!)) { _ in
+                    return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                    }.name = "YOU SHALL NOT PASS!"
+            }
+
+            it("shoud build credentials") {
+                let token = UUID().uuidString
+                let code = UUID().uuidString
+                let values = ["code": code, "id_token" : idToken]
+                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
+                waitUntil { done in
+                    pkce.credentials(from: values) {
+                        expect($0).to(haveCredentials(token))
+                        done()
+                    }
+                }
+            }
+
+            it("shoud fail credentials no nonce") {
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response)
+                let token = UUID().uuidString
+                let code = UUID().uuidString
+                let values = ["code": code, "id_token" : idToken]
+                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
+                waitUntil { done in
+                    pkce.credentials(from: values) {
+                        expect($0).to(beFailure())
+                        done()
+                    }
+                }
+            }
+
+            it("shoud report error to get credentials") {
+                waitUntil { done in
+                    pkce.credentials(from: [:]) {
+                        expect($0).to(beFailure())
+                        done()
+                    }
+                }
+            }
+
+            it("should specify response type") {
+                expect(pkce.responseType.contains(.code)).to(beTrue())
+                expect(pkce.responseType.contains(.idToken)).to(beTrue())
+            }
+
+            it("should specify pkce parameters") {
+                expect(pkce.defaults["code_challenge_method"]) == "S256"
+                expect(pkce.defaults["code_challenge"]) == challenge
+            }
+
+            it("should get values from generator") {
+                let generator = A0SHA256ChallengeGenerator()
+                let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, generator: generator, reponseType: response, nonce: nonce)
+
                 expect(pkce.defaults["code_challenge_method"]) == generator.method
                 expect(pkce.defaults["code_challenge"]) == generator.challenge
                 expect(pkce.verifier) == generator.verifier

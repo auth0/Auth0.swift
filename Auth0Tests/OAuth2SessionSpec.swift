@@ -115,7 +115,7 @@ class OAuth2SessionSpec: QuickSpec {
             context("response_type=code") {
 
                 let generator = A0SHA256ChallengeGenerator()
-                let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: PKCE(authentication: Auth0Authentication(clientId: ClientId, url: Domain), redirectURL: RedirectURL, generator: generator), finish: callback, logger: nil)
+                let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: PKCE(authentication: Auth0Authentication(clientId: ClientId, url: Domain), redirectURL: RedirectURL, generator: generator, reponseType: [.code]), finish: callback, logger: nil)
                 let code = "123456"
 
                 beforeEach {

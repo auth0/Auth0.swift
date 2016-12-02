@@ -26,11 +26,14 @@ import Foundation
 ///  List of supported response_types
 ///  ImplicitGrant
 ///  [.token]
-///  [.id_token]
-///  [.token, .id_token]
+///  [.idToken]
+///  [.token, .idToken]
 ///
 ///  PKCE
 ///  [.code]
+///  [.code, token]
+///  [.code, idToken]
+///  [.code, token, .idToken]
 ///
 public struct ResponseType: OptionSet {
     public let rawValue: Int
