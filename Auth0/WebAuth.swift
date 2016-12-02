@@ -151,6 +151,12 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: the same WebAuth instance to allow method chaining
     func nonce(_ nonce: String) -> Self
 
+    /// The application that is the intended target of the token
+    ///
+    /// - Parameter audience: an audience value like: `https://someapi.com/api`
+    /// - Returns: the same WebAuth instance to allow method chaining
+    func audience(_ audience: String) -> Self
+
     /**
      Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)
 
