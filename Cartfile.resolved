@@ -1,3 +1,4 @@
-github "Quick/Nimble" "197a46a5892340a2badc70af7f669b6aa4c8afa9"
-github "AliSoftware/OHHTTPStubs" "5.2.1-swift3"
-github "Quick/Quick" "8f2bc636ecfa2cc20696f62548b38d4ab943e299"
+github "auth0/JWTDecode.swift" "2.0.0"
+github "Quick/Nimble" "v5.1.1"
+github "AliSoftware/OHHTTPStubs" "5.2.2-swift3"
+github "Quick/Quick" "v1.0.0"

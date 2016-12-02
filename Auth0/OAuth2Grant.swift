@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 import Foundation
+import JWTDecode
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
@@ -30,21 +31,34 @@ protocol OAuth2Grant {
 
 struct ImplicitGrant: OAuth2Grant {
 
-    let defaults: [String : String] = ["response_type": "token"]
+    let defaults: [String : String]
+    let responseType: [ResponseType]
+
+    init(responseType: [ResponseType] = [.token], nonce: String? = nil) {
+        self.responseType = responseType
+        if let nonce = nonce {
+            self.defaults = ["nonce" : nonce]
+        } else {
+            self.defaults = [:]
+        }
+    }
 
     func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
-        guard let credentials = Credentials(json: values as [String : Any]) else {
-            let data = try! JSONSerialization.data(withJSONObject: values, options: [])
-            let string = String(data: data, encoding: .utf8)
-            callback(.failure(error: AuthenticationError(string: string)))
-            return
+        guard validate(responseType: self.responseType, token: values["id_token"], nonce: self.defaults["nonce"]) else {
+            return callback(.failure(error: WebAuthError.invalidIdTokenNonce))
         }
-        callback(.success(result: credentials))
+
+        guard !responseType.contains(.token) || values["access_token"] != nil else {
+            return callback(.failure(error: WebAuthError.missingAccessToken))
+        }
+
+        callback(.success(result: Credentials(json: values as [String : Any])))
     }
 
     func values(fromComponents components: URLComponents) -> [String : String] {
         return components.a0_fragmentValues
     }
+
 }
 
 struct PKCE: OAuth2Grant {
@@ -76,7 +90,7 @@ struct PKCE: OAuth2Grant {
                 let data = try! JSONSerialization.data(withJSONObject: values, options: [])
                 let string = String(data: data, encoding: .utf8)
                 return callback(.failure(error: AuthenticationError(string: string)))
-            }
+        }
         let clientId = self.authentication.clientId
         self.authentication
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
@@ -88,7 +102,7 @@ struct PKCE: OAuth2Grant {
                 } else {
                     callback(result)
                 }
-            }
+        }
     }
 
     func values(fromComponents components: URLComponents) -> [String : String] {
@@ -96,4 +110,11 @@ struct PKCE: OAuth2Grant {
         components.a0_queryValues.forEach { items[$0] = $1 }
         return items
     }
+}
+
+private func validate(responseType: [ResponseType], token: String?, nonce: String?) -> Bool {
+    guard responseType.contains(.idToken) else { return true }
+    guard let token = token, let nonce = nonce, let jwt = try? decode(jwt: token) else { return false }
+    let tokenNonce = jwt.claim(name: "nonce").string
+    return tokenNonce == nonce
 }

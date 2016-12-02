@@ -82,7 +82,7 @@ public func resumeAuth(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any
     return SessionStorage.sharedInstance.resume(url, options: options)
 }
 
-/// OAuth2 Authentication using Auth0
+/// WebAuth Authentication using Auth0
 public protocol WebAuth: Trackable, Loggable {
     var clientId: String { get }
     var url: URL { get }
@@ -93,7 +93,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      Before enabling this flag you'll need to configure Universal Links
 
-     - returns: the same OAuth2 instance to allow method chaining
+     - returns: the same WebAuth instance to allow method chaining
      */
     func useUniversalLink() -> Self
 
@@ -104,7 +104,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - parameter connection: name of the connection to use
 
-     - returns: the same OAuth2 instance to allow method chaining
+     - returns: the same WebAuth instance to allow method chaining
      */
     func connection(_ connection: String) -> Self
 
@@ -113,7 +113,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - parameter scope: a scope value like: `openid email`
 
-     - returns: the same OAuth2 instance to allow method chaining
+     - returns: the same WebAuth instance to allow method chaining
      */
     func scope(_ scope: String) -> Self
 
@@ -125,7 +125,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - parameter state: a state value to send with the auth request
 
-     - returns: the same OAuth2 instance to allow method chaining
+     - returns: the same WebAuth instance to allow method chaining
      */
     func state(_ state: String) -> Self
 
@@ -134,29 +134,43 @@ public protocol WebAuth: Trackable, Loggable {
 
      - parameter parameters: additional auth parameters
 
-     - returns: the same OAuth2 instance to allow method chaining
+     - returns: the same WebAuth instance to allow method chaining
      */
     func parameters(_ parameters: [String: String]) -> Self
+
+    /// Setup the response types to be used for authentcation
+    ///
+    /// - Parameter response: Array of ResponseOptions
+    /// - Returns: the same WebAuth instance to allow method chaining
+    func responseType(_ response: [ResponseType]) -> Self
+
+    /// Add nonce paramater for authentication, this is a requirement for
+    /// when response type .id_token is specified.
+    ///
+    /// - Parameter nonce: nonce string
+    /// - Returns: the same WebAuth instance to allow method chaining
+    func nonce(_ nonce: String) -> Self
 
     /**
      Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)
 
-     - returns: the same OAuth2 instance to allow method chaining
+     - returns: the same WebAuth instance to allow method chaining
      */
+    @available(*, deprecated, message: "use response([.token])")
     func usingImplicitGrant() -> Self
 
     /**
-     Starts the OAuth2 flow by modally presenting a ViewController in the top-most controller.
+     Starts the WebAuth flow by modally presenting a ViewController in the top-most controller.
 
      ```
      Auth0
-     .oauth2(clientId: clientId, domain: "samples.auth0.com")
+     .WebAuth(clientId: clientId, domain: "samples.auth0.com")
      .start { result in
         print(result)
      }
      ```
 
-     Then from `AppDelegate` we just need to resume the OAuth2 Auth like this
+     Then from `AppDelegate` we just need to resume the WebAuth Auth like this
 
      ```
      func application(app: UIApplication, openURL url: NSURL, options: [String : Any]) -> Bool {
@@ -164,10 +178,10 @@ public protocol WebAuth: Trackable, Loggable {
      }
      ```
 
-     Any on going OAuth2 Auth session will be automatically cancelled when starting a new one,
+     Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
      and it's corresponding callback with be called with a failure result of `Authentication.Error.Cancelled`
 
-     - parameter callback: callback called with the result of the OAuth2 flow
+     - parameter callback: callback called with the result of the WebAuth flow
      */
     func start(_ callback: @escaping (Result<Credentials>) -> ())
 }

@@ -1,4 +1,4 @@
-// Credentials.swift
+// ResponseType.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,26 +22,39 @@
 
 import Foundation
 
-/**
- Auth0 users' credentials
- */
-@objc(A0Credentials)
-public class Credentials: NSObject, JSONObjectPayload {
+///
+///  List of supported response_types
+///  ImplicitGrant
+///  [.token]
+///  [.id_token]
+///  [.token, .id_token]
+///
+///  PKCE
+///  [.code]
+///
+public struct ResponseType: OptionSet {
+    public let rawValue: Int
 
-    public let accessToken: String?
-    public let tokenType: String?
-    public let idToken: String?
-    public let refreshToken: String?
-
-    init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil) {
-        self.accessToken = accessToken
-        self.tokenType = tokenType
-        self.idToken = idToken
-        self.refreshToken = refreshToken
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
     }
 
-    convenience required public init(json: [String: Any]) {
-        self.init(accessToken: json["access_token"] as? String, tokenType: json["token_type"] as? String, idToken: json["id_token"] as? String, refreshToken: json["refresh_token"] as? String)
-    }
+    public static let token     = ResponseType(rawValue: 1 << 0)
+    public static let idToken   = ResponseType(rawValue: 1 << 1)
+    public static let code      = ResponseType(rawValue: 1 << 2)
 
+    var label: String? {
+        switch self.rawValue {
+        case ResponseType.token.rawValue:
+            return "token"
+        case ResponseType.idToken.rawValue:
+            return "id_token"
+        case ResponseType.code.rawValue:
+            return "code"
+        default:
+            return nil
+        }
+    }
+    
 }
+

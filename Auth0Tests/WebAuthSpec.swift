@@ -72,7 +72,7 @@ private func newWebAuth() -> SafariWebAuth {
 private func defaultQuery(withParameters parameters: [String: String] = [:]) -> [String: String] {
     var query = [
         "client_id": ClientId,
-        "response_type": "token",
+        "response_type": "code",
         "redirect_uri": RedirectURL.absoluteString,
         "scope": "openid",
         ]
@@ -80,7 +80,7 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
     return query
 }
 
-private let defaults = ["response_type": "token"]
+private let defaults = ["response_type": "code"]
 
 class WebAuthSpec: QuickSpec {
 
@@ -94,7 +94,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(),
-                ]
+                    ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -104,7 +104,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection": "facebook"]),
-                ]
+                    ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -125,7 +125,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["state": state]),
-                    ]
+                ]
             }
 
             it("should override default values") {
@@ -133,6 +133,47 @@ class WebAuthSpec: QuickSpec {
                 let state = auth.state!
                 let url = auth.parameters(["state": "value"]).buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults)
                 expect(url.a0_components?.queryItems).toNot(containItem(withName: "state", value: state))
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .responseType([.idToken])
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["response_type": "id_token"]),
+                    ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .responseType([.token])
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["response_type": "token"]),
+                    ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .responseType([.idToken, .token])
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["response_type": "id_token token"]),
+                    ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .responseType([.idToken])
+                        .nonce("abc1234")
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["nonce": "abc1234", "response_type" : "id_token"]),
+                    ]
             }
         }
 
@@ -150,7 +191,7 @@ class WebAuthSpec: QuickSpec {
 
         }
 
-        
+
         describe("safari") {
 
             var result: Result<Credentials>?
@@ -163,7 +204,7 @@ class WebAuthSpec: QuickSpec {
 
             it("should fail if controller is not presented") {
                 let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
-                callback(.success(result: Credentials(json: ["access_token": "at", "token_type": "bearer"])!))
+                callback(.success(result: Credentials(json: ["access_token": "at", "token_type": "bearer"])))
                 expect(result).toEventually(beFailure())
             }
 

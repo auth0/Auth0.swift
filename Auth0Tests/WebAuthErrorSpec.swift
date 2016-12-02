@@ -51,6 +51,24 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error.domain) == "com.auth0.webauth"
                 expect(error.code) == 0
             }
+
+            it("should build error for no nonce supplied") {
+                let error = WebAuthError.noNonceProvided as NSError
+                expect(error.domain) == "com.auth0.webauth"
+                expect(error.code) == 1
+            }
+
+            it("should build error for no idToken nonce match") {
+                let error = WebAuthError.invalidIdTokenNonce as NSError
+                expect(error.domain) == "com.auth0.webauth"
+                expect(error.code) == 1
+            }
+
+            it("should build error for missing access_token") {
+                let error = WebAuthError.missingAccessToken as NSError
+                expect(error.domain) == "com.auth0.webauth"
+                expect(error.code) == 1
+            }
         }
     }
 }

@@ -24,7 +24,8 @@ class ViewController: UIViewController {
                 alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
                 self?.present(alert, animated: true, completion: nil)
             case .success(let credentials):
-                let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got access_token \(credentials.accessToken)", preferredStyle: .alert)
+                let token = credentials.accessToken ?? credentials.idToken
+                let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got a token \(token)", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
                 self?.present(alert, animated: true, completion: nil)
             }
@@ -36,6 +37,7 @@ class ViewController: UIViewController {
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
+            .responseType([.token])
             .start(onAuth)
     }
 
@@ -44,6 +46,35 @@ class ViewController: UIViewController {
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
+            .start(onAuth)
+    }
+
+    @IBAction func startTokenGoogleOAuth2(_ sender: Any) {
+        var auth0 = Auth0.webAuth()
+        auth0
+            .logging(enabled: true)
+            .connection("google-oauth2")
+            .responseType([.token])
+            .start(onAuth)
+    }
+
+    @IBAction func startIDTokenGoogleOAuth2(_ sender: Any) {
+        var auth0 = Auth0.webAuth()
+        auth0
+            .logging(enabled: true)
+            .connection("google-oauth2")
+            .responseType([.idToken])
+            .nonce("abc1234")
+            .start(onAuth)
+    }
+
+    @IBAction func startTokenIDTokenGoogleOAuth2(_ sender: Any) {
+        var auth0 = Auth0.webAuth()
+        auth0
+            .logging(enabled: true)
+            .connection("google-oauth2")
+            .responseType([.token, .idToken])
+            .nonce("abc1234")
             .start(onAuth)
     }
 }

@@ -37,7 +37,8 @@ class SafariWebAuth: WebAuth {
     var state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
-    var usePKCE = true
+    var responseType: [ResponseType] = [.code]
+    var nonce: String? = nil
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance, telemetry: telemetry)
@@ -76,9 +77,18 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
-    func usingImplicitGrant() -> Self {
-        self.usePKCE = false
+    func responseType(_ responseType: [ResponseType]) -> Self {
+        self.responseType = responseType
         return self
+    }
+
+    func nonce(_ nonce: String) -> Self {
+        self.nonce = nonce
+        return self
+    }
+
+    func usingImplicitGrant() -> Self {
+        return self.responseType([.token])
     }
 
     func start(_ callback: @escaping (Result<Credentials>) -> ()) {
@@ -87,6 +97,9 @@ class SafariWebAuth: WebAuth {
             , !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
             else {
                 return callback(Result.failure(error: WebAuthError.noBundleIdentifierFound))
+        }
+        if self.responseType.contains(.idToken) {
+            guard self.nonce != nil else { return callback(Result.failure(error: WebAuthError.noNonceProvided)) }
         }
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
@@ -129,6 +142,10 @@ class SafariWebAuth: WebAuth {
         entries["redirect_uri"] = redirectURL.absoluteString
         entries["scope"] = "openid"
         entries["state"] = self.state
+        entries["response_type"] = self.responseType.map { $0.label! }.joined(separator: " ")
+        if self.responseType.contains(.idToken) {
+            entries["nonce"] = self.nonce
+        }
         self.parameters.forEach { entries[$0] = $1 }
 
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
@@ -137,12 +154,12 @@ class SafariWebAuth: WebAuth {
     }
 
     func handler(_ redirectURL: URL) -> OAuth2Grant {
-        if self.usePKCE {
+        if self.responseType.contains([.code]){
             var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
             authentication.logger = self.logger
             return PKCE(authentication: authentication, redirectURL: redirectURL)
         } else {
-            return ImplicitGrant()
+            return ImplicitGrant(responseType: self.responseType, nonce: self.nonce)
         }
     }
 
@@ -163,7 +180,7 @@ private func generateDefaultState() -> String? {
     let result = data.withUnsafeMutableBytes { (bytes: UnsafeMutablePointer<UInt8>) -> Int in
         return Int(SecRandomCopyBytes(kSecRandomDefault, data.count, bytes))
     }
-
+    
     guard result == 0 else { return nil }
     return data.a0_encodeBase64URLSafe()
 }
