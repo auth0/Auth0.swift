@@ -151,7 +151,8 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: the same WebAuth instance to allow method chaining
     func nonce(_ nonce: String) -> Self
 
-    /// The application that is the intended target of the token
+    ///  Audience name of the API that your application will call using the `access_token` returned after Auth.
+    ///  This value must match the one defined in Auth0 Dashboard [APIs Section](https://manage.auth0.com/#/apis)
     ///
     /// - Parameter audience: an audience value like: `https://someapi.com/api`
     /// - Returns: the same WebAuth instance to allow method chaining
