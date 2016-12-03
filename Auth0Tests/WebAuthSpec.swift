@@ -175,6 +175,38 @@ class WebAuthSpec: QuickSpec {
                     "query": defaultQuery(withParameters: ["nonce": "abc1234", "response_type" : "id_token"]),
                     ]
             }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                var newDefaults = defaults
+                newDefaults["audience"] = "https://wwww.google.com"
+                return [
+                    "url": newWebAuth().buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["audience": "https://wwww.google.com"]),
+                    ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                var newDefaults = defaults
+                newDefaults["audience"] = "https://wwww.google.com"
+                return [
+                    "url": newWebAuth()
+                        .audience("https://domain.auth0.com")
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["audience": "https://domain.auth0.com"]),
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .audience("https://domain.auth0.com")
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["audience": "https://domain.auth0.com"]),
+                ]
+            }
         }
 
         describe("redirect uri") {

@@ -91,6 +91,11 @@ class SafariWebAuth: WebAuth {
         return self.responseType([.token])
     }
 
+    func audience(_ audience: String) -> Self {
+        self.parameters["audience"] = audience
+        return self
+    }
+
     func start(_ callback: @escaping (Result<Credentials>) -> ()) {
         guard
             let redirectURL = self.redirectURL
