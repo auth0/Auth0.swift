@@ -340,6 +340,14 @@ public protocol Authentication: Trackable, Loggable {
      - seeAlso: https://tools.ietf.org/html/rfc7636
      */
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
+
+    /**
+     Authenticate with a refresh_token.
+
+     - Parameter token: the clients refresh_token
+     - Returns: a request that will yield Auth0 user's credentials
+     */
+    func login(withToken token: String) -> Request<Credentials, AuthenticationError>
 }
 
 /**

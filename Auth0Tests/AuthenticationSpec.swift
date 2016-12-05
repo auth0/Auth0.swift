@@ -135,6 +135,35 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+
+        }
+
+        // MARK:- login with refresh_token
+        describe("refresh token login") {
+
+            let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+
+            beforeEach {
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token":refreshToken])) { _ in return authResponse(accessToken: AccessToken) }.name = "refresh_token login"
+            }
+
+            it("should receive access token") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withToken: refreshToken).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to recieve access token") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withToken: "invalidtoken").start { result in
+                        expect(result).toNot(haveCredentials())
+                        done()
+                    }
+                }
+            }
             
         }
 

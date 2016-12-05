@@ -135,7 +135,7 @@ struct Auth0Authentication: Authentication {
     func tokenExchange(withParameters parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
         var payload: [String: Any] = [
             "client_id": self.clientId,
-        ]
+            ]
         parameters.forEach { payload[$0] = $1 }
         let token = URL(string: "/oauth/token", relativeTo: self.url)!
         return Request(session: session, url: token, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
@@ -148,5 +148,15 @@ struct Auth0Authentication: Authentication {
             "redirect_uri": redirectURI,
             "grant_type": "authorization_code",
             ])
+    }
+
+    func login(withToken token: String) -> Request<Credentials, AuthenticationError> {
+        let payload: [String: Any] = [
+            "refresh_token": token,
+            "grant_type": "refresh_token",
+            "client_id": self.clientId
+        ]
+        let refreshToken = URL(string: "/oauth/token", relativeTo: self.url)!
+        return Request(session: session, url: refreshToken, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 }
