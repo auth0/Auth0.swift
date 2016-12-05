@@ -51,6 +51,7 @@ class AuthenticationSpec: QuickSpec {
                 }.name = "YOU SHALL NOT PASS!"
         }
 
+        // MARK:- login
         describe("login") {
 
             beforeEach {
@@ -135,7 +136,63 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+        }
+
+        // MARK:- grant type paswword
+        describe("grant type password") {
+
+            it("should receive token with username and password") {
+                 stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
+
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to return token") {
+                 stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: "invalid").start { result in
+                        expect(result).toNot(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should specify scope in request") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, scope: "openid").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should specify audience in request") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should specify audience and scope in request") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api", scope: "openid").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
         }
 
         describe("create user") {
@@ -509,7 +566,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
         }
 
         describe("code exchange") {
@@ -567,10 +624,10 @@ class AuthenticationSpec: QuickSpec {
                         .start { result in
                             expect(result).to(beFailure { (error: AuthenticationError) in return error.isMultifactorRequired })
                             done()
-                        }
+                    }
                 }
             }
-
+            
             it("should login with multifactor") {
                 waitUntil(timeout: Timeout) { done in
                     auth
@@ -581,8 +638,8 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-
+            
         }
-
+        
     }
 }
