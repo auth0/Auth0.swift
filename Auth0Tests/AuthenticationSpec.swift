@@ -149,7 +149,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should receive access token") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(withToken: refreshToken).start { result in
+                    auth.renew(withRefreshToken: refreshToken).start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
@@ -158,7 +158,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should fail to recieve access token") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(withToken: "invalidtoken").start { result in
+                    auth.renew(withRefreshToken: "invalidtoken").start { result in
                         expect(result).toNot(haveCredentials())
                         done()
                     }

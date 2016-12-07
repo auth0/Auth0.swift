@@ -342,12 +342,12 @@ public protocol Authentication: Trackable, Loggable {
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Authenticate with a refresh_token.
+     Renew user's credentials with a refresh_token
 
-     - Parameter token: the clients refresh_token
+     - parameter refreshToken: the client's refresh token obtained on auth
      - Returns: a request that will yield Auth0 user's credentials
      */
-    func login(withToken token: String) -> Request<Credentials, AuthenticationError>
+    func renew(withRefreshToken refreshToken: String) -> Request<Credentials, AuthenticationError>
 }
 
 /**

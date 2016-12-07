@@ -150,9 +150,9 @@ struct Auth0Authentication: Authentication {
             ])
     }
 
-    func login(withToken token: String) -> Request<Credentials, AuthenticationError> {
+    func renew(withRefreshToken refreshToken: String) -> Request<Credentials, AuthenticationError> {
         let payload: [String: Any] = [
-            "refresh_token": token,
+            "refresh_token": refreshToken,
             "grant_type": "refresh_token",
             "client_id": self.clientId
         ]
