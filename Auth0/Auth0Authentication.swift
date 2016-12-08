@@ -52,6 +52,19 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
+    func login(usernameOrEmail username: String, password: String, audience: String?, scope: String?, realm: String?) -> Request<Credentials, AuthenticationError> {
+        let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
+        var payload: [String: Any] = [
+            "username": username,
+            "password": password,
+            "grant_type": "password",
+            "client_id": self.clientId,
+            ]
+        payload["audience"] = audience
+        payload["scope"] = scope
+        payload["realm"] = realm
+        return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
+    }
 
     func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         var payload: [String: Any] = [

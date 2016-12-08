@@ -84,6 +84,40 @@ public protocol Authentication: Trackable, Loggable {
     func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
 
     /**
+     Login using username and password to the clients default_directory
+
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .login(
+         usernameOrEmail: "support@auth0.com",
+         password: "a secret password")
+     ```
+
+     You can also specify audience and scope
+
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .login(
+         usernameOrEmail: "support@auth0.com",
+         password: "a secret password",
+         audience: "https://myapi.com/api",
+         scope: "openid profile",
+         realm: "mydatabase")
+     ```
+
+     - Parameters:
+     - username: username or email used of the user to authenticate
+     - password: password of the user
+     - audience: API Identifier that the client is requesting access to.
+     - scope: scope value requested when authenticating the user.
+     - realm: domain realm or connection name
+     - Returns: authentication request that will yield Auth0 User Credentials
+     */
+    func login(usernameOrEmail username: String, password: String, audience: String?, scope: String?, realm: String?) -> Request<Credentials, AuthenticationError>
+
+    /**
      Creates a user in a Database connection
 
      ```
@@ -428,6 +462,43 @@ public extension Authentication {
     public func login(usernameOrEmail username: String, password: String, multifactorCode: String? = nil, connection: String, scope: String = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, multifactorCode: multifactorCode, connection: connection, scope: scope, parameters: parameters)
     }
+
+    /**
+     Login using username and password to the clients default_directory
+
+     ```
+     Auth0
+         .authentication(clientId: clientId, domain: "samples.auth0.com")
+         .login(
+             usernameOrEmail: "support@auth0.com",
+             password: "a secret password")
+     ```
+
+     You can also specify audience and scope
+
+     ```
+     Auth0
+         .authentication(clientId: clientId, domain: "samples.auth0.com")
+         .login(
+             usernameOrEmail: "support@auth0.com",
+             password: "a secret password",
+             audience: "https://myapi.com/api",
+             scope: "openid profile",
+             realm: "mydatabase")
+     ```
+
+     - Parameters:
+     - username: username or email used of the user to authenticate
+     - password: password of the user
+     - audience: API Identifier that the client is requesting access to.
+     - scope: scope value requested when authenticating the user.
+     - realm: domain realm or connection name
+     - Returns: authentication request that will yield Auth0 User Credentials
+     */
+    public func login(usernameOrEmail username: String, password: String, audience: String? = nil, scope: String? = nil, realm: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(usernameOrEmail: username, password: password, audience: audience, scope: scope, realm: realm)
+    }
+
 
     /**
      Creates a user in a Database connection
