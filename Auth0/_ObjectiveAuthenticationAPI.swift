@@ -110,6 +110,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     }
 
     @objc(tokenInfoFromToken:callback:)
+    @available(*, deprecated, message: "see userInfoWithToken:callback:")
     public func tokenInfo(fromToken token: String, callback: @escaping (NSError?, Profile?) -> ()) {
         self.authentication.tokenInfo(token: token).start(handleResult(callback: callback))
     }

@@ -256,6 +256,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - returns: a request that will yield token information
      */
+    @available(*, deprecated, message: "see userInfo(token: String)")
     func tokenInfo(token: String) -> Request<Profile, AuthenticationError>
 
     /**
