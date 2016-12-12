@@ -342,7 +342,7 @@ public protocol Authentication: Trackable, Loggable {
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Renew user's credentials with a refresh_token
+     Renew user's credentials with a refresh_token. This method only works for auth performed with OAuth 2.0 API Authorization
 
      - parameter refreshToken: the client's refresh token obtained on auth
      - Returns: a request that will yield Auth0 user's credentials
