@@ -44,11 +44,14 @@ class AuthenticationSpec: QuickSpec {
 
         let auth = Auth0Authentication(clientId: ClientId, url: URL(string: "https://\(Domain)")!)
 
-        afterEach {
-            OHHTTPStubs.removeAllStubs()
+        beforeEach {
             stub(condition: isHost(Domain)) { _ in
                 return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-                }.name = "YOU SHALL NOT PASS!"
+            }.name = "YOU SHALL NOT PASS!"
+        }
+
+        afterEach {
+            OHHTTPStubs.removeAllStubs()
         }
 
         describe("login") {
@@ -138,13 +141,13 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        // MARK:- login with refresh_token
-        describe("refresh token login") {
+        // MARK:- refresh_token grant_type
+        describe("renew auth with refresh token") {
 
             let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 
             beforeEach {
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token":refreshToken])) { _ in return authResponse(accessToken: AccessToken) }.name = "refresh_token login"
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": refreshToken])) { _ in return authResponse(accessToken: AccessToken) }.name = "refresh_token login"
             }
 
             it("should receive access token") {
@@ -160,6 +163,46 @@ class AuthenticationSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: "invalidtoken").start { result in
                         expect(result).toNot(haveCredentials())
+                        done()
+                    }
+                }
+            }
+            
+        }
+
+        // MARK:- delegation endpoint
+        describe("delegation") {
+
+            let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+
+            beforeEach {
+                let delegationPayload = [
+                    "refresh_token": refreshToken,
+                    "client_id": ClientId,
+                    "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+                    "api_type": "app",
+                    "scope": "openid"
+                ]
+                stub(condition: isMethodPOST() && isHost(Domain) && isPath("/delegation") && hasAllOf(delegationPayload)) { _ in return authResponse(accessToken: AccessToken) }.name = "delegation with refresh token"
+            }
+
+            it("should receive access token") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.delegation(withParameters: [
+                        "refresh_token": refreshToken,
+                        "api_type": "app",
+                        "scope": "openid"
+                        ]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                }
+            }
+
+            it("should fail to recieve access token") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.delegation(withParameters: [:]).start { result in
+                        expect(result).to(beFailure())
                         done()
                     }
                 }

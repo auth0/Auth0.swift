@@ -22,6 +22,19 @@
 
 import Foundation
 
+func plainJson(from response: Response<AuthenticationError>, callback: Request<[String: Any], AuthenticationError>.Callback) {
+    do {
+        if let dictionary = try response.result() as? [String: Any] {
+            callback(.success(result: dictionary))
+        } else {
+            callback(.failure(error: AuthenticationError(string: string(response.data))))
+        }
+
+    } catch let error {
+        callback(.failure(error: error))
+    }
+}
+
 func authenticationObject<T: JSONObjectPayload>(from response: Response<AuthenticationError>, callback: Request<T, AuthenticationError>.Callback) {
     do {
         if let dictionary = try response.result() as? [String: Any], let object = T(json: dictionary) {

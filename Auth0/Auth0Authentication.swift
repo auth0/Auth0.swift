@@ -156,7 +156,17 @@ struct Auth0Authentication: Authentication {
             "grant_type": "refresh_token",
             "client_id": self.clientId
         ]
-        let refreshToken = URL(string: "/oauth/token", relativeTo: self.url)!
-        return Request(session: session, url: refreshToken, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
+        let oauthToken = URL(string: "/oauth/token", relativeTo: self.url)!
+        return Request(session: session, url: oauthToken, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
+    }
+
+    func delegation(withParameters parameters: [String : Any]) -> Request<[String : Any], AuthenticationError> {
+        var payload: [String: Any] = [
+            "client_id": self.clientId,
+            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        ]
+        parameters.forEach { payload[$0] = $1 }
+        let delegation = URL(string: "/delegation", relativeTo: self.url)!
+        return Request(session: session, url: delegation, method: "POST", handle: plainJson, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 }

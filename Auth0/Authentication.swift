@@ -342,12 +342,21 @@ public protocol Authentication: Trackable, Loggable {
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Renew user's credentials with a refresh_token. This method only works for auth performed with OAuth 2.0 API Authorization
-
+     Renew user's credentials with a refresh_token.
+     If you are not using OAuth 2.0 API Authorization please use `delegation(payload:)`
      - parameter refreshToken: the client's refresh token obtained on auth
+     - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
      - Returns: a request that will yield Auth0 user's credentials
      */
     func renew(withRefreshToken refreshToken: String) -> Request<Credentials, AuthenticationError>
+
+    /**
+     Calls delegation endpoint with the given parameters.
+     The only parameters it adds by default are `grant_type` and `client_id`.
+     - parameter parametes: dictionary with delegation parameters to send in the request.
+     - Returns: a request that will yield the result of delegation
+    */
+    func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
 }
 
 /**
