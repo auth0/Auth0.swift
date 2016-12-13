@@ -28,6 +28,7 @@ private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: 
 private let Bearer = "bearer"
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let expiresIn: TimeInterval = 3600
 
 class CredentialsSpec: QuickSpec {
     override func spec() {
@@ -35,12 +36,13 @@ class CredentialsSpec: QuickSpec {
         describe("init from json") {
 
             it("should have all tokens and token_type") {
-                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken])
+                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken, "expires_in" : expiresIn])
                 expect(credentials).toNot(beNil())
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == Bearer
                 expect(credentials.idToken) == IdToken
                 expect(credentials.refreshToken) == RefreshToken
+                expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
             }
 
             it("should have only access_token and token_type") {
@@ -49,6 +51,7 @@ class CredentialsSpec: QuickSpec {
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == Bearer
                 expect(credentials.idToken).to(beNil())
+                expect(credentials.expiresIn).to(beNil())
             }
 
             it("should have id_token") {
@@ -61,6 +64,30 @@ class CredentialsSpec: QuickSpec {
                 expect(credentials.refreshToken) == RefreshToken
             }
 
+            context("expires_in responses") {
+
+                it("should have valid exiresIn from string") {
+                    let credentials = Credentials(json: ["expires_in": String(expiresIn)])
+                    expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+                }
+
+                it("should have valid exiresIn from number") {
+                    let credentials = Credentials(json: ["expires_in": 3600])
+                    expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+                }
+
+                it("should be nil") {
+                    let credentials = Credentials(json: ["expires_in": "invalid"])
+                    expect(credentials.expiresIn).to(beNil())
+                }
+
+                it("should be nil") {
+                    let credentials = Credentials(json: ["expires_in": ""])
+                    expect(credentials.expiresIn).to(beNil())
+                }
+
+            }
+            
         }
     }
 }
