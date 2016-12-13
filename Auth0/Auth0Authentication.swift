@@ -57,7 +57,7 @@ struct Auth0Authentication: Authentication {
         var payload: [String: Any] = [
             "username": username,
             "password": password,
-            "grant_type": "password",
+            "grant_type": "http://auth0.com/oauth/grant-type/password-realm",
             "client_id": self.clientId,
             ]
         payload["audience"] = audience
