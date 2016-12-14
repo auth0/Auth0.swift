@@ -67,12 +67,17 @@ class CredentialsSpec: QuickSpec {
             context("expires_in responses") {
 
                 it("should have valid exiresIn from string") {
-                    let credentials = Credentials(json: ["expires_in": String(expiresIn)])
+                    let credentials = Credentials(json: ["expires_in": "3600"])
                     expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
                 }
 
-                it("should have valid exiresIn from number") {
+                it("should have valid exiresIn from int") {
                     let credentials = Credentials(json: ["expires_in": 3600])
+                    expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+                }
+
+                it("should have valid exiresIn from double") {
+                    let credentials = Credentials(json: ["expires_in": 3600.0])
                     expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
                 }
 
@@ -87,7 +92,7 @@ class CredentialsSpec: QuickSpec {
                 }
 
             }
-            
+
         }
     }
 }
