@@ -84,14 +84,15 @@ public protocol Authentication: Trackable, Loggable {
     func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
 
     /**
-     Login using username and password to the clients default_directory
+     Login using username and password in a realm.
 
      ```
      Auth0
      .authentication(clientId: clientId, domain: "samples.auth0.com")
      .login(
          usernameOrEmail: "support@auth0.com",
-         password: "a secret password")
+         password: "a secret password",
+         realm: "mydatabase")
      ```
 
      You can also specify audience and scope
@@ -102,20 +103,20 @@ public protocol Authentication: Trackable, Loggable {
      .login(
          usernameOrEmail: "support@auth0.com",
          password: "a secret password",
+         realm: "mydatabase",
          audience: "https://myapi.com/api",
-         scope: "openid profile",
-         realm: "mydatabase")
+         scope: "openid profile")
      ```
 
-     - Parameters:
-     - username: username or email used of the user to authenticate
-     - password: password of the user
-     - audience: API Identifier that the client is requesting access to.
-     - scope: scope value requested when authenticating the user.
-     - realm: domain realm or connection name
-     - Returns: authentication request that will yield Auth0 User Credentials
+     - parameter username: username or email used of the user to authenticate
+     - parameter password: password of the user
+     - parameter realm: domain of the realm or connection name
+     - parameter audience: API Identifier that the client is requesting access to.
+     - parameter scope: scope value requested when authenticating the user.
+     - important: This only works if you have the OAuth 2.0 API Authorization flag on
+     - returns: authentication request that will yield Auth0 User Credentials
      */
-    func login(usernameOrEmail username: String, password: String, audience: String?, scope: String?, realm: String?) -> Request<Credentials, AuthenticationError>
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Creates a user in a Database connection
@@ -380,7 +381,7 @@ public protocol Authentication: Trackable, Loggable {
      If you are not using OAuth 2.0 API Authorization please use `delegation(payload:)`
      - parameter refreshToken: the client's refresh token obtained on auth
      - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
-     - Returns: a request that will yield Auth0 user's credentials
+     - returns: a request that will yield Auth0 user's credentials
      */
     func renew(withRefreshToken refreshToken: String) -> Request<Credentials, AuthenticationError>
 
@@ -388,7 +389,7 @@ public protocol Authentication: Trackable, Loggable {
      Calls delegation endpoint with the given parameters.
      The only parameters it adds by default are `grant_type` and `client_id`.
      - parameter parametes: dictionary with delegation parameters to send in the request.
-     - Returns: a request that will yield the result of delegation
+     - returns: a request that will yield the result of delegation
     */
     func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
 }
@@ -464,14 +465,15 @@ public extension Authentication {
     }
 
     /**
-     Login using username and password to the clients default_directory
+     Login using username and password in a realm.
 
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .login(
              usernameOrEmail: "support@auth0.com",
-             password: "a secret password")
+             password: "a secret password",
+             realm: "mydatabase")
      ```
 
      You can also specify audience and scope
@@ -482,21 +484,20 @@ public extension Authentication {
          .login(
              usernameOrEmail: "support@auth0.com",
              password: "a secret password",
+             realm: "mydatabase",
              audience: "https://myapi.com/api",
-             scope: "openid profile",
-             realm: "mydatabase")
+             scope: "openid profile")
      ```
 
-     - Parameters:
-     - username: username or email used of the user to authenticate
-     - password: password of the user
-     - audience: API Identifier that the client is requesting access to.
-     - scope: scope value requested when authenticating the user.
-     - realm: domain realm or connection name
+     - parameter username: username or email used of the user to authenticate
+     - parameter password: password of the user
+     - parameter realm: domain realm or connection name
+     - parameter audience: API Identifier that the client is requesting access to.
+     - parameter scope: scope value requested when authenticating the user.
      - Returns: authentication request that will yield Auth0 User Credentials
      */
-    public func login(usernameOrEmail username: String, password: String, audience: String? = nil, scope: String? = nil, realm: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(usernameOrEmail: username, password: password, audience: audience, scope: scope, realm: realm)
+    public func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope)
     }
 
 
@@ -639,7 +640,6 @@ public extension Authentication {
         .startPasswordless(phoneNumber: "support@auth0.com", type: .iOSLink)
         .start { print($0) }
      ```
-
      - parameter phoneNumber:   phone number where to send the sms with code or link
      - parameter type:          type of passwordless authentication. By default is code
      - parameter connection:    name of the passwordless connection. By default is 'sms'

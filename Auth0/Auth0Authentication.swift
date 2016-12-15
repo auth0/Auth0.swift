@@ -52,17 +52,17 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func login(usernameOrEmail username: String, password: String, audience: String?, scope: String?, realm: String?) -> Request<Credentials, AuthenticationError> {
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "username": username,
             "password": password,
             "grant_type": "http://auth0.com/oauth/grant-type/password-realm",
             "client_id": self.clientId,
+            "realm": realm
             ]
         payload["audience"] = audience
         payload["scope"] = scope
-        payload["realm"] = realm
         return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 

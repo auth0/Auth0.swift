@@ -24,7 +24,7 @@ import Foundation
 
 
 /**
- Auth0 normalized user profile
+ Auth0 normalized user profile returned by Auth0
  
  - seeAlso: [Normalized User Profile](https://auth0.com/docs/user-profile/normalized)
  */

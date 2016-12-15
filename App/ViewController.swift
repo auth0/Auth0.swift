@@ -17,6 +17,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
         self.onAuth = { [weak self] in
             switch $0 {
             case .failure(let cause):

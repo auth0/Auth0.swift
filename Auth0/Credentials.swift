@@ -23,16 +23,24 @@
 import Foundation
 
 /**
- Auth0 users' credentials
+ User's credentials obtained from Auth0.
+ What values are available depends on what type of Auth request you perfomed,
+ so if you used WebAuth (`/authorize` call) the `response_type` and `scope` will determine what tokens you get
  */
 @objc(A0Credentials)
 public class Credentials: NSObject, JSONObjectPayload {
 
+    /// Token used that allows calling to the requested APIs (audience sent on Auth)
     public let accessToken: String?
+    /// Type of the access token
     public let tokenType: String?
-    public let idToken: String?
-    public let refreshToken: String?
+    /// When the access_token expires
     public let expiresIn: Date?
+    /// If the API allows you to request new access tokens and the scope `offline_access` was included on Auth
+    public let refreshToken: String?
+
+    // Token that details the user identity after authentication
+    public let idToken: String?
 
     public init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Date? = nil) {
         self.accessToken = accessToken
