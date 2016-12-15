@@ -34,7 +34,7 @@ public class Credentials: NSObject, JSONObjectPayload {
     public let refreshToken: String?
     public let expiresIn: Date?
 
-    init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Date? = nil) {
+    public init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Date? = nil) {
         self.accessToken = accessToken
         self.tokenType = tokenType
         self.idToken = idToken
