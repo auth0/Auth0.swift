@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 
 import Foundation
-import JWTDecode
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
@@ -125,7 +124,33 @@ struct PKCE: OAuth2Grant {
 
 private func validate(responseType: [ResponseType], token: String?, nonce: String?) -> Bool {
     guard responseType.contains(.idToken) else { return true }
-    guard let token = token, let nonce = nonce, let jwt = try? decode(jwt: token) else { return false }
-    let tokenNonce = jwt.claim(name: "nonce").string
-    return tokenNonce == nonce
+    guard
+        let expectedNonce = nonce,
+        let token = token
+        else { return false }
+    let claims = decode(jwt: token)
+    let actualNonce = claims?["nonce"] as? String
+    return actualNonce == expectedNonce
+}
+
+private func decode(jwt: String) -> [String: Any]? {
+    let parts = jwt.components(separatedBy: ".")
+    guard parts.count == 3 else { return nil }
+    var base64 = parts[1]
+        .replacingOccurrences(of: "-", with: "+")
+        .replacingOccurrences(of: "_", with: "/")
+    let length = Double(base64.lengthOfBytes(using: String.Encoding.utf8))
+    let requiredLength = 4 * ceil(length / 4.0)
+    let paddingLength = requiredLength - length
+    if paddingLength > 0 {
+        let padding = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
+        base64 = base64 + padding
+    }
+
+    guard
+        let bodyData = Data(base64Encoded: base64, options: .ignoreUnknownCharacters)
+        else { return nil }
+
+    let json = try? JSONSerialization.jsonObject(with: bodyData, options: [])
+    return json as? [String: Any]
 }

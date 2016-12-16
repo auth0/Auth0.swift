@@ -79,7 +79,7 @@ class OAuth2GrantSpec: QuickSpec {
                     }
                 }
 
-                it("should fail as invalid token") {
+                it("should fail with invalid token") {
                     let idToken = "notarealtoken"
                     let values = ["id_token": idToken]
                     waitUntil { done in
@@ -90,7 +90,7 @@ class OAuth2GrantSpec: QuickSpec {
                     }
                 }
 
-                it("should fail as no token") {
+                it("should fail with no token") {
                     let values = ["": ""]
                     waitUntil { done in
                         implicit.credentials(from: values) {
@@ -100,7 +100,7 @@ class OAuth2GrantSpec: QuickSpec {
                     }
                 }
 
-                it("should fail as no nonce does not match") {
+                it("should fail cause nonce does not match expected one") {
                     implicit = ImplicitGrant(responseType: [.idToken], nonce: "nomatch")
                     let values = ["id_token": idToken]
                     waitUntil { done in
