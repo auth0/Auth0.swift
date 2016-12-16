@@ -1,3 +1,5 @@
+require('semantic')
+
 opt_out_usage
 
 fastlane_version "1.103.0"
@@ -34,5 +36,67 @@ platform :ios do
     }
     prepare_cache
     test(options)
+  end
+
+  lane :prepare_release do |options|
+    ensure_git_status_clean
+    versions = preapare_release_versioning(bump_type: options[:bump])
+    UI.header "Preparing release for version #{versions.next}"
+    changelog_entry = prepare_changelog(versions: versions, organization: "auth0", repository: "Auth0.swift")
+    prepare_changelog_file(changelog_file: "../CHANGELOG.md", changelog_entry: changelog_entry)
+    UI.message "\n#{changelog_entry}"
+    `"/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" -w ../CHANGELOG.md` unless UI.confirm("is CHANGELOG for version #{versions.next} Ok?")
+    prepare_readme_file(readme_file: "../README.md", versions: versions)
+
+    git_add(path: ['CHANGELOG.md', 'README.md'])
+    increment_version_number(version_number: versions.next.to_s)
+    commit_version_bump(
+      message: "Release #{versions.next}",
+      xcodeproj: "Auth0.xcodeproj",
+      force: true
+      )
+    add_git_tag(tag: versions.next.to_s)
+    UI.success "Release #{versions.next} ready to be uploaded! 📦"
+  end
+
+  private_lane :prepare_readme_file do |options|
+    file_name = options[:readme_file]
+    versions = options[:versions]
+    File.write(f = file_name, File.read(f).gsub(/~> #{versions.current.major}\.#{versions.current.minor}/, "~> #{versions.next.major}.#{versions.next.minor}"))
+  end
+
+  private_lane :prepare_changelog_file do |options|
+    file_name = options[:changelog_file]
+    changelog_entry = options[:changelog_entry]
+    File.write(f = file_name, File.read(f).gsub(/# Change Log/, changelog_entry))
+  end
+
+  private_lane :prepare_changelog do |options|
+    versions = options[:versions]
+    repository = options[:repository]
+    organization = options[:organization]
+    command = "curl -H \"Accept: text/markdown\" https://webtask.it.auth0.com/api/run/wt-hernan-auth0_com-0/oss-changelog.js\\?webtask_no_cache=1\\&repo=#{repository}\\&milestone=#{versions.next}"
+    changelog = FastlaneCore::CommandExecutor.execute(
+      command: command,
+      print_command: false,
+      error: proc do |error_output|
+        UI.user_error!("Failed to build changelog with error: \n#{error_output}")
+      end
+    )
+    "# Change Log\n\n" +
+    "## [#{versions.next}](https://github.com/#{organization}/#{repository}/tree/#{versions.next}) (#{Time.now.strftime('%Y-%m-%d')})\n" +
+    "[Full Changelog](https://github.com/#{organization}/#{repository}/compare/#{versions.current}...#{versions.next})\n\n" +
+    changelog
+  end
+
+  private_lane :preapare_release_versioning do |options|
+    bump_type = options[:bump_type].to_sym
+    UI.user_error!("Must specify if the release is major, minor or patch") if bump_type.nil?
+    current_version_number = get_version_number
+    UI.user_error!("Cannot find current version number from .xcodeproj") if current_version_number.nil?
+    current_version = Semantic::Version.new current_version_number
+    next_version = current_version.increment!(bump_type)
+    UI.message "next_version: #{next_version} current_version: #{current_version}"
+    versions = Struct.new(:current, :next).new current_version, next_version
   end
 end

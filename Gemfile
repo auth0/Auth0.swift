@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'fastlane', '1.103.0'
+gem 'fastlane'
 gem 'carthage_cache', :git => 'https://github.com/guidomb/carthage_cache', :branch => 'master'
+gem 'semantic',  '~> 1.5'
