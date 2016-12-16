@@ -21,9 +21,9 @@ Runs all the tests
 fastlane ios ci
 ```
 Runs all the tests in a CI environment
-### ios prepare_release
+### ios release
 ```
-fastlane ios prepare_release
+fastlane ios release
 ```
 
 

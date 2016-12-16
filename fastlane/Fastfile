@@ -38,8 +38,23 @@ platform :ios do
     test(options)
   end
 
-  lane :prepare_release do |options|
+  lane :release do |options|
+    prepare_release options
+    perform_release options
+  end
+
+  private_lane :perform_release do
+    tag = last_git_tag
+    UI.header "Performing release #{tag}"
+    pod_lib_lint
+    push_to_git_remote
+    pod_push
+    sh("chandler push #{tag}")
+  end
+
+  private_lane :prepare_release do |options|
     ensure_git_status_clean
+    UI.user_error!("Must specify if the release is major, minor or patch") if options[:bump].nil?
     versions = preapare_release_versioning(bump_type: options[:bump])
     UI.header "Preparing release for version #{versions.next}"
     changelog_entry = prepare_changelog(versions: versions, organization: "auth0", repository: "Auth0.swift")
@@ -91,7 +106,6 @@ platform :ios do
 
   private_lane :preapare_release_versioning do |options|
     bump_type = options[:bump_type].to_sym
-    UI.user_error!("Must specify if the release is major, minor or patch") if bump_type.nil?
     current_version_number = get_version_number
     UI.user_error!("Cannot find current version number from .xcodeproj") if current_version_number.nil?
     current_version = Semantic::Version.new current_version_number
