@@ -1,5 +1,26 @@
 # Change Log
 
+## [1.1.0](https://github.com/auth0/Auth0.swift/tree/1.1.0) (2016-12-16)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.1...1.1.0)
+
+**Closed issues**
+- Missing API [\#59](https://github.com/auth0/Auth0.swift/issues/59)
+- Delegation for Firebase [\#55](https://github.com/auth0/Auth0.swift/issues/55)
+
+**Added**
+- Credentials exposes expires_in if returned after auth [\#72](https://github.com/auth0/Auth0.swift/pull/72) ([cocojoe](https://github.com/cocojoe))
+- Added grant type password realm support [\#71](https://github.com/auth0/Auth0.swift/pull/71) ([cocojoe](https://github.com/cocojoe))
+- Support refresh token authentication [\#69](https://github.com/auth0/Auth0.swift/pull/69) ([cocojoe](https://github.com/cocojoe))
+- Support for audience parameter for WebAuth [\#67](https://github.com/auth0/Auth0.swift/pull/67) ([cocojoe](https://github.com/cocojoe))
+- Multiple respone_type support [\#65](https://github.com/auth0/Auth0.swift/pull/65) ([cocojoe](https://github.com/cocojoe))
+- Support id_token response type [\#62](https://github.com/auth0/Auth0.swift/pull/62) ([cocojoe](https://github.com/cocojoe))
+
+**Changed**
+- Expose credentials init [\#73](https://github.com/auth0/Auth0.swift/pull/73) ([cocojoe](https://github.com/cocojoe))
+
+**Deprecated**
+- Deprecate tokeninfo [\#70](https://github.com/auth0/Auth0.swift/pull/70) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.0.1](https://github.com/auth0/Auth0.swift/tree/1.0.1) (2016-11-23)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.0...1.0.1)
 
