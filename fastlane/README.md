@@ -25,7 +25,9 @@ Runs all the tests in a CI environment
 ```
 fastlane ios release
 ```
+Performs the release of the library to Cocoapods & Github Releases
 
+You need to specify the type of release with the `bump` parameter with the values [major|minor|patch]
 
 ----
 

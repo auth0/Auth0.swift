@@ -38,6 +38,8 @@ platform :ios do
     test(options)
   end
 
+  desc "Performs the release of the library to Cocoapods & Github Releases"
+  desc "You need to specify the type of release with the `bump` parameter with the values [major|minor|patch]"
   lane :release do |options|
     prepare_release options
     perform_release options
@@ -49,7 +51,7 @@ platform :ios do
     pod_lib_lint
     push_to_git_remote
     pod_push
-    sh("chandler push #{tag}")
+    sh("chandler push #{tag} --git=../.git --changelog=../CHANGELOG.md")
   end
 
   private_lane :prepare_release do |options|
