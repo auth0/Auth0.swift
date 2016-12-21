@@ -73,6 +73,7 @@ class SafariWebAuth: WebAuth {
     }
 
     func parameters(_ parameters: [String: String]) -> Self {
+        if let value = parameters["state"] { _ = self.state(value) }
         parameters.forEach { self.parameters[$0] = $1 }
         return self
     }
