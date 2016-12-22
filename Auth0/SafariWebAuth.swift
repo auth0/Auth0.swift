@@ -34,7 +34,6 @@ class SafariWebAuth: WebAuth {
     let presenter: ControllerModalPresenter
     let storage: SessionStorage
     var logger: Logger?
-    let state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
     var responseType: [ResponseType] = [.code]
@@ -107,9 +106,10 @@ class SafariWebAuth: WebAuth {
             guard self.nonce != nil else { return callback(Result.failure(error: WebAuthError.noNonceProvided)) }
         }
         let handler = self.handler(redirectURL)
-        let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
+        let state = self.parameters["state"] ?? generateDefaultState()
+        let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults, state: state)
         let (controller, finish) = newSafari(authorizeURL, callback: callback)
-        let state = self.parameters["state"] ?? self.state
+
         let session = SafariSession(controller: controller, redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: self.logger)
         controller.delegate = session
         logger?.trace(url: authorizeURL, source: "Safari")
@@ -139,7 +139,7 @@ class SafariWebAuth: WebAuth {
         return (controller, finish)
     }
 
-    func buildAuthorizeURL(withRedirectURL redirectURL: URL, defaults: [String: String]) -> URL {
+    func buildAuthorizeURL(withRedirectURL redirectURL: URL, defaults: [String: String], state: String?) -> URL {
         let authorize = URL(string: "/authorize", relativeTo: self.url)!
         var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true)!
         var items: [URLQueryItem] = []
@@ -147,7 +147,7 @@ class SafariWebAuth: WebAuth {
         entries["client_id"] = self.clientId
         entries["redirect_uri"] = redirectURL.absoluteString
         entries["scope"] = "openid"
-        entries["state"] = self.state
+        entries["state"] = state
         entries["response_type"] = self.responseType.map { $0.label! }.joined(separator: " ")
         if self.responseType.contains(.idToken) {
             entries["nonce"] = self.nonce
