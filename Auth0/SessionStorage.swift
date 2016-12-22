@@ -26,7 +26,7 @@ import UIKit
 class SessionStorage {
     static let sharedInstance = SessionStorage()
 
-    fileprivate var current: OAuth2Session? = nil
+    private(set) var current: OAuth2Session? = nil
 
     func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
         let resumed = self.current?.resume(url, options: options) ?? false

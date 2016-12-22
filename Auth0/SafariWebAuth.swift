@@ -34,7 +34,7 @@ class SafariWebAuth: WebAuth {
     let presenter: ControllerModalPresenter
     let storage: SessionStorage
     var logger: Logger?
-    var state = generateDefaultState()
+    let state = generateDefaultState()
     var parameters: [String: String] = [:]
     var universalLink = false
     var responseType: [ResponseType] = [.code]
@@ -68,12 +68,11 @@ class SafariWebAuth: WebAuth {
     }
 
     func state(_ state: String) -> Self {
-        self.state = state
+        self.parameters["state"] = state
         return self
     }
 
     func parameters(_ parameters: [String: String]) -> Self {
-        if let value = parameters["state"] { _ = self.state(value) }
         parameters.forEach { self.parameters[$0] = $1 }
         return self
     }
@@ -110,7 +109,8 @@ class SafariWebAuth: WebAuth {
         let handler = self.handler(redirectURL)
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults)
         let (controller, finish) = newSafari(authorizeURL, callback: callback)
-        let session = SafariSession(controller: controller, redirectURL: redirectURL, state: self.state, handler: handler, finish: finish, logger: self.logger)
+        let state = self.parameters["state"] ?? self.state
+        let session = SafariSession(controller: controller, redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: self.logger)
         controller.delegate = session
         logger?.trace(url: authorizeURL, source: "Safari")
         self.presenter.present(controller)

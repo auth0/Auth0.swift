@@ -224,6 +224,40 @@ class WebAuthSpec: QuickSpec {
         }
 
 
+        describe("session") {
+            let storage = SessionStorage.sharedInstance
+
+            beforeEach {
+                if let current = storage.current {
+                    storage.cancel(current)
+                }
+            }
+
+            it("should save started session") {
+                newWebAuth().start({ _ in})
+                expect(storage.current).toNot(beNil())
+            }
+
+            it("should hava a generated state") {
+                let auth = newWebAuth()
+                auth.start({ _ in})
+                expect(storage.current?.state) == auth.state
+            }
+
+            it("should honor supplied state") {
+                let state = UUID().uuidString
+                newWebAuth().state(state).start({ _ in})
+                expect(storage.current?.state) == state
+            }
+
+            it("should honor supplied state via parameters") {
+                let state = UUID().uuidString
+                newWebAuth().parameters(["state": state]).start({ _ in})
+                expect(storage.current?.state) == state
+            }
+
+        }
+
         describe("safari") {
 
             var result: Result<Credentials>?
