@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.1.1](https://github.com/auth0/Auth0.swift/tree/1.1.1) (2017-01-02)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.1.0...1.1.1)
+
+
+**Fixed**
+- Ensure state set correctly when set via parameters [\#77](https://github.com/auth0/Auth0.swift/pull/77) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.1.0](https://github.com/auth0/Auth0.swift/tree/1.1.0) (2016-12-16)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.0.1...1.1.0)
 
