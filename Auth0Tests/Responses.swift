@@ -29,8 +29,9 @@ let Support = "support"
 let Auth0Phone = "+10123456789"
 let Nickname = "sup"
 let PictureURL = URL(string: "https://auth0.com")!
-let CreatedAt = "2015-08-19T17:18:00.123Z"
-let CreatedAtTimestamp = 1440004680.123
+let CreatedAt = "2015-08-19T17:18:00.000Z"
+let CreatedAtUnix = "1440004680"
+let CreatedAtTimestamp = 1440004680.000
 
 func authResponse(accessToken: String, idToken: String? = nil) -> OHHTTPStubsResponse {
     var json = [
@@ -81,7 +82,7 @@ func userInfo() -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(jsonObject: basicProfile(), statusCode: 200, headers: nil)
 }
 
-func basicProfile(_ id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAt) -> [String: Any] {
+func basicProfile(_ id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAtUnix) -> [String: Any] {
     return ["user_id": id, "name": name, "nickname": nickname, "picture": picture, "created_at": createdAt]
 }
 
