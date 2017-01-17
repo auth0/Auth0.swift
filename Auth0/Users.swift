@@ -290,7 +290,7 @@ extension Management: Users {
     func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError> {
         let userPath = "/api/v2/users/\(identifier)"
         let component = components(baseURL: self.url as URL, path: userPath)
-        
+
         return Request(session: self.session, url: component.url!, method: "PATCH", handle: self.managementObject, payload: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
@@ -303,11 +303,10 @@ extension Management: Users {
         return link(identifier, payload: ["link_with": token])
     }
 
-
     func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
         var payload = [
             "user_id": userId,
-            "provider": provider,
+            "provider": provider
         ]
         payload["connection_id"] = connectionId
         return link(identifier, payload: payload)

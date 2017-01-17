@@ -23,6 +23,7 @@
 import Foundation
 
 @objc(A0ManagementAPI)
+// swiftlint:disable:next type_name
 public class _ObjectiveManagementAPI: NSObject {
 
     private var users: Users
@@ -66,8 +67,9 @@ public class _ObjectiveManagementAPI: NSObject {
                 }
         }
     }
-    
+
     @objc(unlinkUserWithIdentifier:provider:fromUserId:callback:)
+    // swiftlint:disable:next function_parameter_count
     public func unlink(identifier: String, provider: String, fromUserId userId: String, callback: @escaping (NSError?, [[String: Any]]?) -> ()) {
         self.users
             .unlink(identityId: identifier, provider: provider, fromUserId:userId)
@@ -80,7 +82,6 @@ public class _ObjectiveManagementAPI: NSObject {
                 }
         }
     }
-
 
     /**
      Avoid Auth0.swift sending its version on every request to Auth0 API.

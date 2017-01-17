@@ -37,6 +37,7 @@ struct Auth0Authentication: Authentication {
         self.telemetry = telemetry
     }
 
+    // swiftlint:disable:next function_parameter_count
     func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = URL(string: "/oauth/ro", relativeTo: self.url)!
         var payload: [String: Any] = [
@@ -45,7 +46,7 @@ struct Auth0Authentication: Authentication {
             "connection": connection,
             "grant_type": "password",
             "scope": scope,
-            "client_id": self.clientId,
+            "client_id": self.clientId
             ]
         payload["mfa_code"] = multifactorCode
         parameters.forEach { key, value in payload[key] = value }
@@ -71,7 +72,7 @@ struct Auth0Authentication: Authentication {
             "email": email,
             "password": password,
             "connection": connection,
-            "client_id": self.clientId,
+            "client_id": self.clientId
             ]
         payload["username"] = username
         payload["user_metadata"] = userMetadata
@@ -90,6 +91,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: resetPassword, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
+    // swiftlint:disable:next function_parameter_count
     func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]?, scope: String, parameters: [String: Any]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError> {
         let first = createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
         let second = login(usernameOrEmail: email, password: password, connection: connection, scope: scope, parameters: parameters)
@@ -101,7 +103,7 @@ struct Auth0Authentication: Authentication {
             "email": email,
             "connection": connection,
             "send": type.rawValue,
-            "client_id": self.clientId,
+            "client_id": self.clientId
             ]
         if case .WebLink = type , !parameters.isEmpty {
             payload["authParams"] = parameters
@@ -116,7 +118,7 @@ struct Auth0Authentication: Authentication {
             "phone_number": phoneNumber,
             "connection": connection,
             "send": type.rawValue,
-            "client_id": self.clientId,
+            "client_id": self.clientId
             ]
         let start = URL(string: "/passwordless/start", relativeTo: self.url)!
         return Request(session: session, url: start, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
@@ -138,7 +140,7 @@ struct Auth0Authentication: Authentication {
             "access_token": token,
             "connection": connection,
             "scope": scope,
-            "client_id": self.clientId,
+            "client_id": self.clientId
             ]
         parameters.forEach { key, value in payload[key] = value }
         let accessToken = URL(string: "/oauth/access_token", relativeTo: self.url)!
@@ -147,7 +149,7 @@ struct Auth0Authentication: Authentication {
 
     func tokenExchange(withParameters parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
         var payload: [String: Any] = [
-            "client_id": self.clientId,
+            "client_id": self.clientId
             ]
         parameters.forEach { payload[$0] = $1 }
         let token = URL(string: "/oauth/token", relativeTo: self.url)!
@@ -159,7 +161,7 @@ struct Auth0Authentication: Authentication {
             "code": code,
             "code_verifier": codeVerifier,
             "redirect_uri": redirectURI,
-            "grant_type": "authorization_code",
+            "grant_type": "authorization_code"
             ])
     }
 
@@ -176,7 +178,7 @@ struct Auth0Authentication: Authentication {
     func delegation(withParameters parameters: [String : Any]) -> Request<[String : Any], AuthenticationError> {
         var payload: [String: Any] = [
             "client_id": self.clientId,
-            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer"
         ]
         parameters.forEach { payload[$0] = $1 }
         let delegation = URL(string: "/delegation", relativeTo: self.url)!

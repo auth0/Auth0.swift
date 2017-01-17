@@ -81,6 +81,7 @@ public protocol Authentication: Trackable, Loggable {
      - returns: authentication request that will yield Auth0 User Credentials
      - seeAlso: Credentials
      */
+    // swiftlint:disable:next function_parameter_count
     func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
 
     /**
@@ -220,6 +221,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - returns: an authentication request that will yield Auth0 user credentials after creating the user.
      */
+    // swiftlint:disable:next function_parameter_count
     func signUp(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, scope: String, parameters: [String: Any]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError>
 
     /**
@@ -499,7 +501,6 @@ public extension Authentication {
     public func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope)
     }
-
 
     /**
      Creates a user in a Database connection

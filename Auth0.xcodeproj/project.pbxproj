@@ -847,6 +847,7 @@
 				5F06DD741CC448B10011842B /* Frameworks */,
 				5F06DD751CC448B10011842B /* Headers */,
 				5F06DD761CC448B10011842B /* Resources */,
+				5B717B241E2E2696004A05A7 /* SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -865,6 +866,7 @@
 				5F06DD811CC448C90011842B /* Frameworks */,
 				5F06DD821CC448C90011842B /* Headers */,
 				5F06DD831CC448C90011842B /* Resources */,
+				5B717B251E2E26B9004A05A7 /* SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -922,6 +924,7 @@
 				5F23E6B51D4ACA7100C3F2D9 /* Frameworks */,
 				5F23E6B61D4ACA7100C3F2D9 /* Headers */,
 				5F23E6B71D4ACA7100C3F2D9 /* Resources */,
+				5B717B261E2E26C4004A05A7 /* SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -940,6 +943,7 @@
 				5F23E6F21D4B87F000C3F2D9 /* Frameworks */,
 				5F23E6F31D4B87F000C3F2D9 /* Headers */,
 				5F23E6F41D4B87F000C3F2D9 /* Resources */,
+				5B717B271E2E26CE004A05A7 /* SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -1128,6 +1132,62 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5B717B241E2E2696004A05A7 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nfi";
+		};
+		5B717B251E2E26B9004A05A7 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nfi";
+		};
+		5B717B261E2E26C4004A05A7 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nfi";
+		};
+		5B717B271E2E26CE004A05A7 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nfi";
+		};
 		5F53F5CB1CFCDC2500476A46 /* Auth0 */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

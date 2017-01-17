@@ -15,6 +15,14 @@ platform :ios do
     end
   end
 
+  desc "SwiftLint pass"
+  lane :lint do
+  	swiftlint(
+  		mode: :lint,
+   		config_file: '.swiftlint.yml'
+  	)
+  end
+
   desc "Runs all the tests"
   lane :test do |options|
     scheme = options[:scheme]

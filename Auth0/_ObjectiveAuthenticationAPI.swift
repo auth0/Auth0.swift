@@ -23,6 +23,7 @@
 import Foundation
 
 @objc(A0AuthenticationAPI)
+// swiftlint:disable:next type_name
 public class _ObjectiveAuthenticationAPI: NSObject {
 
     private var authentication: Authentication
@@ -40,6 +41,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     }
 
     @objc(loginWithUsernameOrEmail:password:connection:scope:parameters:callback:)
+    // swiftlint:disable:next function_parameter_count
     public func login(withUsernameOrEmail username: String, password: String, connection: String, scope: String, parameters: [String: Any]?, callback: @escaping (NSError?, Credentials?) -> ()) {
         self.authentication
             .login(usernameOrEmail: username, password: password, connection: connection, scope: scope, parameters: parameters ?? [:])
@@ -47,6 +49,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     }
 
     @objc(createUserWithEmail:username:password:connection:userMetadata:callback:)
+    // swiftlint:disable:next function_parameter_count
     public func createUser(withEmail email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, callback: @escaping (NSError?, [String: Any]?) -> ()) {
         self.authentication
             .createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
@@ -55,7 +58,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
                 case .success(let user):
                     var info: [String: Any] = [
                         "email": user.email,
-                        "verified": user.verified,
+                        "verified": user.verified
                     ]
                     if let username = user.username {
                         info["username"] = username
@@ -75,6 +78,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     }
 
     @objc(signUpWithEmail:username:password:connection:userMetadata:scope:parameters:callback:)
+    // swiftlint:disable:next function_parameter_count
     public func signUp(withEmail email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, scope: String, parameters: [String: Any]?, callback: @escaping (NSError?, Credentials?) -> ()) {
         self.authentication
             .signUp(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, scope: scope, parameters: parameters ?? [:])

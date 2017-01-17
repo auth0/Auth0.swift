@@ -72,6 +72,7 @@ struct PKCE: OAuth2Grant {
         self.init(authentication: authentication, redirectURL: redirectURL, verifier: generator.verifier, challenge: generator.challenge, method: generator.method, responseType: reponseType, nonce: nonce)
     }
 
+    // swiftlint:disable:next function_parameter_count
     init(authentication: Authentication, redirectURL: URL, verifier: String, challenge: String, method: String, responseType: [ResponseType], nonce: String? = nil) {
         self.authentication = authentication
         self.redirectURL = redirectURL
@@ -80,7 +81,7 @@ struct PKCE: OAuth2Grant {
 
         var newDefaults: [String: String] = [
             "code_challenge": challenge,
-            "code_challenge_method": method,
+            "code_challenge_method": method
         ]
 
         if let nonce = nonce {
@@ -94,6 +95,8 @@ struct PKCE: OAuth2Grant {
         guard
             let code = values["code"]
             else {
+                // FIXME: Force try
+                // swiftlint:disable:next force_try
                 let data = try! JSONSerialization.data(withJSONObject: values, options: [])
                 let string = String(data: data, encoding: .utf8)
                 return callback(.failure(error: AuthenticationError(string: string)))

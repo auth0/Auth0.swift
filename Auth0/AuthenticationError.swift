@@ -152,7 +152,7 @@ extension AuthenticationError: CustomNSError {
     public var errorUserInfo: [String : Any] {
         return [
             NSLocalizedDescriptionKey: self.description,
-            AuthenticationError.infoKey: self,
+            AuthenticationError.infoKey: self
         ]
     }
 }

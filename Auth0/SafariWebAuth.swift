@@ -160,7 +160,7 @@ class SafariWebAuth: WebAuth {
     }
 
     func handler(_ redirectURL: URL) -> OAuth2Grant {
-        if self.responseType.contains([.code]){
+        if self.responseType.contains([.code]) {
             var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
             authentication.logger = self.logger
             return PKCE(authentication: authentication, redirectURL: redirectURL, reponseType: self.responseType, nonce: self.nonce)
@@ -186,7 +186,7 @@ private func generateDefaultState() -> String? {
     let result = data.withUnsafeMutableBytes { (bytes: UnsafeMutablePointer<UInt8>) -> Int in
         return Int(SecRandomCopyBytes(kSecRandomDefault, data.count, bytes))
     }
-    
+
     guard result == 0 else { return nil }
     return data.a0_encodeBase64URLSafe()
 }
