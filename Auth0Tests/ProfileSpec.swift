@@ -102,6 +102,17 @@ class UserProfileSpec: QuickSpec {
             ["user_id", "name", "nickname", "picture", "created_at"].forEach { key in itBehavesLike("invalid profile") { ["key": key] } }
         }
 
+        describe("time conversion") {
+
+            it("should convert ISO8601") {
+                var json = basicProfile()
+                json["created_at"] = CreatedAt
+                let profile = Profile(json: json)
+                expect(profile?.createdAt.timeIntervalSince1970) == CreatedAtTimestamp
+            }
+
+        }
+
         describe("metadata") {
 
             it("should have user_metadata") {
