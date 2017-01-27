@@ -26,7 +26,7 @@ import Foundation
  Auth0 user identity
  */
 @objc(A0Identity)
-public class Identity: NSObject, JSONObjectPayload {
+public class Identity: NSObject, JSONObjectPayload, NSSecureCoding {
 
     public let identifier: String
     public let provider: String
@@ -73,6 +73,38 @@ public class Identity: NSObject, JSONObjectPayload {
         } else {
             expiresIn = nil
         }
+        self.init(identifier: identifier, provider: provider, connection: connection, social: social, profileData: profileData, accessToken: accessToken, expiresIn: expiresIn, accessTokenSecret: accessTokenSecret)
+    }
+    
+    public static var supportsSecureCoding: Bool {
+        return true
+    }
+    
+    public func encode(with aCoder: NSCoder) {
+        aCoder.encode(identifier, forKey: "user_id")
+        aCoder.encode(provider, forKey: "provider")
+        aCoder.encode(connection, forKey: "connection")
+        aCoder.encode(social, forKey: "isSocial")
+        aCoder.encode(profileData, forKey: "profileData")
+        aCoder.encode(accessToken, forKey: "access_token")
+        aCoder.encode(expiresIn, forKey: "expires_in")
+        aCoder.encode(accessTokenSecret, forKey: "access_token_secret")
+    }
+    
+    public convenience required init?(coder aDecoder: NSCoder) {
+        
+        guard let identifier = aDecoder.decodeObject(forKey: "user_id") as? String,
+            let provider = aDecoder.decodeObject(forKey: "provider") as? String,
+            let connection = aDecoder.decodeObject(forKey: "connection") as? String,
+            let profileData = aDecoder.decodeObject(forKey: "profileData") as? [String: Any] else {
+                return nil
+        }
+        
+        let social = aDecoder.decodeBool(forKey: "isSocial")
+        let accessToken = aDecoder.decodeObject(forKey: "access_token") as? String
+        let expiresIn = aDecoder.decodeObject(forKey: "expires_in") as? Date
+        let accessTokenSecret = aDecoder.decodeObject(forKey: "access_token_secret") as? String
+        
         self.init(identifier: identifier, provider: provider, connection: connection, social: social, profileData: profileData, accessToken: accessToken, expiresIn: expiresIn, accessTokenSecret: accessTokenSecret)
     }
 }

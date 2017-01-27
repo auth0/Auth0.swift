@@ -29,7 +29,7 @@ import Foundation
  - seeAlso: [Normalized User Profile](https://auth0.com/docs/user-profile/normalized)
  */
 @objc(A0Profile)
-public class Profile: NSObject, JSONObjectPayload {
+public class Profile: NSObject, JSONObjectPayload, NSSecureCoding {
 
     public let id: String
     public let name: String
@@ -100,7 +100,44 @@ public class Profile: NSObject, JSONObjectPayload {
         let attributes = values
         self.init(id: id, name: name, nickname: nickname, pictureURL: pictureURL, createdAt: createdAt, email: email, emailVerified: emailVerified, givenName: givenName, familyName: familyName, attributes: attributes, identities: identities)
     }
-
+  
+    public static var supportsSecureCoding: Bool {
+        return true
+    }
+    
+    public func encode(with aCoder: NSCoder) {
+        aCoder.encode(id, forKey: "user_id")
+        aCoder.encode(name, forKey: "name")
+        aCoder.encode(nickname, forKey: "nickname")
+        aCoder.encode(pictureURL.absoluteString, forKey: "picture")
+        aCoder.encode(createdAt, forKey: "created_at")
+        aCoder.encode(email, forKey: "email")
+        aCoder.encode(emailVerified, forKey: "email_verified")
+        aCoder.encode(givenName, forKey: "given_name")
+        aCoder.encode(familyName, forKey: "family_name")
+        aCoder.encode(additionalAttributes, forKey: "attributes")
+        aCoder.encode(identities, forKey: "identities")
+    }
+    
+     public convenience required init?(coder aDecoder: NSCoder) {
+        
+        guard let id = aDecoder.decodeObject(forKey: "user_id") as? String,
+            let name = aDecoder.decodeObject(forKey: "name") as? String,
+            let nickname = aDecoder.decodeObject(forKey: "nickname") as? String,
+            let picture = aDecoder.decodeObject(forKey: "picture") as? String, let pictureURL = URL(string: picture),
+            let createdAt = aDecoder.decodeObject(forKey: "created_at") as? Date,
+            let attributes = aDecoder.decodeObject(forKey: "attributes") as? [String: Any] else {
+               return nil
+        }
+        
+        let emailVerified = aDecoder.decodeBool(forKey: "email_verified")
+        let email = aDecoder.decodeObject(forKey: "email") as? String
+        let givenName = aDecoder.decodeObject(forKey: "givenName") as? String
+        let familyName = aDecoder.decodeObject(forKey: "familyName") as? String
+        let identities = aDecoder.decodeObject(forKey: "identities") as? [Identity]
+        
+        self.init(id: id, name: name, nickname: nickname, pictureURL: pictureURL, createdAt: createdAt, email: email, emailVerified: emailVerified, givenName: givenName, familyName: familyName, attributes: attributes, identities: identities ?? [])
+    }
 }
 
 private func date(from string: String) -> Date? {
