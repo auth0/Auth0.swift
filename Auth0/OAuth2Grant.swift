@@ -95,10 +95,7 @@ struct PKCE: OAuth2Grant {
         guard
             let code = values["code"]
             else {
-                // FIXME: Force try
-                // swiftlint:disable:next force_try
-                let data = try! JSONSerialization.data(withJSONObject: values, options: [])
-                let string = String(data: data, encoding: .utf8)
+                let string = "No code found in parameters \(values)"
                 return callback(.failure(error: AuthenticationError(string: string)))
         }
         guard validate(responseType: self.responseType, token: values["id_token"], nonce: self.defaults["nonce"]) else {
@@ -108,7 +105,7 @@ struct PKCE: OAuth2Grant {
         self.authentication
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
             .start { result in
-                // FIXME: Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
+                // Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
                 if case .failure(let cause as AuthenticationError) = result , cause.description == "Unauthorized" {
                     let error = WebAuthError.pkceNotAllowed("Please go to 'https://manage.auth0.com/#/applications/\(clientId)/settings' and make sure 'Client Type' is 'Native' to enable PKCE.")
                     callback(Result.failure(error: error))
