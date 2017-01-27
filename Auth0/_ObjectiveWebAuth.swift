@@ -24,6 +24,7 @@ import UIKit
 
 @objc(A0WebAuth)
 /// Web-based Auth with Auth0
+// swiftlint:disable:next type_name
 public class _ObjectiveOAuth2: NSObject {
 
     private(set) var webAuth: SafariWebAuth

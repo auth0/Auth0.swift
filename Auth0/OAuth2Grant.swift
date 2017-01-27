@@ -72,6 +72,7 @@ struct PKCE: OAuth2Grant {
         self.init(authentication: authentication, redirectURL: redirectURL, verifier: generator.verifier, challenge: generator.challenge, method: generator.method, responseType: reponseType, nonce: nonce)
     }
 
+    // swiftlint:disable:next function_parameter_count
     init(authentication: Authentication, redirectURL: URL, verifier: String, challenge: String, method: String, responseType: [ResponseType], nonce: String? = nil) {
         self.authentication = authentication
         self.redirectURL = redirectURL
@@ -80,7 +81,7 @@ struct PKCE: OAuth2Grant {
 
         var newDefaults: [String: String] = [
             "code_challenge": challenge,
-            "code_challenge_method": method,
+            "code_challenge_method": method
         ]
 
         if let nonce = nonce {
@@ -94,8 +95,7 @@ struct PKCE: OAuth2Grant {
         guard
             let code = values["code"]
             else {
-                let data = try! JSONSerialization.data(withJSONObject: values, options: [])
-                let string = String(data: data, encoding: .utf8)
+                let string = "No code found in parameters \(values)"
                 return callback(.failure(error: AuthenticationError(string: string)))
         }
         guard validate(responseType: self.responseType, token: values["id_token"], nonce: self.defaults["nonce"]) else {
@@ -105,7 +105,7 @@ struct PKCE: OAuth2Grant {
         self.authentication
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
             .start { result in
-                // FIXME: Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
+                // Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
                 if case .failure(let cause as AuthenticationError) = result , cause.description == "Unauthorized" {
                     let error = WebAuthError.pkceNotAllowed("Please go to 'https://manage.auth0.com/#/applications/\(clientId)/settings' and make sure 'Client Type' is 'Native' to enable PKCE.")
                     callback(Result.failure(error: error))

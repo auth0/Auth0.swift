@@ -48,6 +48,7 @@ public struct Request<T, E: Auth0Error>: Requestable {
     let logger: Logger?
     let telemetry: Telemetry
 
+    // swiftlint:disable:next function_parameter_count
     init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> (), payload: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
         self.session = session
         self.url = url
@@ -62,8 +63,8 @@ public struct Request<T, E: Auth0Error>: Requestable {
     var request: URLRequest {
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = method
-        if !payload.isEmpty {
-            request.httpBody = try! JSONSerialization.data(withJSONObject: payload, options: [])
+        if !payload.isEmpty, let httpBody = try? JSONSerialization.data(withJSONObject: payload, options: []) {
+            request.httpBody = httpBody
             #if DEBUG
             URLProtocol.setProperty(payload, forKey: ParameterPropertyKey, in: request)
             #endif
@@ -91,7 +92,7 @@ public struct Request<T, E: Auth0Error>: Requestable {
                 logger?.trace(response: response, data: data)
             }
             handler(Response(data: data, response: response, error: error), callback)
-        }) 
+        })
         task.resume()
     }
 

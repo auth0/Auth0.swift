@@ -29,7 +29,7 @@ struct ControllerModalPresenter {
     init(rootViewController: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) {
         self.rootViewController = rootViewController
     }
-    
+
     func present(_ controller: UIViewController) {
         topViewController?.present(controller, animated: true, completion: nil)
     }

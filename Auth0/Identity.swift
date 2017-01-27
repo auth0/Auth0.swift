@@ -43,6 +43,7 @@ public class Identity: NSObject, JSONObjectPayload {
         return "<identity: \(identifier) provider: \(provider) connection: \(connection)>"
     }
 
+    // swiftlint:disable:next function_parameter_count
     public required init(identifier: String, provider: String, connection: String, social: Bool, profileData: [String: Any], accessToken: String?, expiresIn: Date?, accessTokenSecret: String?) {
         self.identifier = identifier
         self.provider = provider

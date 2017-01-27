@@ -37,5 +37,4 @@ public protocol Auth0Error: Error {
 
     /// The code of the error as a String
     var code: String { get }
-    
 }

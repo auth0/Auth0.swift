@@ -58,6 +58,4 @@ public struct ResponseType: OptionSet {
             return nil
         }
     }
-    
 }
-

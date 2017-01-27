@@ -36,9 +36,7 @@ public struct Telemetry {
     var info: String?
 
     var value: String? {
-        get {
-            return self.enabled ? self.info : nil
-        }
+        return self.enabled ? self.info : nil
     }
 
     public init() {
@@ -92,7 +90,6 @@ public protocol Trackable {
     var telemetry: Telemetry { get set }
 
 }
-
 
 extension Trackable {
     /**

@@ -32,7 +32,7 @@ public class ManagementError: Auth0Error, CustomStringConvertible {
      - seeAlso: `code` & `description` properties
      */
     public let info: [String: Any]
-    
+
     /**
      Creates a Auth0 Management API error when the request's response is not JSON
 
@@ -89,7 +89,7 @@ extension ManagementError: CustomNSError {
     public var errorUserInfo: [String : Any] {
         return [
             NSLocalizedDescriptionKey: self.description,
-            ManagementError.infoKey: self,
+            ManagementError.infoKey: self
         ]
     }
 }
