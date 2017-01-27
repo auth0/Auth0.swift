@@ -1,4 +1,4 @@
-// SessionStorageSpec.swift
+// TransactionStoreSpec.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -25,15 +25,15 @@ import Nimble
 
 @testable import Auth0
 
-class SessionStorageSpec: QuickSpec {
+class TransactionStoreSpec: QuickSpec {
 
     override func spec() {
 
-        var storage: SessionStorage!
+        var storage: TransactionStore!
         var session: MockSession!
 
         beforeEach {
-            storage = SessionStorage()
+            storage = TransactionStore()
             session = MockSession()
         }
 
@@ -98,7 +98,7 @@ class SessionStorageSpec: QuickSpec {
 
 }
 
-class MockSession: OAuth2Session {
+class MockSession: AuthTransaction {
 
     var state: String? = nil
 

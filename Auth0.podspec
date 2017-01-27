@@ -21,9 +21,9 @@ Pod::Spec.new do |s|
   s.ios.source_files = 'Auth0/*.{swift,h,m}'
   s.ios.frameworks = 'UIKit', 'SafariServices'
   s.osx.source_files = 'Auth0/*.swift'
-  s.osx.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/OAuth2Session.swift', 'Auth0/SessionStorage.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift'
+  s.osx.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/AuthTransaction.swift', 'Auth0/TransactionStore.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift'
   s.watchos.source_files = 'Auth0/*.swift'
-  s.watchos.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/OAuth2Session.swift', 'Auth0/SessionStorage.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift'
+  s.watchos.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/AuthTransaction.swift', 'Auth0/TransactionStore.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift'
   s.tvos.source_files = 'Auth0/*.swift'
-  s.tvos.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/OAuth2Session.swift', 'Auth0/SessionStorage.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift'
+  s.tvos.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/AuthTransaction.swift', 'Auth0/TransactionStore.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift'
 end
