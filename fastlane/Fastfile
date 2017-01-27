@@ -15,7 +15,7 @@ platform :ios do
     end
   end
 
-  desc "SwiftLint pass"
+  desc "Run code linter"
   lane :lint do
   	swiftlint(
   		mode: :lint,

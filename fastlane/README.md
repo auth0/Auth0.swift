@@ -11,6 +11,11 @@ sudo gem install fastlane
 fastlane ios prepare_cache
 ```
 Install dependencies from cache
+### ios lint
+```
+fastlane ios lint
+```
+Run code linter
 ### ios test
 ```
 fastlane ios test
