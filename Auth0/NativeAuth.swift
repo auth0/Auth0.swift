@@ -27,12 +27,18 @@ import UIKit
  from a successul authentication with an IdP SDK as part of the NativeAuthTransaction process.
  */
 public struct NativeAuthCredentials {
-    /// The OAuth2 access token returned by the IdP SDK
+    /// Access token returned by the IdP SDK
     let token: String
-    /// Any extras that may be necessary for certain Social IdP connections
+    /// Any extra attributes of the IdP that may be necessary during Auth with Auth0.
     let extras: [String: Any]
 
-    public init(token: String, extras: [String: Any]) {
+    /**
+     Creates a new instance of `NativeAuthCredentials`
+     
+     - parameter token: IdP access token that will be used to authenticate with Auth0
+     - parameter extras: Any extra attributes returned by the IdP.
+    */
+    public init(token: String, extras: [String: Any] = [:]) {
         self.token = token
         self.extras = extras
     }

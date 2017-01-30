@@ -82,7 +82,6 @@ public func resumeAuth(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any
     return TransactionStore.shared.resume(url, options: options)
 }
 
-
 /// WebAuth Authentication using Auth0
 public protocol WebAuth: Trackable, Loggable {
     var clientId: String { get }
