@@ -1,6 +1,6 @@
-// TransactionStore.swift
+// AuthProvider.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2017 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,29 +22,21 @@
 
 import UIKit
 
-/// Keeps track of current Auth Transaction
-class TransactionStore {
-    static let shared = TransactionStore()
+/**
+ The AuthProvider protocol is adopted by an objects that are to be used as Native Authentication
+ handlers. An object implementing this protocol is intended to superceed the default authentication
+ model for a given connection name with its own native implementation.
 
-    private(set) var current: AuthTransaction? = nil
+ ```
+ struct Facebook: AuthProvider {
 
-    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
-        let resumed = self.current?.resume(url, options: options) ?? false
-        if resumed {
-            self.current = nil
-        }
-        return resumed
-    }
-
-    func store(_ transaction: AuthTransaction) {
-        self.current?.cancel()
-        self.current = transaction
-    }
-
-    func cancel(_ transaction: AuthTransaction) {
-        transaction.cancel()
-        if self.current?.state == transaction.state {
-            self.current = nil
-        }
-    }
+     func login(withConnection connection: String, scope: String, parameters: [String : Any]) -> NativeAuthTransaction {
+         let transaction = FacebookNativeAuthTransaction()
+         ...
+         return transaction
+     }
+ ```
+ */
+public protocol AuthProvider {
+    func login(withConnection connection: String, scope: String, parameters: [String: Any]) -> NativeAuthTransaction
 }

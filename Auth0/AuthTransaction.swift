@@ -21,13 +21,13 @@
 // THE SOFTWARE.
 
 import UIKit
-import SafariServices
 
 /**
- Represents an on going AuthTransaction with Auth0.
+ Represents an on going Auth transaction with an Identity Provider (Auth0 or a third party).
 
- It will handle result from the redirect URL configured when the AuthTransaction flow was started,
- so we need to handle when the configured URL is opened in your Application's `AppDelegate`
+ The Auth will be done outside of application control, Safari or third party IdP App. 
+ The only way to communicate the results back is using a url with a registered custom scheme in your application so iOS can open it on success/failure.
+ When that happens iOS will call a method in your `AppDelegate` and that is where you need to handle the result.
 
  ```
  func application(app: UIApplication, openURL url: NSURL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {

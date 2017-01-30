@@ -40,7 +40,7 @@ class SafariWebAuth: WebAuth {
     var nonce: String? = nil
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
-        self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.sharedInstance, telemetry: telemetry)
+        self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
     }
 
     init(clientId: String, url: URL, presenter: ControllerModalPresenter, storage: TransactionStore, telemetry: Telemetry) {

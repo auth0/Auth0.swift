@@ -85,6 +85,6 @@ class SafariSession: NSObject, AuthTransaction {
 
 extension SafariSession: SFSafariViewControllerDelegate {
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        TransactionStore.sharedInstance.cancel(self)
+        TransactionStore.shared.cancel(self)
     }
 }

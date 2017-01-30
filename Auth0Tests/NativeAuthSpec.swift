@@ -65,10 +65,10 @@ class MockNativeAuthTransaction: NativeAuthTransaction {
     }
 
     public func start(callback: @escaping (Result<Credentials>) -> ()) {
-        TransactionStore.sharedInstance.store(self)
+        TransactionStore.shared.store(self)
         self.auth { result in
             switch result {
-            case .success(let nativeAuthCredentials):
+            case .success(_):
                 callback(.success(result: Credentials(accessToken: FacebookToken)))
             case .failure(let error):
                 callback(.failure(error: error))
@@ -119,7 +119,7 @@ class NativeAuthSpec: QuickSpec {
 
             it("should store transaction in store") {
                 nativeTransaction.start { _ in }
-                expect(TransactionStore.sharedInstance.current?.state) == nativeTransaction.state
+                expect(TransactionStore.shared.current?.state) == nativeTransaction.state
             }
 
             it("should return credentials on success") {
