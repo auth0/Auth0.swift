@@ -39,88 +39,61 @@ public struct NativeAuthCredentials {
 }
 
 /**
- The NativeAuthTransaction expands on the AuthTransaction protocol to add additional functionality
- required for handling Native Authentication scenarios. You will need to implement this protocol's
- properties and methods to handle your Social IdP authentication transaction and yield `NativeAuthCredentials`
- to be handled by Auth0's `authentication().loginSocial(...)` yielding the Auth0 user's credentials.
+ Represent a Auth transaction where the user first authenticates with a third party Identity Provider (IdP) and then tries to perform Auth with Auth0.
+ This is usually used when a Social connection has a native SDK, e.g. Facebook, and for usability or need to call the IdP API the SDK should be used to login.
+
+ When implemeting this protocol you only need to take care of the IdP authentication and yield it's results so the Auth0 part of the flow will be taken care of for you
  
- **Properties**
+ To accomplish this the results of the IdP authentication should be send using the callback received when the method `func auth(callback: @escaping Callback) -> ()` is called.
 
- `connection:` name of the social connection.
-
- `scope:`      requested scope value when authenticating the user.
-
- `parameters:` additional parameters sent during authentication.
- 
- `delayed:`    callback that takes a `Result<NativeAuthCredentials>` to handle the outcome from the Social IdP authentication.
-
- **Methods**
-
- `func auth(callback: @escaping NativeAuthTransaction.Callback)`
-
- In this method you should deal with the Social IdP SDKssign in login process. Upon a successful
- authentication event, you should yield a `NativeAuthCredentials` `Result` to the `callback` containing
- the OAuth2 access token from the IdP and any extras that may be necessary for Auth0 to authenticate with
- the chosen IdP. If the authentication was not a success then yield an `Error` `Result`.
- 
-
- `func cancel()`
-
- In this method you should deal with the cancellation of the IdP authentication, if your IdP SDK requires
- any extra steps to cancel this would be a good place to add them.
-
- `func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool`
- 
- In this method you should handle the continuation of the IdP's authentication process that occurs once control
- is returned back to the application through the `AppDelegate`
- Typically this is a call to the IdP SDKs own handler.
-
- **Example**
-
- ```
- class FacebookNativeAuthTransaction: NativeAuthTransaction {
-
-     var connection: String = "facebook"
-     var scope: String = "openid"
-     var parameters: [String : Any] = [:]
-     var delayed: NativeAuthTransaction.Callback = { _ in }
-
-     func auth(callback: @escaping NativeAuthTransaction.Callback) {
-         LoginManager().logIn([.publicProfile]) { result in
-             case .success(_, _, let token):
-                 self.delayed(.success(result: NativeAuthCredentials(token: token.authenticationToken, extras: [:])))
-             case .failed(let error):
-                 self.delayed(.failure(error: error))
-             case .cancelled:
-                 self.cancel()
-             }
-     }
-
-     func cancel() {
-         self.delayed(.failure(error: WebAuthError.userCancelled))
-     }
-
-     func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
-         return SDKApplicationDelegate.shared.application(app, open: url, options: options)
-     }
- }
- ```
+ - important: Auth0 only support this for Facebook, Google and Twitter connections.
  */
 public protocol NativeAuthTransaction: AuthTransaction {
+
+    /// Scope sent to auth0 to login after the native auth, e.g.: openid
     var scope: String { get }
+    /// Connection name registered in Auth0 used to authenticate with the native auth access_token
     var connection: String { get }
+    /// Additional authentication parameters sent to Auth0 to perform the final auth
     var parameters: [String: Any] { get }
 
+    /// Callback where the result of the native authentication is sent
     typealias Callback = (Result<NativeAuthCredentials>) -> ()
+
+    /**
+     Starts the native Auth flow using the IdP SDK and once completed it will notify the result using the callback.
+
+     On sucesss the IdP access token, and any parameter needed by Auth0 to authenticate, should be used to create a `NativeAuthCredentials`.
+
+     ```
+     let credetials = NativeAuthCredentials(token: "{IdP Token}", extras: [:])
+     let result = Auth0.Result.success(result: credentials)
+     ```
+
+     - parameter callback: callback with the IdP credentials on success or the cause of the error.
+     */
     func auth(callback: @escaping Callback) -> ()
 }
 
+/**
+ Extension to handle Auth with Auth0 via /oauth/access_token endpoint
+ */
 public extension NativeAuthTransaction {
 
+    /// For native authentication, this attribute does not matter at all. It's only used for OAuth 2.0 flows using /authorize
     var state: String? {
         return self.connection
     }
 
+    /**
+     Starts the Auth transaction by trying to authenticate the user with the IdP SDK first, 
+     then on success it will try to auth with Auth0 using /oauth/access_token sending at least the IdP access_token.
+     
+     If Auth0 needs more parameters in order to authenticate a given IdP, they must be added in the `extra` attribute of `NativeAuthCredentials`
+
+     - parameter callback: closure that will notify with the result of the Auth transaction. On success it will yield the Auth0 credentilas of the user otherwise it will yield the cause of the failure.
+     - important: Only one `AuthTransaction` can be active at a given time, if there is a pending one (OAuth or Native) it will be cancelled and replaced by the new one.
+     */
     public func start(callback: @escaping (Result<Credentials>) -> ()) {
         TransactionStore.shared.store(self)
         self.auth { result in
