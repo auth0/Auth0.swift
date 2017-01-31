@@ -113,6 +113,65 @@ class UserProfileSpec: QuickSpec {
 
         }
 
+        describe("init from coder") {
+            
+            it("should serialize and desirialize") {
+                var info = basicProfile()
+                let metadata: [String: Any] = [
+                    "subscription": "paid",
+                    "logins": 10,
+                    "verified": true
+                ]
+                
+                info["identities"] = [
+                    [
+                        "user_id": "1234567890",
+                        "connection": "facebook",
+                        "provider": "facebook",
+                        "isSocial": true,
+                        "access_token": "ACCESS_TOKEN",
+                        "expires_in": CreatedAtTimestamp,
+                        "access_token_secret": "Access_Token_Secret",
+                        "profileData": ["lastName": "Doe"]
+                    ]
+                ]
+                
+                info["app_metadata"] = metadata
+                info["email"] = "email@email.com"
+                info["email_verified"] = true
+                info["given_name"] = "John"
+                info["family_name"] = "Doe"
+                let data = NSKeyedArchiver.archivedData(withRootObject: Profile(json: info)!)
+                let unarchivedProfile = NSKeyedUnarchiver.unarchiveObject(with: data) as! Profile
+                expect(unarchivedProfile).toNot(beNil())
+                
+                expect(unarchivedProfile.id) == UserId
+                expect(unarchivedProfile.name) == Support
+                expect(unarchivedProfile.nickname) == Nickname
+                expect(unarchivedProfile.pictureURL) == PictureURL
+                expect(unarchivedProfile.createdAt.timeIntervalSince1970) == CreatedAtTimestamp
+                expect(unarchivedProfile.email) == "email@email.com"
+                expect(unarchivedProfile.emailVerified) == true
+                expect(unarchivedProfile.givenName) == "John"
+                expect(unarchivedProfile.familyName) == "Doe"
+                let appMetadata = unarchivedProfile.additionalAttributes["app_metadata"] as! [String: Any]
+                expect(appMetadata["subscription"] as? String) == "paid"
+                expect(appMetadata["logins"] as? Int) == 10
+                expect(appMetadata["verified"] as? Bool) == true
+                
+                expect(unarchivedProfile.identities.count) == 1
+                let identity = unarchivedProfile.identities[0]
+                expect(identity.identifier) == "1234567890"
+                expect(identity.connection) == "facebook"
+                expect(identity.provider) == "facebook"
+                expect(identity.social) == true
+                expect(identity.accessToken) == "ACCESS_TOKEN"
+                expect(identity.expiresIn?.timeIntervalSince1970) == CreatedAtTimestamp
+                expect(identity.accessTokenSecret) == "Access_Token_Secret"
+                expect(identity.profileData["lastName"] as? String) == "Doe"
+            }
+        }
+
         describe("metadata") {
 
             it("should have user_metadata") {

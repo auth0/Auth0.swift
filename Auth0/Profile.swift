@@ -132,8 +132,8 @@ public class Profile: NSObject, JSONObjectPayload, NSSecureCoding {
         
         let emailVerified = aDecoder.decodeBool(forKey: "email_verified")
         let email = aDecoder.decodeObject(forKey: "email") as? String
-        let givenName = aDecoder.decodeObject(forKey: "givenName") as? String
-        let familyName = aDecoder.decodeObject(forKey: "familyName") as? String
+        let givenName = aDecoder.decodeObject(forKey: "given_name") as? String
+        let familyName = aDecoder.decodeObject(forKey: "family_name") as? String
         let identities = aDecoder.decodeObject(forKey: "identities") as? [Identity]
         
         self.init(id: id, name: name, nickname: nickname, pictureURL: pictureURL, createdAt: createdAt, email: email, emailVerified: emailVerified, givenName: givenName, familyName: familyName, attributes: attributes, identities: identities ?? [])
