@@ -32,7 +32,7 @@ class SafariWebAuth: WebAuth {
     var telemetry: Telemetry
 
     let presenter: ControllerModalPresenter
-    let storage: SessionStorage
+    let storage: TransactionStore
     var logger: Logger?
     var parameters: [String: String] = [:]
     var universalLink = false
@@ -40,10 +40,10 @@ class SafariWebAuth: WebAuth {
     var nonce: String? = nil
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
-        self.init(clientId: clientId, url: url, presenter: presenter, storage: SessionStorage.sharedInstance, telemetry: telemetry)
+        self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
     }
 
-    init(clientId: String, url: URL, presenter: ControllerModalPresenter, storage: SessionStorage, telemetry: Telemetry) {
+    init(clientId: String, url: URL, presenter: ControllerModalPresenter, storage: TransactionStore, telemetry: Telemetry) {
         self.clientId = clientId
         self.url = url
         self.presenter = presenter

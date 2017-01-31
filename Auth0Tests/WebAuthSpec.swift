@@ -225,7 +225,7 @@ class WebAuthSpec: QuickSpec {
 
 
         describe("session") {
-            let storage = SessionStorage.sharedInstance
+            let storage = TransactionStore.shared
 
             beforeEach {
                 if let current = storage.current {

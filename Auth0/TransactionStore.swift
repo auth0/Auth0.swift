@@ -1,4 +1,4 @@
-// SessionStorage.swift
+// TransactionStore.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,11 +22,11 @@
 
 import UIKit
 
-/// Keeps track of current Auth session (e.g. OAuth2)
-class SessionStorage {
-    static let sharedInstance = SessionStorage()
+/// Keeps track of current Auth Transaction
+class TransactionStore {
+    static let shared = TransactionStore()
 
-    private(set) var current: OAuth2Session? = nil
+    private(set) var current: AuthTransaction? = nil
 
     func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
         let resumed = self.current?.resume(url, options: options) ?? false
@@ -36,14 +36,14 @@ class SessionStorage {
         return resumed
     }
 
-    func store(_ session: OAuth2Session) {
+    func store(_ transaction: AuthTransaction) {
         self.current?.cancel()
-        self.current = session
+        self.current = transaction
     }
 
-    func cancel(_ session: OAuth2Session) {
-        session.cancel()
-        if self.current?.state == session.state {
+    func cancel(_ transaction: AuthTransaction) {
+        transaction.cancel()
+        if self.current?.state == transaction.state {
             self.current = nil
         }
     }

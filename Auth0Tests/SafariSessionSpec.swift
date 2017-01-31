@@ -1,4 +1,4 @@
-// OAuth2SessionSpec.swift
+// SafariSessionSpec.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -40,7 +40,7 @@ class MockSafariViewController: SFSafariViewController {
 
 private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 
-class OAuth2SessionSpec: QuickSpec {
+class SafariSessionSpec: QuickSpec {
 
     override func spec() {
 
