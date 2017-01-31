@@ -62,6 +62,8 @@ public protocol NativeAuthTransaction: AuthTransaction {
     var connection: String { get }
     /// Additional authentication parameters sent to Auth0 to perform the final auth
     var parameters: [String: Any] { get }
+    /// Authenticaton object to perform the Auth0 social auth
+    var authentication: Authentication { get }
 
     /// Callback where the result of the native authentication is sent
     typealias Callback = (Result<NativeAuthCredentials>) -> ()
@@ -107,7 +109,7 @@ public extension NativeAuthTransaction {
             case .success(let credentials):
                 var parameters: [String: Any] = self.parameters
                 credentials.extras.forEach { parameters[$0] = $1 }
-                authentication().loginSocial(token: credentials.token, connection: self.connection, scope: self.scope, parameters: parameters)
+                self.authentication.loginSocial(token: credentials.token, connection: self.connection, scope: self.scope, parameters: parameters)
                     .start(callback)
             case .failure(let error):
                 callback(.failure(error: error))

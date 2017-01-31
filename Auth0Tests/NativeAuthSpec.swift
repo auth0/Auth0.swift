@@ -30,6 +30,10 @@ import OHHTTPStubs
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 private let DomainURL = URL(fileURLWithPath: Domain)
+private let Connection = "facebook"
+private let Scope = "openid"
+private let Parameters: [String: Any] = [:]
+private let Timeout: TimeInterval = 2
 
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -37,11 +41,17 @@ private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with
 private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 
 class MockNativeAuthTransaction: NativeAuthTransaction {
-    var connection: String = "facebook"
-    var scope: String = "openid"
-    var parameters: [String : Any] = [:]
+    var connection: String
+    var scope: String
+    var parameters: [String : Any]
+    var authentication: Authentication
 
-    var nativeError: Bool = false
+    init(connection: String, scope: String, parameters: [String: Any], authentication: Authentication) {
+        self.connection = connection
+        self.scope = scope
+        self.parameters = parameters
+        self.authentication = authentication
+    }
 
     var delayed: NativeAuthTransaction.Callback = { _ in }
 
@@ -55,25 +65,14 @@ class MockNativeAuthTransaction: NativeAuthTransaction {
     }
 
     func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
-        guard !self.nativeError else {
-            self.cancel()
-            return false
-        }
-        self.delayed(.success(result: NativeAuthCredentials(token: FacebookToken, extras: [:])))
+        self.delayed(self.onNativeAuth())
         self.delayed = { _ in }
         return true
     }
 
-    public func start(callback: @escaping (Result<Credentials>) -> ()) {
-        TransactionStore.shared.store(self)
-        self.auth { result in
-            switch result {
-            case .success(_):
-                callback(.success(result: Credentials(accessToken: FacebookToken)))
-            case .failure(let error):
-                callback(.failure(error: error))
-            }
-        }
+    /// Test Hooks
+    var onNativeAuth: () -> Result<NativeAuthCredentials> = {
+        return .success(result: NativeAuthCredentials(token: FacebookToken, extras: [:]))
     }
 }
 
@@ -82,76 +81,122 @@ class NativeAuthSpec: QuickSpec {
     override func spec() {
 
         var nativeTransaction: MockNativeAuthTransaction!
-        var error: Error?
-        var nativeCredentials: NativeAuthCredentials!
+        let authentication = Auth0Authentication(clientId: ClientId, url: URL(string: "https://\(Domain)")!)
 
         beforeEach {
-            error = nil
-            nativeCredentials = nil
-            nativeTransaction = MockNativeAuthTransaction()
-            nativeTransaction.auth { result in
-                switch result {
-                case .success(let credentials):
-                    nativeCredentials = credentials
-                case .failure(let nativeError):
-                    error = nativeError
-                }
-            }
+            stub(condition: isHost(Domain)) { _ in
+                return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                }.name = "YOU SHALL NOT PASS!"
+
+            nativeTransaction = MockNativeAuthTransaction(connection: Connection , scope: Scope, parameters: Parameters, authentication: authentication)
         }
 
+        afterEach {
+            OHHTTPStubs.removeAllStubs()
+        }
 
-        describe("Default values set") {
+        describe("Initializer values set") {
 
             it("should have connection") {
-                expect(nativeTransaction.connection) == "facebook"
+                expect(nativeTransaction.connection) == Connection
             }
 
             it("should have scope") {
-                expect(nativeTransaction.scope) == "openid"
+                expect(nativeTransaction.scope) == Scope
             }
 
-            it("should have parameters") {
+            it("should have empty parameters") {
                 expect(nativeTransaction.parameters).to(haveCount(0))
             }
         }
 
-        describe("auth") {
+        describe("start") {
+
+            beforeEach {
+                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook", "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Facebook Auth OpenID"
+                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token":InvalidFacebookToken, "connection": "facebook", "scope": "openid"])) { _ in return authFailure(error: "invalid_token", description: "invalid_token") }.name = "invalid token"
+            }
 
             it("should store transaction in store") {
                 nativeTransaction.start { _ in }
                 expect(TransactionStore.shared.current?.state) == nativeTransaction.state
             }
 
-            it("should return credentials on success") {
-                nativeTransaction.start { result in
-                    expect(result).to(haveCredentials())
+            it("should nil transaction in store after resume") {
+                nativeTransaction.start { _ in }
+                _ = Auth0.resumeAuth(DomainURL, options: [:])
+                expect(TransactionStore.shared.current).to(beNil())
+            }
+
+            it("should yield credentials on success") {
+                waitUntil(timeout: Timeout) { done in
+                    nativeTransaction
+                        .start { result in
+                        switch result {
+                        case .success(let result):
+                            expect(result.accessToken) == AccessToken
+                            done()
+                        default:
+                            break
+                        }
+                    }
+                    _ = nativeTransaction.resume(DomainURL, options: [:])
                 }
-                _ = nativeTransaction.resume(DomainURL, options: [:])
+
+            }
+
+            it("should yield error on native auth failure") {
+                nativeTransaction.onNativeAuth =  {
+                    return .failure(error: WebAuthError.missingAccessToken)
+                }
+                waitUntil(timeout: Timeout) { done in
+                    nativeTransaction.start { result in
+                        switch result {
+                        case .failure(let error):
+                            expect(error).to(matchError(WebAuthError.missingAccessToken))
+                            done()
+                        default:
+                            break
+                        }
+                    }
+                    _ = nativeTransaction.resume(DomainURL, options: [:])
+                }
+
+            }
+
+            it("should yield auth error on invalid native access token") {
+                nativeTransaction.onNativeAuth = {
+                    return .success(result: NativeAuthCredentials(token: InvalidFacebookToken, extras: [:]))
+                }
+                waitUntil(timeout: Timeout) { done in
+                    nativeTransaction.start { result in
+                        expect(result).to(haveAuthenticationError(code: "invalid_token", description: "invalid_token"))
+                        done()
+                    }
+                    _ = nativeTransaction.resume(DomainURL, options: [:])
+                }
+
             }
         }
 
-        describe("resume") {
+        describe("cancel") {
 
-            it("should return true") {
-                expect(nativeTransaction.resume(DomainURL, options: [:])) == true
+            it("should yield error on cancel") {
+                waitUntil(timeout: Timeout) { done in
+                    nativeTransaction.start { result in
+                        switch result {
+                        case .failure(let error):
+                            expect(error).to(matchError(WebAuthError.userCancelled))
+                            done()
+                        default:
+                            break
+                        }
+                    }
+                    _ = nativeTransaction.cancel()
+                }
+                
             }
-
-            it("should return native credentials") {
-                _ = nativeTransaction.resume(DomainURL, options: [:])
-                expect(error).to(beNil())
-                expect(nativeCredentials!.token) == FacebookToken
-            }
-
-            it("should return false") {
-                nativeTransaction.nativeError = true
-                expect(nativeTransaction.resume(DomainURL, options: [:])) == false
-            }
-
-            it("should return error") {
-                nativeTransaction.nativeError = true
-                _ = nativeTransaction.resume(DomainURL, options: [:])
-                expect(error).toNot(beNil())
-            }
+            
         }
         
     }
