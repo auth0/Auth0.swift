@@ -49,7 +49,7 @@ class UserProfileSpec: QuickSpec {
                 expect(profile?.name) == Support
                 expect(profile?.nickname) == Nickname
                 expect(profile?.pictureURL) == PictureURL
-                expect(profile?.createdAt.timeIntervalSince1970) == CreatedAtTimestamp
+                expect(profile?.createdAt?.timeIntervalSince1970) == CreatedAtTimestamp
                 expect(profile?.identities).to(beEmpty())
             }
 
@@ -99,7 +99,22 @@ class UserProfileSpec: QuickSpec {
                 expect(profile?.identities.first).toNot(beNil())
             }
 
-            ["user_id", "name", "nickname", "picture", "created_at"].forEach { key in itBehavesLike("invalid profile") { ["key": key] } }
+            it("should build with simple userinfo") {
+                var info: [String: Any] = [:]
+                info["sub"] = "auth0|123456789"
+                let profile = Profile(json: info)
+                expect(profile?.additionalAttributes["sub"] as? String) == "auth0|123456789"
+            }
+
+            it("should build with basic userinfo") {
+                var info: [String: Any] = [:]
+                info["sub"] = "auth0|123456789"
+                info["updated_at"] = "2017-02-01T15:19:28.395Z"
+                let profile = Profile(json: info)
+                expect(profile?.additionalAttributes["sub"] as? String) == "auth0|123456789"
+                expect(profile?.additionalAttributes["updated_at"] as? String) == "2017-02-01T15:19:28.395Z"
+            }
+
         }
 
         describe("time conversion") {
@@ -108,7 +123,7 @@ class UserProfileSpec: QuickSpec {
                 var json = basicProfile()
                 json["created_at"] = CreatedAt
                 let profile = Profile(json: json)
-                expect(profile?.createdAt.timeIntervalSince1970) == CreatedAtTimestamp
+                expect(profile?.createdAt?.timeIntervalSince1970) == CreatedAtTimestamp
             }
 
         }

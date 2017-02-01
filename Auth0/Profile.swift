@@ -30,14 +30,14 @@ import Foundation
 @objc(A0Profile)
 public class Profile: NSObject, JSONObjectPayload {
 
-    public let id: String
-    public let name: String
-    public let nickname: String
-    public let pictureURL: URL
-    public let createdAt: Date
+    public let id: String?
+    public let name: String?
+    public let nickname: String?
+    public let pictureURL: URL?
+    public let createdAt: Date?
 
     public let email: String?
-    public let emailVerified: Bool
+    public let emailVerified: Bool?
     public let givenName: String?
     public let familyName: String?
 
@@ -61,7 +61,7 @@ public class Profile: NSObject, JSONObjectPayload {
     }
 
     // swiftlint:disable:next function_parameter_count
-    required public init(id: String, name: String, nickname: String, pictureURL: URL, createdAt: Date, email: String?, emailVerified: Bool, givenName: String?, familyName: String?, attributes: [String: Any], identities: [Identity]) {
+    required public init(id: String?, name: String?, nickname: String?, pictureURL: URL?, createdAt: Date?, email: String?, emailVerified: Bool?, givenName: String?, familyName: String?, attributes: [String: Any], identities: [Identity]) {
         self.id = id
         self.name = name
         self.nickname = nickname
@@ -78,23 +78,21 @@ public class Profile: NSObject, JSONObjectPayload {
     }
 
     convenience required public init?(json: [String: Any]) {
-        guard
-            let id = json["user_id"] as? String,
-            let name = json["name"] as? String,
-            let nickname = json["nickname"] as? String,
-            let picture = json["picture"] as? String, let pictureURL = URL(string: picture),
-            let dateString = json["created_at"] as? String, let createdAt = date(from: dateString)
-            else { return nil }
+        var pictureURL: URL?
+        var createdAt: Date?
+        let id = json["user_id"] as? String
+        let name = json["name"] as? String
+        let nickname = json["nickname"] as? String
+        if let picture = json["picture"] as? String { pictureURL = URL(string: picture) }
+        if let dateString = json["created_at"] as? String { createdAt = date(from: dateString) }
         let email = json["email"] as? String
         let emailVerified = json["email_verified"] as? Bool ?? false
         let givenName = json["given_name"] as? String
         let familyName = json["family_name"] as? String
         let identityValues = json["identities"] as? [[String: Any]] ?? []
         let identities = identityValues.flatMap { Identity(json: $0) }
-        let keys = Set(["user_id", "name", "nickname", "picture", "created_at", "email", "email_verified", "given_name", "family_name", "identities"])
         var values: [String: Any] = [:]
         json.forEach { key, value in
-            guard !keys.contains(key) else { return }
             values[key] = value
         }
         let attributes = values
