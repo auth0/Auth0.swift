@@ -79,11 +79,11 @@ public class Profile: NSObject, JSONObjectPayload {
 
     convenience required public init?(json: [String: Any]) {
         guard
-            let id = json["user_id"] as? String,
+            let id = json["user_id"] as? String ?? json["sub"] as? String,
             let name = json["name"] as? String,
             let nickname = json["nickname"] as? String,
             let picture = json["picture"] as? String, let pictureURL = URL(string: picture),
-            let dateString = json["created_at"] as? String, let createdAt = date(from: dateString)
+            let dateString = json["created_at"] as? String ?? json["updated_at"] as? String, let createdAt = date(from: dateString)
             else { return nil }
         let email = json["email"] as? String
         let emailVerified = json["email_verified"] as? Bool ?? false

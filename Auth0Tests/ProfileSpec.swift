@@ -53,6 +53,17 @@ class UserProfileSpec: QuickSpec {
                 expect(profile?.identities).to(beEmpty())
             }
 
+            it("should build with required OIDC conformant values") {
+                let profile = Profile(json: basicOIDCProfile())
+                expect(profile).toNot(beNil())
+                expect(profile?.id) == Sub
+                expect(profile?.name) == Support
+                expect(profile?.nickname) == Nickname
+                expect(profile?.pictureURL) == PictureURL
+                expect(profile?.createdAt.timeIntervalSince1970) == UpdatedAtTimestamp
+                expect(profile?.identities).to(beEmpty())
+            }
+
             it("should build with email") {
                 var info = basicProfile()
                 info["email"] = SupportAtAuth0

@@ -29,9 +29,13 @@ let Support = "support"
 let Auth0Phone = "+10123456789"
 let Nickname = "sup"
 let PictureURL = URL(string: "https://auth0.com")!
+let UpdatedAt = "2015-08-19T17:18:01.000Z"
+let UpdatedAtUnix = "1440004681"
+let UpdatedAtTimestamp = 1440004681.000
 let CreatedAt = "2015-08-19T17:18:00.000Z"
 let CreatedAtUnix = "1440004680"
 let CreatedAtTimestamp = 1440004680.000
+let Sub = "auth0|\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
 
 func authResponse(accessToken: String, idToken: String? = nil) -> OHHTTPStubsResponse {
     var json = [
@@ -84,6 +88,10 @@ func userInfo() -> OHHTTPStubsResponse {
 
 func basicProfile(_ id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAtUnix) -> [String: Any] {
     return ["user_id": id, "name": name, "nickname": nickname, "picture": picture, "created_at": createdAt]
+}
+
+func basicOIDCProfile(_ sub: String = Sub, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, updatedAt: String = UpdatedAtUnix) -> [String: Any] {
+    return ["sub": sub, "name": name, "nickname": nickname, "picture": picture, "updated_at": updatedAt]
 }
 
 func managementResponse(_ payload: Any) -> OHHTTPStubsResponse {
