@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.2.0](https://github.com/auth0/Auth0.swift/tree/1.2.0) (2017-02-06)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.1.1...1.2.0)
+
+
+**Added**
+- Native Authentication support [\#86](https://github.com/auth0/Auth0.swift/pull/86) ([cocojoe](https://github.com/cocojoe))
+- Added SwiftLint to project [\#84](https://github.com/auth0/Auth0.swift/pull/84) ([cocojoe](https://github.com/cocojoe))
+- Profile timestamp to expect epoch, fallback to ISO8601 [\#83](https://github.com/auth0/Auth0.swift/pull/83) ([cocojoe](https://github.com/cocojoe))
+
+**Fixed**
+- Support OIDC /userInfo in Profile [\#89](https://github.com/auth0/Auth0.swift/pull/89) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.1.1](https://github.com/auth0/Auth0.swift/tree/1.1.1) (2017-01-02)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.1.0...1.1.1)
 
