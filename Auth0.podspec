@@ -1,4 +1,19 @@
 version = `agvtool mvers -terse1`.strip
+
+web_auth_files = [
+  'Auth0/_ObjectiveWebAuth.swift',
+  'Auth0/ControllerModalPresenter.swift',
+  'Auth0/OAuth2Grant.swift',
+  'Auth0/AuthTransaction.swift',
+  'Auth0/TransactionStore.swift',
+  'Auth0/WebAuth.swift',
+  'Auth0/WebAuthError.swift',
+  'Auth0/SafariWebAuth.swift',
+  'Auth0/SafariSession.swift',
+  'Auth0/NativeAuth.swift',
+  'Auth0/AuthProvider.swift'
+]
+
 Pod::Spec.new do |s|
   s.name             = 'Auth0'
   s.version          = version
@@ -21,9 +36,9 @@ Pod::Spec.new do |s|
   s.ios.source_files = 'Auth0/*.{swift,h,m}'
   s.ios.frameworks = 'UIKit', 'SafariServices'
   s.osx.source_files = 'Auth0/*.swift'
-  s.osx.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/AuthTransaction.swift', 'Auth0/TransactionStore.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift', 'Auth0/NativeAuth.swift', 'Auth0/AuthProvider.swift'
+  s.osx.exclude_files = web_auth_files
   s.watchos.source_files = 'Auth0/*.swift'
-  s.watchos.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/AuthTransaction.swift', 'Auth0/TransactionStore.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift', 'Auth0/NativeAuth.swift', 'Auth0/AuthProvider.swift'
+  s.watchos.exclude_files = web_auth_files
   s.tvos.source_files = 'Auth0/*.swift'
-  s.tvos.exclude_files = 'Auth0/_ObjectiveWebAuth.swift', 'Auth0/ControllerModalPresenter.swift', 'Auth0/OAuth2Grant.swift', 'Auth0/AuthTransaction.swift', 'Auth0/TransactionStore.swift', 'Auth0/WebAuth.swift', 'Auth0/WebAuthError.swift', 'Auth0/SafariWebAuth.swift', 'Auth0/NativeAuth.swift', 'Auth0/AuthProvider.swift'
+  s.tvos.exclude_files = web_auth_files
 end
