@@ -207,6 +207,29 @@ class WebAuthSpec: QuickSpec {
                     "query": defaultQuery(withParameters: ["audience": "https://domain.auth0.com"]),
                 ]
             }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .connectionScope("user_friends email")
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: "state"),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["connection_scope": "user_friends email"]),
+                    ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                var newDefaults = defaults
+                newDefaults["connection_scope"] = "email"
+                return [
+                    "url": newWebAuth()
+                        .connectionScope("user_friends")
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, state: "state"),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["connection_scope": "user_friends"]),
+                ]
+            }
+
         }
 
         describe("redirect uri") {

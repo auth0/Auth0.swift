@@ -292,6 +292,7 @@
 		5B25A5321E3F68FA00563AE5 /* SafariSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariSession.swift; path = Auth0/SafariSession.swift; sourceTree = SOURCE_ROOT; };
 		5B6269E51E3F700000305093 /* NativeAuthSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NativeAuthSpec.swift; path = Auth0Tests/NativeAuthSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B6269E91E3F9E5200305093 /* AuthProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthProvider.swift; path = Auth0/AuthProvider.swift; sourceTree = SOURCE_ROOT; };
+		5B9A54411E49E3AE004B5454 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = SOURCE_ROOT; };
 		5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResponseType.swift; path = Auth0/ResponseType.swift; sourceTree = SOURCE_ROOT; };
 		5F049B6C1CB42C29006F6C05 /* Auth0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Auth0.h; path = Auth0/Auth0.h; sourceTree = "<group>"; };
 		5F049B6E1CB42C29006F6C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Auth0/Info.plist; sourceTree = "<group>"; };
@@ -618,6 +619,7 @@
 		5F3965C81CF67DD800CDE7C0 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				5B9A54411E49E3AE004B5454 /* Auth0.plist */,
 				5F3965C91CF67DD800CDE7C0 /* AppDelegate.swift */,
 				5F3965D01CF67DD800CDE7C0 /* Assets.xcassets */,
 				5F3965D51CF67DD800CDE7C0 /* Info.plist */,
