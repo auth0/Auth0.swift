@@ -46,8 +46,7 @@ class ViewController: UIViewController {
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
-            .connection("facebook")
-            .connectionScope("user_friends email")
+            .connection("google-oauth2")
             .start(onAuth)
     }
 
