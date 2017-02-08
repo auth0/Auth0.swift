@@ -30,7 +30,8 @@ platform :ios do
     scan(
       scheme: scheme,
       device: device,
-      clean: true
+      clean: true,
+      output_types: 'junit'
       )
   end
 
