@@ -211,10 +211,10 @@ class WebAuthSpec: QuickSpec {
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newWebAuth()
-                        .connectionScope("user_friends email")
+                        .connectionScope("user_friends,email")
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: "state"),
                     "domain": Domain,
-                    "query": defaultQuery(withParameters: ["connection_scope": "user_friends email"]),
+                    "query": defaultQuery(withParameters: ["connection_scope": "user_friends,email"]),
                     ]
             }
 

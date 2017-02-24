@@ -120,7 +120,7 @@ public protocol WebAuth: Trackable, Loggable {
     /**
       Provider scopes for oauth2/social connections. e.g. Facebook, Google etc
 
-     - parameter connectionScope: oauth2/social scope list: `user_friends email`
+     - parameter connectionScope: oauth2/social comma separated scope list: `user_friends,email`
 
      - returns: the same WebAuth instance to allow method chaining
      */
