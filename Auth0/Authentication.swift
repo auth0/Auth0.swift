@@ -407,7 +407,7 @@ public protocol Authentication: Trackable, Loggable {
 public enum PasswordlessType: String {
     case Code = "code"
     case WebLink = "link"
-    case iOSLink = "link_ios"
+    case IOSLink = "link_ios"
     case AndroidLink = "link_android"
 }
 

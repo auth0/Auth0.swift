@@ -95,7 +95,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     @objc(startPasswordlessWithLinkToEmail:connection:callback:)
     public func startPasswordlessLink(email: String, connection: String, callback: @escaping (NSError?) -> ()) {
         self.authentication
-            .startPasswordless(email: email, type: .iOSLink, connection: connection)
+            .startPasswordless(email: email, type: .IOSLink, connection: connection)
             .start(handleResult(callback: callback))
     }
 
@@ -109,7 +109,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     @objc(startPasswordlessWithLinkToPhoneNumber:connection:callback:)
     public func startPasswordlessLink(phoneNumber: String, connection: String, callback: @escaping  (NSError?) -> ()) {
         self.authentication
-            .startPasswordless(phoneNumber: phoneNumber, type: .iOSLink, connection: connection)
+            .startPasswordless(phoneNumber: phoneNumber, type: .IOSLink, connection: connection)
             .start(handleResult(callback: callback))
     }
 

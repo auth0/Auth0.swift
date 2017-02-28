@@ -33,6 +33,7 @@ import Foundation
  - invalidIdTokenNonce:            Failed to match token nonce with request nonce
  - missingAccessToken:             access_token missing in response
  */
+// swiftlint:disable type_name
 public enum WebAuthError: CustomNSError {
     case noBundleIdentifierFound
     case cannotDismissWebAuthController
