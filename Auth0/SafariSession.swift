@@ -25,7 +25,7 @@ import SafariServices
 
 class SafariSession: NSObject, AuthTransaction {
 
-    typealias FinishSession = (Result<Credentials>) -> ()
+    typealias FinishSession = (Result<Credentials>) -> Void
 
     weak var controller: UIViewController?
 

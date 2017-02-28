@@ -24,7 +24,7 @@ import Foundation
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
-    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> ())
+    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void)
     func values(fromComponents components: URLComponents) -> [String: String]
 }
 
@@ -42,7 +42,7 @@ struct ImplicitGrant: OAuth2Grant {
         }
     }
 
-    func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
+    func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> Void) {
         guard validate(responseType: self.responseType, token: values["id_token"], nonce: self.defaults["nonce"]) else {
             return callback(.failure(error: WebAuthError.invalidIdTokenNonce))
         }
@@ -91,7 +91,7 @@ struct PKCE: OAuth2Grant {
         self.defaults = newDefaults
     }
 
-    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> ()) {
+    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void) {
         guard
             let code = values["code"]
             else {
@@ -144,7 +144,7 @@ private func decode(jwt: String) -> [String: Any]? {
     let paddingLength = requiredLength - length
     if paddingLength > 0 {
         let padding = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
-        base64 = base64 + padding
+        base64 += padding
     }
 
     guard

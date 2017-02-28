@@ -25,5 +25,5 @@ import Foundation
 protocol Requestable {
     associatedtype T
 
-    func start(_ callback: @escaping (Result<T>) -> ())
+    func start(_ callback: @escaping (Result<T>) -> Void)
 }

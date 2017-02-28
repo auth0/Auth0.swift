@@ -26,7 +26,7 @@ import UIKit
 class TransactionStore {
     static let shared = TransactionStore()
 
-    private(set) var current: AuthTransaction? = nil
+    private(set) var current: AuthTransaction?
 
     func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
         let resumed = self.current?.resume(url, options: options) ?? false

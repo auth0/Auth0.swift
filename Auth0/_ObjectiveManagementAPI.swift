@@ -41,7 +41,7 @@ public class _ObjectiveManagementAPI: NSObject {
     }
 
     @objc(patchUserWithIdentifier:userMetadata:callback:)
-    public func patchUser(identifier: String, userMetadata: [String: Any], callback: @escaping (NSError?, [String: Any]?) -> ()) {
+    public func patchUser(identifier: String, userMetadata: [String: Any], callback: @escaping (NSError?, [String: Any]?) -> Void) {
         self.users
             .patch(identifier, attributes: UserPatchAttributes().userMetadata(userMetadata))
             .start { result in
@@ -55,7 +55,7 @@ public class _ObjectiveManagementAPI: NSObject {
     }
 
     @objc(linkUserWithIdentifier:withUserUsingToken:callback:)
-    public func linkUser(identifier: String, withUserUsingToken token: String, callback: @escaping (NSError?, [[String: Any]]?) -> ()) {
+    public func linkUser(identifier: String, withUserUsingToken token: String, callback: @escaping (NSError?, [[String: Any]]?) -> Void) {
         self.users
             .link(identifier, withOtherUserToken: token)
             .start { result in
@@ -70,7 +70,7 @@ public class _ObjectiveManagementAPI: NSObject {
 
     @objc(unlinkUserWithIdentifier:provider:fromUserId:callback:)
     // swiftlint:disable:next function_parameter_count
-    public func unlink(identifier: String, provider: String, fromUserId userId: String, callback: @escaping (NSError?, [[String: Any]]?) -> ()) {
+    public func unlink(identifier: String, provider: String, fromUserId userId: String, callback: @escaping (NSError?, [[String: Any]]?) -> Void) {
         self.users
             .unlink(identityId: identifier, provider: provider, fromUserId:userId)
             .start { result in

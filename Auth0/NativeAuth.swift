@@ -66,7 +66,7 @@ public protocol NativeAuthTransaction: AuthTransaction {
     var authentication: Authentication { get }
 
     /// Callback where the result of the native authentication is sent
-    typealias Callback = (Result<NativeAuthCredentials>) -> ()
+    typealias Callback = (Result<NativeAuthCredentials>) -> Void
 
     /**
      Starts the native Auth flow using the IdP SDK and once completed it will notify the result using the callback.
@@ -77,10 +77,9 @@ public protocol NativeAuthTransaction: AuthTransaction {
      let credetials = NativeAuthCredentials(token: "{IdP Token}", extras: [:])
      let result = Auth0.Result.success(result: credentials)
      ```
-
      - parameter callback: callback with the IdP credentials on success or the cause of the error.
      */
-    func auth(callback: @escaping Callback) -> ()
+    func auth(callback: @escaping Callback)
 }
 
 /**
@@ -102,7 +101,7 @@ public extension NativeAuthTransaction {
      - parameter callback: closure that will notify with the result of the Auth transaction. On success it will yield the Auth0 credentilas of the user otherwise it will yield the cause of the failure.
      - important: Only one `AuthTransaction` can be active at a given time, if there is a pending one (OAuth or Native) it will be cancelled and replaced by the new one.
      */
-    public func start(callback: @escaping (Result<Credentials>) -> ()) {
+    public func start(callback: @escaping (Result<Credentials>) -> Void) {
         TransactionStore.shared.store(self)
         self.auth { result in
             switch result {

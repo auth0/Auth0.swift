@@ -45,6 +45,7 @@ platform :ios do
     }
     prepare_cache
     test(options)
+    lint
   end
 
   desc "Performs the release of the library to Cocoapods & Github Releases"
