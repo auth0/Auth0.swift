@@ -36,7 +36,7 @@ struct ImplicitGrant: OAuth2Grant {
     init(responseType: [ResponseType] = [.token], nonce: String? = nil) {
         self.responseType = responseType
         if let nonce = nonce {
-            self.defaults = ["nonce" : nonce]
+            self.defaults = ["nonce": nonce]
         } else {
             self.defaults = [:]
         }
@@ -106,7 +106,7 @@ struct PKCE: OAuth2Grant {
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
             .start { result in
                 // Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
-                if case .failure(let cause as AuthenticationError) = result , cause.description == "Unauthorized" {
+                if case .failure(let cause as AuthenticationError) = result, cause.description == "Unauthorized" {
                     let error = WebAuthError.pkceNotAllowed("Please go to 'https://manage.auth0.com/#/applications/\(clientId)/settings' and make sure 'Client Type' is 'Native' to enable PKCE.")
                     callback(Result.failure(error: error))
                 } else {

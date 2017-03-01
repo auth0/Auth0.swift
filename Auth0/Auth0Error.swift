@@ -22,9 +22,9 @@
 
 import Foundation
 
-let UnknownError = "a0.sdk.internal_error.unknown"
-let NonJSONError = "a0.sdk.internal_error.plain"
-let EmptyBodyError = "a0.sdk.internal_error.empty"
+let unknownError = "a0.sdk.internal_error.unknown"
+let nonJSONError = "a0.sdk.internal_error.plain"
+let emptyBodyError = "a0.sdk.internal_error.empty"
 
 /**
    Generic representation of Auth0 API errors

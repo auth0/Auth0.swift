@@ -23,7 +23,7 @@
 import Foundation
 
 #if DEBUG
-    let ParameterPropertyKey = "com.auth0.parameter"
+    let parameterPropertyKey = "com.auth0.parameter"
 #endif
 
 /**
@@ -66,7 +66,7 @@ public struct Request<T, E: Auth0Error>: Requestable {
         if !payload.isEmpty, let httpBody = try? JSONSerialization.data(withJSONObject: payload, options: []) {
             request.httpBody = httpBody
             #if DEBUG
-            URLProtocol.setProperty(payload, forKey: ParameterPropertyKey, in: request)
+            URLProtocol.setProperty(payload, forKey: parameterPropertyKey, in: request)
             #endif
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

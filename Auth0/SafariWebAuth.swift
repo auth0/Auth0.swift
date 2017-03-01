@@ -97,8 +97,7 @@ class SafariWebAuth: WebAuth {
 
     func start(_ callback: @escaping (Result<Credentials>) -> Void) {
         guard
-            let redirectURL = self.redirectURL
-            , !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
+            let redirectURL = self.redirectURL, !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
             else {
                 return callback(Result.failure(error: WebAuthError.noBundleIdentifierFound))
         }
