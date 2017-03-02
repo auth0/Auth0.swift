@@ -1157,7 +1157,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null && [[ `swiftlint version` =~ \"0.16\" ]] && [[ \"${CONFIGURATION}\" = \"Debug\" ]]; then\nswiftlint\nfi";
+			shellScript = "if [[ \"${CONFIGURATION}\" = \"Debug\" ]] && [ -z ${CIRCLECI} ] && which swiftlint >/dev/null; then\nswiftlint\nfi";
 		};
 		5B717B251E2E26B9004A05A7 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1171,7 +1171,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null && [[ `swiftlint version` =~ \"0.16\" ]] && [[ \"${CONFIGURATION}\" = \"Debug\" ]]; then\nswiftlint\nfi";
+			shellScript = "if [[ \"${CONFIGURATION}\" = \"Debug\" ]] && [ -z ${CIRCLECI} ] && which swiftlint >/dev/null; then\nswiftlint\nfi";
 		};
 		5B717B261E2E26C4004A05A7 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1185,7 +1185,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null && [[ `swiftlint version` =~ \"0.16\" ]] && [[ \"${CONFIGURATION}\" = \"Debug\" ]]; then\nswiftlint\nfi";
+			shellScript = "if [[ \"${CONFIGURATION}\" = \"Debug\" ]] && [ -z ${CIRCLECI} ] && which swiftlint >/dev/null; then\nswiftlint\nfi";
 		};
 		5B717B271E2E26CE004A05A7 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1199,7 +1199,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null && [[ `swiftlint version` =~ \"0.16\" ]] && [[ \"${CONFIGURATION}\" = \"Debug\" ]]; then\nswiftlint\nfi";
+			shellScript = "if [[ \"${CONFIGURATION}\" = \"Debug\" ]] && [ -z ${CIRCLECI} ] && which swiftlint >/dev/null; then\nswiftlint\nfi";
 		};
 		5F53F5CB1CFCDC2500476A46 /* Auth0 */ = {
 			isa = PBXShellScriptBuildPhase;
