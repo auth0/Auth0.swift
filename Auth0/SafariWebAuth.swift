@@ -157,7 +157,6 @@ class SafariWebAuth: WebAuth {
             entries["nonce"] = self.nonce
         }
         self.parameters.forEach { entries[$0] = $1 }
-        self.parameters = [:]
 
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
         components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
