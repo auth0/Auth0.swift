@@ -24,18 +24,12 @@ import UIKit
 
 struct ControllerModalPresenter {
 
-    let rootViewController: UIViewController?
-
-    init(rootViewController: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) {
-        self.rootViewController = rootViewController
-    }
-
     func present(_ controller: UIViewController) {
         topViewController?.present(controller, animated: true, completion: nil)
     }
 
     var topViewController: UIViewController? {
-        guard let root = rootViewController else { return nil }
+        guard let root = UIApplication.shared.keyWindow?.rootViewController else { return nil }
         return findTopViewController(root)
     }
 
