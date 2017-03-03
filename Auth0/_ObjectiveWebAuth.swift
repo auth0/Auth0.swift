@@ -108,7 +108,7 @@ public class _ObjectiveOAuth2: NSObject {
 
      - returns: an object representing the current OAuth2 session.
      */
-    public func start(_ callback: @escaping (NSError?, Credentials?) -> ()) {
+    public func start(_ callback: @escaping (NSError?, Credentials?) -> Void) {
         self.webAuth.start { result in
             switch result {
             case .success(let credentials):

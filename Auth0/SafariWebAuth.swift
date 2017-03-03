@@ -37,7 +37,7 @@ class SafariWebAuth: WebAuth {
     var parameters: [String: String] = [:]
     var universalLink = false
     var responseType: [ResponseType] = [.code]
-    var nonce: String? = nil
+    var nonce: String?
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
@@ -95,10 +95,9 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
-    func start(_ callback: @escaping (Result<Credentials>) -> ()) {
+    func start(_ callback: @escaping (Result<Credentials>) -> Void) {
         guard
-            let redirectURL = self.redirectURL
-            , !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
+            let redirectURL = self.redirectURL, !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
             else {
                 return callback(Result.failure(error: WebAuthError.noBundleIdentifierFound))
         }
@@ -117,9 +116,9 @@ class SafariWebAuth: WebAuth {
         self.storage.store(session)
     }
 
-    func newSafari(_ authorizeURL: URL, callback: @escaping (Result<Credentials>) -> ()) -> (SFSafariViewController, (Result<Credentials>) -> ()) {
+    func newSafari(_ authorizeURL: URL, callback: @escaping (Result<Credentials>) -> Void) -> (SFSafariViewController, (Result<Credentials>) -> Void) {
         let controller = SFSafariViewController(url: authorizeURL)
-        let finish: (Result<Credentials>) -> () = { [weak controller] (result: Result<Credentials>) -> () in
+        let finish: (Result<Credentials>) -> Void = { [weak controller] (result: Result<Credentials>) -> Void in
             guard let presenting = controller?.presentingViewController else {
                 return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
             }

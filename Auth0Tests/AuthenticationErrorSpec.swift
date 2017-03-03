@@ -251,7 +251,7 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
             let values = context()[ExampleValuesKey] as! [String: Any]
             let error = AuthenticationError(info: values, statusCode: 401)
             it("should have unknown error code") {
-                expect(error.code) == UnknownError
+                expect(error.code) == unknownError
             }
 
             it("should have description") {
@@ -283,11 +283,11 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
 
             if value != nil {
                 it("should have plain error code") {
-                    expect(error.code) == NonJSONError
+                    expect(error.code) == nonJSONError
                 }
             } else {
                 it("should have empty body error code") {
-                    expect(error.code) == EmptyBodyError
+                    expect(error.code) == emptyBodyError
                 }
             }
 

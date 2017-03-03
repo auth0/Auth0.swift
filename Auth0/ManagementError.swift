@@ -43,7 +43,7 @@ public class ManagementError: Auth0Error, CustomStringConvertible {
      */
     public required init(string: String? = nil, statusCode: Int = 0) {
         self.info = [
-            "code": string != nil ? NonJSONError : EmptyBodyError,
+            "code": string != nil ? nonJSONError : emptyBodyError,
             "description": string ?? "Empty response body",
             "statusCode": statusCode
             ]
@@ -66,7 +66,7 @@ public class ManagementError: Auth0Error, CustomStringConvertible {
     /**
      Auth0 error code if the server returned one or an internal library code (e.g.: when the server could not be reached)
      */
-    public var code: String { return self.info["code"] as? String ?? UnknownError }
+    public var code: String { return self.info["code"] as? String ?? unknownError }
 
     /**
      Description of the error

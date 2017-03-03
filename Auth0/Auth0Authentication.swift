@@ -105,7 +105,7 @@ struct Auth0Authentication: Authentication {
             "send": type.rawValue,
             "client_id": self.clientId
             ]
-        if case .WebLink = type , !parameters.isEmpty {
+        if case .WebLink = type, !parameters.isEmpty {
             payload["authParams"] = parameters
         }
 

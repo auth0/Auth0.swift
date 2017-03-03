@@ -192,7 +192,7 @@ func beSuccessfulResult<T>() -> MatcherFunc<Result<T>> {
 
 func beInvalidResponse<T>() -> MatcherFunc<Result<T>> {
     return beFailure("invalid response") { (cause: AuthenticationError) in
-        if cause.code == NonJSONError {
+        if cause.code == nonJSONError {
             return true
         }
         return false
@@ -290,7 +290,7 @@ func beURLSafeBase64() -> MatcherFunc<String> {
 extension URLRequest {
     var a0_payload: [String: Any]? {
         get {
-            return URLProtocol.property(forKey: ParameterPropertyKey, in: self) as? [String: Any]
+            return URLProtocol.property(forKey: parameterPropertyKey, in: self) as? [String: Any]
         }
     }
 }

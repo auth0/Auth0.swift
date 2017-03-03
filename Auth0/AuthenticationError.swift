@@ -46,7 +46,7 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
      */
     public required init(string: String? = nil, statusCode: Int = 0) {
         self.info = [
-            "code": string != nil ? NonJSONError : EmptyBodyError,
+            "code": string != nil ? nonJSONError : emptyBodyError,
             "description": string ?? "Empty response body",
             "statusCode": statusCode
         ]
@@ -71,7 +71,7 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
      */
     public var code: String {
         let code = self.info["error"] ?? self.info["code"]
-        return code as? String ?? UnknownError
+        return code as? String ?? unknownError
     }
 
     /**
@@ -84,7 +84,7 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
             return string
         }
 
-        guard self.code == UnknownError else { return "Received error with code \(self.code)" }
+        guard self.code == unknownError else { return "Received error with code \(self.code)" }
 
         return "Failed with unknown error \(self.info)"
     }

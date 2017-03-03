@@ -24,7 +24,7 @@ import Foundation
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
-    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> ())
+    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void)
     func values(fromComponents components: URLComponents) -> [String: String]
 }
 
@@ -36,13 +36,13 @@ struct ImplicitGrant: OAuth2Grant {
     init(responseType: [ResponseType] = [.token], nonce: String? = nil) {
         self.responseType = responseType
         if let nonce = nonce {
-            self.defaults = ["nonce" : nonce]
+            self.defaults = ["nonce": nonce]
         } else {
             self.defaults = [:]
         }
     }
 
-    func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> ()) {
+    func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> Void) {
         guard validate(responseType: self.responseType, token: values["id_token"], nonce: self.defaults["nonce"]) else {
             return callback(.failure(error: WebAuthError.invalidIdTokenNonce))
         }
@@ -91,7 +91,7 @@ struct PKCE: OAuth2Grant {
         self.defaults = newDefaults
     }
 
-    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> ()) {
+    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void) {
         guard
             let code = values["code"]
             else {
@@ -106,7 +106,7 @@ struct PKCE: OAuth2Grant {
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectURL.absoluteString)
             .start { result in
                 // Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
-                if case .failure(let cause as AuthenticationError) = result , cause.description == "Unauthorized" {
+                if case .failure(let cause as AuthenticationError) = result, cause.description == "Unauthorized" {
                     let error = WebAuthError.pkceNotAllowed("Please go to 'https://manage.auth0.com/#/applications/\(clientId)/settings' and make sure 'Client Type' is 'Native' to enable PKCE.")
                     callback(Result.failure(error: error))
                 } else {
@@ -144,7 +144,7 @@ private func decode(jwt: String) -> [String: Any]? {
     let paddingLength = requiredLength - length
     if paddingLength > 0 {
         let padding = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
-        base64 = base64 + padding
+        base64 += padding
     }
 
     guard

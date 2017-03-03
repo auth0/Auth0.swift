@@ -23,7 +23,7 @@
 import Foundation
 
 #if DEBUG
-    let ParameterPropertyKey = "com.auth0.parameter"
+    let parameterPropertyKey = "com.auth0.parameter"
 #endif
 
 /**
@@ -37,19 +37,19 @@ import Foundation
  ```
  */
 public struct Request<T, E: Auth0Error>: Requestable {
-    public typealias Callback = (Result<T>) -> ()
+    public typealias Callback = (Result<T>) -> Void
 
     let session: URLSession
     let url: URL
     let method: String
-    let handle: (Response<E>, Callback) -> ()
+    let handle: (Response<E>, Callback) -> Void
     let payload: [String: Any]
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
 
     // swiftlint:disable:next function_parameter_count
-    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> (), payload: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
+    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, payload: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
         self.session = session
         self.url = url
         self.method = method
@@ -66,7 +66,7 @@ public struct Request<T, E: Auth0Error>: Requestable {
         if !payload.isEmpty, let httpBody = try? JSONSerialization.data(withJSONObject: payload, options: []) {
             request.httpBody = httpBody
             #if DEBUG
-            URLProtocol.setProperty(payload, forKey: ParameterPropertyKey, in: request)
+            URLProtocol.setProperty(payload, forKey: parameterPropertyKey, in: request)
             #endif
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -112,7 +112,7 @@ public struct ConcatRequest<F, S, E: Auth0Error>: Requestable {
 
      - parameter callback: called when the request finishes and yield it's result
      */
-    public func start(_ callback: @escaping (Result<T>) -> ()) {
+    public func start(_ callback: @escaping (Result<T>) -> Void) {
         let second = self.second
         first.start { result in
             switch result {
