@@ -100,6 +100,11 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
+    func reset() -> Self {
+        self.parameters = [:]
+        return self
+    }
+
     func start(_ callback: @escaping (Result<Credentials>) -> Void) {
         guard
             let redirectURL = self.redirectURL, !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
