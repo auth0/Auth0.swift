@@ -279,7 +279,7 @@ class WebAuthSpec: QuickSpec {
                 expect(storage.current?.state) == state
             }
 
-            it("should hava generate on start different states") {
+            it("should generate different state on every start") {
                 let auth = newWebAuth()
                 auth.start({ _ in})
                 let state = storage.current?.state
@@ -302,6 +302,12 @@ class WebAuthSpec: QuickSpec {
             it("should fail if controller is not presented") {
                 let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
                 callback(.success(result: Credentials(json: ["access_token": "at", "token_type": "bearer"])))
+                expect(result).toEventually(beFailure())
+            }
+
+            it("should fail if user dismissed safari viewcontroller") {
+                let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
+                callback(.failure(error: WebAuthError.userCancelled))
                 expect(result).toEventually(beFailure())
             }
 
