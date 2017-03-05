@@ -19,7 +19,8 @@ platform :ios do
   lane :lint do
   	swiftlint(
   		mode: :lint,
-   		config_file: '.swiftlint.yml'
+   		config_file: '.swiftlint.yml',
+      reporter: 'emoji'
   	)
   end
 
@@ -43,9 +44,9 @@ platform :ios do
       scheme: scheme,
       device: ENV["DEVICE"]
     }
+    lint
     prepare_cache
     test(options)
-    lint
   end
 
   desc "Performs the release of the library to Cocoapods & Github Releases"

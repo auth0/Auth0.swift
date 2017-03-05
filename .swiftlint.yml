@@ -1,5 +1,3 @@
-disabled_rules: # rule identifiers to exclude from running
-  - file_length
 opt_in_rules: # some rules are only opt-in
   - empty_count
   # Find all the available rules by running:
@@ -9,8 +7,6 @@ included: # paths to include during linting. `--path` is ignored if present.
 excluded: # paths to ignore during linting. Takes precedence over `included`.
   - Carthage
   - Pods
-  - Source/ExcludedFolder
-  - Source/ExcludedFile.swift
 
 # configurable rules can be customized from this configuration file
 # rules that have both warning and error levels, can set just the warning level
@@ -22,8 +18,6 @@ type_body_length:
   - 400 # error
 type_name:
   min_length: 3 # only warning
-  excluded:
-    - T
 variable_name:
   min_length: # only min_length
     warning: 3 # only error
