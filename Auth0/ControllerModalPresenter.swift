@@ -24,27 +24,31 @@ import UIKit
 
 struct ControllerModalPresenter {
 
-    func present(_ controller: UIViewController) {
+    var rootViewController: UIViewController? {
+        return UIApplication.shared.keyWindow?.rootViewController
+    }
+
+    func present(controller: UIViewController) {
         topViewController?.present(controller, animated: true, completion: nil)
     }
 
     var topViewController: UIViewController? {
-        guard let root = UIApplication.shared.keyWindow?.rootViewController else { return nil }
-        return findTopViewController(root)
+        guard let root = self.rootViewController else { return nil }
+        return findTopViewController(from: root)
     }
 
-    fileprivate func findTopViewController(_ root: UIViewController) -> UIViewController? {
-        if let presented = root.presentedViewController { return findTopViewController(presented) }
+    private func findTopViewController(from root: UIViewController) -> UIViewController? {
+        if let presented = root.presentedViewController { return findTopViewController(from: presented) }
         switch root {
         case let split as UISplitViewController:
             guard let last = split.viewControllers.last else { return split }
-            return findTopViewController(last)
+            return findTopViewController(from: last)
         case let navigation as UINavigationController:
             guard let top = navigation.topViewController else { return navigation }
-            return findTopViewController(top)
+            return findTopViewController(from: top)
         case let tab as UITabBarController:
             guard let selected = tab.selectedViewController else { return tab }
-            return findTopViewController(selected)
+            return findTopViewController(from: selected)
         default:
             return root
         }
