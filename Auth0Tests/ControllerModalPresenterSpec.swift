@@ -41,64 +41,55 @@ class ControllerModalPresenterSpec: QuickSpec {
 
     override func spec() {
 
-        describe("init") {
-
-            it("should get root controller from UIApplication") {
-                let presenter = ControllerModalPresenter()
-                expect(presenter.rootViewController) == UIApplication.shared.keyWindow?.rootViewController
-            }
-
-            it("should accept specific controller") {
-                let controller = UIViewController()
-                let presenter = ControllerModalPresenter(rootViewController: controller)
-                expect(presenter.rootViewController) == controller
-            }
-
-        }
-
         describe("topViewController") {
 
             var root: MockViewController!
 
             beforeEach {
                 root = MockViewController()
+                UIApplication.shared.keyWindow?.rootViewController = root
             }
 
             it("should return nil when root is nil") {
-                expect(ControllerModalPresenter(rootViewController: nil).topViewController).to(beNil())
+                UIApplication.shared.keyWindow?.rootViewController = nil
+                expect(ControllerModalPresenter().topViewController).to(beNil())
             }
 
             it("should return root when is top controller") {
-                expect(ControllerModalPresenter(rootViewController: root).topViewController) == root
+                expect(ControllerModalPresenter().topViewController) == root
             }
 
             it("should return presented controller") {
                 let presented = UIViewController()
                 root.presented = presented
-                expect(ControllerModalPresenter(rootViewController: root).topViewController) == presented
+                expect(ControllerModalPresenter().topViewController) == presented
             }
 
             it("should return split view controller if contains nothing") {
                 let split = UISplitViewController()
-                expect(ControllerModalPresenter(rootViewController: split).topViewController) == split
+                root.presented = split
+                expect(ControllerModalPresenter().topViewController) == split
             }
 
             it("should return last controller from split view controller") {
                 let split = UISplitViewController()
                 let last = UIViewController()
                 split.viewControllers = [UIViewController(), last]
-                expect(ControllerModalPresenter(rootViewController: split).topViewController) == last
+                root.presented = split
+                expect(ControllerModalPresenter().topViewController) == last
             }
 
             it("should return navigation controller if contains nothing") {
                 let navigation = UINavigationController()
-                expect(ControllerModalPresenter(rootViewController: navigation).topViewController) == navigation
+                root.presented = navigation
+                expect(ControllerModalPresenter().topViewController) == navigation
             }
 
             it("should return top from navigation controller") {
                 let top = UIViewController()
                 let navigation = UINavigationController(rootViewController: top)
-                expect(ControllerModalPresenter(rootViewController: navigation).topViewController) == top
+                root.presented = navigation
+                expect(ControllerModalPresenter().topViewController) == top
             }
 
         }
