@@ -66,6 +66,11 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
+    func connectionScope(_ connectionScope: String) -> Self {
+        self.parameters["connection_scope"] = connectionScope
+        return self
+    }
+
     func state(_ state: String) -> Self {
         self.parameters["state"] = state
         return self
