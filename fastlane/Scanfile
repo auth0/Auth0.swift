@@ -1,0 +1,6 @@
+scheme "Auth0.iOS"
+device "iPhone 7 (10.2)"
+
+clean true
+
+output_types "html"

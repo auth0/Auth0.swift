@@ -105,14 +105,14 @@ public struct ConcatRequest<F, S, E: Auth0Error>: Requestable {
     let first: Request<F, E>
     let second: Request<S, E>
 
-    public typealias T = S
+    public typealias ResultType = S
 
     /**
      Starts the request to the server
 
      - parameter callback: called when the request finishes and yield it's result
      */
-    public func start(_ callback: @escaping (Result<T>) -> Void) {
+    public func start(_ callback: @escaping (Result<ResultType>) -> Void) {
         let second = self.second
         first.start { result in
             switch result {

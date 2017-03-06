@@ -1,3 +1,23 @@
 machine:
   xcode:
     version: 8.2
+  environment:
+    AWS_REGION: "us-west-1"
+    CARTHAGE_CACHE_BUCKET_NAME: "carthage-ios-deps"
+    SCHEME: "Auth0.iOS"
+    DEVICE: "iPhone 7 (10.2)"
+    FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
+
+dependencies:
+  pre:
+    - brew install wget swiftlint
+  post:
+    - mkdir -p fastlane/test_output
+
+test:
+  override:
+    - bundle exec fastlane ios ci
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/scan/
+    - cp fastlane/test_output/report.junit $CIRCLE_TEST_REPORTS/scan/report.xml
+    - bash <(curl -s https://codecov.io/bash) -J 'Auth0'

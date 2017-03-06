@@ -49,11 +49,11 @@ Runs all the tests
 fastlane ios ci
 ```
 Runs all the tests in a CI environment
-### ios release
+### ios prepare_release
 ```
-fastlane ios release
+fastlane ios prepare_release
 ```
-Performs the release of the library to Cocoapods & Github Releases
+Prepeares the release of the library to Cocoapods & Github Releases
 
 You need to specify the type of release with the `bump` parameter with the values [major|minor|patch]
 
