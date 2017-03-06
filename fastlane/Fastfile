@@ -41,7 +41,7 @@ platform :ios do
     # TODO: Run rest of platforms
     lint
     prepare_cache
-    test(options)
+    test
   end
 
   desc "Releases the library to Cocoapods & Github Releases and updates README/CHANGELOG"
