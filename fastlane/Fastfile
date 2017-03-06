@@ -51,13 +51,4 @@ platform :ios do
     prepare_release release_options
     perform_release
   end
-
-  # private_lane :perform_release do
-  #   tag = last_git_tag
-  #   UI.header "Performing release #{tag}"
-  #   pod_lib_lint
-  #   push_to_git_remote
-  #   pod_push
-  #   sh("chandler push #{tag} --git=../.git --changelog=../CHANGELOG.md")
-  # end
 end
