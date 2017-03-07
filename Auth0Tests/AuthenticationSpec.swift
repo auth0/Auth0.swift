@@ -722,5 +722,24 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        describe("spawn WebAuth instance") {
+
+            it("should return a WebAuth instance with matching credentials") {
+                let webAuth = auth.webAuth(withConnection: "facebook")
+                expect(webAuth.clientId) == auth.clientId
+                expect(webAuth.url) == auth.url
+            }
+
+            it("should return a WebAuth instance with matching telemetry") {
+                let webAuth = auth.webAuth(withConnection: "facebook") as! SafariWebAuth
+                expect(webAuth.telemetry.info) == auth.telemetry.info
+            }
+
+            it("should return a WebAuth instance with matching connection") {
+                let webAuth = auth.webAuth(withConnection: "facebook") as! SafariWebAuth
+                expect(webAuth.parameters["connection"]) == "facebook"
+            }
+        }
+
     }
 }

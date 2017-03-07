@@ -396,6 +396,22 @@ public protocol Authentication: Trackable, Loggable {
      - returns: a request that will yield the result of delegation
     */
     func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
+
+    /**
+     Creates a new WebAuth compliant instance using authentication credentials
+     and telemetry.
+
+     ```
+     Auth0
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .webAuth(withConnection: "facebook")
+        .start { print($0) }
+     ```
+
+     - parameter connection: name of the connection to use.
+     - returns: a newly created WebAuth compliant object.
+     */
+    func webAuth(withConnection connection: String) -> WebAuth
 }
 
 /**
