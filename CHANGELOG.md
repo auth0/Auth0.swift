@@ -1,5 +1,18 @@
 # Change Log
 
+## [1.3.0](https://github.com/auth0/Auth0.swift/tree/1.3.0) (2017-03-13)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.2.0...1.3.0)
+
+**Added**
+- Authentication can now create WebAuth instances for given connection [\#98](https://github.com/auth0/Auth0.swift/pull/98) ([cocojoe](https://github.com/cocojoe))
+- Added connection scopes to web auth [\#96](https://github.com/auth0/Auth0.swift/pull/96) ([hzalaz](https://github.com/hzalaz))
+
+**Changed**
+- Restrict webauth only to iOS [\#101](https://github.com/auth0/Auth0.swift/pull/101) ([hzalaz](https://github.com/hzalaz))
+
+**Fixed**
+- Avoid WebAuth to retain UIApplication root ViewController [\#95](https://github.com/auth0/Auth0.swift/pull/95) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.2.0](https://github.com/auth0/Auth0.swift/tree/1.2.0) (2017-02-06)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.1.1...1.2.0)
 
