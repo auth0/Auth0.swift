@@ -397,6 +397,7 @@ public protocol Authentication: Trackable, Loggable {
     */
     func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
 
+#if os(iOS)
     /**
      Creates a new WebAuth request to authenticate using Safari browser and OAuth authorize flow.
 
@@ -421,6 +422,7 @@ public protocol Authentication: Trackable, Loggable {
      - returns: a newly created WebAuth object.
      */
     func webAuth(withConnection connection: String) -> WebAuth
+#endif
 }
 
 /**
