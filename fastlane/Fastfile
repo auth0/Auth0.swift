@@ -49,6 +49,6 @@ platform :ios do
   lane :release do |options|
     release_options = {repository: 'Auth0.swift', xcodeproj: 'Auth0.xcodeproj'}.merge(options)
     prepare_release release_options
-    perform_release
+    publish_release
   end
 end
