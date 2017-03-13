@@ -398,18 +398,27 @@ public protocol Authentication: Trackable, Loggable {
     func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
 
     /**
-     Creates a new WebAuth compliant instance using authentication credentials
-     and telemetry.
+     Creates a new WebAuth request to authenticate using Safari browser and OAuth authorize flow.
+
+     With the connection name Auth0 will redirect to the associated IdP login page to authenticate
+     
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .webAuth(withConnection: "facebook")
+     .start { print($0) }
+     ```
+
+     If you need to show your Auth0 account login page just create the WebAuth object directly
 
      ```
      Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .webAuth(withConnection: "facebook")
+        .webAuth(clientId: clientId, domain: "samples.auth0.com")
         .start { print($0) }
      ```
 
-     - parameter connection: name of the connection to use.
-     - returns: a newly created WebAuth compliant object.
+     - parameter connection: name of the connection to use
+     - returns: a newly created WebAuth object.
      */
     func webAuth(withConnection connection: String) -> WebAuth
 }

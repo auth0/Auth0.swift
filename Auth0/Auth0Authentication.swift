@@ -186,6 +186,9 @@ struct Auth0Authentication: Authentication {
     }
 
     func webAuth(withConnection connection: String) -> WebAuth {
-        return SafariWebAuth(clientId: self.clientId, url: self.url, presenter: ControllerModalPresenter(), telemetry: self.telemetry).connection(connection)
+        var safari = SafariWebAuth(clientId: self.clientId, url: self.url, presenter: ControllerModalPresenter(), telemetry: self.telemetry)
+        return safari
+            .logging(enabled: self.logger != nil)
+            .connection(connection)
     }
 }
