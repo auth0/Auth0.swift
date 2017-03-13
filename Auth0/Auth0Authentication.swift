@@ -184,4 +184,11 @@ struct Auth0Authentication: Authentication {
         let delegation = URL(string: "/delegation", relativeTo: self.url)!
         return Request(session: session, url: delegation, method: "POST", handle: plainJson, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
+
+    func webAuth(withConnection connection: String) -> WebAuth {
+        var safari = SafariWebAuth(clientId: self.clientId, url: self.url, presenter: ControllerModalPresenter(), telemetry: self.telemetry)
+        return safari
+            .logging(enabled: self.logger != nil)
+            .connection(connection)
+    }
 }
