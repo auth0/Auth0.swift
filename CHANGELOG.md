@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.4.0](https://github.com/auth0/Auth0.swift/tree/1.4.0) (2017-03-16)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.3.0...1.4.0)
+
+**Added**
+- Added scope to refresh token [\#102](https://github.com/auth0/Auth0.swift/pull/102) ([hzalaz](https://github.com/hzalaz))
+
 ## [1.3.0](https://github.com/auth0/Auth0.swift/tree/1.3.0) (2017-03-13)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.2.0...1.3.0)
 
