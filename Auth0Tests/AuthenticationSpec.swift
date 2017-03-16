@@ -42,7 +42,7 @@ private let Timeout: TimeInterval = 2
 class AuthenticationSpec: QuickSpec {
     override func spec() {
 
-        let auth = Auth0Authentication(clientId: ClientId, url: URL(string: "https://\(Domain)")!)
+        let auth: Authentication = Auth0Authentication(clientId: ClientId, url: URL(string: "https://\(Domain)")!)
 
         beforeEach {
             stub(condition: isHost(Domain)) { _ in
@@ -153,6 +153,15 @@ class AuthenticationSpec: QuickSpec {
             it("should receive access token") {
                 waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should receive access token sending also scope") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.renew(withRefreshToken: refreshToken, scope: "openid").start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }

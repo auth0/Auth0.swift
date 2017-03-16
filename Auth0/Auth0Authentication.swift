@@ -165,12 +165,13 @@ struct Auth0Authentication: Authentication {
             ])
     }
 
-    func renew(withRefreshToken refreshToken: String) -> Request<Credentials, AuthenticationError> {
-        let payload: [String: Any] = [
+    func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+        var payload: [String: Any] = [
             "refresh_token": refreshToken,
             "grant_type": "refresh_token",
             "client_id": self.clientId
         ]
+        payload["scope"] = scope
         let oauthToken = URL(string: "/oauth/token", relativeTo: self.url)!
         return Request(session: session, url: oauthToken, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
