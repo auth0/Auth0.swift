@@ -381,13 +381,14 @@ public protocol Authentication: Trackable, Loggable {
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Renew user's credentials with a refresh_token.
-     If you are not using OAuth 2.0 API Authorization please use `delegation(payload:)`
+     Renew user's credentials with a refresh_token grant for `/oauth/token`
+     If you are not using OAuth 2.0 API Authorization please use `delegation(parameters:)`
      - parameter refreshToken: the client's refresh token obtained on auth
+     - parameter scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during Auth.
      - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
      - returns: a request that will yield Auth0 user's credentials
      */
-    func renew(withRefreshToken refreshToken: String) -> Request<Credentials, AuthenticationError>
+    func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Calls delegation endpoint with the given parameters.
@@ -708,5 +709,33 @@ public extension Authentication {
      */
     public func loginSocial(token: String, connection: String, scope: String = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         return self.loginSocial(token: token, connection: connection, scope: scope, parameters: parameters)
+    }
+
+    /**
+     Renew user's credentials with a refresh_token grant for `/oauth/token`
+     
+     ```
+     Auth0
+        .renew(withRefreshToken: refreshToken, scope: "openid email read:users")
+        .start { print($0) }
+     ```
+
+     or asking the same scopes requested when the refresh token was issued
+
+     ```
+     Auth0
+        .renew(withRefreshToken: refreshToken)
+        .start { print($0) }
+     ```
+
+     If you are not using OAuth 2.0 API Authorization please use `delegation(parameters:)`
+
+     - parameter refreshToken: the client's refresh token obtained on auth
+     - parameter scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during Auth.
+     - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+     - returns: a request that will yield Auth0 user's credentials
+     */
+    func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.renew(withRefreshToken: refreshToken, scope: scope)
     }
 }

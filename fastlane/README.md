@@ -23,17 +23,34 @@ xcode-select --install
 </tr>
 <tr>
 <td width="33%"><code>brew cask install fastlane</code></td>
-<td width="33%"><a href="https://download.fastlane.tools/fastlane.zip">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
+<td width="33%"><a href="https://download.fastlane.tools">Download the zip file</a>. Then double click on the <code>install</code> script (or run it in a terminal window).</td>
 <td width="33%"><code>sudo gem install fastlane -NV</code></td>
 </tr>
 </table>
 # Available Actions
 ## iOS
+### ios dependencies
+```
+fastlane ios dependencies
+```
+Installs dependencies using Carthage
+### ios bootstrap
+```
+fastlane ios bootstrap
+```
+Bootstrap the development environment
 ### ios prepare_cache
 ```
 fastlane ios prepare_cache
 ```
 Install dependencies from cache
+### ios publish_cache
+```
+fastlane ios publish_cache
+```
+Publish dependencies to cache
+
+To run this lane you need to configure the carthage_cache.yml
 ### ios lint
 ```
 fastlane ios lint
@@ -49,11 +66,11 @@ Runs all the tests
 fastlane ios ci
 ```
 Runs all the tests in a CI environment
-### ios prepare_release
+### ios release
 ```
-fastlane ios prepare_release
+fastlane ios release
 ```
-Prepeares the release of the library to Cocoapods & Github Releases
+Releases the library to Cocoapods & Github Releases and updates README/CHANGELOG
 
 You need to specify the type of release with the `bump` parameter with the values [major|minor|patch]
 
