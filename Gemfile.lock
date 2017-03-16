@@ -106,7 +106,7 @@ GEM
       xcodeproj (>= 0.20, < 2.0.0)
       xcpretty (>= 0.2.4, < 1.0.0)
       xcpretty-travis-formatter (>= 0.0.3)
-    fastlane-plugin-auth0_shipper (0.2.1)
+    fastlane-plugin-auth0_shipper (0.2.2)
       semantic (~> 1.5)
     fourflusher (2.0.1)
     fuzzy_match (2.0.4)
