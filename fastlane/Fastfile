@@ -8,10 +8,29 @@ default_platform :ios
 
 platform :ios do
 
+  desc "Installs dependencies using Carthage"
+  lane :dependencies do |options|
+    action = options[:action]
+    carthage(use_binaries: false, command: action)
+  end
+
+  desc "Bootstrap the development environment"
+  lane :bootstrap do
+    dependencies
+  end
+
   desc "Install dependencies from cache"
   lane :prepare_cache do
     Dir.chdir ".." do
       sh "export AWS_REGION=#{ENV["AWS_REGION"]};carthage_cache install --bucket-name #{ENV["CARTHAGE_CACHE_BUCKET_NAME"]}"
+    end
+  end
+
+  desc "Publish dependencies to cache"
+  desc "To run this lane you need to configure the carthage_cache.yml"
+  lane :publish_cache do
+    Dir.chdir ".." do
+      sh "carthage_cache publish"
     end
   end
 
