@@ -18,7 +18,7 @@ type_body_length:
   - 400 # error
 type_name:
   min_length: 3 # only warning
-variable_name:
+identifier_name:
   min_length: # only min_length
     warning: 3 # only error
   excluded: # No regex support available for this
@@ -27,4 +27,7 @@ variable_name:
     - a0_isManagementError
     - a0_fragmentValues
     - a0_queryValues
+    - Code
+    - WebLink
+    - AndroidLink
 reporter: "xcode" # reporter type (xcode, json, csv, checkstyle, junit)

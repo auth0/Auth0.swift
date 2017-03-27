@@ -65,7 +65,7 @@ func databaseUser(from response: Response<AuthenticationError>, callback: Reques
 
 func noBody(from response: Response<AuthenticationError>, callback: Request<Void, AuthenticationError>.Callback) {
     do {
-        let _ = try response.result()
+        _ = try response.result()
         callback(.success(result: ()))
     } catch let error {
         callback(.failure(error: error))
