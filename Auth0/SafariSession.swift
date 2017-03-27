@@ -66,7 +66,7 @@ class SafariSession: NSObject, AuthTransaction {
             }
         var items = self.handler.values(fromComponents: components)
         guard has(state: self.state, inItems: items) else { return false }
-        if let _ = items["error"] {
+        if items["error"] != nil {
             self.finish(.failure(error: AuthenticationError(info: items, statusCode: 0)))
         } else {
             self.handler.credentials(from: items, callback: self.finish)

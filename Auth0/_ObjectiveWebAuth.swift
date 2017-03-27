@@ -39,7 +39,7 @@ public class _ObjectiveOAuth2: NSObject {
     }
 
     public func addParameters(_ parameters: [String: String]) {
-        let _ = self.webAuth.parameters(parameters)
+        _ = self.webAuth.parameters(parameters)
     }
 
     /**
@@ -64,7 +64,7 @@ public class _ObjectiveOAuth2: NSObject {
     public var connection: String? {
         set {
             if let value = newValue {
-                let _ = self.webAuth.connection(value)
+                _ = self.webAuth.connection(value)
             }
         }
         get {
@@ -78,7 +78,7 @@ public class _ObjectiveOAuth2: NSObject {
     public var scope: String? {
         set {
             if let value = newValue {
-                let _ = self.webAuth.scope(value)
+                _ = self.webAuth.scope(value)
             }
         }
         get {
