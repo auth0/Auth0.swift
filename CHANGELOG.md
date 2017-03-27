@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.5.0](https://github.com/auth0/Auth0.swift/tree/1.5.0) (2017-03-27)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.4.0...1.5.0)
+
+**Added**
+- Method to check native auth availability for provider in the device [\#104](https://github.com/auth0/Auth0.swift/pull/104) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.4.0](https://github.com/auth0/Auth0.swift/tree/1.4.0) (2017-03-16)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.3.0...1.4.0)
 
