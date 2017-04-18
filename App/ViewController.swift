@@ -26,7 +26,7 @@ class ViewController: UIViewController {
                 self?.present(alert, animated: true, completion: nil)
             case .success(let credentials):
                 let token = credentials.accessToken ?? credentials.idToken
-                let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got a token \(token)", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got a token \(String(describing: token))", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
                 self?.present(alert, animated: true, completion: nil)
             }

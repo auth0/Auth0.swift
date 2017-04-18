@@ -27,6 +27,7 @@ xcode-select --install
 <td width="33%"><code>sudo gem install fastlane -NV</code></td>
 </tr>
 </table>
+
 # Available Actions
 ## iOS
 ### ios dependencies
@@ -39,18 +40,6 @@ Installs dependencies using Carthage
 fastlane ios bootstrap
 ```
 Bootstrap the development environment
-### ios prepare_cache
-```
-fastlane ios prepare_cache
-```
-Install dependencies from cache
-### ios publish_cache
-```
-fastlane ios publish_cache
-```
-Publish dependencies to cache
-
-To run this lane you need to configure the carthage_cache.yml
 ### ios lint
 ```
 fastlane ios lint
