@@ -3,7 +3,7 @@ machine:
     version: 8.3
   environment:
     SCHEME: "Auth0.iOS"
-    DEVICE: "iPhone 7 (10.2)"
+    DEVICE: "iPhone 7 (10.3)"
     FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
 
 dependencies:
