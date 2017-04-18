@@ -282,6 +282,16 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should specify realm, scope and multifactor code in request") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "mfa_code" : "123456789", "realm" : "customconnection"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom audience, scope and realm"
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "customconnection", scope: "openid", multifactorCode: "123456789").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
             
         }
 

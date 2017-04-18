@@ -116,10 +116,11 @@ public protocol Authentication: Trackable, Loggable {
      - parameter realm: domain of the realm or connection name
      - parameter audience: API Identifier that the client is requesting access to.
      - parameter scope: scope value requested when authenticating the user.
+     - paramater multifactoreCode: multifactor code if the user has enrolled one.
      - important: This only works if you have the OAuth 2.0 API Authorization flag on
      - returns: authentication request that will yield Auth0 User Credentials
      */
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?, multifactorCode: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Creates a user in a Database connection
@@ -526,10 +527,11 @@ public extension Authentication {
      - parameter realm: domain realm or connection name
      - parameter audience: API Identifier that the client is requesting access to.
      - parameter scope: scope value requested when authenticating the user.
+     - paramater multifactorCode: multifactor code if the user has enrolled one.
      - Returns: authentication request that will yield Auth0 User Credentials
      */
-    public func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope)
+    public func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil, multifactorCode: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope, multifactorCode: multifactorCode)
     }
 
     /**
