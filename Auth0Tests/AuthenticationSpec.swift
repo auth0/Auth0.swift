@@ -730,7 +730,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
         }
-
+#if os(iOS)
         describe("spawn WebAuth instance") {
 
             it("should return a WebAuth instance with matching credentials") {
@@ -749,6 +749,7 @@ class AuthenticationSpec: QuickSpec {
                 expect(webAuth.parameters["connection"]) == "facebook"
             }
         }
+#endif
 
     }
 }
