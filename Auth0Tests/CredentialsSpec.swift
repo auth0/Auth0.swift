@@ -94,5 +94,66 @@ class CredentialsSpec: QuickSpec {
             }
 
         }
+
+        describe("serialization") {
+
+            it("should return base64 string") {
+                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken, "expires_in" : expiresIn])
+                let data = credentials.serialize()
+                expect(data.characters.count) > 0
+            }
+
+            it("shoukld not decode credentials") {
+                let aCredentials = Credentials(withSerialized: "garbage")
+                expect(aCredentials).to(beNil())
+            }
+
+
+            it("should decode credentials objects") {
+                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken, "expires_in" : expiresIn])
+                let data = credentials.serialize()
+                let aCredentials = Credentials(withSerialized: data)
+                expect(aCredentials).toNot(beNil())
+                expect(aCredentials?.accessToken) == AccessToken
+                expect(aCredentials?.tokenType).to(beNil())
+                expect(aCredentials?.idToken) == IdToken
+                expect(aCredentials?.refreshToken) == RefreshToken
+                expect(aCredentials?.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+            }
+
+            it("should decode credentials with refreshToken only") {
+                let credentials = Credentials(json: ["refresh_token": RefreshToken])
+                let data = credentials.serialize()
+                let aCredentials = Credentials(withSerialized: data)
+                expect(aCredentials?.refreshToken) == RefreshToken
+                expect(aCredentials?.accessToken).to(beNil())
+                expect(aCredentials?.tokenType).to(beNil())
+                expect(aCredentials?.idToken).to(beNil())
+                expect(aCredentials?.expiresIn).to(beNil())
+            }
+
+            it("should decode credentials with accessToken and expiresIn") {
+                let credentials = Credentials(json: ["access_token": AccessToken, "expires_in" : expiresIn])
+                let data = credentials.serialize()
+                let aCredentials = Credentials(withSerialized: data)
+                expect(aCredentials?.accessToken) == AccessToken
+                expect(aCredentials?.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+                expect(aCredentials?.refreshToken).to(beNil())
+                expect(aCredentials?.tokenType).to(beNil())
+                expect(aCredentials?.idToken).to(beNil())
+            }
+
+            it("should decode credentials with idToken only") {
+                let credentials = Credentials(json: ["id_token": IdToken])
+                let data = credentials.serialize()
+                let aCredentials = Credentials(withSerialized: data)
+                expect(aCredentials?.idToken) == IdToken
+                expect(aCredentials?.accessToken).to(beNil())
+                expect(aCredentials?.tokenType).to(beNil())
+                expect(aCredentials?.refreshToken).to(beNil())
+                expect(aCredentials?.expiresIn).to(beNil())
+            }
+
+        }
     }
 }

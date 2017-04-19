@@ -28,7 +28,7 @@ import Foundation
  so if you used WebAuth (`/authorize` call) the `response_type` and `scope` will determine what tokens you get
  */
 @objc(A0Credentials)
-public class Credentials: NSObject, JSONObjectPayload {
+public class Credentials: NSObject, JSONObjectPayload, Serializable {
 
     /// Token used that allows calling to the requested APIs (audience sent on Auth)
     public let accessToken: String?
@@ -50,6 +50,8 @@ public class Credentials: NSObject, JSONObjectPayload {
         self.expiresIn = expiresIn
     }
 
+    // MARK: - JSONObjectPayload
+
     convenience required public init(json: [String: Any]) {
         var expiresIn: Date?
         switch json["expires_in"] {
@@ -66,4 +68,19 @@ public class Credentials: NSObject, JSONObjectPayload {
         self.init(accessToken: json["access_token"] as? String, tokenType: json["token_type"] as? String, idToken: json["id_token"] as? String, refreshToken: json["refresh_token"] as? String, expiresIn: expiresIn)
     }
 
+    // MARK: - Serializable
+
+    public func serialize() -> String {
+        let dict: [String: Any?] = ["accessToken": self.accessToken, "idToken": self.idToken, "refreshToken": self.refreshToken, "expiresIn": self.expiresIn]
+        return NSKeyedArchiver.archivedData(withRootObject: dict).base64EncodedString()
+    }
+
+    convenience required public init?(withSerialized string: String) {
+        guard
+            let data = Data(base64Encoded: string),
+            let dict = NSKeyedUnarchiver.unarchiveObject(with: data) as? [String: Any?]
+            else { return nil }
+
+        self.init(accessToken: dict["accessToken"] as? String, tokenType: nil, idToken: dict["idToken"] as? String, refreshToken: dict["refreshToken"] as? String, expiresIn: dict["expiresIn"] as? Date)
+    }
 }
