@@ -66,6 +66,11 @@ func resetPasswordResponse() -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
+func revokeTokenResponse() -> OHHTTPStubsResponse {
+    let data = "".data(using: .utf8)!
+    return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
+}
+
 func authFailure(code: String, description: String, name: String? = nil) -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(jsonObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: ["Content-Type": "application/json"])
 }

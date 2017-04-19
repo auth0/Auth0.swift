@@ -57,7 +57,7 @@ struct Response<E: Auth0Error> {
             return json
         }
         // This piece of code is dedicated to our friends the backend devs :)
-        if response.url?.lastPathComponent == "change_password" {
+        if response.url?.lastPathComponent == "change_password" || response.url?.lastPathComponent == "revoke" {
             return nil
         } else {
             throw E(string: string(data), statusCode: response.statusCode)

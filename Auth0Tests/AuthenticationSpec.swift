@@ -47,7 +47,7 @@ class AuthenticationSpec: QuickSpec {
         beforeEach {
             stub(condition: isHost(Domain)) { _ in
                 return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-            }.name = "YOU SHALL NOT PASS!"
+                }.name = "YOU SHALL NOT PASS!"
         }
 
         afterEach {
@@ -141,7 +141,8 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        // MARK:- refresh_token grant_type
+        // MARK:- Refresh Tokens
+
         describe("renew auth with refresh token") {
 
             let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -176,10 +177,40 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
         }
 
-        // MARK:- delegation endpoint
+        describe("renew auth with refresh token") {
+
+            let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+
+            it("should revoke token") {
+                stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": refreshToken])) { _ in
+                    return revokeTokenResponse() }.name = "revokeToken"
+                waitUntil(timeout: Timeout) { done in
+                    auth.revoke(refreshToken: refreshToken).start { result in
+                        guard case .success = result else { return fail("Failed to revoke token") }
+                        done()
+                    }
+                }
+            }
+
+            it("should handle errors") {
+                let code = "invalid_request"
+                let description = "missing params"
+                stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": refreshToken])) { _ in
+                    return authFailure(code: code, description: description) }.name = "revoke failed"
+                waitUntil(timeout: Timeout) { done in
+                    auth.revoke(refreshToken: refreshToken).start { result in
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+        }
+
+        // MARK:- Delegation
         describe("delegation") {
 
             let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -204,7 +235,7 @@ class AuthenticationSpec: QuickSpec {
                         ]).start { result in
                             expect(result).to(beSuccessful())
                             done()
-                        }
+                    }
                 }
             }
 
@@ -216,7 +247,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
         }
 
         // MARK:- password-realm grant type
@@ -282,7 +313,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
         }
 
         describe("create user") {
@@ -656,7 +687,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
         }
 
         describe("code exchange") {
@@ -714,7 +745,7 @@ class AuthenticationSpec: QuickSpec {
                         .start { result in
                             expect(result).to(beFailure { (error: AuthenticationError) in return error.isMultifactorRequired })
                             done()
-                        }
+                    }
                 }
             }
 
@@ -728,28 +759,28 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-
+            
         }
 #if os(iOS)
         describe("spawn WebAuth instance") {
-
+            
             it("should return a WebAuth instance with matching credentials") {
                 let webAuth = auth.webAuth(withConnection: "facebook")
                 expect(webAuth.clientId) == auth.clientId
                 expect(webAuth.url) == auth.url
             }
-
+            
             it("should return a WebAuth instance with matching telemetry") {
                 let webAuth = auth.webAuth(withConnection: "facebook") as! SafariWebAuth
                 expect(webAuth.telemetry.info) == auth.telemetry.info
             }
-
+            
             it("should return a WebAuth instance with matching connection") {
                 let webAuth = auth.webAuth(withConnection: "facebook") as! SafariWebAuth
                 expect(webAuth.parameters["connection"]) == "facebook"
             }
         }
 #endif
-
+        
     }
 }
