@@ -11,6 +11,10 @@
 		5B25A5331E3F68FA00563AE5 /* SafariSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B25A5321E3F68FA00563AE5 /* SafariSession.swift */; };
 		5B6269E71E3F702000305093 /* NativeAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6269E51E3F700000305093 /* NativeAuthSpec.swift */; };
 		5B6269EA1E3F9E5200305093 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6269E91E3F9E5200305093 /* AuthProvider.swift */; };
+		5B6E02BB1EA76E1700B28579 /* Serializable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E02BA1EA76E1700B28579 /* Serializable.swift */; };
+		5B6E02BC1EA76E1700B28579 /* Serializable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E02BA1EA76E1700B28579 /* Serializable.swift */; };
+		5B6E02BD1EA76E1700B28579 /* Serializable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E02BA1EA76E1700B28579 /* Serializable.swift */; };
+		5B6E02BE1EA76E1700B28579 /* Serializable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E02BA1EA76E1700B28579 /* Serializable.swift */; };
 		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */; };
 		5F06DDA51CC451540011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		5F06DDB41CC451700011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
@@ -292,6 +296,7 @@
 		5B25A5321E3F68FA00563AE5 /* SafariSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariSession.swift; path = Auth0/SafariSession.swift; sourceTree = SOURCE_ROOT; };
 		5B6269E51E3F700000305093 /* NativeAuthSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NativeAuthSpec.swift; path = Auth0Tests/NativeAuthSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B6269E91E3F9E5200305093 /* AuthProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthProvider.swift; path = Auth0/AuthProvider.swift; sourceTree = SOURCE_ROOT; };
+		5B6E02BA1EA76E1700B28579 /* Serializable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Serializable.swift; path = Auth0/Serializable.swift; sourceTree = SOURCE_ROOT; };
 		5B9A54411E49E3AE004B5454 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = SOURCE_ROOT; };
 		5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResponseType.swift; path = Auth0/ResponseType.swift; sourceTree = SOURCE_ROOT; };
 		5F049B6C1CB42C29006F6C05 /* Auth0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Auth0.h; path = Auth0/Auth0.h; sourceTree = "<group>"; };
@@ -768,6 +773,7 @@
 				5FDE874D1D8A424700EA27DC /* Profile.swift */,
 				5FDE874E1D8A424700EA27DC /* Credentials.swift */,
 				5FDE874F1D8A424700EA27DC /* Handlers.swift */,
+				5B6E02BA1EA76E1700B28579 /* Serializable.swift */,
 			);
 			name = Authentication;
 			sourceTree = "<group>";
@@ -1250,6 +1256,7 @@
 				5FE2F8B21CCEAED8003628F4 /* Requestable.swift in Sources */,
 				5F7504F51D8C3F2900E3BA1C /* NSError+Helper.swift in Sources */,
 				5FADB60C1CED7E0800D4BB50 /* UserPatchAttributes.swift in Sources */,
+				5B6E02BB1EA76E1700B28579 /* Serializable.swift in Sources */,
 				5FCAB1791D09124D00331C84 /* NSURL+Auth0.swift in Sources */,
 				5F74CB401CEFD5E600226823 /* JSONObjectPayload.swift in Sources */,
 				5FD255B41D14DD2600387ECB /* ManagementError.swift in Sources */,
@@ -1271,6 +1278,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B6E02BC1EA76E1700B28579 /* Serializable.swift in Sources */,
 				5FE2F8BC1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FDE87661D8A424700EA27DC /* Profile.swift in Sources */,
 				5FDE876A1D8A424700EA27DC /* Credentials.swift in Sources */,
@@ -1378,6 +1386,7 @@
 				5FE1182A1D8A4A2B00A374BF /* Telemetry.swift in Sources */,
 				5F23E6E41D4ACD8500C3F2D9 /* JSONObjectPayload.swift in Sources */,
 				5F7504F71D8C3F2900E3BA1C /* NSError+Helper.swift in Sources */,
+				5B6E02BD1EA76E1700B28579 /* Serializable.swift in Sources */,
 				5F23E6DC1D4ACD6100C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				5F23E6E61D4ACD8500C3F2D9 /* Requestable.swift in Sources */,
 				5FDE87671D8A424700EA27DC /* Profile.swift in Sources */,
@@ -1410,6 +1419,7 @@
 				5FE118291D8A4A2A00A374BF /* Telemetry.swift in Sources */,
 				5F23E70D1D4B88FC00C3F2D9 /* JSONObjectPayload.swift in Sources */,
 				5F7504F81D8C3F2900E3BA1C /* NSError+Helper.swift in Sources */,
+				5B6E02BE1EA76E1700B28579 /* Serializable.swift in Sources */,
 				5F23E7061D4B88EA00C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				5F23E70F1D4B88FC00C3F2D9 /* Requestable.swift in Sources */,
 				5FDE87681D8A424700EA27DC /* Profile.swift in Sources */,
