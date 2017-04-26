@@ -47,7 +47,7 @@ struct Response<E: Auth0Error> {
             }
             throw E(string: string(data), statusCode: response.statusCode)
         }
-        guard let data = self.data else {
+        guard let data = self.data, !data.isEmpty else {
             if response.statusCode == 204 {
                 return nil
             }

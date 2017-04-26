@@ -114,6 +114,10 @@ func isOAuthAccessToken(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/access_token")
 }
 
+func isRevokeToken(_ domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/oauth/revoke")
+}
+
 func isUsersPath(_ domain: String, identifier: String? = nil) -> OHHTTPStubsTestBlock {
     let path: String
     if let identifier = identifier {

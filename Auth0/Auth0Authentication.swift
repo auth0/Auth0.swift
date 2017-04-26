@@ -176,6 +176,15 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: oauthToken, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
+    func revoke(refreshToken: String) -> Request<Void, AuthenticationError> {
+        let payload: [String: Any] = [
+            "token": refreshToken,
+            "client_id": self.clientId
+        ]
+        let oauthToken = URL(string: "/oauth/revoke", relativeTo: self.url)!
+        return Request(session: session, url: oauthToken, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
+    }
+
     func delegation(withParameters parameters: [String : Any]) -> Request<[String : Any], AuthenticationError> {
         var payload: [String: Any] = [
             "client_id": self.clientId,

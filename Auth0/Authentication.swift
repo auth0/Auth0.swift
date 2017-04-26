@@ -391,6 +391,21 @@ public protocol Authentication: Trackable, Loggable {
     func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
+     Revoke a user's refresh_token with a call to `/oauth/revoke`
+     
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .revoke(refreshToken: refreshToken)
+     .start { print($0) }
+     ```
+
+     - parameter refreshToken: the client's refresh token obtained on auth
+     - returns: a request
+     */
+    func revoke(refreshToken: String) -> Request<Void, AuthenticationError>
+
+    /**
      Calls delegation endpoint with the given parameters.
      The only parameters it adds by default are `grant_type` and `client_id`.
      - parameter parametes: dictionary with delegation parameters to send in the request.
