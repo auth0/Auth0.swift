@@ -67,6 +67,13 @@ func noBody(from response: Response<AuthenticationError>, callback: Request<Void
     do {
         _ = try response.result()
         callback(.success(result: ()))
+
+    } catch let error as Auth0Error {
+        if error.code == emptyBodyError {
+            callback(.success(result: ()))
+        } else {
+            callback(.failure(error: error))
+        }
     } catch let error {
         callback(.failure(error: error))
     }

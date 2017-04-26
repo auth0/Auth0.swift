@@ -178,7 +178,6 @@ struct Auth0Authentication: Authentication {
 
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError> {
         let payload: [String: Any] = [
-            "tokenEndpointAuthMethod": "none",
             "token": refreshToken,
             "client_id": self.clientId
         ]
