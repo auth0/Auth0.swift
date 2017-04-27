@@ -65,6 +65,37 @@ You need to specify the type of release with the `bump` parameter with the value
 
 ----
 
+## Mac
+### mac dependencies
+```
+fastlane mac dependencies
+```
+Installs dependencies using Carthage
+### mac bootstrap
+```
+fastlane mac bootstrap
+```
+Bootstrap the development environment
+### mac test
+```
+fastlane mac test
+```
+Runs all the tests
+### mac ci
+```
+fastlane mac ci
+```
+Runs all the tests in a CI environment
+### mac release
+```
+fastlane mac release
+```
+Releases the library to Cocoapods & Github Releases and updates README/CHANGELOG
+
+You need to specify the type of release with the `bump` parameter with the values [major|minor|patch]
+
+----
+
 This README.md is auto-generated and will be re-generated every time [fastlane](https://fastlane.tools) is run.
 More information about fastlane can be found on [fastlane.tools](https://fastlane.tools).
 The documentation of fastlane can be found on [docs.fastlane.tools](https://docs.fastlane.tools).

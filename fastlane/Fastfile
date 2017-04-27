@@ -1,8 +1,9 @@
 require('semantic')
 
 opt_out_usage
+skip_docs
 
-fastlane_version "2.27.0"
+fastlane_version "2.28.5"
 
 default_platform :ios
 
@@ -31,20 +32,23 @@ platform :ios do
   desc "Runs all the tests"
   lane :test do |options|
     scheme = options[:scheme]
-    device = options[:device]
-    scan(
-      scheme: scheme,
-      device: device,
-      clean: true,
-      output_types: 'junit'
-      )
+    scan(scheme: scheme,
+        devices: ["iPhone 7 (10.3)", "iPhone 6 (9.3)"],
+        clean: true,
+        output_types: "junit",
+        skip_build: "true")
   end
 
   desc "Runs all the tests in a CI environment"
   lane :ci do
-    # TODO: Run rest of platforms
+    ensure_git_status_clean
+    scheme = ENV["SCHEME_IOS"]
+    UI.user_error!("You must supply a valid scheme in 'SCHEME' env variable") if scheme.nil?
+    options = {
+      scheme: scheme
+    }
+    test(options)
     lint
-    test
   end
 
   desc "Releases the library to Cocoapods & Github Releases and updates README/CHANGELOG"
@@ -54,4 +58,58 @@ platform :ios do
     prepare_release release_options
     publish_release
   end
+end
+
+platform :mac do
+
+  desc "Installs dependencies using Carthage"
+  lane :dependencies do |options|
+    action = options[:action]
+    carthage(use_binaries: false, command: action, cache_builds: true)
+  end
+
+  desc "Bootstrap the development environment"
+  lane :bootstrap do
+    dependencies
+  end
+
+  desc "Run code linter"
+  lane :lint do
+  	swiftlint(
+  		mode: :lint,
+   		config_file: '.swiftlint.yml',
+      reporter: 'emoji'
+  	)
+  end
+
+  desc "Runs all the tests"
+  lane :test do |options|
+    scheme = options[:scheme]
+    scan(scheme: scheme,
+        clean: true,
+        skip_build: "true",
+        include_simulator_logs: false,
+        code_coverage: false)
+  end
+
+  desc "Runs all the tests in a CI environment"
+  lane :ci do
+    ensure_git_status_clean
+    scheme = ENV["SCHEME_MAC"]
+    UI.user_error!("You must supply a valid scheme in 'SCHEME' env variable") if scheme.nil?
+    options = {
+      scheme: scheme
+    }
+    test(options)
+    lint
+  end
+
+  desc "Releases the library to Cocoapods & Github Releases and updates README/CHANGELOG"
+  desc "You need to specify the type of release with the `bump` parameter with the values [major|minor|patch]"
+  lane :release do |options|
+    release_options = {repository: 'Auth0.swift', xcodeproj: 'Auth0.xcodeproj'}.merge(options)
+    prepare_release release_options
+    publish_release
+  end
+
 end
