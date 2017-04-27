@@ -2,8 +2,8 @@ machine:
   xcode:
     version: 8.3
   environment:
-    SCHEME: "Auth0.iOS"
-    DEVICE: "iPhone 7 (10.3)"
+    SCHEME_IOS: "Auth0.iOS"
+    SCHEME_MAC: "Auth0.macOS"
     FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
 
 dependencies:
@@ -16,10 +16,12 @@ dependencies:
   override:
     - bundle install
     - bundle exec fastlane ios bootstrap
+    - bundle exec fastlane mac bootstrap
 
 test:
   override:
     - bundle exec fastlane ios ci
+    - bundle exec fastlane mac ci
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/scan/
     - cp fastlane/test_output/report.junit $CIRCLE_TEST_REPORTS/scan/report.xml
