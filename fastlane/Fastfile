@@ -88,7 +88,8 @@ platform :mac do
     scan(scheme: scheme,
         clean: true,
         skip_build: "true",
-        include_simulator_logs: false)
+        include_simulator_logs: false,
+        code_coverage: false)
   end
 
   desc "Runs all the tests in a CI environment"
