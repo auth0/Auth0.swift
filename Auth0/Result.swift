@@ -28,6 +28,7 @@ import Foundation
  - Success: request completed successfuly with it's response body
  - Failure: request failed with a specific error
  */
+// swiftlint:disable type_name
 public enum Result<T> {
     case success(result: T)
     case failure(error: Error)
