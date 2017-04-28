@@ -289,6 +289,18 @@ class WebAuthSpec: QuickSpec {
 
         }
 
+        describe("reset") {
+
+            it("should reset all parameters") {
+                let auth = newWebAuth()
+                            .connection("facebook")
+                            .connectionScope("email")
+                _ = auth.reset()
+                expect(auth.parameters).to(beEmpty())
+            }
+
+        }
+
         describe("safari") {
 
             var result: Result<Credentials>?

@@ -200,4 +200,9 @@ public protocol WebAuth: Trackable, Loggable {
      - parameter callback: callback called with the result of the WebAuth flow
      */
     func start(_ callback: @escaping (Result<Credentials>) -> Void)
+
+    /*
+     Reset the WebAuth parameters dictionary.
+     */
+    func reset() -> Self
 }
