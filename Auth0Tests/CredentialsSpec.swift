@@ -92,6 +92,47 @@ class CredentialsSpec: QuickSpec {
                 }
 
             }
+        }
+
+        describe("secure coding") {
+
+            it("should unarchive as credentials type") {
+                let credentialsOrig = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken, "expires_in" : expiresIn])
+                let saveData = NSKeyedArchiver.archivedData(withRootObject: credentialsOrig)
+                let credentials = NSKeyedUnarchiver.unarchiveObject(with: saveData)
+                expect(credentials as? Credentials).toNot(beNil())
+            }
+
+            it("should have all properties") {
+                let credentialsOrig = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken, "expires_in" : expiresIn])
+                let saveData = NSKeyedArchiver.archivedData(withRootObject: credentialsOrig)
+                let credentials = NSKeyedUnarchiver.unarchiveObject(with: saveData) as! Credentials
+                expect(credentials.accessToken) == AccessToken
+                expect(credentials.tokenType) == Bearer
+                expect(credentials.idToken) == IdToken
+                expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+            }
+
+            it("should have access_token only") {
+                let credentialsOrig = Credentials(json: ["access_token": AccessToken])
+                let saveData = NSKeyedArchiver.archivedData(withRootObject: credentialsOrig)
+                let credentials = NSKeyedUnarchiver.unarchiveObject(with: saveData) as! Credentials
+                expect(credentials.accessToken) == AccessToken
+                expect(credentials.tokenType).to(beNil())
+                expect(credentials.idToken).to(beNil())
+                expect(credentials.expiresIn).to(beNil())
+            }
+
+            it("should have refresh_token and expires_in only") {
+                let credentialsOrig = Credentials(json: ["refresh_token": RefreshToken, "expires_in" : expiresIn])
+                let saveData = NSKeyedArchiver.archivedData(withRootObject: credentialsOrig)
+                let credentials = NSKeyedUnarchiver.unarchiveObject(with: saveData) as! Credentials
+                expect(credentials.accessToken).to(beNil())
+                expect(credentials.refreshToken) == RefreshToken
+                expect(credentials.tokenType).to(beNil())
+                expect(credentials.idToken).to(beNil())
+                expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+            }
 
         }
     }

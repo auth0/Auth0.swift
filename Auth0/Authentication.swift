@@ -753,4 +753,44 @@ public extension Authentication {
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.renew(withRefreshToken: refreshToken, scope: scope)
     }
+
+    /**
+     Renew expired user's credentials using user's current credentials
+
+     ```
+     Auth0.renewExpired(credentials, scope: "openid profile offline_access") {
+         guard $0 == nil else { return }
+         print($1)
+     }
+     ```
+
+     or asking the same scopes requested when the refresh token was issued
+
+     ```
+     Auth0.renewExpired(credentials) {
+         guard $0 == nil else { return }
+         print($1)
+     }
+     ```
+
+     - parameter credentials: the client's credentials obtained on auth
+     - parameter scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during Auth
+     - parameter callback: callback with the user's credentials or the cause of the error.
+     - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+     */
+    func renewExpired(_ credentials: Credentials, scope: String? = nil, callback: @escaping (Error?, Credentials?) -> Void) {
+        guard let refreshToken = credentials.refreshToken else {
+            return callback(AuthenticationError(string: "missing refresh_token", statusCode: 400), nil)
+        }
+        guard let expiresIn = credentials.expiresIn, expiresIn < Date() else { return callback(nil, credentials) }
+
+        self.renew(withRefreshToken: refreshToken, scope: scope).start {
+            switch $0 {
+            case .success(let credentials):
+                callback(nil, credentials)
+            case .failure(let error):
+                callback(error, nil)
+            }
+        }
+    }
 }
