@@ -180,10 +180,10 @@ public protocol WebAuth: Trackable, Loggable {
 
      ```
      Auth0
-     .WebAuth(clientId: clientId, domain: "samples.auth0.com")
-     .start { result in
-        print(result)
-     }
+         .webAuth(clientId: clientId, domain: "samples.auth0.com")
+         .start { result in
+            print(result)
+         }
      ```
 
      Then from `AppDelegate` we just need to resume the WebAuth Auth like this
@@ -200,4 +200,20 @@ public protocol WebAuth: Trackable, Loggable {
      - parameter callback: callback called with the result of the WebAuth flow
      */
     func start(_ callback: @escaping (Result<Credentials>) -> Void)
+
+    /**
+     Silently clear the SSO Cookie in Auth0 and optionally signout from IdP.
+     More info: https://auth0.com/docs/logout
+
+     
+     ```
+     Auth0
+        .webAuth()
+        .logout(useFederated: false) { print($0) }
+     ```
+     
+     - parameter federated: Bool to enable signout of the IdP
+     - parameter callback: callback called with the result of the logout
+     */
+    func logout(useFederated federated: Bool, callback: @escaping (Bool) -> Void)
 }

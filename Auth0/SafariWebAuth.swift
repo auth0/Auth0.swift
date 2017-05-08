@@ -182,6 +182,13 @@ class SafariWebAuth: WebAuth {
             .appendingPathComponent(bundleIdentifier)
             .appendingPathComponent("callback")
     }
+
+    func logout(useFederated federated: Bool = false, callback: @escaping (Bool) -> Void) {
+        let logoutURL = federated ? URL(string: "/v2/logout?federated", relativeTo: self.url)! : URL(string: "/v2/logout", relativeTo: self.url)!
+        let controller = SilentSFSafariViewController(url: logoutURL) { callback($0) }
+        logger?.trace(url: logoutURL, source: "Safari")
+        self.presenter.present(controller: controller)
+    }
 }
 
 private func generateDefaultState() -> String? {
@@ -193,4 +200,20 @@ private func generateDefaultState() -> String? {
 
     guard result == 0 else { return nil }
     return data.a0_encodeBase64URLSafe()
+}
+
+private class SilentSFSafariViewController: SFSafariViewController, SFSafariViewControllerDelegate {
+    var onResult: (Bool) -> Void = { _ in }
+
+    required init(url URL: URL, callback: @escaping (Bool) -> Void) {
+        super.init(url: URL, entersReaderIfAvailable: false)
+        self.onResult = callback
+        self.delegate = self
+        self.view.alpha = 0.05 // Apple does not allow invisible SafariViews, this is the threshold.
+        self.modalPresentationStyle = .overCurrentContext
+    }
+
+    func safariViewController(_ controller: SFSafariViewController, didCompleteInitialLoad didLoadSuccessfully: Bool) {
+        controller.dismiss(animated: false) { self.onResult(didLoadSuccessfully) }
+    }
 }
