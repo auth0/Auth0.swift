@@ -38,7 +38,6 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
     public let expiresIn: Date?
     /// If the API allows you to request new access tokens and the scope `offline_access` was included on Auth
     public let refreshToken: String?
-
     // Token that details the user identity after authentication
     public let idToken: String?
 

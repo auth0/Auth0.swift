@@ -782,58 +782,5 @@ class AuthenticationSpec: QuickSpec {
         }
 #endif
 
-        describe("renew auth with credentials") {
-
-            let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-
-            beforeEach {
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": refreshToken])) { _ in return authResponse(accessToken: AccessToken) }.name = "refresh_token login"
-            }
-
-            it("should return error when no refresh token present") {
-                let credentials = Credentials(accessToken: nil, tokenType: nil, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -3600))
-                waitUntil(timeout: Timeout) { done in
-                    auth.renewExpired(credentials) { error, result in
-                        expect(error).toNot(beNil())
-                        expect(result).to(beNil())
-                        done()
-                    }
-                }
-            }
-
-            it("should return existing credentials when token has not yet expired") {
-                let credentials = Credentials(accessToken: nil, tokenType: nil, idToken: nil, refreshToken: refreshToken, expiresIn: Date(timeIntervalSinceNow: 3600))
-                waitUntil(timeout: Timeout) { done in
-                    auth.renewExpired(credentials) { error, result in
-                        expect(error).to(beNil())
-                        expect(result).toNot(beNil())
-                        done()
-                    }
-                }
-            }
-
-            it("should receive access token") {
-                let credentials = Credentials(accessToken: nil, tokenType: nil, idToken: nil, refreshToken: refreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
-                waitUntil(timeout: Timeout) { done in
-                    auth.renewExpired(credentials) { error, result in
-                        expect(error).to(beNil())
-                        expect(result!.accessToken).toNot(beNil())
-                        done()
-                    }
-                }
-            }
-
-            it("should receive access token with scope") {
-                let credentials = Credentials(accessToken: nil, tokenType: nil, idToken: nil, refreshToken: refreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
-                waitUntil(timeout: Timeout) { done in
-                    auth.renewExpired(credentials, scope: "openid") { error, result in
-                        expect(error).to(beNil())
-                        expect(result!.accessToken).toNot(beNil())
-                        done()
-                    }
-                }
-            }
-        }
-
     }
 }
