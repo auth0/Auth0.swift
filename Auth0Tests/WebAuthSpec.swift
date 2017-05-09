@@ -317,8 +317,8 @@ class WebAuthSpec: QuickSpec {
 
             it("should launch silent safari viewcontroller") {
                 let auth = newWebAuth()
-                auth.logout(useFederated: false) { _ in }
-                expect(auth.presenter.topViewController is SFSafariViewControllerDelegate).toNot(beNil())
+                auth.clearSession(federated: false) { _ in }
+                expect(auth.presenter.topViewController is SilentSafariViewController).toNot(beNil())
             }
         }
     }
