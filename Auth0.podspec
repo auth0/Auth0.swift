@@ -14,7 +14,8 @@ web_auth_files = [
   'Auth0/NativeAuth.swift',
   'Auth0/AuthProvider.swift',
   'Auth0/CredentialsManager.swift',
-  'Auth0/CredentialsManagerError.swift'
+  'Auth0/CredentialsManagerError.swift',
+  'Auth0/TouchAuthentication.swift'
 ]
 
 Pod::Spec.new do |s|
@@ -37,7 +38,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.ios.source_files = 'Auth0/*.{swift,h,m}'
-  s.ios.frameworks = 'UIKit', 'SafariServices'
+  s.ios.frameworks = 'UIKit', 'SafariServices', 'LocalAuthentication'
   s.ios.dependency 'SimpleKeychain'
   s.osx.source_files = 'Auth0/*.swift'
   s.osx.exclude_files = web_auth_files
