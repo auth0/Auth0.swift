@@ -46,10 +46,9 @@ public struct CredentialsManager {
         return self.storage.setData(NSKeyedArchiver.archivedData(withRootObject: credentials), forKey: storeKey)
     }
 
-    /// Retrieve credentials from keychain and yield new credentials if the accessToken has expired
+    /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
     /// otherwise the retrieved credentails will be returned as they have not expired.
     ///
-    /// - seeAlso: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/refresh-token)
     ///
     /// ```
     /// credentialsManager.credentials {
@@ -62,21 +61,22 @@ public struct CredentialsManager {
     ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth
     ///   - callback: callback with the user's credentials or the cause of the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/refresh-token)
     public func credentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard
             let data = self.storage.data(forKey:self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials
             else { return callback(.noCredentials, nil) }
-        guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
-        guard let expiresIn = credentials.expiresIn else { return callback(.noExpiresIn, nil) }
+        guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
         guard expiresIn < Date() else { return callback(nil, credentials) }
+        guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
 
         self.authentication.renew(withRefreshToken: refreshToken, scope: scope).start {
             switch $0 {
             case .success(let credentials):
                 callback(nil, credentials)
             case .failure(let error):
-                callback(.renewFailed(error), nil)
+                callback(.failedRefresh(error), nil)
             }
         }
     }

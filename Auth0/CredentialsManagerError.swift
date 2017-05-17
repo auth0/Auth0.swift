@@ -25,6 +25,5 @@ import Foundation
 public enum CredentialsManagerError: Error {
     case noCredentials
     case noRefreshToken
-    case noExpiresIn
-    case renewFailed(Error)
+    case failedRefresh(Error)
 }

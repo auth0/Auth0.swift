@@ -64,7 +64,7 @@ class CredentialsManagerSpec: QuickSpec {
             beforeEach {
                 error = nil
                 newCredentials = nil
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authResponse(accessToken: AccessToken) }.name = "refresh_token login"
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authResponse(accessToken: AccessToken) }.name = "renew success"
             }
 
             afterEach {
@@ -78,19 +78,19 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(newCredentials).toEventually(beNil())
             }
 
-            it("should error when no refresh_token present") {
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+            it("should error when no refresh_token present and token expired") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
                 credentialsManager.credentials { error = $0; newCredentials = $1 }
                 expect(error).to(matchError(CredentialsManagerError.noRefreshToken))
                 expect(newCredentials).toEventually(beNil())
             }
 
-            it("should error when no expiresIn present") {
+            it("should error when expiry not present") {
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: nil)
                 _ = credentialsManager.store(credentials: credentials)
                 credentialsManager.credentials { error = $0; newCredentials = $1 }
-                expect(error).to(matchError(CredentialsManagerError.noExpiresIn))
+                expect(error).to(matchError(CredentialsManagerError.noCredentials))
                 expect(newCredentials).toEventually(beNil())
             }
 
@@ -108,6 +108,19 @@ class CredentialsManagerSpec: QuickSpec {
                     credentialsManager.credentials { error = $0; newCredentials = $1
                         expect(error).to(beNil())
                         expect(newCredentials?.accessToken) == AccessToken
+                        done()
+                    }
+                }
+            }
+
+            it("should yield error on failed renew") {
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authFailure(code: "invalid_request", description: "missing_params") }.name = "renew failed"
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                _ = credentialsManager.store(credentials: credentials)
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.credentials { error = $0; newCredentials = $1
+                        expect(error).to(matchError(CredentialsManagerError.failedRefresh(AuthenticationError())))
+                        expect(newCredentials).to(beNil())
                         done()
                     }
                 }
