@@ -38,7 +38,6 @@ class ViewController: UIViewController {
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
-            .responseType([.token])
             .start(onAuth)
     }
 

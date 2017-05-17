@@ -182,6 +182,13 @@ class SafariWebAuth: WebAuth {
             .appendingPathComponent(bundleIdentifier)
             .appendingPathComponent("callback")
     }
+
+    func clearSession(federated: Bool, callback: @escaping (Bool) -> Void) {
+        let logoutURL = federated ? URL(string: "/v2/logout?federated", relativeTo: self.url)! : URL(string: "/v2/logout", relativeTo: self.url)!
+        let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
+        logger?.trace(url: logoutURL, source: "Safari")
+        self.presenter.present(controller: controller)
+    }
 }
 
 private func generateDefaultState() -> String? {

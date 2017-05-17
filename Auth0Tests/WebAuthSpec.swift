@@ -22,6 +22,7 @@
 
 import Quick
 import Nimble
+import SafariServices
 
 @testable import Auth0
 
@@ -310,7 +311,15 @@ class WebAuthSpec: QuickSpec {
                 callback(.failure(error: WebAuthError.userCancelled))
                 expect(result).toEventually(beFailure())
             }
+        }
 
+        describe("logout") {
+
+            it("should launch silent safari viewcontroller") {
+                let auth = newWebAuth()
+                auth.clearSession(federated: false) { _ in }
+                expect(auth.presenter.topViewController is SilentSafariViewController).toNot(beNil())
+            }
         }
     }
 

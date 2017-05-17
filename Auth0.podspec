@@ -10,6 +10,7 @@ web_auth_files = [
   'Auth0/WebAuthError.swift',
   'Auth0/SafariWebAuth.swift',
   'Auth0/SafariSession.swift',
+  'Auth0/SilentSafariViewController.swift',
   'Auth0/NativeAuth.swift',
   'Auth0/AuthProvider.swift'
 ]
