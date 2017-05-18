@@ -180,7 +180,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        describe("renew auth with refresh token") {
+        describe("revoke refresh token") {
 
             let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 
