@@ -325,12 +325,12 @@ class WebAuthSpec: QuickSpec {
 
 }
 
-func containItem(withName name: String, value: String? = nil) -> NonNilMatcherFunc<[URLQueryItem]> {
-    return NonNilMatcherFunc { expression, failureMessage in
-        failureMessage.postfixMessage = "contain item with name <\(name)>"
-        guard let items = try expression.evaluate() else { return false }
-        return items.contains { item -> Bool in
+func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQueryItem]> {
+    return Predicate<[URLQueryItem]>.define("contain item with name <\(name)>") { expression, failureMessage -> PredicateResult in
+        guard let items = try expression.evaluate() else { return PredicateResult(status: .doesNotMatch, message: failureMessage) }
+        let outcome = items.contains { item -> Bool in
             return item.name == name && ((value == nil && item.value != nil) || item.value == value)
         }
+        return PredicateResult(bool: outcome, message: failureMessage)
     }
 }
