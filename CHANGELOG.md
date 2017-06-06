@@ -1,5 +1,21 @@
 # Change Log
 
+## [1.6.0](https://github.com/auth0/Auth0.swift/tree/1.6.0) (2017-06-06)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.5.0...1.6.0)
+
+**Added**
+- Added WebAuth Auth0 Session Clear [\#115](https://github.com/auth0/Auth0.swift/pull/115) ([cocojoe](https://github.com/cocojoe))
+- Credentials support NSSecureCoding, CredentialsManager Utility, KeyChain Storage [\#113](https://github.com/auth0/Auth0.swift/pull/113) ([cocojoe](https://github.com/cocojoe))
+- Added method to revoke refresh tokens [\#111](https://github.com/auth0/Auth0.swift/pull/111) ([cocojoe](https://github.com/cocojoe))
+
+**Changed**
+- Xcode 8.3 Compatibility [\#108](https://github.com/auth0/Auth0.swift/pull/108) ([cocojoe](https://github.com/cocojoe))
+- Use built-in Carthage Cache system [\#107](https://github.com/auth0/Auth0.swift/pull/107) ([hzalaz](https://github.com/hzalaz))
+- Update Dependencies [\#105](https://github.com/auth0/Auth0.swift/pull/105) ([cocojoe](https://github.com/cocojoe))
+
+**Fixed**
+- Restrict webAuth tests to iOS [\#109](https://github.com/auth0/Auth0.swift/pull/109) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.5.0](https://github.com/auth0/Auth0.swift/tree/1.5.0) (2017-03-27)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.4.0...1.5.0)
 
