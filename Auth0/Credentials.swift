@@ -40,13 +40,16 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
     public let refreshToken: String?
     // Token that details the user identity after authentication
     public let idToken: String?
+    // Granted scopes, only populated when a requested scope or scopes was not granted and Auth is OIDC Conformant
+    public let scope: String?
 
-    public init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Date? = nil) {
+    public init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Date? = nil, scope: String? = nil) {
         self.accessToken = accessToken
         self.tokenType = tokenType
         self.idToken = idToken
         self.refreshToken = refreshToken
         self.expiresIn = expiresIn
+        self.scope = scope
     }
 
     convenience required public init(json: [String: Any]) {
@@ -62,7 +65,7 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
         default:
             expiresIn = nil
         }
-        self.init(accessToken: json["access_token"] as? String, tokenType: json["token_type"] as? String, idToken: json["id_token"] as? String, refreshToken: json["refresh_token"] as? String, expiresIn: expiresIn)
+        self.init(accessToken: json["access_token"] as? String, tokenType: json["token_type"] as? String, idToken: json["id_token"] as? String, refreshToken: json["refresh_token"] as? String, expiresIn: expiresIn, scope: json["scope"] as? String)
     }
 
     // MARK: - NSSecureCoding
@@ -73,8 +76,9 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
         let idToken = aDecoder.decodeObject(forKey: "idToken")
         let refreshToken = aDecoder.decodeObject(forKey: "refreshToken")
         let expiresIn = aDecoder.decodeObject(forKey: "expiresIn")
+        let scope = aDecoder.decodeObject(forKey: "scope")
 
-        self.init(accessToken: accessToken as? String, tokenType: tokenType as? String, idToken: idToken as? String, refreshToken: refreshToken as? String, expiresIn: expiresIn as? Date)
+        self.init(accessToken: accessToken as? String, tokenType: tokenType as? String, idToken: idToken as? String, refreshToken: refreshToken as? String, expiresIn: expiresIn as? Date, scope: scope as? String)
     }
 
     public func encode(with aCoder: NSCoder) {
@@ -83,6 +87,7 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
         aCoder.encode(self.idToken, forKey: "idToken")
         aCoder.encode(self.refreshToken, forKey: "refreshToken")
         aCoder.encode(self.expiresIn, forKey: "expiresIn")
+        aCoder.encode(self.scope, forKey: "scope")
     }
 
     public static var supportsSecureCoding: Bool = true
