@@ -101,6 +101,13 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(newCredentials).toEventuallyNot(beNil())
             }
 
+            it("should error as touch not available") {
+                credentialsManager.credentialsOnTouch(withTitle: "Touch to Authentication") {
+                    expect($0).toNot(beNil())
+                    expect($1).to(beNil())
+                }
+            }
+
             it("should yield new credentials") {
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                 _ = credentialsManager.store(credentials: credentials)

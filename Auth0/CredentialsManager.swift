@@ -22,6 +22,7 @@
 
 import Foundation
 import SimpleKeychain
+import LocalAuthentication
 
 /// Credentials management utility
 public struct CredentialsManager {
@@ -29,6 +30,7 @@ public struct CredentialsManager {
     private let storage = A0SimpleKeychain()
     private let storeKey = "credentials"
     private let authentication: Authentication
+    private let touchAuth = TouchAuthentication(authContext: LAContext())
 
     /// Creates a new CredentialsManager instance
     ///
@@ -78,6 +80,13 @@ public struct CredentialsManager {
             case .failure(let error):
                 callback(.failedRefresh(error), nil)
             }
+        }
+    }
+
+    public func credentialsOnTouch(withTitle title: String, scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+        self.touchAuth.requireTouch(withTitle: title) {
+            guard $0 == nil else { return callback(.noCredentials, nil) }
+            self.credentials(withScope: scope, callback: callback)
         }
     }
 }
