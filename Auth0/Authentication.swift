@@ -299,7 +299,7 @@ public protocol Authentication: Trackable, Loggable {
     func tokenInfo(token: String) -> Request<Profile, AuthenticationError>
 
     /**
-     Returns user information by performing a request to /userinfo endpoint
+     Returns user information by performing a request to /userinfo endpoint.
 
      ```
      Auth0
@@ -311,8 +311,27 @@ public protocol Authentication: Trackable, Loggable {
      - parameter token: token obtained by authenticating the user
 
      - returns: a request that will yield user information
+     - important: If you are using an OIDC Conformant client please see `userClaimInfo`
      */
     func userInfo(token: String) -> Request<Profile, AuthenticationError>
+
+    /**
+     Returns OIDC standard claims information by performing a request
+     to /userinfo endpoint.
+
+     ```
+     Auth0
+     .authentication(clientId, domain: "samples.auth0.com")
+     .userClaimInfo(token: token)
+     .start { print($0) }
+     ```
+
+     - parameter token: token obtained by authenticating the user
+
+     - returns: a request that will yield user information
+     - important: This method should be used for OIDC Conformant clients.
+     */
+    func userClaimInfo(token: String) -> Request<UserInfo, AuthenticationError>
 
     /**
      Logs in a user using a social Identity Provider token. e.g. Facebook

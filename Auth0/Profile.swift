@@ -103,7 +103,7 @@ public class Profile: NSObject, JSONObjectPayload {
 
 }
 
-private func date(from string: String) -> Date? {
+func date(from string: String) -> Date? {
     guard let interval = Double(string) else {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")

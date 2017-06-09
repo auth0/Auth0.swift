@@ -35,6 +35,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func startOAuth2(_ sender: Any) {
+        print(UserInfo.publicClaims)
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
