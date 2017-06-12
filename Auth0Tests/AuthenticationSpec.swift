@@ -468,7 +468,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0).start { result in
-                        expect(result).to(beSuccessfulResult())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
@@ -478,7 +478,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "custom_email", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless custom"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .iOSLink, connection: "custom_email").start { result in
-                        expect(result).to(beSuccessfulResult())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
@@ -489,7 +489,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(condition: isPasswordless(Domain) && hasAtLeast(["email": SupportAtAuth0]) && hasObjectAttribute("authParams", value: params)) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless web link with parameters"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .WebLink, parameters: params).start { result in
-                        expect(result).to(beSuccessfulResult())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
@@ -500,7 +500,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: params).start { result in
-                        expect(result).to(beSuccessfulResult())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
@@ -510,7 +510,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: [:]).start { result in
-                        expect(result).to(beSuccessfulResult())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
@@ -533,7 +533,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "sms", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone).start { result in
-                        expect(result).to(beSuccessfulResult())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
@@ -543,7 +543,7 @@ class AuthenticationSpec: QuickSpec {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "custom_sms", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless custom"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone, type: .iOSLink, connection: "custom_sms").start { result in
-                        expect(result).to(beSuccessfulResult())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
