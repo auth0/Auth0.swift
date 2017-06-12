@@ -36,7 +36,7 @@ class TouchAuthenticationSpec: QuickSpec {
 
         beforeEach {
             mockContext = MockLAContext()
-            touchAuthentication = TouchAuthentication(authContext: mockContext)
+            touchAuthentication = TouchAuthentication(authContext: mockContext, title: "Touch Auth")
         }
 
         describe("touch availablility") {
@@ -51,6 +51,20 @@ class TouchAuthenticationSpec: QuickSpec {
             }
         }
 
+        describe("setters") {
+
+            if #available(iOS 10, *) {
+                it("should set cancel title") {
+                    touchAuthentication.cancelTitle = "cancel title"
+                    expect(mockContext.localizedCancelTitle) == "cancel title"
+                }
+            }
+
+            it("should set fallback title") {
+                touchAuthentication.fallbackTitle = "fallback title"
+                expect(mockContext.localizedFallbackTitle) == "fallback title"
+            }
+        }
         describe("touch authentication") {
 
             var error: Error?
@@ -60,21 +74,21 @@ class TouchAuthenticationSpec: QuickSpec {
             }
 
             it("should authenticate") {
-                touchAuthentication.requireTouch(withTitle: "Touch") { error = $0 }
+                touchAuthentication.requireTouch { error = $0 }
                 expect(error).toEventually(beNil())
             }
 
             it("should return error on touch authentication") {
                 let touchError = LAError(.appCancel)
                 mockContext.replyError = touchError
-                touchAuthentication.requireTouch(withTitle: "Touch") { error = $0 }
+                touchAuthentication.requireTouch { error = $0 }
                 expect(error).toEventually(matchError(touchError))
             }
 
             it("should return authenticationFailed error if no policy success") {
                 let touchError = LAError(.authenticationFailed)
                 mockContext.replySuccess = false
-                touchAuthentication.requireTouch(withTitle: "Touch") { error = $0 }
+                touchAuthentication.requireTouch { error = $0 }
                 expect(error).toEventually(matchError(touchError))
             }
 
@@ -87,7 +101,7 @@ class MockLAContext: LAContext {
     var enabled = true
     var replySuccess = true
     var replyError: Error? = nil
-    
+
     override func canEvaluatePolicy(_ policy: LAPolicy, error: NSErrorPointer) -> Bool {
         return self.enabled
     }

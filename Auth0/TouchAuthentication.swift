@@ -23,30 +23,37 @@
 import Foundation
 import LocalAuthentication
 
-public struct TouchAuthentication {
+struct TouchAuthentication {
 
     private let authContext: LAContext
 
-    public init(authContext: LAContext) {
-        self.authContext = authContext
+    let title: String
+    var fallbackTitle: String? {
+        get { return self.authContext.localizedFallbackTitle }
+        set { self.authContext.localizedFallbackTitle = newValue }
     }
 
-    public var available: Bool {
+    @available(iOS 10.0, *)
+    var cancelTitle: String? {
+        get { return self.authContext.localizedCancelTitle }
+        set { self.authContext.localizedCancelTitle = newValue }
+    }
+
+    var available: Bool {
         return self.authContext.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: nil)
     }
 
-    public func requireTouch(withTitle title: String, cancelTitle: String? = nil, callback: @escaping (Error?) -> Void) {
-        if #available(iOS 10, *) {
-            self.authContext.localizedCancelTitle = cancelTitle
-        }
-        self.authContext.localizedFallbackTitle = ""
+    init(authContext: LAContext, title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
+        self.authContext = authContext
+        self.title = title
+        if #available(iOS 10, *) { self.cancelTitle = cancelTitle }
+        self.fallbackTitle = fallbackTitle
+    }
 
-        self.authContext.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: title) {
-            guard $1 == nil else {
-                return callback($1)
-            }
-            guard $0 else { return callback(LAError(LAError.authenticationFailed))}
-            callback(nil)
+    func requireTouch(callback: @escaping (Error?) -> Void) {
+        self.authContext.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: self.title) {
+            guard $1 == nil else { return callback($1) }
+            callback($0 ? nil : LAError(LAError.authenticationFailed))
         }
     }
 }
