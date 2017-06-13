@@ -54,7 +54,7 @@ class UserProfileSpec: QuickSpec {
             }
 
             it("should build with required OIDC conformant values") {
-                let profile = Profile(json: basicOIDCProfile())
+                let profile = Profile(json: basicProfileOIDC())
                 expect(profile).toNot(beNil())
                 expect(profile?.id) == Sub
                 expect(profile?.name) == Support

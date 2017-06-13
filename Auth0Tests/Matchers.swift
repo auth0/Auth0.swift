@@ -240,6 +240,15 @@ func haveProfile(_ userId: String) -> Predicate<Result<Profile>> {
     }
 }
 
+func haveProfileOIDC(_ sub: String) -> Predicate<Result<UserInfo>> {
+    return Predicate<Result<UserInfo>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> PredicateResult in
+        if let actual = try expression.evaluate(), case .success(let userInfo) = actual {
+            return PredicateResult(bool: userInfo.sub == sub, message: failureMessage)
+        }
+        return PredicateResult(status: .doesNotMatch, message: failureMessage)
+    }
+}
+
 func haveObjectWithAttributes(_ attributes: [String]) -> Predicate<Result<[String: Any]>> {
     return Predicate<Result<[String: Any]>>.define("have attribues \(attributes)") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .success(let value) = actual {

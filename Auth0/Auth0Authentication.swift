@@ -135,9 +135,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(token)"], logger: self.logger, telemetry: self.telemetry)
     }
 
-    func userClaimInfo(token: String) -> Request<UserInfo, AuthenticationError> {
+    func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError> {
         let userInfo = URL(string: "/userinfo", relativeTo: self.url)!
-        return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(token)"], logger: self.logger, telemetry: self.telemetry)
+        return Request(session: session, url: userInfo, method: "GET", handle: authenticationObject, headers: ["Authorization": "Bearer \(accessToken)"], logger: self.logger, telemetry: self.telemetry)
     }
 
     func loginSocial(token: String, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {

@@ -322,16 +322,16 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
      .authentication(clientId, domain: "samples.auth0.com")
-     .userClaimInfo(token: token)
+     .userInfo(withAccessToken: accessToken)
      .start { print($0) }
      ```
 
-     - parameter token: token obtained by authenticating the user
+     - parameter accessToken: accessToken obtained by authenticating the user
 
      - returns: a request that will yield user information
      - important: This method should be used for OIDC Conformant clients.
      */
-    func userClaimInfo(token: String) -> Request<UserInfo, AuthenticationError>
+    func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError>
 
     /**
      Logs in a user using a social Identity Provider token. e.g. Facebook
