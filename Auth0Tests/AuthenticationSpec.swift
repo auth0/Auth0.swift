@@ -561,6 +561,7 @@ class AuthenticationSpec: QuickSpec {
         }
 
         describe("user information") {
+
             it("should return token information") {
                 stub(condition: isTokenInfo(Domain) && hasAllOf(["id_token": IdToken])) { _ in return tokenInfo() }.name = "token info"
                 waitUntil(timeout: Timeout) { done in
@@ -582,7 +583,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should return user information") {
-                stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo() }.name = "user info"
+                stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo(withProfile: basicProfile()) }.name = "user info"
                 waitUntil(timeout: Timeout) { done in
                     auth.userInfo(token: AccessToken).start { result in
                         expect(result).to(haveProfile(UserId))
@@ -601,6 +602,30 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
+        }
+
+        describe("user information OIDC conformant") {
+
+            it("should return user information") {
+                stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo(withProfile: basicProfileOIDC()) }.name = "user info oidc"
+                waitUntil(timeout: Timeout) { done in
+                    auth.userInfo(withAccessToken: AccessToken).start { result in
+                        expect(result).to(haveProfileOIDC(Sub))
+                        done()
+                    }
+                }
+            }
+
+            it("should report failure to get user info") {
+                stub(condition: isUserInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
+                waitUntil(timeout: Timeout) { done in
+                    auth.userInfo(withAccessToken: AccessToken).start { result in
+                        expect(result).to(haveAuthenticationError(code: "invalid_token", description: "the token is invalid"))
+                        done()
+                    }
+                }
+            }
+            
         }
 
         describe("social login") {
