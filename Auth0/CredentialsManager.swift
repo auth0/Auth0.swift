@@ -22,6 +22,7 @@
 
 import Foundation
 import SimpleKeychain
+import LocalAuthentication
 
 /// Credentials management utility
 public struct CredentialsManager {
@@ -29,6 +30,7 @@ public struct CredentialsManager {
     private let storage = A0SimpleKeychain()
     private let storeKey = "credentials"
     private let authentication: Authentication
+    private var touchAuth: TouchAuthentication?
 
     /// Creates a new CredentialsManager instance
     ///
@@ -36,6 +38,16 @@ public struct CredentialsManager {
     ///   - authentication: Auth0 authentication instance
     public init(authentication: Authentication) {
         self.authentication = authentication
+    }
+
+    /// Enable TouchID Authentication for additional securtity during credentials retrieval.
+    ///
+    /// - Parameters:
+    ///   - title: main message to display in TouchID prompt
+    ///   - cancelTitle: cancel message to display in TouchID prompt (iOS 10+)
+    ///   - fallbackTitle: fallback message to display in TouchID prompt after a failed match
+    public mutating func enableTouchAuth(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
+        self.touchAuth = TouchAuthentication(authContext: LAContext(), title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
 
     /// Store credentials instance in keychain
@@ -63,6 +75,20 @@ public struct CredentialsManager {
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/refresh-token)
     public func credentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+        if let touchAuth = self.touchAuth {
+            guard touchAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
+            touchAuth.requireTouch {
+                guard $0 == nil else {
+                    return callback(.touchFailed($0!), nil)
+                }
+                self.retrieveCredentials(withScope: scope, callback: callback)
+            }
+        } else {
+            self.retrieveCredentials(withScope: scope, callback: callback)
+        }
+    }
+
+    private func retrieveCredentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard
             let data = self.storage.data(forKey:self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials

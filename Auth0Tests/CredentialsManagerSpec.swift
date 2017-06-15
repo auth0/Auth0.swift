@@ -24,6 +24,7 @@ import Quick
 import Nimble
 import OHHTTPStubs
 import SimpleKeychain
+import LocalAuthentication
 
 @testable import Auth0
 
@@ -56,7 +57,7 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
-        describe("renewal") {
+        describe("retrieval") {
 
             var error: Error?
             var newCredentials: Credentials?
@@ -101,27 +102,48 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(newCredentials).toEventuallyNot(beNil())
             }
 
-            it("should yield new credentials") {
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
-                _ = credentialsManager.store(credentials: credentials)
-                waitUntil(timeout: 2) { done in
-                    credentialsManager.credentials { error = $0; newCredentials = $1
-                        expect(error).to(beNil())
-                        expect(newCredentials?.accessToken) == AccessToken
-                        done()
+            context("require touch") {
+
+                beforeEach {
+                    credentialsManager.enableTouchAuth(withTitle: "Auth Title", cancelTitle: "Cancel Title", fallbackTitle: "Fallback Title")
+                }
+
+                it("should error when touch unavailable") {
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials { error = $0; newCredentials = $1
+                            expect(error).to(matchError(CredentialsManagerError.touchFailed(LAError(LAError.touchIDNotAvailable))))
+                            expect(newCredentials).to(beNil())
+                            done()
+                        }
                     }
                 }
+
             }
 
-            it("should yield error on failed renew") {
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authFailure(code: "invalid_request", description: "missing_params") }.name = "renew failed"
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
-                _ = credentialsManager.store(credentials: credentials)
-                waitUntil(timeout: 2) { done in
-                    credentialsManager.credentials { error = $0; newCredentials = $1
-                        expect(error).to(matchError(CredentialsManagerError.failedRefresh(AuthenticationError())))
-                        expect(newCredentials).to(beNil())
-                        done()
+            context("renew") {
+
+                it("should yield new credentials") {
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.accessToken) == AccessToken
+                            done()
+                        }
+                    }
+                }
+
+                it("should yield error on failed renew") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authFailure(code: "invalid_request", description: "missing_params") }.name = "renew failed"
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials { error = $0; newCredentials = $1
+                            expect(error).to(matchError(CredentialsManagerError.failedRefresh(AuthenticationError())))
+                            expect(newCredentials).to(beNil())
+                            done()
+                        }
                     }
                 }
             }
