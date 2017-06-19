@@ -27,7 +27,16 @@ class SilentSafariViewController: SFSafariViewController, SFSafariViewController
     var onResult: (Bool) -> Void = { _ in }
 
     required init(url URL: URL, callback: @escaping (Bool) -> Void) {
-        super.init(url: URL, entersReaderIfAvailable: false)
+        #if swift(>=3.2)
+            if #available(iOS 11.0, *) {
+                super.init(url: URL, configuration: SFSafariViewController.Configuration())
+            } else {
+                super.init(url: URL, entersReaderIfAvailable: false)
+            }
+        #else
+            super.init(url: URL, entersReaderIfAvailable: false)
+        #endif
+
         self.onResult = callback
         self.delegate = self
         self.view.alpha = 0.05 // Apple does not allow invisible SafariViews, this is the threshold.
