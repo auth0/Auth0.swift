@@ -83,6 +83,7 @@ public protocol Authentication: Trackable, Loggable {
      - returns: authentication request that will yield Auth0 User Credentials
      - seeAlso: Credentials
      */
+    @available(*, deprecated, message: "see login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?)")
     // swiftlint:disable:next function_parameter_count
     func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
 
@@ -223,6 +224,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - returns: an authentication request that will yield Auth0 user credentials after creating the user.
      */
+    @available(*, deprecated, message: "see createUser(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?)")
     // swiftlint:disable:next function_parameter_count
     func signUp(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, scope: String, parameters: [String: Any]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError>
 
@@ -251,6 +253,7 @@ public protocol Authentication: Trackable, Loggable {
      - parameter parameters: additional authentication parameters added for Web link. Ignored in other types
 
      - returns: a request
+     - warning: disabled for OIDC-conformant clients, an alternative will be added in a future release
      */
     func startPasswordless(email: String, type: PasswordlessType, connection: String, parameters: [String: Any]) -> Request<Void, AuthenticationError>
 
@@ -278,6 +281,7 @@ public protocol Authentication: Trackable, Loggable {
      - parameter connection:    name of the passwordless connection. By default is 'sms'
 
      - returns: a request
+     - warning: disabled for OIDC-conformant clients, an alternative will be added in a future release
      */
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
@@ -295,7 +299,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - returns: a request that will yield token information
      */
-    @available(*, deprecated, message: "see userInfo(token: String)")
+    @available(*, deprecated, message: "see userInfo(withAccessToken accessToken: String)")
     func tokenInfo(token: String) -> Request<Profile, AuthenticationError>
 
     /**
@@ -311,7 +315,7 @@ public protocol Authentication: Trackable, Loggable {
      - parameter token: token obtained by authenticating the user
 
      - returns: a request that will yield user information
-     - important: If you are using an OIDC Conformant client please see `userClaimInfo`
+     - warning: for OIDC-conformant clients please use `userInfo(withAccessToken accessToken: String)`
      */
     func userInfo(token: String) -> Request<Profile, AuthenticationError>
 
@@ -358,6 +362,7 @@ public protocol Authentication: Trackable, Loggable {
      - parameter parameters: additional parameters sent during authentication
 
      - returns: a request that will yield Auth0 user's credentials
+     - warning: disabled for OIDC-conformant clients, an alternative will be added in a future release
      */
     func loginSocial(token: String, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
 
@@ -682,6 +687,7 @@ public extension Authentication {
      - parameter parameters: additional authentication parameters added for Web link. Ignored in other types
 
      - returns: a request
+     - warning: disabled for OIDC-conformant clients, an alternative will be added in a future release
      */
     public func startPasswordless(email: String, type: PasswordlessType = .Code, connection: String = "email", parameters: [String: Any] = [:]) -> Request<Void, AuthenticationError> {
         return self.startPasswordless(email: email, type: type, connection: connection, parameters: parameters)
@@ -710,6 +716,7 @@ public extension Authentication {
      - parameter connection:    name of the passwordless connection. By default is 'sms'
 
      - returns: a request
+     - warning: disabled for OIDC-conformant clients, an alternative will be added in a future release
      */
     public func startPasswordless(phoneNumber: String, type: PasswordlessType = .Code, connection: String = "sms") -> Request<Void, AuthenticationError> {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
@@ -740,6 +747,7 @@ public extension Authentication {
      - parameter parameters: additional parameters sent during authentication
 
      - returns: a request that will yield Auth0 user's credentials
+     - warning: disabled for OIDC-conformant clients, an alternative will be added in a future release
      */
     public func loginSocial(token: String, connection: String, scope: String = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         return self.loginSocial(token: token, connection: connection, scope: scope, parameters: parameters)
