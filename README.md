@@ -193,11 +193,14 @@ credentialsManager.credentials { error, credentials in
 
 ### Authentication API (iOS / macOS / tvOS)
 
-The Authentication API exposes the identity functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
+The Authentication API exposes AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML. 
+We recommend using our Hosted Login Page but if you wish to build your own UI you can use our API endpoints to do so. However some Auth flows (Grant types) are disable by default so you will need to enable them via your Auth0 Dashboard as explained in [this guide](https://auth0.com/docs/clients/client-grant-types#edit-available-grant_types).
 
-Most users consume this API through our Quickstarts, the hosted login or the [Lock widget](https://github.com/auth0/Lock.swift). However, if you are building all of your authentication UI manually you can interact with this API directly.
+These are the required Grant Types that needs to be enabled in your client:
 
-#### Login with database connection
+* **Password**: For login with username/password using a realm (or connection name). If you set the grants via API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `password`, otherwise Auth0 Dashboard will take care of activating both when `Password` is enabled.
+
+#### Login with database connection (via Realm)
 
 ```swift
 Auth0
@@ -216,6 +219,8 @@ Auth0
          }
      }
 ```
+
+> This requires `Password` Grant or `http://auth0.com/oauth/grant-type/password-realm`
 
 #### Sign Up with database connection
 
@@ -237,92 +242,6 @@ Auth0
             print("Failed with \(error)")
         }
     }
-```
-
-### Passwordless
-
-Passwordless connections in Auth0 allow users to login without the need to remember a password. This is a two step process:
-1. Request a OTP to be sent to the user by email or SMS
-2. Perform the login using the OTP
-
-#### Email OTP
-
-```swift
-Auth0
-    .authentication()
-    .startPasswordless(
-        email: "support@auth0.com",
-        type: .Code,
-        connection: "email",
-        parameters: [:])
-    .start { result in
-        switch result {
-        case .success:
-            print("OTP Sent")
-        case .failure(let error):
-            print("Failed with \(error)")
-        }
-    }
-```
-
-#### Email Login
-
-```swift
-Auth0
-    .authentication()
-    .login(
-        usernameOrEmail: "support@auth0.com",
-        password: "OTP Code",
-        realm: "email",
-        scope: "openid")
-     .start { result in
-         switch result {
-         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
-         case .failure(let error):
-            print("Failed with \(error)")
-         }
-     }
-```
-
-#### SMS OTP
-
-```swift
-Auth0
-    .authentication()
-    .startPasswordless(
-        phoneNumber: "01234567890"
-        type: .Code,
-        connection: "sms",
-        parameters: [:])
-    .start { result in
-        switch result {
-        case .success:
-            print("OTP Sent")
-        case .failure(let error):
-            print("Failed with \(error)")
-        }
-    }
-```
-
-#### SMS Login
-
-```swift
-Auth0
-    .authentication()
-    .login(
-        usernameOrEmail: "01234567890",
-        password: "OTP Code",
-        realm: "sms",
-        scope: "openid")
-     .start { result in
-         switch result {
-         case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
-         case .failure(let error):
-            print("Failed with \(error)")
-         }
-     }
 ```
 
 ### Management API (Users)
