@@ -1,5 +1,20 @@
 # Change Log
 
+## [1.7.0](https://github.com/auth0/Auth0.swift/tree/1.7.0) (2017-06-26)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.6.0...1.7.0)
+
+**Added**
+- Added OIDC Conformant UserInfo class and API Method [\#122](https://github.com/auth0/Auth0.swift/pull/122) ([cocojoe](https://github.com/cocojoe))
+- Added scope property to Credentials [\#120](https://github.com/auth0/Auth0.swift/pull/120) ([cocojoe](https://github.com/cocojoe))
+- Added Touch ID Utility [\#116](https://github.com/auth0/Auth0.swift/pull/116) ([cocojoe](https://github.com/cocojoe))
+
+**Changed**
+- Use new SFSafariViewController init for iOS11 [\#125](https://github.com/auth0/Auth0.swift/pull/125) ([cocojoe](https://github.com/cocojoe))
+- Refactor deprecated Matcher protocol with Predicate protocol [\#117](https://github.com/auth0/Auth0.swift/pull/117) ([cocojoe](https://github.com/cocojoe))
+
+**Deprecated**
+- Document Legacy Grant Types & Method deprecations [\#126](https://github.com/auth0/Auth0.swift/pull/126) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.6.0](https://github.com/auth0/Auth0.swift/tree/1.6.0) (2017-06-06)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.5.0...1.6.0)
 
