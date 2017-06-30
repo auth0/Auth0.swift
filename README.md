@@ -140,7 +140,7 @@ Check out the [iOS Swift QuickStart Guide](https://auth0.com/docs/quickstart/nat
 ```swift
 Auth0
    .authentication()
-   .userInfo(token: accessToken)
+   .userInfo(withAccessToken: accessToken)
    .start { result in
        switch result {
        case .success(let profile):
