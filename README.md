@@ -247,6 +247,22 @@ Auth0
 
 ### Management API (Users)
 
+#### Retrieve user_metadata
+
+```swift
+Auth0
+    .users(token: idToken)
+    .get("user identifier", fields: ["user_metadata"], include: true)
+    .start { result in
+        switch result {
+        case .success(let userInfo):
+            print("user: \(userInfo)")
+        case .failure(let error):
+            print(error)
+        }
+    }
+```
+
 #### Update user_metadata
 
 ```swift
