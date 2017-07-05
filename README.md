@@ -56,6 +56,7 @@ import Auth0
 ```swift
 Auth0
     .webAuth()
+    .audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")
     .start { result in
         switch result {
         case .success(let credentials):
@@ -139,7 +140,7 @@ Check out the [iOS Swift QuickStart Guide](https://auth0.com/docs/quickstart/nat
 ```swift
 Auth0
    .authentication()
-   .userInfo(token: accessToken)
+   .userInfo(withAccessToken: accessToken)
    .start { result in
        switch result {
        case .success(let profile):
@@ -193,7 +194,7 @@ credentialsManager.credentials { error, credentials in
 
 ### Authentication API (iOS / macOS / tvOS)
 
-The Authentication API exposes AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML. 
+The Authentication API exposes AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
 We recommend using our Hosted Login Page but if you wish to build your own UI you can use our API endpoints to do so. However some Auth flows (Grant types) are disabled by default so you will need to enable them via your Auth0 Dashboard as explained in [this guide](https://auth0.com/docs/clients/client-grant-types#edit-available-grant_types).
 
 These are the required Grant Types that needs to be enabled in your client:
@@ -245,6 +246,22 @@ Auth0
 ```
 
 ### Management API (Users)
+
+#### Retrieve user_metadata
+
+```swift
+Auth0
+    .users(token: idToken)
+    .get("user identifier", fields: ["user_metadata"], include: true)
+    .start { result in
+        switch result {
+        case .success(let userInfo):
+            print("user: \(userInfo)")
+        case .failure(let error):
+            print(error)
+        }
+    }
+```
 
 #### Update user_metadata
 
