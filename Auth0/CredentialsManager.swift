@@ -58,6 +58,13 @@ public struct CredentialsManager {
         return self.storage.setData(NSKeyedArchiver.archivedData(withRootObject: credentials), forKey: storeKey)
     }
 
+    /// Clear credentials stored in keychain
+    ///
+    /// - Returns: Bool outcome of removal success
+    public func clearCredentials() -> Bool {
+        return self.storage.deleteEntry(forKey: storeKey)
+    }
+
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
     /// otherwise the retrieved credentails will be returned as they have not expired.
     ///

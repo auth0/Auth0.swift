@@ -55,6 +55,14 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
             }
 
+            it("should clear credentials in keychain") {
+                expect(credentialsManager.clearCredentials()).to(beTrue())
+            }
+
+            it("should fail to clear credentials") {
+                expect(credentialsManager.clearCredentials()).to(beFalse())
+            }
+
         }
 
         describe("retrieval") {
