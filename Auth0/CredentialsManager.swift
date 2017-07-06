@@ -65,6 +65,19 @@ public struct CredentialsManager {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
+    /// Checks if valid credentials are available
+    ///
+    /// - Returns: Bool outcome of result
+    public func hasCredentials() -> Bool {
+        guard
+            let data = self.storage.data(forKey:self.storeKey),
+            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
+            credentials.accessToken != nil,
+            let expiresIn = credentials.expiresIn, expiresIn > Date()
+            else { return false }
+        return true
+    }
+
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
     /// otherwise the retrieved credentails will be returned as they have not expired.
     ///
