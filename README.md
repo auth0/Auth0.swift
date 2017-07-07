@@ -23,7 +23,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 If you are using Carthage, add the following lines to your `Cartfile`:
 
 ```ruby
-pod "Auth0", '~> 1.7'
+github "auth0/Auth0.swift" ~> 1.7
 ```
 
 Then run `carthage bootstrap`.
