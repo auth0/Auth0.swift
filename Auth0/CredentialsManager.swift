@@ -53,29 +53,29 @@ public struct CredentialsManager {
     /// Store credentials instance in keychain
     ///
     /// - Parameter credentials: credentials instance to store
-    /// - Returns: Bool outcome of success
+    /// - Returns: if credentials were stored
     public func store(credentials: Credentials) -> Bool {
         return self.storage.setData(NSKeyedArchiver.archivedData(withRootObject: credentials), forKey: storeKey)
     }
 
     /// Clear credentials stored in keychain
     ///
-    /// - Returns: Bool outcome of removal success
-    public func clearCredentials() -> Bool {
+    /// - Returns: if credentials were removed
+    public func clear() -> Bool {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
     /// Checks if valid credentials are available
     ///
-    /// - Returns: Bool outcome of result
-    public func hasCredentials() -> Bool {
+    /// - Returns: if there are valid and non-expired credentials stored
+    public func hasValid() -> Bool {
         guard
             let data = self.storage.data(forKey:self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
             credentials.accessToken != nil,
-            let expiresIn = credentials.expiresIn, expiresIn > Date()
+            let expiresIn = credentials.expiresIn
             else { return false }
-        return true
+        return expiresIn > Date()
     }
 
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
