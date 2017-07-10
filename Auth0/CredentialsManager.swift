@@ -65,7 +65,7 @@ public struct CredentialsManager {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
-    /// Checks if valid credentials are available
+    /// Checks if valid credentials are stored
     ///
     /// - Returns: if there are valid and non-expired credentials stored
     public func hasValid() -> Bool {
