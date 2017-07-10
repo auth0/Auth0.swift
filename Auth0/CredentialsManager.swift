@@ -65,7 +65,7 @@ public struct CredentialsManager {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
-    /// Checks if valid credentials are stored
+    /// Checks if a non-expired set of credentials are stored
     ///
     /// - Returns: if there are valid and non-expired credentials stored
     public func hasValid() -> Bool {
@@ -75,7 +75,7 @@ public struct CredentialsManager {
             credentials.accessToken != nil,
             let expiresIn = credentials.expiresIn
             else { return false }
-        return expiresIn > Date()
+        return expiresIn > Date() || credentials.refreshToken != nil
     }
 
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired

@@ -70,28 +70,40 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
-        describe("availability") {
+        describe("valididity") {
 
             afterEach {
                 _ = credentialsManager.clear()
             }
 
-            it("should have credentials available when stored and not expired") {
+            it("should have valid credentials when stored and not expired") {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid()).to(beTrue())
             }
 
-            it("should not have credentials available when keychain empty") {
+            it("should not have valid credentials when keychain empty") {
                 expect(credentialsManager.hasValid()).to(beFalse())
             }
 
-            it("should not have credentials available when token expired") {
+            it("should have valid credentials when token valid and no refresh token present") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.hasValid()).to(beTrue())
+            }
+
+            it("should have valid credentials when token expired and refresh token present") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.hasValid()).to(beTrue())
+            }
+
+            it("should not have valid credentials when token expired and no refresh token present") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid()).to(beFalse())
             }
 
-            it("should not have credentials available when no access token") {
+            it("should not have valid credentials when no access token") {
                 let credentials = Credentials(accessToken: nil, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid()).to(beFalse())
