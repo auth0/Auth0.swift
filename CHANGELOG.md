@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.7.1](https://github.com/auth0/Auth0.swift/tree/1.7.1) (2017-07-11)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.7.0...1.7.1)
+
+**Added**
+- Added credential manager methods `clear` and `hasValid` [\#133](https://github.com/auth0/Auth0.swift/pull/133) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.7.0](https://github.com/auth0/Auth0.swift/tree/1.7.0) (2017-06-26)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.6.0...1.7.0)
 
