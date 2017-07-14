@@ -30,4 +30,4 @@ FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
 
-#import <Auth0/A0ChallengeGenerator.h>
+#import "A0ChallengeGenerator.h"
