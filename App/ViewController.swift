@@ -39,6 +39,11 @@ class ViewController: UIViewController {
         auth0
             .logging(enabled: true)
             .start(onAuth)
+
+        var auth = Auth0.authentication()
+        _ = auth.logging(enabled: true)
+        auth.changePassword(email: "martinwalsh@gmail.com", oldPassword: "Password2", newPassword: "Password3", connection: "Username-Password-Authentication").start { print($0) }
+
     }
 
     @IBAction func startGoogleOAuth2(_ sender: Any) {

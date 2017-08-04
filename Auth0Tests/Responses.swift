@@ -70,6 +70,11 @@ func resetPasswordResponse() -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
+func changePasswordResponse() -> OHHTTPStubsResponse {
+    let data = "".data(using: .utf8)!
+    return OHHTTPStubsResponse(data: data, statusCode: 204, headers: ["Content-Type": "application/json"])
+}
+
 func revokeTokenResponse() -> OHHTTPStubsResponse {
     let data = "".data(using: .utf8)!
     return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
