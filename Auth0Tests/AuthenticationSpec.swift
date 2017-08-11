@@ -407,7 +407,7 @@ class AuthenticationSpec: QuickSpec {
         describe("change password") {
 
             it("should change password") {
-                stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": Password, "new_password": NewPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return changePasswordResponse() }.name = "change request sent"
+                stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": Password, "new_password": NewPassword, "connection": ConnectionName])) { _ in return changePasswordResponse() }.name = "change request sent"
                 waitUntil(timeout: Timeout) { done in
                     auth.changePassword(email: SupportAtAuth0, oldPassword: Password, newPassword: NewPassword, connection: ConnectionName).start { result in
                         guard case .success = result else { return fail("Failed to change password") }
@@ -419,7 +419,7 @@ class AuthenticationSpec: QuickSpec {
             it("should fail if old password invalid") {
                 let code = "invalid_user_password"
                 let description = "Wrong email or password."
-                  stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": "invalidPassword", "new_password": NewPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "change password failed"
+                  stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": "invalidPassword", "new_password": NewPassword, "connection": ConnectionName])) { _ in return authFailure(code: code, description: description) }.name = "change password failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.changePassword(email: SupportAtAuth0, oldPassword: "invalidPassword", newPassword: NewPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
@@ -431,7 +431,7 @@ class AuthenticationSpec: QuickSpec {
             it("should fail if password missing") {
                 let code = "invalid_request"
                 let description = "old_password is required"
-                stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": "", "new_password": NewPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "change password failed"
+                stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": "", "new_password": NewPassword, "connection": ConnectionName])) { _ in return authFailure(code: code, description: description) }.name = "change password failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.changePassword(email: SupportAtAuth0, oldPassword: "", newPassword: NewPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
@@ -443,7 +443,7 @@ class AuthenticationSpec: QuickSpec {
             it("should fail on password policy violation") {
                 let code = "change_password_error"
                 let description = "password policy rules violation"
-                stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": Password, "new_password": NewPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "change password failed"
+                stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": Password, "new_password": NewPassword, "connection": ConnectionName])) { _ in return authFailure(code: code, description: description) }.name = "change password failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.changePassword(email: SupportAtAuth0, oldPassword: Password, newPassword: NewPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))

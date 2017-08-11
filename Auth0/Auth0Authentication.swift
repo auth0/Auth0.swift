@@ -205,8 +205,7 @@ struct Auth0Authentication: Authentication {
             "username": email,
             "old_password": oldPassword,
             "new_password": newPassword,
-            "connection": connection,
-            "client_id": self.clientId
+            "connection": connection
         ]
         let changePassword = URL(string: "/dbconnections/self_change_password", relativeTo: self.url)!
         return Request(session: session, url: changePassword, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
