@@ -28,15 +28,15 @@ public class _ObjectiveAuthenticationAPI: NSObject {
 
     private var authentication: Authentication
 
-    public override init () {
+    @objc public override init () {
         self.authentication = Auth0.authentication()
     }
 
-    public convenience init(clientId: String, url: URL) {
+    @objc public convenience init(clientId: String, url: URL) {
         self.init(clientId: clientId, url: url, session: .shared)
     }
 
-    public init(clientId: String, url: URL, session: URLSession) {
+    @objc public init(clientId: String, url: URL, session: URLSession) {
         self.authentication = Auth0Authentication(clientId: clientId, url: url, session: session)
     }
 
@@ -138,7 +138,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
 
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
-    public func setTelemetryEnabled(enabled: Bool) {
+    @objc public func setTelemetryEnabled(enabled: Bool) {
         self.authentication.tracking(enabled: enabled)
     }
 }

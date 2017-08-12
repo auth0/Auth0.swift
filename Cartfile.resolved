@@ -1,4 +1,4 @@
 github "AliSoftware/OHHTTPStubs" "6.0.0"
-github "Quick/Nimble" "v7.0.1"
-github "Quick/Quick" "v1.1.0"
+github "Quick/Nimble" "24aa2d97405b352cb85bd963d1898f780f9bde3e"
+github "Quick/Quick" "6814556ae44d281e4636f8ccf8458d19ae65a457"
 github "auth0/SimpleKeychain" "0.8.0"

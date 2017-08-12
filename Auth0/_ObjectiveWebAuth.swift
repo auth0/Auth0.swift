@@ -29,16 +29,16 @@ public class _ObjectiveOAuth2: NSObject {
 
     private(set) var webAuth: SafariWebAuth
 
-    public override init() {
+    @objc public override init() {
         let values = plistValues(bundle: Bundle.main)!
         self.webAuth = SafariWebAuth(clientId: values.clientId, url: .a0_url(values.domain))
     }
 
-    public init(clientId: String, url: URL) {
+    @objc public init(clientId: String, url: URL) {
         self.webAuth = SafariWebAuth(clientId: clientId, url: url)
     }
 
-    public func addParameters(_ parameters: [String: String]) {
+    @objc public func addParameters(_ parameters: [String: String]) {
         _ = self.webAuth.parameters(parameters)
     }
 
@@ -47,7 +47,7 @@ public class _ObjectiveOAuth2: NSObject {
 
      Before enabling this flag you'll need to configure Universal Links
     */
-    public var universalLink: Bool {
+    @objc public var universalLink: Bool {
         set {
             self.webAuth.universalLink = newValue
         }
@@ -61,7 +61,7 @@ public class _ObjectiveOAuth2: NSObject {
 
      By default no connection is specified, so the hosted login page will be displayed
     */
-    public var connection: String? {
+    @objc public var connection: String? {
         set {
             if let value = newValue {
                 _ = self.webAuth.connection(value)
@@ -75,7 +75,7 @@ public class _ObjectiveOAuth2: NSObject {
     /**
      Scopes that will be requested during auth
     */
-    public var scope: String? {
+    @objc public var scope: String? {
         set {
             if let value = newValue {
                 _ = self.webAuth.scope(value)
@@ -108,7 +108,7 @@ public class _ObjectiveOAuth2: NSObject {
 
      - returns: an object representing the current OAuth2 session.
      */
-    public func start(_ callback: @escaping (NSError?, Credentials?) -> Void) {
+    @objc public func start(_ callback: @escaping (NSError?, Credentials?) -> Void) {
         self.webAuth.start { result in
             switch result {
             case .success(let credentials):
@@ -138,7 +138,7 @@ public class _ObjectiveOAuth2: NSObject {
 
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
-    public func setTelemetryEnabled(_ enabled: Bool) {
+    @objc public func setTelemetryEnabled(_ enabled: Bool) {
         self.webAuth.tracking(enabled: enabled)
     }
 }
