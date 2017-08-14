@@ -2,7 +2,7 @@ require('semantic')
 
 opt_out_usage
 
-fastlane_version "2.27.0"
+fastlane_version "2.53.0"
 
 default_platform :ios
 
@@ -30,11 +30,11 @@ platform :ios do
 
   desc "Runs all the tests"
   lane :test do |options|
-    scheme = options[:scheme]
-    device = options[:device]
+    scheme = ENV['SCHEME'] || options[:scheme]
+    devices = ENV['DEVICES'].split(",") unless ENV['DEVICES'].nil? || options[:devices]
     scan(
       scheme: scheme,
-      device: device,
+      devices: devices,
       clean: true,
       output_types: 'junit'
       )
