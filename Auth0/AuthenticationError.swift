@@ -121,7 +121,7 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
     /// When username and/or password used for authentication are invalid
     public var isInvalidCredentials: Bool {
-        return self.code == "invalid_user_password"
+        return self.code == "invalid_user_password" || (self.code == "invalid_grant" && self.description == "Wrong email or password.")
     }
 
     /// When authenticating with web-based authentication and the resource server denied access per OAuth2 spec
