@@ -169,6 +169,15 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isTooManyAttempts) == true
             }
 
+            it("should detect invalid credentials") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Wrong email or password."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                expect(error.isInvalidCredentials) == true
+            }
+
         }
 
     }
@@ -204,7 +213,6 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                     expect(error.info[key] as? String) == value
                 }
             }
-
 
             it("should not match any custom error") {
                 expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
