@@ -187,6 +187,18 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
+                it("should preserve refresh token in renewed credentials") {
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.refreshToken) == RefreshToken
+                            done()
+                        }
+                    }
+                }
+
                 it("should yield error on failed renew") {
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authFailure(code: "invalid_request", description: "missing_params") }.name = "renew failed"
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
