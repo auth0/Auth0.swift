@@ -120,7 +120,13 @@ public struct CredentialsManager {
         self.authentication.renew(withRefreshToken: refreshToken, scope: scope).start {
             switch $0 {
             case .success(let credentials):
-                callback(nil, credentials)
+                let refreshedCredentials = Credentials(accessToken: credentials.accessToken,
+                                                       tokenType: credentials.tokenType,
+                                                       idToken: credentials.idToken,
+                                                       refreshToken: refreshToken,
+                                                       expiresIn: credentials.expiresIn,
+                                                       scope: credentials.scope)
+                callback(nil, refreshedCredentials)
             case .failure(let error):
                 callback(.failedRefresh(error), nil)
             }
