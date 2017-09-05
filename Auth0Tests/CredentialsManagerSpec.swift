@@ -29,6 +29,7 @@ import LocalAuthentication
 @testable import Auth0
 
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let NewAccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let TokenType = "bearer"
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -118,7 +119,7 @@ class CredentialsManagerSpec: QuickSpec {
             beforeEach {
                 error = nil
                 newCredentials = nil
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authResponse(accessToken: AccessToken) }.name = "renew success"
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authResponse(accessToken: NewAccessToken, expiresIn: 86400) }.name = "renew success"
             }
 
             afterEach {
@@ -175,14 +176,30 @@ class CredentialsManagerSpec: QuickSpec {
 
             context("renew") {
 
-                it("should yield new credentials") {
+                it("should yield new credentials, maintain refresh token") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
                             expect(error).to(beNil())
-                            expect(newCredentials?.accessToken) == AccessToken
+                            expect(newCredentials?.accessToken) == NewAccessToken
+                            expect(newCredentials?.refreshToken) == RefreshToken
                             done()
+                        }
+                    }
+                }
+
+                it("should store new credentials") {
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            credentialsManager.credentials {
+                                expect($1!.accessToken) == NewAccessToken
+                                expect($1!.refreshToken) == RefreshToken
+                                done()
+                            }
                         }
                     }
                 }
