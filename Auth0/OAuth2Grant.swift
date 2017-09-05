@@ -72,7 +72,6 @@ struct PKCE: OAuth2Grant {
         self.init(authentication: authentication, redirectURL: redirectURL, verifier: generator.verifier, challenge: generator.challenge, method: generator.method, responseType: reponseType, nonce: nonce)
     }
 
-    // swiftlint:disable:next function_parameter_count
     init(authentication: Authentication, redirectURL: URL, verifier: String, challenge: String, method: String, responseType: [ResponseType], nonce: String? = nil) {
         self.authentication = authentication
         self.redirectURL = redirectURL

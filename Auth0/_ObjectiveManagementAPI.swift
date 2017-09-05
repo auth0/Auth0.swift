@@ -69,7 +69,6 @@ public class _ObjectiveManagementAPI: NSObject {
     }
 
     @objc(unlinkUserWithIdentifier:provider:fromUserId:callback:)
-    // swiftlint:disable:next function_parameter_count
     public func unlink(identifier: String, provider: String, fromUserId userId: String, callback: @escaping (NSError?, [[String: Any]]?) -> Void) {
         self.users
             .unlink(identityId: identifier, provider: provider, fromUserId:userId)
