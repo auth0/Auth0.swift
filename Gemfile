@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'fastlane'
+gem 'fastlane', '~> 2.5'
 gem 'semantic',  '~> 1.5'
 
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')

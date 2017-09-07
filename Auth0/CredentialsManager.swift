@@ -79,7 +79,8 @@ public struct CredentialsManager {
     }
 
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
-    /// otherwise the retrieved credentails will be returned as they have not expired.
+    /// otherwise the retrieved credentails will be returned as they have not expired. Renewed credentials will be 
+    /// stored in the keychain.
     ///
     ///
     /// ```
@@ -120,7 +121,14 @@ public struct CredentialsManager {
         self.authentication.renew(withRefreshToken: refreshToken, scope: scope).start {
             switch $0 {
             case .success(let credentials):
-                callback(nil, credentials)
+                let newCredentials = Credentials(accessToken: credentials.accessToken,
+                                                       tokenType: credentials.tokenType,
+                                                       idToken: credentials.idToken,
+                                                       refreshToken: refreshToken,
+                                                       expiresIn: credentials.expiresIn,
+                                                       scope: credentials.scope)
+                _ = self.store(credentials: newCredentials)
+                callback(nil, newCredentials)
             case .failure(let error):
                 callback(.failedRefresh(error), nil)
             }

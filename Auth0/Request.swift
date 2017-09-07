@@ -48,7 +48,6 @@ public struct Request<T, E: Auth0Error>: Requestable {
     let logger: Logger?
     let telemetry: Telemetry
 
-    // swiftlint:disable:next function_parameter_count
     init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, payload: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
         self.session = session
         self.url = url

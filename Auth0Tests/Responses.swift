@@ -41,7 +41,7 @@ let Sub = "auth0|\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
 let LocaleUS = "en-US"
 let ZoneEST = "US/Eastern"
 
-func authResponse(accessToken: String, idToken: String? = nil) -> OHHTTPStubsResponse {
+func authResponse(accessToken: String, idToken: String? = nil, expiresIn: Double? = nil) -> OHHTTPStubsResponse {
     var json = [
         "access_token": accessToken,
         "token_type": "bearer",
@@ -49,6 +49,10 @@ func authResponse(accessToken: String, idToken: String? = nil) -> OHHTTPStubsRes
 
     if let token = idToken {
         json["id_token"] = token
+    }
+
+    if let expires = expiresIn {
+        json["expires_in"] = String(expires)
     }
     return OHHTTPStubsResponse(jsonObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
 }

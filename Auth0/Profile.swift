@@ -60,7 +60,6 @@ public class Profile: NSObject, JSONObjectPayload {
         return self["app_metadata"] as? [String: Any] ?? [:]
     }
 
-    // swiftlint:disable:next function_parameter_count
     required public init(id: String, name: String, nickname: String, pictureURL: URL, createdAt: Date, email: String?, emailVerified: Bool, givenName: String?, familyName: String?, attributes: [String: Any], identities: [Identity]) {
         self.id = id
         self.name = name
