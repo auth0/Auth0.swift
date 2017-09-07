@@ -36,6 +36,7 @@ platform :ios do
       scheme: scheme,
       device: device,
       clean: true,
+      skip_build: true,
       output_types: 'junit'
       )
   end
