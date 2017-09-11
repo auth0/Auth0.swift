@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.7.2](https://github.com/auth0/Auth0.swift/tree/1.7.2) (2017-09-11)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.7.1...1.7.2)
+
+**Added**
+- Added invalid_credentials check for /oauth/token [\#147](https://github.com/auth0/Auth0.swift/pull/147) ([cocojoe](https://github.com/cocojoe))
+
+**Fixed**
+- Fixed - Ensure existing refreshToken returned in Credentials Manager [\#146](https://github.com/auth0/Auth0.swift/pull/146) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.7.1](https://github.com/auth0/Auth0.swift/tree/1.7.1) (2017-07-11)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.7.0...1.7.1)
 
