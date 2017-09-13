@@ -78,7 +78,7 @@ describe(@"login", ^{
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
 
-        waitUntilTimeout(3000, ^(void(^done)()) {
+        waitUntilTimeout(3000, ^(void(^done)(void)) {
             [api loginWithUsernameOrEmail:@"support@auth0.com"
                                  password:@"random password"
                                connection:@"Username-Password-Authentication"
@@ -102,7 +102,7 @@ describe(@"login", ^{
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
 
-        waitUntilTimeout(3000, ^(void(^done)()) {
+        waitUntilTimeout(3000, ^(void(^done)(void)) {
             [api loginWithUsernameOrEmail:@"support@auth0.com"
                                  password:@"random password"
                                connection:@"Username-Password-Authentication"
@@ -139,7 +139,7 @@ describe(@"create user", ^{
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
 
-        waitUntilTimeout(3000, ^(void(^done)()) {
+        waitUntilTimeout(3000, ^(void(^done)(void)) {
             [api createUserWithEmail:@"support@auth0.com"
                             username:nil
                             password:@"random pass"
@@ -162,7 +162,7 @@ describe(@"create user", ^{
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
 
-        waitUntilTimeout(3000, ^(void(^done)()) {
+        waitUntilTimeout(3000, ^(void(^done)(void)) {
             [api createUserWithEmail:@"support@auth0.com"
                             username:nil
                             password:@"random pass"
@@ -199,7 +199,7 @@ describe(@"reset password", ^{
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
 
-        waitUntilTimeout(3000, ^(void(^done)()) {
+        waitUntilTimeout(3000, ^(void(^done)(void)) {
             [api resetPasswordWithEmail:@"support@auth0.com"
                              connection:@"MyConnection"
                                callback:^(NSError * _Nullable error) {
@@ -218,7 +218,7 @@ describe(@"reset password", ^{
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
 
-        waitUntilTimeout(3000, ^(void(^done)()) {
+        waitUntilTimeout(3000, ^(void(^done)(void)) {
             [api resetPasswordWithEmail:@"support@auth0.com"
                              connection:@"MyConnection"
                                callback:^(NSError * _Nullable error) {
@@ -258,7 +258,7 @@ describe(@"signup", ^{
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
 
-        waitUntilTimeout(3000, ^(void(^done)()) {
+        waitUntilTimeout(3000, ^(void(^done)(void)) {
             [api signUpWithEmail:@"support@auth0.com"
                         username:nil
                         password:@"random password"
@@ -284,7 +284,7 @@ describe(@"signup", ^{
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
 
-        waitUntilTimeout(3000, ^(void(^done)()) {
+        waitUntilTimeout(3000, ^(void(^done)(void)) {
             [api signUpWithEmail:@"support@auth0.com"
                         username:nil
                         password:@"random password"

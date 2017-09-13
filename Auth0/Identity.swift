@@ -28,22 +28,22 @@ import Foundation
 @objc(A0Identity)
 public class Identity: NSObject, JSONObjectPayload {
 
-    public let identifier: String
-    public let provider: String
-    public let connection: String
+    @objc public let identifier: String
+    @objc public let provider: String
+    @objc public let connection: String
 
-    public let social: Bool
-    public let profileData: [String: Any]
+    @objc public let social: Bool
+    @objc public let profileData: [String: Any]
 
-    public let accessToken: String?
-    public let expiresIn: Date?
-    public let accessTokenSecret: String?
+    @objc public let accessToken: String?
+    @objc public let expiresIn: Date?
+    @objc public let accessTokenSecret: String?
 
-    override public var debugDescription: String {
+    @objc override public var debugDescription: String {
         return "<identity: \(identifier) provider: \(provider) connection: \(connection)>"
     }
 
-    public required init(identifier: String, provider: String, connection: String, social: Bool, profileData: [String: Any], accessToken: String?, expiresIn: Date?, accessTokenSecret: String?) {
+    @objc public required init(identifier: String, provider: String, connection: String, social: Bool, profileData: [String: Any], accessToken: String?, expiresIn: Date?, accessTokenSecret: String?) {
         self.identifier = identifier
         self.provider = provider
         self.connection = connection
@@ -54,7 +54,7 @@ public class Identity: NSObject, JSONObjectPayload {
         self.accessTokenSecret = accessTokenSecret
     }
 
-    convenience public required init?(json: [String : Any]) {
+    @objc convenience public required init?(json: [String : Any]) {
 
         guard
             let identifier = json["user_id"] as? String,

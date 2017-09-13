@@ -31,19 +31,19 @@ import Foundation
 public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
 
     /// Token used that allows calling to the requested APIs (audience sent on Auth)
-    public let accessToken: String?
+    @objc public let accessToken: String?
     /// Type of the access token
-    public let tokenType: String?
+    @objc public let tokenType: String?
     /// When the access_token expires
-    public let expiresIn: Date?
+    @objc public let expiresIn: Date?
     /// If the API allows you to request new access tokens and the scope `offline_access` was included on Auth
-    public let refreshToken: String?
+    @objc public let refreshToken: String?
     // Token that details the user identity after authentication
-    public let idToken: String?
+    @objc public let idToken: String?
     // Granted scopes, only populated when a requested scope or scopes was not granted and Auth is OIDC Conformant
-    public let scope: String?
+    @objc public let scope: String?
 
-    public init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Date? = nil, scope: String? = nil) {
+    @objc public init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Date? = nil, scope: String? = nil) {
         self.accessToken = accessToken
         self.tokenType = tokenType
         self.idToken = idToken
