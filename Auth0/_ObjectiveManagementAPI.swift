@@ -28,15 +28,15 @@ public class _ObjectiveManagementAPI: NSObject {
 
     private var users: Users
 
-    public init(token: String) {
+    @objc public init(token: String) {
         self.users = Auth0.users(token: token)
     }
 
-    public convenience init(token: String, url: URL) {
+    @objc public convenience init(token: String, url: URL) {
         self.init(token: token, url: url, session: URLSession.shared)
     }
 
-    public init(token: String, url: URL, session: URLSession) {
+    @objc public init(token: String, url: URL, session: URLSession) {
         self.users = Management(token: token, url: url, session: session)
     }
 
@@ -88,7 +88,7 @@ public class _ObjectiveManagementAPI: NSObject {
 
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
-    public func setTelemetry(enabled: Bool) {
+    @objc public func setTelemetry(enabled: Bool) {
         self.users.tracking(enabled: enabled)
     }
 }

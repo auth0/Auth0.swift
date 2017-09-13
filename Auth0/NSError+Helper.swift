@@ -23,6 +23,6 @@
 import Foundation
 
 public extension NSError {
-    public var a0_isManagementError: Bool { return self.domain == ManagementError.errorDomain }
-    public var a0_isAuthenticationError: Bool { return self.domain == AuthenticationError.errorDomain }
+    @objc public var a0_isManagementError: Bool { return self.domain == ManagementError.errorDomain }
+    @objc public var a0_isAuthenticationError: Bool { return self.domain == AuthenticationError.errorDomain }
 }
