@@ -123,6 +123,8 @@ In your application's `Info.plist` file, register your iOS Bundle Identifer as a
 </array>
 ```
 
+> If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As / Source Code**.
+
 Finally, go to your [Auth0 Dashboard](${manage_url}/#/applications/${account.clientId}/settings) and make sure that **Allowed Callback URLs** contains the following:
 
 ```text
