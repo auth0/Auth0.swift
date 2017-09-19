@@ -6,15 +6,15 @@
 [![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
-![Swift 3.0](https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat-square)
+![Swift 3.1](https://img.shields.io/badge/Swift-3.1-orange.svg?style=flat-square)
 
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
 
 ## Requirements
 
 - iOS 9 or later
-- Xcode 8
-- Swift 3.0
+- Xcode 8.3 / 9.0
+- Swift 3.1+
 
 ## Installation
 
