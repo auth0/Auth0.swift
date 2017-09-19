@@ -188,17 +188,17 @@ public protocol WebAuth: Trackable, Loggable {
 
      ```
      Auth0
-     .webAuth(clientId: clientId, domain: "samples.auth0.com")
-     .start { result in
-     print(result)
-     }
+         .webAuth(clientId: clientId, domain: "samples.auth0.com")
+         .start { result in
+             print(result)
+         }
      ```
 
      Then from `AppDelegate` we just need to resume the WebAuth Auth like this
 
      ```
      func application(app: UIApplication, openURL url: NSURL, options: [String : Any]) -> Bool {
-     return Auth0.resumeAuth(url, options: options)
+         return Auth0.resumeAuth(url, options: options)
      }
      ```
 
@@ -216,16 +216,16 @@ public protocol WebAuth: Trackable, Loggable {
 
      ```
      Auth0
-     .webAuth()
-     .clearSession { print($0) }
+         .webAuth()
+         .clearSession { print($0) }
      ```
 
      Remove Auth0 session and remove the IdP session.
 
      ```
      Auth0
-     .webAuth()
-     .clearSession(federated: true) { print($0) }
+         .webAuth()
+         .clearSession(federated: true) { print($0) }
      ```
 
      - parameter federated: Bool to remove the IdP session
