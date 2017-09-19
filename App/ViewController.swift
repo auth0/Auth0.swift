@@ -45,8 +45,7 @@ class ViewController: UIViewController {
         var auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
-            .connection("google-oauth2")
-            .start(onAuth)
+            .clearSession(federated: false) { print($0) }
     }
 
     @IBAction func startTokenGoogleOAuth2(_ sender: Any) {

@@ -23,74 +23,27 @@
 import UIKit
 import SafariServices
 
+#if swift(>=3.2)
 @available(iOS 11.0, *)
-class SafariAuthenticationSession: AuthTransaction {
+class SafariAuthenticationSession: AuthSession {
 
     typealias FinishSession = (Result<Credentials>) -> Void
 
-    let state: String?
+    var authSession: SFAuthenticationSession?
     let authorizeURL: URL
-    let redirectURL: URL
-    let finish: FinishSession
-    let handler: OAuth2Grant
-    let logger: Logger?
-    let storage: TransactionStore
-    var authSession: SFAuthenticationSession!
 
-    init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?, storage: TransactionStore) {
-        self.state = state
+    init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
         self.authorizeURL = authorizeURL
-        self.redirectURL = redirectURL
-        self.finish = finish
-        self.handler = handler
-        self.logger = logger
-        self.storage = storage
-    }
+        super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
 
-    func start() {
         self.authSession = SFAuthenticationSession(url: self.authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
             guard $1 == nil, let callbackURL = $0 else {
                 self.finish(.failure(error: $1!))
-                return self.storage.clear()
+                return TransactionStore.shared.clear()
             }
-            _ = self.storage.resume(callbackURL, options: [:])
+            _ = TransactionStore.shared.resume(callbackURL, options: [:])
         }
-        self.authSession.start()
-    }
-
-    /**
-     Tries to resume (and complete) the OAuth2 session from the received URL
-
-     - parameter url:     url received in application's AppDelegate
-     - parameter options: a dictionary of launch options received from application's AppDelegate
-
-     - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
-     */
-    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any] = [:]) -> Bool {
-        self.logger?.trace(url: url, source: "iOS SafariAuthenticationSession")
-        guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
-
-        guard
-            let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-            else {
-                self.finish(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
-                return false
-        }
-        var items = self.handler.values(fromComponents: components)
-        guard has(state: self.state, inItems: items) else { return false }
-        if items["error"] != nil {
-            self.finish(.failure(error: AuthenticationError(info: items, statusCode: 0)))
-        } else {
-            self.handler.credentials(from: items, callback: self.finish)
-        }
-        return true
-    }
-
-    func cancel() {
-        self.finish(Result.failure(error: WebAuthError.userCancelled))
-    }
-
-    private func has(state: String?, inItems items: [String: String]) -> Bool {
-        return state == nil || items["state"] == state
+        self.authSession?.start()
     }
 }
+#endif

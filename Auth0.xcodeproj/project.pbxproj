@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B16D8851F713635009476A5 /* SafariWebAuthenticatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D8841F713635009476A5 /* SafariWebAuthenticatable.swift */; };
+		5B16D88E1F7141A0009476A5 /* SafariAuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* SafariAuthenticationSession.swift */; };
+		5B16D88F1F7141A0009476A5 /* SafariSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88D1F7141A0009476A5 /* SafariSession.swift */; };
+		5B16D8931F714324009476A5 /* AuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D8921F714324009476A5 /* AuthSession.swift */; };
 		5B1748741EF2D3A40060E653 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1748731EF2D3A40060E653 /* Date.swift */; };
 		5B1748751EF2D3A70060E653 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1748731EF2D3A40060E653 /* Date.swift */; };
 		5B1748761EF2D3A70060E653 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1748731EF2D3A40060E653 /* Date.swift */; };
 		5B1748771EF2D3A90060E653 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1748731EF2D3A40060E653 /* Date.swift */; };
 		5B25A52F1E3F520300563AE5 /* NativeAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B25A52E1E3F520300563AE5 /* NativeAuth.swift */; };
-		5B25A5331E3F68FA00563AE5 /* SafariSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B25A5321E3F68FA00563AE5 /* SafariSession.swift */; };
 		5B2860CE1EEAC30500C75D54 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860CD1EEAC30500C75D54 /* UserInfo.swift */; };
 		5B2860CF1EEAC30900C75D54 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860CD1EEAC30500C75D54 /* UserInfo.swift */; };
 		5B2860D01EEAC30A00C75D54 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860CD1EEAC30500C75D54 /* UserInfo.swift */; };
@@ -22,7 +25,6 @@
 		5B6269E71E3F702000305093 /* NativeAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6269E51E3F700000305093 /* NativeAuthSpec.swift */; };
 		5B6269EA1E3F9E5200305093 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6269E91E3F9E5200305093 /* AuthProvider.swift */; };
 		5B76A2AA1F7112AA0030F089 /* SafariWebAuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B76A2A91F7112AA0030F089 /* SafariWebAuthSession.swift */; };
-		5B76A2AC1F71156B0030F089 /* SafariAuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B76A2AB1F71156B0030F089 /* SafariAuthenticationSession.swift */; };
 		5B9262C01ECF0CA800F4F6D3 /* TouchAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262BF1ECF0CA800F4F6D3 /* TouchAuthentication.swift */; };
 		5B9262C31ECF0CC200F4F6D3 /* TouchAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262C11ECF0CBA00F4F6D3 /* TouchAuthenticationSpec.swift */; };
 		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */; };
@@ -306,16 +308,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5B16D8841F713635009476A5 /* SafariWebAuthenticatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariWebAuthenticatable.swift; path = Auth0/SafariWebAuthenticatable.swift; sourceTree = SOURCE_ROOT; };
+		5B16D88C1F7141A0009476A5 /* SafariAuthenticationSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariAuthenticationSession.swift; path = Auth0/SafariAuthenticationSession.swift; sourceTree = SOURCE_ROOT; };
+		5B16D88D1F7141A0009476A5 /* SafariSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariSession.swift; path = Auth0/SafariSession.swift; sourceTree = SOURCE_ROOT; };
+		5B16D8921F714324009476A5 /* AuthSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthSession.swift; sourceTree = "<group>"; };
 		5B1748731EF2D3A40060E653 /* Date.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		5B25A52E1E3F520300563AE5 /* NativeAuth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NativeAuth.swift; path = Auth0/NativeAuth.swift; sourceTree = SOURCE_ROOT; };
-		5B25A5321E3F68FA00563AE5 /* SafariSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariSession.swift; path = Auth0/SafariSession.swift; sourceTree = SOURCE_ROOT; };
 		5B2860CD1EEAC30500C75D54 /* UserInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserInfoSpec.swift; path = Auth0Tests/UserInfoSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManagerError.swift; sourceTree = "<group>"; };
 		5B6269E51E3F700000305093 /* NativeAuthSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NativeAuthSpec.swift; path = Auth0Tests/NativeAuthSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B6269E91E3F9E5200305093 /* AuthProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthProvider.swift; path = Auth0/AuthProvider.swift; sourceTree = SOURCE_ROOT; };
 		5B76A2A91F7112AA0030F089 /* SafariWebAuthSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariWebAuthSession.swift; path = Auth0/SafariWebAuthSession.swift; sourceTree = SOURCE_ROOT; };
-		5B76A2AB1F71156B0030F089 /* SafariAuthenticationSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariAuthenticationSession.swift; path = Auth0/SafariAuthenticationSession.swift; sourceTree = SOURCE_ROOT; };
 		5B9262BF1ECF0CA800F4F6D3 /* TouchAuthentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouchAuthentication.swift; sourceTree = "<group>"; };
 		5B9262C11ECF0CBA00F4F6D3 /* TouchAuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TouchAuthenticationSpec.swift; path = Auth0Tests/TouchAuthenticationSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B9A54411E49E3AE004B5454 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = SOURCE_ROOT; };
@@ -499,6 +503,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5B16D8901F7141E5009476A5 /* Transactions */ = {
+			isa = PBXGroup;
+			children = (
+				5B16D8921F714324009476A5 /* AuthSession.swift */,
+				5B16D88D1F7141A0009476A5 /* SafariSession.swift */,
+				5B16D88C1F7141A0009476A5 /* SafariAuthenticationSession.swift */,
+			);
+			name = Transactions;
+			sourceTree = "<group>";
+		};
+		5B16D8911F714261009476A5 /* WebAuthenticators */ = {
+			isa = PBXGroup;
+			children = (
+				5B16D8841F713635009476A5 /* SafariWebAuthenticatable.swift */,
+				5FAE9C901D8878D400A871CE /* SafariWebAuth.swift */,
+				5B76A2A91F7112AA0030F089 /* SafariWebAuthSession.swift */,
+			);
+			name = WebAuthenticators;
+			sourceTree = "<group>";
+		};
 		5BD4A9CC1DEC6ECE00D6D7AE /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -652,23 +676,20 @@
 			isa = PBXGroup;
 			children = (
 				5FCAB1771D0901BA00331C84 /* ObjectiveC */,
-				5BD4A9CC1DEC6ECE00D6D7AE /* Models */,
+				5B6269E91E3F9E5200305093 /* AuthProvider.swift */,
 				5F53F5CD1CFD157300476A46 /* AuthTransaction.swift */,
 				5F3965F21CF6857A00CDE7C0 /* ControllerModalPresenter.swift */,
+				5BD4A9CC1DEC6ECE00D6D7AE /* Models */,
 				5B25A52E1E3F520300563AE5 /* NativeAuth.swift */,
-				5B6269E91E3F9E5200305093 /* AuthProvider.swift */,
 				5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */,
-				5B25A5321E3F68FA00563AE5 /* SafariSession.swift */,
-				5B76A2AB1F71156B0030F089 /* SafariAuthenticationSession.swift */,
-				5FAE9C901D8878D400A871CE /* SafariWebAuth.swift */,
-				5B76A2A91F7112AA0030F089 /* SafariWebAuthSession.swift */,
 				5BEDE1561EC1FBBE0007300D /* SilentSafariViewController.swift */,
+				5B16D8911F714261009476A5 /* WebAuthenticators */,
+				5B16D8901F7141E5009476A5 /* Transactions */,
 				5FCAB1751D0900CF00331C84 /* TransactionStore.swift */,
 				5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */,
 				5FD255B91D14F70B00387ECB /* WebAuthError.swift */,
 			);
 			name = Auth;
-			path = WebAuth;
 			sourceTree = "<group>";
 		};
 		5F3965C81CF67DD800CDE7C0 /* App */ = {
@@ -691,7 +712,7 @@
 				5F6FAC621D09E98000D5B4EA /* Logger.swift */,
 				5F28B4601D8216180000EB23 /* Loggable.swift */,
 			);
-			path = Logger;
+			name = Logger;
 			sourceTree = "<group>";
 		};
 		5FADB6011CEC0C1600D4BB50 /* Management */ = {
@@ -701,7 +722,7 @@
 				5FADB60E1CED7E5200D4BB50 /* UserPatchAttributesSpec.swift */,
 				5FADB6021CEC0C3300D4BB50 /* UsersSpec.swift */,
 			);
-			path = Management;
+			name = Management;
 			sourceTree = "<group>";
 		};
 		5FAE9C861D8872E900A871CE /* Supporting Files */ = {
@@ -731,7 +752,7 @@
 				5FBBF0371CC964BC0024D2AF /* Matchers.swift */,
 				5FBBF03A1CC96AA70024D2AF /* Responses.swift */,
 			);
-			path = Utils;
+			name = Utils;
 			sourceTree = "<group>";
 		};
 		5FBBF0411CCA901B0024D2AF /* Authentication */ = {
@@ -744,7 +765,7 @@
 				5FE2F8C51CD1522F003628F4 /* ProfileSpec.swift */,
 				5FD255B01D14A9E000387ECB /* AuthenticationErrorSpec.swift */,
 			);
-			path = Authentication;
+			name = Authentication;
 			sourceTree = "<group>";
 		};
 		5FCAB1661D07ABEA00331C84 /* WebAuth */ = {
@@ -759,7 +780,7 @@
 				5F53F5D61CFFAA4A00476A46 /* WebAuthSpec.swift */,
 				5F686A761D4AB90900412E3D /* TransactionStoreSpec.swift */,
 			);
-			path = WebAuth;
+			name = WebAuth;
 			sourceTree = "<group>";
 		};
 		5FCAB16E1D08FFE900331C84 /* Extensions */ = {
@@ -770,7 +791,7 @@
 				5FCAB1701D09005A00331C84 /* NSURLComponents+OAuth2.swift */,
 				5F7504F41D8C3F2900E3BA1C /* NSError+Helper.swift */,
 			);
-			path = Extensions;
+			name = Extensions;
 			sourceTree = "<group>";
 		};
 		5FCAB16F1D09001100331C84 /* Crypto */ = {
@@ -779,7 +800,7 @@
 				5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */,
 				5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */,
 			);
-			path = Crypto;
+			name = Crypto;
 			sourceTree = "<group>";
 		};
 		5FCAB1771D0901BA00331C84 /* ObjectiveC */ = {
@@ -787,7 +808,8 @@
 			children = (
 				5FF2866E1D8A417B00314B72 /* _ObjectiveWebAuth.swift */,
 			);
-			path = ObjectiveC;
+			name = ObjectiveC;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		5FCCC30F1CF4D4D000901E2E /* ObjectiveC */ = {
@@ -796,7 +818,7 @@
 				5FBEF3DD1D07A4B700D90941 /* A0WebAuthSpec.m */,
 				5FCCC3101CF4D4FF00901E2E /* AuthenticationAPISpec.m */,
 			);
-			path = ObjectiveC;
+			name = ObjectiveC;
 			sourceTree = "<group>";
 		};
 		5FCCC3171CF51B9D00901E2E /* ObjectiveC */ = {
@@ -804,7 +826,7 @@
 			children = (
 				5FCCC31B1CF51DF300901E2E /* _ObjectiveManagementAPI.swift */,
 			);
-			path = ObjectiveC;
+			name = ObjectiveC;
 			sourceTree = "<group>";
 		};
 		5FDE87451D8A421900EA27DC /* Telemetry */ = {
@@ -840,7 +862,7 @@
 				5FE2F8BA1CD0EAAD003628F4 /* Response.swift */,
 				5FE2F8A81CCE54F1003628F4 /* Result.swift */,
 			);
-			path = Networking;
+			name = Networking;
 			sourceTree = "<group>";
 		};
 		5FE2F8C11CD0FA11003628F4 /* Networking */ = {
@@ -848,7 +870,7 @@
 			children = (
 				5F1FBB981D8A4465006B0B85 /* ResponseSpec.swift */,
 			);
-			path = Networking;
+			name = Networking;
 			sourceTree = "<group>";
 		};
 		5FE686A81D1894990075874C /* Telemetry */ = {
@@ -868,7 +890,7 @@
 				5FADB6051CED27FB00D4BB50 /* Users.swift */,
 				5FD255B31D14DD2600387ECB /* ManagementError.swift */,
 			);
-			path = Management;
+			name = Management;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1308,17 +1330,19 @@
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FCCC31C1CF51DF300901E2E /* _ObjectiveManagementAPI.swift in Sources */,
 				5FDE87591D8A424700EA27DC /* Authentication.swift in Sources */,
+				5B16D88F1F7141A0009476A5 /* SafariSession.swift in Sources */,
+				5B16D8851F713635009476A5 /* SafariWebAuthenticatable.swift in Sources */,
+				5B16D8931F714324009476A5 /* AuthSession.swift in Sources */,
 				5FC34AF81D0101BF000F28F5 /* A0ChallengeGenerator.m in Sources */,
 				5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */,
 				5F28B4611D8216180000EB23 /* Loggable.swift in Sources */,
 				5B76A2AA1F7112AA0030F089 /* SafariWebAuthSession.swift in Sources */,
-				5B25A5331E3F68FA00563AE5 /* SafariSession.swift in Sources */,
 				5FDE87551D8A424700EA27DC /* Auth0Authentication.swift in Sources */,
 				5F53F5CE1CFD157300476A46 /* AuthTransaction.swift in Sources */,
 				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */,
 				5FCAB1731D09009600331C84 /* NSData+URLSafe.swift in Sources */,
-				5B76A2AC1F71156B0030F089 /* SafariAuthenticationSession.swift in Sources */,
+				5B16D88E1F7141A0009476A5 /* SafariAuthenticationSession.swift in Sources */,
 				5FD255BA1D14F70B00387ECB /* WebAuthError.swift in Sources */,
 				5B25A52F1E3F520300563AE5 /* NativeAuth.swift in Sources */,
 				5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */,

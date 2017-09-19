@@ -67,11 +67,15 @@ public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
  - returns: Auth0 WebAuth component
  */
 public func webAuth(clientId: String, domain: String) -> WebAuth {
-    if #available(iOS 11.0, *) {
-        return SafariWebAuthSession(clientId: clientId, url: .a0_url(domain))
-    } else {
+    #if swift(>=3.2)
+        if #available(iOS 11.0, *) {
+            return SafariWebAuthSession(clientId: clientId, url: .a0_url(domain))
+        } else {
+            return SafariWebAuth(clientId: clientId, url: .a0_url(domain))
+        }
+    #else
         return SafariWebAuth(clientId: clientId, url: .a0_url(domain))
-    }
+    #endif
 }
 
 /**
@@ -122,7 +126,7 @@ public protocol WebAuth: Trackable, Loggable {
     func scope(_ scope: String) -> Self
 
     /**
-      Provider scopes for oauth2/social connections. e.g. Facebook, Google etc
+     Provider scopes for oauth2/social connections. e.g. Facebook, Google etc
 
      - parameter connectionScope: oauth2/social comma separated scope list: `user_friends,email`
 
@@ -184,17 +188,17 @@ public protocol WebAuth: Trackable, Loggable {
 
      ```
      Auth0
-         .webAuth(clientId: clientId, domain: "samples.auth0.com")
-         .start { result in
-            print(result)
-         }
+     .webAuth(clientId: clientId, domain: "samples.auth0.com")
+     .start { result in
+     print(result)
+     }
      ```
 
      Then from `AppDelegate` we just need to resume the WebAuth Auth like this
 
      ```
      func application(app: UIApplication, openURL url: NSURL, options: [String : Any]) -> Bool {
-        return Auth0.resumeAuth(url, options: options)
+     return Auth0.resumeAuth(url, options: options)
      }
      ```
 
@@ -212,12 +216,12 @@ public protocol WebAuth: Trackable, Loggable {
 
      ```
      Auth0
-        .webAuth()
-        .clearSession { print($0) }
+     .webAuth()
+     .clearSession { print($0) }
      ```
-     
+
      Remove Auth0 session and remove the IdP session.
-     
+
      ```
      Auth0
      .webAuth()
