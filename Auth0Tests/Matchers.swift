@@ -98,6 +98,10 @@ func isResetPassword(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/dbconnections/change_password")
 }
 
+func isChangePassword(_ domain: String) -> OHHTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/dbconnections/self_change_password")
+}
+
 func isPasswordless(_ domain: String) -> OHHTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/passwordless/start")
 }

@@ -33,6 +33,8 @@ private let Phone = "+144444444444"
 private let ValidPassword = "I.O.U. a password"
 private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
+private let Password = "A SECURE PASSWORD"
+private let NewPassword = "A NEW SECURE PASSWORD"
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -54,6 +56,7 @@ class AuthenticationSpec: QuickSpec {
             OHHTTPStubs.removeAllStubs()
         }
 
+        // MARK: Login
         describe("login") {
 
             beforeEach {
@@ -141,7 +144,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        // MARK:- Refresh Tokens
+        // MARK: Refresh Tokens
 
         describe("renew auth with refresh token") {
 
@@ -180,6 +183,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        // MARK: Revoke
         describe("revoke refresh token") {
 
             let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -210,7 +214,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        // MARK:- Delegation
+        // MARK: Delegation
         describe("delegation") {
 
             let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -250,7 +254,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        // MARK:- password-realm grant type
+        // MARK: password-realm grant type
         describe("authenticating with credentials in a realm") {
 
             it("should receive token with username and password") {
@@ -316,6 +320,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        // MARK:  Create user
         describe("create user") {
 
             beforeEach {
@@ -371,6 +376,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        // MARK: Reset Password
         describe("reset password") {
 
             it("should reset password") {
@@ -397,6 +403,59 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        // MARK: Change Password
+        describe("change password") {
+
+            it("should change password") {
+                stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": Password, "new_password": NewPassword, "connection": ConnectionName])) { _ in return changePasswordResponse() }.name = "change request sent"
+                waitUntil(timeout: Timeout) { done in
+                    auth.changePassword(email: SupportAtAuth0, oldPassword: Password, newPassword: NewPassword, connection: ConnectionName).start { result in
+                        guard case .success = result else { return fail("Failed to change password") }
+                        done()
+                    }
+                }
+            }
+
+            it("should fail if old password invalid") {
+                let code = "invalid_user_password"
+                let description = "Wrong email or password."
+                  stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": "invalidPassword", "new_password": NewPassword, "connection": ConnectionName])) { _ in return authFailure(code: code, description: description) }.name = "change password failed"
+                waitUntil(timeout: Timeout) { done in
+                    auth.changePassword(email: SupportAtAuth0, oldPassword: "invalidPassword", newPassword: NewPassword, connection: ConnectionName).start { result in
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail if password missing") {
+                let code = "invalid_request"
+                let description = "old_password is required"
+                stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": "", "new_password": NewPassword, "connection": ConnectionName])) { _ in return authFailure(code: code, description: description) }.name = "change password failed"
+                waitUntil(timeout: Timeout) { done in
+                    auth.changePassword(email: SupportAtAuth0, oldPassword: "", newPassword: NewPassword, connection: ConnectionName).start { result in
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail on password policy violation") {
+                let code = "change_password_error"
+                let description = "password policy rules violation"
+                stub(condition: isChangePassword(Domain) && hasAllOf(["username": SupportAtAuth0, "old_password": Password, "new_password": NewPassword, "connection": ConnectionName])) { _ in return authFailure(code: code, description: description) }.name = "change password failed"
+                waitUntil(timeout: Timeout) { done in
+                    auth.changePassword(email: SupportAtAuth0, oldPassword: Password, newPassword: NewPassword, connection: ConnectionName).start { result in
+                        expect(result).to(haveAuthenticationError(code: code, description: description))
+                        done()
+                    }
+                }
+            }
+
+
+        }
+
+        // MARK: Create User / Login
         describe("create user and login") {
 
             it("should fail if create user fails") {
@@ -462,6 +521,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        // MARK: Passwordless Email
         describe("passwordless email") {
 
             it("should start with email with default values") {
@@ -527,6 +587,7 @@ class AuthenticationSpec: QuickSpec {
             }
         }
 
+        // MARK: Passwordless SMS
         describe("passwordless sms") {
 
             it("should start with sms with default values") {
@@ -560,6 +621,7 @@ class AuthenticationSpec: QuickSpec {
             }
         }
 
+        // MARK: User Information
         describe("user information") {
 
             it("should return token information") {
@@ -628,6 +690,7 @@ class AuthenticationSpec: QuickSpec {
             
         }
 
+        // MARK: Social
         describe("social login") {
 
             beforeEach {
@@ -715,6 +778,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        // MARK: Token Exchange
         describe("code exchange") {
 
             var code: String!
@@ -753,6 +817,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        // MARK: MFA
         describe("resource owner multifactor") {
 
             var code: String!

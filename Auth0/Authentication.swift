@@ -442,6 +442,25 @@ public protocol Authentication: Trackable, Loggable {
     */
     func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
 
+     /**
+     Change a Database user's password
+
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .changePassword(email: "support@auth0.com", oldPassword: "a secure password", newPassword: "a new secure password", connection: "Username-Password-Authentication")
+     .start { print($0) }
+     ```
+
+     - parameter email:         email of the database user
+     - parameter oldPassword:   user's old password
+     - parameter newPassword:   user's new password
+     - parameter connection:    name of the Database connection
+
+     - returns: a request to change password
+     */
+    func changePassword(email: String, oldPassword: String, newPassword: String, connection: String) -> Request<Void, AuthenticationError>
+
 #if os(iOS)
     /**
      Creates a new WebAuth request to authenticate using Safari browser and OAuth authorize flow.

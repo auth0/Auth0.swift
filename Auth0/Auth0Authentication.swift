@@ -200,6 +200,17 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: delegation, method: "POST", handle: plainJson, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
+    func changePassword(email: String, oldPassword: String, newPassword: String, connection: String) -> Request<Void, AuthenticationError> {
+        let payload = [
+            "username": email,
+            "old_password": oldPassword,
+            "new_password": newPassword,
+            "connection": connection
+        ]
+        let changePassword = URL(string: "/dbconnections/self_change_password", relativeTo: self.url)!
+        return Request(session: session, url: changePassword, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
+    }
+
 #if os(iOS)
     func webAuth(withConnection connection: String) -> WebAuth {
         var safari = SafariWebAuth(clientId: self.clientId, url: self.url, presenter: ControllerModalPresenter(), telemetry: self.telemetry)
