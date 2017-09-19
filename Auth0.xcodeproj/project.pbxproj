@@ -21,6 +21,8 @@
 		5B5E93F91EC45C22002A37F9 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5B6269E71E3F702000305093 /* NativeAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6269E51E3F700000305093 /* NativeAuthSpec.swift */; };
 		5B6269EA1E3F9E5200305093 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6269E91E3F9E5200305093 /* AuthProvider.swift */; };
+		5B76A2AA1F7112AA0030F089 /* SafariWebAuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B76A2A91F7112AA0030F089 /* SafariWebAuthSession.swift */; };
+		5B76A2AC1F71156B0030F089 /* SafariAuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B76A2AB1F71156B0030F089 /* SafariAuthenticationSession.swift */; };
 		5B9262C01ECF0CA800F4F6D3 /* TouchAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262BF1ECF0CA800F4F6D3 /* TouchAuthentication.swift */; };
 		5B9262C31ECF0CC200F4F6D3 /* TouchAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262C11ECF0CBA00F4F6D3 /* TouchAuthenticationSpec.swift */; };
 		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */; };
@@ -312,6 +314,8 @@
 		5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManagerError.swift; sourceTree = "<group>"; };
 		5B6269E51E3F700000305093 /* NativeAuthSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NativeAuthSpec.swift; path = Auth0Tests/NativeAuthSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B6269E91E3F9E5200305093 /* AuthProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthProvider.swift; path = Auth0/AuthProvider.swift; sourceTree = SOURCE_ROOT; };
+		5B76A2A91F7112AA0030F089 /* SafariWebAuthSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariWebAuthSession.swift; path = Auth0/SafariWebAuthSession.swift; sourceTree = SOURCE_ROOT; };
+		5B76A2AB1F71156B0030F089 /* SafariAuthenticationSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariAuthenticationSession.swift; path = Auth0/SafariAuthenticationSession.swift; sourceTree = SOURCE_ROOT; };
 		5B9262BF1ECF0CA800F4F6D3 /* TouchAuthentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouchAuthentication.swift; sourceTree = "<group>"; };
 		5B9262C11ECF0CBA00F4F6D3 /* TouchAuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TouchAuthenticationSpec.swift; path = Auth0Tests/TouchAuthenticationSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B9A54411E49E3AE004B5454 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = SOURCE_ROOT; };
@@ -655,7 +659,9 @@
 				5B6269E91E3F9E5200305093 /* AuthProvider.swift */,
 				5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */,
 				5B25A5321E3F68FA00563AE5 /* SafariSession.swift */,
+				5B76A2AB1F71156B0030F089 /* SafariAuthenticationSession.swift */,
 				5FAE9C901D8878D400A871CE /* SafariWebAuth.swift */,
+				5B76A2A91F7112AA0030F089 /* SafariWebAuthSession.swift */,
 				5BEDE1561EC1FBBE0007300D /* SilentSafariViewController.swift */,
 				5FCAB1751D0900CF00331C84 /* TransactionStore.swift */,
 				5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */,
@@ -1305,12 +1311,14 @@
 				5FC34AF81D0101BF000F28F5 /* A0ChallengeGenerator.m in Sources */,
 				5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */,
 				5F28B4611D8216180000EB23 /* Loggable.swift in Sources */,
+				5B76A2AA1F7112AA0030F089 /* SafariWebAuthSession.swift in Sources */,
 				5B25A5331E3F68FA00563AE5 /* SafariSession.swift in Sources */,
 				5FDE87551D8A424700EA27DC /* Auth0Authentication.swift in Sources */,
 				5F53F5CE1CFD157300476A46 /* AuthTransaction.swift in Sources */,
 				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */,
 				5FCAB1731D09009600331C84 /* NSData+URLSafe.swift in Sources */,
+				5B76A2AC1F71156B0030F089 /* SafariAuthenticationSession.swift in Sources */,
 				5FD255BA1D14F70B00387ECB /* WebAuthError.swift in Sources */,
 				5B25A52F1E3F520300563AE5 /* NativeAuth.swift in Sources */,
 				5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */,

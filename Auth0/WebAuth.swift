@@ -67,7 +67,11 @@ public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
  - returns: Auth0 WebAuth component
  */
 public func webAuth(clientId: String, domain: String) -> WebAuth {
-    return SafariWebAuth(clientId: clientId, url: .a0_url(domain))
+    if #available(iOS 11.0, *) {
+        return SafariWebAuthSession(clientId: clientId, url: .a0_url(domain))
+    } else {
+        return SafariWebAuth(clientId: clientId, url: .a0_url(domain))
+    }
 }
 
 /**

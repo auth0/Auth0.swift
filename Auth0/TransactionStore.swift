@@ -47,4 +47,8 @@ class TransactionStore {
             self.current = nil
         }
     }
+
+    func clear() {
+        self.current = nil
+    }
 }
