@@ -35,7 +35,6 @@ class SafariAuthenticationSession: AuthSession {
     init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
         self.authorizeURL = authorizeURL
         super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
-
         self.authSession = SFAuthenticationSession(url: self.authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
             guard $1 == nil, let callbackURL = $0 else {
                 self.finish(.failure(error: $1!))

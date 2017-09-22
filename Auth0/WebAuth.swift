@@ -67,15 +67,7 @@ public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
  - returns: Auth0 WebAuth component
  */
 public func webAuth(clientId: String, domain: String) -> WebAuth {
-    #if swift(>=3.2)
-        if #available(iOS 11.0, *) {
-            return SafariWebAuthSession(clientId: clientId, url: .a0_url(domain))
-        } else {
-            return SafariWebAuth(clientId: clientId, url: .a0_url(domain))
-        }
-    #else
-        return SafariWebAuth(clientId: clientId, url: .a0_url(domain))
-    #endif
+    return SafariWebAuth(clientId: clientId, url: .a0_url(domain))
 }
 
 /**
@@ -230,6 +222,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - parameter federated: Bool to remove the IdP session
      - parameter callback: callback called with bool outcome of the call
+     - important: Not available in iOS 11+
      */
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void)
 }
