@@ -184,6 +184,7 @@ public protocol WebAuth: Trackable, Loggable {
      - returns: the same WebAuth instance to allow method chaining
      - note: [SFAuthenticationSession](https://developer.apple.com/documentation/safariservices/sfauthenticationsession)
      */
+    @available(iOS 11, *)
     func useSFAuthenticationSession() -> Self
 
     /**
