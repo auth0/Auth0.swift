@@ -176,6 +176,17 @@ public protocol WebAuth: Trackable, Loggable {
     func usingImplicitGrant() -> Self
 
     /**
+     Use `SFAuthenticationSession` instead of `SFSafariViewController` for WebAuth
+     in iOS 11.0+.
+
+     The `clearSession` method is unavailable while in this mode.
+
+     - returns: the same WebAuth instance to allow method chaining
+     - note: [SFAuthenticationSession](https://developer.apple.com/documentation/safariservices/sfauthenticationsession)
+     */
+    func useSFAuthenticationSession() -> Self
+
+    /**
      Starts the WebAuth flow by modally presenting a ViewController in the top-most controller.
 
      ```

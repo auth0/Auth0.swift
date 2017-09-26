@@ -38,6 +38,7 @@ class SafariWebAuth: WebAuth {
     var universalLink = false
     var responseType: [ResponseType] = [.code]
     var nonce: String?
+    var authenticationSession = false
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
@@ -100,6 +101,11 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
+    func useSFAuthenticationSession() -> Self {
+        self.authenticationSession = true
+        return self
+    }
+
     func start(_ callback: @escaping (Result<Credentials>) -> Void) {
         guard
             let redirectURL = self.redirectURL, !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
@@ -114,7 +120,7 @@ class SafariWebAuth: WebAuth {
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults, state: state)
 
         #if swift(>=3.2)
-        if #available(iOS 11.0, *) {
+        if #available(iOS 11.0, *), self.authenticationSession {
             let session = SafariAuthenticationSession(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, finish: callback, logger: logger)
             logger?.trace(url: authorizeURL, source: "SafariAuthenticationSession")
             self.storage.store(session)
@@ -199,7 +205,7 @@ class SafariWebAuth: WebAuth {
     }
 
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void) {
-        if #available(iOS 11.0, *) {
+        if #available(iOS 11.0, *), self.authenticationSession {
             callback(false)
         } else {
             let logoutURL = federated ? URL(string: "/v2/logout?federated", relativeTo: self.url)! : URL(string: "/v2/logout", relativeTo: self.url)!
