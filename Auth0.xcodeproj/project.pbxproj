@@ -31,6 +31,7 @@
 		5BEDE17F1EC2138C0007300D /* SimpleKeychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BEDE15B1EC202960007300D /* SimpleKeychain.framework */; };
 		5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5BEDE1951EC333380007300D /* CredentialsManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */; };
+		5BFB98A51F7D1232001FE50D /* SafariAuthenticationCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFB98A41F7D1232001FE50D /* SafariAuthenticationCallback.swift */; };
 		5F06DDA51CC451540011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		5F06DDB41CC451700011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
 		5F06DDC91CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
@@ -335,6 +336,7 @@
 		5BEDE15B1EC202960007300D /* SimpleKeychain.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SimpleKeychain.framework; path = Carthage/Build/iOS/SimpleKeychain.framework; sourceTree = "<group>"; };
 		5BEDE1891EC21B040007300D /* CredentialsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManager.swift; sourceTree = "<group>"; };
 		5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = CredentialsManagerSpec.swift; path = Auth0Tests/CredentialsManagerSpec.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		5BFB98A41F7D1232001FE50D /* SafariAuthenticationCallback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariAuthenticationCallback.swift; sourceTree = "<group>"; };
 		5F049B6C1CB42C29006F6C05 /* Auth0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Auth0.h; path = Auth0/Auth0.h; sourceTree = "<group>"; };
 		5F049B6E1CB42C29006F6C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Auth0/Info.plist; sourceTree = "<group>"; };
 		5F06DD781CC448B10011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -516,16 +518,9 @@
 				5B16D8921F714324009476A5 /* AuthSession.swift */,
 				5B16D88D1F7141A0009476A5 /* SafariSession.swift */,
 				5B16D88C1F7141A0009476A5 /* SafariAuthenticationSession.swift */,
+				5BFB98A41F7D1232001FE50D /* SafariAuthenticationCallback.swift */,
 			);
 			name = AuthTransactions;
-			sourceTree = "<group>";
-		};
-		5B16D8911F714261009476A5 /* WebAuthenticators */ = {
-			isa = PBXGroup;
-			children = (
-				5FAE9C901D8878D400A871CE /* SafariWebAuth.swift */,
-			);
-			name = WebAuthenticators;
 			sourceTree = "<group>";
 		};
 		5BD4A9CC1DEC6ECE00D6D7AE /* Models */ = {
@@ -688,7 +683,7 @@
 				5B25A52E1E3F520300563AE5 /* NativeAuth.swift */,
 				5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */,
 				5BEDE1561EC1FBBE0007300D /* SilentSafariViewController.swift */,
-				5B16D8911F714261009476A5 /* WebAuthenticators */,
+				5FAE9C901D8878D400A871CE /* SafariWebAuth.swift */,
 				5B16D8901F7141E5009476A5 /* AuthTransactions */,
 				5FCAB1751D0900CF00331C84 /* TransactionStore.swift */,
 				5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */,
@@ -1375,6 +1370,7 @@
 				5B5E93F91EC45C22002A37F9 /* CredentialsManagerError.swift in Sources */,
 				5FDE875D1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				5FADB6061CED27FB00D4BB50 /* Users.swift in Sources */,
+				5BFB98A51F7D1232001FE50D /* SafariAuthenticationCallback.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

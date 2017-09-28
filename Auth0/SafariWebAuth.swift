@@ -38,7 +38,7 @@ class SafariWebAuth: WebAuth {
     var universalLink = false
     var responseType: [ResponseType] = [.code]
     var nonce: String?
-    var authenticationSession = false
+    var authenticationSession = true
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
@@ -101,8 +101,8 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
-    func useSFAuthenticationSession() -> Self {
-        self.authenticationSession = true
+    func useLegacyAuthentication() -> Self {
+        self.authenticationSession = false
         return self
     }
 
@@ -205,14 +205,28 @@ class SafariWebAuth: WebAuth {
     }
 
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void) {
+        let logoutURL = federated ? URL(string: "/v2/logout?federated", relativeTo: self.url)! : URL(string: "/v2/logout", relativeTo: self.url)!
+        #if swift(>=3.2)
         if #available(iOS 11.0, *), self.authenticationSession {
-            callback(false)
+            let returnTo = URLQueryItem(name: "returnTo", value: self.redirectURL?.absoluteString)
+            let clientId = URLQueryItem(name: "client_id", value: self.clientId)
+            var components = URLComponents(url: logoutURL, resolvingAgainstBaseURL: true)
+            components?.queryItems = [returnTo, clientId]
+            guard let clearSessionURL = components?.url, let redirectURL = returnTo.value else {
+                return callback(false)
+            }
+            let clearSession = SafariAuthenticationSessionCallback(url: clearSessionURL, schemeURL: redirectURL, callback: callback)
+            self.storage.store(clearSession)
         } else {
-            let logoutURL = federated ? URL(string: "/v2/logout?federated", relativeTo: self.url)! : URL(string: "/v2/logout", relativeTo: self.url)!
             let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
             logger?.trace(url: logoutURL, source: "Safari")
             self.presenter.present(controller: controller)
         }
+        #else
+            let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
+            logger?.trace(url: logoutURL, source: "Safari")
+            self.presenter.present(controller: controller)
+        #endif
     }
 }
 
