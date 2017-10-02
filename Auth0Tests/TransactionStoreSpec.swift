@@ -37,7 +37,7 @@ class TransactionStoreSpec: QuickSpec {
             session = MockSession()
         }
 
-        describe("store") {
+        describe("storage") {
 
 
             it("should store session") {
@@ -48,6 +48,12 @@ class TransactionStoreSpec: QuickSpec {
                 storage.store(session)
                 storage.store(MockSession())
                 expect(session.cancelled) == true
+            }
+
+            it("should clear session") {
+                storage.store(session)
+                storage.clear()
+                expect(storage.current).to(beNil())
             }
         }
 

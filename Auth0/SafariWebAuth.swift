@@ -38,7 +38,7 @@ class SafariWebAuth: WebAuth {
     var universalLink = false
     var responseType: [ResponseType] = [.code]
     var nonce: String?
-    var authenticationSession = true
+    private var authenticationSession = true
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
