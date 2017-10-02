@@ -230,7 +230,7 @@ class SafariWebAuth: WebAuth {
     }
 }
 
-func generateDefaultState() -> String? {
+private func generateDefaultState() -> String? {
     var data = Data(count: 32)
 
     let result = data.withUnsafeMutableBytes { (bytes: UnsafeMutablePointer<UInt8>) -> Int in
