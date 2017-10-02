@@ -315,6 +315,7 @@ class WebAuthSpec: QuickSpec {
 
         describe("logout") {
 
+            #if swift(>=3.2)
             context("SFAuthenticationSession") {
 
                 var outcome: Bool?
@@ -347,12 +348,15 @@ class WebAuthSpec: QuickSpec {
                 }
 
             }
+            #endif
 
             context("SFSafariViewController") {
 
                 it("should launch silent safari viewcontroller") {
                     let auth = newWebAuth()
+                    #if swift(>=3.2)
                     _ = auth.useLegacyAuthentication()
+                    #endif
                     auth.clearSession(federated: false) { _ in }
                     expect(auth.presenter.topViewController is SilentSafariViewController).toNot(beNil())
                 }

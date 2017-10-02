@@ -231,7 +231,6 @@ public protocol WebAuth: Trackable, Loggable {
 
      - parameter federated: Bool to remove the IdP session
      - parameter callback: callback called with bool outcome of the call
-     - important: Not available in iOS 11+, unless you are using. `useLegacyAuthentication`
      */
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void)
 }
