@@ -4,12 +4,13 @@ coverage:
   range: "70...100"
   ignore:
     - Auth0Tests/*
+    - App/*
   status:
     patch:
       default:
         threshold: 50
         if_no_uploads: error
-    changes: true
+    changes: no
     project:
       default:
         target: auto
