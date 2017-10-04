@@ -10,7 +10,7 @@ coverage:
       default:
         threshold: 50
         if_no_uploads: error
-    changes: no
+    changes: true
     project:
       default:
         target: auto
