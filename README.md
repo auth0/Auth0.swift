@@ -308,7 +308,7 @@ var auth0 = Auth0.authentication()
 auth0.logging(enabled: true)
 ```
 
-For an OAuth2 authentication you'll see something similar to the following:
+Then for an OAuth2 authentication you'll see something similar to the following:
 
 ```
 Safari: https://samples.auth0.com/authorize?.....
@@ -330,7 +330,7 @@ Connection: keep-alive
 {"access_token":"...","token_type":"Bearer"}
 ```
 
-> To avoid leaking users' credentials in the device log set this flag only when **DEBUGGING**.
+> To avoid leaking user's credentials in the device log set this flag only when **DEBUGGING**.
 
 ## What is Auth0?
 
