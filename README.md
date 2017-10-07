@@ -157,7 +157,7 @@ Auth0
 
 #### Renew user credentials
 
-Renewal of credentials can be achieved using a [Refresh Token](https://auth0.com/docs/tokens/refresh-token/), it's recommended that you read and understand the refresh token process before implementing.
+Renew credentials using a [Refresh Token](https://auth0.com/docs/tokens/refresh-token/). It's recommended that you read and understand the refresh token process before implementing.
 
 ```swift
 Auth0
@@ -301,14 +301,14 @@ Auth0
 
 ### Logging
 
-To enable Auth0.swift to log HTTP request and OAuth2 flow for debugging you can call the following method in either `WebAuth`, `Authentication` or `Users` object:
+To enable Auth0.swift to log HTTP requests and OAuth2 flows for debugging call the following method in the `WebAuth`, `Authentication` or `Users` object:
 
 ```swift
 var auth0 = Auth0.authentication()
 auth0.logging(enabled: true)
 ```
 
-Then for a OAuth2 authentication you'll see something similar to the following:
+For an OAuth2 authentication you'll see something similar to the following:
 
 ```
 Safari: https://samples.auth0.com/authorize?.....
@@ -330,7 +330,7 @@ Connection: keep-alive
 {"access_token":"...","token_type":"Bearer"}
 ```
 
-> Only set this flag for **DEBUG** only or you'll be leaking user's credentials in the device log.
+> To avoid leaking users' credentials in the device log set this flag only when **DEBUGGING**.
 
 ## What is Auth0?
 
