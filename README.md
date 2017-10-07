@@ -39,7 +39,7 @@ use_frameworks!
 pod 'Auth0', '~> 1.8'
 ```
 
-Then, run `pod install`.
+Then run `pod install`.
 
 > For further reference on Cocoapods, check [their official documentation](http://guides.cocoapods.org/using/getting-started.html).
 
@@ -157,7 +157,7 @@ Auth0
 
 #### Renew user credentials
 
-Renewal of credentials can be achieved using a [Refresh Token](https://auth0.com/docs/tokens/refresh-token/), it's recommended that you read and understand the refresh token process before implementing.
+Use a [Refresh Token](https://auth0.com/docs/tokens/refresh-token/) to renew user credentials. It's recommended that you read and understand the refresh token process before implementing.
 
 ```swift
 Auth0
@@ -330,7 +330,7 @@ Connection: keep-alive
 {"access_token":"...","token_type":"Bearer"}
 ```
 
-> Only set this flag for **DEBUG** only or you'll be leaking user's credentials in the device log.
+> Set this flag only when **DEBUGGING** to avoid leaking user's credentials in the device log.
 
 ## What is Auth0?
 
