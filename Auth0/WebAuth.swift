@@ -118,7 +118,7 @@ public protocol WebAuth: Trackable, Loggable {
     func scope(_ scope: String) -> Self
 
     /**
-      Provider scopes for oauth2/social connections. e.g. Facebook, Google etc
+     Provider scopes for oauth2/social connections. e.g. Facebook, Google etc
 
      - parameter connectionScope: oauth2/social comma separated scope list: `user_friends,email`
 
@@ -176,13 +176,22 @@ public protocol WebAuth: Trackable, Loggable {
     func usingImplicitGrant() -> Self
 
     /**
+     Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
+     in iOS 11.0+.
+
+     - returns: the same WebAuth instance to allow method chaining
+     */
+    @available(iOS 11, *)
+    func useLegacyAuthentication() -> Self
+
+    /**
      Starts the WebAuth flow by modally presenting a ViewController in the top-most controller.
 
      ```
      Auth0
          .webAuth(clientId: clientId, domain: "samples.auth0.com")
          .start { result in
-            print(result)
+             print(result)
          }
      ```
 
@@ -190,7 +199,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      ```
      func application(app: UIApplication, openURL url: NSURL, options: [String : Any]) -> Bool {
-        return Auth0.resumeAuth(url, options: options)
+         return Auth0.resumeAuth(url, options: options)
      }
      ```
 
@@ -208,16 +217,16 @@ public protocol WebAuth: Trackable, Loggable {
 
      ```
      Auth0
-        .webAuth()
-        .clearSession { print($0) }
+         .webAuth()
+         .clearSession { print($0) }
      ```
-     
+
      Remove Auth0 session and remove the IdP session.
-     
+
      ```
      Auth0
-     .webAuth()
-     .clearSession(federated: true) { print($0) }
+         .webAuth()
+         .clearSession(federated: true) { print($0) }
      ```
 
      - parameter federated: Bool to remove the IdP session
