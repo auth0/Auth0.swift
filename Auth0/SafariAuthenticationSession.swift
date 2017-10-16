@@ -1,6 +1,6 @@
-// SafariSession.swift
+// SafariAuthenticationSession.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2017 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,30 @@
 import UIKit
 import SafariServices
 
-class SafariSession: AuthSession {
+#if swift(>=3.2)
+@available(iOS 11.0, *)
+class SafariAuthenticationSession: AuthSession {
 
     typealias FinishSession = (Result<Credentials>) -> Void
 
-    weak var controller: UIViewController?
+    var authSession: SFAuthenticationSession?
+    let authorizeURL: URL
 
-    init(controller: SFSafariViewController, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
-        self.controller = controller
+    init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
+        self.authorizeURL = authorizeURL
         super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
-        controller.delegate = self
+        self.authSession = SFAuthenticationSession(url: self.authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
+            guard $1 == nil, let callbackURL = $0 else {
+                if case SFAuthenticationError.canceledLogin = $1! {
+                    self.finish(.failure(error: WebAuthError.userCancelled))
+                } else {
+                    self.finish(.failure(error: $1!))
+                }
+                return TransactionStore.shared.clear()
+            }
+            _ = TransactionStore.shared.resume(callbackURL, options: [:])
+        }
+        self.authSession?.start()
     }
 }
-
-extension SafariSession: SFSafariViewControllerDelegate {
-    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        TransactionStore.shared.cancel(self)
-    }
-}
+#endif

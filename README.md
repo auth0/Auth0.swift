@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
-![Swift 3.1](https://img.shields.io/badge/Swift-3.1-orange.svg?style=flat-square)
+![Swift 3.2](https://img.shields.io/badge/Swift-3.2-orange.svg?style=flat-square)
 
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
 
@@ -14,7 +14,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 
 - iOS 9 or later
 - Xcode 8.3 / 9.0
-- Swift 3.1+
+- Swift 3.2
 
 ## Installation
 
@@ -125,10 +125,16 @@ In your application's `Info.plist` file, register your iOS Bundle Identifer as a
 
 > If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As / Source Code**.
 
-Finally, go to your [Auth0 Dashboard](https://manage.auth0.com/#/clients) and make sure that **Allowed Callback URLs** contains the following entry:
+Finally, go to your [Auth0 Dashboard](${manage_url}/#/applications/${account.clientId}/settings) and make sure that **Allowed Callback URLs** contains the following entry:
 
 ```text
 {YOUR_BUNDLE_IDENTIFIER}://${YOUR_AUTH0_DOMAIN}/ios/{YOUR_BUNDLE_IDENTIFIER}/callback
+```
+
+e.g. If your bundle identifier was `com.company.myapp` and your domain was `company.auth0.com` then this value would be
+
+```text
+com.company.myapp://company.auth0.com/ios/com.company.myapp/callback
 ```
 
 ## Next Steps

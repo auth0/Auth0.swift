@@ -38,6 +38,7 @@ class SafariWebAuth: WebAuth {
     var universalLink = false
     var responseType: [ResponseType] = [.code]
     var nonce: String?
+    private var authenticationSession = true
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
@@ -100,6 +101,11 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
+    func useLegacyAuthentication() -> Self {
+        self.authenticationSession = false
+        return self
+    }
+
     func start(_ callback: @escaping (Result<Credentials>) -> Void) {
         guard
             let redirectURL = self.redirectURL, !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
@@ -112,13 +118,28 @@ class SafariWebAuth: WebAuth {
         let handler = self.handler(redirectURL)
         let state = self.parameters["state"] ?? generateDefaultState()
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL, defaults: handler.defaults, state: state)
-        let (controller, finish) = newSafari(authorizeURL, callback: callback)
 
-        let session = SafariSession(controller: controller, redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: self.logger)
-        controller.delegate = session
-        logger?.trace(url: authorizeURL, source: "Safari")
-        self.presenter.present(controller: controller)
-        self.storage.store(session)
+        #if swift(>=3.2)
+        if #available(iOS 11.0, *), self.authenticationSession {
+            let session = SafariAuthenticationSession(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, finish: callback, logger: logger)
+            logger?.trace(url: authorizeURL, source: "SafariAuthenticationSession")
+            self.storage.store(session)
+        } else {
+            let (controller, finish) = newSafari(authorizeURL, callback: callback)
+            let session = SafariSession(controller: controller, redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: self.logger)
+            controller.delegate = session
+            self.presenter.present(controller: controller)
+            logger?.trace(url: authorizeURL, source: "Safari")
+            self.storage.store(session)
+        }
+        #else
+            let (controller, finish) = newSafari(authorizeURL, callback: callback)
+            let session = SafariSession(controller: controller, redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: self.logger)
+            controller.delegate = session
+            self.presenter.present(controller: controller)
+            logger?.trace(url: authorizeURL, source: "Safari")
+            self.storage.store(session)
+        #endif
     }
 
     func newSafari(_ authorizeURL: URL, callback: @escaping (Result<Credentials>) -> Void) -> (SFSafariViewController, (Result<Credentials>) -> Void) {
@@ -185,9 +206,27 @@ class SafariWebAuth: WebAuth {
 
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void) {
         let logoutURL = federated ? URL(string: "/v2/logout?federated", relativeTo: self.url)! : URL(string: "/v2/logout", relativeTo: self.url)!
-        let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
-        logger?.trace(url: logoutURL, source: "Safari")
-        self.presenter.present(controller: controller)
+        #if swift(>=3.2)
+        if #available(iOS 11.0, *), self.authenticationSession {
+            let returnTo = URLQueryItem(name: "returnTo", value: self.redirectURL?.absoluteString)
+            let clientId = URLQueryItem(name: "client_id", value: self.clientId)
+            var components = URLComponents(url: logoutURL, resolvingAgainstBaseURL: true)
+            components?.queryItems = [returnTo, clientId]
+            guard let clearSessionURL = components?.url, let redirectURL = returnTo.value else {
+                return callback(false)
+            }
+            let clearSession = SafariAuthenticationSessionCallback(url: clearSessionURL, schemeURL: redirectURL, callback: callback)
+            self.storage.store(clearSession)
+        } else {
+            let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
+            logger?.trace(url: logoutURL, source: "Safari")
+            self.presenter.present(controller: controller)
+        }
+        #else
+            let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
+            logger?.trace(url: logoutURL, source: "Safari")
+            self.presenter.present(controller: controller)
+        #endif
     }
 }
 

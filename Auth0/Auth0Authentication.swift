@@ -200,12 +200,12 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: delegation, method: "POST", handle: plainJson, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-#if os(iOS)
+    #if os(iOS)
     func webAuth(withConnection connection: String) -> WebAuth {
         var safari = SafariWebAuth(clientId: self.clientId, url: self.url, presenter: ControllerModalPresenter(), telemetry: self.telemetry)
         return safari
             .logging(enabled: self.logger != nil)
             .connection(connection)
     }
-#endif
+    #endif
 }
