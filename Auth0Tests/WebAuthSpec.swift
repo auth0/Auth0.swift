@@ -326,12 +326,14 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should launch SafariAuthenticationSessionCallback") {
+                    guard #available(iOS 11.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
                 it("should cancel SafariAuthenticationSessionCallback") {
+                    guard #available(iOS 11.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { outcome = $0 }
                     TransactionStore.shared.cancel(TransactionStore.shared.current!)
@@ -340,6 +342,7 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should resume SafariAuthenticationSessionCallback") {
+                    guard #available(iOS 11.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { outcome = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!, options: [:])
