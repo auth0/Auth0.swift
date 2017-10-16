@@ -315,12 +315,55 @@ class WebAuthSpec: QuickSpec {
 
         describe("logout") {
 
-            it("should launch silent safari viewcontroller") {
-                let auth = newWebAuth()
-                auth.clearSession(federated: false) { _ in }
-                expect(auth.presenter.topViewController is SilentSafariViewController).toNot(beNil())
+            #if swift(>=3.2)
+            context("SFAuthenticationSession") {
+
+                var outcome: Bool?
+
+                beforeEach {
+                    outcome = nil
+                    TransactionStore.shared.clear()
+                }
+
+                it("should launch SafariAuthenticationSessionCallback") {
+                    let auth = newWebAuth()
+                    auth.clearSession(federated: false) { _ in }
+                    expect(TransactionStore.shared.current).toNot(beNil())
+                }
+
+                it("should cancel SafariAuthenticationSessionCallback") {
+                    let auth = newWebAuth()
+                    auth.clearSession(federated: false) { outcome = $0 }
+                    TransactionStore.shared.cancel(TransactionStore.shared.current!)
+                    expect(outcome).to(beFalse())
+                    expect(TransactionStore.shared.current).to(beNil())
+                }
+
+                it("should resume SafariAuthenticationSessionCallback") {
+                    let auth = newWebAuth()
+                    auth.clearSession(federated: false) { outcome = $0 }
+                    _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!, options: [:])
+                    expect(outcome).to(beTrue())
+                    expect(TransactionStore.shared.current).to(beNil())
+                }
+
+            }
+            #endif
+
+            context("SFSafariViewController") {
+
+                it("should launch silent safari viewcontroller") {
+                    let auth = newWebAuth()
+                    #if swift(>=3.2)
+                    _ = auth.useLegacyAuthentication()
+                    #endif
+                    auth.clearSession(federated: false) { _ in }
+                    expect(auth.presenter.topViewController is SilentSafariViewController).toNot(beNil())
+                }
+
             }
         }
+
     }
 
 }
