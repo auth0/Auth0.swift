@@ -125,10 +125,10 @@ In your application's `Info.plist` file, register your iOS Bundle Identifer as a
 
 > If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As / Source Code**.
 
-Finally, go to your [Auth0 Dashboard](${manage_url}/#/applications/${account.clientId}/settings) and make sure that **Allowed Callback URLs** and **Allowed Logout URLs** contain the following entry:
+Finally, go to your [Auth0 Dashboard](${manage_url}/#/applications/${account.clientId}/settings) and make sure that **Allowed Callback URLs** contains the following entry:
 
 ```text
-{YOUR_BUNDLE_IDENTIFIER}://${YOUR_DOMAIN}/ios/{YOUR_BUNDLE_IDENTIFIER}/callback
+{YOUR_BUNDLE_IDENTIFIER}://${YOUR_AUTH0_DOMAIN}/ios/{YOUR_BUNDLE_IDENTIFIER}/callback
 ```
 
 e.g. If your bundle identifier was `com.company.myapp` and your domain was `company.auth0.com` then this value would be
