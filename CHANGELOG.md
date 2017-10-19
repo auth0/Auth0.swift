@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.9.0](https://github.com/auth0/Auth0.swift/tree/1.9.0) (2017-10-19)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.8.0...1.9.0)
+
+**Added**
+- Added SFAuthenticationSession support in iOS 11 [\#154](https://github.com/auth0/Auth0.swift/pull/154) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.8.0](https://github.com/auth0/Auth0.swift/tree/1.8.0) (2017-09-15)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.7.2...1.8.0)
 
