@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.9.1](https://github.com/auth0/Auth0.swift/tree/1.9.1) (2017-10-20)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.9.0...1.9.1)
+
+**Fixed**
+- Fixed callback error in Swift 4.0 [\#167](https://github.com/auth0/Auth0.swift/pull/167) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.9.0](https://github.com/auth0/Auth0.swift/tree/1.9.0) (2017-10-19)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.8.0...1.9.0)
 
