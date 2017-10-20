@@ -33,8 +33,8 @@ class SafariAuthenticationSessionCallback: AuthTransaction {
 
     init(url: URL, schemeURL: String, callback: @escaping (Bool) -> Void) {
         self.callback = callback
-        self.authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] in
-            self.callback($0.0 != nil)
+        self.authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
+            self.callback(url != nil)
             TransactionStore.shared.clear()
         }
         self.authSession?.start()
