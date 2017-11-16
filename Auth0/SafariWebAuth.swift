@@ -211,7 +211,12 @@ class SafariWebAuth: WebAuth {
             let returnTo = URLQueryItem(name: "returnTo", value: self.redirectURL?.absoluteString)
             let clientId = URLQueryItem(name: "client_id", value: self.clientId)
             var components = URLComponents(url: logoutURL, resolvingAgainstBaseURL: true)
-            components?.queryItems = [returnTo, clientId]
+            if federated {
+                let federatedQueryItem = URLQueryItem(name: "federated", value: nil)
+                components?.queryItems = [returnTo, clientId, federatedQueryItem]
+            } else {
+                components?.queryItems = [returnTo, clientId]
+            }
             guard let clearSessionURL = components?.url, let redirectURL = returnTo.value else {
                 return callback(false)
             }
