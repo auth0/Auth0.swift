@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.9.2](https://github.com/auth0/Auth0.swift/tree/1.9.2) (2017-11-17)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.9.1...1.9.2)
+
+**Fixed**
+- Fixed Federated param in logoutURL iOS 11+ [\#171](https://github.com/auth0/Auth0.swift/pull/171) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.9.1](https://github.com/auth0/Auth0.swift/tree/1.9.1) (2017-10-20)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.9.0...1.9.1)
 
