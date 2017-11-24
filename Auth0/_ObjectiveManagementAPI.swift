@@ -71,7 +71,7 @@ public class _ObjectiveManagementAPI: NSObject {
     @objc(unlinkUserWithIdentifier:provider:fromUserId:callback:)
     public func unlink(identifier: String, provider: String, fromUserId userId: String, callback: @escaping (NSError?, [[String: Any]]?) -> Void) {
         self.users
-            .unlink(identityId: identifier, provider: provider, fromUserId:userId)
+            .unlink(identityId: identifier, provider: provider, fromUserId: userId)
             .start { result in
                 switch result {
                 case .success(let payload):

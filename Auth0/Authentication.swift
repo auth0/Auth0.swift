@@ -444,8 +444,7 @@ public protocol Authentication: Trackable, Loggable {
 
 #if os(iOS)
     /**
-     Creates a new WebAuth request to authenticate using Safari browser and OAuth authorize flow.
-
+     Creates a new WebAuth object to authenticate using Safari browser and OAuth authorize flow.
      With the connection name Auth0 will redirect to the associated IdP login page to authenticate
      
      ```
@@ -467,6 +466,20 @@ public protocol Authentication: Trackable, Loggable {
      - returns: a newly created WebAuth object.
      */
     func webAuth(withConnection connection: String) -> WebAuth
+
+    /**
+     Creates a new WebAuth object to authenticate using Safari browser and OAuth authorize flow.
+
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .webAuth()
+     .start { print($0) }
+     ```
+
+     - returns: a newly created WebAuth object.
+     */
+    func webAuth() -> WebAuth
 #endif
 }
 

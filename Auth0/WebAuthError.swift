@@ -58,7 +58,7 @@ public enum WebAuthError: CustomNSError {
         }
     }
 
-    public var errorUserInfo: [String : Any] {
+    public var errorUserInfo: [String: Any] {
         switch self {
         case .userCancelled:
             return [
