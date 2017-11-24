@@ -56,7 +56,7 @@ struct DefaultLogger: Logger {
         request.allHTTPHeaderFields?.forEach { key, value in output.log(message: "\(key): \(value)") }
         if let data = request.httpBody, let string = String(data: data, encoding: .utf8) {
             output.newLine()
-            output.log(message:string)
+            output.log(message: string)
         }
         output.newLine()
     }

@@ -804,6 +804,17 @@ class AuthenticationSpec: QuickSpec {
                 let webAuth = auth.webAuth(withConnection: "facebook") as! SafariWebAuth
                 expect(webAuth.parameters["connection"]) == "facebook"
             }
+
+            it("should return a WebAuth instance with matching credentials") {
+                let webAuth = auth.webAuth()
+                expect(webAuth.clientId) == auth.clientId
+                expect(webAuth.url) == auth.url
+            }
+
+            it("should return a WebAuth instance with matching telemetry") {
+                let webAuth = auth.webAuth() as! SafariWebAuth
+                expect(webAuth.telemetry.info) == auth.telemetry.info
+            }
         }
 #endif
 

@@ -86,7 +86,7 @@ extension ManagementError: CustomNSError {
     public static let infoKey = "com.auth0.management.error.info"
     public static var errorDomain: String { return "com.auth0.management" }
     public var errorCode: Int { return 1 }
-    public var errorUserInfo: [String : Any] {
+    public var errorUserInfo: [String: Any] {
         return [
             NSLocalizedDescriptionKey: self.description,
             ManagementError.infoKey: self

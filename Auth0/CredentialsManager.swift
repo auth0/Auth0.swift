@@ -70,7 +70,7 @@ public struct CredentialsManager {
     /// - Returns: if there are valid and non-expired credentials stored
     public func hasValid() -> Bool {
         guard
-            let data = self.storage.data(forKey:self.storeKey),
+            let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
             credentials.accessToken != nil,
             let expiresIn = credentials.expiresIn
@@ -111,7 +111,7 @@ public struct CredentialsManager {
 
     private func retrieveCredentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard
-            let data = self.storage.data(forKey:self.storeKey),
+            let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials
             else { return callback(.noCredentials, nil) }
         guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
