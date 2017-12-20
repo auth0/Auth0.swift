@@ -1,4 +1,4 @@
-// TouchAuthentication.swift
+// BioAuthentication.swift
 //
 // Copyright (c) 2017 Auth0 (http://auth0.com)
 //
@@ -23,7 +23,7 @@
 import Foundation
 import LocalAuthentication
 
-struct TouchAuthentication {
+struct BioAuthentication {
 
     private let authContext: LAContext
 
@@ -50,7 +50,7 @@ struct TouchAuthentication {
         self.fallbackTitle = fallbackTitle
     }
 
-    func requireTouch(callback: @escaping (Error?) -> Void) {
+    func validateBiometric(callback: @escaping (Error?) -> Void) {
         self.authContext.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: self.title) {
             guard $1 == nil else { return callback($1) }
             callback($0 ? nil : LAError(LAError.authenticationFailed))
