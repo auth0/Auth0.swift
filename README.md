@@ -202,8 +202,7 @@ credentialsManager.store(credentials: credentials)
 
 #### Retrieve stored credentials 
 
-Credentials will automatically be renewed (if expired) using the refresh token. The scope `offline_access` is required
-to ensure the refreshtToken is returned.
+Credentials will automatically be renewed (if expired) using the refresh token. The scope `offline_access` is required to ensure the refresh token is returned.
 
 ```swift
 credentialsManager.credentials { error, credentials in
@@ -214,8 +213,7 @@ credentialsManager.credentials { error, credentials in
 
 #### Biometric authentication
 
-You can enable an additional level of user authentication before retrieving credentials using the biometric authentication
-supported by your device e.g. Face ID or Touch ID.
+You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by your device e.g. Face ID or Touch ID.
 
 ```swift
 credentialsManager.enableBiometricAuth(withTitle: "Touch to Authenticate")
