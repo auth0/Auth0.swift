@@ -46,18 +46,18 @@ public struct CredentialsManager {
     ///   - title: main message to display in TouchID prompt
     ///   - cancelTitle: cancel message to display in TouchID prompt (iOS 10+)
     ///   - fallbackTitle: fallback message to display in TouchID prompt after a failed match
-    @available(*, deprecated, message: "see enableBioAuth(withTitle title:, cancelTitle:, fallbackTitle:)")
+    @available(*, deprecated, message: "see enableBiometrics(withTitle title:, cancelTitle:, fallbackTitle:)")
     public mutating func enableTouchAuth(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
-        self.enableBiometricAuth(withTitle: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
+        self.enableBiometrics(withTitle: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
 
-    /// Enable Device Biometric Authentication for additional securtity during credentials retrieval.
+    /// Enable Biometric Authentication for additional securtity during credentials retrieval.
     ///
     /// - Parameters:
     ///   - title: main message to display when Touch ID is used
     ///   - cancelTitle: cancel message to display when Touch ID is used (iOS 10+)
     ///   - fallbackTitle: fallback message to display when Touch ID is used after a failed match
-    public mutating func enableBiometricAuth(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
+    public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
         self.bioAuth = BioAuthentication(authContext: LAContext(), title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
 

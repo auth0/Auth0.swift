@@ -160,7 +160,7 @@ class CredentialsManagerSpec: QuickSpec {
             context("require touch") {
 
                 beforeEach {
-                    credentialsManager.enableBiometricAuth(withTitle: "Auth Title", cancelTitle: "Cancel Title", fallbackTitle: "Fallback Title")
+                    credentialsManager.enableBiometrics(withTitle: "Auth Title", cancelTitle: "Cancel Title", fallbackTitle: "Fallback Title")
                 }
 
                 it("should error when touch unavailable") {

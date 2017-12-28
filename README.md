@@ -216,7 +216,7 @@ credentialsManager.credentials { error, credentials in
 You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by your device e.g. Face ID or Touch ID.
 
 ```swift
-credentialsManager.enableBiometricAuth(withTitle: "Touch to Authenticate")
+credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
 ### Authentication API (iOS / macOS / tvOS)
