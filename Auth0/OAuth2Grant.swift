@@ -30,7 +30,7 @@ protocol OAuth2Grant {
 
 struct ImplicitGrant: OAuth2Grant {
 
-    let defaults: [String : String]
+    let defaults: [String: String]
     let responseType: [ResponseType]
 
     init(responseType: [ResponseType] = [.token], nonce: String? = nil) {
@@ -42,7 +42,7 @@ struct ImplicitGrant: OAuth2Grant {
         }
     }
 
-    func credentials(from values: [String : String], callback: @escaping (Result<Credentials>) -> Void) {
+    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void) {
         guard validate(responseType: self.responseType, token: values["id_token"], nonce: self.defaults["nonce"]) else {
             return callback(.failure(error: WebAuthError.invalidIdTokenNonce))
         }
@@ -51,10 +51,10 @@ struct ImplicitGrant: OAuth2Grant {
             return callback(.failure(error: WebAuthError.missingAccessToken))
         }
 
-        callback(.success(result: Credentials(json: values as [String : Any])))
+        callback(.success(result: Credentials(json: values as [String: Any])))
     }
 
-    func values(fromComponents components: URLComponents) -> [String : String] {
+    func values(fromComponents components: URLComponents) -> [String: String] {
         return components.a0_fragmentValues
     }
 
@@ -64,7 +64,7 @@ struct PKCE: OAuth2Grant {
 
     let authentication: Authentication
     let redirectURL: URL
-    let defaults: [String : String]
+    let defaults: [String: String]
     let verifier: String
     let responseType: [ResponseType]
 
@@ -114,7 +114,7 @@ struct PKCE: OAuth2Grant {
         }
     }
 
-    func values(fromComponents components: URLComponents) -> [String : String] {
+    func values(fromComponents components: URLComponents) -> [String: String] {
         var items = components.a0_fragmentValues
         components.a0_queryValues.forEach { items[$0] = $1 }
         return items

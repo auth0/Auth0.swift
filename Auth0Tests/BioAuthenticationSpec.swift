@@ -1,4 +1,4 @@
-// TouchAuthenticationSpec.swift
+// BioAuthenticationSpec.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -27,27 +27,27 @@ import LocalAuthentication
 
 @testable import Auth0
 
-class TouchAuthenticationSpec: QuickSpec {
+class BioAuthenticationSpec: QuickSpec {
 
     override func spec() {
 
         var mockContext: MockLAContext!
-        var touchAuthentication: TouchAuthentication!
+        var bioAuthentication: BioAuthentication!
 
         beforeEach {
             mockContext = MockLAContext()
-            touchAuthentication = TouchAuthentication(authContext: mockContext, title: "Touch Auth")
+            bioAuthentication = BioAuthentication(authContext: mockContext, title: "Touch Auth")
         }
 
         describe("touch availablility") {
 
             it("touch should be enabled") {
-                expect(touchAuthentication.available).to(beTrue())
+                expect(bioAuthentication.available).to(beTrue())
             }
 
             it("touch should be disabled") {
                 mockContext.enabled = false
-                expect(touchAuthentication.available).to(beFalse())
+                expect(bioAuthentication.available).to(beFalse())
             }
         }
 
@@ -55,13 +55,13 @@ class TouchAuthenticationSpec: QuickSpec {
 
             if #available(iOS 10, *) {
                 it("should set cancel title") {
-                    touchAuthentication.cancelTitle = "cancel title"
+                    bioAuthentication.cancelTitle = "cancel title"
                     expect(mockContext.localizedCancelTitle) == "cancel title"
                 }
             }
 
             it("should set fallback title") {
-                touchAuthentication.fallbackTitle = "fallback title"
+                bioAuthentication.fallbackTitle = "fallback title"
                 expect(mockContext.localizedFallbackTitle) == "fallback title"
             }
         }
@@ -74,21 +74,21 @@ class TouchAuthenticationSpec: QuickSpec {
             }
 
             it("should authenticate") {
-                touchAuthentication.requireTouch { error = $0 }
+                bioAuthentication.validateBiometric { error = $0 }
                 expect(error).toEventually(beNil())
             }
 
             it("should return error on touch authentication") {
                 let touchError = LAError(.appCancel)
                 mockContext.replyError = touchError
-                touchAuthentication.requireTouch { error = $0 }
+                bioAuthentication.validateBiometric { error = $0 }
                 expect(error).toEventually(matchError(touchError))
             }
 
             it("should return authenticationFailed error if no policy success") {
                 let touchError = LAError(.authenticationFailed)
                 mockContext.replySuccess = false
-                touchAuthentication.requireTouch { error = $0 }
+                bioAuthentication.validateBiometric { error = $0 }
                 expect(error).toEventually(matchError(touchError))
             }
 

@@ -54,7 +54,7 @@ public class Identity: NSObject, JSONObjectPayload {
         self.accessTokenSecret = accessTokenSecret
     }
 
-    @objc convenience public required init?(json: [String : Any]) {
+    @objc convenience public required init?(json: [String: Any]) {
 
         guard
             let identifier = json["user_id"] as? String,

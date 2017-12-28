@@ -134,11 +134,11 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(newCredentials).toEventually(beNil())
             }
 
-            it("should error when no refresh_token present and token expired") {
+            it("should error when token expired") {
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
                 credentialsManager.credentials { error = $0; newCredentials = $1 }
-                expect(error).to(matchError(CredentialsManagerError.noRefreshToken))
+                expect(error).to(matchError(CredentialsManagerError.noCredentials))
                 expect(newCredentials).toEventually(beNil())
             }
 
@@ -160,10 +160,13 @@ class CredentialsManagerSpec: QuickSpec {
             context("require touch") {
 
                 beforeEach {
-                    credentialsManager.enableTouchAuth(withTitle: "Auth Title", cancelTitle: "Cancel Title", fallbackTitle: "Fallback Title")
+                    credentialsManager.enableBiometrics(withTitle: "Auth Title", cancelTitle: "Cancel Title", fallbackTitle: "Fallback Title")
                 }
 
                 it("should error when touch unavailable") {
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                    _ = credentialsManager.store(credentials: credentials)
+
                     waitUntil(timeout: 2) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
                             expect(error).to(matchError(CredentialsManagerError.touchFailed(LAError(LAError.touchIDNotAvailable))))
@@ -172,7 +175,6 @@ class CredentialsManagerSpec: QuickSpec {
                         }
                     }
                 }
-
             }
 
             context("renew") {

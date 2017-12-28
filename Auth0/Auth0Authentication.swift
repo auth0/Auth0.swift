@@ -190,7 +190,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: oauthToken, method: "POST", handle: noBody, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func delegation(withParameters parameters: [String : Any]) -> Request<[String : Any], AuthenticationError> {
+    func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError> {
         var payload: [String: Any] = [
             "client_id": self.clientId,
             "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer"

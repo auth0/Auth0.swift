@@ -186,6 +186,8 @@ Auth0
 
 ### Credentials Management Utility (iOS Only)
 
+The credentials manager utility provides a convenience to securely store and retrieve the user's credentials from the Keychain.
+
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 ```
@@ -198,13 +200,23 @@ Store user credentials securely in the KeyChain.
 credentialsManager.store(credentials: credentials)
 ```
 
-#### Retrieve stored credentials and auto-renew if expired
+#### Retrieve stored credentials 
+
+Credentials will automatically be renewed (if expired) using the refresh token. The scope `offline_access` is required to ensure the refresh token is returned.
 
 ```swift
 credentialsManager.credentials { error, credentials in
     guard error == nil else { return print("Failed with \(error)") }
     print("Obtained credentials: \(credentials)")
 }
+```
+
+#### Biometric authentication
+
+You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by your device e.g. Face ID or Touch ID.
+
+```swift
+credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
 ### Authentication API (iOS / macOS / tvOS)
