@@ -18,7 +18,7 @@ web_auth_files = [
   'Auth0/AuthProvider.swift',
   'Auth0/CredentialsManager.swift',
   'Auth0/CredentialsManagerError.swift',
-  'Auth0/TouchAuthentication.swift'
+  'Auth0/BioAuthentication.swift'
 ]
 
 Pod::Spec.new do |s|
