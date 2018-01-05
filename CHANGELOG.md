@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.10.0](https://github.com/auth0/Auth0.swift/tree/1.10.0) (2018-01-05)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.9.2...1.10.0)
+
+**Changed**
+- Updated Credentials Manager [\#180](https://github.com/auth0/Auth0.swift/pull/180) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.9.2](https://github.com/auth0/Auth0.swift/tree/1.9.2) (2017-11-17)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.9.1...1.9.2)
 
