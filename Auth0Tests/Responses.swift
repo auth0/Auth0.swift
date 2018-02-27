@@ -40,6 +40,8 @@ let CreatedAtTimestamp = 1440004680.000
 let Sub = "auth0|\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
 let LocaleUS = "en-US"
 let ZoneEST = "US/Eastern"
+let OTP = "123456"
+let MFAToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 
 func authResponse(accessToken: String, idToken: String? = nil, expiresIn: Double? = nil) -> OHHTTPStubsResponse {
     var json = [

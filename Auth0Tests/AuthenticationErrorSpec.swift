@@ -13,7 +13,7 @@
 // all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,u
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -142,9 +142,27 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isMultifactorRequired) == true
             }
 
+            it("should detect mfa required oidc") {
+                let values = [
+                    "error": "mfa_required",
+                    "error_description": "missing mfa_code parameter"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isMultifactorRequired) == true
+            }
+
             it("should detect mfa enrolled required") {
                 let values = [
                     "error": "a0.mfa_registration_required",
+                    "error_description": "User is not enrolled with google-authenticator"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isMultifactorEnrollRequired) == true
+            }
+
+            it("should detect mfa enrolled required oidc") {
+                let values = [
+                    "error": "unsupported_challenge_type",
                     "error_description": "User is not enrolled with google-authenticator"
                 ]
                 let error = AuthenticationError(info: values, statusCode: 401)
@@ -155,6 +173,15 @@ class AuthenticationErrorSpec: QuickSpec {
                 let values = [
                     "error": "a0.mfa_invalid_code",
                     "error_description": "Wrong or expired code."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isMultifactorCodeInvalid) == true
+            }
+
+            it("should detect mfa invalid code oidc") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid otp_code."
                 ]
                 let error = AuthenticationError(info: values, statusCode: 401)
                 expect(error.isMultifactorCodeInvalid) == true
@@ -176,6 +203,24 @@ class AuthenticationErrorSpec: QuickSpec {
                 ]
                 let error = AuthenticationError(info: values, statusCode: 403)
                 expect(error.isInvalidCredentials) == true
+            }
+
+            it("should detect invalid mfa token") {
+                let values = [
+                    "error": "expired_token",
+                    "error_description": "mfa_token is expired"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isMultifactorTokenInvalid) == true
+            }
+
+            it("should detect invalid malformed mfa token") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Malformed mfa_token"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isMultifactorTokenInvalid) == true
             }
 
         }
@@ -275,6 +320,7 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
             it("should not match any known error") {
                 expect(error.isMultifactorCodeInvalid).to(beFalse(), description: "should not match mfa invalid")
                 expect(error.isMultifactorEnrollRequired).to(beFalse(), description: "should not match mfa enroll")
+                expect(error.isMultifactorCodeInvalid).to(beFalse(), description: "should not match code invalid")
                 expect(error.isMultifactorRequired).to(beFalse(), description: "should not match mfa missing")
                 expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
                 expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")

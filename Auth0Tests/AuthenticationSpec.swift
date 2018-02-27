@@ -141,6 +141,41 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
+        describe("login MFA") {
+
+            beforeEach {
+                stub(condition: isToken(Domain) && hasAtLeast(["otp":OTP, "mfa_token": MFAToken])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                stub(condition: isToken(Domain) && hasAtLeast(["otp":"bad_otp", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Invalid otp_code.") }.name = "invalid otp"
+            }
+
+            it("should login with otp and mfa tokens") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withOTP: OTP, mfaToken: MFAToken).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail login with bad otp") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withOTP: "bad_otp", mfaToken: MFAToken).start { result in
+                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid otp_code."))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail login with bad otp") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withOTP: "bad_otp", mfaToken: MFAToken).start { result in
+                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid otp_code."))
+                        done()
+                    }
+                }
+            }
+        }
+
         // MARK:- Refresh Tokens
 
         describe("renew auth with refresh token") {

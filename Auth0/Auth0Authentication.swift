@@ -23,6 +23,7 @@
 import Foundation
 
 struct Auth0Authentication: Authentication {
+
     let clientId: String
     let url: URL
     var telemetry: Telemetry
@@ -65,6 +66,17 @@ struct Auth0Authentication: Authentication {
         payload["audience"] = audience
         payload["scope"] = scope
         return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
+    }
+
+    func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
+        let url = URL(string: "/oauth/token", relativeTo: self.url)!
+        let payload: [String: Any] = [
+            "otp": otp,
+            "mfa_token": mfaToken,
+            "grant_type": "http://auth0.com/oauth/grant-type/mfa-otp",
+            "client_id": self.clientId
+        ]
+        return Request(session: session, url: url, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
     func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {

@@ -126,6 +126,22 @@ public protocol Authentication: Trackable, Loggable {
     func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
+     Login using One Time Password and MFA token.
+
+     ```
+     Auth0.
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .login(withOTP: "123456", mfaToken: "mfa token value")
+     }
+     ```
+
+     - parameter otp: One time password supplied by MFA Authenticator
+     - parameter mfaToken: Token returned when authentication fails due to MFA requirement
+     - requires: Grant `http://auth0.com/oauth/grant-type/mfa-otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
+     */
+    func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
+
+    /**
      Creates a user in a Database connection
 
      ```
