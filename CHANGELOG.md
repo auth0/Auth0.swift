@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.10.1](https://github.com/auth0/Auth0.swift/tree/1.10.1) (2018-03-08)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.10.0...1.10.1)
+
+**Fixed**
+- Fixed client ID and redirect URL query items not being passed in nonfederated clearSession() [\#188](https://github.com/auth0/Auth0.swift/pull/188) ([Rypac](https://github.com/Rypac))
+
 ## [1.10.0](https://github.com/auth0/Auth0.swift/tree/1.10.0) (2018-01-05)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.9.2...1.10.0)
 
