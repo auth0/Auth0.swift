@@ -215,7 +215,7 @@ public protocol WebAuth: Trackable, Loggable {
      - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/logout)
 
      For iOS 11+ you will need to ensure that the **Callback URL** has been added
-     to the **Allowed Logout URLs** section of your client in the [Auth0 Dashboard](https://manage.auth0.com/#/clients/).
+     to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
 
      ```

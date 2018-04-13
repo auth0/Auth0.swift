@@ -29,7 +29,7 @@ import Foundation
  Auth0.authentication(clientId: clientId, domain: "samples.auth0.com")
  ```
 
- - parameter clientId: clientId of your Auth0 client/application
+ - parameter clientId: clientId of your Auth0 application
  - parameter domain:   domain of your Auth0 account. e.g.: 'samples.auth0.com'
  - parameter session:  instance of NSURLSession used for networking. By default it will use the shared NSURLSession
 
