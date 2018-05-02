@@ -7,12 +7,14 @@ jobs:
     steps:
       - checkout
       - run: | 
+          export LC_ALL=en_US.UTF-8
+          export LANG=en_US.UTF-8
           brew install swiftlint
           bundle install --without=developments
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
       - run:
           name: Bootstrap
-          command: bundle exec fastlane ios bootstrap --platform iOS
+          command: bundle exec fastlane ios bootstrap
       - run:
           name: Run test suite
           command: bundle exec fastlane ios ci
