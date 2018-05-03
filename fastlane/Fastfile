@@ -39,6 +39,12 @@ platform :ios do
       )
   end
 
+  desc "Cocoapods library lint"
+  lane :pod_lint do
+    pod_lib_lint()
+  end
+
+
   desc "Runs all the tests in a CI environment"
   lane :ci do
     # TODO: Run rest of platforms
