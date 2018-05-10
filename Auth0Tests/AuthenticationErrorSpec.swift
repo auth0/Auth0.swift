@@ -318,9 +318,9 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
             }
 
             it("should not match any known error") {
-                expect(error.isMultifactorCodeInvalid).to(beFalse(), description: "should not match mfa invalid")
+                expect(error.isMultifactorCodeInvalid).to(beFalse(), description: "should not match mfa otp invalid")
                 expect(error.isMultifactorEnrollRequired).to(beFalse(), description: "should not match mfa enroll")
-                expect(error.isMultifactorCodeInvalid).to(beFalse(), description: "should not match code invalid")
+                expect(error.isMultifactorTokenInvalid).to(beFalse(), description: "should not match mfa token invalid")
                 expect(error.isMultifactorRequired).to(beFalse(), description: "should not match mfa missing")
                 expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
                 expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")

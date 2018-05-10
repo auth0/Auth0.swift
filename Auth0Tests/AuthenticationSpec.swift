@@ -146,6 +146,7 @@ class AuthenticationSpec: QuickSpec {
             beforeEach {
                 stub(condition: isToken(Domain) && hasAtLeast(["otp":OTP, "mfa_token": MFAToken])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
                 stub(condition: isToken(Domain) && hasAtLeast(["otp":"bad_otp", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Invalid otp_code.") }.name = "invalid otp"
+                stub(condition: isToken(Domain) && hasAtLeast(["otp":OTP, "mfa_token": "bad_token"])) { _ in return authFailure(code: "invalid_grant", description: "Malformed mfa_token") }.name = "invalid mfa_token"
             }
 
             it("should login with otp and mfa tokens") {
@@ -166,10 +167,10 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should fail login with bad otp") {
+            it("should fail login with invalid mfa") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(withOTP: "bad_otp", mfaToken: MFAToken).start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid otp_code."))
+                    auth.login(withOTP: OTP, mfaToken: "bad_token").start { result in
+                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
                         done()
                     }
                 }
