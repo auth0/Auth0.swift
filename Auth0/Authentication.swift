@@ -114,16 +114,34 @@ public protocol Authentication: Trackable, Loggable {
          scope: "openid profile")
      ```
 
-     - parameter username: username or email used of the user to authenticate
-     - parameter password: password of the user
-     - parameter realm: domain of the realm or connection name
-     - parameter audience: API Identifier that the client is requesting access to.
-     - parameter scope: scope value requested when authenticating the user.
+     - parameter username:  username or email used of the user to authenticate
+     - parameter password:  password of the user
+     - parameter realm:     domain of the realm or connection name
+     - parameter audience:  API Identifier that the client is requesting access to.
+     - parameter scope:     scope value requested when authenticating the user.
+
      - important: This only works if you have the OAuth 2.0 API Authorization flag on
      - returns: authentication request that will yield Auth0 User Credentials
      - requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
      */
     func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
+
+    /**
+     Login using One Time Password and MFA token.
+
+     ```
+     Auth0
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .login(withOTP: "123456", mfaToken: "mfa token value")
+     }
+     ```
+
+     - parameter otp:       One time password supplied by MFA Authenticator
+     - parameter mfaToken:  Token returned when authentication fails due to MFA requirement
+
+     - requires: Grant `http://auth0.com/oauth/grant-type/mfa-otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
+     */
+    func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Creates a user in a Database connection

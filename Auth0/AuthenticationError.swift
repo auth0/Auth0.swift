@@ -91,27 +91,32 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
     /// When MFA code is required to authenticate
     public var isMultifactorRequired: Bool {
-        return self.code == "a0.mfa_required"
+        return self.code == "a0.mfa_required" || self.code == "mfa_required"
     }
 
     /// When MFA is required and the user is not enrolled
     public var isMultifactorEnrollRequired: Bool {
-        return self.code == "a0.mfa_registration_required"
+        return self.code == "a0.mfa_registration_required" || self.code == "unsupported_challenge_type"
     }
 
     /// When MFA code sent is invalid or expired
     public var isMultifactorCodeInvalid: Bool {
-        return self.code == "a0.mfa_invalid_code"
+        return self.code == "a0.mfa_invalid_code" || self.code == "invalid_grant" && self.description == "Invalid otp_code."
+    }
+
+    /// When MFA code sent is invalid or expired
+    public var isMultifactorTokenInvalid: Bool {
+        return self.code == "expired_token" && self.description == "mfa_token is expired" || self.code == "invalid_grant" && self.description == "Malformed mfa_token"
     }
 
     /// When password used for SignUp does not match connection's strength requirements. More info will be available in `info`
     public var isPasswordNotStrongEnough: Bool {
-        return self.code == "invalid_password" &&  self.value("name") == "PasswordStrengthError"
+        return self.code == "invalid_password" && self.value("name") == "PasswordStrengthError"
     }
 
     /// When password used for SignUp was already used before (Reported when password history feature is enabled). More info will be available in `info`
     public var isPasswordAlreadyUsed: Bool {
-        return self.code == "invalid_password" &&  self.value("name") == "PasswordHistoryError"
+        return self.code == "invalid_password" && self.value("name") == "PasswordHistoryError"
     }
 
     /// When Auth0 rule returns an error. The message returned by the rull will be in `description`
