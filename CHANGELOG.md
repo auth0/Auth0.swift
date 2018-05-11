@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.11.0](https://github.com/auth0/Auth0.swift/tree/1.11.0) (2018-05-11)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.10.1...1.11.0)
+
+**Added**
+- Added CI 2.0 [\#196](https://github.com/auth0/Auth0.swift/pull/196) ([cocojoe](https://github.com/cocojoe))
+- Added OIDC MFA EndPoint [\#189](https://github.com/auth0/Auth0.swift/pull/189) ([cocojoe](https://github.com/cocojoe))
+
+**Changed**
+- Updates Xcode 9.3 settings, dependencies [\#195](https://github.com/auth0/Auth0.swift/pull/195) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.10.1](https://github.com/auth0/Auth0.swift/tree/1.10.1) (2018-03-08)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.10.0...1.10.1)
 
