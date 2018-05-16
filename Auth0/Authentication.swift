@@ -125,7 +125,8 @@ public protocol Authentication: Trackable, Loggable {
      - returns: authentication request that will yield Auth0 User Credentials
      - requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
      */
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?, parameters: [String:Any]?) -> Request<Credentials, AuthenticationError>
+    // swiftlint:disable:next function_parameter_count
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError>
 
     /**
      Login using One Time Password and MFA token.

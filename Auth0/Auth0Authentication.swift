@@ -54,7 +54,6 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    // swiftlint:disable:next function_parameter_count
     func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
