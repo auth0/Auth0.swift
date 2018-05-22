@@ -350,6 +350,17 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
+            it("should send additional parameters") {
+                let state = UUID().uuidString
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm" : "customconnection", "state": state])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Parameter Auth"
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "customconnection", audience: "https://myapi.com/api", scope: "openid", parameters: ["state": state]).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
         }
 
         describe("create user") {
