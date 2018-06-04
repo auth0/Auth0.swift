@@ -81,9 +81,7 @@ public struct CredentialsManager {
     /// - Returns: if there are valid and non-expired credentials stored
     public func hasValid() -> Bool {
         guard
-            let data = self.storage.data(forKey: self.storeKey),
-            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
-            credentials.accessToken != nil,
+            let credentials = self.renewableCredentials(),
             let expiresIn = credentials.expiresIn
             else { return false }
         return expiresIn > Date() || credentials.refreshToken != nil
@@ -107,7 +105,7 @@ public struct CredentialsManager {
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/refresh-token)
     public func credentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard self.hasValid() else { return callback(.noCredentials, nil) }
+        guard self.renewableCredentials() != nil else { return callback(.noCredentials, nil) }
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
             bioAuth.validateBiometric {
@@ -122,10 +120,7 @@ public struct CredentialsManager {
     }
 
     private func retrieveCredentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard
-            let data = self.storage.data(forKey: self.storeKey),
-            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials
-            else { return callback(.noCredentials, nil) }
+        guard let credentials = self.renewableCredentials() else { return callback(.noCredentials, nil) }
         guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
         guard expiresIn < Date() else { return callback(nil, credentials) }
         guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
@@ -146,4 +141,15 @@ public struct CredentialsManager {
             }
         }
     }
+
+    private func renewableCredentials() -> Credentials? {
+        guard
+            let data = self.storage.data(forKey: self.storeKey),
+            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
+            credentials.accessToken != nil,
+            credentials.expiresIn != nil
+            else { return nil }
+        return credentials
+    }
+
 }
