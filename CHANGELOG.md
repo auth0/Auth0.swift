@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.11.1](https://github.com/auth0/Auth0.swift/tree/1.11.1) (2018-06-08)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.11.0...1.11.1)
+
+**Added**
+- Added optional paramaters to login API [\#199](https://github.com/auth0/Auth0.swift/pull/199) ([akiroz](https://github.com/akiroz))
+
 ## [1.11.0](https://github.com/auth0/Auth0.swift/tree/1.11.0) (2018-05-11)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.10.1...1.11.0)
 
