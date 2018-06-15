@@ -277,7 +277,11 @@ func beURLSafeBase64() -> Predicate<String> {
 extension URLRequest {
     var a0_payload: [String: Any]? {
         get {
+            #if DEBUG
             return URLProtocol.property(forKey: parameterPropertyKey, in: self) as? [String: Any]
+            #else
+            return nil
+            #endif
         }
     }
 }
