@@ -89,7 +89,7 @@ public class Profile: NSObject, JSONObjectPayload {
         let givenName = json["given_name"] as? String
         let familyName = json["family_name"] as? String
         let identityValues = json["identities"] as? [[String: Any]] ?? []
-        let identities = identityValues.flatMap { Identity(json: $0) }
+        let identities = identityValues.compactMap { Identity(json: $0) }
         let keys = Set(["user_id", "name", "nickname", "picture", "created_at", "email", "email_verified", "given_name", "family_name", "identities"])
         var values: [String: Any] = [:]
         json.forEach { key, value in

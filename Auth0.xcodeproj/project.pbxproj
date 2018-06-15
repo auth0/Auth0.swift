@@ -1290,7 +1290,7 @@
 					};
 					5F06DD771CC448B10011842B = {
 						CreatedOnToolsVersion = 7.3;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = "";
 					};
 					5F06DD841CC448C90011842B = {
 						CreatedOnToolsVersion = 7.3;
@@ -1298,7 +1298,7 @@
 					};
 					5F06DD9F1CC451540011842B = {
 						CreatedOnToolsVersion = 7.3;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = "";
 						ProvisioningStyle = Manual;
 						TestTargetID = 5F3965C61CF67DD800CDE7C0;
 					};
@@ -1325,7 +1325,7 @@
 					};
 					5F3965C61CF67DD800CDE7C0 = {
 						CreatedOnToolsVersion = 7.3.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = "";
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -2224,8 +2224,7 @@
 				PRODUCT_NAME = Auth0;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -2253,8 +2252,7 @@
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = Auth0;
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -2286,7 +2284,6 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -2318,7 +2315,6 @@
 				PRODUCT_NAME = Auth0;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -2344,8 +2340,7 @@
 				PRODUCT_NAME = Auth0Tests;
 				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0Tests.iOS-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2.app/OAuth2";
 			};
 			name = Debug;
@@ -2370,8 +2365,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
 				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0Tests.iOS-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2.app/OAuth2";
 			};
 			name = Release;
@@ -2397,7 +2391,6 @@
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0Tests.OSX-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2Mac.app/Contents/MacOS/OAuth2Mac";
 			};
@@ -2423,7 +2416,6 @@
 				PRODUCT_NAME = Auth0Tests;
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0Tests.OSX-Bridging-Header.h";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2Mac.app/Contents/MacOS/OAuth2Mac";
 			};
@@ -2450,7 +2442,6 @@
 				PRODUCT_NAME = Auth0;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 2.2;
@@ -2478,7 +2469,6 @@
 				PRODUCT_NAME = Auth0;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 2.2;
@@ -2507,7 +2497,6 @@
 				PRODUCT_NAME = Auth0;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.2;
@@ -2535,7 +2524,6 @@
 				PRODUCT_NAME = Auth0;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.2;
@@ -2558,7 +2546,6 @@
 				PRODUCT_MODULE_NAME = Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
 				SDKROOT = appletvos;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2TV.app/OAuth2TV";
 				TVOS_DEPLOYMENT_TARGET = 9.2;
@@ -2581,7 +2568,6 @@
 				PRODUCT_MODULE_NAME = Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
 				SDKROOT = appletvos;
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2TV.app/OAuth2TV";
 				TVOS_DEPLOYMENT_TARGET = 9.2;
@@ -2608,8 +2594,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -2632,8 +2617,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
