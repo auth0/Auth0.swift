@@ -16,8 +16,6 @@ web_auth_files = [
   'Auth0/SilentSafariViewController.swift',
   'Auth0/NativeAuth.swift',
   'Auth0/AuthProvider.swift',
-  'Auth0/CredentialsManager.swift',
-  'Auth0/CredentialsManagerError.swift',
   'Auth0/BioAuthentication.swift'
 ]
 

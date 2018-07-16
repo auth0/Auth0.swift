@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
+		5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5B16D88E1F7141A0009476A5 /* SafariAuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* SafariAuthenticationSession.swift */; };
 		5B16D88F1F7141A0009476A5 /* SafariSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88D1F7141A0009476A5 /* SafariSession.swift */; };
 		5B16D8931F714324009476A5 /* AuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D8921F714324009476A5 /* AuthSession.swift */; };
@@ -23,6 +25,26 @@
 		5B5E93F91EC45C22002A37F9 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5B6269E71E3F702000305093 /* NativeAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6269E51E3F700000305093 /* NativeAuthSpec.swift */; };
 		5B6269EA1E3F9E5200305093 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6269E91E3F9E5200305093 /* AuthProvider.swift */; };
+		5B6EE39620F8AEDB00264AC7 /* CredentialsManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */; };
+		5B7EE45B20FC9F3300367724 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7EE45A20FC9F3300367724 /* AppDelegate.swift */; };
+		5B7EE45D20FC9F3300367724 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7EE45C20FC9F3300367724 /* ViewController.swift */; };
+		5B7EE46020FC9F3300367724 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B7EE45E20FC9F3300367724 /* Main.storyboard */; };
+		5B7EE46220FC9F3400367724 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B7EE46120FC9F3400367724 /* Assets.xcassets */; };
+		5B7EE46720FC9F5200367724 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F23E6F61D4B87F000C3F2D9 /* Auth0.framework */; };
+		5B7EE46820FC9F5200367724 /* Auth0.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5F23E6F61D4B87F000C3F2D9 /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5B7EE46D20FC9F7800367724 /* SimpleKeychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B7EE46C20FC9F7800367724 /* SimpleKeychain.framework */; };
+		5B7EE47220FCA00300367724 /* CredentialsManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */; };
+		5B7EE47320FCA00700367724 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
+		5B7EE47420FCA00A00367724 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
+		5B7EE47C20FCA0A100367724 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7EE47B20FCA0A100367724 /* AppDelegate.swift */; };
+		5B7EE47E20FCA0A100367724 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7EE47D20FCA0A100367724 /* ViewController.swift */; };
+		5B7EE48020FCA0A200367724 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B7EE47F20FCA0A200367724 /* Assets.xcassets */; };
+		5B7EE48320FCA0A200367724 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B7EE48120FCA0A200367724 /* Main.storyboard */; };
+		5B7EE48D20FCA0F400367724 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
+		5B7EE48E20FCA0F400367724 /* Auth0.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5B7EE49420FCABC600367724 /* SimpleKeychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B7EE49220FCA10100367724 /* SimpleKeychain.framework */; };
+		5B7EE49520FCAD4100367724 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
+		5B7EE49620FCAD4300367724 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5B9262C01ECF0CA800F4F6D3 /* BioAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */; };
 		5B9262C31ECF0CC200F4F6D3 /* BioAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */; };
 		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */; };
@@ -238,6 +260,34 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5B7EE46920FC9F5200367724 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5F23E6F51D4B87F000C3F2D9;
+			remoteInfo = Auth0.tvOS;
+		};
+		5B7EE47020FC9FFE00367724 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5B7EE45720FC9F3200367724;
+			remoteInfo = OAuth2TV;
+		};
+		5B7EE48920FCA0A600367724 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5B7EE47820FCA0A100367724;
+			remoteInfo = OAuth2Mac;
+		};
+		5B7EE48F20FCA0F400367724 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5F06DD841CC448C90011842B;
+			remoteInfo = Auth0.macOS;
+		};
 		5F06DDA61CC451540011842B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
@@ -269,6 +319,28 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		5B7EE46B20FC9F5200367724 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5B7EE46820FC9F5200367724 /* Auth0.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5B7EE49120FCA0F400367724 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5B7EE48E20FCA0F400367724 /* Auth0.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5BE65DC91F7270C600CADD3B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -328,6 +400,21 @@
 		5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManagerError.swift; sourceTree = "<group>"; };
 		5B6269E51E3F700000305093 /* NativeAuthSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NativeAuthSpec.swift; path = Auth0Tests/NativeAuthSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B6269E91E3F9E5200305093 /* AuthProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthProvider.swift; path = Auth0/AuthProvider.swift; sourceTree = SOURCE_ROOT; };
+		5B7EE45820FC9F3200367724 /* OAuth2TV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2TV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B7EE45A20FC9F3300367724 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		5B7EE45C20FC9F3300367724 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		5B7EE45F20FC9F3300367724 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		5B7EE46120FC9F3400367724 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5B7EE46320FC9F3400367724 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5B7EE46C20FC9F7800367724 /* SimpleKeychain.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SimpleKeychain.framework; path = Carthage/Build/tvOS/SimpleKeychain.framework; sourceTree = "<group>"; };
+		5B7EE47920FCA0A100367724 /* OAuth2Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2Mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B7EE47B20FCA0A100367724 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		5B7EE47D20FCA0A100367724 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		5B7EE47F20FCA0A200367724 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5B7EE48220FCA0A200367724 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		5B7EE48420FCA0A200367724 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5B7EE48520FCA0A200367724 /* OAuth2Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OAuth2Mac.entitlements; sourceTree = "<group>"; };
+		5B7EE49220FCA10100367724 /* SimpleKeychain.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SimpleKeychain.framework; path = Carthage/Build/Mac/SimpleKeychain.framework; sourceTree = "<group>"; };
 		5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BioAuthentication.swift; sourceTree = "<group>"; };
 		5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BioAuthenticationSpec.swift; path = Auth0Tests/BioAuthenticationSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B9A54411E49E3AE004B5454 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = SOURCE_ROOT; };
@@ -440,6 +527,24 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5B7EE45520FC9F3200367724 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B7EE46D20FC9F7800367724 /* SimpleKeychain.framework in Frameworks */,
+				5B7EE46720FC9F5200367724 /* Auth0.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5B7EE47620FCA0A100367724 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B7EE49420FCABC600367724 /* SimpleKeychain.framework in Frameworks */,
+				5B7EE48D20FCA0F400367724 /* Auth0.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5F06DD741CC448B10011842B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -524,6 +629,31 @@
 			name = AuthTransactions;
 			sourceTree = "<group>";
 		};
+		5B7EE45920FC9F3200367724 /* OAuth2TV */ = {
+			isa = PBXGroup;
+			children = (
+				5B7EE45A20FC9F3300367724 /* AppDelegate.swift */,
+				5B7EE45C20FC9F3300367724 /* ViewController.swift */,
+				5B7EE45E20FC9F3300367724 /* Main.storyboard */,
+				5B7EE46120FC9F3400367724 /* Assets.xcassets */,
+				5B7EE46320FC9F3400367724 /* Info.plist */,
+			);
+			path = OAuth2TV;
+			sourceTree = "<group>";
+		};
+		5B7EE47A20FCA0A100367724 /* OAuth2Mac */ = {
+			isa = PBXGroup;
+			children = (
+				5B7EE47B20FCA0A100367724 /* AppDelegate.swift */,
+				5B7EE47D20FCA0A100367724 /* ViewController.swift */,
+				5B7EE47F20FCA0A200367724 /* Assets.xcassets */,
+				5B7EE48120FCA0A200367724 /* Main.storyboard */,
+				5B7EE48420FCA0A200367724 /* Info.plist */,
+				5B7EE48520FCA0A200367724 /* OAuth2Mac.entitlements */,
+			);
+			path = OAuth2Mac;
+			sourceTree = "<group>";
+		};
 		5BD4A9CC1DEC6ECE00D6D7AE /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -556,6 +686,8 @@
 				5F049B6B1CB42C29006F6C05 /* Auth0 */,
 				5F06DD921CC451430011842B /* Auth0Tests */,
 				5F3965C81CF67DD800CDE7C0 /* App */,
+				5B7EE45920FC9F3200367724 /* OAuth2TV */,
+				5B7EE47A20FCA0A100367724 /* OAuth2Mac */,
 				5F06DDC21CC5712F0011842B /* Frameworks */,
 				5F049B6A1CB42C29006F6C05 /* Products */,
 				5FAE9C861D8872E900A871CE /* Supporting Files */,
@@ -573,6 +705,8 @@
 				5F23E6B91D4ACA7100C3F2D9 /* Auth0.framework */,
 				5F23E6F61D4B87F000C3F2D9 /* Auth0.framework */,
 				5F331AF91D4BB24C00AE4382 /* Auth0Tests.xctest */,
+				5B7EE45820FC9F3200367724 /* OAuth2TV.app */,
+				5B7EE47920FCA0A100367724 /* OAuth2Mac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -618,6 +752,8 @@
 		5F06DDC21CC5712F0011842B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5B7EE46C20FC9F7800367724 /* SimpleKeychain.framework */,
+				5B7EE49220FCA10100367724 /* SimpleKeychain.framework */,
 				5BEDE17C1EC202DC0007300D /* watchOS */,
 				5F331B111D4BB8D700AE4382 /* tvOS */,
 				5F06DDC31CC571480011842B /* iOS */,
@@ -937,6 +1073,48 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		5B7EE45720FC9F3200367724 /* OAuth2TV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5B7EE46620FC9F3400367724 /* Build configuration list for PBXNativeTarget "OAuth2TV" */;
+			buildPhases = (
+				5B7EE45420FC9F3200367724 /* Sources */,
+				5B7EE45520FC9F3200367724 /* Frameworks */,
+				5B7EE45620FC9F3200367724 /* Resources */,
+				5B7EE46B20FC9F5200367724 /* Embed Frameworks */,
+				5B7EE46E20FC9F8600367724 /* Carthage */,
+				5B7EE46F20FC9FAE00367724 /* Auth0 */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5B7EE46A20FC9F5200367724 /* PBXTargetDependency */,
+			);
+			name = OAuth2TV;
+			productName = OAuth2TV;
+			productReference = 5B7EE45820FC9F3200367724 /* OAuth2TV.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5B7EE47820FCA0A100367724 /* OAuth2Mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5B7EE48620FCA0A200367724 /* Build configuration list for PBXNativeTarget "OAuth2Mac" */;
+			buildPhases = (
+				5B7EE47520FCA0A100367724 /* Sources */,
+				5B7EE47620FCA0A100367724 /* Frameworks */,
+				5B7EE47720FCA0A100367724 /* Resources */,
+				5B7EE48B20FCA0AF00367724 /* Carthage */,
+				5B7EE48C20FCA0D900367724 /* Auth0 */,
+				5B7EE49120FCA0F400367724 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5B7EE49020FCA0F400367724 /* PBXTargetDependency */,
+			);
+			name = OAuth2Mac;
+			productName = OAuth2Mac;
+			productReference = 5B7EE47920FCA0A100367724 /* OAuth2Mac.app */;
+			productType = "com.apple.product-type.application";
+		};
 		5F06DD771CC448B10011842B /* Auth0.iOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5F06DD7F1CC448B10011842B /* Build configuration list for PBXNativeTarget "Auth0.iOS" */;
@@ -1008,6 +1186,7 @@
 			);
 			dependencies = (
 				5F06DDB61CC451700011842B /* PBXTargetDependency */,
+				5B7EE48A20FCA0A600367724 /* PBXTargetDependency */,
 			);
 			name = Auth0Tests.macOS;
 			productName = Auth0Tests.OSX;
@@ -1060,11 +1239,13 @@
 				5F331AF61D4BB24C00AE4382 /* Frameworks */,
 				5F331AF71D4BB24C00AE4382 /* Resources */,
 				5F331B1F1D4BCBFD00AE4382 /* CopyFiles */,
+				5B6EE39520F8AE5700264AC7 /* Carthage */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				5F331B001D4BB24C00AE4382 /* PBXTargetDependency */,
+				5B7EE47120FC9FFE00367724 /* PBXTargetDependency */,
 			);
 			name = Auth0Tests.tvOS;
 			productName = Auth0Tests.tvOS;
@@ -1097,10 +1278,18 @@
 		5F049B601CB42C29006F6C05 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0930;
+				LastSwiftUpdateCheck = 0940;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = Auth0;
 				TargetAttributes = {
+					5B7EE45720FC9F3200367724 = {
+						CreatedOnToolsVersion = 9.4.1;
+						ProvisioningStyle = Manual;
+					};
+					5B7EE47820FCA0A100367724 = {
+						CreatedOnToolsVersion = 9.4.1;
+						ProvisioningStyle = Manual;
+					};
 					5F06DD771CC448B10011842B = {
 						CreatedOnToolsVersion = 7.3;
 						LastSwiftMigration = 0900;
@@ -1118,6 +1307,7 @@
 					5F06DDAE1CC451700011842B = {
 						CreatedOnToolsVersion = 7.3;
 						LastSwiftMigration = 0900;
+						TestTargetID = 5B7EE47820FCA0A100367724;
 					};
 					5F23E6B81D4ACA7100C3F2D9 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -1133,6 +1323,7 @@
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Manual;
+						TestTargetID = 5B7EE45720FC9F3200367724;
 					};
 					5F3965C61CF67DD800CDE7C0 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -1162,11 +1353,31 @@
 				5F06DDAE1CC451700011842B /* Auth0Tests.macOS */,
 				5F331AF81D4BB24C00AE4382 /* Auth0Tests.tvOS */,
 				5F3965C61CF67DD800CDE7C0 /* OAuth2 */,
+				5B7EE45720FC9F3200367724 /* OAuth2TV */,
+				5B7EE47820FCA0A100367724 /* OAuth2Mac */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		5B7EE45620FC9F3200367724 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B7EE46220FC9F3400367724 /* Assets.xcassets in Resources */,
+				5B7EE46020FC9F3300367724 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5B7EE47720FCA0A100367724 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B7EE48020FCA0A200367724 /* Assets.xcassets in Resources */,
+				5B7EE48320FCA0A200367724 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5F06DD761CC448B10011842B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1232,6 +1443,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5B6EE39520F8AE5700264AC7 /* Carthage */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/tvOS/SimpleKeychain.framework",
+			);
+			name = Carthage;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
 		5B717B241E2E2696004A05A7 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1288,6 +1514,64 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ \"${CONFIGURATION}\" = \"Debug\" ]] && [ -z ${CIRCLECI} ] && which swiftlint >/dev/null; then\nswiftlint\nfi";
 		};
+		5B7EE46E20FC9F8600367724 /* Carthage */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/tvOS/SimpleKeychain.framework",
+			);
+			name = Carthage;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
+		5B7EE46F20FC9FAE00367724 /* Auth0 */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Auth0;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\nif [ -f $AUTH0_PLIST ];\nthen\ncp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nfi";
+		};
+		5B7EE48B20FCA0AF00367724 /* Carthage */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/Mac/SimpleKeychain.framework",
+			);
+			name = Carthage;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
+		5B7EE48C20FCA0D900367724 /* Auth0 */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Auth0;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\nif [ -f $AUTH0_PLIST ];\nthen\ncp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nfi";
+		};
 		5BEDE1801EC213C10007300D /* Carthage */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1320,6 +1604,24 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5B7EE45420FC9F3200367724 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B7EE45D20FC9F3300367724 /* ViewController.swift in Sources */,
+				5B7EE45B20FC9F3300367724 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5B7EE47520FCA0A100367724 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B7EE47E20FCA0A100367724 /* ViewController.swift in Sources */,
+				5B7EE47C20FCA0A100367724 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5F06DD731CC448B10011842B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1381,6 +1683,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5FE2F8BC1CD0EAAD003628F4 /* Response.swift in Sources */,
+				5B7EE47420FCA00A00367724 /* CredentialsManagerError.swift in Sources */,
 				5FDE87661D8A424700EA27DC /* Profile.swift in Sources */,
 				5FDE876A1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5FCCC31D1CF51DF300901E2E /* _ObjectiveManagementAPI.swift in Sources */,
@@ -1400,6 +1703,7 @@
 				5FADB60D1CED7E0800D4BB50 /* UserPatchAttributes.swift in Sources */,
 				5F74CB411CEFD5E600226823 /* JSONObjectPayload.swift in Sources */,
 				5FE2F8B91CD0E910003628F4 /* Request.swift in Sources */,
+				5B7EE47320FCA00700367724 /* CredentialsManager.swift in Sources */,
 				5FDE875A1D8A424700EA27DC /* Authentication.swift in Sources */,
 				5FE2F8AA1CCE54F1003628F4 /* Result.swift in Sources */,
 				5FCAB1741D09009600331C84 /* NSData+URLSafe.swift in Sources */,
@@ -1461,6 +1765,7 @@
 				5F28B4681D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5FE2F8C71CD1522F003628F4 /* ProfileSpec.swift in Sources */,
+				5B7EE47220FCA00300367724 /* CredentialsManagerSpec.swift in Sources */,
 				5FADB6041CEC0C3300D4BB50 /* UsersSpec.swift in Sources */,
 				5F74CB441CEFDFB800226823 /* IdentitySpec.swift in Sources */,
 				5FCCC3121CF4D4FF00901E2E /* AuthenticationAPISpec.m in Sources */,
@@ -1482,6 +1787,7 @@
 				5F23E6E71D4ACD8500C3F2D9 /* Response.swift in Sources */,
 				5B2860D11EEAC30A00C75D54 /* UserInfo.swift in Sources */,
 				5F28B4631D8216180000EB23 /* Loggable.swift in Sources */,
+				5B7EE49620FCAD4300367724 /* CredentialsManagerError.swift in Sources */,
 				5F23E6E01D4ACD7F00C3F2D9 /* Management.swift in Sources */,
 				5F23E6E11D4ACD7F00C3F2D9 /* UserPatchAttributes.swift in Sources */,
 				5F23E6DF1D4ACD7A00C3F2D9 /* Logger.swift in Sources */,
@@ -1492,6 +1798,7 @@
 				5FDE876B1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5FE1182A1D8A4A2B00A374BF /* Telemetry.swift in Sources */,
 				5F23E6E41D4ACD8500C3F2D9 /* JSONObjectPayload.swift in Sources */,
+				5B7EE49520FCAD4100367724 /* CredentialsManager.swift in Sources */,
 				5F7504F71D8C3F2900E3BA1C /* NSError+Helper.swift in Sources */,
 				5F23E6DC1D4ACD6100C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				5F23E6E61D4ACD8500C3F2D9 /* Requestable.swift in Sources */,
@@ -1516,6 +1823,7 @@
 				5F23E7101D4B88FC00C3F2D9 /* Response.swift in Sources */,
 				5B2860D01EEAC30A00C75D54 /* UserInfo.swift in Sources */,
 				5F28B4641D8216180000EB23 /* Loggable.swift in Sources */,
+				5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */,
 				5F23E7091D4B88F600C3F2D9 /* Management.swift in Sources */,
 				5F23E70A1D4B88F600C3F2D9 /* UserPatchAttributes.swift in Sources */,
 				5F23E71B1D4B891E00C3F2D9 /* Auth0Error.swift in Sources */,
@@ -1526,6 +1834,7 @@
 				5FDE876C1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5FE118291D8A4A2A00A374BF /* Telemetry.swift in Sources */,
 				5F23E70D1D4B88FC00C3F2D9 /* JSONObjectPayload.swift in Sources */,
+				5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */,
 				5F7504F81D8C3F2900E3BA1C /* NSError+Helper.swift in Sources */,
 				5F23E7061D4B88EA00C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				5F23E70F1D4B88FC00C3F2D9 /* Requestable.swift in Sources */,
@@ -1541,6 +1850,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F331B0F1D4BB80700AE4382 /* Responses.swift in Sources */,
+				5B6EE39620F8AEDB00264AC7 /* CredentialsManagerSpec.swift in Sources */,
 				5F331B061D4BB7DA00AE4382 /* CredentialsSpec.swift in Sources */,
 				5F331B0B1D4BB7F900AE4382 /* UserPatchAttributesSpec.swift in Sources */,
 				5F331B051D4BB7D400AE4382 /* AuthenticationSpec.swift in Sources */,
@@ -1569,6 +1879,26 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5B7EE46A20FC9F5200367724 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5F23E6F51D4B87F000C3F2D9 /* Auth0.tvOS */;
+			targetProxy = 5B7EE46920FC9F5200367724 /* PBXContainerItemProxy */;
+		};
+		5B7EE47120FC9FFE00367724 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5B7EE45720FC9F3200367724 /* OAuth2TV */;
+			targetProxy = 5B7EE47020FC9FFE00367724 /* PBXContainerItemProxy */;
+		};
+		5B7EE48A20FCA0A600367724 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5B7EE47820FCA0A100367724 /* OAuth2Mac */;
+			targetProxy = 5B7EE48920FCA0A600367724 /* PBXContainerItemProxy */;
+		};
+		5B7EE49020FCA0F400367724 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5F06DD841CC448C90011842B /* Auth0.macOS */;
+			targetProxy = 5B7EE48F20FCA0F400367724 /* PBXContainerItemProxy */;
+		};
 		5F06DDA71CC451540011842B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5F06DD771CC448B10011842B /* Auth0.iOS */;
@@ -1592,6 +1922,22 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		5B7EE45E20FC9F3300367724 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5B7EE45F20FC9F3300367724 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		5B7EE48120FCA0A200367724 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5B7EE48220FCA0A200367724 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		5F3965CD1CF67DD800CDE7C0 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1613,6 +1959,136 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		5B7EE46420FC9F3400367724 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = OAuth2TV/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2TV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = appletvos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+		5B7EE46520FC9F3400367724 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = OAuth2TV/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2TV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = appletvos;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Release;
+		};
+		5B7EE48720FCA0A200367724 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = OAuth2Mac/OAuth2Mac.entitlements;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = OAuth2Mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2Mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		5B7EE48820FCA0A200367724 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = OAuth2Mac/OAuth2Mac.entitlements;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = OAuth2Mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2Mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
 		5F049B6F1CB42C29006F6C05 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1666,6 +2142,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1718,6 +2195,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1789,9 +2267,11 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1820,9 +2300,11 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1921,6 +2403,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2Mac.app/Contents/MacOS/OAuth2Mac";
 			};
 			name = Debug;
 		};
@@ -1946,6 +2429,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Auth0Tests/Auth0Tests.OSX-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2Mac.app/Contents/MacOS/OAuth2Mac";
 			};
 			name = Release;
 		};
@@ -2011,7 +2495,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 86WQXF56BC;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -2040,7 +2524,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 86WQXF56BC;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -2080,6 +2564,7 @@
 				SDKROOT = appletvos;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2TV.app/OAuth2TV";
 				TVOS_DEPLOYMENT_TARGET = 9.2;
 			};
 			name = Debug;
@@ -2102,6 +2587,7 @@
 				SDKROOT = appletvos;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2TV.app/OAuth2TV";
 				TVOS_DEPLOYMENT_TARGET = 9.2;
 			};
 			name = Release;
@@ -2158,6 +2644,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5B7EE46620FC9F3400367724 /* Build configuration list for PBXNativeTarget "OAuth2TV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B7EE46420FC9F3400367724 /* Debug */,
+				5B7EE46520FC9F3400367724 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5B7EE48620FCA0A200367724 /* Build configuration list for PBXNativeTarget "OAuth2Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B7EE48720FCA0A200367724 /* Debug */,
+				5B7EE48820FCA0A200367724 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		5F049B631CB42C29006F6C05 /* Build configuration list for PBXProject "Auth0" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

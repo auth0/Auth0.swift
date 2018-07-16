@@ -24,7 +24,9 @@ import Quick
 import Nimble
 import OHHTTPStubs
 import SimpleKeychain
+#if os(iOS)
 import LocalAuthentication
+#endif
 
 @testable import Auth0
 
@@ -157,6 +159,7 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(newCredentials).toEventuallyNot(beNil())
             }
 
+            #if os(iOS)
             context("require touch") {
 
                 beforeEach {
@@ -176,6 +179,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
             }
+            #endif
 
             context("renew") {
 
