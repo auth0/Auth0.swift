@@ -43,8 +43,10 @@ Pod::Spec.new do |s|
   s.ios.dependency 'SimpleKeychain'
   s.osx.source_files = 'Auth0/*.swift'
   s.osx.exclude_files = web_auth_files
+  s.osx.dependency 'SimpleKeychain'
   s.watchos.source_files = 'Auth0/*.swift'
   s.watchos.exclude_files = web_auth_files
   s.tvos.source_files = 'Auth0/*.swift'
   s.tvos.exclude_files = web_auth_files
+  s.tvos.dependency 'SimpleKeychain'
 end
