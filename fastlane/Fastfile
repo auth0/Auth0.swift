@@ -9,7 +9,7 @@ platform :ios do
   desc "Installs dependencies using Carthage"
   lane :dependencies do |options|
     action = options[:action]
-    carthage(use_binaries: false, command: action, cache_builds: true, platform: 'iOS')
+    carthage(use_binaries: false, command: action, cache_builds: true, platform: 'all')
   end
 
   desc "Bootstrap the development environment"
