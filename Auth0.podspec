@@ -16,9 +16,28 @@ web_auth_files = [
   'Auth0/SilentSafariViewController.swift',
   'Auth0/NativeAuth.swift',
   'Auth0/AuthProvider.swift',
-  'Auth0/CredentialsManager.swift',
-  'Auth0/CredentialsManagerError.swift',
   'Auth0/BioAuthentication.swift'
+]
+
+watchos_exclude_files = [
+'Auth0/_ObjectiveWebAuth.swift',
+'Auth0/ControllerModalPresenter.swift',
+'Auth0/OAuth2Grant.swift',
+'Auth0/AuthTransaction.swift',
+'Auth0/TransactionStore.swift',
+'Auth0/WebAuth.swift',
+'Auth0/WebAuthError.swift',
+'Auth0/SafariWebAuth.swift',
+'Auth0/AuthSession.swift',
+'Auth0/SafariSession.swift',
+'Auth0/SafariAuthenticationSession.swift',
+'Auth0/SafariAuthenticationCallback.swift',
+'Auth0/SilentSafariViewController.swift',
+'Auth0/NativeAuth.swift',
+'Auth0/AuthProvider.swift',
+'Auth0/BioAuthentication.swift',
+'Auth0/CredentialsManagerError.swift',
+'Auth0/CredentialsManager.swift'
 ]
 
 Pod::Spec.new do |s|
@@ -45,8 +64,10 @@ Pod::Spec.new do |s|
   s.ios.dependency 'SimpleKeychain'
   s.osx.source_files = 'Auth0/*.swift'
   s.osx.exclude_files = web_auth_files
+  s.osx.dependency 'SimpleKeychain'
   s.watchos.source_files = 'Auth0/*.swift'
-  s.watchos.exclude_files = web_auth_files
+  s.watchos.exclude_files = watchos_exclude_files
   s.tvos.source_files = 'Auth0/*.swift'
   s.tvos.exclude_files = web_auth_files
+  s.tvos.dependency 'SimpleKeychain'
 end
