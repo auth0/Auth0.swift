@@ -204,9 +204,9 @@ class CredentialsManagerSpec: QuickSpec {
                         credentialsManager.credentials { error = $0; newCredentials = $1
                             expect(error).to(beNil())
                             credentialsManager.credentials {
-                                expect($1!.accessToken) == NewAccessToken
-                                expect($1!.refreshToken) == RefreshToken
-                                expect($1!.idToken) == NewIdToken
+                                expect($1?.accessToken) == NewAccessToken
+                                expect($1?.refreshToken) == RefreshToken
+                                expect($1?.idToken) == NewIdToken
                                 done()
                             }
                         }
