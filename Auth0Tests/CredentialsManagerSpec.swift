@@ -71,7 +71,83 @@ class CredentialsManagerSpec: QuickSpec {
             it("should fail to clear credentials") {
                 expect(credentialsManager.clear()).to(beFalse())
             }
+            
+        }
+        
+        describe("multi instances of credentials manager") {
+            
+            var secondaryCredentialsManager: CredentialsManager!
+            var sedondaryCredentials: Credentials!
 
+            beforeEach {
+                secondaryCredentialsManager = CredentialsManager(authentication: authentication, storeKey: "secondary_store")
+                sedondaryCredentials = Credentials(accessToken: "SecondaryAccessToken", tokenType: TokenType, idToken: "SecondaryIdToken", refreshToken: "SecondaryRefreshToken", expiresIn: Date(timeIntervalSinceNow: 10))
+            }
+            
+            it("should store credentials into distinct locations") {
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(secondaryCredentialsManager.store(credentials: sedondaryCredentials)).to(beTrue())
+                                
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.credentials {
+                        expect($0).to(beNil())
+                        expect($1!.accessToken) == AccessToken
+                        expect($1!.refreshToken) == RefreshToken
+                        expect($1!.idToken) == IdToken
+                        done()
+                    }
+                }
+                
+                waitUntil(timeout: 2) { done in
+                    secondaryCredentialsManager.credentials {
+                        expect($0).to(beNil())
+                        expect($1!.accessToken) == "SecondaryAccessToken"
+                        expect($1!.refreshToken) == "SecondaryRefreshToken"
+                        expect($1!.idToken) == "SecondaryIdToken"
+                        done()
+                    }
+                }
+
+            }
+            
+            it("should store new credentials") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                _ = credentialsManager.store(credentials: credentials)
+            }
+            
+            it("should share a space in the keychain if using the same store key") {
+                
+                credentialsManager = CredentialsManager(authentication: authentication, storeKey: "secondary_store")
+                
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.credentials {
+                        expect($0).to(beNil())
+                        expect($1!.accessToken) == AccessToken
+                        expect($1!.refreshToken) == RefreshToken
+                        expect($1!.idToken) == IdToken
+                        done()
+                    }
+                }
+
+                waitUntil(timeout: 2) { done in
+                    secondaryCredentialsManager.credentials {
+                        expect($0).to(beNil())
+                        expect($1!.accessToken) == AccessToken
+                        expect($1!.refreshToken) == RefreshToken
+                        expect($1!.idToken) == IdToken
+                        done()
+                    }
+                }
+
+            }
+
+            afterEach {
+                _ = credentialsManager.clear()
+                _ = secondaryCredentialsManager.clear()
+            }
+            
         }
 
         describe("valididity") {
