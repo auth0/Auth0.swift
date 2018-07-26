@@ -30,7 +30,7 @@ import LocalAuthentication
 public struct CredentialsManager {
 
     private let storage = A0SimpleKeychain()
-    private let storeKey = "credentials"
+    private let storeKey: String
     private let authentication: Authentication
     #if os(iOS)
     private var bioAuth: BioAuthentication?
@@ -40,7 +40,9 @@ public struct CredentialsManager {
     ///
     /// - Parameters:
     ///   - authentication: Auth0 authentication instance
-    public init(authentication: Authentication) {
+    ///   - storeKey: Key used to store user credentials in the keychain, defaults to "credentials"
+    public init(authentication: Authentication, storeKey: String = "credentials") {
+        self.storeKey = storeKey
         self.authentication = authentication
     }
 
