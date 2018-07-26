@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.12.0](https://github.com/auth0/Auth0.swift/tree/1.12.0) (2018-07-26)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.11.1...1.12.0)
+
+**Added**
+- Added support for custom Keychain key in Credentials Manager [\#208](https://github.com/auth0/Auth0.swift/pull/208) ([danielphillips](https://github.com/danielphillips))
+- Enable Credentials Manager for tvOS and Mac Platforms [\#206](https://github.com/auth0/Auth0.swift/pull/206) ([cocojoe](https://github.com/cocojoe))
+
+**Fixed**
+- Fix Swift 4.1 Warning [\#207](https://github.com/auth0/Auth0.swift/pull/207) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.11.1](https://github.com/auth0/Auth0.swift/tree/1.11.1) (2018-06-08)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.11.0...1.11.1)
 
