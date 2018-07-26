@@ -102,7 +102,7 @@ GEM
       xcodeproj (>= 1.5.7, < 2.0.0)
       xcpretty (>= 0.2.4, < 1.0.0)
       xcpretty-travis-formatter (>= 0.0.3)
-    fastlane-plugin-auth0_shipper (0.2.2)
+    fastlane-plugin-auth0_shipper (0.3.1)
       semantic (~> 1.5)
     fourflusher (2.0.1)
     fuzzy_match (2.0.4)
@@ -203,8 +203,8 @@ PLATFORMS
 DEPENDENCIES
   cocoapods (~> 1.2)
   fastlane
-  fastlane-plugin-auth0_shipper
+  fastlane-plugin-auth0_shipper (= 0.3.1)
   semantic (~> 1.5)
 
 BUNDLED WITH
-   1.15.4
+   1.16.3
