@@ -2,4 +2,4 @@
 #
 # Ensure this file is checked in to source control!
 
-gem 'fastlane-plugin-auth0_shipper'
+gem 'fastlane-plugin-auth0_shipper',  '0.3.1'
