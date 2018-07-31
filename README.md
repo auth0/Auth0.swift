@@ -278,7 +278,7 @@ Auth0
 
 ```swift
 Auth0
-    .users(token: idToken)
+    .users(token: accessToken)
     .get("user identifier", fields: ["user_metadata"], include: true)
     .start { result in
         switch result {
@@ -294,7 +294,7 @@ Auth0
 
 ```swift
 Auth0
-    .users(token: idToken)
+    .users(token: accessToken)
     .patch("user identifier", userMetadata: ["first_name": "John", "last_name": "Doe"])
     .start { result in
         switch result {
@@ -310,7 +310,7 @@ Auth0
 
 ```swift
 Auth0
-    .users(token: idToken)
+    .users(token: accessToken)
     .link("user identifier", withOtherUserToken: "another user token")
     .start { result in
         switch result {
