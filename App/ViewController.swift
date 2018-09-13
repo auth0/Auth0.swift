@@ -35,14 +35,14 @@ class ViewController: UIViewController {
     }
 
     @IBAction func startOAuth2(_ sender: Any) {
-        var auth0 = Auth0.webAuth()
+        let auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
             .start(onAuth)
     }
 
     @IBAction func startGoogleOAuth2(_ sender: Any) {
-        var auth0 = Auth0.webAuth()
+        let auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
@@ -50,7 +50,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func startTokenGoogleOAuth2(_ sender: Any) {
-        var auth0 = Auth0.webAuth()
+        let auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
@@ -59,7 +59,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func startIDTokenGoogleOAuth2(_ sender: Any) {
-        var auth0 = Auth0.webAuth()
+        let auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
@@ -69,7 +69,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func startTokenIDTokenGoogleOAuth2(_ sender: Any) {
-        var auth0 = Auth0.webAuth()
+        let auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")
@@ -79,7 +79,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func startCodeIDTokenGoogleOAuth2(_ sender: Any) {
-        var auth0 = Auth0.webAuth()
+        let auth0 = Auth0.webAuth()
         auth0
             .logging(enabled: true)
             .connection("google-oauth2")

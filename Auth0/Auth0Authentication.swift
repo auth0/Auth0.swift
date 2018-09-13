@@ -218,7 +218,7 @@ struct Auth0Authentication: Authentication {
 
     #if os(iOS)
     func webAuth(withConnection connection: String) -> WebAuth {
-        var safari = SafariWebAuth(clientId: self.clientId, url: self.url, presenter: ControllerModalPresenter(), telemetry: self.telemetry)
+        let safari = SafariWebAuth(clientId: self.clientId, url: self.url, presenter: ControllerModalPresenter(), telemetry: self.telemetry)
         return safari
             .logging(enabled: self.logger != nil)
             .connection(connection)
