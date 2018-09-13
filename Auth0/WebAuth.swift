@@ -78,7 +78,7 @@ public func webAuth(clientId: String, domain: String) -> WebAuth {
 
  - returns: if the url was handled by an on going session or not.
  */
-public func resumeAuth(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
+public func resumeAuth(_ url: URL, options: [OpenURLOptionsKey: Any]) -> Bool {
     return TransactionStore.shared.resume(url, options: options)
 }
 

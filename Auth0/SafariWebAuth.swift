@@ -23,6 +23,12 @@
 import UIKit
 import SafariServices
 
+#if swift(>=4.2)
+public typealias OpenURLOptionsKey = UIApplication.OpenURLOptionsKey
+#else
+public typealias OpenURLOptionsKey = UIApplicationOpenURLOptionsKey
+#endif
+
 class SafariWebAuth: WebAuth {
 
     fileprivate static let NoBundleIdentifier = "com.auth0.this-is-no-bundle"

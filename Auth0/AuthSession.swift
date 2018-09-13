@@ -49,7 +49,7 @@ class AuthSession: NSObject, AuthTransaction {
 
      - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
      */
-    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any] = [:]) -> Bool {
+    func resume(_ url: URL, options: [OpenURLOptionsKey: Any] = [:]) -> Bool {
         self.logger?.trace(url: url, source: "iOS Safari")
         guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
 
