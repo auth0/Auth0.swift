@@ -233,10 +233,11 @@ class SafariWebAuth: WebAuth {
 
 private func generateDefaultState() -> String? {
     var data = Data(count: 32)
+    var count = data.count
     var tempData = data
 
     let result = tempData.withUnsafeMutableBytes { (bytes: UnsafeMutablePointer<UInt8>) -> Int in
-        return Int(SecRandomCopyBytes(kSecRandomDefault, data.count, bytes))
+        return Int(SecRandomCopyBytes(kSecRandomDefault, count, bytes))
     }
 
     guard result == 0 else { return nil }
