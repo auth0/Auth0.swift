@@ -54,7 +54,7 @@ platform :ios do
 
   desc "Releases the library to Cocoapods & Github Releases and updates README/CHANGELOG"
   desc "You need to specify the type of release with the `bump` parameter with the values [major|minor|patch]"
-  lane :release do |options|
+  lane :release_prepare do |options|
     release_options = {repository: 'Auth0.swift', xcodeproj: 'Auth0.xcodeproj', target: 'Auth0.iOS'}.merge(options)
     prepare_release release_options
   end
