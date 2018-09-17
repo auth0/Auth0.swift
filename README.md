@@ -206,7 +206,9 @@ Credentials will automatically be renewed (if expired) using the refresh token. 
 
 ```swift
 credentialsManager.credentials { error, credentials in
-    guard error == nil else { return print("Failed with \(error)") }
+    guard error == nil, let credentials = credentials else { 
+        return print("Failed with \(error)") 
+    }
     print("Obtained credentials: \(credentials)")
 }
 ```
