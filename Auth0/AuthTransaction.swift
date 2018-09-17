@@ -52,7 +52,7 @@ public protocol AuthTransaction {
      - parameter options: options recieved in the openUrl method of the `AppDelegate`
      - returns: if the url was expected and properly formatted otherwise it will return false.
     */
-    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool
+    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool
 
     /**
      Terminates the transaction and reports back that it was cancelled.
