@@ -22,6 +22,12 @@
 
 import UIKit
 
+#if swift(>=4.2)
+public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey
+#else
+public typealias A0URLOptionsKey = UIApplicationOpenURLOptionsKey
+#endif
+
 /**
  Auth0 iOS component for authenticating with web-based flow
 
@@ -78,7 +84,7 @@ public func webAuth(clientId: String, domain: String) -> WebAuth {
 
  - returns: if the url was handled by an on going session or not.
  */
-public func resumeAuth(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
+public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
     return TransactionStore.shared.resume(url, options: options)
 }
 

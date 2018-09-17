@@ -40,7 +40,7 @@ class SafariAuthenticationSessionCallback: AuthTransaction {
         self.authSession?.start()
     }
 
-    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
+    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
         self.callback(true)
         return true
     }

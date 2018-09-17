@@ -128,7 +128,7 @@ public class _ObjectiveOAuth2: NSObject {
      - returns: if the url was handled by an on going session or not.
      */
     @objc(resumeAuthWithURL:options:)
-    public static func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
+    public static func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
         return TransactionStore.shared.resume(url, options: options)
     }
 
