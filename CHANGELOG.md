@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.13.0](https://github.com/auth0/Auth0.swift/tree/1.13.0) (2018-09-17)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.12.0...1.13.0)
+
+**Fixed**
+- Fixed Xcode 10 Support [\#221](https://github.com/auth0/Auth0.swift/pull/221) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.12.0](https://github.com/auth0/Auth0.swift/tree/1.12.0) (2018-07-26)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.11.1...1.12.0)
 
