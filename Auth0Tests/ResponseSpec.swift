@@ -70,11 +70,11 @@ class ResponseSpec: QuickSpec {
                 expect(try? response.result()).to(beNil())
             }
 
-//            it("should fail with invalid JSON") {
-//                let data = "A simple String".data(using: .utf8)
-//                let response = Response<AuthenticationError>(data: data, response: http(200), error: nil)
-//                expect(try? response.result()).to(beNil())
-//            }
+            it("should fail with invalid JSON") {
+                let data = "A simple String".data(using: .utf8)
+                let response = Response<AuthenticationError>(data: data, response: http(200), error: nil)
+                expect(try? response.result()).to(beNil())
+            }
 
             it("should fail with NSError") {
                 let error = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
