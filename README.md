@@ -274,55 +274,11 @@ Auth0
     }
 ```
 
-### Management API (Users)
+### Management API
 
-#### Retrieve user_metadata
+You can request more information than returned in the basic profile and manage the user's metadata. To do this, you can access the Auth0 [Management API](https://auth0.com/docs/api/management/v2)
 
-```swift
-Auth0
-    .users(token: idToken)
-    .get("user identifier", fields: ["user_metadata"], include: true)
-    .start { result in
-        switch result {
-        case .success(let userInfo):
-            print("user: \(userInfo)")
-        case .failure(let error):
-            print(error)
-        }
-    }
-```
-
-#### Update user_metadata
-
-```swift
-Auth0
-    .users(token: idToken)
-    .patch("user identifier", userMetadata: ["first_name": "John", "last_name": "Doe"])
-    .start { result in
-        switch result {
-        case .success(let userInfo):
-            print("User: \(userInfo)")
-        case .failure(let error):
-            print("Failed with \(error)")
-        }
-    }
-```
-
-#### Link an account
-
-```swift
-Auth0
-    .users(token: idToken)
-    .link("user identifier", withOtherUserToken: "another user token")
-    .start { result in
-        switch result {
-        case .success(let userInfo):
-            print("User: \(userInfo)")
-        case .failure(let error):
-            print("Failed with \(error)")
-        }
-    }
-```
+You can find a detailed guide in this [iOS Swift QuickStart](https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata)
 
 ### Logging
 
