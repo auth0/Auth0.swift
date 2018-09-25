@@ -276,9 +276,25 @@ Auth0
 
 ### Management API
 
-You can request more information than returned in the basic profile and manage the user's metadata. To do this, you can access the Auth0 [Management API](https://auth0.com/docs/api/management/v2)
+You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2). For security reasons native mobile applications are restricted to a subset of User based functionality.
 
 You can find a detailed guide in this [iOS Swift QuickStart](https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata)
+
+#### Link an account
+
+```swift
+Auth0
+    .users(token: idToken)
+    .link("user identifier", withOtherUserToken: "another user token")
+    .start { result in
+        switch result {
+        case .success(let userInfo):
+            print("User: \(userInfo)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
 
 ### Logging
 
