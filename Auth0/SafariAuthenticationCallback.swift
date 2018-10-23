@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 import UIKit
+import AuthenticationServices
 import SafariServices
 
 #if swift(>=3.2)
@@ -28,16 +29,27 @@ import SafariServices
 class SafariAuthenticationSessionCallback: AuthTransaction {
 
     var state: String?
-    var authSession: SFAuthenticationSession?
     var callback: (Bool) -> Void = { _ in }
+    
+    private var authSession: NSObject?
 
     init(url: URL, schemeURL: String, callback: @escaping (Bool) -> Void) {
         self.callback = callback
-        self.authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
-            self.callback(url != nil)
-            TransactionStore.shared.clear()
+        if #available(iOS 12.0, *) {
+            let authSession = ASWebAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
+                self.callback(url != nil)
+                TransactionStore.shared.clear()
+            }
+            self.authSession = authSession
+            authSession.start()
+        } else {
+            let authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
+                self.callback(url != nil)
+                TransactionStore.shared.clear()
+            }
+            self.authSession = authSession
+            authSession.start()
         }
-        self.authSession?.start()
     }
 
     func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
