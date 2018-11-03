@@ -30,7 +30,7 @@ class SafariAuthenticationSessionCallback: AuthTransaction {
 
     var state: String?
     var callback: (Bool) -> Void = { _ in }
-    
+
     private var authSession: NSObject?
 
     init(url: URL, schemeURL: String, callback: @escaping (Bool) -> Void) {

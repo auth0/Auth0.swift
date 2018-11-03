@@ -27,7 +27,7 @@ import AuthenticationServices
 #if swift(>=3.2)
 @available(iOS 11.0, *)
 class SafariAuthenticationSession: AuthSession {
-    
+
     private var authSession: NSObject?
 
     init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {

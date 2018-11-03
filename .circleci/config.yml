@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - checkout
-      - run: | 
+      - run: |
           brew install swiftlint
           bundle install --without=developments
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
@@ -28,7 +28,7 @@ jobs:
           name: Pod Lib Lint
           command: bundle exec fastlane ios pod_lint
       - run: |
-          bash <(curl -s https://codecov.io/bash) -J 'Auth0' 
+          bash <(curl -s https://codecov.io/bash) -J 'Auth0'
       - save_cache:
           key: dependency-cache
           paths:
