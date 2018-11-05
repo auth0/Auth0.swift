@@ -274,6 +274,13 @@ Auth0
     }
 ```
 
+### Custom Domains
+
+If you are using the [Custom Domains](https://auth0.com/docs/custom-domains) feature and need to use an Auth0 endpoint
+such as `/userinfo`, please use the Auth0 domain specified for your Application in the [Auth0 Dashboard](https://auth0.com/docs/dashboard).
+
+Example:  `.audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")`
+
 ### Management API (Users)
 
 #### Retrieve user_metadata
