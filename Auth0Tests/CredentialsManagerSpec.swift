@@ -77,16 +77,16 @@ class CredentialsManagerSpec: QuickSpec {
         describe("multi instances of credentials manager") {
             
             var secondaryCredentialsManager: CredentialsManager!
-            var sedondaryCredentials: Credentials!
+            var secondaryCredentials: Credentials!
 
             beforeEach {
                 secondaryCredentialsManager = CredentialsManager(authentication: authentication, storeKey: "secondary_store")
-                sedondaryCredentials = Credentials(accessToken: "SecondaryAccessToken", tokenType: TokenType, idToken: "SecondaryIdToken", refreshToken: "SecondaryRefreshToken", expiresIn: Date(timeIntervalSinceNow: 10))
+                secondaryCredentials = Credentials(accessToken: "SecondaryAccessToken", tokenType: TokenType, idToken: "SecondaryIdToken", refreshToken: "SecondaryRefreshToken", expiresIn: Date(timeIntervalSinceNow: 10))
             }
             
             it("should store credentials into distinct locations") {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
-                expect(secondaryCredentialsManager.store(credentials: sedondaryCredentials)).to(beTrue())
+                expect(secondaryCredentialsManager.store(credentials: secondaryCredentials)).to(beTrue())
                                 
                 waitUntil(timeout: 2) { done in
                     credentialsManager.credentials {
