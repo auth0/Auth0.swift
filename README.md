@@ -44,7 +44,7 @@ Then run `pod install`.
 > For further reference on Cocoapods, check [their official documentation](http://guides.cocoapods.org/using/getting-started.html).
 
 > ### Upgrade Notes
-> If you are using the [clearSession](https://github.com/auth0/Auth0.swift/blob/master/Auth0/WebAuth.swift#L235) method in iOS 11+. You will need to ensure that the **Callback URL** has been added to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+> If you are using the [clearSession](https://github.com/auth0/Auth0.swift/blob/master/Auth0/WebAuth.swift#L235) method in iOS 11+, you will need to ensure that the **Callback URL** has been added to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
 
 
@@ -274,7 +274,14 @@ Auth0
     }
 ```
 
-### Management API
+### Custom Domains
+
+If you are using the [Custom Domains](https://auth0.com/docs/custom-domains) feature and need to use an Auth0 endpoint
+such as `/userinfo`, please use the Auth0 domain specified for your Application in the [Auth0 Dashboard](https://auth0.com/docs/dashboard).
+
+Example:  `.audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")`
+
+### Management API (Users)
 
 You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2). For security reasons native mobile applications are restricted to a subset of User based functionality.
 
