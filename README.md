@@ -283,37 +283,9 @@ Example:  `.audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")`
 
 ### Management API (Users)
 
-#### Retrieve user_metadata
+You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2). For security reasons native mobile applications are restricted to a subset of User based functionality.
 
-```swift
-Auth0
-    .users(token: idToken)
-    .get("user identifier", fields: ["user_metadata"], include: true)
-    .start { result in
-        switch result {
-        case .success(let userInfo):
-            print("user: \(userInfo)")
-        case .failure(let error):
-            print(error)
-        }
-    }
-```
-
-#### Update user_metadata
-
-```swift
-Auth0
-    .users(token: idToken)
-    .patch("user identifier", userMetadata: ["first_name": "John", "last_name": "Doe"])
-    .start { result in
-        switch result {
-        case .success(let userInfo):
-            print("User: \(userInfo)")
-        case .failure(let error):
-            print("Failed with \(error)")
-        }
-    }
-```
+You can find a detailed guide in this [iOS Swift QuickStart](https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata)
 
 #### Link an account
 
