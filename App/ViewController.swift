@@ -21,14 +21,18 @@ class ViewController: UIViewController {
         self.onAuth = { [weak self] in
             switch $0 {
             case .failure(let cause):
-                let alert = UIAlertController(title: "Auth Failed!", message: "\(cause)", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-                self?.present(alert, animated: true, completion: nil)
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(title: "Auth Failed!", message: "\(cause)", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                    self?.present(alert, animated: true, completion: nil)
+                }
             case .success(let credentials):
-                let token = credentials.accessToken ?? credentials.idToken
-                let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got a token \(String(describing: token))", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-                self?.present(alert, animated: true, completion: nil)
+                DispatchQueue.main.async {
+                    let token = credentials.accessToken ?? credentials.idToken
+                    let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got a token \(String(describing: token))", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+                    self?.present(alert, animated: true, completion: nil)
+                }
             }
             print($0)
         }
