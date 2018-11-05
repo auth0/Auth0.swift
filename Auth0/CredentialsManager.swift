@@ -46,7 +46,7 @@ public struct CredentialsManager {
         self.authentication = authentication
     }
 
-    /// Enable Touch ID Authentication for additional securtity during credentials retrieval.
+    /// Enable Touch ID Authentication for additional security during credentials retrieval.
     ///
     /// - Parameters:
     ///   - title: main message to display in TouchID prompt
@@ -59,7 +59,7 @@ public struct CredentialsManager {
     }
     #endif
 
-    /// Enable Biometric Authentication for additional securtity during credentials retrieval.
+    /// Enable Biometric Authentication for additional security during credentials retrieval.
     ///
     /// - Parameters:
     ///   - title: main message to display when Touch ID is used
