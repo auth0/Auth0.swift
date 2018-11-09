@@ -99,7 +99,7 @@ jobs:
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
       - run:
           name: Bootstrap
-          command: carthage bootstrap platform --macOS
+          command: carthage bootstrap --platform mac
       - run:
           name: Run test suite
           command: xcodebuild test -scheme Auth0.macOS -destination 'platform=macOS,arch=x86_64'
@@ -121,7 +121,7 @@ jobs:
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
       - run:
           name: Bootstrap
-          command: carthage bootstrap platform --tvOS
+          command: carthage bootstrap --platform tvOS
       - run:
           name: Run test suite
           command: xcodebuild test -scheme Auth0.tvOS -destination 'platform=tvOS Simulator,name=Apple TV'
