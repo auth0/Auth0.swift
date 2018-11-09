@@ -1,18 +1,16 @@
 version: 2
 jobs:
-  build-and-test:
+  build-and-test-swift-4.2:
     macos:
       xcode: "10.0.0"
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
-          BUNDLE_PATH: ~/.gems
-
     steps:
       - checkout
-      - run: | 
+      - run: |
           brew install swiftlint
-          bundle install --without=developments
+          bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
       - run:
           name: Bootstrap
@@ -24,11 +22,67 @@ jobs:
             SCHEME: Auth0.iOS
             DEVICE: iPhone 8
             FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
-      - run:
-          name: Pod Lib Lint
-          command: bundle exec fastlane ios pod_lint
       - run: |
-          bash <(curl -s https://codecov.io/bash) -J 'Auth0' 
+          bash <(curl -s https://codecov.io/bash) -J 'Auth0'
+      - save_cache:
+          key: dependency-cache
+          paths:
+            - Carthage/Build
+      - store_test_results:
+          path: fastlane/test_output
+  build-and-test-swift-4.0:
+    macos:
+      xcode: "10.0.0"
+    environment:
+          LC_ALL: en_US.UTF-8
+          LANG: en_US.UTF-8
+    steps:
+      - checkout
+      - run: |
+          brew install swiftlint
+          bundle install --without=development
+          grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
+          sed -i "" 's/SWIFT_VERSION = 4.2/SWIFT_VERSION = 4.0/g' "Auth0.xcodeproj/project.pbxproj"
+      - run:
+          name: Bootstrap
+          command: bundle exec fastlane ios bootstrap
+      - run:
+          name: Run test suite
+          command: bundle exec fastlane ios ci
+          environment:
+            SCHEME: Auth0.iOS
+            DEVICE: iPhone 8
+            FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
+      - save_cache:
+          key: dependency-cache
+          paths:
+            - Carthage/Build
+      - store_test_results:
+          path: fastlane/test_output
+  build-and-test-swift-3.0:
+    macos:
+      xcode: "9.4.1"
+    environment:
+          LC_ALL: en_US.UTF-8
+          LANG: en_US.UTF-8
+    steps:
+      - checkout
+      - run: |
+          brew install swiftlint
+          sudo gem install bundler
+          bundle install --without=development
+          grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
+          sed -i "" 's/SWIFT_VERSION = 4.2/SWIFT_VERSION = 3.0/g' "Auth0.xcodeproj/project.pbxproj"
+      - run:
+          name: Bootstrap
+          command: bundle exec fastlane ios bootstrap
+      - run:
+          name: Run test suite
+          command: bundle exec fastlane ios ci
+          environment:
+            SCHEME: Auth0.iOS
+            DEVICE: iPhone 8
+            FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
       - save_cache:
           key: dependency-cache
           paths:
@@ -38,6 +92,12 @@ jobs:
 
 workflows:
   version: 2
-  build-test-report:
+  build-test-4.2:
     jobs:
-      - build-and-test
+      -  build-and-test-swift-4.2
+  build-test-4.0:
+    jobs:
+      -  build-and-test-swift-4.0
+  build-test-3.0:
+    jobs:
+      - build-and-test-swift-3.0
