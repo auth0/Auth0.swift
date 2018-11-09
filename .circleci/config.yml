@@ -100,9 +100,16 @@ jobs:
       - run:
           name: Bootstrap
           command: carthage bootstrap --platform mac
+      - run: 
+          name: Setup Keychain
+          command: |
+            security create-keychain -p circle cikeychain
+            security list-keychains -d user -s "/Users/distiller/Library/Keychains/xcode.keychain-db" /Users/distiller/Library/Keychains/cikeychain-db
+            security default-keychain -s /Users/distiller/Library/Keychains/cikeychain-db
+            security unlock-keychain -p circle "/Users/distiller/Library/Keychains/cikeychain-db"
       - run:
           name: Run test suite
-          command: xcodebuild test -scheme Auth0.macOS -destination 'platform=macOS,arch=x86_64'
+          command: xcodebuild test -scheme Auth0.macOS -destination 'platform=macOS,arch=x86_64' | xcpretty
       - save_cache:
           key: dependency-cache
           paths:
@@ -119,13 +126,12 @@ jobs:
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
-          security unlock-keychain -p ""
       - run:
           name: Bootstrap
           command: carthage bootstrap --platform tvOS
       - run:
           name: Run test suite
-          command: xcodebuild test -scheme Auth0.tvOS -destination 'platform=tvOS Simulator,name=Apple TV'
+          command: xcodebuild test -scheme Auth0.tvOS -destination 'platform=tvOS Simulator,name=Apple TV' | xcpretty
       - save_cache:
           key: dependency-cache
           paths:
