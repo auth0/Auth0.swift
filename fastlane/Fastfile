@@ -9,7 +9,7 @@ platform :ios do
   desc "Installs dependencies using Carthage"
   lane :dependencies do |options|
     action = options[:action]
-    carthage(use_binaries: false, command: action, cache_builds: true, platform: 'all')
+    carthage(use_binaries: false, command: action, cache_builds: true, platform: 'iOS')
   end
 
   desc "Bootstrap the development environment"
@@ -69,3 +69,4 @@ platform :ios do
     publish_release repository: 'Auth0.swift'
   end
 end
+

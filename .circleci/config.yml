@@ -57,8 +57,6 @@ jobs:
           key: dependency-cache
           paths:
             - Carthage/Build
-      - store_test_results:
-          path: fastlane/test_output
   build-and-test-swift-3.0:
     macos:
       xcode: "9.4.1"
@@ -87,17 +85,37 @@ jobs:
           key: dependency-cache
           paths:
             - Carthage/Build
-      - store_test_results:
-          path: fastlane/test_output
+
+build-and-test-mac-swift-4.2:
+    macos:
+      xcode: "10.0.0"
+    environment:
+          LC_ALL: en_US.UTF-8
+          LANG: en_US.UTF-8
+    steps:
+      - checkout
+      - run: |
+          brew install swiftlint
+          bundle install --without=development
+          grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
+      - run:
+          name: Bootstrap
+          command: carthage boostrap platform --macOS
+      - run:
+          name: Run test suite
+          command: xcodebuild test -scheme Auth0.macOS -destination 'platform=macOS,arch=x86_64'
+      - save_cache:
+          key: dependency-cache
+          paths:
+            - Carthage/Build
 
 workflows:
   version: 2
-  build-test-4.2:
+  build-test-ios:
     jobs:
       -  build-and-test-swift-4.2
-  build-test-4.0:
-    jobs:
       -  build-and-test-swift-4.0
-  build-test-3.0:
+      -  build-and-test-swift-3.0
+  build-test-mac:
     jobs:
-      - build-and-test-swift-3.0
+      -  build-and-test-mac-4.2
