@@ -110,11 +110,9 @@ build-and-test-mac-swift-4.2:
 
 workflows:
   version: 2
-  build-test-ios:
+  build-test:
     jobs:
       -  build-and-test-swift-4.2
       -  build-and-test-swift-4.0
       -  build-and-test-swift-3.0
-  build-test-mac:
-    jobs:
       -  build-and-test-mac-swift-4.2
