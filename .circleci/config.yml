@@ -118,4 +118,4 @@ workflows:
       -  build-and-test-swift-3.0
   build-test-mac:
     jobs:
-      -  build-and-test-mac-4.2
+      -  build-and-test-mac-swift-4.2
