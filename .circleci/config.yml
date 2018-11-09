@@ -97,7 +97,6 @@ jobs:
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
-          security unlock-keychain -u   
       - run:
           name: Bootstrap
           command: carthage bootstrap --platform mac
@@ -120,6 +119,7 @@ jobs:
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
+          security unlock-keychain -p ""
       - run:
           name: Bootstrap
           command: carthage bootstrap --platform tvOS
