@@ -85,7 +85,7 @@ jobs:
           key: dependency-cache
           paths:
             - Carthage/Build
-build-and-test-mac-swift-4.2:
+  build-and-test-mac-swift-4.2:
     macos:
       xcode: "10.0.0"
     environment:
