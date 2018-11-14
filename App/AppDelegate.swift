@@ -23,16 +23,22 @@
 import UIKit
 import Auth0
 
+#if swift(>=4.2)
+typealias A0ApplicationLaunchOptionsKey = UIApplication.LaunchOptionsKey
+#else
+typealias A0ApplicationLaunchOptionsKey = UIApplicationLaunchOptionsKey
+#endif
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [A0ApplicationLaunchOptionsKey: Any]?) -> Bool {
         return true
     }
-
-    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
+    
+    func application(_ app: UIApplication, open url: URL, options: [A0URLOptionsKey : Any]) -> Bool {
         return Auth0.resumeAuth(url, options: options)
     }
 }

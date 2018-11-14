@@ -115,7 +115,7 @@ class MockSession: AuthTransaction {
         self.cancelled = true
     }
 
-    func resume(_ url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
+    func resume(_ url: URL, options: [A0URLOptionsKey : Any]) -> Bool {
         return self.resumeResult
     }
 }
