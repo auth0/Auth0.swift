@@ -136,3 +136,13 @@ jobs:
           key: dependency-cache
           paths:
             - Carthage/Build
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      -  build-iOS-Swift-4.2
+      -  build-iOS-Swift-4.0
+      -  build-iOS-Swift-3.0
+      -  build-macOS-Swift-4.2
+      -  build-tvOS-Swift-4.2
