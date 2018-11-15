@@ -22,7 +22,9 @@
 
 import UIKit
 import SafariServices
+#if canImport(AuthenticationServices)
 import AuthenticationServices
+#endif
 
 #if swift(>=3.2)
 @available(iOS 11.0, *)
@@ -32,6 +34,7 @@ class SafariAuthenticationSession: AuthSession {
 
     init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
         super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
+        #if canImport(AuthenticationServices)
         if #available(iOS 12.0, *) {
             let authSession = ASWebAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
                 guard $1 == nil, let callbackURL = $0 else {
@@ -61,6 +64,21 @@ class SafariAuthenticationSession: AuthSession {
             self.authSession = authSession
             authSession.start()
         }
+        #else
+        let authSession = SFAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
+            guard $1 == nil, let callbackURL = $0 else {
+                if case SFAuthenticationError.canceledLogin = $1! {
+                    self.finish(.failure(error: WebAuthError.userCancelled))
+                } else {
+                    self.finish(.failure(error: $1!))
+                }
+                return TransactionStore.shared.clear()
+            }
+            _ = TransactionStore.shared.resume(callbackURL, options: [:])
+        }
+        self.authSession = authSession
+        authSession.start()
+        #endif
     }
 }
 #endif
