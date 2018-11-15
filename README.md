@@ -12,8 +12,8 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 
 ## Requirements
 
-- iOS 9 or later
-- Xcode 9.0 / 10.0
+- iOS 9+ / macOS 10.10+ / tvOS 9.2+ / watchOS 2.2+
+- Xcode 9+
 - Swift 3.x/4.x
 
 ## Installation
