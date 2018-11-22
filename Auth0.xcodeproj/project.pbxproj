@@ -413,6 +413,7 @@
 		5B7EE48420FCA0A200367724 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5B7EE48520FCA0A200367724 /* OAuth2Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OAuth2Mac.entitlements; sourceTree = "<group>"; };
 		5B7EE49220FCA10100367724 /* SimpleKeychain.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SimpleKeychain.framework; path = Carthage/Build/Mac/SimpleKeychain.framework; sourceTree = "<group>"; };
+		5B90A94D219DB501003496EF /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BioAuthentication.swift; sourceTree = "<group>"; };
 		5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BioAuthenticationSpec.swift; path = Auth0Tests/BioAuthenticationSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B9A54411E49E3AE004B5454 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = SOURCE_ROOT; };
@@ -750,6 +751,7 @@
 		5F06DDC21CC5712F0011842B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5B90A94D219DB501003496EF /* AuthenticationServices.framework */,
 				5B7EE46C20FC9F7800367724 /* SimpleKeychain.framework */,
 				5B7EE49220FCA10100367724 /* SimpleKeychain.framework */,
 				5BEDE17C1EC202DC0007300D /* watchOS */,
