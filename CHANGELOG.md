@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.14.0](https://github.com/auth0/Auth0.swift/tree/1.14.0) (2018-12-06)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.13.0...1.14.0)
+
+**Added**
+- Added ASWebAuthenticationSession Support iOS12 [\#245](https://github.com/auth0/Auth0.swift/pull/245) ([cocojoe](https://github.com/cocojoe))
+- Add Multiple Platform CI [\#242](https://github.com/auth0/Auth0.swift/pull/242) ([cocojoe](https://github.com/cocojoe))
+
+**Fixed**
+- Ensure correct thread execution in test app [\#227](https://github.com/auth0/Auth0.swift/pull/227) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.13.0](https://github.com/auth0/Auth0.swift/tree/1.13.0) (2018-09-17)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.12.0...1.13.0)
 
