@@ -38,6 +38,8 @@ jobs:
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
+          HOMEBREW_LOGS: ~/homebrew-logs
+          HOMEBREW_TEMP: ~/homebrew-temp
     steps:
       - checkout
       - run: |
@@ -65,6 +67,8 @@ jobs:
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
+          HOMEBREW_LOGS: ~/homebrew-logs
+          HOMEBREW_TEMP: ~/homebrew-temp
     steps:
       - checkout
       - run: |
@@ -93,6 +97,8 @@ jobs:
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
+          HOMEBREW_LOGS: ~/homebrew-logs
+          HOMEBREW_TEMP: ~/homebrew-temp
     steps:
       - checkout
       - run: |
@@ -122,6 +128,8 @@ jobs:
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
+          HOMEBREW_LOGS: ~/homebrew-logs
+          HOMEBREW_TEMP: ~/homebrew-temp
     steps:
       - checkout
       - run: |
