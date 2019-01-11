@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.14.1](https://github.com/auth0/Auth0.swift/tree/1.14.1) (2019-01-11)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.14.0...1.14.1)
+
+**Fixed**
+- Add Fix for Brew in Swift 3.0 CI [\#254](https://github.com/auth0/Auth0.swift/pull/254) ([cocojoe](https://github.com/cocojoe))
+- Pods Fix - Move AuthenticationServices to weak_framework section [\#253](https://github.com/auth0/Auth0.swift/pull/253) ([ivabra](https://github.com/ivabra))
+
 ## [1.14.0](https://github.com/auth0/Auth0.swift/tree/1.14.0) (2018-12-06)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.13.0...1.14.0)
 
