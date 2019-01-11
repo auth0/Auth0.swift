@@ -60,7 +60,8 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.ios.source_files = 'Auth0/*.{swift,h,m}'
-  s.ios.frameworks = 'UIKit', 'SafariServices', 'LocalAuthentication', 'AuthenticationServices'
+  s.ios.frameworks = 'UIKit', 'SafariServices', 'LocalAuthentication'
+  s.ios.weak_framework = 'AuthenticationServices'
   s.ios.dependency 'SimpleKeychain'
   s.osx.source_files = 'Auth0/*.swift'
   s.osx.exclude_files = web_auth_files
