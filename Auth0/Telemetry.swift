@@ -89,8 +89,7 @@ public struct Telemetry {
     static func generateEnviroment() -> [String: String] {
         let platform = Telemetry.osInfo()
         let env = [ "swift": Telemetry.swiftVersion(),
-                    "os": platform.0,
-                    "os_version": platform.1
+                    platform.0: platform.1
         ]
         return env
     }

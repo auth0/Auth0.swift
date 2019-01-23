@@ -82,6 +82,21 @@ class TelemetrySpec: QuickSpec {
             it("should return lib name") {
                 expect(subject["name"] as? String) == "Auth0.swift"
             }
+            
+            it("should have env info") {
+                let env = subject["env"] as! [String : String]
+                #if os(iOS)
+                expect(env["iOS"]).toNot(beNil())
+                #elseif os(OSX)
+                expect(env["macOS"]).toNot(beNil())
+                #elseif os(tvOS)
+                expect(env["tvOS"]).toNot(beNil())
+                #elseif os(watchOS)
+                expect(env["watchOS"]).toNot(beNil())
+                #else
+                expect(env["unknown"]).toNot(beNil())
+                #endif
+            }
 
         }
 
@@ -118,17 +133,16 @@ class TelemetrySpec: QuickSpec {
                 let env = info["env"] as! [String : String]
                 expect(env["core"]) == version as? String
                 #if os(iOS)
-                expect(env["os"]) == "iOS"
+                expect(env["iOS"]).toNot(beNil())
                 #elseif os(OSX)
-                expect(env["os"]) == "macOS"
+                expect(env["macOS"]).toNot(beNil())
                 #elseif os(tvOS)
-                expect(env["os"]) == "tvOS"
+                expect(env["tvOS"]).toNot(beNil())
                 #elseif os(watchOS)
-                expect(env["os"]) == "watchOS"
+                expect(env["watchOS"]).toNot(beNil())
                 #else
-                expect(env["os"]) == "unknown"
+                expect(env["unknown"]).toNot(beNil())
                 #endif
-                expect(env["os_version"]).toNot(beNil())
             }
         }
 
