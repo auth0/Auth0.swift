@@ -66,21 +66,36 @@ class TelemetrySpec: QuickSpec {
                 bundle.version = nil
             }
 
-            var subject: [String: String] {
+            var subject: [String: Any] {
                 return Telemetry.versionInformation(bundle: bundle)
             }
 
             pending("should return bundle default version if nil") {
-                expect(subject["version"]) == "0.0.0"
+                expect(subject["version"] as? String) == "0.0.0"
             }
 
             pending("should return bundle version") {
                 bundle.version = "1.0.0"
-                expect(subject["version"]) == "1.0.0"
+                expect(subject["version"] as? String) == "1.0.0"
             }
 
             it("should return lib name") {
-                expect(subject["name"]) == "Auth0.swift"
+                expect(subject["name"] as? String) == "Auth0.swift"
+            }
+            
+            it("should have env info") {
+                let env = subject["env"] as! [String : String]
+                #if os(iOS)
+                expect(env["iOS"]).toNot(beNil())
+                #elseif os(OSX)
+                expect(env["macOS"]).toNot(beNil())
+                #elseif os(tvOS)
+                expect(env["tvOS"]).toNot(beNil())
+                #elseif os(watchOS)
+                expect(env["watchOS"]).toNot(beNil())
+                #else
+                expect(env["unknown"]).toNot(beNil())
+                #endif
             }
 
         }
@@ -112,10 +127,22 @@ class TelemetrySpec: QuickSpec {
                 let padded = value.padding(toLength: paddedLength, withPad: "=", startingAt: 0)
 
                 let data = Data(base64Encoded: padded, options: [NSData.Base64DecodingOptions.ignoreUnknownCharacters])
-                let info = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String: String]
-                expect(info["version"]) == "1.0.0-alpha.4"
-                expect(info["lib_version"]) == version
-                expect(info["name"]) == "Lock.iOS"
+                let info = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String: Any]
+                expect(info["version"] as? String) == "1.0.0-alpha.4"
+                expect(info["name"] as? String) == "Lock.iOS"
+                let env = info["env"] as! [String : String]
+                expect(env["core"]) == version as? String
+                #if os(iOS)
+                expect(env["iOS"]).toNot(beNil())
+                #elseif os(OSX)
+                expect(env["macOS"]).toNot(beNil())
+                #elseif os(tvOS)
+                expect(env["tvOS"]).toNot(beNil())
+                #elseif os(watchOS)
+                expect(env["watchOS"]).toNot(beNil())
+                #else
+                expect(env["unknown"]).toNot(beNil())
+                #endif
             }
         }
 

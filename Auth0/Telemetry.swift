@@ -26,7 +26,8 @@ public struct Telemetry {
 
     static let NameKey = "name"
     static let VersionKey = "version"
-    static let WrappedVersion = "lib_version"
+    static let WrappedVersion = "core"
+    static let EnvironmentKey = "env"
 
     static let NoVersion = "0.0.0"
     static let LibraryName = "Auth0.swift"
@@ -45,10 +46,16 @@ public struct Telemetry {
 
     mutating func wrapped(inLibrary name: String, version: String) {
         let info = Telemetry.versionInformation()
-        let wrapped = [
+        var env = Telemetry.generateEnviroment()
+        if let libVersion = info[Telemetry.VersionKey] as? String {
+            env[Telemetry.WrappedVersion] = libVersion
+        } else {
+            env[Telemetry.WrappedVersion] =  Telemetry.NoVersion
+        }
+        let wrapped: [String: Any] = [
             Telemetry.NameKey: name,
             Telemetry.VersionKey: version,
-            Telemetry.WrappedVersion: info[Telemetry.VersionKey] ?? Telemetry.NoVersion
+            Telemetry.EnvironmentKey: env
         ]
         self.info = Telemetry.generateValue(fromInfo: wrapped)
     }
@@ -69,19 +76,53 @@ public struct Telemetry {
         return items
     }
 
-    static func versionInformation(bundle: Bundle = Bundle(for: Credentials.classForCoder())) -> [String: String] {
+    static func versionInformation(bundle: Bundle = Bundle(for: Credentials.classForCoder())) -> [String: Any] {
         let version = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? Telemetry.NoVersion
-        let dict = [
+        let dict: [String: Any] = [
             Telemetry.NameKey: Telemetry.LibraryName,
             Telemetry.VersionKey: version,
-            "swift-version": "3.0"
-            ]
+            Telemetry.EnvironmentKey: Telemetry.generateEnviroment()
+        ]
         return dict
     }
 
-    static func generateValue(fromInfo info: [String: String] = Telemetry.versionInformation()) -> String? {
+    static func generateEnviroment() -> [String: String] {
+        let platform = Telemetry.osInfo()
+        let env = [ "swift": Telemetry.swiftVersion(),
+                    platform.0: platform.1
+        ]
+        return env
+    }
+
+    static func generateValue(fromInfo info: [String: Any] = Telemetry.versionInformation()) -> String? {
         let data = try? JSONSerialization.data(withJSONObject: info, options: [])
         return data?.a0_encodeBase64URLSafe()
+    }
+
+    static func swiftVersion() -> String {
+        #if swift(>=4.0)
+        return "4.x"
+        #elseif swift(>=3.0)
+        return "3.x"
+        #endif
+    }
+
+    static func osPlatform() -> String {
+        #if os(iOS)
+        return "iOS"
+        #elseif os(OSX)
+        return "macOS"
+        #elseif os(tvOS)
+        return "tvOS"
+        #elseif os(watchOS)
+        return "watchOS"
+        #else
+        return "unknown"
+        #endif
+    }
+
+    static func osInfo() -> (String, String) {
+        return (self.osPlatform(), "\(ProcessInfo().operatingSystemVersion.majorVersion).\(ProcessInfo().operatingSystemVersion.minorVersion)")
     }
 }
 
@@ -95,7 +136,7 @@ extension Trackable {
     /**
      Avoid Auth0.swift sending its version on every request to Auth0 API.
      By default we collect our libraries and SDKs versions to help us during support and evaluate usage.
-
+     
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
     public mutating func tracking(enabled: Bool) {
@@ -104,7 +145,7 @@ extension Trackable {
 
     /**
      Send the library/framework, that has Auth0.swift as dependency, when sending telemetry information
-
+     
      - parameter name:    name of library or framework that uses Auth0.swift
      - parameter version: version of library or framework
      */
