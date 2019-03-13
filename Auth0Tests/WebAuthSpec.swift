@@ -230,6 +230,21 @@ class WebAuthSpec: QuickSpec {
                     "query": defaultQuery(withParameters: ["connection_scope": "user_friends"]),
                 ]
             }
+            
+            context("encoding") {
+                
+                itBehavesLike(ValidAuthorizeURLExample) {
+                    let newDefaults = defaults
+                    return [
+                        "url": newWebAuth()
+                            .parameters(["login_hint": "first+last@host.com"])
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, state: "state"),
+                        "domain": Domain,
+                        "query": defaultQuery(withParameters: ["login_hint": "first+last@host.com"]),
+                    ]
+                }
+                
+            }
 
         }
 
