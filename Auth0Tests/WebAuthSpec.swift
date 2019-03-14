@@ -233,15 +233,11 @@ class WebAuthSpec: QuickSpec {
             
             context("encoding") {
                 
-                itBehavesLike(ValidAuthorizeURLExample) {
-                    let newDefaults = defaults
-                    return [
-                        "url": newWebAuth()
+                it("should encode + as %2B"){
+                    let url = newWebAuth()
                             .parameters(["login_hint": "first+last@host.com"])
-                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, state: "state"),
-                        "domain": Domain,
-                        "query": defaultQuery(withParameters: ["login_hint": "first+last@host.com"]),
-                    ]
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: "state")
+                    expect(url.absoluteString.contains("first%2Blast@host.com")).to(beTrue())
                 }
                 
             }
