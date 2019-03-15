@@ -230,6 +230,17 @@ class WebAuthSpec: QuickSpec {
                     "query": defaultQuery(withParameters: ["connection_scope": "user_friends"]),
                 ]
             }
+            
+            context("encoding") {
+                
+                it("should encode + as %2B"){
+                    let url = newWebAuth()
+                            .parameters(["login_hint": "first+last@host.com"])
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: "state")
+                    expect(url.absoluteString.contains("first%2Blast@host.com")).to(beTrue())
+                }
+                
+            }
 
         }
 
