@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.14.2](https://github.com/auth0/Auth0.swift/tree/1.14.2) (2019-03-18)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.14.1...1.14.2)
+
+**Changed**
+- Ensure URL encoding of + as %2B Authorize URL [SDK-691] [\#259](https://github.com/auth0/Auth0.swift/pull/259) ([cocojoe](https://github.com/cocojoe))
+- Updated Auth0 Telemetry Format [\#256](https://github.com/auth0/Auth0.swift/pull/256) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.14.1](https://github.com/auth0/Auth0.swift/tree/1.14.1) (2019-01-11)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.14.0...1.14.1)
 
