@@ -30,7 +30,7 @@ public extension URL {
 
      - returns: URL of your Auth0 account
      */
-    public static func a0_url(_ domain: String) -> URL {
+    static func a0_url(_ domain: String) -> URL {
         let urlString: String
         if !domain.hasPrefix("https") {
             urlString = "https://\(domain)"
