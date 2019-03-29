@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D0E0141224E5FA300E7249A /* SimpleKeychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0E0140224E5FA300E7249A /* SimpleKeychain.framework */; };
+		4D0E0143224E5FE300E7249A /* SimpleKeychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0E0142224E5FE300E7249A /* SimpleKeychain.framework */; };
+		4D0E0145224E5FF800E7249A /* SimpleKeychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0E0144224E5FF800E7249A /* SimpleKeychain.framework */; };
+		4D0E0147224E600900E7249A /* SimpleKeychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0E0146224E600900E7249A /* SimpleKeychain.framework */; };
 		5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5B16D88E1F7141A0009476A5 /* SafariAuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* SafariAuthenticationSession.swift */; };
@@ -388,6 +392,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4D0E0140224E5FA300E7249A /* SimpleKeychain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SimpleKeychain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D0E0142224E5FE300E7249A /* SimpleKeychain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SimpleKeychain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D0E0144224E5FF800E7249A /* SimpleKeychain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SimpleKeychain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D0E0146224E600900E7249A /* SimpleKeychain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SimpleKeychain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B16D88C1F7141A0009476A5 /* SafariAuthenticationSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariAuthenticationSession.swift; path = Auth0/SafariAuthenticationSession.swift; sourceTree = SOURCE_ROOT; };
 		5B16D88D1F7141A0009476A5 /* SafariSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafariSession.swift; path = Auth0/SafariSession.swift; sourceTree = SOURCE_ROOT; };
 		5B16D8921F714324009476A5 /* AuthSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthSession.swift; sourceTree = "<group>"; };
@@ -548,6 +556,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D0E0141224E5FA300E7249A /* SimpleKeychain.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -555,6 +564,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D0E0143224E5FE300E7249A /* SimpleKeychain.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -584,6 +594,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D0E0145224E5FF800E7249A /* SimpleKeychain.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -591,6 +602,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D0E0147224E600900E7249A /* SimpleKeychain.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -751,6 +763,10 @@
 		5F06DDC21CC5712F0011842B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4D0E0146224E600900E7249A /* SimpleKeychain.framework */,
+				4D0E0144224E5FF800E7249A /* SimpleKeychain.framework */,
+				4D0E0142224E5FE300E7249A /* SimpleKeychain.framework */,
+				4D0E0140224E5FA300E7249A /* SimpleKeychain.framework */,
 				5B90A94D219DB501003496EF /* AuthenticationServices.framework */,
 				5B7EE46C20FC9F7800367724 /* SimpleKeychain.framework */,
 				5B7EE49220FCA10100367724 /* SimpleKeychain.framework */,
