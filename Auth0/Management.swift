@@ -35,7 +35,7 @@ struct Management: Trackable, Loggable {
 
     let session: URLSession
 
-    init(token: String, url: URL, session: URLSession = .shared, telemetry: Telemetry = Telemetry()) {
+    init(token: String, url: URL, session: URLSession, telemetry: Telemetry = Telemetry()) {
         self.token = token
         self.url = url
         self.session = session

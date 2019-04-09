@@ -67,7 +67,7 @@ public func authentication(clientId: String, domain: String, session: URLSession
  - returns: Auth0 Authentication API
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func authentication(session: URLSession = .shared, bundle: Bundle = .main) -> Authentication {
+public func authentication(session: URLSession, bundle: Bundle = .main) -> Authentication {
     let values = plistValues(bundle: bundle)!
     return authentication(clientId: values.clientId, domain: values.domain, session: session)
 }
@@ -108,7 +108,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
  - returns: Auth0 Management API v2
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func users(token: String, session: URLSession = .shared, bundle: Bundle = .main) -> Users {
+public func users(token: String, session: URLSession, bundle: Bundle = .main) -> Users {
     let values = plistValues(bundle: bundle)!
     return users(token: token, domain: values.domain, session: session)
 }
@@ -133,7 +133,7 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
 
  - returns: Auth0 Management API v2
  */
-public func users(token: String, domain: String, session: URLSession = .shared) -> Users {
+public func users(token: String, domain: String, session: URLSession) -> Users {
     return Management(token: token, url: .a0_url(domain), session: session)
 }
 

@@ -50,9 +50,9 @@ import Foundation
  - returns: Auth0 WebAuth component
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
+public func webAuth(session: URLSession, bundle: Bundle = Bundle.main) -> WebAuth {
     let values = plistValues(bundle: bundle)!
-    return webAuth(clientId: values.clientId, domain: values.domain)
+    return webAuth(clientId: values.clientId, domain: values.domain, session: session)
 }
 
 /**
@@ -67,8 +67,20 @@ public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
 
  - returns: Auth0 WebAuth component
  */
-public func webAuth(clientId: String, domain: String) -> WebAuth {
-    return Auth0WebAuth(clientId: clientId, url: .a0_url(domain))
+public func webAuth(clientId: String, domain: String, session: URLSession = .shared) -> WebAuth {
+    return SafariWebAuth(clientId: clientId, url: .a0_url(domain), session: session)
+}
+
+/**
+ Resumes the current Auth session (if any).
+
+ - parameter url:     url received by iOS application in AppDelegate
+ - parameter options: dictionary with launch options received by iOS application in AppDelegate
+
+ - returns: if the url was handled by an on going session or not.
+ */
+public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
+    return TransactionStore.shared.resume(url, options: options)
 }
 
 /// WebAuth Authentication using Auth0

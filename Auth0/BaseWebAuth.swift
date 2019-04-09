@@ -29,6 +29,10 @@ class BaseWebAuth: WebAuthenticatable {
 
     let clientId: String
     let url: URL
+    let session: URLSession
+    var telemetry: Telemetry
+
+    let presenter: ControllerModalPresenter
     let storage: TransactionStore
     var telemetry: Telemetry
     var logger: Logger?
@@ -53,10 +57,19 @@ class BaseWebAuth: WebAuthenticatable {
             .appendingPathComponent("callback")
     }()
 
-    init(platform: String, clientId: String, url: URL, storage: TransactionStore, telemetry: Telemetry) {
+    private var authenticationSession = true
+    private var safariPresentationStyle = UIModalPresentationStyle.fullScreen
+
+    convenience init(platform: String, clientId: String, url: URL, session: URLSession, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
+        self.init(clientId: clientId, url: url, session: session, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
+    }
+
+    init(platform: String, clientId: String, url: URL, session: URLSession, presenter: ControllerModalPresenter, storage: TransactionStore, telemetry: Telemetry) {
         self.platform = platform
         self.clientId = clientId
         self.url = url
+        self.session = session
+        self.presenter = presenter
         self.storage = storage
         self.telemetry = telemetry
         self.issuer = "\(url.absoluteString)/"
@@ -247,8 +260,8 @@ class BaseWebAuth: WebAuthenticatable {
         return components.url!
     }
 
-    private func handler(_ redirectURL: URL) -> OAuth2Grant {
-        var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+    func handler(_ redirectURL: URL) -> OAuth2Grant {
+        var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, session: self.session, telemetry: self.telemetry)
         if self.responseType.contains([.code]) { // both Hybrid and Code flow
             authentication.logger = self.logger
             return PKCE(authentication: authentication,
