@@ -5,7 +5,8 @@ coverage:
   ignore:
     - Auth0Tests/*
     - App/*
-    - Auth0/*.m
+    - Auth0/_ObjectiveWebAuth.swift
+    - Auth0/_ObjectiveAuthenticationAPI.swift
   status:
     patch:
       default:
