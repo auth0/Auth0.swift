@@ -5,6 +5,7 @@ coverage:
   ignore:
     - Auth0Tests/*
     - App/*
+    - Auth0/*.m
   status:
     patch:
       default:

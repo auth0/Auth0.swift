@@ -118,11 +118,11 @@ class TelemetrySpec: QuickSpec {
                     .replacingOccurrences(of: "-", with: "+")
                     .replacingOccurrences(of: "_", with: "/")
                 let paddedLength: Int
-                let padding = value.characters.count % 4
+                let padding = value.count % 4
                 if padding > 0 {
-                    paddedLength = value.characters.count + (4 - padding)
+                    paddedLength = value.count + (4 - padding)
                 } else {
-                    paddedLength = value.characters.count
+                    paddedLength = value.count
                 }
                 let padded = value.padding(toLength: paddedLength, withPad: "=", startingAt: 0)
 
