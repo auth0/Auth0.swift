@@ -23,7 +23,7 @@
 import Foundation
 
 public extension Data {
-    public func a0_encodeBase64URLSafe() -> String? {
+    func a0_encodeBase64URLSafe() -> String? {
         return self
             .base64EncodedString(options: [])
             .replacingOccurrences(of: "+", with: "-")

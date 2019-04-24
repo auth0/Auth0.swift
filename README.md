@@ -6,15 +6,15 @@
 [![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
-![Swift 3.2](https://img.shields.io/badge/Swift-4.2-orange.svg?style=flat-square)
+![Swift 5.0](https://img.shields.io/badge/Swift-5.0-orange.svg?style=flat-square)
 
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
 
 ## Requirements
 
-- iOS 9+ / macOS 10.10+ / tvOS 9.2+ / watchOS 2.2+
-- Xcode 9+
-- Swift 3.x/4.x
+- iOS 9+ / macOS 10.11+ / tvOS 9.0+ / watchOS 2.0+
+- Xcode 10.x
+- Swift 4.x/5.x
 
 ## Installation
 
@@ -23,7 +23,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 If you are using Carthage, add the following lines to your `Cartfile`:
 
 ```ruby
-github "auth0/Auth0.swift" ~> 1.14
+github "auth0/Auth0.swift" ~> 1.15
 ```
 
 Then run `carthage bootstrap`.
@@ -36,7 +36,7 @@ If you are using [Cocoapods](https://cocoapods.org/), add these lines to your `P
 
 ```ruby
 use_frameworks!
-pod 'Auth0', '~> 1.14'
+pod 'Auth0', '~> 1.15'
 ```
 
 Then run `pod install`.
