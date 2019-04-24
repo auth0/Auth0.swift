@@ -71,4 +71,6 @@ Pod::Spec.new do |s|
   s.tvos.source_files = 'Auth0/*.swift'
   s.tvos.exclude_files = web_auth_files
   s.tvos.dependency 'SimpleKeychain'
+
+  s.swift_version = '4.0'
 end
