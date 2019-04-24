@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.15.0](https://github.com/auth0/Auth0.swift/tree/1.15.0) (2019-04-24)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.14.2...1.15.0)
+
+**Added**
+- Added Swift 5 / Xcode 10.2 Support [\#272](https://github.com/auth0/Auth0.swift/pull/272) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.14.2](https://github.com/auth0/Auth0.swift/tree/1.14.2) (2019-03-18)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.14.1...1.14.2)
 
