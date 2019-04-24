@@ -101,7 +101,7 @@ public extension NativeAuthTransaction {
      - parameter callback: closure that will notify with the result of the Auth transaction. On success it will yield the Auth0 credentilas of the user otherwise it will yield the cause of the failure.
      - important: Only one `AuthTransaction` can be active at a given time, if there is a pending one (OAuth or Native) it will be cancelled and replaced by the new one.
      */
-    public func start(callback: @escaping (Result<Credentials>) -> Void) {
+    func start(callback: @escaping (Result<Credentials>) -> Void) {
         TransactionStore.shared.store(self)
         self.auth { result in
             switch result {
