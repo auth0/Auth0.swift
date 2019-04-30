@@ -191,6 +191,14 @@ public protocol WebAuth: Trackable, Loggable {
     func useLegacyAuthentication() -> Self
 
     /**
+     Change modal presentation style if using `SFSafariViewController`.
+     
+     - returns: the same WebAuth instance to allow method chaining
+     */
+    @available(iOS 11, *)
+    func legacyAuthenticationPresentationStyle(_ style: UIModalPresentationStyle) -> Self
+
+    /**
      Starts the WebAuth flow by modally presenting a ViewController in the top-most controller.
 
      ```

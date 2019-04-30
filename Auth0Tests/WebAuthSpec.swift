@@ -322,6 +322,12 @@ class WebAuthSpec: QuickSpec {
                 callback(.failure(error: WebAuthError.userCancelled))
                 expect(result).toEventually(beFailure())
             }
+            
+            it("should present user overrided presentation style") {
+                let auth = newWebAuth().useLegacyAuthentication().legacyAuthenticationPresentationStyle(.overFullScreen)
+                let controller = auth.newSafari(DomainURL, callback: { _ in }).0
+                expect(controller.modalPresentationStyle) == .overFullScreen
+            }
         }
 
         describe("logout") {

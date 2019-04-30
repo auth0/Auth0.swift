@@ -39,6 +39,7 @@ class SafariWebAuth: WebAuth {
     var responseType: [ResponseType] = [.code]
     var nonce: String?
     private var authenticationSession = true
+    private var safariPresentationStyle = UIModalPresentationStyle.fullScreen
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
@@ -106,6 +107,11 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
+    func legacyAuthenticationPresentationStyle(_ style: UIModalPresentationStyle) -> Self {
+        self.safariPresentationStyle = style
+        return self
+    }
+
     func start(_ callback: @escaping (Result<Credentials>) -> Void) {
         guard
             let redirectURL = self.redirectURL, !redirectURL.absoluteString.hasPrefix(SafariWebAuth.NoBundleIdentifier)
@@ -144,6 +150,7 @@ class SafariWebAuth: WebAuth {
 
     func newSafari(_ authorizeURL: URL, callback: @escaping (Result<Credentials>) -> Void) -> (SFSafariViewController, (Result<Credentials>) -> Void) {
         let controller = SFSafariViewController(url: authorizeURL)
+        controller.modalPresentationStyle = safariPresentationStyle
         let finish: (Result<Credentials>) -> Void = { [weak controller] (result: Result<Credentials>) -> Void in
             guard let presenting = controller?.presentingViewController else {
                 return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
