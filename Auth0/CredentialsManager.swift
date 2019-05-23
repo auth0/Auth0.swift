@@ -41,6 +41,7 @@ public struct CredentialsManager {
     /// - Parameters:
     ///   - authentication: Auth0 authentication instance
     ///   - storeKey: Key used to store user credentials in the keychain, defaults to "credentials"
+    ///   - storage: The A0SimpleKeychain object that user credentials are saved to. Defaults to the standard application keychain
     public init(authentication: Authentication, storeKey: String = "credentials", storage: A0SimpleKeychain = A0SimpleKeychain()) {
         self.storeKey = storeKey
         self.authentication = authentication
