@@ -29,7 +29,7 @@ import LocalAuthentication
 /// Credentials management utility
 public struct CredentialsManager {
 
-    private let storage: A0SimpleKeychain
+    internal let storage: A0SimpleKeychain
     private let storeKey: String
     private let authentication: Authentication
     #if os(iOS)
