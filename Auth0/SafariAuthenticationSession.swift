@@ -51,6 +51,15 @@ class SafariAuthenticationSession: AuthSession {
                 return session.start()
             }
         }
+
+        func cancel() {
+            switch self {
+            case .authenticationServices(let session):
+                return session.cancel()
+            case .safariServices(let session):
+                return session.cancel()
+            }
+        }
     }
 
     private var authSession: AuthenticationSession?
@@ -101,6 +110,12 @@ class SafariAuthenticationSession: AuthSession {
         #endif
 
         _ = authSession?.start()
+    }
+
+    override func cancel() {
+        super.cancel()
+        authSession?.cancel()
+        authSession = nil
     }
 }
 #endif
