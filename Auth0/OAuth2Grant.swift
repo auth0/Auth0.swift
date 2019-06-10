@@ -106,7 +106,7 @@ struct PKCE: OAuth2Grant {
             .start { result in
                 // Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
                 if case .failure(let cause as AuthenticationError) = result, cause.description == "Unauthorized" {
-                    let error = WebAuthError.pkceNotAllowed("Please go to 'https://manage.auth0.com/#/applications/\(clientId)/settings' and make sure 'Client Type' is 'Native' to enable PKCE.")
+                    let error = WebAuthError.pkceNotAllowed("Unable to complete authentication with PKCE. PKCE support can be enabled by setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app at 'https://manage.auth0.com/#/applications/\(clientId)/settings'.")
                     callback(Result.failure(error: error))
                 } else {
                     callback(result)
