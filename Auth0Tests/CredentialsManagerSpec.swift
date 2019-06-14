@@ -45,12 +45,11 @@ class CredentialsManagerSpec: QuickSpec {
     override func spec() {
 
         let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
-        let storage = A0SimpleKeychain(service: "test_service")
         var credentialsManager: CredentialsManager!
         var credentials: Credentials!
 
         beforeEach {
-            credentialsManager = CredentialsManager(authentication: authentication, storage: storage)
+            credentialsManager = CredentialsManager(authentication: authentication)
             credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
         }
 
@@ -71,11 +70,6 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should fail to clear credentials") {
                 expect(credentialsManager.clear()).to(beFalse())
-            }
-
-            it("should accept custom keychains") {
-                expect(credentialsManager.storage.service).to(match("test_service"))
-                expect(credentialsManager.storage.service).toNot(match("credentials"))
             }
         }
         
@@ -308,6 +302,17 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
             
+            context("custom keychain", closure: {
+                beforeEach {
+                    let storage = A0SimpleKeychain(service: "test_service")
+                    credentialsManager = CredentialsManager(authentication: authentication,
+                                                            storage: storage)
+                }
+                
+                it("should accept custom keychains") {
+                    expect(credentialsManager.storage.service).to(match("test_service"))
+                }
+            })
         }
     }
 }
