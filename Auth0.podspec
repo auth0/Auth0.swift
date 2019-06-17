@@ -72,5 +72,5 @@ Pod::Spec.new do |s|
   s.tvos.exclude_files = web_auth_files
   s.tvos.dependency 'SimpleKeychain'
 
-  s.swift_version = '5.0'
+  s.swift_versions = ['4.0', '4.1', '4.2', '5.0']
 end
