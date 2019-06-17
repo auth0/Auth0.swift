@@ -323,12 +323,6 @@ class WebAuthSpec: QuickSpec {
                 expect(result).toEventually(beFailure())
             }
             
-            it("should present a default presentation style") {
-                let auth = newWebAuth().useLegacyAuthentication()
-                let controller = auth.newSafari(DomainURL, callback: { _ in }).0
-                expect(controller.modalPresentationStyle) == .fullScreen
-            }
-            
             it("should present user overrided presentation style") {
                 let auth = newWebAuth().useLegacyAuthentication(withStyle: .overFullScreen)
                 let controller = auth.newSafari(DomainURL, callback: { _ in }).0
@@ -381,7 +375,7 @@ class WebAuthSpec: QuickSpec {
                 it("should launch silent safari viewcontroller") {
                     let auth = newWebAuth()
                     #if swift(>=3.2)
-                    _ = auth.useLegacyAuthentication()
+                    _ = auth.useLegacyAuthentication(withStyle: .fullScreen)
                     #endif
                     auth.clearSession(federated: false) { _ in }
                     expect(auth.presenter.topViewController is SilentSafariViewController).toNot(beNil())
