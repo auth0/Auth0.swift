@@ -47,7 +47,6 @@ class CredentialsManagerSpec: QuickSpec {
         let authentication = Auth0.authentication(clientId: ClientId, domain: Domain)
         var credentialsManager: CredentialsManager!
         var credentials: Credentials!
-        var storage: A0SimpleKeychain?
 
         beforeEach {
             credentialsManager = CredentialsManager(authentication: authentication)
@@ -303,17 +302,20 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
             
-            context("custom keychain", closure: {
+            context("custom keychain") {
+                let storage = A0SimpleKeychain(service: "test_service")
                 beforeEach {
-                    storage = A0SimpleKeychain(service: "test_service")
                     credentialsManager = CredentialsManager(authentication: authentication,
-                                                            storage: storage ?? A0SimpleKeychain())
+                                                            storage: storage)
                 }
                 
                 it("should accept custom keychains") {
-                    expect(storage?.service).to(match("test_service"))
+                    expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                    expect(storage.data(forKey: "credentials")).toNot(beNil())
+                    expect(credentialsManager.clear()).to(beTrue())
+                    expect(storage.data(forKey: "credentials")).to(beNil())
                 }
-            })
+            }
         }
     }
 }
