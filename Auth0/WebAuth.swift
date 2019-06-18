@@ -246,7 +246,7 @@ public protocol WebAuth: Trackable, Loggable {
 }
 
 public extension WebAuth {
-    
+
     /**
      Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
      in iOS 11.0+.
