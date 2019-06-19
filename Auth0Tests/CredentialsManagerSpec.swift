@@ -309,10 +309,10 @@ class CredentialsManagerSpec: QuickSpec {
                                                             storage: storage)
                 }
                 
-                it("should accept custom keychains") {
-                    expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                it("custom keychain should successfully set and clear credentials") {
+                    _ = credentialsManager.store(credentials: credentials)
                     expect(storage.data(forKey: "credentials")).toNot(beNil())
-                    expect(credentialsManager.clear()).to(beTrue())
+                    _ = credentialsManager.clear()
                     expect(storage.data(forKey: "credentials")).to(beNil())
                 }
             }
