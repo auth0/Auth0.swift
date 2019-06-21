@@ -185,10 +185,11 @@ public protocol WebAuth: Trackable, Loggable {
      Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
      in iOS 11.0+.
 
+     - Parameter style: modal presentation style
      - returns: the same WebAuth instance to allow method chaining
      */
     @available(iOS 11, *)
-    func useLegacyAuthentication() -> Self
+    func useLegacyAuthentication(withStyle style: UIModalPresentationStyle) -> Self
 
     /**
      Starts the WebAuth flow by modally presenting a ViewController in the top-most controller.
@@ -242,4 +243,19 @@ public protocol WebAuth: Trackable, Loggable {
      - parameter callback: callback called with bool outcome of the call
      */
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void)
+}
+
+public extension WebAuth {
+
+    /**
+     Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
+     in iOS 11.0+.
+     Defaults to .fullScreen modal presentation style.
+     
+     - returns: the same WebAuth instance to allow method chaining
+     */
+    @available(iOS 11, *)
+    func useLegacyAuthentication() -> Self {
+        return useLegacyAuthentication(withStyle: .fullScreen)
+    }
 }
