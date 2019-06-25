@@ -71,7 +71,6 @@ class CredentialsManagerSpec: QuickSpec {
             it("should fail to clear credentials") {
                 expect(credentialsManager.clear()).to(beFalse())
             }
-            
         }
         
         describe("multi instances of credentials manager") {
@@ -303,6 +302,20 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
             
+            context("custom keychain") {
+                let storage = A0SimpleKeychain(service: "test_service")
+                beforeEach {
+                    credentialsManager = CredentialsManager(authentication: authentication,
+                                                            storage: storage)
+                }
+                
+                it("custom keychain should successfully set and clear credentials") {
+                    _ = credentialsManager.store(credentials: credentials)
+                    expect(storage.data(forKey: "credentials")).toNot(beNil())
+                    _ = credentialsManager.clear()
+                    expect(storage.data(forKey: "credentials")).to(beNil())
+                }
+            }
         }
     }
 }
