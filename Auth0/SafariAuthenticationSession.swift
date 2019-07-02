@@ -38,10 +38,11 @@ class SafariAuthenticationSession: AuthSession {
         if #available(iOS 12.0, *) {
             let authSession = ASWebAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
                 guard $1 == nil, let callbackURL = $0 else {
-                    if case ASWebAuthenticationSessionError.canceledLogin = $1! {
+                    let authError = $1 ?? WebAuthError.unknownError
+                    if case ASWebAuthenticationSessionError.canceledLogin = authError {
                         self.finish(.failure(error: WebAuthError.userCancelled))
                     } else {
-                        self.finish(.failure(error: $1!))
+                        self.finish(.failure(error: authError))
                     }
                     return TransactionStore.shared.clear()
                 }
@@ -52,10 +53,11 @@ class SafariAuthenticationSession: AuthSession {
         } else {
             let authSession = SFAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
                 guard $1 == nil, let callbackURL = $0 else {
-                    if case SFAuthenticationError.canceledLogin = $1! {
+                    let authError = $1 ?? WebAuthError.unknownError
+                    if case SFAuthenticationError.canceledLogin = authError {
                         self.finish(.failure(error: WebAuthError.userCancelled))
                     } else {
-                        self.finish(.failure(error: $1!))
+                        self.finish(.failure(error: authError))
                     }
                     return TransactionStore.shared.clear()
                 }
@@ -67,10 +69,11 @@ class SafariAuthenticationSession: AuthSession {
         #else
         let authSession = SFAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
             guard $1 == nil, let callbackURL = $0 else {
-                if case SFAuthenticationError.canceledLogin = $1! {
+                let authError = $1 ?? WebAuthError.unknownError
+                if case SFAuthenticationError.canceledLogin = authError {
                     self.finish(.failure(error: WebAuthError.userCancelled))
                 } else {
-                    self.finish(.failure(error: $1!))
+                    self.finish(.failure(error: authError))
                 }
                 return TransactionStore.shared.clear()
             }
