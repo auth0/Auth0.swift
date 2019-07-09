@@ -155,7 +155,7 @@ public protocol Authentication: Trackable, Loggable {
         .start { print($0) }
      ```
 
-     you can also add additional attributes when creating the user
+     you can also add additional metadata when creating the user
 
      ```
      Auth0
@@ -178,10 +178,12 @@ public protocol Authentication: Trackable, Loggable {
      - parameter password:          password for the new user
      - parameter connection:        name where the user will be created (Database connection)
      - parameter userMetadata:      additional userMetadata parameters that will be added to the newly created user.
+     - parameter rootAttributes:    root attributes that will be added to the newly created user.
 
      - returns: request that will yield a created database user (just email, username and email verified flag)
      */
-    func createUser(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
+    // swiftlint:disable:next function_parameter_count
+    func createUser(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
     /**
      Resets a Database user password
@@ -632,11 +634,12 @@ public extension Authentication {
      - parameter password:          password for the new user
      - parameter connection:        name where the user will be created (Database connection)
      - parameter userMetadata:      additional userMetadata parameters that will be added to the newly created user.
+     - parameter rootAttributes:    root attributes that will be added to the newly created user. See https://auth0.com/docs/api/authentication#signup for supported attributes.
 
      - returns: request that will yield a created database user (just email, username and email verified flag)
      */
-    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
-        return self.createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
+    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+        return self.createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
     }
 
     /**

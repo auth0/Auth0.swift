@@ -83,7 +83,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: url, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         var payload: [String: Any] = [
             "email": email,
             "password": password,
@@ -92,6 +92,11 @@ struct Auth0Authentication: Authentication {
             ]
         payload["username"] = username
         payload["user_metadata"] = userMetadata
+        if let rootAttributes = rootAttributes {
+            rootAttributes.forEach { (key, value) in
+                if payload[key] == nil { payload[key] = value }
+            }
+        }
 
         let createUser = URL(string: "/dbconnections/signup", relativeTo: self.url)!
         return Request(session: session, url: createUser, method: "POST", handle: databaseUser, payload: payload, logger: self.logger, telemetry: self.telemetry)
