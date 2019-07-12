@@ -178,8 +178,8 @@ public protocol Authentication: Trackable, Loggable {
      - parameter password:          password for the new user
      - parameter connection:        name where the user will be created (Database connection)
      - parameter userMetadata:      additional userMetadata parameters that will be added to the newly created user.
-     - parameter rootAttributes:    root attributes that will be added to the newly created user.
-
+     - parameter rootAttributes:    root attributes that will be added to the newly created user. See https://auth0.com/docs/api/authentication#signup for supported attributes. Will not overwrite existing parameters.
+     
      - returns: request that will yield a created database user (just email, username and email verified flag)
      */
     // swiftlint:disable:next function_parameter_count
@@ -634,12 +634,27 @@ public extension Authentication {
      - parameter password:          password for the new user
      - parameter connection:        name where the user will be created (Database connection)
      - parameter userMetadata:      additional userMetadata parameters that will be added to the newly created user.
-     - parameter rootAttributes:    root attributes that will be added to the newly created user. See https://auth0.com/docs/api/authentication#signup for supported attributes.
+     - parameter rootAttributes:    root attributes that will be added to the newly created user. See https://auth0.com/docs/api/authentication#signup for supported attributes. Will not overwrite existing parameters.
 
      - returns: request that will yield a created database user (just email, username and email verified flag)
      */
     func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         return self.createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
+    }
+
+    /**
+     Creates a user in a Database connection
+     
+     - parameter email:             email of the user to create
+     - parameter username:          username of the user if the connection requires username. By default is 'nil'
+     - parameter password:          password for the new user
+     - parameter connection:        name where the user will be created (Database connection)
+     - parameter userMetadata:      additional userMetadata parameters that will be added to the newly created user.
+    
+     - returns: request that will yield a created database user (just email, username and email verified flag)
+     */
+    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+        return self.createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: nil)
     }
 
     /**
