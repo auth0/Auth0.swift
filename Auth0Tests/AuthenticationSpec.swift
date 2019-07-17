@@ -415,6 +415,35 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+            
+            context("root attributes") {
+                
+                it("should send root attributes") {
+                    let attributes = ["family_name": "Doe",
+                                      "nickname" : "Johnny"]
+                    stub(condition: isSignUp(Domain) && hasAtLeast(attributes)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/root attributes"
+                    waitUntil(timeout: Timeout) { done in
+                        auth.createUser(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, rootAttributes: attributes).start { result in
+                            expect(result).to(haveCreatedUser(SupportAtAuth0))
+                            done()
+                        }
+                    }
+                }
+                
+                it("should send root attributes but not overwrite existing email") {
+                    let attributes = ["family_name": "Doe",
+                                      "nickname" : "Johnny",
+                                      "email" : "root@email.com"]
+                    stub(condition: isSignUp(Domain) && !hasAtLeast(attributes)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/root attributes"
+                    waitUntil(timeout: Timeout) { done in
+                        auth.createUser(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, rootAttributes: attributes).start { result in
+                            expect(result).to(haveCreatedUser(SupportAtAuth0))
+                            done()
+                        }
+                    }
+                }
+                
+            }
 
         }
 

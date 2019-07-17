@@ -239,8 +239,8 @@ private func generateDefaultState() -> String? {
     var data = Data(count: 32)
     var tempData = data
 
-    let result = tempData.withUnsafeMutableBytes { (bytes: UnsafeMutablePointer<UInt8>) -> Int in
-        return Int(SecRandomCopyBytes(kSecRandomDefault, data.count, bytes))
+    let result = tempData.withUnsafeMutableBytes {
+        SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
     }
 
     guard result == 0 else { return nil }
