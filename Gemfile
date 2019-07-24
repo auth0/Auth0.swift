@@ -7,3 +7,4 @@ plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
 eval_gemfile(plugins_path) if File.exist?(plugins_path)
 
 gem "cocoapods", ">= 1.6.0.beta.2"
+gem "mini_magick", ">= 4.9.4"

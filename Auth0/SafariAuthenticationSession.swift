@@ -112,7 +112,7 @@ class SafariAuthenticationSession: AuthSession {
         _ = authSession?.start()
     }
 
-    override func resume(_ url: URL, options: [A0URLOptionsKey : Any]) -> Bool {
+    override func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
         if super.resume(url, options: options) {
             authSession?.cancel()
             authSession = nil
