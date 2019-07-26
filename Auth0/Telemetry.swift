@@ -22,7 +22,7 @@
 
 import Foundation
 
-public struct Telemetry {
+public class Telemetry {
 
     static let NameKey = "name"
     static let VersionKey = "version"
@@ -44,7 +44,7 @@ public struct Telemetry {
         self.info = Telemetry.generateValue()
     }
 
-    mutating func wrapped(inLibrary name: String, version: String) {
+    func wrapped(inLibrary name: String, version: String) {
         let info = Telemetry.versionInformation()
         var env = Telemetry.generateEnviroment()
         if let libVersion = info[Telemetry.VersionKey] as? String {
