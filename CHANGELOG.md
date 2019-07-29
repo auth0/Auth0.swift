@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.16.1](https://github.com/auth0/Auth0.swift/tree/1.16.1) (2019-07-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.16.0...1.16.1)
+
+**Fixed**
+- Fixed ObjMembers attribute added for ObjC access [\#289](https://github.com/auth0/Auth0.swift/pull/289) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.16.0](https://github.com/auth0/Auth0.swift/tree/1.16.0) (2019-07-17)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.15.0...1.16.0)
 
