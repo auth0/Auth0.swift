@@ -72,6 +72,22 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String? = nil, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
+        let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
+        var payload: [String: Any] = [
+            "username": username,
+            "password": password,
+            "grant_type": "password",
+            "client_id": self.clientId
+        ]
+        payload["audience"] = audience
+        payload["scope"] = scope
+        if let parameters = parameters {
+            parameters.forEach { key, value in payload[key] = value }
+        }
+        return Request(session: session, url: resourceOwner, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
+    }
+
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "/oauth/token", relativeTo: self.url)!
         let payload: [String: Any] = [
