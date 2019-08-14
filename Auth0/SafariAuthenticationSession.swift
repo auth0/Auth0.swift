@@ -29,9 +29,12 @@ import AuthenticationServices
 #if swift(>=3.2)
 @available(iOS 11.0, *)
 class SafariAuthenticationSession: AuthSession {
+
     private enum AuthenticationSession {
+
         @available(iOS 12.0, *)
         case authenticationServices(ASWebAuthenticationSession)
+
         case safariServices(SFAuthenticationSession)
 
         @available(iOS 12.0, *)
@@ -64,11 +67,11 @@ class SafariAuthenticationSession: AuthSession {
 
     private var authSession: AuthenticationSession?
 
-    init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
+    init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?, presentationContextController: Any? = nil) {
         super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
         #if canImport(AuthenticationServices)
         if #available(iOS 12.0, *) {
-            authSession = .init(ASWebAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
+            let webAuthenticationSession = ASWebAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
                 guard $1 == nil, let callbackURL = $0 else {
                     let authError = $1 ?? WebAuthError.unknownError
                     if case ASWebAuthenticationSessionError.canceledLogin = authError {
@@ -79,7 +82,11 @@ class SafariAuthenticationSession: AuthSession {
                     return TransactionStore.shared.clear()
                 }
                 _ = TransactionStore.shared.resume(callbackURL, options: [:])
-            })
+            }
+            if #available(iOS 13.0, *) {
+            webAuthenticationSession.presentationContextProvider = presentationContextController as? ASWebAuthenticationPresentationContextProviding
+            }
+            authSession = .init(webAuthenticationSession)
         } else {
             authSession = .init(SFAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
                 guard $1 == nil, let callbackURL = $0 else {
@@ -108,7 +115,6 @@ class SafariAuthenticationSession: AuthSession {
             _ = TransactionStore.shared.resume(callbackURL, options: [:])
         })
         #endif
-
         _ = authSession?.start()
     }
 

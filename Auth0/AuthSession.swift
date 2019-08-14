@@ -59,7 +59,7 @@ class AuthSession: NSObject, AuthTransaction {
                 self.finish(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
                 return false
             }
-        var items = self.handler.values(fromComponents: components)
+        let items = self.handler.values(fromComponents: components)
         guard has(state: self.state, inItems: items) else { return false }
         if items["error"] != nil {
             self.finish(.failure(error: AuthenticationError(info: items, statusCode: 0)))

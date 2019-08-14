@@ -2,7 +2,7 @@ version: 2
 jobs:
   build-iOS-Swift-5.0:
     macos:
-      xcode: "10.2.0"
+      xcode: "10.3.0"
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
@@ -35,7 +35,7 @@ jobs:
           path: fastlane/test_output
   build-iOS-Swift-4.2:
     macos:
-      xcode: "10.2.0"
+      xcode: "10.3.0"
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
@@ -69,7 +69,7 @@ jobs:
           path: fastlane/test_output
   build-iOS-Swift-4.0:
     macos:
-      xcode: "10.2.0"
+      xcode: "10.3.0"
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
@@ -99,7 +99,7 @@ jobs:
             - Carthage/Build
   build-macOS-Swift-5.0:
     macos:
-      xcode: "10.2.0"
+      xcode: "10.3.0"
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
@@ -131,7 +131,7 @@ jobs:
             - Carthage/Build
   build-macOS-Swift-4.2:
     macos:
-      xcode: "10.2.0"
+      xcode: "10.3.0"
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
@@ -164,7 +164,7 @@ jobs:
             - Carthage/Build
   build-tvOS-Swift-5.0:
     macos:
-      xcode: "10.2.0"
+      xcode: "10.3.0"
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
@@ -189,7 +189,7 @@ jobs:
             - Carthage/Build
   build-tvOS-Swift-4.2:
     macos:
-      xcode: "10.2.0"
+      xcode: "10.3.0"
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8

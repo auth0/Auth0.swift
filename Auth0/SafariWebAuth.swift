@@ -22,6 +22,9 @@
 
 import UIKit
 import SafariServices
+#if canImport(AuthenticationServices)
+import AuthenticationServices
+#endif
 
 class SafariWebAuth: WebAuth {
 
@@ -40,6 +43,7 @@ class SafariWebAuth: WebAuth {
     var nonce: String?
     private var authenticationSession = true
     private var safariPresentationStyle = UIModalPresentationStyle.fullScreen
+    var presentationContextProvider: Any?
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
@@ -123,7 +127,7 @@ class SafariWebAuth: WebAuth {
 
         #if swift(>=3.2)
         if #available(iOS 11.0, *), self.authenticationSession {
-            let session = SafariAuthenticationSession(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, finish: callback, logger: logger)
+            let session = SafariAuthenticationSession(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, finish: callback, logger: logger, presentationContextController: presentationContextProvider)
             logger?.trace(url: authorizeURL, source: "SafariAuthenticationSession")
             self.storage.store(session)
         } else {
@@ -233,10 +237,16 @@ class SafariWebAuth: WebAuth {
             self.presenter.present(controller: controller)
         #endif
     }
+
+    @available(iOS 13.0, *)
+    func presentationContextProvider(_ context: ASWebAuthenticationPresentationContextProviding) -> Self {
+        self.presentationContextProvider = context
+        return self
+    }
 }
 
 private func generateDefaultState() -> String? {
-    var data = Data(count: 32)
+    let data = Data(count: 32)
     var tempData = data
 
     let result = tempData.withUnsafeMutableBytes {
