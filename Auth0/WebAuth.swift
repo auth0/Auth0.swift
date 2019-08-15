@@ -246,11 +246,6 @@ public protocol WebAuth: Trackable, Loggable {
      - parameter callback: callback called with bool outcome of the call
      */
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void)
-
-    /// Provides context for Web Authentication where in the application's UI the authorization view should be shown.
-    /// - Parameter context: The presentationContextProvider delegate to use 
-    @available(iOS 13, *)
-    func presentationContextProvider(_ context: ASWebAuthenticationPresentationContextProviding) -> Self
 }
 
 public extension WebAuth {

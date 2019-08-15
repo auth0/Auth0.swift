@@ -12,7 +12,7 @@ import Auth0
 import AuthenticationServices
 #endif
 
-class ViewController: UIViewController, ASWebAuthenticationPresentationContextProviding {
+class ViewController: UIViewController {
     
     var onAuth: ((Result<Credentials>) -> ())!
     
@@ -41,22 +41,10 @@ class ViewController: UIViewController, ASWebAuthenticationPresentationContextPr
         }
     }
     
-    @available(iOS 12.0, *)
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return self.view.window ?? ASPresentationAnchor()
-    }
-    
     @IBAction func startOAuth2(_ sender: Any) {
-        if #available(iOS 13, *) {
-        Auth0.webAuth()
-            .logging(enabled: true)
-            .presentationContextProvider(self)
-            .start(onAuth)
-        } else {
             Auth0.webAuth()
             .logging(enabled: true)
             .start(onAuth)
-        }
     }
     
     @IBAction func startGoogleOAuth2(_ sender: Any) {

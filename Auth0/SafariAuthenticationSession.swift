@@ -84,7 +84,7 @@ class SafariAuthenticationSession: AuthSession {
                 _ = TransactionStore.shared.resume(callbackURL, options: [:])
             }
             if #available(iOS 13.0, *) {
-            webAuthenticationSession.presentationContextProvider = presentationContextController as? ASWebAuthenticationPresentationContextProviding
+                webAuthenticationSession.presentationContextProvider = self
             }
             authSession = .init(webAuthenticationSession)
         } else {
@@ -131,6 +131,13 @@ class SafariAuthenticationSession: AuthSession {
         super.cancel()
         authSession?.cancel()
         authSession = nil
+    }
+}
+
+@available(iOS 13.0, *)
+extension SafariAuthenticationSession: ASWebAuthenticationPresentationContextProviding {
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return UIApplication.shared.keyWindow ?? ASPresentationAnchor()
     }
 }
 #endif
