@@ -12,8 +12,8 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - run:
-        name: Set Ruby Version
-        command:  echo "ruby-2.5" > ~/.ruby-version 
+          name: Set Ruby Version
+          command:  echo "ruby-2.5" > ~/.ruby-version 
       - checkout
       - run: |
           brew install swiftlint
