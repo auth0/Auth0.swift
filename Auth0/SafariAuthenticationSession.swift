@@ -67,7 +67,7 @@ class SafariAuthenticationSession: AuthSession {
 
     private var authSession: AuthenticationSession?
 
-    init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?, presentationContextController: Any? = nil) {
+    init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
         super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
         #if canImport(AuthenticationServices)
         if #available(iOS 12.0, *) {
