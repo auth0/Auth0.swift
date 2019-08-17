@@ -1,8 +1,9 @@
 version: 2
 jobs:
-  build-iOS-13-Swift-5.0:
+  build-iOS-Swift-5.1:
     macos:
       xcode: "11.0.0"
+    shell: /bin/bash --login -eo pipefail
     environment:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
@@ -10,6 +11,9 @@ jobs:
           HOMEBREW_TEMP: ~/homebrew-temp
           HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
+      - run:
+        name: Set Ruby Version
+        command:  echo "ruby-2.5" > ~/.ruby-version 
       - checkout
       - run: |
           brew install swiftlint
@@ -247,7 +251,7 @@ workflows:
   version: 2
   build:
     jobs:
-      -  build-iOS-13-Swift-5.0
+      -  build-iOS-Swift-5.1
       -  build-iOS-Swift-5.0
       -  build-iOS-Swift-4.2
       -  build-iOS-Swift-4.0
