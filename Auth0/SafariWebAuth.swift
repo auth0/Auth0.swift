@@ -22,6 +22,9 @@
 
 import UIKit
 import SafariServices
+#if canImport(AuthenticationServices)
+import AuthenticationServices
+#endif
 
 class SafariWebAuth: WebAuth {
 
@@ -236,7 +239,7 @@ class SafariWebAuth: WebAuth {
 }
 
 private func generateDefaultState() -> String? {
-    var data = Data(count: 32)
+    let data = Data(count: 32)
     var tempData = data
 
     let result = tempData.withUnsafeMutableBytes {

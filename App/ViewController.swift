@@ -8,16 +8,19 @@
 
 import UIKit
 import Auth0
+#if canImport(AuthenticationServices)
+import AuthenticationServices
+#endif
 
 class ViewController: UIViewController {
-
+    
     var onAuth: ((Result<Credentials>) -> ())!
-
+    
     @IBOutlet weak var oauth2: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.onAuth = { [weak self] in
             switch $0 {
             case .failure(let cause):
@@ -37,20 +40,20 @@ class ViewController: UIViewController {
             print($0)
         }
     }
-
+    
     @IBAction func startOAuth2(_ sender: Any) {
-        Auth0.webAuth()
+            Auth0.webAuth()
             .logging(enabled: true)
             .start(onAuth)
     }
-
+    
     @IBAction func startGoogleOAuth2(_ sender: Any) {
         Auth0.webAuth()
             .logging(enabled: true)
             .connection("google-oauth2")
             .start(onAuth)
     }
-
+    
     @IBAction func startTokenGoogleOAuth2(_ sender: Any) {
         Auth0.webAuth()
             .logging(enabled: true)
@@ -58,7 +61,7 @@ class ViewController: UIViewController {
             .responseType([.token])
             .start(onAuth)
     }
-
+    
     @IBAction func startIDTokenGoogleOAuth2(_ sender: Any) {
         Auth0.webAuth()
             .logging(enabled: true)
@@ -67,7 +70,7 @@ class ViewController: UIViewController {
             .nonce("abc1234")
             .start(onAuth)
     }
-
+    
     @IBAction func startTokenIDTokenGoogleOAuth2(_ sender: Any) {
         Auth0.webAuth()
             .logging(enabled: true)
@@ -76,7 +79,7 @@ class ViewController: UIViewController {
             .nonce("abc1234")
             .start(onAuth)
     }
-
+    
     @IBAction func startCodeIDTokenGoogleOAuth2(_ sender: Any) {
         Auth0.webAuth()
             .logging(enabled: true)
