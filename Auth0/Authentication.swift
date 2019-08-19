@@ -146,6 +146,40 @@ public protocol Authentication: Trackable, Loggable {
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
     /**
+     Login using username and password in the default directory
+     
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .loginDefaultDirectory(
+     withUsername: "support@auth0.com",
+     password: "a secret password")
+     ```
+     
+     You can also specify audience and scope
+     
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .loginDefaultDirectory(
+     withUsername: "support@auth0.com",
+     password: "a secret password",
+     audience: "https://myapi.com/api",
+     scope: "openid profile")
+     ```
+     
+     - parameter username:    username or email used of the user to authenticate
+     - parameter password:    password of the user
+     - parameter audience:    API Identifier that the client is requesting access to.
+     - parameter scope:       scope value requested when authenticating the user.
+     - parameter parameters:  additional parameters that are optionally sent with the authentication request
+     
+     - important: This only works if you have the OAuth 2.0 API Authorization flag on
+     - returns: authentication request that will yield Auth0 User Credentials
+     */
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError>
+
+    /**
      Creates a user in a Database connection
 
      ```
@@ -599,6 +633,42 @@ public extension Authentication {
      */
     func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope, parameters: parameters)
+    }
+    
+    /**
+     Login using username and password in the default directory
+     
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .loginDefaultDirectory(
+     withUsername: "support@auth0.com",
+     password: "a secret password")
+     ```
+     
+     You can also specify audience and scope
+     
+     ```
+     Auth0
+     .authentication(clientId: clientId, domain: "samples.auth0.com")
+     .loginDefaultDirectory(
+     withUsername: "support@auth0.com",
+     password: "a secret password",
+     audience: "https://myapi.com/api",
+     scope: "openid profile")
+     ```
+     
+     - parameter username:    username or email used of the user to authenticate
+     - parameter password:    password of the user
+     - parameter audience:    API Identifier that the client is requesting access to.
+     - parameter scope:       scope value requested when authenticating the user.
+     - parameter parameters:  additional parameters that are optionally sent with the authentication request
+     
+     - important: This only works if you have the OAuth 2.0 API Authorization flag on
+     - returns: authentication request that will yield Auth0 User Credentials
+     */
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String? = nil, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope, parameters: parameters)
     }
 
     /**
