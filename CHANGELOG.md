@@ -7,6 +7,9 @@
 - Added support for iOS13 changes in ASWebAuthenticationSession [\#297](https://github.com/auth0/Auth0.swift/pull/297) ([cocojoe](https://github.com/cocojoe))
 - Added authentication method for default directory login [\#296](https://github.com/auth0/Auth0.swift/pull/296) ([cocojoe](https://github.com/cocojoe))
 
+**Notes**
+Behaviour changes in iOS 13 relating to Web Authentication require that in Xcode 11 this library **must** be compiled using Swift 5.x. This should be the default setting unless it has been manually changed.
+
 ## [1.16.1](https://github.com/auth0/Auth0.swift/tree/1.16.1) (2019-07-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.16.0...1.16.1)
 
