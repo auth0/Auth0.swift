@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.17.0](https://github.com/auth0/Auth0.swift/tree/1.17.0) (2019-08-27)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.16.1...1.17.0)
+
+**Added**
+- Added support for iOS13 changes in ASWebAuthenticationSession [\#297](https://github.com/auth0/Auth0.swift/pull/297) ([cocojoe](https://github.com/cocojoe))
+- Added authentication method for default directory login [\#296](https://github.com/auth0/Auth0.swift/pull/296) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.16.1](https://github.com/auth0/Auth0.swift/tree/1.16.1) (2019-07-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.16.0...1.16.1)
 
