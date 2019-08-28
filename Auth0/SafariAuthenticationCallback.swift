@@ -28,7 +28,7 @@ import AuthenticationServices
 
 #if swift(>=3.2)
 @available(iOS 11.0, *)
-class SafariAuthenticationSessionCallback: AuthTransaction {
+class SafariAuthenticationSessionCallback: NSObject, AuthTransaction {
 
     var state: String?
     var callback: (Bool) -> Void = { _ in }
@@ -36,6 +36,7 @@ class SafariAuthenticationSessionCallback: AuthTransaction {
     private var authSession: NSObject?
 
     init(url: URL, schemeURL: String, callback: @escaping (Bool) -> Void) {
+        super.init()
         self.callback = callback
         #if canImport(AuthenticationServices)
         if #available(iOS 12.0, *) {
@@ -43,6 +44,11 @@ class SafariAuthenticationSessionCallback: AuthTransaction {
                 self.callback(url != nil)
                 TransactionStore.shared.clear()
             }
+            #if swift(>=5.1)
+            if #available(iOS 13.0, *) {
+                authSession.presentationContextProvider = self
+            }
+            #endif
             self.authSession = authSession
             authSession.start()
         } else {
@@ -70,6 +76,15 @@ class SafariAuthenticationSessionCallback: AuthTransaction {
 
     func cancel() {
         self.callback(false)
+    }
+}
+#endif
+
+#if swift(>=5.1)
+@available(iOS 13.0, *)
+extension SafariAuthenticationSessionCallback: ASWebAuthenticationPresentationContextProviding {
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return UIApplication.shared.keyWindow ?? ASPresentationAnchor()
     }
 }
 #endif
