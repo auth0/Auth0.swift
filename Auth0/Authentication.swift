@@ -634,7 +634,7 @@ public extension Authentication {
     func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope, parameters: parameters)
     }
-    
+
     /**
      Login using username and password in the default directory
      
@@ -895,9 +895,9 @@ public extension Authentication {
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.renew(withRefreshToken: refreshToken, scope: scope)
     }
-    
+
     /**
-    Authenticate a user with their Sign In With Apple information.
+    Authenticate a user with their Sign In With Apple authorization code.
 
     ```
     Auth0
@@ -915,8 +915,8 @@ public extension Authentication {
        .start { print($0) }
     ```
 
-    - parameter authCode:   Authorization Code retrieved from Apple Authorization
-    - parameter scope       :   requested scope value when authenticating the user. By default is 'openid profile offline_access'
+    - parameter authCode: Authorization Code retrieved from Apple Authorization
+    - parameter scope: requested scope value when authenticating the user. By default is 'openid profile offline_access'
 
     - returns: a request that will yield Auth0 user's credentials
     */
