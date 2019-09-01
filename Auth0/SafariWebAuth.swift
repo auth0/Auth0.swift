@@ -106,6 +106,7 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
+    @available(iOS 11.0, *)
     func setSafariDismissStyle(_ style: SFSafariViewController.DismissButtonStyle) -> Self {
         self.safariDismissStyle = style
         return self
