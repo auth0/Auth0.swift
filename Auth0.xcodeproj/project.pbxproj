@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0B827B04231B7EB10006CC57 /* WebAuthSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F53F5D61CFFAA4A00476A46 /* WebAuthSpec.swift */; };
 		5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5B16D88E1F7141A0009476A5 /* SafariAuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* SafariAuthenticationSession.swift */; };
@@ -1867,7 +1866,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F3965CC1CF67DD800CDE7C0 /* ViewController.swift in Sources */,
-				0B827B04231B7EB10006CC57 /* WebAuthSpec.swift in Sources */,
 				5F3965CA1CF67DD800CDE7C0 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
