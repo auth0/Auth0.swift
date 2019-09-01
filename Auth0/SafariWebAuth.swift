@@ -157,15 +157,16 @@ class SafariWebAuth: WebAuth {
     func newSafari(_ authorizeURL: URL, callback: @escaping (Result<Credentials>) -> Void) -> (SFSafariViewController, (Result<Credentials>) -> Void) {
         let controller = SFSafariViewController(url: authorizeURL)
         controller.modalPresentationStyle = safariPresentationStyle
+        
+        if #available(iOS 11.0, *) {
+            controller.dismissButtonStyle = (self.safariDismissStyle as? SFSafariViewController.DismissButtonStyle) ?? .done
+        }
+        
         let finish: (Result<Credentials>) -> Void = { [weak controller] (result: Result<Credentials>) -> Void in
             guard let presenting = controller?.presentingViewController else {
                 return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
             }
 
-            if #available(iOS 11.0, *) {
-                controller.dismissButtonStyle = (self.safariDismissStyle as? SFSafariViewController.DismissButtonStyle) ?? .done
-            }
-            
             if case .failure(let cause as WebAuthError) = result, case .userCancelled = cause {
                 DispatchQueue.main.async {
                     callback(result)
