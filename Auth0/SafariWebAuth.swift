@@ -132,12 +132,12 @@ class SafariWebAuth: WebAuth {
 
         #if swift(>=3.2)
         if #available(iOS 11.0, *), self.authenticationSession {
-            let session = SafariAuthenticationSession(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, finish: callback, logger: logger)
+            let session = SafariAuthenticationSession(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, finish: callback, logger: logger, dismissStyle: self.safariDismissSytle)
             logger?.trace(url: authorizeURL, source: "SafariAuthenticationSession")
             self.storage.store(session)
         } else {
             let (controller, finish) = newSafari(authorizeURL, callback: callback)
-            let session = SafariSession(controller: controller, redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: self.logger)
+            let session = SafariSession(controller: controller, redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: self.logger, dismissStyle: self.safariDismissSytle)
             controller.delegate = session
             self.presenter.present(controller: controller)
             logger?.trace(url: authorizeURL, source: "Safari")

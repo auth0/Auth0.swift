@@ -29,10 +29,14 @@ class SafariSession: AuthSession {
 
     weak var controller: UIViewController?
 
-    init(controller: SFSafariViewController, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
+    init(controller: SFSafariViewController, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?, dismissStyle: Any?) {
         self.controller = controller
         super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
         controller.delegate = self
+        
+        if #available(iOS 11.0, *) {
+            controller.dismissButtonStyle = (dismissStyle as? SFSafariViewController.DismissButtonStyle) ?? .done
+        }
     }
 }
 
