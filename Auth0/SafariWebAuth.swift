@@ -105,6 +105,10 @@ class SafariWebAuth: WebAuth {
         return self
     }
 
+    func setSafariDismissStyle(_ style: SFSafariViewController.DismissButtonStyle) -> Self {
+        print(style)
+    }
+    
     func useLegacyAuthentication(withStyle style: UIModalPresentationStyle = .fullScreen) -> Self {
         self.authenticationSession = false
         self.safariPresentationStyle = style

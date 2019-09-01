@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 import UIKit
+import SafariServices
 #if canImport(AuthenticationServices)
 import AuthenticationServices
 #endif
@@ -184,6 +185,16 @@ public protocol WebAuth: Trackable, Loggable {
     @available(*, deprecated, message: "use response([.token])")
     func usingImplicitGrant() -> Self
 
+    /**
+     Set `SFSafariViewController.dimissButtonStyle` when using
+     `useLegacyAuthentication(withStyle:)`.
+     
+     - Parameter style: dismiss button style
+     - returns: the same WebAuth instance to allow method chaining
+    */
+    @available(iOS 11.0, *)
+    func setSafariDismissStyle(_ style: SFSafariViewController.DismissButtonStyle) -> Self
+    
     /**
      Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
      in iOS 11.0+.
