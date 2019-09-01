@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 import UIKit
+import SafariServices
 
 class SafariSession: AuthSession {
 
