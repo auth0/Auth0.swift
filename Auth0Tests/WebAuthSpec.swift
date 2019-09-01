@@ -329,10 +329,21 @@ class WebAuthSpec: QuickSpec {
                 expect(controller.modalPresentationStyle) == .fullScreen
             }
             
-            it("should present user overrided presentation style") {
+            it("should present user overriden presentation style") {
                 let auth = newWebAuth().useLegacyAuthentication(withStyle: .overFullScreen)
                 let controller = auth.newSafari(DomainURL, callback: { _ in }).0
                 expect(controller.modalPresentationStyle) == .overFullScreen
+            }
+            
+            if #available(iOS 11.0, *) {
+                it("should present user overriden dismiss button style") {
+                    let auth = newWebAuth()
+                        .useLegacyAuthentication(withStyle: .overFullScreen)
+                        .setSafariDismissStyle(.cancel)
+                    let controller = auth.newSafari(DomainURL, callback: { _ in }).0
+                    
+                    expect(controller.dismissButtonStyle) == .cancel
+                }
             }
         }
 

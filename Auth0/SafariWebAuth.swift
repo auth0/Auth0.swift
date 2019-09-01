@@ -43,7 +43,7 @@ class SafariWebAuth: WebAuth {
     var nonce: String?
     private var authenticationSession = true
     private var safariPresentationStyle = UIModalPresentationStyle.fullScreen
-    private var safariDismissSytle: Any?
+    private var safariDismissStyle: Any?
 
     convenience init(clientId: String, url: URL, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
         self.init(clientId: clientId, url: url, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
@@ -107,7 +107,7 @@ class SafariWebAuth: WebAuth {
     }
 
     func setSafariDismissStyle(_ style: SFSafariViewController.DismissButtonStyle) -> Self {
-        self.safariDismissSytle = style
+        self.safariDismissStyle = style
         return self
     }
     
@@ -132,12 +132,12 @@ class SafariWebAuth: WebAuth {
 
         #if swift(>=3.2)
         if #available(iOS 11.0, *), self.authenticationSession {
-            let session = SafariAuthenticationSession(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, finish: callback, logger: logger, dismissStyle: self.safariDismissSytle)
+            let session = SafariAuthenticationSession(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, finish: callback, logger: logger)
             logger?.trace(url: authorizeURL, source: "SafariAuthenticationSession")
             self.storage.store(session)
         } else {
             let (controller, finish) = newSafari(authorizeURL, callback: callback)
-            let session = SafariSession(controller: controller, redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: self.logger, dismissStyle: self.safariDismissSytle)
+            let session = SafariSession(controller: controller, redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: self.logger)
             controller.delegate = session
             self.presenter.present(controller: controller)
             logger?.trace(url: authorizeURL, source: "Safari")
@@ -161,6 +161,10 @@ class SafariWebAuth: WebAuth {
                 return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
             }
 
+            if #available(iOS 11.0, *) {
+                controller.dismissButtonStyle = (self.safariDismissStyle as? SFSafariViewController.DismissButtonStyle) ?? .done
+            }
+            
             if case .failure(let cause as WebAuthError) = result, case .userCancelled = cause {
                 DispatchQueue.main.async {
                     callback(result)
