@@ -221,7 +221,7 @@ credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 
 ### Sign in With Apple
 
-If you've added [the Sign In with Apple Flow to Your App](https://developer.apple.com/documentation/authenticationservices/adding_the_sign_in_with_apple_flow_to_your_app) you can use the resulting `ASAuthorizationAppleIDCredential.authorizationCode` property obtained after a successful Apple autthentication to perform a token exchange for Auth0 tokens.
+If you've added [the Sign In with Apple Flow to Your App](https://developer.apple.com/documentation/authenticationservices/adding_the_sign_in_with_apple_flow_to_your_app) you can use the string value from the  `authorizationCode` property obtained after a successful Apple authentication to perform a token exchange for Auth0 tokens.
 
 ```swift
 Auth0
