@@ -336,10 +336,9 @@ class WebAuthSpec: QuickSpec {
             }
             
             if #available(iOS 11.0, *) {
-                it("should present user overridden dismiss button style") {
+                it("should present user with the .cancel dismiss button style") {
                     let auth = newWebAuth()
                         .useLegacyAuthentication(withStyle: .overFullScreen)
-                        .setSafariDismissStyle(.cancel)
                     let controller = auth.newSafari(DomainURL, callback: { _ in }).0
                     
                     expect(controller.dismissButtonStyle) == .cancel
