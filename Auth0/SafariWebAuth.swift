@@ -104,7 +104,7 @@ class SafariWebAuth: WebAuth {
         self.parameters["audience"] = audience
         return self
     }
-    
+
     func useLegacyAuthentication(withStyle style: UIModalPresentationStyle = .fullScreen) -> Self {
         self.authenticationSession = false
         self.safariPresentationStyle = style

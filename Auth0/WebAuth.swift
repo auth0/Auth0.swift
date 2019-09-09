@@ -184,7 +184,7 @@ public protocol WebAuth: Trackable, Loggable {
      */
     @available(*, deprecated, message: "use response([.token])")
     func usingImplicitGrant() -> Self
-    
+
     /**
      Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
      in iOS 11.0+.
