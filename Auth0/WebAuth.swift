@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 
 import UIKit
-import SafariServices
 #if canImport(AuthenticationServices)
 import AuthenticationServices
 #endif
