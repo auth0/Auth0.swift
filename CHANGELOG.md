@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.17.1](https://github.com/auth0/Auth0.swift/tree/1.17.1) (2019-09-04)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.17.0...1.17.1)
+
+**Fixed**
+- Fixed ability to clear WebAuth session in iOS 13 [\#301](https://github.com/auth0/Auth0.swift/pull/301) ([matt](https://github.com/matt))
+
 ## [1.17.0](https://github.com/auth0/Auth0.swift/tree/1.17.0) (2019-08-27)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.16.1...1.17.0)
 
