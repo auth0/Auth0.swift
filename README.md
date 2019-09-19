@@ -17,7 +17,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 - Swift 4.x/5.x
 
 ## Important Notice
-Behaviour changes in iOS 13 relating to Web Authentication require that when using Xcode 11 this library **must** be compiled using Swift 5.x. This *should* be the default setting applied when updating, unless it has been manually set. However, would recommend checking that this value is set correctly.
+Behaviour changes in iOS 13 related to Web Authentication require that developers using Xcode 11 with this library **must** compile using Swift 5.x. This *should* be the default setting applied when updating, unless it has been manually set. However, we recommend checking that this value is set correctly.
 
 ## Installation
 
