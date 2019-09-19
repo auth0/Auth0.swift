@@ -634,7 +634,7 @@ public extension Authentication {
     func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope, parameters: parameters)
     }
-    
+
     /**
      Login using username and password in the default directory
      
@@ -894,5 +894,39 @@ public extension Authentication {
      */
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.renew(withRefreshToken: refreshToken, scope: scope)
+    }
+
+    /**
+    Authenticate a user with their Sign In With Apple authorization code.
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .tokenExchange(withAppleAuthorizationCode: authCode)
+       .start { print($0) }
+    ```
+
+    and if you need to specify a scope or add additional parameters
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .tokenExchange(withAppleAuthorizationCode: authCode, scope: "openid profile offline_access", audience: "https://myapi.com/api)
+       .start { print($0) }
+    ```
+
+    - parameter authCode: Authorization Code retrieved from Apple Authorization
+    - parameter scope: requested scope value when authenticating the user. By default is 'openid profile offline_access'
+    - parameter audience: API Identifier that the client is requesting access to
+
+    - returns: a request that will yield Auth0 user's credentials
+    */
+    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String? = nil, audience: String? = nil) -> Request<Credentials, AuthenticationError> {
+        var parameters = [ "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+                       "subject_token": authCode,
+                       "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
+                       "scope": scope ?? "openid profile offline_access"]
+        parameters["audience"] = audience
+        return self.tokenExchange(withParameters: parameters)
     }
 }
