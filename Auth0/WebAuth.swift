@@ -21,6 +21,9 @@
 // THE SOFTWARE.
 
 import UIKit
+#if canImport(AuthenticationServices)
+import AuthenticationServices
+#endif
 
 #if swift(>=4.2)
 public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey

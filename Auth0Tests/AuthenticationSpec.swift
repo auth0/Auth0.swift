@@ -362,6 +362,73 @@ class AuthenticationSpec: QuickSpec {
             }
 
         }
+        
+        // MARK:- password grant type
+        describe("authenticating with credentials in a default directory") {
+            
+            it("should receive token with username and password") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
+                
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+            
+            it("should fail to return token") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: "invalid").start { result in
+                        expect(result).toNot(haveCredentials())
+                        done()
+                    }
+                }
+            }
+            
+            it("should specify scope in request") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword,  scope: "openid").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+            
+            it("should specify audience in request") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Audience"
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+            
+            it("should specify audience and scope in request") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api", scope: "openid").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+            
+            it("should send additional parameters") {
+                let state = UUID().uuidString
+                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "state": state])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Parameter Auth"
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api", scope: "openid", parameters: ["state": state]).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+            
+        }
 
         describe("create user") {
 
