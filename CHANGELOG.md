@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.18.0](https://github.com/auth0/Auth0.swift/tree/1.18.0) (2019-09-20)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.17.1...1.18.0)
+
+**Added**
+- Default DismissButtonStyle when using SFSafariViewController iOS 11+ [\#305](https://github.com/auth0/Auth0.swift/pull/305) ([andrewfoghel](https://github.com/andrewfoghel))
+- Added SIWA token exchange support [\#304](https://github.com/auth0/Auth0.swift/pull/304) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.17.1](https://github.com/auth0/Auth0.swift/tree/1.17.1) (2019-09-04)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.17.0...1.17.1)
 
