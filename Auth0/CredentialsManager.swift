@@ -84,6 +84,7 @@ public struct CredentialsManager {
     /// Clear credentials stored in keychain
     ///
     /// - Returns: if credentials were removed
+    @available(*, deprecated, message: "use clearAndRevokeToken(callback) instead")
     public func clear() -> Bool {
         return self.storage.deleteEntry(forKey: storeKey)
     }
