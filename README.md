@@ -214,6 +214,20 @@ credentialsManager.credentials { error, credentials in
 }
 ```
 
+#### Clearing credentials
+
+Credentials can be cleared by using the `clearAndRevokeToken` function. This function will attempt to revoke any associated refresh token that has been stored, before clearing the credentials from memory:
+
+```swift
+credentialsManager.clearAndRevokeToken { error in
+    guard error == nil else {
+        return print("Failed to clear credentials")
+    }
+    
+    print("Credentials cleared")
+}
+```
+
 #### Biometric authentication
 
 You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by your device e.g. Face ID or Touch ID.
