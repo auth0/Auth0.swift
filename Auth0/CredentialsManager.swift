@@ -108,7 +108,7 @@ public struct CredentialsManager {
                 switch result {
                 case .failure(let error):
                     callback(CredentialsManagerError.revokeFailed(error))
-                default:
+                case .success:
                     self.storage.deleteEntry(forKey: self.storeKey)
                     callback(nil)
                 }
