@@ -50,13 +50,17 @@ class CredentialsManagerSpec: QuickSpec {
 
         beforeEach {
             credentialsManager = CredentialsManager(authentication: authentication)
+            
             credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+            
+            stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in return revokeTokenResponse() }.name = "revoke success"
         }
 
         describe("storage") {
-
             afterEach {
-                _ = credentialsManager.clear()
+                waitUntil { done in
+                    credentialsManager.clearAndRevokeToken { _ in done() }
+                }
             }
 
             it("should store credentials in keychain") {
@@ -65,39 +69,28 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should clear credentials in keychain") {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
-                expect(credentialsManager.clear()).to(beTrue())
-            }
-
-            it("should fail to clear credentials") {
-                expect(credentialsManager.clear()).to(beFalse())
+                
+                waitUntil { done in
+                    credentialsManager.clearAndRevokeToken { error in
+                        expect(error).to(beNil())
+                        done()
+                    }
+                }
             }
         }
         
         describe("clearing and revoking refresh token") {
-            
             beforeEach {
                 _ = credentialsManager.store(credentials: credentials)
-                
-                stub(condition: isRevokeToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return revokeTokenResponse() }.name = "revoke success"
-            }
-            
-            afterEach {
-                _ = credentialsManager.clear()
             }
             
             it("should clear credentials and revoke the refresh token") {
-                credentialsManager.clearAndRevokeToken {
-                    expect($0).to(beNil())
-                    expect(credentialsManager.hasValid()).to(beFalse())
-                }
-            }
-            
-            it("should not return an error if there were no credentials stored") {
-                _ = credentialsManager.clear()
-                
-                credentialsManager.clearAndRevokeToken {
-                    expect($0).to(beNil())
-                    expect(credentialsManager.hasValid()).to(beFalse())
+                waitUntil { done in
+                    credentialsManager.clearAndRevokeToken {
+                        expect($0).to(beNil())
+                        expect(credentialsManager.hasValid()).to(beFalse())
+                        done()
+                    }
                 }
             }
             
@@ -110,9 +103,12 @@ class CredentialsManagerSpec: QuickSpec {
                 
                 _ = credentialsManager.store(credentials: credentials)
                 
-                credentialsManager.clearAndRevokeToken {
-                    expect($0).to(beNil())
-                    expect(credentialsManager.hasValid()).to(beFalse())
+                waitUntil { done in
+                    credentialsManager.clearAndRevokeToken {
+                        expect($0).to(beNil())
+                        expect(credentialsManager.hasValid()).to(beFalse())
+                        done()
+                    }
                 }
             }
             
@@ -121,12 +117,15 @@ class CredentialsManagerSpec: QuickSpec {
                     return authFailure(code: "400", description: "Revoke failed")
                 }
                 
-                credentialsManager.clearAndRevokeToken {
-                    expect($0).to(matchError(
-                        CredentialsManagerError.revokeFailed(AuthenticationError(string: "Revoke failed", statusCode: 400))
-                    ))
-                    
-                    expect(credentialsManager.hasValid()).to(beTrue())
+                waitUntil { done in
+                    credentialsManager.clearAndRevokeToken {
+                        expect($0).to(matchError(
+                            CredentialsManagerError.revokeFailed(AuthenticationError(string: "Revoke failed", statusCode: 400))
+                        ))
+                        
+                        expect(credentialsManager.hasValid()).to(beTrue())
+                        done()
+                    }
                 }
             }
         }
@@ -201,8 +200,11 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             afterEach {
-                _ = credentialsManager.clear()
-                _ = secondaryCredentialsManager.clear()
+                waitUntil { done in
+                    credentialsManager.clearAndRevokeToken { _ in
+                        secondaryCredentialsManager.clearAndRevokeToken { _ in done() }
+                    }
+                }
             }
             
         }
@@ -210,7 +212,9 @@ class CredentialsManagerSpec: QuickSpec {
         describe("valididity") {
 
             afterEach {
-                _ = credentialsManager.clear()
+                waitUntil { done in
+                    credentialsManager.clearAndRevokeToken { _ in done() }
+                }
             }
 
             it("should have valid credentials when stored and not expired") {
@@ -370,8 +374,13 @@ class CredentialsManagerSpec: QuickSpec {
                 it("custom keychain should successfully set and clear credentials") {
                     _ = credentialsManager.store(credentials: credentials)
                     expect(storage.data(forKey: "credentials")).toNot(beNil())
-                    _ = credentialsManager.clear()
-                    expect(storage.data(forKey: "credentials")).to(beNil())
+                    
+                    waitUntil { done in
+                        credentialsManager.clearAndRevokeToken { _ in
+                            expect(storage.data(forKey: "credentials")).to(beNil())
+                            done()
+                        }
+                    }
                 }
             }
         }
