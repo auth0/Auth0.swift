@@ -58,7 +58,7 @@ class CredentialsManagerSpec: QuickSpec {
 
         describe("storage") {
             afterEach {
-                waitUntil { done in
+                waitUntil(timeout: 2) { done in
                     credentialsManager.clearAndRevokeToken { _ in done() }
                 }
             }
@@ -70,7 +70,7 @@ class CredentialsManagerSpec: QuickSpec {
             it("should clear credentials in keychain") {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 
-                waitUntil { done in
+                waitUntil(timeout: 2) { done in
                     credentialsManager.clearAndRevokeToken { error in
                         expect(error).to(beNil())
                         done()
@@ -85,7 +85,7 @@ class CredentialsManagerSpec: QuickSpec {
             }
             
             it("should clear credentials and revoke the refresh token") {
-                waitUntil { done in
+                waitUntil(timeout: 2) { done in
                     credentialsManager.clearAndRevokeToken {
                         expect($0).to(beNil())
                         expect(credentialsManager.hasValid()).to(beFalse())
@@ -103,7 +103,7 @@ class CredentialsManagerSpec: QuickSpec {
                 
                 _ = credentialsManager.store(credentials: credentials)
                 
-                waitUntil { done in
+                waitUntil(timeout: 2) { done in
                     credentialsManager.clearAndRevokeToken {
                         expect($0).to(beNil())
                         expect(credentialsManager.hasValid()).to(beFalse())
@@ -117,7 +117,7 @@ class CredentialsManagerSpec: QuickSpec {
                     return authFailure(code: "400", description: "Revoke failed")
                 }
                 
-                waitUntil { done in
+                waitUntil(timeout: 2) { done in
                     credentialsManager.clearAndRevokeToken {
                         expect($0).to(matchError(
                             CredentialsManagerError.revokeFailed(AuthenticationError(string: "Revoke failed", statusCode: 400))
@@ -200,7 +200,7 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             afterEach {
-                waitUntil { done in
+                waitUntil(timeout: 2) { done in
                     credentialsManager.clearAndRevokeToken { _ in
                         secondaryCredentialsManager.clearAndRevokeToken { _ in done() }
                     }
@@ -212,7 +212,7 @@ class CredentialsManagerSpec: QuickSpec {
         describe("valididity") {
 
             afterEach {
-                waitUntil { done in
+                waitUntil(timeout: 2) { done in
                     credentialsManager.clearAndRevokeToken { _ in done() }
                 }
             }
@@ -375,7 +375,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     expect(storage.data(forKey: "credentials")).toNot(beNil())
                     
-                    waitUntil { done in
+                    waitUntil(timeout: 2) { done in
                         credentialsManager.clearAndRevokeToken { _ in
                             expect(storage.data(forKey: "credentials")).to(beNil())
                             done()
