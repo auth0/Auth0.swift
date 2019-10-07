@@ -84,7 +84,6 @@ public struct CredentialsManager {
     /// Clear credentials stored in keychain
     ///
     /// - Returns: if credentials were removed
-    @available(*, deprecated, message: "use clearAndRevokeToken(callback) instead")
     public func clear() -> Bool {
         return self.storage.deleteEntry(forKey: storeKey)
     }
@@ -98,7 +97,7 @@ public struct CredentialsManager {
             let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
             let refreshToken = credentials.refreshToken else {
-                self.storage.deleteEntry(forKey: self.storeKey)
+                _ = self.clear()
                 return callback(nil)
         }
 
@@ -109,7 +108,7 @@ public struct CredentialsManager {
                 case .failure(let error):
                     callback(CredentialsManagerError.revokeFailed(error))
                 case .success:
-                    self.storage.deleteEntry(forKey: self.storeKey)
+                    _ = self.clear()
                     callback(nil)
                 }
             }
