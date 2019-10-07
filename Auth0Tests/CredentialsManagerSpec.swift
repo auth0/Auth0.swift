@@ -200,7 +200,7 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             afterEach {
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: 4) { done in
                     credentialsManager.clearAndRevokeToken { _ in
                         secondaryCredentialsManager.clearAndRevokeToken { _ in done() }
                     }
