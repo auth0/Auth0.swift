@@ -92,7 +92,7 @@ public struct CredentialsManager {
     /// the credentials are not cleared and an error is raised through the callback.
     ///
     /// - Parameter callback: callback with an error if the refresh token could not be revoked
-    public func clearAndRevokeToken(_ callback: @escaping (CredentialsManagerError?) -> Void) {
+    public func revoke(_ callback: @escaping (CredentialsManagerError?) -> Void) {
         guard
             let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
