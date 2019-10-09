@@ -31,18 +31,17 @@ import AuthenticationServices
 class SafariAuthenticationSessionCallback: NSObject, AuthTransaction {
 
     var state: String?
-    var callback: (Bool) -> Void = { _ in }
+    var callback: (Result<Void>) -> Void = { _ in }
 
     private var authSession: NSObject?
 
-    init(url: URL, schemeURL: String, callback: @escaping (Bool) -> Void) {
+    init(url: URL, schemeURL: String, callback: @escaping (Result<Void>) -> Void) {
         super.init()
         self.callback = callback
         #if canImport(AuthenticationServices)
         if #available(iOS 12.0, *) {
-            let authSession = ASWebAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
-                self.callback(url != nil)
-                TransactionStore.shared.clear()
+            let authSession = ASWebAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, error in
+                self.handleResult(url: url, error: error, callback: callback)
             }
             #if swift(>=5.1)
             if #available(iOS 13.0, *) {
@@ -52,30 +51,47 @@ class SafariAuthenticationSessionCallback: NSObject, AuthTransaction {
             self.authSession = authSession
             authSession.start()
         } else {
-            let authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
-                self.callback(url != nil)
-                TransactionStore.shared.clear()
+            let authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, error in
+                self.handleResult(url: url, error: error, callback: callback)
             }
             self.authSession = authSession
             authSession.start()
         }
         #else
-        let authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
-            self.callback(url != nil)
-            TransactionStore.shared.clear()
+        let authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, error in
+            self.handleResult(url: url, error: error, callback: callback)
         }
         self.authSession = authSession
         authSession.start()
         #endif
     }
 
+    private func handleResult(url: URL?, error: Error?, callback: @escaping (Result<Void>) -> Void) {
+        guard error == nil, url != nil else {
+            let authError = error ?? WebAuthError.unknownError
+
+            if #available(iOS 12.0, *), case ASWebAuthenticationSessionError.canceledLogin = authError {
+                self.callback(.failure(error: WebAuthError.userCancelled))
+            } else if case SFAuthenticationError.canceledLogin = authError {
+                self.callback(.failure(error: WebAuthError.userCancelled))
+            } else {
+                self.callback(.failure(error: authError))
+            }
+
+            return TransactionStore.shared.clear()
+        }
+
+        self.callback(.success(result: ()))
+        TransactionStore.shared.clear()
+    }
+
     func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        self.callback(true)
+        self.callback(.success(result: ()))
         return true
     }
 
     func cancel() {
-        self.callback(false)
+        self.callback(.failure(error: WebAuthError.cancelled))
     }
 }
 #endif

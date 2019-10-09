@@ -36,6 +36,7 @@ import Foundation
 public enum WebAuthError: CustomNSError {
     case noBundleIdentifierFound
     case cannotDismissWebAuthController
+    case cancelled
     case userCancelled
     case pkceNotAllowed(String)
     case noNonceProvided
@@ -52,7 +53,7 @@ public enum WebAuthError: CustomNSError {
 
     public var errorCode: Int {
         switch self {
-        case .userCancelled:
+        case .cancelled, .userCancelled:
             return WebAuthError.cancelledFoundationCode
         default:
             return WebAuthError.genericFoundationCode
@@ -61,6 +62,11 @@ public enum WebAuthError: CustomNSError {
 
     public var errorUserInfo: [String: Any] {
         switch self {
+        case .cancelled:
+            return [
+                NSLocalizedDescriptionKey: "Web Authentication was cancelled",
+                WebAuthError.infoKey: self
+            ]
         case .userCancelled:
             return [
                 NSLocalizedDescriptionKey: "User Cancelled Web Authentication",
