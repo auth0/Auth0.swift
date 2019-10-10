@@ -88,8 +88,10 @@ public struct CredentialsManager {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
-    /// Revokes the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
     /// the credentials are not cleared and an error is raised through the callback.
+    ///
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
     ///
     /// - Parameter callback: callback with an error if the refresh token could not be revoked
     public func revoke(_ callback: @escaping (CredentialsManagerError?) -> Void) {
