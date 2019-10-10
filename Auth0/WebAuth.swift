@@ -227,11 +227,10 @@ public protocol WebAuth: Trackable, Loggable {
      For iOS 11+ you will need to ensure that the **Callback URL** has been added
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
-     If the user has already logged into the web service in Safari or other apps using ASWebAuthenticationSession or
-     SFAuthenticationSession, it’s possible to share the existing login information. The system presents the user with
-     a dialog asking for consent to share login information. If the user cancels the alert, the session is canceled,
-     and the completion handler is called with error code ASWebAuthenticationSessionError.canceledLogin or
-     SFAuthenticationError.canceledLogin respectively.
+     Users can share existing login information if an ASWebAuthenticationSession or SFAuthenticationSession is used.
+     A system dialog is shown requesting the user's consent. If the user cancels the alert, the completion handler
+     is called with an ASWebAuthenticationSessionError.canceledLogin or SFAuthenticationError.canceledLogin error
+     respectively.
 
      ```
      Auth0
@@ -251,7 +250,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
      Auth0
         .webAuth()
-        .clearSession { result in
+        .clearSession(federated: true) { result in
             switch result {
             case .success:
                 // Handle success
@@ -262,7 +261,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      - parameter federated: Bool to remove the IdP session
-     - parameter callback: returns the result of the call including an error if one occured.
+     - parameter callback: callback called with either a successful result or an error if one occured.
      */
     func clearSession(federated: Bool, callback: @escaping (Result<Void>) -> Void)
 }

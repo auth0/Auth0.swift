@@ -351,7 +351,7 @@ class WebAuthSpec: QuickSpec {
             #if swift(>=3.2)
             context("SFAuthenticationSession") {
 
-                var outcome: Bool?
+                var outcome: Result<Void>?
 
                 beforeEach {
                     outcome = nil
@@ -370,7 +370,11 @@ class WebAuthSpec: QuickSpec {
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { outcome = $0 }
                     TransactionStore.shared.cancel(TransactionStore.shared.current!)
-                    expect(outcome).to(beFalse())
+
+                    guard case let .failure(error)? = outcome, case WebAuthError.cancelled = error else {
+                        return XCTFail("Unexpected result!")
+                    }
+
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
@@ -379,7 +383,9 @@ class WebAuthSpec: QuickSpec {
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { outcome = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!, options: [:])
-                    expect(outcome).to(beTrue())
+
+                    guard case .success? = outcome else { return XCTFail("Unexpected result!") }
+
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
