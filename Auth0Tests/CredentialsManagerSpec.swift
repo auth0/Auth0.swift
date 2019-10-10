@@ -107,7 +107,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
             
-            it("should not return an error if there is no refresh token") {
+            it("should not return an error if there is no refresh token, and clear credentials anyway") {
                 let credentials = Credentials(
                     accessToken: AccessToken,
                     idToken: IdToken,
