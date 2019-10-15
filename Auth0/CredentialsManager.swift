@@ -88,6 +88,34 @@ public struct CredentialsManager {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
+    /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// the credentials are not cleared and an error is raised through the callback.
+    ///
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
+    ///
+    /// - Parameter callback: callback with an error if the refresh token could not be revoked
+    public func revoke(_ callback: @escaping (CredentialsManagerError?) -> Void) {
+        guard
+            let data = self.storage.data(forKey: self.storeKey),
+            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
+            let refreshToken = credentials.refreshToken else {
+                _ = self.clear()
+                return callback(nil)
+        }
+
+        self.authentication
+            .revoke(refreshToken: refreshToken)
+            .start { result in
+                switch result {
+                case .failure(let error):
+                    callback(CredentialsManagerError.revokeFailed(error))
+                case .success:
+                    _ = self.clear()
+                    callback(nil)
+                }
+            }
+    }
+
     /// Checks if a non-expired set of credentials are stored
     ///
     /// - Returns: if there are valid and non-expired credentials stored
