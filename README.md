@@ -26,7 +26,7 @@ Behaviour changes in iOS 13 related to Web Authentication require that developer
 If you are using Carthage, add the following lines to your `Cartfile`:
 
 ```ruby
-github "auth0/Auth0.swift" ~> 1.18
+github "auth0/Auth0.swift" ~> 1.19
 ```
 
 Then run `carthage bootstrap`.
@@ -39,7 +39,7 @@ If you are using [Cocoapods](https://cocoapods.org/), add these lines to your `P
 
 ```ruby
 use_frameworks!
-pod 'Auth0', '~> 1.18'
+pod 'Auth0', '~> 1.19'
 ```
 
 Then run `pod install`.
@@ -211,6 +211,26 @@ credentialsManager.credentials { error, credentials in
         return print("Failed with \(error)") 
     }
     print("Obtained credentials: \(credentials)")
+}
+```
+
+#### Clearing credentials and revoking refresh tokens
+
+Credentials can be cleared by using the `clear` function, which clears credentials from the keychain:
+
+```swift
+let didClear = credentialsManager.clear()
+```
+
+In addition, credentials can be cleared and the refresh token revoked using a single call to `revoke`. This function will attempt to revoke the current refresh token stored by the credential manager and then clear credentials from the keychain. If revoking the token results in an error, then the credentials are not cleared:
+
+```swift
+credentialsManager.revoke { error in
+    guard error == nil else {
+        return print("Failed to revoke refresh token: \(error)")
+    }
+    
+    print("Success")
 }
 ```
 
