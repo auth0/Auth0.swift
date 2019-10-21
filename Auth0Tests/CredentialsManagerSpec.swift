@@ -73,6 +73,76 @@ class CredentialsManagerSpec: QuickSpec {
             }
         }
         
+        describe("clearing and revoking refresh token") {
+            
+            beforeEach {
+                _ = credentialsManager.store(credentials: credentials)
+                
+                stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in return revokeTokenResponse() }.name = "revoke success"
+            }
+            
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+            
+            it("should clear credentials and revoke the refresh token") {
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.revoke {
+                        expect($0).to(beNil())
+                        expect(credentialsManager.hasValid()).to(beFalse())
+                        done()
+                    }
+                }
+            }
+            
+            it("should not return an error if there were no credentials stored") {
+                _ = credentialsManager.clear()
+                
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.revoke {
+                        expect($0).to(beNil())
+                        expect(credentialsManager.hasValid()).to(beFalse())
+                        done()
+                    }
+                }
+            }
+            
+            it("should not return an error if there is no refresh token, and clear credentials anyway") {
+                let credentials = Credentials(
+                    accessToken: AccessToken,
+                    idToken: IdToken,
+                    expiresIn: Date(timeIntervalSinceNow: ExpiresIn)
+                    )
+                
+                _ = credentialsManager.store(credentials: credentials)
+                
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.revoke {
+                        expect($0).to(beNil())
+                        expect(credentialsManager.hasValid()).to(beFalse())
+                        done()
+                    }
+                }
+            }
+            
+            it("should return the failure if the token could not be revoked, and not clear credentials") {
+                stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                    return authFailure(code: "400", description: "Revoke failed")
+                }
+                
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.revoke {
+                        expect($0).to(matchError(
+                            CredentialsManagerError.revokeFailed(AuthenticationError(string: "Revoke failed", statusCode: 400))
+                        ))
+                        
+                        expect(credentialsManager.hasValid()).to(beTrue())
+                        done()
+                    }
+                }
+            }
+        }
+        
         describe("multi instances of credentials manager") {
             
             var secondaryCredentialsManager: CredentialsManager!
