@@ -156,16 +156,15 @@ class SafariWebAuth: WebAuth {
         }
         
         let finish: (Result<Credentials>) -> Void = { [weak controller] (result: Result<Credentials>) -> Void in
-            guard let presenting = controller?.presentingViewController else {
-                return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
-            }
-
             if case .failure(let cause as WebAuthError) = result, case .userCancelled = cause {
                 DispatchQueue.main.async {
                     callback(result)
                 }
             } else {
                 DispatchQueue.main.async {
+                    guard let presenting = controller?.presentingViewController else {
+                        return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
+                    }
                     presenting.dismiss(animated: true) {
                         callback(result)
                     }
