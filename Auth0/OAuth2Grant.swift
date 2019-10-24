@@ -132,7 +132,7 @@ private func validate(responseType: [ResponseType], token: String?, nonce: Strin
     return actualNonce == expectedNonce
 }
 
-private func decode(jwt: String) -> [String: Any]? {
+func decode(jwt: String) -> [String: Any]? {
     let parts = jwt.components(separatedBy: ".")
     guard parts.count == 3 else { return nil }
     var base64 = parts[1]

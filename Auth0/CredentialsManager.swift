@@ -123,10 +123,9 @@ public struct CredentialsManager {
         guard
             let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
-            credentials.accessToken != nil,
-            let expiresIn = credentials.expiresIn
+            credentials.accessToken != nil
             else { return false }
-        return expiresIn > Date() || credentials.refreshToken != nil
+        return self.hasExpired(credentials) || credentials.refreshToken != nil
     }
 
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
@@ -173,8 +172,8 @@ public struct CredentialsManager {
             let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials
             else { return callback(.noCredentials, nil) }
-        guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
-        guard expiresIn < Date() else { return callback(nil, credentials) }
+        guard credentials.expiresIn != nil else { return callback(.noCredentials, nil) }
+        guard !self.hasExpired(credentials) else { return callback(nil, credentials) }
         guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
 
         self.authentication.renew(withRefreshToken: refreshToken, scope: scope).start {
@@ -192,5 +191,21 @@ public struct CredentialsManager {
                 callback(.failedRefresh(error), nil)
             }
         }
+    }
+
+    private func hasExpired(_ credentials: Credentials) -> Bool {
+
+        if let expiresAT = credentials.expiresIn {
+            if expiresAT < Date() { return false }
+        }
+
+        if let idToken = credentials.idToken,
+            let jwt = decode(jwt: idToken),
+            let jwtExp = jwt["exp"] as? Double {
+                let expiresToken = Date(timeIntervalSince1970: jwtExp)
+                if expiresToken < Date() { return false }
+        }
+
+        return true
     }
 }
