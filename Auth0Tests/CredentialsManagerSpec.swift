@@ -152,14 +152,14 @@ class CredentialsManagerSpec: QuickSpec {
 
             beforeEach {
                 secondaryCredentialsManager = CredentialsManager(authentication: authentication, storeKey: "secondary_store")
-                secondaryCredentials = Credentials(accessToken: "SecondaryAccessToken", tokenType: TokenType, idToken: "SecondaryIdToken", refreshToken: "SecondaryRefreshToken", expiresIn: Date(timeIntervalSinceNow: 10))
+                secondaryCredentials = Credentials(accessToken: "SecondaryAccessToken", tokenType: TokenType, idToken: "SecondaryIdToken", refreshToken: "SecondaryRefreshToken", expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
             }
             
             it("should store credentials into distinct locations") {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(secondaryCredentialsManager.store(credentials: secondaryCredentials)).to(beTrue())
                                 
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: 200) { done in
                     credentialsManager.credentials {
                         expect($0).to(beNil())
                         expect($1!.accessToken) == AccessToken
@@ -261,6 +261,34 @@ class CredentialsManagerSpec: QuickSpec {
             }
         }
         
+        describe("validity expiry") {
+            
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should not be expired when expiry of at is + 1 hour") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.hasExpired(credentials)).to(beFalse())
+            }
+            
+            it("should not be expired when expiry of at is +1 hour and idt not expired") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ValidToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.hasExpired(credentials)).to(beFalse())
+            }
+            
+            it("should be expired when expiry of at is - 1 hour") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                expect(credentialsManager.hasExpired(credentials)).to(beTrue())
+            }
+            
+            it("should be expired when expiry of at is + 1 hour and idt is expired") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.hasExpired(credentials)).to(beTrue())
+            }
+            
+        }
+        
         describe("validity with id token") {
             
             afterEach {
@@ -273,7 +301,7 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.hasValid()).to(beTrue())
             }
             
-            it("should not be valid when at valid and id token expired") {
+            fit("should not be valid when at valid and id token expired") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid()).to(beFalse())

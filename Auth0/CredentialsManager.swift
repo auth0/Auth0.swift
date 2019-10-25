@@ -125,7 +125,7 @@ public struct CredentialsManager {
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
             credentials.accessToken != nil
             else { return false }
-        return self.hasExpired(credentials) || credentials.refreshToken != nil
+        return !self.hasExpired(credentials) || credentials.refreshToken != nil
     }
 
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
@@ -173,7 +173,7 @@ public struct CredentialsManager {
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials
             else { return callback(.noCredentials, nil) }
         guard credentials.expiresIn != nil else { return callback(.noCredentials, nil) }
-        guard !self.hasExpired(credentials) else { return callback(nil, credentials) }
+        guard self.hasExpired(credentials) else { return callback(nil, credentials) }
         guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
 
         self.authentication.renew(withRefreshToken: refreshToken, scope: scope).start {
@@ -193,20 +193,22 @@ public struct CredentialsManager {
         }
     }
 
-    private func hasExpired(_ credentials: Credentials) -> Bool {
+    func hasExpired(_ credentials: Credentials) -> Bool {
 
-        if let expiresAT = credentials.expiresIn {
-            if expiresAT < Date() { return false }
+        var hasATExpired = true
+        var hasIDTExpired = true
+
+        if let expiresIn = credentials.expiresIn {
+            if expiresIn > Date() { hasATExpired = false }
         }
 
-        if let idToken = credentials.idToken,
-            let jwt = decode(jwt: idToken),
-            let jwtExp = jwt["exp"] as? Double {
-                let expiresToken = Date(timeIntervalSince1970: jwtExp)
-                if expiresToken < Date() { return false }
+        if let token = credentials.idToken,
+            let tokenDecoded = decode(jwt: token),
+            let exp = tokenDecoded["exp"] as? Double {
+            if Date(timeIntervalSince1970: exp) > Date() { hasIDTExpired = false }
         }
 
-        return true
+        return hasATExpired || hasIDTExpired
     }
 }
 
