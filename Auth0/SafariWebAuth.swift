@@ -163,7 +163,7 @@ class SafariWebAuth: WebAuth {
             } else {
                 DispatchQueue.main.async {
                     guard let presenting = controller?.presentingViewController else {
-                        return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
+                        return callback(result)
                     }
                     presenting.dismiss(animated: true) {
                         callback(result)
