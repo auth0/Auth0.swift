@@ -123,10 +123,9 @@ public struct CredentialsManager {
         guard
             let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
-            credentials.accessToken != nil,
-            let expiresIn = credentials.expiresIn
+            credentials.accessToken != nil
             else { return false }
-        return expiresIn > Date() || credentials.refreshToken != nil
+        return !self.hasExpired(credentials) || credentials.refreshToken != nil
     }
 
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
@@ -173,8 +172,8 @@ public struct CredentialsManager {
             let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials
             else { return callback(.noCredentials, nil) }
-        guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
-        guard expiresIn < Date() else { return callback(nil, credentials) }
+        guard credentials.expiresIn != nil else { return callback(.noCredentials, nil) }
+        guard self.hasExpired(credentials) else { return callback(nil, credentials) }
         guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
 
         self.authentication.renew(withRefreshToken: refreshToken, scope: scope).start {
@@ -193,4 +192,44 @@ public struct CredentialsManager {
             }
         }
     }
+
+    func hasExpired(_ credentials: Credentials) -> Bool {
+
+        var hasATExpired = true
+        var hasIDTExpired = true
+
+        if let expiresIn = credentials.expiresIn {
+            if expiresIn > Date() { hasATExpired = false }
+        }
+
+        if let token = credentials.idToken,
+            let tokenDecoded = decode(jwt: token),
+            let exp = tokenDecoded["exp"] as? Double {
+            if Date(timeIntervalSince1970: exp) > Date() { hasIDTExpired = false }
+        }
+
+        return hasATExpired || hasIDTExpired
+    }
+}
+
+func decode(jwt: String) -> [String: Any]? {
+    let parts = jwt.components(separatedBy: ".")
+    guard parts.count == 3 else { return nil }
+    var base64 = parts[1]
+        .replacingOccurrences(of: "-", with: "+")
+        .replacingOccurrences(of: "_", with: "/")
+    let length = Double(base64.lengthOfBytes(using: String.Encoding.utf8))
+    let requiredLength = 4 * ceil(length / 4.0)
+    let paddingLength = requiredLength - length
+    if paddingLength > 0 {
+        let padding = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
+        base64 += padding
+    }
+
+    guard
+        let bodyData = Data(base64Encoded: base64, options: .ignoreUnknownCharacters)
+        else { return nil }
+
+    let json = try? JSONSerialization.jsonObject(with: bodyData, options: [])
+    return json as? [String: Any]
 }
