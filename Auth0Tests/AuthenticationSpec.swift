@@ -215,10 +215,11 @@ class AuthenticationSpec: QuickSpec {
             }
 
         }
-
+        
         // MARK:- Token Exchange
 
         describe("token exchange") {
+            
             beforeEach {
                 stub(condition: isToken(Domain) && hasAtLeast([
                     "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
@@ -226,14 +227,14 @@ class AuthenticationSpec: QuickSpec {
                     "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
                     "scope": "openid profile offline_access"
                     ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success"
-
+                
                 stub(condition: isToken(Domain) && hasAtLeast([
                     "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
                     "subject_token": "VALIDCODE",
                     "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
                     "scope": "openid email"
                     ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope"
-
+                
                 stub(condition: isToken(Domain) && hasAtLeast([
                 "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
                 "subject_token": "VALIDCODE",
@@ -241,7 +242,7 @@ class AuthenticationSpec: QuickSpec {
                 "scope": "openid email",
                 "audience": "https://myapi.com/api"
                 ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope and audience"
-
+                
                 stub(condition: isToken(Domain) && hasAtLeast([
                 "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
                 "subject_token": "VALIDNAMECODE",
@@ -260,7 +261,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-
+            
             it("should exchange apple auth code and fail") {
                 waitUntil(timeout: Timeout) { done in
                     auth.tokenExchange(withAppleAuthorizationCode: "INVALIDCODE")
@@ -270,7 +271,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-
+            
             it("should exchange apple auth code for credentials with custom scope") {
                 waitUntil(timeout: Timeout) { done in
                     auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email")
@@ -280,7 +281,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-
+            
             it("should exchange apple auth code for credentials with custom scope and audience") {
                 waitUntil(timeout: Timeout) { done in
                     auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email", audience: "https://myapi.com/api")
@@ -290,7 +291,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-
+            
             it("should exchange apple auth code for credentials with fullName") {
                 var fullName = PersonNameComponents()
                 fullName.givenName = "John"
@@ -306,8 +307,9 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-        }
 
+        }
+        
         describe("revoke refresh token") {
 
             let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")

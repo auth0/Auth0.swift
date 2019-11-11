@@ -923,7 +923,6 @@ public extension Authentication {
     - returns: a request that will yield Auth0 user's credentials
     */
     func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String? = nil, audience: String? = nil, fullName: PersonNameComponents? = nil) -> Request<Credentials, AuthenticationError> {
-
         var parameters: [String: String] =
             [ "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
               "subject_token": authCode,
