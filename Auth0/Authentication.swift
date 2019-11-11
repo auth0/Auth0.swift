@@ -911,21 +911,38 @@ public extension Authentication {
     ```
     Auth0
        .authentication(clientId: clientId, domain: "samples.auth0.com")
-       .tokenExchange(withAppleAuthorizationCode: authCode, scope: "openid profile offline_access", audience: "https://myapi.com/api)
+       .tokenExchange(withAppleAuthorizationCode: authCode, fullName: credentials.fullName, scope: "openid profile offline_access", audience: "https://myapi.com/api)
        .start { print($0) }
     ```
 
     - parameter authCode: Authorization Code retrieved from Apple Authorization
     - parameter scope: requested scope value when authenticating the user. By default is 'openid profile offline_access'
     - parameter audience: API Identifier that the client is requesting access to
+    - parameter fullName: The full name property returned with the Apple ID Credentials
 
     - returns: a request that will yield Auth0 user's credentials
     */
-    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String? = nil, audience: String? = nil) -> Request<Credentials, AuthenticationError> {
-        var parameters = [ "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-                       "subject_token": authCode,
-                       "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
-                       "scope": scope ?? "openid profile offline_access"]
+    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String? = nil, audience: String? = nil, fullName: PersonNameComponents? = nil) -> Request<Credentials, AuthenticationError> {
+
+        var parameters: [String: String] =
+            [ "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+              "subject_token": authCode,
+              "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
+              "scope": scope ?? "openid profile offline_access" ]
+        if fullName != nil {
+            if let jsonData = try? String(
+                data: JSONSerialization.data(
+                    withJSONObject: [
+                        "name": [
+                            "firstName": fullName?.givenName,
+                            "lastName": fullName?.familyName
+                        ]
+                    ],
+                    options: []),
+                encoding: String.Encoding.utf8) {
+                parameters["user_profile"] = jsonData
+            }
+        }
         parameters["audience"] = audience
         return self.tokenExchange(withParameters: parameters)
     }
