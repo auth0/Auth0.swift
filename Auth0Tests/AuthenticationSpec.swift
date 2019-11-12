@@ -249,7 +249,21 @@ class AuthenticationSpec: QuickSpec {
                 "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
                 (hasAtLeast(["user_profile": "{\"name\":{\"lastName\":\"Smith\",\"firstName\":\"John\"}}" ]) || hasAtLeast(["user_profile": "{\"name\":{\"firstName\":\"John\",\"lastName\":\"Smith\"}}" ]))
                 ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with user profile"
-
+                
+                stub(condition: isToken(Domain) && hasAtLeast([
+                "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+                "subject_token": "VALIDPARTIALNAMECODE",
+                "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
+                "user_profile": "{\"name\":{\"firstName\":\"John\"}}"
+                ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with partial user profile"
+                
+                stub(condition: isToken(Domain) && hasAtLeast([
+                "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+                "subject_token": "VALIDMISSINGNAMECODE",
+                "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
+                hasNoneOf(["user_profile"])
+                ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with missing user profile"
+                
             }
 
             it("should exchange apple auth code for credentials") {
@@ -307,7 +321,39 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-
+            
+            it("should exchange apple auth code for credentials with partial fullName") {
+                var fullName = PersonNameComponents()
+                fullName.givenName = "John"
+                fullName.familyName = nil
+                fullName.middleName = "Ignored"
+                
+                waitUntil(timeout: Timeout) { done in
+                    auth.tokenExchange(withAppleAuthorizationCode: "VALIDPARTIALNAMECODE",
+                                       fullName: fullName)
+                        .start { result in
+                            expect(result).to(haveCredentials())
+                            done()
+                    }
+                }
+            }
+            
+            it("should exchange apple auth code for credentials with missing fullName") {
+                var fullName = PersonNameComponents()
+                fullName.givenName = nil
+                fullName.familyName = nil
+                fullName.middleName = nil
+                
+                waitUntil(timeout: Timeout) { done in
+                    auth.tokenExchange(withAppleAuthorizationCode: "VALIDMISSINGNAMECODE",
+                                       fullName: fullName)
+                        .start { result in
+                            expect(result).to(haveCredentials())
+                            done()
+                    }
+                }
+            }
+            
         }
         
         describe("revoke refresh token") {
