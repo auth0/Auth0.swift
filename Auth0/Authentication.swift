@@ -911,7 +911,7 @@ public extension Authentication {
     ```
     Auth0
        .authentication(clientId: clientId, domain: "samples.auth0.com")
-       .tokenExchange(withAppleAuthorizationCode: authCode, fullName: credentials.fullName, scope: "openid profile offline_access", audience: "https://myapi.com/api)
+       .tokenExchange(withAppleAuthorizationCode: authCode, scope: "openid profile offline_access", audience: "https://myapi.com/api, fullName: credentials.fullName)
        .start { print($0) }
     ```
 
@@ -928,17 +928,19 @@ public extension Authentication {
               "subject_token": authCode,
               "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
               "scope": scope ?? "openid profile offline_access" ]
-        if fullName != nil {
-            if let jsonData = try? String(
-                data: JSONSerialization.data(
-                    withJSONObject: [
-                        "name": [
-                            "firstName": fullName?.givenName,
-                            "lastName": fullName?.familyName
-                        ]
-                    ],
-                    options: []),
-                encoding: String.Encoding.utf8) {
+        if let fullName = fullName {
+            let name = [
+                "firstName": fullName.givenName,
+                "lastName": fullName.familyName
+            ].filter { $0.value != nil }.mapValues { $0! }
+            if !name.isEmpty, let jsonData = try? String(
+                    data: JSONSerialization.data(
+                        withJSONObject: [
+                            "name": name
+                        ],
+                        options: []),
+                    encoding: String.Encoding.utf8
+            ) {
                 parameters["user_profile"] = jsonData
             }
         }
