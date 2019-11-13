@@ -27,4 +27,5 @@ public enum CredentialsManagerError: Error {
     case noRefreshToken
     case failedRefresh(Error)
     case touchFailed(Error)
+    case revokeFailed(Error)
 }

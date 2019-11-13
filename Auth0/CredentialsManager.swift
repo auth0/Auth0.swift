@@ -88,6 +88,34 @@ public struct CredentialsManager {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
+    /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// the credentials are not cleared and an error is raised through the callback.
+    ///
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
+    ///
+    /// - Parameter callback: callback with an error if the refresh token could not be revoked
+    public func revoke(_ callback: @escaping (CredentialsManagerError?) -> Void) {
+        guard
+            let data = self.storage.data(forKey: self.storeKey),
+            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
+            let refreshToken = credentials.refreshToken else {
+                _ = self.clear()
+                return callback(nil)
+        }
+
+        self.authentication
+            .revoke(refreshToken: refreshToken)
+            .start { result in
+                switch result {
+                case .failure(let error):
+                    callback(CredentialsManagerError.revokeFailed(error))
+                case .success:
+                    _ = self.clear()
+                    callback(nil)
+                }
+            }
+    }
+
     /// Checks if a non-expired set of credentials are stored
     ///
     /// - Returns: if there are valid and non-expired credentials stored
@@ -95,10 +123,9 @@ public struct CredentialsManager {
         guard
             let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
-            credentials.accessToken != nil,
-            let expiresIn = credentials.expiresIn
+            credentials.accessToken != nil
             else { return false }
-        return expiresIn > Date() || credentials.refreshToken != nil
+        return !self.hasExpired(credentials) || credentials.refreshToken != nil
     }
 
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
@@ -145,8 +172,8 @@ public struct CredentialsManager {
             let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials
             else { return callback(.noCredentials, nil) }
-        guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
-        guard expiresIn < Date() else { return callback(nil, credentials) }
+        guard credentials.expiresIn != nil else { return callback(.noCredentials, nil) }
+        guard self.hasExpired(credentials) else { return callback(nil, credentials) }
         guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
 
         self.authentication.renew(withRefreshToken: refreshToken, scope: scope).start {
@@ -165,4 +192,44 @@ public struct CredentialsManager {
             }
         }
     }
+
+    func hasExpired(_ credentials: Credentials) -> Bool {
+
+        var hasATExpired = true
+        var hasIDTExpired = true
+
+        if let expiresIn = credentials.expiresIn {
+            if expiresIn > Date() { hasATExpired = false }
+        }
+
+        if let token = credentials.idToken,
+            let tokenDecoded = decode(jwt: token),
+            let exp = tokenDecoded["exp"] as? Double {
+            if Date(timeIntervalSince1970: exp) > Date() { hasIDTExpired = false }
+        }
+
+        return hasATExpired || hasIDTExpired
+    }
+}
+
+func decode(jwt: String) -> [String: Any]? {
+    let parts = jwt.components(separatedBy: ".")
+    guard parts.count == 3 else { return nil }
+    var base64 = parts[1]
+        .replacingOccurrences(of: "-", with: "+")
+        .replacingOccurrences(of: "_", with: "/")
+    let length = Double(base64.lengthOfBytes(using: String.Encoding.utf8))
+    let requiredLength = 4 * ceil(length / 4.0)
+    let paddingLength = requiredLength - length
+    if paddingLength > 0 {
+        let padding = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
+        base64 += padding
+    }
+
+    guard
+        let bodyData = Data(base64Encoded: base64, options: .ignoreUnknownCharacters)
+        else { return nil }
+
+    let json = try? JSONSerialization.jsonObject(with: bodyData, options: [])
+    return json as? [String: Any]
 }

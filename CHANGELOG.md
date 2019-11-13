@@ -1,5 +1,20 @@
 # Change Log
 
+## [1.19.1](https://github.com/auth0/Auth0.swift/tree/1.19.1) (2019-10-31)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.19.0...1.19.1)
+
+**Added**
+- Renew tokens in Credentials Manager if either token has expired [SDK-999] [\#319](https://github.com/auth0/Auth0.swift/pull/319) ([cocojoe](https://github.com/cocojoe))
+
+**Fixed**
+- Fix non-main thread use during inspection in SafariViewController [SDK-1119] [\#318](https://github.com/auth0/Auth0.swift/pull/318) ([cocojoe](https://github.com/cocojoe))
+
+## [1.19.0](https://github.com/auth0/Auth0.swift/tree/1.19.0) (2019-10-15)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.18.0...1.19.0)
+
+**Added**
+- CredentialsManager function to clear and revoke the refresh token [\#312](https://github.com/auth0/Auth0.swift/pull/312) ([stevehobbsdev](https://github.com/stevehobbsdev))
+
 ## [1.18.0](https://github.com/auth0/Auth0.swift/tree/1.18.0) (2019-09-20)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.17.1...1.18.0)
 

@@ -39,6 +39,8 @@ private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with:
 private let ExpiresIn: TimeInterval = 3600
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
+private let ExpiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NzE4NTI0NjMsImV4cCI6MTU0MDIzMDA2MywiYXVkIjoiYXVkaWVuY2UiLCJzdWIiOiIxMjM0NSJ9.Lcz79P1AFAZDI4Yr1teFapFVAmBbdfhGBGbj9dQVeRM"
+private let ValidToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZXN0IiwiaWF0IjoxNTcxOTExNTkyLCJleHAiOjE5MTg5ODAzOTIsImF1ZCI6ImF1ZGllbmNlIiwic3ViIjoic3VifDEyMyJ9.uLNF8IpY6cJTY-RyO3CcqLpCaKGaVekR-DTDoQTlnPk" // Token is valid until 2030
 
 class CredentialsManagerSpec: QuickSpec {
 
@@ -73,6 +75,76 @@ class CredentialsManagerSpec: QuickSpec {
             }
         }
         
+        describe("clearing and revoking refresh token") {
+            
+            beforeEach {
+                _ = credentialsManager.store(credentials: credentials)
+                
+                stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in return revokeTokenResponse() }.name = "revoke success"
+            }
+            
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+            
+            it("should clear credentials and revoke the refresh token") {
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.revoke {
+                        expect($0).to(beNil())
+                        expect(credentialsManager.hasValid()).to(beFalse())
+                        done()
+                    }
+                }
+            }
+            
+            it("should not return an error if there were no credentials stored") {
+                _ = credentialsManager.clear()
+                
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.revoke {
+                        expect($0).to(beNil())
+                        expect(credentialsManager.hasValid()).to(beFalse())
+                        done()
+                    }
+                }
+            }
+            
+            it("should not return an error if there is no refresh token, and clear credentials anyway") {
+                let credentials = Credentials(
+                    accessToken: AccessToken,
+                    idToken: IdToken,
+                    expiresIn: Date(timeIntervalSinceNow: ExpiresIn)
+                    )
+                
+                _ = credentialsManager.store(credentials: credentials)
+                
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.revoke {
+                        expect($0).to(beNil())
+                        expect(credentialsManager.hasValid()).to(beFalse())
+                        done()
+                    }
+                }
+            }
+            
+            it("should return the failure if the token could not be revoked, and not clear credentials") {
+                stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                    return authFailure(code: "400", description: "Revoke failed")
+                }
+                
+                waitUntil(timeout: 2) { done in
+                    credentialsManager.revoke {
+                        expect($0).to(matchError(
+                            CredentialsManagerError.revokeFailed(AuthenticationError(string: "Revoke failed", statusCode: 400))
+                        ))
+                        
+                        expect(credentialsManager.hasValid()).to(beTrue())
+                        done()
+                    }
+                }
+            }
+        }
+        
         describe("multi instances of credentials manager") {
             
             var secondaryCredentialsManager: CredentialsManager!
@@ -80,14 +152,14 @@ class CredentialsManagerSpec: QuickSpec {
 
             beforeEach {
                 secondaryCredentialsManager = CredentialsManager(authentication: authentication, storeKey: "secondary_store")
-                secondaryCredentials = Credentials(accessToken: "SecondaryAccessToken", tokenType: TokenType, idToken: "SecondaryIdToken", refreshToken: "SecondaryRefreshToken", expiresIn: Date(timeIntervalSinceNow: 10))
+                secondaryCredentials = Credentials(accessToken: "SecondaryAccessToken", tokenType: TokenType, idToken: "SecondaryIdToken", refreshToken: "SecondaryRefreshToken", expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
             }
             
             it("should store credentials into distinct locations") {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(secondaryCredentialsManager.store(credentials: secondaryCredentials)).to(beTrue())
                                 
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: 200) { done in
                     credentialsManager.credentials {
                         expect($0).to(beNil())
                         expect($1!.accessToken) == AccessToken
@@ -188,6 +260,54 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.hasValid()).to(beFalse())
             }
         }
+        
+        describe("validity expiry") {
+            
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should not be expired when expiry of at is + 1 hour") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.hasExpired(credentials)).to(beFalse())
+            }
+            
+            it("should not be expired when expiry of at is +1 hour and idt not expired") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ValidToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.hasExpired(credentials)).to(beFalse())
+            }
+            
+            it("should be expired when expiry of at is - 1 hour") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                expect(credentialsManager.hasExpired(credentials)).to(beTrue())
+            }
+            
+            it("should be expired when expiry of at is + 1 hour and idt is expired") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.hasExpired(credentials)).to(beTrue())
+            }
+            
+        }
+        
+        describe("validity with id token") {
+            
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should be valid when at valid and id token valid") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ValidToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.hasValid()).to(beTrue())
+            }
+            
+            fit("should not be valid when at valid and id token expired") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.hasValid()).to(beFalse())
+            }
+            
+        }
 
         describe("retrieval") {
 
@@ -260,6 +380,20 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should yield new credentials, maintain refresh token") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.accessToken) == NewAccessToken
+                            expect(newCredentials?.refreshToken) == RefreshToken
+                            expect(newCredentials?.idToken) == NewIdToken
+                            done()
+                        }
+                    }
+                }
+                
+                it("should yield new credentials when idToken expired") {
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: 10))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
