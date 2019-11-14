@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.19.2](https://github.com/auth0/Auth0.swift/tree/1.19.2) (2019-11-14)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.19.1...1.19.2)
+
+**Added**
+- Add support for extended profile using SIWA token exchange [\#322](https://github.com/auth0/Auth0.swift/pull/322) ([asmclean](https://github.com/asmclean))
+
 ## [1.19.1](https://github.com/auth0/Auth0.swift/tree/1.19.1) (2019-10-31)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.19.0...1.19.1)
 
