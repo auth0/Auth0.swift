@@ -29,6 +29,8 @@ jobs:
             SCHEME: Auth0.iOS
             DEVICE: iPhone 8
             FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
+      - run: |
+          bash <(curl -s https://codecov.io/bash) -J 'Auth0'
       - save_cache:
           key: dependency-cache
           paths:
@@ -60,8 +62,6 @@ jobs:
             SCHEME: Auth0.iOS
             DEVICE: iPhone 8
             FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
-      - run: |
-          bash <(curl -s https://codecov.io/bash) -J 'Auth0'
       - save_cache:
           key: dependency-cache
           paths:
