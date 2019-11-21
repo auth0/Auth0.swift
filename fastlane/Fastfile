@@ -37,6 +37,10 @@ platform :ios do
       skip_build: true,
       output_types: 'junit'
       )
+    lcov(
+      project_name: "Auth0",
+      scheme: "Auth0.iOS"
+      )
   end
 
   desc "Cocoapods library lint"
