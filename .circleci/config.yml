@@ -17,6 +17,7 @@ jobs:
       - checkout
       - run: |
           brew install swiftlint
+          brew install lcov
           bundle install --without=development
       - run:
           name: Bootstrap
