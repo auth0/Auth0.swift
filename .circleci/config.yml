@@ -26,13 +26,16 @@ jobs:
             DEVICE: iPhone 8
             FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
       - run: |
-          cd Build/Build/ProfileData
+          cd ~/Library/Developer/Xcode/DerivedData/
           cd $(ls -d */|head -n 1)
-          directory=${PWD##*/} 
-          pathCoverage=Build/Build/ProfileData/${directory}/Coverage.profdata
+          directoryBase=${PWD##*/} 
+          cd Build/ProfileData/
+          cd $(ls -d */|head -n 1)
+          directoryCoverage=${PWD##*/} 
+          pathCoverage=${directoryBase}/Build/ProfileData/${directoryCoverage}/Coverage.profdata
           cd ../../../../
-          xcrun llvm-cov export -format="lcov" -instr-profile $pathCoverage Build/Build/Products/Debug-iphonesimulator/standard-swift.app/standard-swift > info.lcov
-          bash <(curl -s https://codecov.io/bash)
+          xcrun llvm-cov export -format="lcov" -instr-profile $pathCoverage ${directoryBase}/Build/Products/Debug-iphonesimulator/Auth0.framework/Auth0 > info.lcov
+          bash <(curl -s https://codecov.io/bash) -J Auth0
       - save_cache:
           key: dependency-cache
           paths:
