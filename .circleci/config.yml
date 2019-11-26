@@ -27,11 +27,7 @@ jobs:
             DEVICE: iPhone 8
             FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
       - run: |
-          slather
-          mkdir /tmp/artifacts
-          cp ./fastlane/test_output/* /tmp/artifacts/
-          cp ./cobertura.xml /tmp/artifacts/
-          bash <(curl -s https://codecov.io/bash) -J Auth0 -f ./cobertura.xml
+          bash <(curl -s https://codecov.io/bash) -J 'Auth0'
       - save_cache:
           key: dependency-cache
           paths:
