@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.19.3](https://github.com/auth0/Auth0.swift/tree/1.19.3) (2019-11-27)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.19.2...1.19.3)
+
+**Fixed**
+- Fix Credentials Manager Test [\#325](https://github.com/auth0/Auth0.swift/pull/325) ([cocojoe](https://github.com/cocojoe))
+
 ## [1.19.2](https://github.com/auth0/Auth0.swift/tree/1.19.2) (2019-11-14)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.19.1...1.19.2)
 
