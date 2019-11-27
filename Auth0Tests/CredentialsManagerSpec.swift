@@ -301,7 +301,7 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.hasValid()).to(beTrue())
             }
             
-            fit("should not be valid when at valid and id token expired") {
+            it("should not be valid when at valid and id token expired") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid()).to(beFalse())

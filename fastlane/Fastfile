@@ -35,7 +35,7 @@ platform :ios do
       device: device,
       clean: true,
       skip_build: true,
-      output_types: 'junit'
+      code_coverage: true
       )
   end
 

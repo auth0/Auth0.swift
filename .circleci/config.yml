@@ -2,7 +2,7 @@ version: 2
 jobs:
   build-iOS-Swift-5.1:
     macos:
-      xcode: "11.0.0"
+      xcode: "11.2.0"
     shell: /bin/bash --login -eo pipefail
     environment:
           LC_ALL: en_US.UTF-8
@@ -11,9 +11,6 @@ jobs:
           HOMEBREW_TEMP: ~/homebrew-temp
           HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-      - run:
-          name: Set Ruby Version
-          command:  echo "ruby-2.5" > ~/.ruby-version 
       - checkout
       - run: |
           brew install swiftlint
@@ -29,12 +26,18 @@ jobs:
             SCHEME: Auth0.iOS
             DEVICE: iPhone 8
             FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
+      - run: |
+          slather
+          mkdir /tmp/artifacts
+          cp ./fastlane/test_output/* /tmp/artifacts/
+          cp ./cobertura.xml /tmp/artifacts/
+          bash <(curl -s https://codecov.io/bash) -J Auth0 -f ./cobertura.xml
       - save_cache:
           key: dependency-cache
           paths:
             - Carthage/Build
-      - store_test_results:
-          path: fastlane/test_output
+      - store_artifacts:
+          path: /tmp/artifacts
   build-iOS-Swift-5.0:
     macos:
       xcode: "10.3.0"
@@ -60,14 +63,10 @@ jobs:
             SCHEME: Auth0.iOS
             DEVICE: iPhone 8
             FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
-      - run: |
-          bash <(curl -s https://codecov.io/bash) -J 'Auth0'
       - save_cache:
           key: dependency-cache
           paths:
             - Carthage/Build
-      - store_test_results:
-          path: fastlane/test_output
   build-iOS-Swift-4.2:
     macos:
       xcode: "10.3.0"
@@ -98,8 +97,6 @@ jobs:
           key: dependency-cache
           paths:
             - Carthage/Build
-      - store_test_results:
-          path: fastlane/test_output
   build-iOS-Swift-4.0:
     macos:
       xcode: "10.3.0"
