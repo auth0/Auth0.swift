@@ -38,6 +38,7 @@ private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let Timeout: TimeInterval = 2
+private let PasswordlessGrantType = "http://auth0.com/oauth/grant-type/passwordless/otp"
 
 class AuthenticationSpec: QuickSpec {
     override func spec() {
@@ -808,6 +809,143 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+            
+            context("passwordless login") {
+                
+                let emailRealm = "email"
+                
+                it("should login with email code") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "otp": OTP, "realm": emailRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP).start { result in
+                            expect(result).to(haveCredentials(AccessToken))
+                            done()
+                        }
+                    }
+                }
+                
+                it("should include audience if it is not nil") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["audience": "audience"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: "audience", scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include audience if it is nil") {
+                    stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include audience by default") {
+                    stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should include scope if it is not nil") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "scope"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: "scope", parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include scope if it is nil") {
+                    stub(condition: isToken(Domain) && hasNoneOf(["scope"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should use 'openid' as the default scope") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should return an id token when the scope includes 'openid'") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid"])) { _ in
+                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: "openid", parameters: [:]).start { result in
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                        }
+                    }
+                }
+                
+                it("should include extra parameters") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["foo": "bar"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil, parameters: ["foo": "bar"]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include extra parameters if they're empty") {
+                    stub(condition: isToken(Domain) && hasAllOf(["username": SupportAtAuth0, "otp": OTP, "realm": emailRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include extra parameters by default") {
+                    stub(condition: isToken(Domain) && hasAllOf(["username": SupportAtAuth0, "otp": OTP, "realm": emailRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+            }
         }
 
         describe("passwordless sms") {
@@ -838,6 +976,143 @@ class AuthenticationSpec: QuickSpec {
                     auth.startPasswordless(phoneNumber: Phone).start { result in
                         expect(result).to(haveAuthenticationError(code: "error", description: "description"))
                         done()
+                    }
+                }
+            }
+            
+            context("passwordless login") {
+                
+                let smsRealm = "sms"
+                
+                it("should login with sms code") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["username": Phone, "otp": OTP, "realm": smsRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP).start { result in
+                            expect(result).to(haveCredentials(AccessToken))
+                            done()
+                        }
+                    }
+                }
+                
+                it("should include audience if it is not nil") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["audience": "audience"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: "audience", scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include audience if it is nil") {
+                    stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include audience by default") {
+                    stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should include scope if it is not nil") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "scope"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: "scope", parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include scope if it is nil") {
+                    stub(condition: isToken(Domain) && hasNoneOf(["scope"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should use 'openid' as the default scope") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should return an id token when the scope includes 'openid'") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid"])) { _ in
+                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: "openid", parameters: [:]).start { result in
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                        }
+                    }
+                }
+                
+                it("should include extra parameters") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["foo": "bar"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil, parameters: ["foo": "bar"]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include extra parameters if they're empty") {
+                    stub(condition: isToken(Domain) && hasAllOf(["username": Phone, "otp": OTP, "realm": smsRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not include extra parameters by default") {
+                    stub(condition: isToken(Domain) && hasAllOf(["username": Phone, "otp": OTP, "realm": smsRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil).start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
                     }
                 }
             }
