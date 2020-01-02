@@ -64,7 +64,7 @@ public protocol Authentication: Trackable, Loggable {
        .start { print($0) }
     ```
 
-    When result is `Successful`, a `Credentials` object will be in it's associated value with at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
 
     - parameter email:             email the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via email
@@ -108,7 +108,7 @@ public protocol Authentication: Trackable, Loggable {
        .start { print($0) }
     ```
 
-    When result is `Successful`, a `Credentials` object will be in it's associated value with at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
 
     - parameter phoneNumber:       phone number the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via sms
@@ -159,7 +159,7 @@ public protocol Authentication: Trackable, Loggable {
 
      Also some enterprise connections, like Active Directory (AD), allows authentication using username/password without using the web flow.
 
-     When result is `Successful`, a `Credentials` object will be in it's associated value with at least an `access_token` (depending on the scopes used to authenticate)
+     When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
 
      - parameter usernameOrEmail:   username or email used of the user to authenticate, e.g. in email in Database connections or phone number for SMS connections.
      - parameter password:          password of the user or one time password (OTP) for passwordless connection users
@@ -661,7 +661,7 @@ public extension Authentication {
        .start { print($0) }
     ```
 
-    When result is `Successful`, a `Credentials` object will be in it's associated value with at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
 
     - parameter email:             email the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via email
@@ -707,7 +707,7 @@ public extension Authentication {
        .start { print($0) }
     ```
 
-    When result is `Successful`, a `Credentials` object will be in it's associated value with at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
 
     - parameter phoneNumber:       phone number the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via sms
@@ -760,7 +760,7 @@ public extension Authentication {
 
      Also some enterprise connections, like Active Directory (AD), allows authentication using username/password without using the web flow.
 
-     When result is `Successful`, a `Credentials` object will be in it's associated value with at least an `access_token` (depending on the scopes used to authenticate)
+     When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
 
      - parameter usernameOrEmail:   username or email used of the user to authenticate, e.g. in email in Database connections or phone number for SMS connections.
      - parameter password:          password of the user or one time password (OTP) for passwordless connection users

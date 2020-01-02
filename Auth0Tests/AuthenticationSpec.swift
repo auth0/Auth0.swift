@@ -827,11 +827,11 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should include audience if it is not nil") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["audience": "audience"])) { _ in
+                    stub(condition: isToken(Domain) && hasAtLeast(["audience": "https://myapi.com/api"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: "audience", scope: nil, parameters: [:]).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: "https://myapi.com/api", scope: nil, parameters: [:]).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -863,11 +863,11 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should include scope if it is not nil") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "scope"])) { _ in
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid profile email"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: "scope", parameters: [:]).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: "openid profile email", parameters: [:]).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -893,18 +893,6 @@ class AuthenticationSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP, audience: nil, parameters: [:]).start { result in
                             expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should return an id token when the scope includes 'openid'") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid"])) { _ in
-                        return authResponse(accessToken: AccessToken, idToken: IdToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: "openid", parameters: [:]).start { result in
-                            expect(result).to(haveCredentials(AccessToken, IdToken))
                             done()
                         }
                     }
@@ -997,11 +985,11 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should include audience if it is not nil") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["audience": "audience"])) { _ in
+                    stub(condition: isToken(Domain) && hasAtLeast(["audience": "https://myapi.com/api"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: "audience", scope: nil, parameters: [:]).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: "https://myapi.com/api", scope: nil, parameters: [:]).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1033,11 +1021,11 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should include scope if it is not nil") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "scope"])) { _ in
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid profile email"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: "scope", parameters: [:]).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: "openid profile email", parameters: [:]).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1063,18 +1051,6 @@ class AuthenticationSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP, audience: nil, parameters: [:]).start { result in
                             expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should return an id token when the scope includes 'openid'") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid"])) { _ in
-                        return authResponse(accessToken: AccessToken, idToken: IdToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: "openid", parameters: [:]).start { result in
-                            expect(result).to(haveCredentials(AccessToken, IdToken))
                             done()
                         }
                     }
