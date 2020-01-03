@@ -23,7 +23,7 @@
 import Foundation
 
 struct Auth0Authentication: Authentication {
-
+    
     let clientId: String
     let url: URL
     var telemetry: Telemetry
@@ -36,6 +36,14 @@ struct Auth0Authentication: Authentication {
         self.url = url
         self.session = session
         self.telemetry = telemetry
+    }
+    
+    func login(email username: String, code otp: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
+        return login(username: username, otp: otp, realm: "email", audience: audience, scope: scope, parameters: parameters)
+    }
+    
+    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
+        return login(username: username, otp: otp, realm: "sms", audience: audience, scope: scope, parameters: parameters)
     }
 
     // swiftlint:disable:next function_parameter_count
@@ -245,4 +253,26 @@ struct Auth0Authentication: Authentication {
             .connection(connection)
     }
     #endif
+    
+    // MARK: - Private Methods
+    
+    // swiftlint:disable:next function_parameter_count
+    private func login(username: String, otp: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
+        let url = URL(string: "/oauth/token", relativeTo: self.url)!
+        var payload: [String: Any] = [
+            "username": username,
+            "otp": otp,
+            "realm": realm,
+            "grant_type": "http://auth0.com/oauth/grant-type/passwordless/otp",
+            "client_id": self.clientId
+        ]
+        if let audience = audience {
+            payload["audience"] = audience
+        }
+        if let scope = scope {
+            payload["scope"] = scope
+        }
+        parameters.forEach { key, value in payload[key] = value }
+        return Request(session: session, url: url, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
+    }
 }
