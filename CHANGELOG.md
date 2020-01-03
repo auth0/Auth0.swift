@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.20.0](https://github.com/auth0/Auth0.swift/tree/1.20.0) (2020-01-03)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.19.3...1.20.0)
+
+**Added**
+- Implemented passwordless login [SDK-1185] [\#330](https://github.com/auth0/Auth0.swift/pull/330) ([Widcket](https://github.com/Widcket))
+
 ## [1.19.3](https://github.com/auth0/Auth0.swift/tree/1.19.3) (2019-11-27)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.19.2...1.19.3)
 

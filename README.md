@@ -26,7 +26,7 @@ Behaviour changes in iOS 13 related to Web Authentication require that developer
 If you are using Carthage, add the following lines to your `Cartfile`:
 
 ```ruby
-github "auth0/Auth0.swift" ~> 1.19
+github "auth0/Auth0.swift" ~> 1.20
 ```
 
 Then run `carthage bootstrap`.
@@ -39,7 +39,7 @@ If you are using [Cocoapods](https://cocoapods.org/), add these lines to your `P
 
 ```ruby
 use_frameworks!
-pod 'Auth0', '~> 1.19'
+pod 'Auth0', '~> 1.20'
 ```
 
 Then run `pod install`.
