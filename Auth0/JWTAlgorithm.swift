@@ -38,9 +38,8 @@ enum JWTAlgorithm: String {
             #if os(OSX)
             guard #available(OSX 10.12, *) else { return true }
             #endif
-            guard let publicKey = jwk.rsaPublicKey,
-                let sha256 = A0SHA(algorithm: "sha256"),
-                let rsa = A0RSA(key: publicKey) else { return false }
+            guard let publicKey = jwk.rsaPublicKey, let rsa = A0RSA(key: publicKey) else { return false }
+            let sha256 = A0SHA()
             return rsa.verify(sha256.hash(data), signature: signature)
         case .hs256: return true
         }

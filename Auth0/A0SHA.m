@@ -23,6 +23,8 @@
 #import <A0SHA.h>
 #import <CommonCrypto/CommonHMAC.h>
 
+static NSString * const kDefaultSHAAlgorithm = @"sha256";
+
 @interface A0SHA ()
 @property (readonly, nonatomic) NSInteger digestLength;
 @end
@@ -33,13 +35,17 @@
     self = [super init];
     if (self) {
         const NSString * alg = algorithm.lowercaseString;
-        if ([@"sha256"  isEqual: alg]) {
+        if ([kDefaultSHAAlgorithm  isEqual: alg]) {
             _digestLength = CC_SHA256_DIGEST_LENGTH;
         } else {
             return nil;
         }
     }
     return self;
+}
+
+- (instancetype)init {
+    return [self initWithAlgorithm: kDefaultSHAAlgorithm];
 }
 
 - (NSData *)hash:(NSData *)data {

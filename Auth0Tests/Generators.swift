@@ -25,14 +25,16 @@ import JWTDecode
 
 @testable import Auth0
 
+// MARK: - Constants
+
+fileprivate let defaultKid = "key123"
+
 // MARK: - Keys
 
 enum TestKeys {
     static let rsaPrivate: SecKey = {
-        let query: [String: Any] = [
-            String(kSecAttrKeyType): kSecAttrKeyTypeRSA,
-            String(kSecAttrKeySizeInBits): 2048,
-        ]
+        let query: [String: Any] = [String(kSecAttrKeyType): kSecAttrKeyTypeRSA,
+                                    String(kSecAttrKeySizeInBits): 2048]
         
         return SecKeyCreateRandomKey(query as CFDictionary, nil)!
     }()
@@ -109,7 +111,7 @@ private func generateJWTBody(alg: String,
 }
 
 func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
-                 kid: String = "key123",
+                 kid: String = defaultKid,
                  iss: String? = "https://tokens-test.auth0.com/",
                  sub: String? = "auth0|123456789",
                  aud: [String]? = ["tokens-test-123"],
@@ -148,6 +150,9 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
 
 // MARK: - JWK
 
+// This method calculates the length of a given DER triplet.
+// It starts at the triplet's base address, then proceeds from there.
+// It returns a pointer to the end of the triplet plus its length.
 private func calculateLength(from bytes: UnsafePointer<UInt8>) -> (UnsafePointer<UInt8>, Int) {
     guard bytes.pointee > 0x7f else { return (bytes + 1, Int(bytes.pointee)) }
 
@@ -158,8 +163,11 @@ private func calculateLength(from bytes: UnsafePointer<UInt8>) -> (UnsafePointer
     return (pointer, length)
 }
 
+// This method extracts the data portion from a given DER triplet.
+// It starts at the triplet's base address, then proceeds from there.
+// It returns a pointer to the end of the triplet plus its data.
 private func extractData(from bytes: UnsafePointer<UInt8>) -> (UnsafePointer<UInt8>, Data)? {
-    guard bytes.pointee == 0x02 else { return nil }
+    guard bytes.pointee == 0x02 else { return nil } // Checks that this is an INTEGER triplet (either the modulus or the exponent)
     
     let (valueBytes, valueLength) = calculateLength(from: bytes + 1)
     let data = Data(bytes: valueBytes, count: valueLength)
@@ -168,9 +176,9 @@ private func extractData(from bytes: UnsafePointer<UInt8>) -> (UnsafePointer<UIn
     return (pointer, data)
 }
 
-func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String = "key123") -> JWK {
+func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String = defaultKid) -> JWK {
     let asn = { (bytes: UnsafePointer<UInt8>) -> JWK? in
-        guard bytes.pointee == 0x30 else { return nil }
+        guard bytes.pointee == 0x30 else { return nil } // Checks that this is a SEQUENCE triplet
         
         let (modulusBytes, totalLength) = calculateLength(from: bytes + 1)
         

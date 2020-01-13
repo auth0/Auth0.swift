@@ -47,6 +47,48 @@ class JWKSpec: QuickSpec {
             }
             
             context("unsuccessful generation") {
+                it("should fail to generate a public key given an invalid key type") {
+                    let jwkWithInvalidKeyType = JWK(keyType: "AES",
+                                                    keyId: jwk.keyId,
+                                                    usage: jwk.usage,
+                                                    algorithm: jwk.algorithm,
+                                                    certUrl: nil,
+                                                    certThumbprint: nil,
+                                                    certChain: nil,
+                                                    rsaModulus: jwk.rsaModulus,
+                                                    rsaExponent: jwk.rsaExponent)
+                    
+                    expect(jwkWithInvalidKeyType.rsaPublicKey).to(beNil())
+                }
+                
+                it("should fail to generate a public key given an invalid algorithm") {
+                    let jwkWithInvalidAlgorithm = JWK(keyType: jwk.keyType,
+                                                      keyId: jwk.keyId,
+                                                      usage: jwk.usage,
+                                                      algorithm: "AES256",
+                                                      certUrl: nil,
+                                                      certThumbprint: nil,
+                                                      certChain: nil,
+                                                      rsaModulus: jwk.rsaModulus,
+                                                      rsaExponent: jwk.rsaExponent)
+                    
+                    expect(jwkWithInvalidAlgorithm.rsaPublicKey).to(beNil())
+                }
+                
+                it("should fail to generate a public key given an unsupported usage") {
+                    let jwkWithUnsupportedUsage = JWK(keyType: jwk.keyType,
+                                                      keyId: jwk.keyId,
+                                                      usage: "enc",
+                                                      algorithm: jwk.algorithm,
+                                                      certUrl: nil,
+                                                      certThumbprint: nil,
+                                                      certChain: nil,
+                                                      rsaModulus: jwk.rsaModulus,
+                                                      rsaExponent: jwk.rsaExponent)
+                    
+                    expect(jwkWithUnsupportedUsage.rsaPublicKey).to(beNil())
+                }
+                
                 it("should fail to generate a public key given an invalid modulus") {
                     let jwkWithInvalidModulus = JWK(keyType: jwk.keyType,
                                                     keyId: jwk.keyId,
