@@ -434,7 +434,7 @@ public protocol Authentication: Trackable, Loggable {
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
     /**
-     Returns token information by performing a request to /tokeninfo endpoint
+     Returns token information by performing a request to the `/tokeninfo` endpoint.
 
      ```
      Auth0
@@ -451,7 +451,7 @@ public protocol Authentication: Trackable, Loggable {
     func tokenInfo(token: String) -> Request<Profile, AuthenticationError>
 
     /**
-     Returns user information by performing a request to /userinfo endpoint.
+     Returns user information by performing a request to the `/userinfo` endpoint.
 
      ```
      Auth0
@@ -469,7 +469,7 @@ public protocol Authentication: Trackable, Loggable {
 
     /**
      Returns OIDC standard claims information by performing a request
-     to /userinfo endpoint.
+     to the `/userinfo` endpoint.
 
      ```
      Auth0
@@ -585,6 +585,20 @@ public protocol Authentication: Trackable, Loggable {
      - returns: a request that will yield the result of delegation
     */
     func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
+    
+    /**
+    Returns JSON Web Key Set (JWKS) information by performing a request to the `/.well-known/jwks.json` endpoint.
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .jwks()
+       .start { print($0) }
+    ```
+    
+    - returns: a request that will yield JWKS information
+    */
+    func jwks() -> Request<JWKS, AuthenticationError>
 
 #if os(iOS)
     /**

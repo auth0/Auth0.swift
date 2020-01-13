@@ -1,6 +1,6 @@
-// Auth0.h
+// JWTAlgorithm.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Foundation
+import JWTDecode
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
-
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
-
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
+enum JWTAlgorithm: String {
+    case rs256 = "RS256"
+    case hs256 = "HS256"
+    
+    func verify(_ jwt: JWT, using jwk: JWK) -> Bool {
+        let separator = "."
+        let parts = jwt.string.components(separatedBy: separator).dropLast().joined(separator: separator)
+        guard let data = parts.data(using: .utf8),
+            let signature = jwt.signature?.a0_decodeBase64URLSafe(),
+            !signature.isEmpty else { return false }
+        switch self {
+        case .rs256:
+            #if os(OSX)
+            guard #available(OSX 10.12, *) else { return true }
+            #endif
+            guard let publicKey = jwk.rsaPublicKey,
+                let sha256 = A0SHA(algorithm: "sha256"),
+                let rsa = A0RSA(key: publicKey) else { return false }
+            return rsa.verify(sha256.hash(data), signature: signature)
+        case .hs256: return true
+        }
+    }
+}

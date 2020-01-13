@@ -1,4 +1,4 @@
-// Auth0.h
+// A0SHA.m
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -20,16 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+#import <A0SHA.h>
+#import <CommonCrypto/CommonHMAC.h>
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
+@interface A0SHA ()
+@property (readonly, nonatomic) NSInteger digestLength;
+@end
 
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
+@implementation A0SHA
 
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
+- (instancetype)initWithAlgorithm:(NSString *)algorithm {
+    self = [super init];
+    if (self) {
+        const NSString * alg = algorithm.lowercaseString;
+        if ([@"sha256"  isEqual: alg]) {
+            _digestLength = CC_SHA256_DIGEST_LENGTH;
+        } else {
+            return nil;
+        }
+    }
+    return self;
+}
 
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
+- (NSData *)hash:(NSData *)data {
+    uint8_t hashBytes[self.digestLength];
+    memset(hashBytes, 0x0, self.digestLength);
+
+    CC_SHA256(data.bytes, (CC_LONG)data.length, hashBytes);
+
+    NSData *hash = [NSData dataWithBytes:hashBytes length:self.digestLength];
+    return hash;
+}
+
+@end

@@ -63,14 +63,17 @@ Pod::Spec.new do |s|
   s.ios.frameworks = 'UIKit', 'SafariServices', 'LocalAuthentication'
   s.ios.weak_framework = 'AuthenticationServices'
   s.ios.dependency 'SimpleKeychain'
+  s.ios.dependency 'JWTDecode'
   s.osx.source_files = 'Auth0/*.swift'
   s.osx.exclude_files = web_auth_files
   s.osx.dependency 'SimpleKeychain'
+  s.osx.dependency 'JWTDecode'
   s.watchos.source_files = 'Auth0/*.swift'
   s.watchos.exclude_files = watchos_exclude_files
   s.tvos.source_files = 'Auth0/*.swift'
   s.tvos.exclude_files = web_auth_files
   s.tvos.dependency 'SimpleKeychain'
+  s.tvos.dependency 'JWTDecode'
 
   s.swift_versions = ['4.0', '4.1', '4.2', '5.0']
 end
