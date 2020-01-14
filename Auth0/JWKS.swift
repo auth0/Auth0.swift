@@ -59,9 +59,9 @@ public struct JWK: Codable {
 
 extension JWK {
     var rsaPublicKey: SecKey? {
+        if let usage = usage, usage != "sig" { return nil }
         guard keyType == "RSA",
             algorithm == JWTAlgorithm.rs256.rawValue,
-            usage == "sig",
             let modulus = rsaModulus?.a0_decodeBase64URLSafe(),
             let exponent = rsaExponent?.a0_decodeBase64URLSafe() else { return nil }
         let encodedKey = encodeRSAPublicKey(modulus: [UInt8](modulus), exponent: [UInt8](exponent))
