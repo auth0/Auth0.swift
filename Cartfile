@@ -1,1 +1,2 @@
 github "auth0/SimpleKeychain" 
+github "auth0/JWTDecode.swift"
