@@ -25,14 +25,59 @@ import JWTDecode
 
 @testable import Auth0
 
-class MockIDTokenSignatureValidator: JWTSignatureValidator {
+// MARK: - Signature Validator Mocks
+
+struct MockSuccessfulIDTokenSignatureValidator: JWTSignatureValidator {
     func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
         callback(nil)
     }
 }
 
-class MockIDTokenClaimsValidator: JWTClaimValidator {
+struct MockUnsuccessfulIDTokenSignatureValidator: JWTSignatureValidator {
+    enum ValidationError: LocalizedError {
+        case errorCase
+        
+        var errorDescription: String? { return "Error message" }
+    }
+        
+    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
+        callback(ValidationError.errorCase)
+    }
+}
+
+// MARK: - Claims Validator Mocks
+
+struct MockSuccessfulIDTokenClaimsValidator: JWTClaimValidator {
     func validate(_ jwt: JWT) -> LocalizedError? {
         return nil
+    }
+}
+
+class MockUnsuccessfulIDTokenClaimValidator: JWTClaimValidator {
+    enum ValidationError: LocalizedError {
+        case errorCase1
+        case errorCase2
+        
+        var errorDescription: String? { return "Error message" }
+    }
+    
+    let errorCase: ValidationError
+    
+    init(errorCase: ValidationError = .errorCase1) {
+        self.errorCase = errorCase
+    }
+    
+    func validate(_ jwt: JWT) -> LocalizedError? {
+        return errorCase
+    }
+}
+
+class SpyUnsuccessfulIDTokenClaimValidator: MockUnsuccessfulIDTokenClaimValidator {
+    var didExecuteValidation: Bool = false
+    
+    override func validate(_ jwt: JWT) -> LocalizedError? {
+        didExecuteValidation = true
+        
+        return super.validate(jwt)
     }
 }
