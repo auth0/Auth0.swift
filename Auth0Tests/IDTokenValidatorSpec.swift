@@ -35,12 +35,15 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
         
         describe("sanity checks") {
             it("should fail to validate a nil id token") {
+                let expectedError = IDTokenDecodingError.missingToken
+                
                 waitUntil { done in
                     validate(idToken: nil,
                              context: validatorContext,
                              signatureValidator: mockSignatureValidator,
                              claimsValidator: mockClaimsValidator) { error in
-                        expect(error).to(matchError(IDTokenDecodingError.missingToken))
+                        expect(error).to(matchError(expectedError))
+                        expect(error?.errorDescription).to(equal(expectedError.errorDescription))
                         done()
                     }
                 }
@@ -56,6 +59,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
+                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
                             done()
                         }
                     }
@@ -68,6 +72,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
+                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
                             done()
                         }
                     }
@@ -80,6 +85,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
+                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
                             done()
                         }
                     }
@@ -93,6 +99,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
+                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
                             done()
                         }
                     }

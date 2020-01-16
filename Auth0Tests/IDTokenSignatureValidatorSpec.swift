@@ -52,13 +52,14 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 }
 
                 it("should not support other algorithms") {
-                    let jwt = generateJWT(alg: "AES256")
-                                        
+                    let alg = "AES256"
+                    let jwt = generateJWT(alg: alg)
+                    let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: alg, expected: "RS256")
+                    
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
-                            let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: "", expected: "")
-                            
                             expect(error).to(matchError(expectedError))
+                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
                             done()
                         }
                     }
@@ -67,7 +68,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
             
             context("kid validation") {
                 let jwt = generateJWT()
-                let expectedError = IDTokenSignatureValidator.ValidationError.missingPublicKey(kid: "")
+                let expectedError = IDTokenSignatureValidator.ValidationError.missingPublicKey(kid: "key123")
                 
                 it("should fail if the kid is not present") {
                     stub(condition: isJWKSPath(domain)) { _ in jwksResponse(kid: nil) }
@@ -75,6 +76,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
+                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
                             done()
                         }
                     }
@@ -86,6 +88,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
+                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
                             done()
                         }
                     }
@@ -97,6 +100,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
+                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
                             done()
                         }
                     }
