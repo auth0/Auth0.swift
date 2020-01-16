@@ -23,6 +23,8 @@
 import Foundation
 import OHHTTPStubs
 
+@testable import Auth0
+
 let UserId = "auth0|\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
 let SupportAtAuth0 = "support@auth0.com"
 let Support = "support"
@@ -42,6 +44,7 @@ let LocaleUS = "en-US"
 let ZoneEST = "US/Eastern"
 let OTP = "123456"
 let MFAToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+let JWKKid = "key123"
 
 func authResponse(accessToken: String, idToken: String? = nil, expiresIn: Double? = nil) -> OHHTTPStubsResponse {
     var json = [
@@ -114,4 +117,23 @@ func managementResponse(_ payload: Any) -> OHHTTPStubsResponse {
 
 func managementErrorResponse(error: String, description: String, code: String, statusCode: Int = 400) -> OHHTTPStubsResponse {
     return OHHTTPStubsResponse(jsonObject: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: Int32(statusCode), headers: ["Content-Type": "application/json"])
+}
+
+func jwksResponse(kid: String? = JWKKid) -> OHHTTPStubsResponse {
+    let jwk = generateRSAJWK()
+    let jwks = ["keys": [
+        ["alg": jwk.algorithm,
+         "kty": jwk.keyType,
+         "use": jwk.usage,
+             "n": jwk.rsaModulus,
+             "e": jwk.rsaExponent,
+             "kid": kid]
+        ]
+    ]
+    
+    return OHHTTPStubsResponse(jsonObject: jwks, statusCode: 200, headers: nil)
+}
+
+func jwksErrorResponse() -> OHHTTPStubsResponse {
+    return OHHTTPStubsResponse(jsonObject: [], statusCode: 500, headers: nil)
 }

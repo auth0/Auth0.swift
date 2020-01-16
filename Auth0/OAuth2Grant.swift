@@ -127,7 +127,7 @@ private func validate(responseType: [ResponseType], token: String?, nonce: Strin
         let expectedNonce = nonce,
         let token = token
         else { return false }
-    let claims = decode(jwt: token)
+    let claims = decodeJwt(token)
     let actualNonce = claims?["nonce"] as? String
     return actualNonce == expectedNonce
 }
