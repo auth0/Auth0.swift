@@ -10,14 +10,27 @@
 
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
 
+## Important Notice
+Behaviour changes in iOS 13 related to Web Authentication require that developers using Xcode 11 with this library **must** compile using Swift 5.x. This *should* be the default setting applied when updating, unless it has been manually set. However, we recommend checking that this value is set correctly.
+
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Next Steps](#next-steps)
+- [What is Auth0?](#what-is-auth0-)
+- [Create a Free Auth0 Account](#create-a-free-auth0-account)
+- [Issue Reporting](#issue-reporting)
+- [Author](#author)
+- [License](#license)
+
 ## Requirements
 
 - iOS 9+ / macOS 10.11+ / tvOS 9.0+ / watchOS 2.0+
 - Xcode 10.x/11.x
 - Swift 4.x/5.x
 
-## Important Notice
-Behaviour changes in iOS 13 related to Web Authentication require that developers using Xcode 11 with this library **must** compile using Swift 5.x. This *should* be the default setting applied when updating, unless it has been manually set. However, we recommend checking that this value is set correctly.
 
 ## Installation
 
@@ -49,16 +62,16 @@ Then run `pod install`.
 > ### Upgrade Notes
 > If you are using the [clearSession](https://github.com/auth0/Auth0.swift/blob/master/Auth0/WebAuth.swift#L248) method in iOS 11+, you will need to ensure that the **Callback URL** has been added to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
-## Getting started
+## Getting Started
 
-### Authentication with hosted login page (iOS Only)
+### Authentication with Universal Login (iOS Only)
 
 1. Import **Auth0** into your project.        
 ```swift
 import Auth0
 ```
 
-2. Present the hosted login page.
+2. Present the Universal Login page.
 ```swift
 Auth0
     .webAuth()
@@ -265,7 +278,7 @@ Find out more about [Setting up Sign in with Apple](https://auth0.com/docs/conne
 ### Authentication API (iOS / macOS / tvOS)
 
 The Authentication API exposes AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
-We recommend using our Hosted Login Page but if you wish to build your own UI you can use our API endpoints to do so. However some Auth flows (Grant types) are disabled by default so you will need to enable them via your Auth0 Dashboard as explained in [this guide](https://auth0.com/docs/clients/client-grant-types#edit-available-grant_types).
+We recommend using Universal Login but if you wish to build your own UI you can use our API endpoints to do so. However some Auth flows (Grant types) are disabled by default so you will need to enable them via your Auth0 Dashboard as explained in [this guide](https://auth0.com/docs/clients/client-grant-types#edit-available-grant_types).
 
 These are the required Grant Types that needs to be enabled in your application:
 
@@ -388,7 +401,7 @@ Auth0 helps you to:
 * Analytics of how, when and where users are logging in.
 * Pull data from other sources and add it to the user profile, through [JavaScript rules](https://docs.auth0.com/rules).
 
-## Create a free Auth0 Account
+## Create a Free Auth0 Account
 
 1. Go to [Auth0](https://auth0.com) and click Sign Up.
 2. Use Google, GitHub or Microsoft Account to login.
