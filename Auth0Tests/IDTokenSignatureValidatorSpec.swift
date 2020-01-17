@@ -63,7 +63,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should not support other algorithms") {
-                    let alg = "AES256"
+                    let alg = "ES256"
                     let jwt = generateJWT(alg: alg)
                     let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: alg, expected: "RS256")
                     
@@ -76,10 +76,9 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     }
                 }
                 
-                it("should not support no algorithm") { // alg == none, not supported by us
-                    let alg = ""
-                    let jwt = generateJWT(alg: alg)
-                    let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: alg, expected: "RS256")
+                it("should not support none") {
+                    let jwt = generateJWT(alg: "none") // not supported by us
+                    let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: "", expected: "RS256")
                     
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
@@ -97,21 +96,6 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 
                 it("should fail if the jwk has no kid") {
                     stub(condition: isJWKSPath(domain)) { _ in jwksResponse(kid: nil) }
-                    
-                    waitUntil { done in
-                        signatureValidator.validate(jwt) { error in
-                            expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
-                            done()
-                        }
-                    }
-                }
-                
-                it("should fail if the jwt has no kid") {
-                    let jwt = generateJWT(kid: nil)
-                    let expectedError = IDTokenSignatureValidator.ValidationError.missingPublicKey(kid: "nil")
-                    
-                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse(kid: "key123") }
                     
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in

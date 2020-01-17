@@ -52,12 +52,8 @@ private func encodeJWTPart(from dict: [String: Any]) -> String {
     return json.a0_encodeBase64URLSafe()!
 }
 
-private func generateJWTHeader(alg: String?, kid: String?) -> String {
-    var headerDict: [String: Any] = [:]
-    
-    if let alg = alg {
-        headerDict["alg"] = alg
-    }
+private func generateJWTHeader(alg: String, kid: String?) -> String {
+    var headerDict: [String: Any] = ["alg": alg]
     
     if let kid = kid {
         headerDict["kid"] = kid
@@ -116,7 +112,7 @@ private func generateJWTBody(iss: String?,
     return encodeJWTPart(from: bodyDict)
 }
 
-func generateJWT(alg: String? = JWTAlgorithm.rs256.rawValue,
+func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  kid: String? = defaultKid,
                  iss: String? = "https://tokens-test.auth0.com/",
                  sub: String? = "auth0|123456789",
@@ -145,7 +141,7 @@ func generateJWT(alg: String? = JWTAlgorithm.rs256.rawValue,
     if let signature = signature {
         signaturePart = signature
     }
-    else if let alg = alg, let algorithm = JWTAlgorithm(rawValue: alg) {
+    else if let algorithm = JWTAlgorithm(rawValue: alg) {
         signaturePart = algorithm.sign(value: signableParts.data(using: .utf8)!).a0_encodeBase64URLSafe()!
     }
     
