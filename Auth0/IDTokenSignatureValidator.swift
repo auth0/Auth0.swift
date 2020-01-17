@@ -24,8 +24,8 @@ import Foundation
 import JWTDecode
 
 protocol IDTokenSignatureValidatorContext {
-    var domain: String { get }
-    var clientId: String { get }
+    var issuer: String { get }
+    var audience: String { get }
     var jwksRequest: Request<JWKS, AuthenticationError> { get }
 }
 

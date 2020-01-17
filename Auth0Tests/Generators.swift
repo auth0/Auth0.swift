@@ -52,15 +52,21 @@ private func encodeJWTPart(from dict: [String: Any]) -> String {
     return json.a0_encodeBase64URLSafe()!
 }
 
-private func generateJWTHeader(alg: String, kid: String) -> String {
-    let headerDict: [String: Any] = ["alg": alg, "kid": kid]
+private func generateJWTHeader(alg: String?, kid: String?) -> String {
+    var headerDict: [String: Any] = [:]
+    
+    if let alg = alg {
+        headerDict["alg"] = alg
+    }
+    
+    if let kid = kid {
+        headerDict["kid"] = kid
+    }
     
     return encodeJWTPart(from: headerDict)
 }
 
-private func generateJWTBody(alg: String,
-                             kid: String,
-                             iss: String?,
+private func generateJWTBody(iss: String?,
                              sub: String?,
                              aud: [String]?,
                              exp: Date?,
@@ -110,8 +116,8 @@ private func generateJWTBody(alg: String,
     return encodeJWTPart(from: bodyDict)
 }
 
-func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
-                 kid: String = defaultKid,
+func generateJWT(alg: String? = JWTAlgorithm.rs256.rawValue,
+                 kid: String? = defaultKid,
                  iss: String? = "https://tokens-test.auth0.com/",
                  sub: String? = "auth0|123456789",
                  aud: [String]? = ["tokens-test-123"],
@@ -123,9 +129,7 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  authTime: Date? = nil,
                  signature: String? = nil) -> JWT {
     let header = generateJWTHeader(alg: alg, kid: kid)
-    let body = generateJWTBody(alg: alg,
-                               kid: kid,
-                               iss: iss,
+    let body = generateJWTBody(iss: iss,
                                sub: sub,
                                aud: aud,
                                exp: exp,
@@ -136,12 +140,12 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                                authTime: authTime)
     
     let signableParts = "\(header).\(body)"
-    var signaturePart = "SIGNATURE"
+    var signaturePart = ""
     
     if let signature = signature {
         signaturePart = signature
     }
-    else if let algorithm = JWTAlgorithm(rawValue: alg) {
+    else if let alg = alg, let algorithm = JWTAlgorithm(rawValue: alg) {
         signaturePart = algorithm.sign(value: signableParts.data(using: .utf8)!).a0_encodeBase64URLSafe()!
     }
     

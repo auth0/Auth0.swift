@@ -24,8 +24,8 @@ import Foundation
 import JWTDecode
 
 protocol IDTokenClaimsValidatorContext {
-    var domain: String { get }
-    var clientId: String { get }
+    var issuer: String { get }
+    var audience: String { get }
     var leeway: Int { get }
     var nonce: String? { get }
     var maxAge: Int? { get }

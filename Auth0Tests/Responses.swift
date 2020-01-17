@@ -121,15 +121,12 @@ func managementErrorResponse(error: String, description: String, code: String, s
 
 func jwksResponse(kid: String? = JWKKid) -> OHHTTPStubsResponse {
     let jwk = generateRSAJWK()
-    let jwks = ["keys": [
-        ["alg": jwk.algorithm,
-         "kty": jwk.keyType,
-         "use": jwk.usage,
-             "n": jwk.rsaModulus,
-             "e": jwk.rsaExponent,
-             "kid": kid]
-        ]
-    ]
+    let jwks = ["keys": [["alg": jwk.algorithm,
+                          "kty": jwk.keyType,
+                          "use": jwk.usage,
+                          "n": jwk.rsaModulus,
+                          "e": jwk.rsaExponent,
+                          "kid": kid]]]
     
     return OHHTTPStubsResponse(jsonObject: jwks, statusCode: 200, headers: nil)
 }
