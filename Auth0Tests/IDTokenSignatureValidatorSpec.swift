@@ -77,8 +77,9 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should not support none") {
-                    let jwt = generateJWT(alg: "none") // not supported by us
-                    let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: "", expected: "RS256")
+                    let alg = "none"
+                    let jwt = generateJWT(alg: alg)
+                    let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: alg, expected: "RS256")
                     
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in

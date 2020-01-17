@@ -73,8 +73,7 @@ struct IDTokenSignatureValidator: JWTSignatureValidator {
     private func validateAlg(_ jwt: JWT) -> LocalizedError? {
         let defaultAlgorithm = JWTAlgorithm.rs256.rawValue
         guard jwt.algorithm != nil else {
-            var actualAlgorithm = jwt.header["alg"] as? String
-            actualAlgorithm = actualAlgorithm == "none" ? "" : actualAlgorithm
+            let actualAlgorithm = jwt.header["alg"] as? String
             return ValidationError.invalidAlgorithm(actual: actualAlgorithm.debugDescription, expected: defaultAlgorithm)
         }
         return nil
