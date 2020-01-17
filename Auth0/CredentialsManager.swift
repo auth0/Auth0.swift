@@ -200,7 +200,7 @@ public struct CredentialsManager {
         }
 
         if let token = credentials.idToken,
-            let tokenDecoded = decode(jwt: token),
+            let tokenDecoded = decodeJwt(token),
             let exp = tokenDecoded["exp"] as? Double {
             if Date(timeIntervalSince1970: exp) < Date() { return true }
         }
@@ -209,7 +209,8 @@ public struct CredentialsManager {
     }
 }
 
-func decode(jwt: String) -> [String: Any]? {
+// To avoid collision with JWTDecode's decode function. This one will be removed in the last PR
+func decodeJwt(_ jwt: String) -> [String: Any]? {
     let parts = jwt.components(separatedBy: ".")
     guard parts.count == 3 else { return nil }
     var base64 = parts[1]

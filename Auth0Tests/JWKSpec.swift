@@ -33,7 +33,7 @@ class JWKSpec: QuickSpec {
         
         describe("public key generation") {
             
-            let jwk = generateRSAJWK(from: TestKeys.rsaPublic)
+            let jwk = generateRSAJWK()
             
             if #available(iOS 10, OSX 10.12, tvOS 10, watchOS 3, *) {
                 context("successful generation") {
@@ -48,7 +48,7 @@ class JWKSpec: QuickSpec {
             
             context("unsuccessful generation") {
                 it("should fail to generate a public key given an invalid key type") {
-                    let jwkWithInvalidKeyType = JWK(keyType: "AES",
+                    let jwkWithInvalidKeyType = JWK(keyType: "ECDSA",
                                                     keyId: jwk.keyId,
                                                     usage: jwk.usage,
                                                     algorithm: jwk.algorithm,
@@ -65,7 +65,7 @@ class JWKSpec: QuickSpec {
                     let jwkWithInvalidAlgorithm = JWK(keyType: jwk.keyType,
                                                       keyId: jwk.keyId,
                                                       usage: jwk.usage,
-                                                      algorithm: "AES256",
+                                                      algorithm: "ES256",
                                                       certUrl: nil,
                                                       certThumbprint: nil,
                                                       certChain: nil,
