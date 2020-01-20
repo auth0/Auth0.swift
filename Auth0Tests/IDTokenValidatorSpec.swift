@@ -33,18 +33,21 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
         let mockSignatureValidator = MockSuccessfulIDTokenSignatureValidator()
         let mockClaimsValidator = MockSuccessfulIDTokenClaimsValidator()
         
-        describe("sanity checks") {
-            it("should fail to validate a nil id token") {
-                let expectedError = IDTokenDecodingError.missingToken
-                
-                waitUntil { done in
-                    validate(idToken: nil,
-                             context: validatorContext,
-                             signatureValidator: mockSignatureValidator,
-                             claimsValidator: mockClaimsValidator) { error in
-                        expect(error).to(matchError(expectedError))
-                        expect(error?.errorDescription).to(equal(expectedError.errorDescription))
-                        done()
+        describe("top level validation api") {
+            
+            context("sanity checks") {
+                it("should fail to validate a nil id token") {
+                    let expectedError = IDTokenDecodingError.missingToken
+                    
+                    waitUntil { done in
+                        validate(idToken: nil,
+                                 context: validatorContext,
+                                 signatureValidator: mockSignatureValidator,
+                                 claimsValidator: mockClaimsValidator) { error in
+                            expect(error).to(matchError(expectedError))
+                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            done()
+                        }
                     }
                 }
             }
@@ -106,67 +109,70 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 }
             }
             
-            context("id token validation") {
-                let jwt = generateJWT()
+        }
+        
+        describe("id token validator") {
+            
+            let jwt = generateJWT()
+            
+            it("should pass the validation when the signature validation passes and the claims validation passes") {
+                let validator = IDTokenValidator(signatureValidator: mockSignatureValidator,
+                                                 claimsValidator: mockClaimsValidator,
+                                                 context: validatorContext)
                 
-                it("should pass the validation when the signature validation passes and the claims validation passes") {
-                    let validator = IDTokenValidator(signatureValidator: mockSignatureValidator,
-                                                     claimsValidator: mockClaimsValidator,
-                                                     context: validatorContext)
-                    
-                    waitUntil { done in
-                        validator.validate(jwt) { error in
-                            expect(error).to(beNil())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should fail the validation when the signature validation passes and the claims validation fails") {
-                    let expectedError = MockUnsuccessfulIDTokenClaimValidator.ValidationError.errorCase1
-                    let validator = IDTokenValidator(signatureValidator: mockSignatureValidator,
-                                                     claimsValidator: MockUnsuccessfulIDTokenClaimValidator(),
-                                                     context: validatorContext)
-                    
-                    waitUntil { done in
-                        validator.validate(jwt) { error in
-                            expect(error).to(matchError(expectedError))
-                            done()
-                        }
-                    }
-                }
-                
-                it("should fail the validation when the signature validation fails") {
-                    let expectedError = MockUnsuccessfulIDTokenSignatureValidator.ValidationError.errorCase
-                    let validator = IDTokenValidator(signatureValidator: MockUnsuccessfulIDTokenSignatureValidator(),
-                                                     claimsValidator: mockClaimsValidator,
-                                                     context: validatorContext)
-                    
-                    waitUntil { done in
-                        validator.validate(jwt) { error in
-                            expect(error).to(matchError(expectedError))
-                            done()
-                        }
-                    }
-                }
-                
-                it("should not execute the claims validation when the signature validation fails") {
-                    let expectedError = MockUnsuccessfulIDTokenSignatureValidator.ValidationError.errorCase
-                    let spyClaimsValidator = SpyUnsuccessfulIDTokenClaimValidator()
-                    let validator = IDTokenValidator(signatureValidator: MockUnsuccessfulIDTokenSignatureValidator(),
-                                                     claimsValidator: spyClaimsValidator,
-                                                     context: validatorContext)
-                    
-                    waitUntil { done in
-                        validator.validate(jwt) { error in
-                            expect(error).to(matchError(expectedError))
-                            expect(spyClaimsValidator.didExecuteValidation).to(beFalse())
-                            done()
-                        }
+                waitUntil { done in
+                    validator.validate(jwt) { error in
+                        expect(error).to(beNil())
+                        done()
                     }
                 }
             }
+            
+            it("should fail the validation when the signature validation passes and the claims validation fails") {
+                let expectedError = MockUnsuccessfulIDTokenClaimValidator.ValidationError.errorCase1
+                let validator = IDTokenValidator(signatureValidator: mockSignatureValidator,
+                                                 claimsValidator: MockUnsuccessfulIDTokenClaimValidator(),
+                                                 context: validatorContext)
+                
+                waitUntil { done in
+                    validator.validate(jwt) { error in
+                        expect(error).to(matchError(expectedError))
+                        done()
+                    }
+                }
+            }
+            
+            it("should fail the validation when the signature validation fails") {
+                let expectedError = MockUnsuccessfulIDTokenSignatureValidator.ValidationError.errorCase
+                let validator = IDTokenValidator(signatureValidator: MockUnsuccessfulIDTokenSignatureValidator(),
+                                                 claimsValidator: mockClaimsValidator,
+                                                 context: validatorContext)
+                
+                waitUntil { done in
+                    validator.validate(jwt) { error in
+                        expect(error).to(matchError(expectedError))
+                        done()
+                    }
+                }
+            }
+            
+            it("should not execute the claims validation when the signature validation fails") {
+                let expectedError = MockUnsuccessfulIDTokenSignatureValidator.ValidationError.errorCase
+                let spyClaimsValidator = SpyUnsuccessfulIDTokenClaimValidator()
+                let validator = IDTokenValidator(signatureValidator: MockUnsuccessfulIDTokenSignatureValidator(),
+                                                 claimsValidator: spyClaimsValidator,
+                                                 context: validatorContext)
+                
+                waitUntil { done in
+                    validator.validate(jwt) { error in
+                        expect(error).to(matchError(expectedError))
+                        expect(spyClaimsValidator.didExecuteValidation).to(beFalse())
+                        done()
+                    }
+                }
+            }
+            
         }
     }
-    
+
 }
