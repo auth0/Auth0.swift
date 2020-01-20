@@ -80,7 +80,7 @@ extension JWK {
         let encodedSequence = (encodedModulus + encodedExponent).a0_derEncode(as: 48) // Sequence
         return Data(encodedSequence)
     }
-    
+
     @available(iOS 10, OSX 10.12, tvOS 10, watchOS 3, *)
     private func generateRSAPublicKey(from derEncodedData: Data) -> SecKey? {
         let sizeInBits = derEncodedData.count * MemoryLayout<UInt8>.size

@@ -62,15 +62,15 @@ private func generateJWTHeader(alg: String, kid: String?) -> String {
     return encodeJWTPart(from: headerDict)
 }
 
-private func generateJWTBody(iss: String?,
-                             sub: String?,
-                             aud: [String]?,
-                             exp: Date?,
-                             iat: Date?,
-                             azp: String?,
-                             nonce: String?,
-                             maxAge: Int?,
-                             authTime: Date?) -> String {
+private func generateJWTPayload(iss: String?,
+                                sub: String?,
+                                aud: [String]?,
+                                exp: Date?,
+                                iat: Date?,
+                                azp: String?,
+                                nonce: String?,
+                                maxAge: Int?,
+                                authTime: Date?) -> String {
     var bodyDict: [String: Any] = [:]
     
     if let iss = iss {
@@ -125,15 +125,15 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  authTime: Date? = nil,
                  signature: String? = nil) -> JWT {
     let header = generateJWTHeader(alg: alg, kid: kid)
-    let body = generateJWTBody(iss: iss,
-                               sub: sub,
-                               aud: aud,
-                               exp: exp,
-                               iat: iat,
-                               azp: azp,
-                               nonce: nonce,
-                               maxAge: maxAge,
-                               authTime: authTime)
+    let body = generateJWTPayload(iss: iss,
+                                  sub: sub,
+                                  aud: aud,
+                                  exp: exp,
+                                  iat: iat,
+                                  azp: azp,
+                                  nonce: nonce,
+                                  maxAge: maxAge,
+                                  authTime: authTime)
     
     let signableParts = "\(header).\(body)"
     var signaturePart = ""

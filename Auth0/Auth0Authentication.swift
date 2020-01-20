@@ -23,7 +23,7 @@
 import Foundation
 
 struct Auth0Authentication: Authentication {
-    
+
     let clientId: String
     let url: URL
     var telemetry: Telemetry
@@ -37,11 +37,11 @@ struct Auth0Authentication: Authentication {
         self.session = session
         self.telemetry = telemetry
     }
-    
+
     func login(email username: String, code otp: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
         return login(username: username, otp: otp, realm: "email", audience: audience, scope: scope, parameters: parameters)
     }
-    
+
     func login(phoneNumber username: String, code otp: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
         return login(username: username, otp: otp, realm: "sms", audience: audience, scope: scope, parameters: parameters)
     }
@@ -340,7 +340,7 @@ struct Auth0Authentication: Authentication {
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
-    
+
     func jwks() -> Request<JWKS, AuthenticationError> {
         let jwks = URL(string: "/.well-known/jwks.json", relativeTo: self.url)!
         return Request(session: session,
@@ -359,9 +359,9 @@ struct Auth0Authentication: Authentication {
             .connection(connection)
     }
     #endif
-    
+
     // MARK: - Private Methods
-    
+
     // swiftlint:disable:next function_parameter_count
     private func login(username: String, otp: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "/oauth/token", relativeTo: self.url)!
