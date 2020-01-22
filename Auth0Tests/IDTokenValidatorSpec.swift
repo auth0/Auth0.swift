@@ -23,12 +23,14 @@
 import Foundation
 import Quick
 import Nimble
+import OHHTTPStubs
 
 @testable import Auth0
 
 class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
 
     override func spec() {
+        let domain = self.domain
         let validatorContext = self.validatorContext
         let mockSignatureValidator = MockSuccessfulIDTokenSignatureValidator()
         let mockClaimsValidator = MockSuccessfulIDTokenClaimsValidator()
@@ -103,6 +105,149 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("signature validation") {
+                beforeEach {
+                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse() }
+                }
+                
+                it("should validate a token signed with RS256") {
+                    let jwt = generateJWT(alg: "RS256")
+                    
+                    waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 context: validatorContext,
+                                 claimsValidator: mockClaimsValidator) { error in
+                            expect(error).to(beNil())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should validate a token signed with HS256") {
+                    let jwt = generateJWT(alg: "HS256")
+                    
+                    waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 context: validatorContext,
+                                 claimsValidator: mockClaimsValidator) { error in
+                            expect(error).to(beNil())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not validate a token signed with an unsupported algorithm") {
+                    let jwt = generateJWT(alg: "ES256")
+                    
+                    waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 context: validatorContext,
+                                 claimsValidator: mockClaimsValidator) { error in
+                            expect(error).toNot(beNil())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not validate an unsigned token") {
+                    let jwt = generateJWT(alg: "none")
+                    
+                    waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 context: validatorContext,
+                                 claimsValidator: mockClaimsValidator) { error in
+                            expect(error).toNot(beNil())
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("claims validation") {
+                let aud = ["tokens-test-123"]
+                
+                it("should validate a token with default claims") {
+                    let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: nil, authTime: nil)
+                    let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
+                                                          audience: aud[0],
+                                                          jwksRequest: validatorContext.jwksRequest,
+                                                          leeway: validatorContext.leeway,
+                                                          nonce: nil,
+                                                          maxAge: nil)
+                    
+                    waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 context: context,
+                                 signatureValidator: mockSignatureValidator) { error in
+                            expect(error).to(beNil())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should validate a token with azp") {
+                    let azp = "https://example.org"
+                    let aud = ["https://example.com", "https://example.net", azp]
+                    let jwt = generateJWT(aud: aud, azp: azp, nonce: nil, maxAge: nil, authTime: nil)
+                    let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
+                                                          audience: aud[2],
+                                                          jwksRequest: validatorContext.jwksRequest,
+                                                          leeway: validatorContext.leeway,
+                                                          nonce: nil,
+                                                          maxAge: nil)
+                    
+                    waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 context: context,
+                                 signatureValidator: mockSignatureValidator) { error in
+                            expect(error).to(beNil())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should validate a token with nonce") {
+                    let nonce = "a1b2c3d4e5"
+                    let jwt = generateJWT(aud: aud, azp: nil, nonce: nonce, maxAge: nil, authTime: nil)
+                    let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
+                                                          audience: aud[0],
+                                                          jwksRequest: validatorContext.jwksRequest,
+                                                          leeway: validatorContext.leeway,
+                                                          nonce: nonce,
+                                                          maxAge: nil)
+                    
+                    waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 context: context,
+                                 signatureValidator: mockSignatureValidator) { error in
+                            expect(error).to(beNil())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should validate a token with auth time") {
+                    let maxAge = 1000 // 1 second
+                    let authTime = Date().addingTimeInterval(-10000) // -10 seconds
+                    let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: maxAge, authTime: authTime)
+                    let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
+                                                          audience: aud[0],
+                                                          jwksRequest: validatorContext.jwksRequest,
+                                                          leeway: 1000, // 1 second
+                                                          nonce: nil,
+                                                          maxAge: maxAge)
+                    
+                    waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 context: context,
+                                 signatureValidator: mockSignatureValidator) { error in
+                            expect(error).to(beNil())
                             done()
                         }
                     }

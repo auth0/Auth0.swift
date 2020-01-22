@@ -33,23 +33,23 @@ struct IDTokenValidatorContext: IDTokenSignatureValidatorContext, IDTokenClaimsV
     init(issuer: String,
          audience: String,
          jwksRequest: Request<JWKS, AuthenticationError>,
-         nonce: String?,
          leeway: Int,
+         nonce: String?,
          maxAge: Int?) {
         self.issuer = issuer
         self.audience = audience
         self.jwksRequest = jwksRequest
-        self.nonce = nonce
         self.leeway = leeway
+        self.nonce = nonce
         self.maxAge = maxAge
     }
 
-    init(authentication: Authentication, nonce: String?, leeway: Int, maxAge: Int?) {
+    init(authentication: Authentication, leeway: Int, nonce: String?, maxAge: Int?) {
         self.init(issuer: authentication.url.host!,
                   audience: authentication.clientId,
                   jwksRequest: authentication.jwks(),
-                  nonce: nonce,
                   leeway: leeway,
+                  nonce: nonce,
                   maxAge: maxAge)
     }
 }

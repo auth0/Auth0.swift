@@ -1,4 +1,4 @@
-// ClaimsValidators.swift
+// ClaimValidators.swift
 //
 // Copyright (c) 2020 Auth0 (http://auth0.com)
 //
@@ -57,16 +57,16 @@ struct IDTokenIssValidator: JWTValidating {
         }
     }
 
-    private let issuer: String
+    private let expectedIss: String
 
     init(issuer: String) {
-        self.issuer = issuer
+        self.expectedIss = issuer
     }
 
     func validate(_ jwt: JWT) -> LocalizedError? {
-        guard let iss = jwt.issuer else { return ValidationError.missingIss }
-        guard iss == issuer else {
-            return ValidationError.mismatchedIss(actual: iss, expected: issuer)
+        guard let actualIss = jwt.issuer else { return ValidationError.missingIss }
+        guard actualIss == expectedIss else {
+            return ValidationError.mismatchedIss(actual: actualIss, expected: expectedIss)
         }
         return nil
     }
@@ -107,18 +107,18 @@ struct IDTokenAudValidator: JWTValidating {
         }
     }
 
-    private let audience: String
+    private let expectedAud: String
 
     init(audience: String) {
-        self.audience = audience
+        self.expectedAud = audience
     }
 
     func validate(_ jwt: JWT) -> LocalizedError? {
-        guard let aud = jwt.audience, !aud.isEmpty else { return ValidationError.missingAud }
-        guard aud.contains(audience) else {
-            return aud.count == 1 ?
-                ValidationError.mismatchedAudString(actual: aud[0], expected: audience) :
-                ValidationError.mismatchedAudArray(actual: aud, expected: audience)
+        guard let actualAud = jwt.audience, !actualAud.isEmpty else { return ValidationError.missingAud }
+        guard actualAud.contains(expectedAud) else {
+            return actualAud.count == 1 ?
+                ValidationError.mismatchedAudString(actual: actualAud[0], expected: expectedAud) :
+                ValidationError.mismatchedAudArray(actual: actualAud, expected: expectedAud)
         }
         return nil
     }
@@ -188,16 +188,16 @@ struct IDTokenNonceValidator: JWTValidating {
         }
     }
 
-    private let nonce: String
+    private let expectedNonce: String
 
     init(nonce: String) {
-        self.nonce = nonce
+        self.expectedNonce = nonce
     }
 
     func validate(_ jwt: JWT) -> LocalizedError? {
-        guard let nonceClaim = jwt.claim(name: "nonce").string else { return ValidationError.missingNonce }
-        guard nonceClaim == nonce else {
-            return ValidationError.mismatchedNonce(actual: nonceClaim, expected: nonce)
+        guard let actualNonce = jwt.claim(name: "nonce").string else { return ValidationError.missingNonce }
+        guard actualNonce == expectedNonce else {
+            return ValidationError.mismatchedNonce(actual: actualNonce, expected: expectedNonce)
         }
         return nil
     }
@@ -218,16 +218,16 @@ struct IDTokenAzpValidator: JWTValidating {
         }
     }
 
-    let audience: String
+    let expectedAzp: String
 
-    init(audience: String) {
-        self.audience = audience
+    init(authorizedParty: String) {
+        self.expectedAzp = authorizedParty
     }
 
     func validate(_ jwt: JWT) -> LocalizedError? {
-        guard let azp = jwt.claim(name: "azp").string else { return ValidationError.missingAzp }
-        guard azp == audience else {
-            return ValidationError.mismatchedAzp(actual: azp, expected: audience)
+        guard let actualAzp = jwt.claim(name: "azp").string else { return ValidationError.missingAzp }
+        guard actualAzp == expectedAzp else {
+            return ValidationError.mismatchedAzp(actual: actualAzp, expected: expectedAzp)
         }
         return nil
     }

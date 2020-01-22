@@ -132,16 +132,16 @@
 		5CB41D6D23D0BBA600074024 /* JWT+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D6B23D0BBA500074024 /* JWT+Header.swift */; };
 		5CB41D6E23D0BBA600074024 /* JWT+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D6B23D0BBA500074024 /* JWT+Header.swift */; };
 		5CB41D6F23D0BBA600074024 /* JWT+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D6B23D0BBA500074024 /* JWT+Header.swift */; };
-		5CB41D7123D0BED200074024 /* ClaimsValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimsValidators.swift */; };
-		5CB41D7223D0BED200074024 /* ClaimsValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimsValidators.swift */; };
-		5CB41D7323D0BED200074024 /* ClaimsValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimsValidators.swift */; };
-		5CB41D7423D0BED200074024 /* ClaimsValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimsValidators.swift */; };
+		5CB41D7123D0BED200074024 /* ClaimValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimValidators.swift */; };
+		5CB41D7223D0BED200074024 /* ClaimValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimValidators.swift */; };
+		5CB41D7323D0BED200074024 /* ClaimValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimValidators.swift */; };
+		5CB41D7423D0BED200074024 /* ClaimValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimValidators.swift */; };
 		5CB41D7623D0C15000074024 /* IDTokenValidatorBaseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7523D0C15000074024 /* IDTokenValidatorBaseSpec.swift */; };
 		5CB41D7723D0C15000074024 /* IDTokenValidatorBaseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7523D0C15000074024 /* IDTokenValidatorBaseSpec.swift */; };
 		5CB41D7823D0C15000074024 /* IDTokenValidatorBaseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7523D0C15000074024 /* IDTokenValidatorBaseSpec.swift */; };
-		5CB41D8223D611AE00074024 /* ClaimsValidatorsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D8123D611AE00074024 /* ClaimsValidatorsSpec.swift */; };
-		5CB41D8323D611AE00074024 /* ClaimsValidatorsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D8123D611AE00074024 /* ClaimsValidatorsSpec.swift */; };
-		5CB41D8423D611AE00074024 /* ClaimsValidatorsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D8123D611AE00074024 /* ClaimsValidatorsSpec.swift */; };
+		5CB41D8223D611AE00074024 /* ClaimValidatorsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D8123D611AE00074024 /* ClaimValidatorsSpec.swift */; };
+		5CB41D8323D611AE00074024 /* ClaimValidatorsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D8123D611AE00074024 /* ClaimValidatorsSpec.swift */; };
+		5CB41D8423D611AE00074024 /* ClaimValidatorsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D8123D611AE00074024 /* ClaimValidatorsSpec.swift */; };
 		5F06DDA51CC451540011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		5F06DDB41CC451700011842B /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
 		5F06DDC91CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
@@ -538,9 +538,9 @@
 		5CB41D5223D0BA4B00074024 /* IDTokenValidatorSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IDTokenValidatorSpec.swift; sourceTree = "<group>"; };
 		5CB41D5323D0BA4B00074024 /* IDTokenValidatorMocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IDTokenValidatorMocks.swift; sourceTree = "<group>"; };
 		5CB41D6B23D0BBA500074024 /* JWT+Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "JWT+Header.swift"; sourceTree = "<group>"; };
-		5CB41D7023D0BED200074024 /* ClaimsValidators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClaimsValidators.swift; sourceTree = "<group>"; };
+		5CB41D7023D0BED200074024 /* ClaimValidators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClaimValidators.swift; sourceTree = "<group>"; };
 		5CB41D7523D0C15000074024 /* IDTokenValidatorBaseSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDTokenValidatorBaseSpec.swift; sourceTree = "<group>"; };
-		5CB41D8123D611AE00074024 /* ClaimsValidatorsSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClaimsValidatorsSpec.swift; sourceTree = "<group>"; };
+		5CB41D8123D611AE00074024 /* ClaimValidatorsSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClaimValidatorsSpec.swift; sourceTree = "<group>"; };
 		5F049B6C1CB42C29006F6C05 /* Auth0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Auth0.h; path = Auth0/Auth0.h; sourceTree = "<group>"; };
 		5F049B6E1CB42C29006F6C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Auth0/Info.plist; sourceTree = "<group>"; };
 		5F06DD781CC448B10011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -811,7 +811,7 @@
 				5CB41D3E23D0BA2C00074024 /* IDTokenValidator.swift */,
 				5CB41D3C23D0BA2C00074024 /* IDTokenValidatorContext.swift */,
 				5CB41D3D23D0BA2C00074024 /* IDTokenSignatureValidator.swift */,
-				5CB41D7023D0BED200074024 /* ClaimsValidators.swift */,
+				5CB41D7023D0BED200074024 /* ClaimValidators.swift */,
 				5CB41D3F23D0BA2C00074024 /* Optional+DebugDescription.swift */,
 			);
 			name = Validators;
@@ -824,7 +824,7 @@
 				5CB41D5323D0BA4B00074024 /* IDTokenValidatorMocks.swift */,
 				5CB41D5223D0BA4B00074024 /* IDTokenValidatorSpec.swift */,
 				5CB41D5123D0BA4B00074024 /* IDTokenSignatureValidatorSpec.swift */,
-				5CB41D8123D611AE00074024 /* ClaimsValidatorsSpec.swift */,
+				5CB41D8123D611AE00074024 /* ClaimValidatorsSpec.swift */,
 			);
 			name = Validators;
 			sourceTree = "<group>";
@@ -1851,7 +1851,7 @@
 				5C4F551E23C8FB8E00C89615 /* Array+Encode.swift in Sources */,
 				5B9262C01ECF0CA800F4F6D3 /* BioAuthentication.swift in Sources */,
 				5C4F552823C9116B00C89615 /* A0SimpleKeychain+RSAPublicKey.swift in Sources */,
-				5CB41D7123D0BED200074024 /* ClaimsValidators.swift in Sources */,
+				5CB41D7123D0BED200074024 /* ClaimValidators.swift in Sources */,
 				5FADB60C1CED7E0800D4BB50 /* UserPatchAttributes.swift in Sources */,
 				5FCAB1791D09124D00331C84 /* NSURL+Auth0.swift in Sources */,
 				5F74CB401CEFD5E600226823 /* JSONObjectPayload.swift in Sources */,
@@ -1896,7 +1896,7 @@
 				5FD255B51D14DD2600387ECB /* ManagementError.swift in Sources */,
 				5FE2F8B31CCEAED8003628F4 /* Requestable.swift in Sources */,
 				5CB41D4523D0BA2C00074024 /* IDTokenSignatureValidator.swift in Sources */,
-				5CB41D7223D0BED200074024 /* ClaimsValidators.swift in Sources */,
+				5CB41D7223D0BED200074024 /* ClaimValidators.swift in Sources */,
 				5B2860CF1EEAC30900C75D54 /* UserInfo.swift in Sources */,
 				5C4F552423C8FBA100C89615 /* JWKS.swift in Sources */,
 				5FE1182B1D8A4A2B00A374BF /* Telemetry.swift in Sources */,
@@ -1958,7 +1958,7 @@
 				5FE2F8C61CD1522F003628F4 /* ProfileSpec.swift in Sources */,
 				5C4F552E23C9123000C89615 /* Generators.swift in Sources */,
 				5B6269E71E3F702000305093 /* NativeAuthSpec.swift in Sources */,
-				5CB41D8223D611AE00074024 /* ClaimsValidatorsSpec.swift in Sources */,
+				5CB41D8223D611AE00074024 /* ClaimValidatorsSpec.swift in Sources */,
 				5FADB6031CEC0C3300D4BB50 /* UsersSpec.swift in Sources */,
 				5F686A771D4AB90900412E3D /* TransactionStoreSpec.swift in Sources */,
 				5F74CB431CEFDFB800226823 /* IdentitySpec.swift in Sources */,
@@ -1971,7 +1971,7 @@
 			files = (
 				5CB41D6123D0BAC800074024 /* IDTokenValidatorSpec.swift in Sources */,
 				5FE686AB1D1894AA0075874C /* TelemetrySpec.swift in Sources */,
-				5CB41D8323D611AE00074024 /* ClaimsValidatorsSpec.swift in Sources */,
+				5CB41D8323D611AE00074024 /* ClaimValidatorsSpec.swift in Sources */,
 				5FBBF03C1CC96AA70024D2AF /* Responses.swift in Sources */,
 				5FADB6101CED7E5200D4BB50 /* UserPatchAttributesSpec.swift in Sources */,
 				5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */,
@@ -2035,7 +2035,7 @@
 				5F23E6DC1D4ACD6100C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				5F23E6E61D4ACD8500C3F2D9 /* Requestable.swift in Sources */,
 				5FDE87671D8A424700EA27DC /* Profile.swift in Sources */,
-				5CB41D7323D0BED200074024 /* ClaimsValidators.swift in Sources */,
+				5CB41D7323D0BED200074024 /* ClaimValidators.swift in Sources */,
 				5CB41D4223D0BA2C00074024 /* IDTokenValidatorContext.swift in Sources */,
 				5FDE875F1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				5B1748761EF2D3A70060E653 /* Date.swift in Sources */,
@@ -2076,7 +2076,7 @@
 				5CB41D6F23D0BBA600074024 /* JWT+Header.swift in Sources */,
 				5FDE876C1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5FE118291D8A4A2A00A374BF /* Telemetry.swift in Sources */,
-				5CB41D7423D0BED200074024 /* ClaimsValidators.swift in Sources */,
+				5CB41D7423D0BED200074024 /* ClaimValidators.swift in Sources */,
 				5F23E70D1D4B88FC00C3F2D9 /* JSONObjectPayload.swift in Sources */,
 				5C4F552623C8FBA100C89615 /* JWKS.swift in Sources */,
 				5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */,
@@ -2098,7 +2098,7 @@
 			files = (
 				5CB41D6023D0BAC800074024 /* IDTokenValidatorSpec.swift in Sources */,
 				5F331B0F1D4BB80700AE4382 /* Responses.swift in Sources */,
-				5CB41D8423D611AE00074024 /* ClaimsValidatorsSpec.swift in Sources */,
+				5CB41D8423D611AE00074024 /* ClaimValidatorsSpec.swift in Sources */,
 				5B6EE39620F8AEDB00264AC7 /* CredentialsManagerSpec.swift in Sources */,
 				5F331B061D4BB7DA00AE4382 /* CredentialsSpec.swift in Sources */,
 				5F331B0B1D4BB7F900AE4382 /* UserPatchAttributesSpec.swift in Sources */,

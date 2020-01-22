@@ -71,22 +71,22 @@ func validate(idToken: String?,
               callback: @escaping (LocalizedError?) -> Void) {
     guard let idToken = idToken else { return callback(IDTokenDecodingError.missingToken) }
     guard let jwt = try? decode(jwt: idToken) else { return callback(IDTokenDecodingError.cannotDecode) }
-    var claimsValidators: [JWTValidating] = [IDTokenIssValidator(issuer: context.issuer),
-                                             IDTokenSubValidator(),
-                                             IDTokenAudValidator(audience: context.audience),
-                                             IDTokenExpValidator(leeway: context.leeway),
-                                             IDTokenIatValidator()]
+    var claimValidators: [JWTValidating] = [IDTokenIssValidator(issuer: context.issuer),
+                                            IDTokenSubValidator(),
+                                            IDTokenAudValidator(audience: context.audience),
+                                            IDTokenExpValidator(leeway: context.leeway),
+                                            IDTokenIatValidator()]
     if let nonce = context.nonce {
-        claimsValidators.append(IDTokenNonceValidator(nonce: nonce))
+        claimValidators.append(IDTokenNonceValidator(nonce: nonce))
     }
     if let aud = jwt.audience, aud.count > 1 {
-        claimsValidators.append(IDTokenAzpValidator(audience: context.audience))
+        claimValidators.append(IDTokenAzpValidator(authorizedParty: context.audience))
     }
     if let maxAge = context.maxAge {
-        claimsValidators.append(IDTokenAuthTimeValidator(leeway: context.leeway, maxAge: maxAge))
+        claimValidators.append(IDTokenAuthTimeValidator(leeway: context.leeway, maxAge: maxAge))
     }
     let validator = IDTokenValidator(signatureValidator: signatureValidator ?? IDTokenSignatureValidator(context: context),
-                                     claimsValidator: claimsValidator ?? IDTokenClaimsValidator(validators: claimsValidators),
+                                     claimsValidator: claimsValidator ?? IDTokenClaimsValidator(validators: claimValidators),
                                      context: context)
     validator.validate(jwt, callback: callback)
 }

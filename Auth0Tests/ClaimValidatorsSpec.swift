@@ -1,4 +1,4 @@
-// ClaimsValidatorsSpec.swift
+// ClaimValidatorsSpec.swift
 //
 // Copyright (c) 2020 Auth0 (http://auth0.com)
 //
@@ -27,7 +27,7 @@ import OHHTTPStubs
 
 @testable import Auth0
 
-class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
+class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
     
     override func spec() {
         
@@ -38,8 +38,8 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             context("successful validation") {
                 it("should return nil if no claim validator returns an error") {
                     let claimsValidators: [JWTValidating] = [MockSuccessfulIDTokenClaimValidator(),
-                                                                 MockSuccessfulIDTokenClaimValidator(),
-                                                                 MockSuccessfulIDTokenClaimValidator()]
+                                                             MockSuccessfulIDTokenClaimValidator(),
+                                                             MockSuccessfulIDTokenClaimValidator()]
                     let claimsValidator = IDTokenClaimsValidator(validators: claimsValidators)
                     
                     expect(claimsValidator.validate(jwt)).to(beNil())
@@ -49,9 +49,9 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             context("unsuccessful validation") {
                 it("should return an error if a validation fails") {
                     let claimsValidators: [JWTValidating] = [MockSuccessfulIDTokenClaimValidator(),
-                                                                 MockSuccessfulIDTokenClaimValidator(),
-                                                                 MockSuccessfulIDTokenClaimValidator(),
-                                                                 MockUnsuccessfulIDTokenClaimValidator()]
+                                                             MockSuccessfulIDTokenClaimValidator(),
+                                                             MockSuccessfulIDTokenClaimValidator(),
+                                                             MockUnsuccessfulIDTokenClaimValidator()]
                     let claimsValidator = IDTokenClaimsValidator(validators: claimsValidators)
                     
                     expect(claimsValidator.validate(jwt)).toNot(beNil())
@@ -59,9 +59,9 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
                 
                 it("should return the error from the first failed validation") {
                     let claimsValidators: [JWTValidating] = [MockSuccessfulIDTokenClaimValidator(),
-                                                                 MockUnsuccessfulIDTokenClaimValidator(errorCase: .errorCase2),
-                                                                 MockSuccessfulIDTokenClaimValidator(),
-                                                                 MockUnsuccessfulIDTokenClaimValidator(errorCase: .errorCase1)]
+                                                             MockUnsuccessfulIDTokenClaimValidator(errorCase: .errorCase2),
+                                                             MockSuccessfulIDTokenClaimValidator(),
+                                                             MockUnsuccessfulIDTokenClaimValidator(errorCase: .errorCase1)]
                     let claimsValidator = IDTokenClaimsValidator(validators: claimsValidators)
                     let expectedError = MockUnsuccessfulIDTokenClaimValidator.ValidationError.errorCase2
                     
@@ -72,9 +72,9 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
                     let firstSpyClaimValidator = SpyUnsuccessfulIDTokenClaimValidator()
                     let secondSpyClaimValidator = SpyUnsuccessfulIDTokenClaimValidator()
                     let claimsValidators: [JWTValidating] = [MockSuccessfulIDTokenClaimValidator(),
-                                                                 firstSpyClaimValidator,
-                                                                 secondSpyClaimValidator,
-                                                                 MockSuccessfulIDTokenClaimValidator()]
+                                                             firstSpyClaimValidator,
+                                                             secondSpyClaimValidator,
+                                                             MockSuccessfulIDTokenClaimValidator()]
                     let claimsValidator = IDTokenClaimsValidator(validators: claimsValidators)
                     
                     _ = claimsValidator.validate(jwt)
@@ -113,12 +113,6 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             }
             
             context("mismatched iss") {
-                it("should return nil if iss matches the domain url") {
-                    let jwt = generateJWT(iss: expectedIss)
-                    
-                    expect(issValidator.validate(jwt)).to(beNil())
-                }
-                
                 it("should return an error if iss does not match the domain url") {
                     let iss = "https://samples.auth0.com"
                     let jwt = generateJWT(iss: iss)
@@ -186,12 +180,6 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             }
             
             context("mismatched aud (string)") {
-                it("should return nil if aud matches the client id") {
-                    let jwt = generateJWT(aud: [expectedAud])
-                    
-                    expect(audValidator.validate(jwt)).to(beNil())
-                }
-                
                 it("should return an error if aud does not match the client id") {
                     let aud = "https://example.com"
                     let jwt = generateJWT(aud: [aud])
@@ -204,12 +192,6 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             }
             
             context("mismatched aud (array)") {
-                it("should return nil if aud matches the client id") {
-                    let jwt = generateJWT(aud: ["https://example.com", "https://example.net", "https://example.org", expectedAud])
-                    
-                    expect(audValidator.validate(jwt)).to(beNil())
-                }
-                
                 it("should return an error if aud does not match the client id") {
                     let aud = ["https://example.com", "https://example.net", "https://example.org"]
                     let jwt = generateJWT(aud: aud)
@@ -252,12 +234,6 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             }
             
             context("incorrect exp") {
-                it("should return nil if exp + leeway is in the future") {
-                    let jwt = generateJWT(exp: expectedExp)
-                    
-                    expect(expValidator.validate(jwt)).to(beNil())
-                }
-                
                 it("should return an error if exp + leeway is in the present") {
                     let expectedExp = currentTime.addingTimeInterval(-Double(leeway))
                     let jwt = generateJWT(exp: expectedExp)
@@ -341,12 +317,6 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             }
             
             context("mismatched nonce") {
-                it("should return nil if nonce matches the request nonce") {
-                    let jwt = generateJWT(nonce: expectedNonce)
-                    
-                    expect(nonceValidator.validate(jwt)).to(beNil())
-                }
-                
                 it("should return an error if nonce does not match the request nonce") {
                     let nonce = "abc123"
                     let jwt = generateJWT(nonce: nonce)
@@ -365,21 +335,21 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             
             var azpValidator: IDTokenAzpValidator!
             let expectedAzp = self.clientId
+            let aud = ["https://example.com", "https://example.net", "https://example.org"]
             
             beforeEach {
-                azpValidator = IDTokenAzpValidator(audience: expectedAzp)
+                azpValidator = IDTokenAzpValidator(authorizedParty: expectedAzp)
             }
             
             context("missing azp") {
                 it("should return nil if azp is present") {
-                    let aud = ["https://example.com", "https://example.net", "https://example.org"]
                     let jwt = generateJWT(aud: aud, azp: expectedAzp)
                     
                     expect(azpValidator.validate(jwt)).to(beNil())
                 }
                 
                 it("should return an error if azp is missing") {
-                    let jwt = generateJWT(aud: nil)
+                    let jwt = generateJWT(aud: aud, azp: nil)
                     let expectedError = IDTokenAzpValidator.ValidationError.missingAzp
                     let result = azpValidator.validate(jwt)
                     
@@ -389,15 +359,7 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             }
             
             context("mismatched azp") {
-                it("should return nil if azp matches the client id") {
-                    let aud = ["https://example.com", "https://example.net", "https://example.org"]
-                    let jwt = generateJWT(aud: aud, azp: expectedAzp)
-                    
-                    expect(azpValidator.validate(jwt)).to(beNil())
-                }
-                
                 it("should return an error if azp does not match the client id") {
-                    let aud = ["https://example.com", "https://example.net", "https://example.org"]
                     let azp = "abc123"
                     let jwt = generateJWT(aud: aud, azp: azp)
                     let expectedError = IDTokenAzpValidator.ValidationError.mismatchedAzp(actual: azp,
@@ -423,14 +385,14 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
                 authTimeValidator = IDTokenAuthTimeValidator(baseTime: currentTime, leeway: leeway, maxAge: maxAge)
             }
             
-            context("missing auth time") {
-                it("should return nil if max age is present and auth time is present") {
+            context("auth time request") {
+                it("should return nil if max age is present and auth time was requested") {
                     let jwt = generateJWT(maxAge: maxAge, authTime: expectedAuthTime)
                     
                     expect(authTimeValidator.validate(jwt)).to(beNil())
                 }
                 
-                it("should return an error if max age is present and auth time is missing") {
+                it("should return an error if max age is present and auth time was not requested") {
                     let jwt = generateJWT(maxAge: maxAge, authTime: nil)
                     let expectedError = IDTokenAuthTimeValidator.ValidationError.missingAuthTime
                     let result = authTimeValidator.validate(jwt)
@@ -441,12 +403,6 @@ class ClaimsValidatorsSpec: IDTokenValidatorBaseSpec {
             }
             
             context("incorrect auth time") {
-                it("should return nil if last auth time + max age + leeway is in the past") {
-                    let jwt = generateJWT(maxAge: maxAge, authTime: expectedAuthTime)
-                    
-                    expect(authTimeValidator.validate(jwt)).to(beNil())
-                }
-                
                 it("should return an error if last auth time + max age + leeway is in the present") {
                     let expectedAuthTime = currentTime
                         .addingTimeInterval(-Double(maxAge))

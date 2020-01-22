@@ -37,7 +37,7 @@ class IDTokenValidatorBaseSpec: QuickSpec {
     lazy var validatorContext = IDTokenValidatorContext(issuer: URL.a0_url(domain).absoluteString,
                                                         audience: clientId,
                                                         jwksRequest: authentication.jwks(),
-                                                        nonce: nonce,
                                                         leeway: leeway,
+                                                        nonce: nonce,
                                                         maxAge: maxAge)
 }

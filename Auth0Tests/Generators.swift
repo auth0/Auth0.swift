@@ -114,7 +114,7 @@ private func generateJWTPayload(iss: String?,
 
 func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  kid: String? = defaultKid,
-                 iss: String? = "https://tokens-test.auth0.com/",
+                 iss: String? = "https://tokens-test.auth0.com",
                  sub: String? = "auth0|123456789",
                  aud: [String]? = ["tokens-test-123"],
                  exp: Date? = Date().addingTimeInterval(86400000), // 1 day in milliseconds
