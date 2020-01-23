@@ -26,7 +26,7 @@ import JWTDecode
 enum JWTAlgorithm: String {
     case rs256 = "RS256"
     case hs256 = "HS256"
-    
+
     func verify(_ jwt: JWT, using jwk: JWK) -> Bool {
         let separator = "."
         let parts = jwt.string.components(separatedBy: separator).dropLast().joined(separator: separator)

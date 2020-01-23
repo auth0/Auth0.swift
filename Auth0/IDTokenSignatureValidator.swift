@@ -29,7 +29,7 @@ protocol IDTokenSignatureValidatorContext {
     var jwksRequest: Request<JWKS, AuthenticationError> { get }
 }
 
-struct IDTokenSignatureValidator: JWTSignatureValidator {
+struct IDTokenSignatureValidator: JWTAsyncValidator {
     enum ValidationError: LocalizedError {
         case invalidAlgorithm(actual: String, expected: String)
         case missingPublicKey(kid: String)

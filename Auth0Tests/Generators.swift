@@ -62,15 +62,15 @@ private func generateJWTHeader(alg: String, kid: String?) -> String {
     return encodeJWTPart(from: headerDict)
 }
 
-private func generateJWTBody(iss: String?,
-                             sub: String?,
-                             aud: [String]?,
-                             exp: Date?,
-                             iat: Date?,
-                             azp: String?,
-                             nonce: String?,
-                             maxAge: Int?,
-                             authTime: Date?) -> String {
+private func generateJWTPayload(iss: String?,
+                                sub: String?,
+                                aud: [String]?,
+                                exp: Date?,
+                                iat: Date?,
+                                azp: String?,
+                                nonce: String?,
+                                maxAge: Int?,
+                                authTime: Date?) -> String {
     var bodyDict: [String: Any] = [:]
     
     if let iss = iss {
@@ -116,7 +116,7 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  kid: String? = defaultKid,
                  iss: String? = "https://tokens-test.auth0.com/",
                  sub: String? = "auth0|123456789",
-                 aud: [String]? = ["tokens-test-123"],
+                 aud: [String]? = ["e31f6f9827c187e8aebdb0839a0c963a"],
                  exp: Date? = Date().addingTimeInterval(86400000), // 1 day in milliseconds
                  iat: Date? = Date().addingTimeInterval(-3600000), // 1 hour in milliseconds
                  azp: String? = nil,
@@ -125,15 +125,15 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  authTime: Date? = nil,
                  signature: String? = nil) -> JWT {
     let header = generateJWTHeader(alg: alg, kid: kid)
-    let body = generateJWTBody(iss: iss,
-                               sub: sub,
-                               aud: aud,
-                               exp: exp,
-                               iat: iat,
-                               azp: azp,
-                               nonce: nonce,
-                               maxAge: maxAge,
-                               authTime: authTime)
+    let body = generateJWTPayload(iss: iss,
+                                  sub: sub,
+                                  aud: aud,
+                                  exp: exp,
+                                  iat: iat,
+                                  azp: azp,
+                                  nonce: nonce,
+                                  maxAge: maxAge,
+                                  authTime: authTime)
     
     let signableParts = "\(header).\(body)"
     var signaturePart = ""

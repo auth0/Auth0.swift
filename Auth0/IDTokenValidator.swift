@@ -23,23 +23,21 @@
 import Foundation
 import JWTDecode
 
-protocol JWTSignatureValidator {
-    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void)
-}
-
-protocol JWTClaimValidator {
+protocol JWTValidator {
     func validate(_ jwt: JWT) -> LocalizedError?
 }
 
-struct IDTokenValidator {
-    static let defaultLeeway: Int = 60 * 1000 // Default leeway is 60 seconds
+protocol JWTAsyncValidator {
+    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void)
+}
 
-    private let signatureValidator: JWTSignatureValidator
-    private let claimsValidator: JWTClaimValidator
+struct IDTokenValidator: JWTAsyncValidator {
+    private let signatureValidator: JWTAsyncValidator
+    private let claimsValidator: JWTValidator
     private let context: IDTokenValidatorContext
 
-    init(signatureValidator: JWTSignatureValidator,
-         claimsValidator: JWTClaimValidator,
+    init(signatureValidator: JWTAsyncValidator,
+         claimsValidator: JWTValidator,
          context: IDTokenValidatorContext) {
         self.signatureValidator = signatureValidator
         self.claimsValidator = claimsValidator
@@ -68,13 +66,27 @@ enum IDTokenDecodingError: LocalizedError {
 
 func validate(idToken: String?,
               context: IDTokenValidatorContext,
-              signatureValidator: JWTSignatureValidator? = nil, // for testing
-              claimsValidator: JWTClaimValidator? = nil,
+              signatureValidator: JWTAsyncValidator? = nil, // for testing
+              claimsValidator: JWTValidator? = nil,
               callback: @escaping (LocalizedError?) -> Void) {
     guard let idToken = idToken else { return callback(IDTokenDecodingError.missingToken) }
     guard let jwt = try? decode(jwt: idToken) else { return callback(IDTokenDecodingError.cannotDecode) }
+    var claimValidators: [JWTValidator] = [IDTokenIssValidator(issuer: context.issuer),
+                                           IDTokenSubValidator(),
+                                           IDTokenAudValidator(audience: context.audience),
+                                           IDTokenExpValidator(leeway: context.leeway),
+                                           IDTokenIatValidator()]
+    if let nonce = context.nonce {
+        claimValidators.append(IDTokenNonceValidator(nonce: nonce))
+    }
+    if let aud = jwt.audience, aud.count > 1 {
+        claimValidators.append(IDTokenAzpValidator(authorizedParty: context.audience))
+    }
+    if let maxAge = context.maxAge {
+        claimValidators.append(IDTokenAuthTimeValidator(leeway: context.leeway, maxAge: maxAge))
+    }
     let validator = IDTokenValidator(signatureValidator: signatureValidator ?? IDTokenSignatureValidator(context: context),
-                                     claimsValidator: claimsValidator ?? IDTokenClaimsValidator(validators: []),
+                                     claimsValidator: claimsValidator ?? IDTokenClaimsValidator(validators: claimValidators),
                                      context: context)
     validator.validate(jwt, callback: callback)
 }
