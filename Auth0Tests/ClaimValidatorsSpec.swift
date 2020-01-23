@@ -89,7 +89,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
         describe("iss validation") {
             
             var issValidator: IDTokenIssValidator!
-            let expectedIss = URL.a0_url(domain).absoluteString
+            let expectedIss = "\(URL.a0_url(domain).absoluteString)/"
             
             beforeEach {
                 issValidator = IDTokenIssValidator(issuer: expectedIss)
@@ -114,7 +114,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
             
             context("mismatched iss") {
                 it("should return an error if iss does not match the domain url") {
-                    let iss = "https://samples.auth0.com"
+                    let iss = "https://samples.auth0.com/"
                     let jwt = generateJWT(iss: iss)
                     let expectedError = IDTokenIssValidator.ValidationError.mismatchedIss(actual: iss,
                                                                                           expected: expectedIss)
@@ -182,7 +182,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
             
             context("mismatched aud (string)") {
                 it("should return an error if aud does not match the client id") {
-                    let aud = "https://example.com"
+                    let aud = "891fdf19ef753d822b2ef2dfd5d959eb"
                     let jwt = generateJWT(aud: [aud])
                     let expectedError = IDTokenAudValidator.ValidationError.mismatchedAudString(actual: aud,
                                                                                                 expected: expectedAud)
@@ -195,7 +195,9 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
             
             context("mismatched aud (array)") {
                 it("should return an error if aud does not match the client id") {
-                    let aud = ["https://example.com", "https://example.net", "https://example.org"]
+                    let aud = ["891fdf19ef753d822b2ef2dfd5d959eb",
+                               "3cf22ab1358d8099c6fe59da79b0027b",
+                               "0af84213b28a5aee38e693e2e37447cc"]
                     let jwt = generateJWT(aud: aud)
                     let expectedError = IDTokenAudValidator.ValidationError.mismatchedAudArray(actual: aud,
                                                                                                expected: expectedAud)
@@ -338,7 +340,9 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
             
             var azpValidator: IDTokenAzpValidator!
             let expectedAzp = self.clientId
-            let aud = ["https://example.com", "https://example.net", "https://example.org"]
+            let aud = ["891fdf19ef753d822b2ef2dfd5d959eb",
+                       "3cf22ab1358d8099c6fe59da79b0027b",
+                       "0af84213b28a5aee38e693e2e37447cc"]
             
             beforeEach {
                 azpValidator = IDTokenAzpValidator(authorizedParty: expectedAzp)

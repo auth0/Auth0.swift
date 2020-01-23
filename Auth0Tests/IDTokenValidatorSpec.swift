@@ -170,7 +170,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
             }
             
             context("claims validation") {
-                let aud = ["tokens-test-123"]
+                let aud = ["e31f6f9827c187e8aebdb0839a0c963a"]
                 
                 it("should validate a token with default claims") {
                     let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: nil, authTime: nil)
@@ -192,8 +192,8 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should validate a token with azp") {
-                    let azp = "https://example.org"
-                    let aud = ["https://example.com", "https://example.net", azp]
+                    let azp = "0af84213b28a5aee38e693e2e37447cc"
+                    let aud = ["891fdf19ef753d822b2ef2dfd5d959eb", "3cf22ab1358d8099c6fe59da79b0027b", azp]
                     let jwt = generateJWT(aud: aud, azp: azp, nonce: nil, maxAge: nil, authTime: nil)
                     let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
                                                           audience: aud[2],
