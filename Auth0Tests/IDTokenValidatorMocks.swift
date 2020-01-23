@@ -27,13 +27,13 @@ import JWTDecode
 
 // MARK: - Signature Validator Mocks
 
-struct MockSuccessfulIDTokenSignatureValidator: JWTAsyncValidating {
+struct MockSuccessfulIDTokenSignatureValidator: JWTAsyncValidator {
     func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
         callback(nil)
     }
 }
 
-struct MockUnsuccessfulIDTokenSignatureValidator: JWTAsyncValidating {
+struct MockUnsuccessfulIDTokenSignatureValidator: JWTAsyncValidator {
     enum ValidationError: LocalizedError {
         case errorCase
         
@@ -47,19 +47,19 @@ struct MockUnsuccessfulIDTokenSignatureValidator: JWTAsyncValidating {
 
 // MARK: - Claims Validator Mocks
 
-struct MockSuccessfulIDTokenClaimsValidator: JWTValidating {
+struct MockSuccessfulIDTokenClaimsValidator: JWTValidator {
     func validate(_ jwt: JWT) -> LocalizedError? {
         return nil
     }
 }
 
-struct MockSuccessfulIDTokenClaimValidator: JWTValidating {
+struct MockSuccessfulIDTokenClaimValidator: JWTValidator {
     func validate(_ jwt: JWT) -> LocalizedError? {
         return nil
     }
 }
 
-class MockUnsuccessfulIDTokenClaimValidator: JWTValidating {
+class MockUnsuccessfulIDTokenClaimValidator: JWTValidator {
     enum ValidationError: LocalizedError {
         case errorCase1
         case errorCase2

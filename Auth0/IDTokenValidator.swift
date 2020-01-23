@@ -23,21 +23,21 @@
 import Foundation
 import JWTDecode
 
-protocol JWTValidating {
+protocol JWTValidator {
     func validate(_ jwt: JWT) -> LocalizedError?
 }
 
-protocol JWTAsyncValidating {
+protocol JWTAsyncValidator {
     func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void)
 }
 
-struct IDTokenValidator: JWTAsyncValidating {
-    private let signatureValidator: JWTAsyncValidating
-    private let claimsValidator: JWTValidating
+struct IDTokenValidator: JWTAsyncValidator {
+    private let signatureValidator: JWTAsyncValidator
+    private let claimsValidator: JWTValidator
     private let context: IDTokenValidatorContext
 
-    init(signatureValidator: JWTAsyncValidating,
-         claimsValidator: JWTValidating,
+    init(signatureValidator: JWTAsyncValidator,
+         claimsValidator: JWTValidator,
          context: IDTokenValidatorContext) {
         self.signatureValidator = signatureValidator
         self.claimsValidator = claimsValidator
@@ -66,16 +66,16 @@ enum IDTokenDecodingError: LocalizedError {
 
 func validate(idToken: String?,
               context: IDTokenValidatorContext,
-              signatureValidator: JWTAsyncValidating? = nil, // for testing
-              claimsValidator: JWTValidating? = nil,
+              signatureValidator: JWTAsyncValidator? = nil, // for testing
+              claimsValidator: JWTValidator? = nil,
               callback: @escaping (LocalizedError?) -> Void) {
     guard let idToken = idToken else { return callback(IDTokenDecodingError.missingToken) }
     guard let jwt = try? decode(jwt: idToken) else { return callback(IDTokenDecodingError.cannotDecode) }
-    var claimValidators: [JWTValidating] = [IDTokenIssValidator(issuer: context.issuer),
-                                            IDTokenSubValidator(),
-                                            IDTokenAudValidator(audience: context.audience),
-                                            IDTokenExpValidator(leeway: context.leeway),
-                                            IDTokenIatValidator()]
+    var claimValidators: [JWTValidator] = [IDTokenIssValidator(issuer: context.issuer),
+                                           IDTokenSubValidator(),
+                                           IDTokenAudValidator(audience: context.audience),
+                                           IDTokenExpValidator(leeway: context.leeway),
+                                           IDTokenIatValidator()]
     if let nonce = context.nonce {
         claimValidators.append(IDTokenNonceValidator(nonce: nonce))
     }

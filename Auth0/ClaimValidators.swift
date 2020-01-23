@@ -31,10 +31,10 @@ protocol IDTokenClaimsValidatorContext {
     var maxAge: Int? { get }
 }
 
-struct IDTokenClaimsValidator: JWTValidating {
-    private let validators: [JWTValidating]
+struct IDTokenClaimsValidator: JWTValidator {
+    private let validators: [JWTValidator]
 
-    init(validators: [JWTValidating]) {
+    init(validators: [JWTValidator]) {
         self.validators = validators
     }
 
@@ -43,7 +43,7 @@ struct IDTokenClaimsValidator: JWTValidating {
     }
 }
 
-struct IDTokenIssValidator: JWTValidating {
+struct IDTokenIssValidator: JWTValidator {
     enum ValidationError: LocalizedError {
         case missingIss
         case mismatchedIss(actual: String, expected: String)
@@ -72,7 +72,7 @@ struct IDTokenIssValidator: JWTValidating {
     }
 }
 
-struct IDTokenSubValidator: JWTValidating {
+struct IDTokenSubValidator: JWTValidator {
     enum ValidationError: LocalizedError {
         case missingSub
 
@@ -89,7 +89,7 @@ struct IDTokenSubValidator: JWTValidating {
     }
 }
 
-struct IDTokenAudValidator: JWTValidating {
+struct IDTokenAudValidator: JWTValidator {
     enum ValidationError: LocalizedError {
         case missingAud
         case mismatchedAudString(actual: String, expected: String)
@@ -124,7 +124,7 @@ struct IDTokenAudValidator: JWTValidating {
     }
 }
 
-struct IDTokenExpValidator: JWTValidating {
+struct IDTokenExpValidator: JWTValidator {
     enum ValidationError: LocalizedError {
         case missingExp
         case pastExp(baseTime: Double, expirationTime: Double)
@@ -157,7 +157,7 @@ struct IDTokenExpValidator: JWTValidating {
     }
 }
 
-struct IDTokenIatValidator: JWTValidating {
+struct IDTokenIatValidator: JWTValidator {
     enum ValidationError: LocalizedError {
         case missingIat
 
@@ -174,7 +174,7 @@ struct IDTokenIatValidator: JWTValidating {
     }
 }
 
-struct IDTokenNonceValidator: JWTValidating {
+struct IDTokenNonceValidator: JWTValidator {
     enum ValidationError: LocalizedError {
         case missingNonce
         case mismatchedNonce(actual: String, expected: String)
@@ -203,7 +203,7 @@ struct IDTokenNonceValidator: JWTValidating {
     }
 }
 
-struct IDTokenAzpValidator: JWTValidating {
+struct IDTokenAzpValidator: JWTValidator {
     enum ValidationError: LocalizedError {
         case missingAzp
         case mismatchedAzp(actual: String, expected: String)
@@ -233,7 +233,7 @@ struct IDTokenAzpValidator: JWTValidating {
     }
 }
 
-struct IDTokenAuthTimeValidator: JWTValidating {
+struct IDTokenAuthTimeValidator: JWTValidator {
     enum ValidationError: LocalizedError {
         case missingAuthTime
         case pastLastAuth(baseTime: Double, lastAuthTime: Double)
