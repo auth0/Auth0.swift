@@ -47,11 +47,12 @@ public class _ObjectiveAuthenticationAPI: NSObject {
             .login(usernameOrEmail: username, password: password, connection: connection, scope: scope, parameters: parameters ?? [:])
             .start(handleResult(callback: callback))
     }
-    
+
     @objc(loginWithUsernameOrEmail:password:realm:audience:scope:parameters:callback:)
-    public func login(withUsernameOrEmail username: String, password: String, realm: String, audience: String, scope: String, parameters: [String: Any]?, callback: @escaping (NSError?, Credentials?) -> Void) {
+    // swiftlint:disable:next function_parameter_count
+    public func login(withUsernameOrEmail username: String, password: String, realm: String, audience: String, scope: String, parameters: [String: Any]? = [:], callback: @escaping (NSError?, Credentials?) -> Void) {
         self.authentication
-            .login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope, parameters: parameters ?? [:])
+            .login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope, parameters: parameters)
             .start(handleResult(callback: callback))
     }
 
@@ -76,11 +77,13 @@ public class _ObjectiveAuthenticationAPI: NSObject {
                 }
             }
     }
-    
+
+#if canImport(UIKit)
     @objc(resumeAuthWithURL:options:)
     public static func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
         return resumeAuth(url, options: options);
     }
+#endif
 
     @objc(renewWithRefreshToken:scope:callback:)
     public func renew(WithRefreshToken refreshToken: String, scope: String, callback: @escaping (NSError?, Credentials?) -> Void) {
