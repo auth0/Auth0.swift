@@ -198,10 +198,11 @@ class SafariWebAuth: WebAuth {
         entries["response_type"] = self.responseType.map { $0.label! }.joined(separator: " ")
         if self.responseType.contains(.idToken) {
             entries["nonce"] = self.nonce
+            if let maxAge = self.maxAge {
+                entries["max_age"] = String(maxAge)
+            }
         }
-        if let maxAge = self.maxAge {
-            entries["max_age"] = String(maxAge)
-        }
+
         self.parameters.forEach { entries[$0] = $1 }
 
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
