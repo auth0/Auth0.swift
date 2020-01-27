@@ -45,7 +45,7 @@ struct IDTokenValidatorContext: IDTokenSignatureValidatorContext, IDTokenClaimsV
     }
 
     init(authentication: Authentication, leeway: Int, nonce: String?, maxAge: Int?) {
-        self.init(issuer: authentication.url.host!,
+        self.init(issuer: "\(authentication.url.absoluteString)/",
                   audience: authentication.clientId,
                   jwksRequest: authentication.jwks(),
                   leeway: leeway,

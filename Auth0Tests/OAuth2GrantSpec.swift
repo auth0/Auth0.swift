@@ -30,13 +30,19 @@ class OAuth2GrantSpec: QuickSpec {
 
     override func spec() {
 
+        let domain = URL.a0_url("samples.auth0.com")
+        let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
+        let idToken = generateJWT(iss: "\(domain.absoluteString)/", aud: [authentication.clientId]).string
+        let nonce = "a1b2c3d4e5"
+        let leeway = 60 * 1000
+
         describe("ImplicitGrant") {
 
             var implicit: ImplicitGrant!
-            let idToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2JydWNrZS5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTQwODYzMzgzMTQyMjM5NDk2MzMiLCJhdWQiOiJZTjlTQ0hwcWY4dUxScFpia0xmZWhnbXFsQU9iUGdYTCIsImV4cCI6MTQ4MDU1NDg0MywiaWF0IjoxNDgwNTE4ODQzLCJub25jZSI6ImNiYTMyMSJ9.msDkQLVNK_urtbJJjb8h2ku-a9GVYgUFN9MvTTlO-v0"
 
             beforeEach {
-                implicit = ImplicitGrant()
+                implicit = ImplicitGrant(authentication: authentication, leeway: leeway)
+                stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
             }
 
             it("shoud build credentials") {
@@ -66,7 +72,7 @@ class OAuth2GrantSpec: QuickSpec {
             describe("ImplicitGrant with id_token") {
 
                 beforeEach {
-                    implicit = ImplicitGrant(responseType: [.idToken], nonce: "cba321")
+                    implicit = ImplicitGrant(authentication: authentication, responseType: [.idToken], leeway: leeway, nonce: nonce)
                 }
 
                 it("should build credentials") {
@@ -79,9 +85,8 @@ class OAuth2GrantSpec: QuickSpec {
                     }
                 }
 
-                it("should fail with invalid token") {
-                    let idToken = "notarealtoken"
-                    let values = ["id_token": idToken]
+                it("should fail with an invalid id_token") {
+                    let values = ["id_token": generateJWT(iss: nil).string]
                     waitUntil { done in
                         implicit.credentials(from: values) {
                             expect($0).to(beFailure())
@@ -90,7 +95,7 @@ class OAuth2GrantSpec: QuickSpec {
                     }
                 }
 
-                it("should fail with no token") {
+                it("should fail with no id_token") {
                     let values = ["": ""]
                     waitUntil { done in
                         implicit.credentials(from: values) {
@@ -100,24 +105,13 @@ class OAuth2GrantSpec: QuickSpec {
                     }
                 }
 
-                it("should fail cause nonce does not match expected one") {
-                    implicit = ImplicitGrant(responseType: [.idToken], nonce: "nomatch")
-                    let values = ["id_token": idToken]
-                    waitUntil { done in
-                        implicit.credentials(from: values) {
-                            expect($0).to(beFailure())
-                            done()
-                        }
-                    }
-                }
-
             }
+
         }
 
 
         describe("Authorization Code w/PKCE") {
 
-            let domain = URL.a0_url("samples.auth0.com")
             let method = "S256"
             let redirectURL = URL(string: "https://samples.auth0.com/callback")!
             var verifier: String!
@@ -128,8 +122,7 @@ class OAuth2GrantSpec: QuickSpec {
             beforeEach {
                 verifier = "\(arc4random())"
                 challenge = "\(arc4random())"
-                let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
-                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response)
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response, nonce: nil, leeway: leeway)
             }
 
             afterEach {
@@ -143,7 +136,9 @@ class OAuth2GrantSpec: QuickSpec {
                 let token = UUID().uuidString
                 let code = UUID().uuidString
                 let values = ["code": code]
-                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token) }.name = "Code Exchange Auth"
+                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
+                    return authResponse(accessToken: token, idToken: idToken)
+                }.name = "Code Exchange Auth"
                 waitUntil { done in
                     pkce.credentials(from: values) {
                         expect($0).to(haveCredentials(token))
@@ -173,7 +168,7 @@ class OAuth2GrantSpec: QuickSpec {
             it("should get values from generator") {
                 let generator = A0SHA256ChallengeGenerator()
                 let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
-                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, generator: generator, reponseType: response)
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, generator: generator, reponseType: response, nonce: nil, leeway: leeway)
                 
                 expect(pkce.defaults["code_challenge_method"]) == generator.method
                 expect(pkce.defaults["code_challenge"]) == generator.challenge
@@ -190,15 +185,13 @@ class OAuth2GrantSpec: QuickSpec {
             var challenge: String!
             var pkce: PKCE!
             let response: [ResponseType] = [.code, .idToken]
-            let nonce = "abc123"
-            let idToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsIm5vbmNlIjoiYWJjMTIzIn0.l5K4au9Uq_NMImvuM2xigQNPa6S6LCKAqWs5c4_wrjQ"
             var authentication: Auth0Authentication!
 
             beforeEach {
                 verifier = "\(arc4random())"
                 challenge = "\(arc4random())"
                 authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
-                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response, nonce: nonce)
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response, nonce: nonce, leeway: leeway)
             }
 
             afterEach {
@@ -211,8 +204,9 @@ class OAuth2GrantSpec: QuickSpec {
             it("shoud build credentials") {
                 let token = UUID().uuidString
                 let code = UUID().uuidString
-                let values = ["code": code, "id_token" : idToken]
+                let values = ["code": code, "id_token": idToken, "nonce": nonce]
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
+                stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
                 waitUntil { done in
                     pkce.credentials(from: values) {
                         expect($0).to(haveCredentials(token))
@@ -221,11 +215,25 @@ class OAuth2GrantSpec: QuickSpec {
                 }
             }
 
-            it("shoud fail credentials no nonce") {
-                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response)
+            it("should fail with no nonce") {
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response, nonce: nil, leeway: leeway)
                 let token = UUID().uuidString
                 let code = UUID().uuidString
-                let values = ["code": code, "id_token" : idToken]
+                let values = ["code": code, "id_token": idToken]
+                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
+                waitUntil { done in
+                    pkce.credentials(from: values) {
+                        expect($0).to(beFailure())
+                        done()
+                    }
+                }
+            }
+            
+            it("should fail with an invalid id_token") {
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, responseType: response, nonce: nil, leeway: leeway)
+                let token = UUID().uuidString
+                let code = UUID().uuidString
+                let values = ["code": code, "id_token": generateJWT(iss: nil).string, "nonce": nonce]
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
                 waitUntil { done in
                     pkce.credentials(from: values) {
@@ -257,7 +265,7 @@ class OAuth2GrantSpec: QuickSpec {
             it("should get values from generator") {
                 let generator = A0SHA256ChallengeGenerator()
                 let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
-                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, generator: generator, reponseType: response, nonce: nonce)
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, generator: generator, reponseType: response, nonce: nonce, leeway: leeway)
 
                 expect(pkce.defaults["code_challenge_method"]) == generator.method
                 expect(pkce.defaults["code_challenge"]) == generator.challenge

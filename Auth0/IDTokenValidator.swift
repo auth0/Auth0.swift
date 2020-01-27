@@ -65,7 +65,7 @@ enum IDTokenDecodingError: LocalizedError {
 }
 
 func validate(idToken: String?,
-              context: IDTokenValidatorContext,
+              with context: IDTokenValidatorContext,
               signatureValidator: JWTAsyncValidator? = nil, // for testing
               claimsValidator: JWTValidator? = nil,
               callback: @escaping (LocalizedError?) -> Void) {
