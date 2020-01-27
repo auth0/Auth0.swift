@@ -179,7 +179,7 @@ public protocol WebAuth: Trackable, Loggable {
     /// Add a leeway amount for ID Token validation.
     /// This value represents the clock skew for the validation of date claims e.g. `exp`.
     ///
-    /// - Parameter leeway: number of milliseconds. Defaults to `60000`.
+    /// - Parameter leeway: number of milliseconds. Defaults to `60000` (1 minute).
     /// - Returns: the same WebAuth instance to allow method chaining
     func leeway(_ leeway: Int) -> Self
 
