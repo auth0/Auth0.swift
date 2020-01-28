@@ -178,8 +178,8 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           audience: aud[0],
                                                           jwksRequest: validatorContext.jwksRequest,
                                                           leeway: validatorContext.leeway,
-                                                          nonce: nil,
-                                                          maxAge: nil)
+                                                          maxAge: nil,
+                                                          nonce: nil)
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
@@ -199,8 +199,8 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           audience: aud[2],
                                                           jwksRequest: validatorContext.jwksRequest,
                                                           leeway: validatorContext.leeway,
-                                                          nonce: nil,
-                                                          maxAge: nil)
+                                                          maxAge: nil,
+                                                          nonce: nil)
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
@@ -219,8 +219,8 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           audience: aud[0],
                                                           jwksRequest: validatorContext.jwksRequest,
                                                           leeway: validatorContext.leeway,
-                                                          nonce: nonce,
-                                                          maxAge: nil)
+                                                          maxAge: nil,
+                                                          nonce: nonce)
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
@@ -240,8 +240,8 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           audience: aud[0],
                                                           jwksRequest: validatorContext.jwksRequest,
                                                           leeway: 1000, // 1 second
-                                                          nonce: nil,
-                                                          maxAge: maxAge)
+                                                          maxAge: maxAge,
+                                                          nonce: nil)
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,

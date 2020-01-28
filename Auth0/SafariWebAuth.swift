@@ -225,8 +225,8 @@ class SafariWebAuth: WebAuth {
         return ImplicitGrant(authentication: authentication,
                              responseType: self.responseType,
                              leeway: self.leeway,
-                             nonce: self.nonce,
-                             maxAge: self.maxAge)
+                             maxAge: self.maxAge,
+                             nonce: self.nonce)
     }
 
     var redirectURL: URL? {

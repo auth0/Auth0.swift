@@ -40,8 +40,8 @@ struct ImplicitGrant: OAuth2Grant {
     init(authentication: Authentication,
          responseType: [ResponseType] = [.token],
          leeway: Int,
-         nonce: String? = nil,
-         maxAge: Int? = nil) {
+         maxAge: Int? = nil,
+         nonce: String? = nil) {
         self.authentication = authentication
         self.responseType = responseType
         self.leeway = leeway
@@ -57,8 +57,8 @@ struct ImplicitGrant: OAuth2Grant {
         let responseType = self.responseType
         let validatorContext = IDTokenValidatorContext(authentication: authentication,
                                                        leeway: leeway,
-                                                       nonce: self.defaults["nonce"],
-                                                       maxAge: maxAge)
+                                                       maxAge: maxAge,
+                                                       nonce: self.defaults["nonce"])
         validate(idToken: values["id_token"], for: responseType, with: validatorContext) { error in
             if let error = error { return callback(.failure(error: error)) }
             guard !responseType.contains(.token) || values["access_token"] != nil else {
@@ -144,8 +144,8 @@ struct PKCE: OAuth2Grant {
         let isFrontChannelIdTokenExpected = responseType.contains(.idToken)
         let validatorContext = IDTokenValidatorContext(authentication: authentication,
                                                        leeway: leeway,
-                                                       nonce: nonce,
-                                                       maxAge: maxAge)
+                                                       maxAge: maxAge,
+                                                       nonce: nonce)
         validate(idToken: idToken, for: responseType, with: validatorContext) { error in
             if let error = error { return callback(.failure(error: error)) }
             authentication
