@@ -38,6 +38,6 @@ class IDTokenValidatorBaseSpec: QuickSpec {
                                                         audience: clientId,
                                                         jwksRequest: authentication.jwks(),
                                                         leeway: leeway,
-                                                        nonce: nonce,
-                                                        maxAge: maxAge)
+                                                        maxAge: maxAge,
+                                                        nonce: nonce)
 }

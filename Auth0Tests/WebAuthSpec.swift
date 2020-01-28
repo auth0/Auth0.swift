@@ -176,6 +176,17 @@ class WebAuthSpec: QuickSpec {
                     "query": defaultQuery(withParameters: ["nonce": "abc1234", "response_type" : "id_token"]),
                     ]
             }
+            
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .responseType([.idToken])
+                        .maxAge(10000) // 1 second
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: "state"),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["max_age": "10000", "response_type" : "id_token"]),
+                    ]
+            }
 
             itBehavesLike(ValidAuthorizeURLExample) {
                 var newDefaults = defaults

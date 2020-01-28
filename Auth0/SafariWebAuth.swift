@@ -41,6 +41,8 @@ class SafariWebAuth: WebAuth {
     var universalLink = false
     var responseType: [ResponseType] = [.code]
     var nonce: String?
+    var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
+    var maxAge: Int?
     private var authenticationSession = true
     private var safariPresentationStyle = UIModalPresentationStyle.fullScreen
 
@@ -108,6 +110,16 @@ class SafariWebAuth: WebAuth {
     func useLegacyAuthentication(withStyle style: UIModalPresentationStyle = .fullScreen) -> Self {
         self.authenticationSession = false
         self.safariPresentationStyle = style
+        return self
+    }
+
+    func leeway(_ leeway: Int) -> Self {
+        self.leeway = leeway
+        return self
+    }
+
+    func maxAge(_ maxAge: Int) -> Self {
+        self.maxAge = maxAge
         return self
     }
 
@@ -186,7 +198,11 @@ class SafariWebAuth: WebAuth {
         entries["response_type"] = self.responseType.map { $0.label! }.joined(separator: " ")
         if self.responseType.contains(.idToken) {
             entries["nonce"] = self.nonce
+            if let maxAge = self.maxAge {
+                entries["max_age"] = String(maxAge)
+            }
         }
+
         self.parameters.forEach { entries[$0] = $1 }
 
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
@@ -196,13 +212,21 @@ class SafariWebAuth: WebAuth {
     }
 
     func handler(_ redirectURL: URL) -> OAuth2Grant {
-        if self.responseType.contains([.code]) {
-            var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+        var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+        if self.responseType.contains([.code]) { // both Hybrid and Code flow
             authentication.logger = self.logger
-            return PKCE(authentication: authentication, redirectURL: redirectURL, reponseType: self.responseType, nonce: self.nonce)
-        } else {
-            return ImplicitGrant(responseType: self.responseType, nonce: self.nonce)
+            return PKCE(authentication: authentication,
+                        redirectURL: redirectURL,
+                        responseType: self.responseType,
+                        leeway: self.leeway,
+                        maxAge: self.maxAge,
+                        nonce: self.nonce)
         }
+        return ImplicitGrant(authentication: authentication,
+                             responseType: self.responseType,
+                             leeway: self.leeway,
+                             maxAge: self.maxAge,
+                             nonce: self.nonce)
     }
 
     var redirectURL: URL? {

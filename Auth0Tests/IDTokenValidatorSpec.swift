@@ -43,7 +43,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     
                     waitUntil { done in
                         validate(idToken: nil,
-                                 context: validatorContext,
+                                 with: validatorContext,
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
@@ -60,7 +60,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should fail to decode an empty id token") {
                     waitUntil { done in
                         validate(idToken: "",
-                                 context: validatorContext,
+                                 with: validatorContext,
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
@@ -73,7 +73,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should fail to decode a malformed id token") {
                     waitUntil { done in
                         validate(idToken: "a.b.c.d.e",
-                                 context: validatorContext,
+                                 with: validatorContext,
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
@@ -86,7 +86,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should fail to decode an id token with an empty signature") {
                     waitUntil { done in
                         validate(idToken: "a.b.", // alg == none, not supported by us
-                                 context: validatorContext,
+                                 with: validatorContext,
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
@@ -100,7 +100,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should fail to decode an id token with no signature") {
                     waitUntil { done in
                         validate(idToken: "a.b",
-                                 context: validatorContext,
+                                 with: validatorContext,
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
@@ -121,7 +121,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
-                                 context: validatorContext,
+                                 with: validatorContext,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(beNil())
                             done()
@@ -134,7 +134,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
-                                 context: validatorContext,
+                                 with: validatorContext,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(beNil())
                             done()
@@ -147,7 +147,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
-                                 context: validatorContext,
+                                 with: validatorContext,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).toNot(beNil())
                             done()
@@ -160,7 +160,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
-                                 context: validatorContext,
+                                 with: validatorContext,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).toNot(beNil())
                             done()
@@ -178,12 +178,12 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           audience: aud[0],
                                                           jwksRequest: validatorContext.jwksRequest,
                                                           leeway: validatorContext.leeway,
-                                                          nonce: nil,
-                                                          maxAge: nil)
+                                                          maxAge: nil,
+                                                          nonce: nil)
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
-                                 context: context,
+                                 with: context,
                                  signatureValidator: mockSignatureValidator) { error in
                             expect(error).to(beNil())
                             done()
@@ -199,12 +199,12 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           audience: aud[2],
                                                           jwksRequest: validatorContext.jwksRequest,
                                                           leeway: validatorContext.leeway,
-                                                          nonce: nil,
-                                                          maxAge: nil)
+                                                          maxAge: nil,
+                                                          nonce: nil)
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
-                                 context: context,
+                                 with: context,
                                  signatureValidator: mockSignatureValidator) { error in
                             expect(error).to(beNil())
                             done()
@@ -219,12 +219,12 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           audience: aud[0],
                                                           jwksRequest: validatorContext.jwksRequest,
                                                           leeway: validatorContext.leeway,
-                                                          nonce: nonce,
-                                                          maxAge: nil)
+                                                          maxAge: nil,
+                                                          nonce: nonce)
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
-                                 context: context,
+                                 with: context,
                                  signatureValidator: mockSignatureValidator) { error in
                             expect(error).to(beNil())
                             done()
@@ -240,12 +240,12 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           audience: aud[0],
                                                           jwksRequest: validatorContext.jwksRequest,
                                                           leeway: 1000, // 1 second
-                                                          nonce: nil,
-                                                          maxAge: maxAge)
+                                                          maxAge: maxAge,
+                                                          nonce: nil)
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,
-                                 context: context,
+                                 with: context,
                                  signatureValidator: mockSignatureValidator) { error in
                             expect(error).to(beNil())
                             done()
