@@ -217,17 +217,16 @@ class SafariWebAuth: WebAuth {
             authentication.logger = self.logger
             return PKCE(authentication: authentication,
                         redirectURL: redirectURL,
-                        reponseType: self.responseType,
-                        nonce: self.nonce,
+                        responseType: self.responseType,
                         leeway: self.leeway,
-                        maxAge: self.maxAge)
-        } else {
-            return ImplicitGrant(authentication: authentication,
-                                 responseType: self.responseType,
-                                 leeway: self.leeway,
-                                 nonce: self.nonce,
-                                 maxAge: self.maxAge)
+                        maxAge: self.maxAge,
+                        nonce: self.nonce)
         }
+        return ImplicitGrant(authentication: authentication,
+                             responseType: self.responseType,
+                             leeway: self.leeway,
+                             nonce: self.nonce,
+                             maxAge: self.maxAge)
     }
 
     var redirectURL: URL? {

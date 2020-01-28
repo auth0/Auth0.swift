@@ -162,7 +162,7 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: the same WebAuth instance to allow method chaining
     func responseType(_ response: [ResponseType]) -> Self
 
-    /// Add `nonce` paramater for authentication, this is a requirement
+    /// Add `nonce` parameter for authentication, this is a requirement
     /// when response type `.idToken` is specified.
     ///
     /// - Parameter nonce: nonce string

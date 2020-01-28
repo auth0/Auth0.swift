@@ -125,7 +125,7 @@ class SafariSessionSpec: QuickSpec {
 
                 var session: SafariSession!
                 let generator = A0SHA256ChallengeGenerator()
-                let handler = PKCE(authentication: authentication, redirectURL: RedirectURL, generator: generator, reponseType: [.code], nonce: nil, leeway: Leeway)
+                let handler = PKCE(authentication: authentication, redirectURL: RedirectURL, generator: generator, responseType: [.code], leeway: Leeway, nonce: nil)
                 let idToken = generateJWT().string
                 let code = "123456"
 

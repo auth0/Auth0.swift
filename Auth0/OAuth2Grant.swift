@@ -87,19 +87,19 @@ struct PKCE: OAuth2Grant {
     init(authentication: Authentication,
          redirectURL: URL,
          generator: A0SHA256ChallengeGenerator = A0SHA256ChallengeGenerator(),
-         reponseType: [ResponseType] = [.code],
-         nonce: String? = nil,
+         responseType: [ResponseType] = [.code],
          leeway: Int,
-         maxAge: Int? = nil) {
+         maxAge: Int? = nil,
+         nonce: String? = nil) {
         self.init(authentication: authentication,
                   redirectURL: redirectURL,
                   verifier: generator.verifier,
                   challenge: generator.challenge,
                   method: generator.method,
-                  responseType: reponseType,
-                  nonce: nonce,
+                  responseType: responseType,
                   leeway: leeway,
-                  maxAge: maxAge)
+                  maxAge: maxAge,
+                  nonce: nonce)
     }
 
     init(authentication: Authentication,
@@ -108,9 +108,9 @@ struct PKCE: OAuth2Grant {
          challenge: String,
          method: String,
          responseType: [ResponseType],
-         nonce: String? = nil,
          leeway: Int,
-         maxAge: Int? = nil) {
+         maxAge: Int? = nil,
+         nonce: String? = nil) {
         self.authentication = authentication
         self.redirectURL = redirectURL
         self.verifier = verifier
@@ -138,10 +138,10 @@ struct PKCE: OAuth2Grant {
         let leeway = self.leeway
         let nonce = self.defaults["nonce"]
         let maxAge = self.maxAge
-        let isHybridFlow = responseType.contains(.idToken)
         let verifier = self.verifier
         let redirectUrlString = self.redirectURL.absoluteString
         let clientId = authentication.clientId
+        let isFrontChannelIdTokenExpected = responseType.contains(.idToken)
         let validatorContext = IDTokenValidatorContext(authentication: authentication,
                                                        leeway: leeway,
                                                        nonce: nonce,
@@ -158,20 +158,19 @@ struct PKCE: OAuth2Grant {
                         return callback(.failure(error: webAuthError))
                     case .failure(let error): return callback(.failure(error: error))
                     case .success(let credentials):
-                        guard !isHybridFlow else {
-                            let newCredentials = Credentials(accessToken: credentials.accessToken,
-                                                             tokenType: credentials.tokenType,
-                                                             idToken: idToken,
-                                                             refreshToken: credentials.refreshToken,
-                                                             expiresIn: credentials.expiresIn,
-                                                             scope: credentials.scope)
-                            return callback(.success(result: newCredentials))
+                        guard isFrontChannelIdTokenExpected else {
+                            return validate(idToken: credentials.idToken, for: responseType, with: validatorContext) { error in
+                                if let error = error { return callback(.failure(error: error)) }
+                                callback(result)
+                            }
                         }
-                        // Code flow
-                        validate(idToken: credentials.idToken, for: responseType, with: validatorContext) { error in
-                            if let error = error { return callback(.failure(error: error)) }
-                            callback(result)
-                        }
+                        let newCredentials = Credentials(accessToken: credentials.accessToken,
+                                                         tokenType: credentials.tokenType,
+                                                         idToken: idToken,
+                                                         refreshToken: credentials.refreshToken,
+                                                         expiresIn: credentials.expiresIn,
+                                                         scope: credentials.scope)
+                        return callback(.success(result: newCredentials))
                     }
             }
         }
@@ -185,11 +184,12 @@ struct PKCE: OAuth2Grant {
 
 }
 
+// This method will skip the validation if the response type does not contain "id_token"
 private func validate(idToken: String?,
                       for responseType: [ResponseType],
                       with context: IDTokenValidatorContext,
                       callback: @escaping (LocalizedError?) -> Void) {
-    guard responseType.contains(.idToken) else { return callback(nil) } // Code flow case, below is Hybrid flow
+    guard responseType.contains(.idToken) else { return callback(nil) }
     validate(idToken: idToken, with: context) { error in
         if let error = error { return callback(error) }
         callback(nil)
