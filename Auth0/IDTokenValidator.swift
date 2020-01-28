@@ -45,9 +45,14 @@ struct IDTokenValidator: JWTAsyncValidator {
     }
 
     func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
-        signatureValidator.validate(jwt) { error in
-            if let error = error { return callback(error) }
-            callback(self.claimsValidator.validate(jwt))
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.signatureValidator.validate(jwt) { error in
+                if let error = error { return callback(error) }
+                let result = self.claimsValidator.validate(jwt)
+                DispatchQueue.main.async {
+                    callback(result)
+                }
+            }
         }
     }
 }
