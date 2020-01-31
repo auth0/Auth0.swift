@@ -45,10 +45,30 @@ struct MockUnsuccessfulIDTokenSignatureValidator: JWTAsyncValidator {
     }
 }
 
+class SpyThreadingIDTokenSignatureValidator: JWTAsyncValidator {
+    var didExecuteInWorkerThread: Bool = false
+    
+    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
+        didExecuteInWorkerThread = !Thread.isMainThread
+        
+        callback(nil)
+    }
+}
+
 // MARK: - Claims Validator Mocks
 
 struct MockSuccessfulIDTokenClaimsValidator: JWTValidator {
     func validate(_ jwt: JWT) -> LocalizedError? {
+        return nil
+    }
+}
+
+class SpyThreadingIDTokenClaimsValidator: JWTValidator {
+    var didExecuteInWorkerThread: Bool = false
+    
+    func validate(_ jwt: JWT) -> LocalizedError? {
+        didExecuteInWorkerThread = !Thread.isMainThread
+        
         return nil
     }
 }
