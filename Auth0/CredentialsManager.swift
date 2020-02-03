@@ -22,6 +22,7 @@
 
 import Foundation
 import SimpleKeychain
+import JWTDecode
 #if os(iOS)
 import LocalAuthentication
 #endif
@@ -129,7 +130,7 @@ public struct CredentialsManager {
     }
 
     /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
-    /// otherwise the retrieved credentails will be returned as they have not expired. Renewed credentials will be 
+    /// otherwise the retrieved credentails will be returned as they have not expired. Renewed credentials will be
     /// stored in the keychain.
     ///
     ///
@@ -194,39 +195,14 @@ public struct CredentialsManager {
     }
 
     func hasExpired(_ credentials: Credentials) -> Bool {
-
         if let expiresIn = credentials.expiresIn {
             if expiresIn < Date() { return true }
         }
 
-        if let token = credentials.idToken,
-            let tokenDecoded = decode(jwt: token),
-            let exp = tokenDecoded["exp"] as? Double {
-            if Date(timeIntervalSince1970: exp) < Date() { return true }
+        if let token = credentials.idToken, let jwt = try? decode(jwt: token) {
+            return jwt.expired
         }
 
         return false
     }
-}
-
-func decode(jwt: String) -> [String: Any]? {
-    let parts = jwt.components(separatedBy: ".")
-    guard parts.count == 3 else { return nil }
-    var base64 = parts[1]
-        .replacingOccurrences(of: "-", with: "+")
-        .replacingOccurrences(of: "_", with: "/")
-    let length = Double(base64.lengthOfBytes(using: String.Encoding.utf8))
-    let requiredLength = 4 * ceil(length / 4.0)
-    let paddingLength = requiredLength - length
-    if paddingLength > 0 {
-        let padding = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
-        base64 += padding
-    }
-
-    guard
-        let bodyData = Data(base64Encoded: base64, options: .ignoreUnknownCharacters)
-        else { return nil }
-
-    let json = try? JSONSerialization.jsonObject(with: bodyData, options: [])
-    return json as? [String: Any]
 }

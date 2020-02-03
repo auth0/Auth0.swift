@@ -162,8 +162,8 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: the same WebAuth instance to allow method chaining
     func responseType(_ response: [ResponseType]) -> Self
 
-    /// Add nonce paramater for authentication, this is a requirement for
-    /// when response type .id_token is specified.
+    /// Add `nonce` parameter for authentication, this is a requirement
+    /// when response type `.idToken` is specified.
     ///
     /// - Parameter nonce: nonce string
     /// - Returns: the same WebAuth instance to allow method chaining
@@ -175,6 +175,20 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Parameter audience: an audience value like: `https://someapi.com/api`
     /// - Returns: the same WebAuth instance to allow method chaining
     func audience(_ audience: String) -> Self
+
+    /// Add a leeway amount for ID Token validation.
+    /// This value represents the clock skew for the validation of date claims e.g. `exp`.
+    ///
+    /// - Parameter leeway: number of milliseconds. Defaults to `60000` (1 minute).
+    /// - Returns: the same WebAuth instance to allow method chaining
+    func leeway(_ leeway: Int) -> Self
+
+    /// Add `max_age` parameter for authentication, only when response type `.idToken` is specified.
+    /// Sending this parameter will require the presence of the `auth_time` claim in the ID Token.
+    ///
+    /// - Parameter maxAge: number of milliseconds
+    /// - Returns: the same WebAuth instance to allow method chaining
+    func maxAge(_ maxAge: Int) -> Self
 
     /**
      Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)

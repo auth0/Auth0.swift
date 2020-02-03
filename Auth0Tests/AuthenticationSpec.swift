@@ -34,7 +34,7 @@ private let ValidPassword = "I.O.U. a password"
 private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let IdToken = generateJWT().string
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let Timeout: TimeInterval = 2
@@ -1315,6 +1315,34 @@ class AuthenticationSpec: QuickSpec {
                         .start { result in
                             expect(result).to(haveCredentials())
                             done()
+                    }
+                }
+            }
+        }
+        
+        describe("jwks") {
+            context("successful fetch") {
+                it("should fetch the jwks") {
+                    stub(condition: isJWKSPath(Domain)) { _ in jwksResponse() }
+                    
+                    waitUntil { done in
+                        auth.jwks().start {
+                            expect($0).to(haveJWKS())
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("unsuccesful fetch") {
+                it("should produce an error") {
+                    stub(condition: isJWKSPath(Domain)) { _ in jwksErrorResponse() }
+                    
+                    waitUntil { done in
+                        auth.jwks().start {
+                            expect($0).to(beFailure())
+                            done()
+                        }
                     }
                 }
             }

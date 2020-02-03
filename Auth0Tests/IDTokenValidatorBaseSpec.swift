@@ -1,6 +1,6 @@
-// Auth0.h
+// IDTokenValidatorBaseSpec.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Foundation
+import Quick
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
+@testable import Auth0
 
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
-
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
+class IDTokenValidatorBaseSpec: QuickSpec {
+    let domain = "tokens-test.auth0.com"
+    let clientId = "e31f6f9827c187e8aebdb0839a0c963a"
+    let nonce = "a1b2c3d4e5"
+    let leeway = 60 * 1000 // 60 seconds
+    let maxAge = 1000 // 1 second
+    
+    // Can't override the initWithInvocation: initializer, because NSInvocation is not available in Swift
+    lazy var authentication = Auth0.authentication(clientId: clientId, domain: domain)
+    lazy var validatorContext = IDTokenValidatorContext(issuer: "\(URL.a0_url(domain).absoluteString)/",
+                                                        audience: clientId,
+                                                        jwksRequest: authentication.jwks(),
+                                                        leeway: leeway,
+                                                        maxAge: maxAge,
+                                                        nonce: nonce)
+}

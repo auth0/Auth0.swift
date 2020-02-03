@@ -1,4 +1,4 @@
-// Auth0.h
+// A0RSA.h
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -22,14 +22,14 @@
 
 #import <Foundation/Foundation.h>
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
+NS_ASSUME_NONNULL_BEGIN
+@interface A0RSA: NSObject
 
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
+- (nullable instancetype)initWithKey: (SecKeyRef)key;
 
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
+- (NSData *)sign: (NSData *)data;
 
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
+- (Boolean)verify: (NSData *)data  signature: (NSData *)signature;
+
+@end
+NS_ASSUME_NONNULL_END

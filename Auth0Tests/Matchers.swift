@@ -132,6 +132,10 @@ func isLinkPath(_ domain: String, identifier: String) -> OHHTTPStubsTestBlock {
     return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")
 }
 
+func isJWKSPath(_ domain: String) -> OHHTTPStubsTestBlock {
+    return isHost(domain) && isPath("/.well-known/jwks.json")
+}
+
 func hasBearerToken(_ token: String) -> OHHTTPStubsTestBlock {
     return { request in
         return request.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)"
@@ -256,6 +260,15 @@ func haveObjectWithAttributes(_ attributes: [String]) -> Predicate<Result<[Strin
                 return initial && attributes.contains(value)
             })
             return PredicateResult(bool: outcome, message: failureMessage)
+        }
+        return PredicateResult(status: .doesNotMatch, message: failureMessage)
+    }
+}
+
+func haveJWKS() -> Predicate<Result<JWKS>> {
+    return Predicate<Result<JWKS>>.define("have a JWKS object with at least one key") { expression, failureMessage -> PredicateResult in
+        if let actual = try expression.evaluate(), case .success(let jwks) = actual {
+            return PredicateResult(bool: !jwks.keys.isEmpty, message: failureMessage)
         }
         return PredicateResult(status: .doesNotMatch, message: failureMessage)
     }

@@ -1,6 +1,6 @@
-// Auth0.h
+// Extensions.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2019 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Foundation
+import Security
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
+@testable import Auth0
 
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
+extension SecKey {
+    func export() -> Data {
+        return SecKeyCopyExternalRepresentation(self, nil)! as Data
+    }
+}
 
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
-
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
+extension JWTAlgorithm {
+    func sign(value: Data, key: SecKey = TestKeys.rsaPrivate) -> Data {
+        switch self {
+        case .rs256:
+            let sha256 = A0SHA()
+            let rsa = A0RSA(key: key)!
+            
+            return rsa.sign(sha256.hash(value))
+        case .hs256: return value
+        }
+    }
+}

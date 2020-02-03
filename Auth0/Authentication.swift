@@ -33,7 +33,7 @@ public typealias DatabaseUser = (email: String, username: String?, verified: Boo
 public protocol Authentication: Trackable, Loggable {
     var clientId: String { get }
     var url: URL { get }
-    
+
     /**
     Logs in a user using an email and an OTP code received via email (last part of the passwordless login flow)
 
@@ -77,7 +77,7 @@ public protocol Authentication: Trackable, Loggable {
     - requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     */
     func login(email username: String, code otp: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
-    
+
     /**
     Logs in a user using a phone number and an OTP code received via sms (last part of the passwordless login flow)
 
@@ -434,7 +434,7 @@ public protocol Authentication: Trackable, Loggable {
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
     /**
-     Returns token information by performing a request to /tokeninfo endpoint
+     Returns token information by performing a request to the `/tokeninfo` endpoint.
 
      ```
      Auth0
@@ -451,7 +451,7 @@ public protocol Authentication: Trackable, Loggable {
     func tokenInfo(token: String) -> Request<Profile, AuthenticationError>
 
     /**
-     Returns user information by performing a request to /userinfo endpoint.
+     Returns user information by performing a request to the `/userinfo` endpoint.
 
      ```
      Auth0
@@ -469,7 +469,7 @@ public protocol Authentication: Trackable, Loggable {
 
     /**
      Returns OIDC standard claims information by performing a request
-     to /userinfo endpoint.
+     to the `/userinfo` endpoint.
 
      ```
      Auth0
@@ -586,6 +586,20 @@ public protocol Authentication: Trackable, Loggable {
     */
     func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
 
+    /**
+    Returns JSON Web Key Set (JWKS) information by performing a request to the `/.well-known/jwks.json` endpoint.
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .jwks()
+       .start { print($0) }
+    ```
+    
+    - returns: a request that will yield JWKS information
+    */
+    func jwks() -> Request<JWKS, AuthenticationError>
+
 #if os(iOS)
     /**
      Creates a new WebAuth request to authenticate using Safari browser and OAuth authorize flow.
@@ -630,7 +644,7 @@ public enum PasswordlessType: String {
 }
 
 public extension Authentication {
-   
+
     /**
     Logs in a user using an email and an OTP code received via email (last part of the passwordless login flow)
 
@@ -676,7 +690,7 @@ public extension Authentication {
     func login(email username: String, code otp: String, audience: String? = nil, scope: String? = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         return self.login(email: username, code: otp, audience: audience, scope: scope, parameters: parameters)
     }
-    
+
     /**
     Logs in a user using a phone number and an OTP code received via sms (last part of the passwordless login flow)
 
