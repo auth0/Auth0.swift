@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.21.0](https://github.com/auth0/Auth0.swift/tree/1.21.0) (2020-02-04)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.20.0...1.21.0)
+
+**Added**
+- Added a Table of Contents to the README [\#338](https://github.com/auth0/Auth0.swift/pull/338) ([Widcket](https://github.com/Widcket))
+- Exposed additional Swift calls to Objective-C [\#342](https://github.com/auth0/Auth0.swift/pull/342) ([npalethorpe](https://github.com/npalethorpe))
+- Improved OIDC compliance [SDK-976] [\#346](https://github.com/auth0/Auth0.swift/pull/346) ([Widcket](https://github.com/Widcket))
+
+**Fixed**
+- Added missing watchOS shared scheme [\#336](https://github.com/auth0/Auth0.swift/pull/336) ([Widcket](https://github.com/Widcket))
+
 ## [1.20.0](https://github.com/auth0/Auth0.swift/tree/1.20.0) (2020-01-03)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.19.3...1.20.0)
 
