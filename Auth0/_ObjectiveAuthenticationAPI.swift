@@ -78,7 +78,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
             }
     }
 
-#if canImport(UIKit)
+#if os(iOS)
     @objc(resumeAuthWithURL:options:)
     public static func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
         return resumeAuth(url, options: options)

@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 
 import Foundation
-import SimpleKeychain
 
 public struct JWKS: Codable {
     let keys: [JWK]
@@ -54,41 +53,5 @@ public struct JWK: Codable {
         case certChain = "x5c"
         case rsaModulus = "n"
         case rsaExponent = "e"
-    }
-}
-
-extension JWK {
-    var rsaPublicKey: SecKey? {
-        if let usage = usage, usage != "sig" { return nil }
-        guard keyType == "RSA",
-            algorithm == JWTAlgorithm.rs256.rawValue,
-            let modulus = rsaModulus?.a0_decodeBase64URLSafe(),
-            let exponent = rsaExponent?.a0_decodeBase64URLSafe() else { return nil }
-        let encodedKey = encodeRSAPublicKey(modulus: [UInt8](modulus), exponent: [UInt8](exponent))
-        if #available(iOS 10, OSX 10.12, tvOS 10, watchOS 3, *) {
-            return generateRSAPublicKey(from: encodedKey)
-        }
-        let tag = "com.auth0.tmp.RSAPublicKey"
-        let keychain = A0SimpleKeychain()
-        guard keychain.setRSAPublicKey(data: encodedKey, forKey: tag) else { return nil }
-        return keychain.keyRefOfRSAKey(withTag: tag).takeRetainedValue()
-    }
-
-    private func encodeRSAPublicKey(modulus: [UInt8], exponent: [UInt8]) -> Data {
-        let encodedModulus = modulus.a0_derEncode(as: 2) // Integer
-        let encodedExponent = exponent.a0_derEncode(as: 2) // Integer
-        let encodedSequence = (encodedModulus + encodedExponent).a0_derEncode(as: 48) // Sequence
-        return Data(encodedSequence)
-    }
-
-    @available(iOS 10, OSX 10.12, tvOS 10, watchOS 3, *)
-    private func generateRSAPublicKey(from derEncodedData: Data) -> SecKey? {
-        let sizeInBits = derEncodedData.count * MemoryLayout<UInt8>.size
-        let attributes: [CFString: Any] = [kSecClass: kSecClassKey,
-                                           kSecAttrKeyType: kSecAttrKeyTypeRSA,
-                                           kSecAttrKeyClass: kSecAttrKeyClassPublic,
-                                           kSecAttrAccessible: kSecAttrAccessibleAlways,
-                                           kSecAttrKeySizeInBits: NSNumber(value: sizeInBits)]
-        return SecKeyCreateWithData(derEncodedData as CFData, attributes as CFDictionary, nil)
     }
 }
