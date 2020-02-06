@@ -26,6 +26,9 @@ jobs:
             SCHEME: Auth0.iOS
             DEVICE: iPhone 8
             FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
+      - run: 
+          name: Run pod lib lint
+          command: bundle exec fastlane ios pod_lint
       - run: |
           slather
           mkdir /tmp/artifacts
