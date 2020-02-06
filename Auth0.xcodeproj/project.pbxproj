@@ -52,6 +52,10 @@
 		5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5BEDE1951EC333380007300D /* CredentialsManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */; };
 		5BFB98A51F7D1232001FE50D /* SafariAuthenticationCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFB98A41F7D1232001FE50D /* SafariAuthenticationCallback.swift */; };
+		5C49EB3523EB5A80008D562F /* JWK+RSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C49EB3423EB5A80008D562F /* JWK+RSA.swift */; };
+		5C49EB3623EB5A80008D562F /* JWK+RSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C49EB3423EB5A80008D562F /* JWK+RSA.swift */; };
+		5C49EB3723EB5A80008D562F /* JWK+RSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C49EB3423EB5A80008D562F /* JWK+RSA.swift */; };
+		5C49EB3823EB5A80008D562F /* JWK+RSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C49EB3423EB5A80008D562F /* JWK+RSA.swift */; };
 		5C4F550723C8FADF00C89615 /* A0SHA.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550223C8FADE00C89615 /* A0SHA.m */; };
 		5C4F550823C8FADF00C89615 /* A0SHA.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C4F550323C8FADE00C89615 /* A0SHA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5C4F550923C8FADF00C89615 /* JWTAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550423C8FADE00C89615 /* JWTAlgorithm.swift */; };
@@ -514,6 +518,7 @@
 		5BEDE1891EC21B040007300D /* CredentialsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManager.swift; sourceTree = "<group>"; };
 		5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = CredentialsManagerSpec.swift; path = Auth0Tests/CredentialsManagerSpec.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		5BFB98A41F7D1232001FE50D /* SafariAuthenticationCallback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariAuthenticationCallback.swift; sourceTree = "<group>"; };
+		5C49EB3423EB5A80008D562F /* JWK+RSA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JWK+RSA.swift"; sourceTree = "<group>"; };
 		5C4F550223C8FADE00C89615 /* A0SHA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = A0SHA.m; sourceTree = "<group>"; };
 		5C4F550323C8FADE00C89615 /* A0SHA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = A0SHA.h; sourceTree = "<group>"; };
 		5C4F550423C8FADE00C89615 /* JWTAlgorithm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTAlgorithm.swift; sourceTree = "<group>"; };
@@ -1090,6 +1095,7 @@
 				5F7504F41D8C3F2900E3BA1C /* NSError+Helper.swift */,
 				5C4F552723C9116B00C89615 /* A0SimpleKeychain+RSAPublicKey.swift */,
 				5CB41D6B23D0BBA500074024 /* JWT+Header.swift */,
+				5C49EB3423EB5A80008D562F /* JWK+RSA.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -1827,6 +1833,7 @@
 				5FC34AF81D0101BF000F28F5 /* A0ChallengeGenerator.m in Sources */,
 				5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */,
 				5F28B4611D8216180000EB23 /* Loggable.swift in Sources */,
+				5C49EB3523EB5A80008D562F /* JWK+RSA.swift in Sources */,
 				5FDE87551D8A424700EA27DC /* Auth0Authentication.swift in Sources */,
 				5F53F5CE1CFD157300476A46 /* AuthTransaction.swift in Sources */,
 				5CB41D6C23D0BBA600074024 /* JWT+Header.swift in Sources */,
@@ -1914,6 +1921,7 @@
 				5FE2F8AA1CCE54F1003628F4 /* Result.swift in Sources */,
 				5FCAB1741D09009600331C84 /* NSData+URLSafe.swift in Sources */,
 				5C4F551523C8FAEE00C89615 /* A0RSA.m in Sources */,
+				5C49EB3623EB5A80008D562F /* JWK+RSA.swift in Sources */,
 				5F7504F61D8C3F2900E3BA1C /* NSError+Helper.swift in Sources */,
 				5FCAB17A1D09124D00331C84 /* NSURL+Auth0.swift in Sources */,
 				5C4F554D23C9195100C89615 /* JWTAlgorithm.swift in Sources */,
@@ -2012,6 +2020,7 @@
 				5C4F554E23C9195100C89615 /* JWTAlgorithm.swift in Sources */,
 				5F23E6E81D4ACD8500C3F2D9 /* Result.swift in Sources */,
 				5F23E6DD1D4ACD6100C3F2D9 /* NSURL+Auth0.swift in Sources */,
+				5C49EB3723EB5A80008D562F /* JWK+RSA.swift in Sources */,
 				5F23E6E71D4ACD8500C3F2D9 /* Response.swift in Sources */,
 				5B2860D11EEAC30A00C75D54 /* UserInfo.swift in Sources */,
 				5CB41D4E23D0BA2C00074024 /* Optional+DebugDescription.swift in Sources */,
@@ -2059,6 +2068,7 @@
 				5F23E7131D4B890500C3F2D9 /* A0ChallengeGenerator.m in Sources */,
 				5F23E71A1D4B891E00C3F2D9 /* Auth0.swift in Sources */,
 				5F23E7101D4B88FC00C3F2D9 /* Response.swift in Sources */,
+				5C49EB3823EB5A80008D562F /* JWK+RSA.swift in Sources */,
 				5B2860D01EEAC30A00C75D54 /* UserInfo.swift in Sources */,
 				5F28B4641D8216180000EB23 /* Loggable.swift in Sources */,
 				5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */,

@@ -25,12 +25,6 @@ import UIKit
 import AuthenticationServices
 #endif
 
-#if swift(>=4.2)
-public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey
-#else
-public typealias A0URLOptionsKey = UIApplicationOpenURLOptionsKey
-#endif
-
 /**
  Auth0 iOS component for authenticating with web-based flow
 
