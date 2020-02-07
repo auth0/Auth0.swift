@@ -16,7 +16,20 @@ web_auth_files = [
   'Auth0/SilentSafariViewController.swift',
   'Auth0/NativeAuth.swift',
   'Auth0/AuthProvider.swift',
-  'Auth0/BioAuthentication.swift'
+  'Auth0/BioAuthentication.swift',
+  'Auth0/A0RSA.h',
+  'Auth0/A0RSA.m',
+  'Auth0/A0SHA.h',
+  'Auth0/A0SHA.m',
+  'Auth0/A0SimpleKeychain+RSAPublicKey.swift',
+  'Auth0/Array+Encode.swift',
+  'Auth0/ClaimValidators.swift',
+  'Auth0/IDTokenSignatureValidator.swift',
+  'Auth0/IDTokenValidator.swift',
+  'Auth0/IDTokenValidatorContext.swift',
+  'Auth0/JWT+Header.swift',
+  'Auth0/JWK+RSA.swift',
+  'Auth0/JWTAlgorithm.swift'
 ]
 
 watchos_exclude_files = [
@@ -37,7 +50,20 @@ watchos_exclude_files = [
 'Auth0/AuthProvider.swift',
 'Auth0/BioAuthentication.swift',
 'Auth0/CredentialsManagerError.swift',
-'Auth0/CredentialsManager.swift'
+'Auth0/CredentialsManager.swift',
+'Auth0/A0RSA.h',
+'Auth0/A0RSA.m',
+'Auth0/A0SHA.h',
+'Auth0/A0SHA.m',
+'Auth0/A0SimpleKeychain+RSAPublicKey.swift',
+'Auth0/Array+Encode.swift',
+'Auth0/ClaimValidators.swift',
+'Auth0/IDTokenSignatureValidator.swift',
+'Auth0/IDTokenValidator.swift',
+'Auth0/IDTokenValidatorContext.swift',
+'Auth0/JWT+Header.swift',
+'Auth0/JWK+RSA.swift',
+'Auth0/JWTAlgorithm.swift'
 ]
 
 Pod::Spec.new do |s|
@@ -63,14 +89,18 @@ Pod::Spec.new do |s|
   s.ios.frameworks = 'UIKit', 'SafariServices', 'LocalAuthentication'
   s.ios.weak_framework = 'AuthenticationServices'
   s.ios.dependency 'SimpleKeychain'
+  s.ios.dependency 'JWTDecode'
   s.osx.source_files = 'Auth0/*.swift'
   s.osx.exclude_files = web_auth_files
   s.osx.dependency 'SimpleKeychain'
+  s.osx.dependency 'JWTDecode'
   s.watchos.source_files = 'Auth0/*.swift'
   s.watchos.exclude_files = watchos_exclude_files
+  s.watchos.dependency 'JWTDecode'
   s.tvos.source_files = 'Auth0/*.swift'
   s.tvos.exclude_files = web_auth_files
   s.tvos.dependency 'SimpleKeychain'
+  s.tvos.dependency 'JWTDecode'
 
   s.swift_versions = ['4.0', '4.1', '4.2', '5.0']
 end

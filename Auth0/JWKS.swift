@@ -1,6 +1,6 @@
-// Auth0.h
+// JWKS.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2019 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
+public struct JWKS: Codable {
+    let keys: [JWK]
+}
 
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
+public extension JWKS {
+    func key(id kid: String) -> JWK? {
+        return keys.first { $0.keyId == kid }
+    }
+}
 
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
+public struct JWK: Codable {
+    let keyType: String
+    let keyId: String?
+    let usage: String?
+    let algorithm: String?
+    let certUrl: String?
+    let certThumbprint: String?
+    let certChain: [String]?
+    let rsaModulus: String?
+    let rsaExponent: String?
 
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
+    enum CodingKeys: String, CodingKey {
+        case keyType = "kty"
+        case keyId = "kid"
+        case usage = "use"
+        case algorithm = "alg"
+        case certUrl = "x5u"
+        case certThumbprint = "x5t"
+        case certChain = "x5c"
+        case rsaModulus = "n"
+        case rsaExponent = "e"
+    }
+}

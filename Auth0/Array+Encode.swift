@@ -1,6 +1,6 @@
-// Auth0.h
+// Array+Encode.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2019 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
-
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
-
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
+extension Array where Element == UInt8 {
+    func a0_derEncode(as dataType: UInt8) -> [UInt8] {
+        var encodedBytes: [UInt8] = [dataType]
+        var numberOfBytes = count
+        if numberOfBytes < 128 {
+            encodedBytes.append(UInt8(numberOfBytes))
+        } else {
+            let lengthData = Data(bytes: &numberOfBytes, count: MemoryLayout.size(ofValue: numberOfBytes))
+            let lengthBytes = [UInt8](lengthData).filter({ $0 != 0 }).reversed()
+            encodedBytes.append(UInt8(truncatingIfNeeded: lengthBytes.count) | 0b10000000)
+            encodedBytes.append(contentsOf: lengthBytes)
+        }
+        encodedBytes.append(contentsOf: self)
+        return encodedBytes
+    }
+}

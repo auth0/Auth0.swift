@@ -53,11 +53,9 @@ class BioAuthenticationSpec: QuickSpec {
 
         describe("setters") {
 
-            if #available(iOS 10, *) {
-                it("should set cancel title") {
-                    bioAuthentication.cancelTitle = "cancel title"
-                    expect(mockContext.localizedCancelTitle) == "cancel title"
-                }
+            it("should set cancel title") {
+                bioAuthentication.cancelTitle = "cancel title"
+                expect(mockContext.localizedCancelTitle) == "cancel title"
             }
 
             it("should set fallback title") {

@@ -29,6 +29,7 @@ import OHHTTPStubs
 
 private let ClientId = "CLIENT_ID"
 private let Domain = URL(string: "https://samples.auth0.com")!
+private let Leeway = 60 * 1000
 
 class MockSafariViewController: SFSafariViewController {
     var presenting: UIViewController? = nil
@@ -47,14 +48,15 @@ class SafariSessionSpec: QuickSpec {
         var result: Result<Credentials>? = nil
         let callback: (Result<Credentials>) -> () = { result = $0 }
         let controller = MockSafariViewController(url: URL(string: "https://auth0.com")!)
-        let handler = ImplicitGrant()
-        let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
+        let authentication = Auth0Authentication(clientId: ClientId, url: Domain)
+        let handler = ImplicitGrant(authentication: authentication, leeway: Leeway)
 
         beforeEach {
             result = nil
         }
 
         context("SFSafariViewControllerDelegate") {
+
             var session: SafariSession!
 
             beforeEach {
@@ -74,8 +76,11 @@ class SafariSessionSpec: QuickSpec {
 
         describe("resume:options") {
 
+            var session: SafariSession!
+
             beforeEach {
                 controller.presenting = MockViewController()
+                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
             }
 
             it("should return true if URL matches redirect URL") {
@@ -88,7 +93,11 @@ class SafariSessionSpec: QuickSpec {
 
             context("response_type=token") {
 
-                let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: ImplicitGrant() , finish: callback, logger: nil)
+                var session: SafariSession!
+
+                beforeEach {
+                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
+                }
 
                 it("should not return credentials from query string") {
                     let _ = session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)
@@ -114,13 +123,18 @@ class SafariSessionSpec: QuickSpec {
 
             context("response_type=code") {
 
+                var session: SafariSession!
                 let generator = A0SHA256ChallengeGenerator()
-                let session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: PKCE(authentication: Auth0Authentication(clientId: ClientId, url: Domain), redirectURL: RedirectURL, generator: generator, reponseType: [.code]), finish: callback, logger: nil)
+                let handler = PKCE(authentication: authentication, redirectURL: RedirectURL, generator: generator, responseType: [.code], leeway: Leeway, nonce: nil)
+                let idToken = generateJWT().string
                 let code = "123456"
 
                 beforeEach {
-                    stub(condition: isToken("samples.auth0.com") && hasAtLeast(["code": code, "code_verifier": generator.verifier, "grant_type": "authorization_code", "redirect_uri": RedirectURL.absoluteString])) { _ in return authResponse(accessToken: "AT", idToken: "IDT") }.name = "Code Exchange Auth"
-
+                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
+                    stub(condition: isToken(Domain.host!) && hasAtLeast(["code": code, "code_verifier": generator.verifier, "grant_type": "authorization_code", "redirect_uri": RedirectURL.absoluteString])) {
+                        _ in return authResponse(accessToken: "AT", idToken: idToken)
+                    }.name = "Code Exchange Auth"
+                    stub(condition: isJWKSPath(Domain.host!)) { _ in jwksResponse() }
                 }
 
                 afterEach {

@@ -34,9 +34,8 @@ private let Connection = "facebook"
 private let Scope = "openid"
 private let Parameters: [String: Any] = [:]
 private let Timeout: TimeInterval = 2
-
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let IdToken = generateJWT().string
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 

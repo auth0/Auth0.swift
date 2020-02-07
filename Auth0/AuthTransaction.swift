@@ -22,6 +22,12 @@
 
 import UIKit
 
+#if swift(>=4.2)
+public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey
+#else
+public typealias A0URLOptionsKey = UIApplicationOpenURLOptionsKey
+#endif
+
 /**
  Represents an ongoing Auth transaction with an Identity Provider (Auth0 or a third party).
 
@@ -58,4 +64,5 @@ public protocol AuthTransaction {
      Terminates the transaction and reports back that it was cancelled.
     */
     func cancel()
+    
 }

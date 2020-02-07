@@ -1,6 +1,6 @@
-// Auth0.h
+// A0SimpleKeychain+RSAPublicKey.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Foundation
+import SimpleKeychain
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
-
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
-
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
+extension A0SimpleKeychain {
+    func setRSAPublicKey(data: Data, forKey tag: String) -> Bool {
+        let sizeInBits = data.count * MemoryLayout<UInt8>.size
+        let query: [CFString: Any] = [kSecClass: kSecClassKey,
+                                      kSecAttrKeyType: kSecAttrKeyTypeRSA,
+                                      kSecAttrKeyClass: kSecAttrKeyClassPublic,
+                                      kSecAttrAccessible: kSecAttrAccessibleAlways,
+                                      kSecAttrKeySizeInBits: NSNumber(value: sizeInBits),
+                                      kSecAttrApplicationTag: tag,
+                                      kSecValueData: data]
+        if hasRSAKey(withTag: tag) { deleteRSAKey(withTag: tag) }
+        let result = SecItemAdd(query as CFDictionary, nil)
+        return result == errSecSuccess
+    }
+}

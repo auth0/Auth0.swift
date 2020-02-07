@@ -1,6 +1,6 @@
-// Auth0.h
+// String+URLSafe.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2019 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
-
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
-
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
+public extension String {
+    func a0_decodeBase64URLSafe() -> Data? {
+        let lengthMultiple = 4
+        let paddingLength = lengthMultiple - count % lengthMultiple
+        let padding = (paddingLength < lengthMultiple) ? String(repeating: "=", count: paddingLength) : ""
+        let base64EncodedString = self
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+            + padding
+        return Data(base64Encoded: base64EncodedString)
+    }
+}
