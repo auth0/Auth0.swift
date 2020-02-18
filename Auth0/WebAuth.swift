@@ -156,6 +156,12 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: the same WebAuth instance to allow method chaining
     func responseType(_ response: [ResponseType]) -> Self
 
+    /// Specify a redirect url to be used instead of a custom scheme
+    ///
+    /// - Parameter redirectURL: custom redirect url
+    /// - Returns: the same WebAuth instance to allow method chaining
+    func redirectURL(_ redirectURL: URL) -> Self
+
     /// Add `nonce` parameter for authentication, this is a requirement
     /// when response type `.idToken` is specified.
     ///
@@ -234,7 +240,6 @@ public protocol WebAuth: Trackable, Loggable {
 
      For iOS 11+ you will need to ensure that the **Callback URL** has been added
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
-
 
      ```
      Auth0
