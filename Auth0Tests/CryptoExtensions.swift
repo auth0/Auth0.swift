@@ -1,4 +1,4 @@
-// Extensions.swift
+// CryptoExtensions.swift
 //
 // Copyright (c) 2019 Auth0 (http://auth0.com)
 //

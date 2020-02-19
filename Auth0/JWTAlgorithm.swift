@@ -35,9 +35,6 @@ enum JWTAlgorithm: String {
             !signature.isEmpty else { return false }
         switch self {
         case .rs256:
-            #if os(OSX)
-            guard #available(OSX 10.12, *) else { return true }
-            #endif
             guard let publicKey = jwk.rsaPublicKey, let rsa = A0RSA(key: publicKey) else { return false }
             let sha256 = A0SHA()
             return rsa.verify(sha256.hash(data), signature: signature)
