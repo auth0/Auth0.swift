@@ -26,7 +26,6 @@ import SafariServices
 import AuthenticationServices
 #endif
 
-#if swift(>=3.2)
 @available(iOS 11.0, *)
 class SafariAuthenticationSessionCallback: NSObject, AuthTransaction {
 
@@ -78,7 +77,6 @@ class SafariAuthenticationSessionCallback: NSObject, AuthTransaction {
         self.callback(false)
     }
 }
-#endif
 
 #if swift(>=5.1)
 @available(iOS 13.0, *)
