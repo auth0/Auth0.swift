@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.22.0](https://github.com/auth0/Auth0.swift/tree/1.22.0) (2020-02-19)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.21.0...1.22.0)
+
+**Added**
+- Added redirect URL method to WebAuth builder [SDK-1299] [\#351](https://github.com/auth0/Auth0.swift/pull/351) ([Widcket](https://github.com/Widcket))
+
+**Changed**
+- Refactored SIWA token exchange method [SDK-1349] [\#350](https://github.com/auth0/Auth0.swift/pull/350) ([Widcket](https://github.com/Widcket))
+
 ## [1.21.0](https://github.com/auth0/Auth0.swift/tree/1.21.0) (2020-02-04)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.20.0...1.21.0)
 
