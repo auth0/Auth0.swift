@@ -17,6 +17,8 @@ web_auth_files = [
   'Auth0/NativeAuth.swift',
   'Auth0/AuthProvider.swift',
   'Auth0/BioAuthentication.swift',
+  'Auth0/A0ChallengeGenerator.h',
+  'Auth0/A0ChallengeGenerator.m',
   'Auth0/A0RSA.h',
   'Auth0/A0RSA.m',
   'Auth0/A0SHA.h',
@@ -33,37 +35,9 @@ web_auth_files = [
 ]
 
 watchos_exclude_files = [
-'Auth0/_ObjectiveWebAuth.swift',
-'Auth0/ControllerModalPresenter.swift',
-'Auth0/OAuth2Grant.swift',
-'Auth0/AuthTransaction.swift',
-'Auth0/TransactionStore.swift',
-'Auth0/WebAuth.swift',
-'Auth0/WebAuthError.swift',
-'Auth0/SafariWebAuth.swift',
-'Auth0/AuthSession.swift',
-'Auth0/SafariSession.swift',
-'Auth0/SafariAuthenticationSession.swift',
-'Auth0/SafariAuthenticationCallback.swift',
-'Auth0/SilentSafariViewController.swift',
-'Auth0/NativeAuth.swift',
-'Auth0/AuthProvider.swift',
-'Auth0/BioAuthentication.swift',
-'Auth0/CredentialsManagerError.swift',
-'Auth0/CredentialsManager.swift',
-'Auth0/A0RSA.h',
-'Auth0/A0RSA.m',
-'Auth0/A0SHA.h',
-'Auth0/A0SHA.m',
-'Auth0/A0SimpleKeychain+RSAPublicKey.swift',
-'Auth0/Array+Encode.swift',
-'Auth0/ClaimValidators.swift',
-'Auth0/IDTokenSignatureValidator.swift',
-'Auth0/IDTokenValidator.swift',
-'Auth0/IDTokenValidatorContext.swift',
-'Auth0/JWT+Header.swift',
-'Auth0/JWK+RSA.swift',
-'Auth0/JWTAlgorithm.swift'
+  *web_auth_files,
+  'Auth0/CredentialsManagerError.swift',
+  'Auth0/CredentialsManager.swift'
 ]
 
 Pod::Spec.new do |s|

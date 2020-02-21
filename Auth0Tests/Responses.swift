@@ -120,6 +120,7 @@ func managementErrorResponse(error: String, description: String, code: String, s
 }
 
 func jwksResponse(kid: String? = JWKKid) -> OHHTTPStubsResponse {
+    #if os(iOS)
     let jwk = generateRSAJWK()
     let jwks = ["keys": [["alg": jwk.algorithm,
                           "kty": jwk.keyType,
@@ -127,6 +128,14 @@ func jwksResponse(kid: String? = JWKKid) -> OHHTTPStubsResponse {
                           "n": jwk.rsaModulus,
                           "e": jwk.rsaExponent,
                           "kid": kid]]]
+    #else
+    let jwks = ["keys": [["alg": "RS256",
+                          "kty": "RSA",
+                          "use": "sig",
+                          "n": "uGbXWiK3dQTyCbX5xdE4yCuYp0AF2d15Qq1JSXT_lx8CEcXb9RbDddl8jGDv-spi5qPa8qEHiK7FwV2KpRE983wGPnYsAm9BxLFb4YrLYcDFOIGULuk2FtrPS512Qea1bXASuvYXEpQNpGbnTGVsWXI9C-yjHztqyL2h8P6mlThPY9E9ue2fCqdgixfTFIF9Dm4SLHbphUS2iw7w1JgT69s7of9-I9l5lsJ9cozf1rxrXX4V1u_SotUuNB3Fp8oB4C1fLBEhSlMcUJirz1E8AziMCxS-VrRPDM-zfvpIJg3JljAh3PJHDiLu902v9w-Iplu1WyoB2aPfitxEhRN0Yw",
+                          "e": "AQAB",
+                          "kid": kid]]]
+    #endif
     
     return OHHTTPStubsResponse(jsonObject: jwks, statusCode: 200, headers: nil)
 }
