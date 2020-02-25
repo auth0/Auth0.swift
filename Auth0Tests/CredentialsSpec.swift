@@ -25,7 +25,7 @@ import Nimble
 @testable import Auth0
 
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-private let IdToken = generateJWT().string
+private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let Bearer = "bearer"
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let expiresIn: TimeInterval = 3600

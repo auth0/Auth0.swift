@@ -554,6 +554,34 @@ public protocol Authentication: Trackable, Loggable {
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
+    Authenticate a user with their Sign In With Apple authorization code.
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .tokenExchange(withAppleAuthorizationCode: authCode)
+       .start { print($0) }
+    ```
+
+    and if you need to specify a scope or add additional parameters
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .tokenExchange(withAppleAuthorizationCode: authCode, scope: "openid profile offline_access", audience: "https://myapi.com/api, fullName: credentials.fullName)
+       .start { print($0) }
+    ```
+
+    - parameter authCode: Authorization Code retrieved from Apple Authorization
+    - parameter scope: requested scope value when authenticating the user. By default is 'openid profile offline_access'
+    - parameter audience: API Identifier that the client is requesting access to
+    - parameter fullName: The full name property returned with the Apple ID Credentials
+
+    - returns: a request that will yield Auth0 user's credentials
+    */
+    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String?, audience: String?, fullName: PersonNameComponents?) -> Request<Credentials, AuthenticationError>
+
+    /**
      Renew user's credentials with a refresh_token grant for `/oauth/token`
      If you are not using OAuth 2.0 API Authorization please use `delegation(parameters:)`
      - parameter refreshToken: the client's refresh token obtained on auth
@@ -1117,28 +1145,6 @@ public extension Authentication {
     - returns: a request that will yield Auth0 user's credentials
     */
     func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String? = nil, audience: String? = nil, fullName: PersonNameComponents? = nil) -> Request<Credentials, AuthenticationError> {
-        var parameters: [String: String] =
-            [ "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-              "subject_token": authCode,
-              "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
-              "scope": scope ?? "openid profile offline_access" ]
-        if let fullName = fullName {
-            let name = [
-                "firstName": fullName.givenName,
-                "lastName": fullName.familyName
-            ].filter { $0.value != nil }.mapValues { $0! }
-            if !name.isEmpty, let jsonData = try? String(
-                    data: JSONSerialization.data(
-                        withJSONObject: [
-                            "name": name
-                        ],
-                        options: []),
-                    encoding: String.Encoding.utf8
-            ) {
-                parameters["user_profile"] = jsonData
-            }
-        }
-        parameters["audience"] = audience
-        return self.tokenExchange(withParameters: parameters)
+        return self.tokenExchange(withAppleAuthorizationCode: authCode, scope: scope, audience: audience, fullName: fullName)
     }
 }

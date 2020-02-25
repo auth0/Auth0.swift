@@ -35,7 +35,7 @@ class JWKSpec: QuickSpec {
             
             let jwk = generateRSAJWK()
             
-            if #available(iOS 10, OSX 10.12, tvOS 10, watchOS 3, *) {
+            if #available(iOS 10, *) {
                 context("successful generation") {
                     it("should generate a RSA public key") {
                         let publicKey = jwk.rsaPublicKey!

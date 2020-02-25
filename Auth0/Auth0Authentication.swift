@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// swiftlint:disable file_length
+
 import Foundation
 
 struct Auth0Authentication: Authentication {
@@ -293,6 +295,23 @@ struct Auth0Authentication: Authentication {
             ])
     }
 
+    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String?, audience: String?, fullName: PersonNameComponents?) -> Request<Credentials, AuthenticationError> {
+        var parameters: [String: String] = [:]
+        if let fullName = fullName {
+            let name = ["firstName": fullName.givenName, "lastName": fullName.familyName].compactMapValues { $0 }
+            if !name.isEmpty,
+                let jsonData = try? JSONSerialization.data(withJSONObject: ["name": name], options: []),
+                let json = String(data: jsonData, encoding: .utf8) {
+                parameters["user_profile"] = json
+            }
+        }
+        return self.tokenExchange(subjectToken: authCode,
+                                  subjectTokenType: "http://auth0.com/oauth/token-type/apple-authz-code",
+                                  scope: scope,
+                                  audience: audience,
+                                  parameters: parameters)
+    }
+
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         var payload: [String: Any] = [
             "refresh_token": refreshToken,
@@ -380,5 +399,17 @@ struct Auth0Authentication: Authentication {
         }
         parameters.forEach { key, value in payload[key] = value }
         return Request(session: session, url: url, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
+    }
+
+    private func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String?, audience: String?, parameters: [String: String]?) -> Request<Credentials, AuthenticationError> {
+        var parameters: [String: String] = parameters ?? [:]
+        parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
+        parameters["subject_token"] = subjectToken
+        parameters["subject_token_type"] = subjectTokenType
+        parameters["scope"] = scope ?? "openid profile offline_access"
+        if let audience = audience {
+            parameters["audience"] = audience
+        }
+        return self.tokenExchange(withParameters: parameters)
     }
 }
