@@ -34,11 +34,7 @@ extension JWK {
         if #available(iOS 10, *) {
             return generateRSAPublicKey(from: encodedKey)
         }
-        let tag = "com.auth0.tmp.RSAPublicKey"
-        let keychain = A0SimpleKeychain()
-        guard keychain.setRSAPublicKey(data: encodedKey, forKey: tag),
-            let keyRef = keychain.keyRefOfRSAKey(withTag: tag) else { return nil }
-        return keyRef.takeRetainedValue()
+        return generateRSAPublicKeyLegacy(from: encodedKey)
     }
 
     private func encodeRSAPublicKey(modulus: [UInt8], exponent: [UInt8]) -> Data {
@@ -57,5 +53,12 @@ extension JWK {
                                            kSecAttrAccessible: kSecAttrAccessibleAlways,
                                            kSecAttrKeySizeInBits: NSNumber(value: sizeInBits)]
         return SecKeyCreateWithData(derEncodedData as CFData, attributes as CFDictionary, nil)
+    }
+
+    private func generateRSAPublicKeyLegacy(from derEncodedData: Data) -> SecKey? {
+        let tag = "com.auth0.tmp.RSAPublicKey"
+        let keychain = A0SimpleKeychain()
+        guard keychain.setRSAPublicKey(data: derEncodedData, forKey: tag) else { return nil }
+        return keychain.keyRefOfRSAKey(withTag: tag)?.takeRetainedValue()
     }
 }
