@@ -36,8 +36,9 @@ extension JWK {
         }
         let tag = "com.auth0.tmp.RSAPublicKey"
         let keychain = A0SimpleKeychain()
-        guard keychain.setRSAPublicKey(data: encodedKey, forKey: tag) else { return nil }
-        return keychain.keyRefOfRSAKey(withTag: tag)?.takeRetainedValue()
+        guard keychain.setRSAPublicKey(data: encodedKey, forKey: tag),
+            let keyRef = keychain.keyRefOfRSAKey(withTag: tag) else { return nil }
+        return keyRef.takeRetainedValue()
     }
 
     private func encodeRSAPublicKey(modulus: [UInt8], exponent: [UInt8]) -> Data {
