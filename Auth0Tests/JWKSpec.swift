@@ -45,13 +45,6 @@ class JWKSpec: QuickSpec {
                     }
                 }
             }
-            else {
-                context("successful generation") {
-                    it("should generate a RSA public key") {
-                        expect(jwk.rsaPublicKey).toNot(beNil())
-                    }
-                }
-            }
             
             context("unsuccessful generation") {
                 it("should fail to generate a public key given an invalid key type") {
