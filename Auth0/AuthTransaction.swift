@@ -64,5 +64,5 @@ public protocol AuthTransaction {
      Terminates the transaction and reports back that it was cancelled.
     */
     func cancel()
-    
+
 }

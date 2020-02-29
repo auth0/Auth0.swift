@@ -38,6 +38,7 @@ private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let Timeout: TimeInterval = 2
+private let TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange"
 private let PasswordlessGrantType = "http://auth0.com/oauth/grant-type/passwordless/otp"
 
 class AuthenticationSpec: QuickSpec {
@@ -219,144 +220,253 @@ class AuthenticationSpec: QuickSpec {
         
         // MARK:- Token Exchange
 
-        describe("token exchange") {
+        describe("native social token exchange") {
             
-            beforeEach {
-                stub(condition: isToken(Domain) && hasAtLeast([
-                    "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+            context("apple") {
+                beforeEach {
+                    stub(condition: isToken(Domain) && hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": "VALIDCODE",
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
+                        "scope": "openid profile offline_access",
+                        "client_id": ClientId
+                        ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success"
+                    
+                    stub(condition: isToken(Domain) && hasAtLeast([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": "VALIDCODE",
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
+                        "scope": "openid email"
+                        ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope"
+                    
+                    stub(condition: isToken(Domain) && hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
                     "subject_token": "VALIDCODE",
                     "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
-                    "scope": "openid profile offline_access"
-                    ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success"
-                
-                stub(condition: isToken(Domain) && hasAtLeast([
-                    "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-                    "subject_token": "VALIDCODE",
+                    "scope": "openid email",
+                    "audience": "https://myapi.com/api"
+                    ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope and audience"
+                    
+                    stub(condition: isToken(Domain) && hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
+                    "subject_token": "VALIDNAMECODE",
+                    "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
+                    (hasAtLeast(["user_profile": "{\"name\":{\"lastName\":\"Smith\",\"firstName\":\"John\"}}" ]) || hasAtLeast(["user_profile": "{\"name\":{\"firstName\":\"John\",\"lastName\":\"Smith\"}}" ]))
+                    ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with user profile"
+                    
+                    stub(condition: isToken(Domain) && hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
+                    "subject_token": "VALIDPARTIALNAMECODE",
                     "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
-                    "scope": "openid email"
-                    ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope"
+                    "user_profile": "{\"name\":{\"firstName\":\"John\"}}"
+                    ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with partial user profile"
+                    
+                    stub(condition: isToken(Domain) && hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
+                    "subject_token": "VALIDMISSINGNAMECODE",
+                    "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
+                    hasNoneOf(["user_profile"])
+                    ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with missing user profile"
+                }
+
+                it("should exchange apple auth code for credentials") {
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE")
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                }
                 
-                stub(condition: isToken(Domain) && hasAtLeast([
-                "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-                "subject_token": "VALIDCODE",
-                "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
-                "scope": "openid email",
-                "audience": "https://myapi.com/api"
-                ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope and audience"
+                it("should exchange apple auth code and fail") {
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withAppleAuthorizationCode: "INVALIDCODE")
+                            .start { result in
+                                expect(result).toNot(haveCredentials())
+                                done()
+                        }
+                    }
+                }
                 
-                stub(condition: isToken(Domain) && hasAtLeast([
-                "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-                "subject_token": "VALIDNAMECODE",
-                "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
-                (hasAtLeast(["user_profile": "{\"name\":{\"lastName\":\"Smith\",\"firstName\":\"John\"}}" ]) || hasAtLeast(["user_profile": "{\"name\":{\"firstName\":\"John\",\"lastName\":\"Smith\"}}" ]))
-                ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with user profile"
+                it("should exchange apple auth code for credentials with custom scope") {
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email")
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                }
                 
-                stub(condition: isToken(Domain) && hasAtLeast([
-                "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-                "subject_token": "VALIDPARTIALNAMECODE",
-                "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
-                "user_profile": "{\"name\":{\"firstName\":\"John\"}}"
-                ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with partial user profile"
+                it("should exchange apple auth code for credentials with custom scope and audience") {
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email", audience: "https://myapi.com/api")
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                }
                 
-                stub(condition: isToken(Domain) && hasAtLeast([
-                "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-                "subject_token": "VALIDMISSINGNAMECODE",
-                "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
-                hasNoneOf(["user_profile"])
-                ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with missing user profile"
+                it("should exchange apple auth code for credentials with fullName") {
+                    var fullName = PersonNameComponents()
+                    fullName.givenName = "John"
+                    fullName.familyName = "Smith"
+                    fullName.middleName = "Ignored"
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDNAMECODE",
+                                           fullName: fullName)
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                }
                 
+                it("should exchange apple auth code for credentials with partial fullName") {
+                    var fullName = PersonNameComponents()
+                    fullName.givenName = "John"
+                    fullName.familyName = nil
+                    fullName.middleName = "Ignored"
+                    
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDPARTIALNAMECODE",
+                                           fullName: fullName)
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                }
+                
+                it("should exchange apple auth code for credentials with missing fullName") {
+                    var fullName = PersonNameComponents()
+                    fullName.givenName = nil
+                    fullName.familyName = nil
+                    fullName.middleName = nil
+                    
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDMISSINGNAMECODE",
+                                           fullName: fullName)
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                }
             }
 
-            it("should exchange apple auth code for credentials") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE")
-                        .start { result in
-                            expect(result).to(haveCredentials())
-                            done()
-                    }
-                }
-            }
-            
-            it("should exchange apple auth code and fail") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.tokenExchange(withAppleAuthorizationCode: "INVALIDCODE")
-                        .start { result in
-                            expect(result).toNot (haveCredentials())
-                            done()
-                    }
-                }
-            }
-            
-            it("should exchange apple auth code for credentials with custom scope") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email")
-                        .start { result in
-                            expect(result).to(haveCredentials())
-                            done()
-                    }
-                }
-            }
-            
-            it("should exchange apple auth code for credentials with custom scope and audience") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email", audience: "https://myapi.com/api")
-                        .start { result in
-                            expect(result).to(haveCredentials())
-                            done()
-                    }
-                }
-            }
-            
-            it("should exchange apple auth code for credentials with fullName") {
-                var fullName = PersonNameComponents()
-                fullName.givenName = "John"
-                fullName.familyName = "Smith"
-                fullName.middleName = "Ignored"
+            context("facebook") {
+                let sessionAccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+                let profile = ["name": "John Smith"]
 
-                waitUntil(timeout: Timeout) { done in
-                    auth.tokenExchange(withAppleAuthorizationCode: "VALIDNAMECODE",
-                                       fullName: fullName)
-                        .start { result in
-                            expect(result).to(haveCredentials())
-                            done()
+                it("should exchage the session access token and profile data for credentials") {
+                    stub(condition: isToken(Domain) && hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": sessionAccessToken,
+                        "subject_token_type": "http://auth0.com/oauth/token-type/facebook-session-access-token",
+                        "scope": "openid profile offline_access",
+                        "user_profile": "{\"name\":\"John Smith\"}",
+                        "client_id": ClientId
+                    ])) { _ in
+                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken, profile: profile)
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                        }
+                    }
+                }
+
+                it("should include profile data") {
+                    stub(condition: isToken(Domain) &&
+                        (hasAtLeast(["user_profile": "{\"name\":\"John Smith\",\"email\":\"john@smith.com\"}" ]) ||
+                        hasAtLeast(["user_profile": "{\"email\":\"john@smith.com\",\"name\":\"John Smith\"}" ]))) { _ in
+                            return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                                           profile: ["name": "John Smith", "email": "john@smith.com"])
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                        }
+                    }
+                }
+
+                it("should include audience if it is not nil") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["audience": "https://myapi.com/api"])) { _ in
+                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                                           profile: profile,
+                                           audience: "https://myapi.com/api")
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                        }
+                    }
+                }
+
+                it("should not include audience if it is nil") {
+                    stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
+                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                                           profile: profile,
+                                           audience: nil)
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                        }
+                    }
+                }
+
+                it("should include scope if it is not nil") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email"])) { _ in
+                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                                           profile: profile,
+                                           scope: "openid email")
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                        }
+                    }
+                }
+
+                it("should not include scope if it is nil") {
+                    stub(condition: isToken(Domain) && hasNoneOf(["scope"])) { _ in
+                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                                           profile: profile,
+                                           scope: nil)
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                        }
                     }
                 }
             }
-            
-            it("should exchange apple auth code for credentials with partial fullName") {
-                var fullName = PersonNameComponents()
-                fullName.givenName = "John"
-                fullName.familyName = nil
-                fullName.middleName = "Ignored"
-                
-                waitUntil(timeout: Timeout) { done in
-                    auth.tokenExchange(withAppleAuthorizationCode: "VALIDPARTIALNAMECODE",
-                                       fullName: fullName)
-                        .start { result in
-                            expect(result).to(haveCredentials())
-                            done()
-                    }
-                }
-            }
-            
-            it("should exchange apple auth code for credentials with missing fullName") {
-                var fullName = PersonNameComponents()
-                fullName.givenName = nil
-                fullName.familyName = nil
-                fullName.middleName = nil
-                
-                waitUntil(timeout: Timeout) { done in
-                    auth.tokenExchange(withAppleAuthorizationCode: "VALIDMISSINGNAMECODE",
-                                       fullName: fullName)
-                        .start { result in
-                            expect(result).to(haveCredentials())
-                            done()
-                    }
-                }
-            }
-            
+
         }
-        
+
         describe("revoke refresh token") {
 
             let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
