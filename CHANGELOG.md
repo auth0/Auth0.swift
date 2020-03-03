@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.22.1](https://github.com/auth0/Auth0.swift/tree/1.22.1) (2020-02-28)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.22.0...1.22.1)
+
+**Fixed**
+- Fixed build failure with SimpleKeychain 0.11.0 [\#354](https://github.com/auth0/Auth0.swift/pull/354) ([jshier](https://github.com/jshier))
+
 ## [1.22.0](https://github.com/auth0/Auth0.swift/tree/1.22.0) (2020-02-19)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.21.0...1.22.0)
 
