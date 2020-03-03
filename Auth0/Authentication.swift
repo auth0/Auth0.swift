@@ -568,18 +568,52 @@ public protocol Authentication: Trackable, Loggable {
     ```
     Auth0
        .authentication(clientId: clientId, domain: "samples.auth0.com")
-       .tokenExchange(withAppleAuthorizationCode: authCode, scope: "openid profile offline_access", audience: "https://myapi.com/api, fullName: credentials.fullName)
+       .tokenExchange(withAppleAuthorizationCode: authCode,
+           scope: "openid profile email",
+           audience: "https://myapi.com/api",
+           fullName: credentials.fullName)
        .start { print($0) }
     ```
 
     - parameter authCode: Authorization Code retrieved from Apple Authorization
-    - parameter scope: requested scope value when authenticating the user. By default is 'openid profile offline_access'
+    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
     - parameter audience: API Identifier that the client is requesting access to
     - parameter fullName: The full name property returned with the Apple ID Credentials
 
     - returns: a request that will yield Auth0 user's credentials
     */
     func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String?, audience: String?, fullName: PersonNameComponents?) -> Request<Credentials, AuthenticationError>
+
+    /**
+    Authenticate a user with their Facebook session info access token and profile data.
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .tokenExchange(withFacebookSessionAccessToken: sessionAccessToken, profile: profile)
+       .start { print($0) }
+    ```
+
+    and if you need to specify a scope or audience
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+           profile: profile,
+           scope: "openid profile email",
+           audience: "https://myapi.com/api")
+       .start { print($0) }
+    ```
+
+    - parameter sessionAccessToken: Session info access token retrieved from Facebook
+    - parameter profile: The user profile returned by Facebook
+    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
+    - parameter audience: API Identifier that the client is requesting access to
+
+    - returns: a request that will yield Auth0 user's credentials
+    */
+    func tokenExchange(withFacebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], scope: String?, audience: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Renew user's credentials with a refresh_token grant for `/oauth/token`
@@ -1133,18 +1167,55 @@ public extension Authentication {
     ```
     Auth0
        .authentication(clientId: clientId, domain: "samples.auth0.com")
-       .tokenExchange(withAppleAuthorizationCode: authCode, scope: "openid profile offline_access", audience: "https://myapi.com/api, fullName: credentials.fullName)
+       .tokenExchange(withAppleAuthorizationCode: authCode,
+           scope: "openid profile email",
+           audience: "https://myapi.com/api",
+           fullName: credentials.fullName)
        .start { print($0) }
     ```
 
     - parameter authCode: Authorization Code retrieved from Apple Authorization
-    - parameter scope: requested scope value when authenticating the user. By default is 'openid profile offline_access'
+    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
     - parameter audience: API Identifier that the client is requesting access to
     - parameter fullName: The full name property returned with the Apple ID Credentials
 
     - returns: a request that will yield Auth0 user's credentials
     */
-    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String? = nil, audience: String? = nil, fullName: PersonNameComponents? = nil) -> Request<Credentials, AuthenticationError> {
+    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String? = "openid profile offline_access", audience: String? = nil, fullName: PersonNameComponents? = nil) -> Request<Credentials, AuthenticationError> {
         return self.tokenExchange(withAppleAuthorizationCode: authCode, scope: scope, audience: audience, fullName: fullName)
     }
+
+    /**
+    Authenticate a user with their Facebook session info access token and profile data.
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .tokenExchange(withFacebookSessionAccessToken: sessionAccessToken, profile: profile)
+       .start { print($0) }
+    ```
+
+    and if you need to specify a scope or audience
+
+    ```
+    Auth0
+       .authentication(clientId: clientId, domain: "samples.auth0.com")
+       .tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+           profile: profile,
+           scope: "openid profile email",
+           audience: "https://myapi.com/api")
+       .start { print($0) }
+    ```
+
+    - parameter sessionAccessToken: Session info access token retrieved from Facebook
+    - parameter profile: The user profile returned by Facebook
+    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
+    - parameter audience: API Identifier that the client is requesting access to
+
+    - returns: a request that will yield Auth0 user's credentials
+    */
+    func tokenExchange(withFacebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], scope: String? = "openid profile offline_access", audience: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken, profile: profile, scope: scope, audience: audience)
+    }
+
 }

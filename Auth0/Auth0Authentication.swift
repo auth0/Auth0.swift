@@ -312,6 +312,19 @@ struct Auth0Authentication: Authentication {
                                   parameters: parameters)
     }
 
+    func tokenExchange(withFacebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], scope: String?, audience: String?) -> Request<Credentials, AuthenticationError> {
+        var parameters: [String: String] = [:]
+        if let jsonData = try? JSONSerialization.data(withJSONObject: profile, options: []),
+            let json = String(data: jsonData, encoding: .utf8) {
+            parameters["user_profile"] = json
+        }
+        return self.tokenExchange(subjectToken: sessionAccessToken,
+                                  subjectTokenType: "http://auth0.com/oauth/token-type/facebook-session-access-token",
+                                  scope: scope,
+                                  audience: audience,
+                                  parameters: parameters)
+    }
+
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         var payload: [String: Any] = [
             "refresh_token": refreshToken,
@@ -379,10 +392,13 @@ struct Auth0Authentication: Authentication {
     }
     #endif
 
-    // MARK: - Private Methods
+}
 
+// MARK: - Private Methods
+
+private extension Auth0Authentication {
     // swiftlint:disable:next function_parameter_count
-    private func login(username: String, otp: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
+    func login(username: String, otp: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "/oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "username": username,
@@ -401,12 +417,14 @@ struct Auth0Authentication: Authentication {
         return Request(session: session, url: url, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    private func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String?, audience: String?, parameters: [String: String]?) -> Request<Credentials, AuthenticationError> {
+    func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String?, audience: String?, parameters: [String: String]?) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: String] = parameters ?? [:]
         parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
         parameters["subject_token"] = subjectToken
         parameters["subject_token_type"] = subjectTokenType
-        parameters["scope"] = scope ?? "openid profile offline_access"
+        if let scope = scope {
+            parameters["scope"] = scope
+        }
         if let audience = audience {
             parameters["audience"] = audience
         }
