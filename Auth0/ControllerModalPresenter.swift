@@ -25,7 +25,7 @@ import UIKit
 struct ControllerModalPresenter {
 
     var rootViewController: UIViewController? {
-        return UIApplication.shared.keyWindow?.rootViewController
+        return UIApplication.shared()?.keyWindow?.rootViewController
     }
 
     func present(controller: UIViewController) {
