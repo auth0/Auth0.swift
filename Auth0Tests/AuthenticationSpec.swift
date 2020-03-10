@@ -366,7 +366,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAllOf([
                         "grant_type": TokenExchangeGrantType,
                         "subject_token": sessionAccessToken,
-                        "subject_token_type": "http://auth0.com/oauth/token-type/facebook-session-access-token",
+                        "subject_token_type": "http://auth0.com/oauth/token-type/facebook-info-session-access-token",
                         "scope": "openid profile offline_access",
                         "user_profile": "{\"name\":\"John Smith\"}",
                         "client_id": ClientId
