@@ -319,7 +319,7 @@ struct Auth0Authentication: Authentication {
             parameters["user_profile"] = json
         }
         return self.tokenExchange(subjectToken: sessionAccessToken,
-                                  subjectTokenType: "http://auth0.com/oauth/token-type/facebook-session-access-token",
+                                  subjectTokenType: "http://auth0.com/oauth/token-type/facebook-info-session-access-token",
                                   scope: scope,
                                   audience: audience,
                                   parameters: parameters)
