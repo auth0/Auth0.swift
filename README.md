@@ -2,9 +2,9 @@
 
 [![CircleCI](https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat-square)](https://circleci.com/gh/auth0/Auth0.swift/tree/master)
 [![Coverage Status](https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat-square)](https://codecov.io/github/auth0/Auth0.swift)
-[![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
-[![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
-[![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](http://cocoadocs.org/docsets/Auth0)
+[![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
+[![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
+[![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
 ![Swift 5.0](https://img.shields.io/badge/Swift-5.0-orange.svg?style=flat-square)
 
@@ -34,30 +34,29 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 
 ## Installation
 
+#### Cocoapods
+
+If you are using [Cocoapods](https://cocoapods.org), add this line to your `Podfile`:
+
+```ruby
+pod 'Auth0', '~> 1.22'
+```
+
+Then, run `pod install`.
+
+> For more information on Cocoapods, check [their official documentation](https://guides.cocoapods.org/using/getting-started.html).
+
 #### Carthage
 
-If you are using [Carthage](https://github.com/Carthage/Carthage), add the following lines to your `Cartfile`:
+If you are using [Carthage](https://github.com/Carthage/Carthage), add the following line to your `Cartfile`:
 
 ```ruby
 github "auth0/Auth0.swift" ~> 1.22
 ```
 
-Then run `carthage bootstrap`.
+Then, run `carthage bootstrap`.
 
 > For more information about Carthage usage, check [their official documentation](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos).
-
-#### Cocoapods
-
-If you are using [Cocoapods](https://cocoapods.org/), add these lines to your `Podfile`:
-
-```ruby
-use_frameworks!
-pod 'Auth0', '~> 1.22'
-```
-
-Then run `pod install`.
-
-> For further reference on Cocoapods, check [their official documentation](http://guides.cocoapods.org/using/getting-started.html).
 
 > ### Upgrade Notes
 > If you are using the [clearSession](https://github.com/auth0/Auth0.swift/blob/master/Auth0/WebAuth.swift#L248) method in iOS 11+, you will need to ensure that the **Callback URL** has been added to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
@@ -394,21 +393,21 @@ Connection: keep-alive
 
 Auth0 helps you to:
 
-* Add authentication with [multiple authentication sources](https://auth0.com/docs/identityproviders), either social like **Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce, amont others**, or enterprise identity systems like **Windows Azure AD, Google Apps, Active Directory, ADFS or any SAML Identity Provider**.
+* Add authentication with [multiple sources](https://auth0.com/docs/identityproviders), either social identity providers such as **Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce** (amongst others), or enterprise identity systems like **Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML Identity Provider**.
 * Add authentication through more traditional **[username/password databases](https://auth0.com/docs/connections/database/custom-db)**.
 * Add support for **[linking different user accounts](https://auth0.com/docs/link-accounts)** with the same user.
 * Support for generating signed [JSON Web Tokens](https://auth0.com/docs/tokens/concepts/jwts) to call your APIs and **flow the user identity** securely.
-* Analytics of how, when and where users are logging in.
-* Pull data from other sources and add it to the user profile, through [JavaScript rules](https://auth0.com/docs/rules).
+* Analytics of how, when, and where users are logging in.
+* Pull data from other sources and add it to the user profile through [JavaScript rules](https://auth0.com/docs/rules).
 
 ## Create a Free Auth0 Account
 
-1. Go to [Auth0](https://auth0.com) and click Sign Up.
-2. Use Google, GitHub or Microsoft Account to login.
+1. Go to [Auth0](https://auth0.com) and click **Sign Up**.
+2. Use Google, GitHub, or Microsoft Account to login.
 
 ## Issue Reporting
 
-If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy/) details the procedure for disclosing security issues.
+If you have found a bug or to request a feature, please [raise an issue](https://github.com/auth0/Auth0.swift/issues). Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy) details the procedure for disclosing security issues.
 
 ## Author
 
@@ -416,4 +415,4 @@ If you have found a bug or if you have a feature request, please report them at 
 
 ## License
 
-This project is licensed under the MIT license. See the [LICENSE](LICENSE.txt) file for more info.
+This project is licensed under the MIT license. See the [LICENSE](https://github.com/auth0/Auth0.swift/blob/master/LICENSE) file for more info.
