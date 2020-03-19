@@ -31,7 +31,8 @@ web_auth_files = [
   'Auth0/IDTokenValidatorContext.swift',
   'Auth0/JWT+Header.swift',
   'Auth0/JWK+RSA.swift',
-  'Auth0/JWTAlgorithm.swift'
+  'Auth0/JWTAlgorithm.swift',
+  'Auth0/UIApplication+Shared.swift'
 ]
 
 watchos_exclude_files = [
