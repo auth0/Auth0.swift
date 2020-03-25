@@ -27,10 +27,19 @@ import JWTDecode
 import LocalAuthentication
 #endif
 
+public protocol KeychainWrapper {
+
+    func setData(_ data: Data, forKey: String) -> Bool
+    func data(forKey: String) -> Data?
+    func deleteEntry(forKey: String) -> Bool
+}
+
+extension A0SimpleKeychain: KeychainWrapper {}
+
 /// Credentials management utility
 public struct CredentialsManager {
 
-    private let storage: A0SimpleKeychain
+    private let storage: KeychainWrapper
     private let storeKey: String
     private let authentication: Authentication
     #if os(iOS)
@@ -42,8 +51,8 @@ public struct CredentialsManager {
     /// - Parameters:
     ///   - authentication: Auth0 authentication instance
     ///   - storeKey: Key used to store user credentials in the keychain, defaults to "credentials"
-    ///   - storage: The A0SimpleKeychain instance used to manage credentials storage. Defaults to a standard A0SimpleKeychain instance
-    public init(authentication: Authentication, storeKey: String = "credentials", storage: A0SimpleKeychain = A0SimpleKeychain()) {
+    ///   - storage: The KeychainWrapper instance used to manage credentials storage. Defaults to a standard A0SimpleKeychain instance
+    public init(authentication: Authentication, storeKey: String = "credentials", storage: KeychainWrapper = A0SimpleKeychain()) {
         self.storeKey = storeKey
         self.authentication = authentication
         self.storage = storage
