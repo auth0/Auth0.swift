@@ -618,7 +618,7 @@ public protocol Authentication: Trackable, Loggable {
     /**
      Renew user's credentials with a refresh_token grant for `/oauth/token`
      If you are not using OAuth 2.0 API Authorization please use `delegation(parameters:)`
-     - parameter refreshToken: the client's refresh token obtained on auth
+     - parameter refreshToken: the client's refresh token
      - parameter scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during Auth.
      - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
      - returns: a request that will yield Auth0 user's credentials
@@ -635,7 +635,7 @@ public protocol Authentication: Trackable, Loggable {
      .start { print($0) }
      ```
 
-     - parameter refreshToken: the client's refresh token obtained on auth
+     - parameter refreshToken: the client's refresh token
      - returns: a request
      */
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError>
@@ -1143,7 +1143,7 @@ public extension Authentication {
 
      - precondition: if you are not using OAuth 2.0 API Authorization please use `delegation(parameters:)`
 
-     - parameter refreshToken: the client's refresh token obtained on auth
+     - parameter refreshToken: the client's refresh token
      - parameter scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during Auth.
      - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
      - returns: a request that will yield Auth0 user's credentials

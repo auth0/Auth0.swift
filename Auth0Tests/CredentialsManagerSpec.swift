@@ -36,6 +36,7 @@ private let TokenType = "bearer"
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let NewIdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let NewRefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let ExpiresIn: TimeInterval = 3600
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
@@ -317,7 +318,9 @@ class CredentialsManagerSpec: QuickSpec {
             beforeEach {
                 error = nil
                 newCredentials = nil
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: 86400) }.name = "renew success"
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) {
+                    _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: 86400)
+                }.name = "renew success"
             }
 
             afterEach {
@@ -378,7 +381,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             context("renew") {
 
-                it("should yield new credentials, maintain refresh token") {
+                it("should yield new credentials without refresh token rotation") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
@@ -386,6 +389,23 @@ class CredentialsManagerSpec: QuickSpec {
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == NewAccessToken
                             expect(newCredentials?.refreshToken) == RefreshToken
+                            expect(newCredentials?.idToken) == NewIdToken
+                            done()
+                        }
+                    }
+                }
+                
+                it("should yield new credentials with refresh token rotation") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) {
+                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: 86400)
+                    }
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.accessToken) == NewAccessToken
+                            expect(newCredentials?.refreshToken) == NewRefreshToken
                             expect(newCredentials?.idToken) == NewIdToken
                             done()
                         }
