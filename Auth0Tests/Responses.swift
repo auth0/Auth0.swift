@@ -46,14 +46,18 @@ let OTP = "123456"
 let MFAToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 let JWKKid = "key123"
 
-func authResponse(accessToken: String, idToken: String? = nil, expiresIn: Double? = nil) -> OHHTTPStubsResponse {
+func authResponse(accessToken: String, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Double? = nil) -> OHHTTPStubsResponse {
     var json = [
         "access_token": accessToken,
         "token_type": "bearer",
     ]
 
-    if let token = idToken {
-        json["id_token"] = token
+    if let idToken = idToken {
+        json["id_token"] = idToken
+    }
+
+    if let refreshToken = refreshToken {
+        json["refresh_token"] = refreshToken
     }
 
     if let expires = expiresIn {

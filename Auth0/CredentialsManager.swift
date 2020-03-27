@@ -183,7 +183,7 @@ public struct CredentialsManager {
                 let newCredentials = Credentials(accessToken: credentials.accessToken,
                                                  tokenType: credentials.tokenType,
                                                  idToken: credentials.idToken,
-                                                 refreshToken: refreshToken,
+                                                 refreshToken: credentials.refreshToken ?? refreshToken,
                                                  expiresIn: credentials.expiresIn,
                                                  scope: credentials.scope)
                 _ = self.store(credentials: newCredentials)
