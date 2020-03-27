@@ -58,6 +58,7 @@
 		5C29743523FDBF5500BC18FA /* JWTDecode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C4F554923C9187E00C89615 /* JWTDecode.framework */; };
 		5C29743623FDBF6700BC18FA /* JWTDecode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C4F554723C9177500C89615 /* JWTDecode.framework */; };
 		5C29743723FDBF7F00BC18FA /* JWTDecode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C4F554B23C9189700C89615 /* JWTDecode.framework */; };
+		5C3BBAB92412CB100017FAEE /* UIApplication+Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3BBAB82412CB100017FAEE /* UIApplication+Shared.swift */; };
 		5C49EB3523EB5A80008D562F /* JWK+RSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C49EB3423EB5A80008D562F /* JWK+RSA.swift */; };
 		5C4F550723C8FADF00C89615 /* A0SHA.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550223C8FADE00C89615 /* A0SHA.m */; };
 		5C4F550823C8FADF00C89615 /* A0SHA.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C4F550323C8FADE00C89615 /* A0SHA.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -461,6 +462,7 @@
 		5BEDE1891EC21B040007300D /* CredentialsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManager.swift; sourceTree = "<group>"; };
 		5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = CredentialsManagerSpec.swift; path = Auth0Tests/CredentialsManagerSpec.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		5BFB98A41F7D1232001FE50D /* SafariAuthenticationCallback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariAuthenticationCallback.swift; sourceTree = "<group>"; };
+		5C3BBAB82412CB100017FAEE /* UIApplication+Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Shared.swift"; sourceTree = "<group>"; };
 		5C49EB3423EB5A80008D562F /* JWK+RSA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JWK+RSA.swift"; sourceTree = "<group>"; };
 		5C4F550223C8FADE00C89615 /* A0SHA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = A0SHA.m; sourceTree = "<group>"; };
 		5C4F550323C8FADE00C89615 /* A0SHA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = A0SHA.h; sourceTree = "<group>"; };
@@ -1042,6 +1044,7 @@
 				5C4F552723C9116B00C89615 /* A0SimpleKeychain+RSAPublicKey.swift */,
 				5CB41D6B23D0BBA500074024 /* JWT+Header.swift */,
 				5C49EB3423EB5A80008D562F /* JWK+RSA.swift */,
+				5C3BBAB82412CB100017FAEE /* UIApplication+Shared.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -1760,6 +1763,7 @@
 				5B6269EA1E3F9E5200305093 /* AuthProvider.swift in Sources */,
 				5FDE876D1D8A424700EA27DC /* Handlers.swift in Sources */,
 				5FF2866F1D8A417B00314B72 /* _ObjectiveWebAuth.swift in Sources */,
+				5C3BBAB92412CB100017FAEE /* UIApplication+Shared.swift in Sources */,
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5FCCC31C1CF51DF300901E2E /* _ObjectiveManagementAPI.swift in Sources */,
 				5FDE87591D8A424700EA27DC /* Authentication.swift in Sources */,

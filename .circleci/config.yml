@@ -53,6 +53,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          echo "ruby-2.6" > ~/.ruby-version
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
@@ -82,6 +83,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          echo "ruby-2.6" > ~/.ruby-version
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
@@ -112,6 +114,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          echo "ruby-2.6" > ~/.ruby-version
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
@@ -142,6 +145,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          echo "ruby-2.6" > ~/.ruby-version
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
@@ -174,6 +178,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          echo "ruby-2.6" > ~/.ruby-version
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
@@ -207,6 +212,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          echo "ruby-2.6" > ~/.ruby-version
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
@@ -232,6 +238,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          echo "ruby-2.6" > ~/.ruby-version
           brew install swiftlint
           bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'

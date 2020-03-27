@@ -82,7 +82,7 @@ class SafariAuthenticationSessionCallback: NSObject, AuthTransaction {
 @available(iOS 13.0, *)
 extension SafariAuthenticationSessionCallback: ASWebAuthenticationPresentationContextProviding {
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return UIApplication.shared.keyWindow ?? ASPresentationAnchor()
+        return UIApplication.shared()?.keyWindow ?? ASPresentationAnchor()
     }
 }
 #endif
