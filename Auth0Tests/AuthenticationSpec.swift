@@ -271,6 +271,14 @@ class AuthenticationSpec: QuickSpec {
 
                 it("should exchange apple auth code for credentials") {
                     waitUntil(timeout: Timeout) { done in
+                        auth.login(appleAuthorizationCode: "VALIDCODE")
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                    
+                    waitUntil(timeout: Timeout) { done in
                         auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE")
                             .start { result in
                                 expect(result).to(haveCredentials())
@@ -280,6 +288,14 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should exchange apple auth code and fail") {
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(appleAuthorizationCode: "INVALIDCODE")
+                            .start { result in
+                                expect(result).toNot(haveCredentials())
+                                done()
+                        }
+                    }
+                    
                     waitUntil(timeout: Timeout) { done in
                         auth.tokenExchange(withAppleAuthorizationCode: "INVALIDCODE")
                             .start { result in
@@ -291,6 +307,14 @@ class AuthenticationSpec: QuickSpec {
                 
                 it("should exchange apple auth code for credentials with custom scope") {
                     waitUntil(timeout: Timeout) { done in
+                        auth.login(appleAuthorizationCode: "VALIDCODE", scope: "openid email")
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                    
+                    waitUntil(timeout: Timeout) { done in
                         auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email")
                             .start { result in
                                 expect(result).to(haveCredentials())
@@ -300,6 +324,14 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should exchange apple auth code for credentials with custom scope and audience") {
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(appleAuthorizationCode: "VALIDCODE", scope: "openid email", audience: "https://myapi.com/api")
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                    
                     waitUntil(timeout: Timeout) { done in
                         auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email", audience: "https://myapi.com/api")
                             .start { result in
@@ -375,7 +407,7 @@ class AuthenticationSpec: QuickSpec {
                     }
 
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken, profile: profile)
+                        auth.login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
                                 done()
@@ -391,7 +423,7 @@ class AuthenticationSpec: QuickSpec {
                     }
 
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                        auth.login(facebookSessionAccessToken: sessionAccessToken,
                                            profile: ["name": "John Smith", "email": "john@smith.com"])
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
@@ -406,7 +438,7 @@ class AuthenticationSpec: QuickSpec {
                     }
 
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                        auth.login(facebookSessionAccessToken: sessionAccessToken,
                                            profile: profile,
                                            audience: "https://myapi.com/api")
                             .start { result in
@@ -422,7 +454,7 @@ class AuthenticationSpec: QuickSpec {
                     }
 
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                        auth.login(facebookSessionAccessToken: sessionAccessToken,
                                            profile: profile,
                                            audience: nil)
                             .start { result in
@@ -438,7 +470,7 @@ class AuthenticationSpec: QuickSpec {
                     }
 
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                        auth.login(facebookSessionAccessToken: sessionAccessToken,
                                            profile: profile,
                                            scope: "openid email")
                             .start { result in
@@ -454,7 +486,7 @@ class AuthenticationSpec: QuickSpec {
                     }
 
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withFacebookSessionAccessToken: sessionAccessToken,
+                        auth.login(facebookSessionAccessToken: sessionAccessToken,
                                            profile: profile,
                                            scope: nil)
                             .start { result in

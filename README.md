@@ -254,14 +254,16 @@ You can enable an additional level of user authentication before retrieving cred
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
-### Sign in With Apple
+### Native Social Login
 
-If you've added [the Sign In with Apple Flow to Your App](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) you can use the string value from the  `authorizationCode` property obtained after a successful Apple authentication to perform a token exchange for Auth0 tokens.
+#### Sign in With Apple
+
+If you've added [the Sign In with Apple flow](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) to your app, you can use the string value from the  `authorizationCode` property obtained after a successful Apple authentication to perform a token exchange for Auth0 tokens.
 
 ```swift
 Auth0
     .authentication()
-    .tokenExchange(withAppleAuthorizationCode: authCode)
+    .login(appleAuthorizationCode: authCode)
     .start { result in
         switch result {
         case .success(let credentials):
@@ -273,6 +275,26 @@ Auth0
 ```
 
 Find out more about [Setting up Sign in with Apple](https://auth0.com/docs/connections/apple-siwa/set-up-apple) with Auth0.
+
+#### Facebook Login
+
+If you've added [the Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and use them to perform a token exchange for Auth0 tokens.
+
+```swift
+Auth0
+    .authentication()
+    .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+}
+```
+
+Find out more about [Setting up Facebook Login](https://auth0.com/docs/connections/nativesocial/facebook) with Auth0.
 
 ### Authentication API (iOS / macOS / tvOS)
 
