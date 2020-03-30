@@ -4,15 +4,15 @@
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.22.1...1.23.0)
 
 **Added**
-- Added support for Refresh Token Rotation [SDK-1420] [\#369](https://github.com/auth0/Auth0.swift/pull/369) [Widcket](https://github.com/Widcket))
-- Added support for iOS extensions [\#365](https://github.com/auth0/Auth0.swift/pull/365) [Widcket](https://github.com/Widcket))
-- Added Facebook token exchange method [SDK-1401] [\#358](https://github.com/auth0/Auth0.swift/pull/358) [Widcket](https://github.com/Widcket))
+- Added support for Refresh Token Rotation [SDK-1420] [\#369](https://github.com/auth0/Auth0.swift/pull/369) ([Widcket](https://github.com/Widcket))
+- Added support for iOS extensions [\#365](https://github.com/auth0/Auth0.swift/pull/365) ([Widcket](https://github.com/Widcket))
+- Added Facebook token exchange method [SDK-1401] [\#358](https://github.com/auth0/Auth0.swift/pull/358) ([Widcket](https://github.com/Widcket))
 
 **Deprecated**
-- Renamed native social login methods [\#370](https://github.com/auth0/Auth0.swift/pull/370) [Widcket](https://github.com/Widcket))
+- Renamed native social login methods [\#370](https://github.com/auth0/Auth0.swift/pull/370) ([Widcket](https://github.com/Widcket))
 
 **Fixed**
-- Updated Facebook subject_token_type [\#361](https://github.com/auth0/Auth0.swift/pull/361) [Widcket](https://github.com/Widcket))
+- Updated Facebook subject_token_type [\#361](https://github.com/auth0/Auth0.swift/pull/361) ([Widcket](https://github.com/Widcket))
 
 **Security**
 - [Snyk] Fix for 3 vulnerabilities [\#360](https://github.com/auth0/Auth0.swift/pull/360) ([crew-security](https://github.com/crew-security))
