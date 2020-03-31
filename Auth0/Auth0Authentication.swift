@@ -133,6 +133,36 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
+    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, scope: String?, audience: String?) -> Request<Credentials, AuthenticationError> {
+        var parameters: [String: String] = [:]
+        if let fullName = fullName {
+            let name = ["firstName": fullName.givenName, "lastName": fullName.familyName].compactMapValues { $0 }
+            if !name.isEmpty,
+                let jsonData = try? JSONSerialization.data(withJSONObject: ["name": name], options: []),
+                let json = String(data: jsonData, encoding: .utf8) {
+                parameters["user_profile"] = json
+            }
+        }
+        return self.tokenExchange(subjectToken: authorizationCode,
+                                  subjectTokenType: "http://auth0.com/oauth/token-type/apple-authz-code",
+                                  scope: scope,
+                                  audience: audience,
+                                  parameters: parameters)
+    }
+
+    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], scope: String?, audience: String?) -> Request<Credentials, AuthenticationError> {
+        var parameters: [String: String] = [:]
+        if let jsonData = try? JSONSerialization.data(withJSONObject: profile, options: []),
+            let json = String(data: jsonData, encoding: .utf8) {
+            parameters["user_profile"] = json
+        }
+        return self.tokenExchange(subjectToken: sessionAccessToken,
+                                  subjectTokenType: "http://auth0.com/oauth/token-type/facebook-info-session-access-token",
+                                  scope: scope,
+                                  audience: audience,
+                                  parameters: parameters)
+    }
+
     func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         var payload: [String: Any] = [
             "email": email,
@@ -296,33 +326,7 @@ struct Auth0Authentication: Authentication {
     }
 
     func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String?, audience: String?, fullName: PersonNameComponents?) -> Request<Credentials, AuthenticationError> {
-        var parameters: [String: String] = [:]
-        if let fullName = fullName {
-            let name = ["firstName": fullName.givenName, "lastName": fullName.familyName].compactMapValues { $0 }
-            if !name.isEmpty,
-                let jsonData = try? JSONSerialization.data(withJSONObject: ["name": name], options: []),
-                let json = String(data: jsonData, encoding: .utf8) {
-                parameters["user_profile"] = json
-            }
-        }
-        return self.tokenExchange(subjectToken: authCode,
-                                  subjectTokenType: "http://auth0.com/oauth/token-type/apple-authz-code",
-                                  scope: scope,
-                                  audience: audience,
-                                  parameters: parameters)
-    }
-
-    func tokenExchange(withFacebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], scope: String?, audience: String?) -> Request<Credentials, AuthenticationError> {
-        var parameters: [String: String] = [:]
-        if let jsonData = try? JSONSerialization.data(withJSONObject: profile, options: []),
-            let json = String(data: jsonData, encoding: .utf8) {
-            parameters["user_profile"] = json
-        }
-        return self.tokenExchange(subjectToken: sessionAccessToken,
-                                  subjectTokenType: "http://auth0.com/oauth/token-type/facebook-info-session-access-token",
-                                  scope: scope,
-                                  audience: audience,
-                                  parameters: parameters)
+        return self.login(appleAuthorizationCode: authCode, fullName: fullName, scope: scope, audience: audience)
     }
 
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
