@@ -262,13 +262,6 @@ public protocol MobileWebAuthenticatable: WebAuthenticatable {
     /**
      Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
      in iOS 11.0+.
-     Defaults to .fullScreen modal presentation style.
-     
-     - returns: the same WebAuth instance to allow method chaining
-     */
-    /**
-     Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
-     in iOS 11.0+.
 
      - Parameter style: modal presentation style
      - returns: the same WebAuth instance to allow method chaining
