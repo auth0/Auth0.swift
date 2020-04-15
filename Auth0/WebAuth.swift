@@ -21,12 +21,13 @@
 // THE SOFTWARE.
 
 import UIKit
+import SafariServices
 #if canImport(AuthenticationServices)
 import AuthenticationServices
 #endif
 
 /**
- Auth0 iOS component for authenticating with web-based flow
+ Auth0 component for authenticating with web-based flow
 
  ```
  Auth0.webAuth()
@@ -58,7 +59,7 @@ public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
 }
 
 /**
- Auth0 iOS component for authenticating with web-based flow
+ Auth0  component for authenticating with web-based flow
 
  ```
  Auth0.webAuth(clientId: clientId, domain: "samples.auth0.com")
@@ -70,29 +71,17 @@ public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
  - returns: Auth0 WebAuth component
  */
 public func webAuth(clientId: String, domain: String) -> WebAuth {
-    return SafariWebAuth(clientId: clientId, url: .a0_url(domain))
-}
-
-/**
- Resumes the current Auth session (if any).
-
- - parameter url:     url received by iOS application in AppDelegate
- - parameter options: dictionary with launch options received by iOS application in AppDelegate
-
- - returns: if the url was handled by an on going session or not.
- */
-public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-    return TransactionStore.shared.resume(url, options: options)
+    return Auth0WebAuth(clientId: clientId, url: .a0_url(domain))
 }
 
 /// WebAuth Authentication using Auth0
-public protocol WebAuth: Trackable, Loggable {
+public protocol WebAuthenticatable: Trackable, Loggable {
     var clientId: String { get }
     var url: URL { get }
     var telemetry: Telemetry { get set }
 
     /**
-     For redirect url instead of a custom scheme it will use `https` and iOS 9 Universal Links.
+     For redirect url instead of a custom scheme it will use `https` and Universal Links.
 
      Before enabling this flag you'll need to configure Universal Links
 
@@ -199,16 +188,6 @@ public protocol WebAuth: Trackable, Loggable {
     func usingImplicitGrant() -> Self
 
     /**
-     Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
-     in iOS 11.0+.
-
-     - Parameter style: modal presentation style
-     - returns: the same WebAuth instance to allow method chaining
-     */
-    @available(iOS 11, *)
-    func useLegacyAuthentication(withStyle style: UIModalPresentationStyle) -> Self
-
-    /**
      Starts the WebAuth flow by modally presenting a ViewController in the top-most controller.
 
      ```
@@ -261,7 +240,45 @@ public protocol WebAuth: Trackable, Loggable {
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void)
 }
 
-public extension WebAuth {
+// TODO: MOVE to a platform-only file
+#if os(iOS)
+public typealias WebAuth = MobileWebAuthenticatable
+typealias Auth0WebAuth = MobileWebAuth
+
+/**
+ Resumes the current Auth session (if any).
+
+ - parameter url:     url received by the iOS application in AppDelegate
+ - parameter options: dictionary with launch options received by the iOS application in AppDelegate
+
+ - returns: if the url was handled by an on going session or not.
+ */
+public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
+    return TransactionStore.shared.resume(url, options: options)
+}
+
+public protocol MobileWebAuthenticatable: WebAuthenticatable {
+
+    /**
+     Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
+     in iOS 11.0+.
+     Defaults to .fullScreen modal presentation style.
+     
+     - returns: the same WebAuth instance to allow method chaining
+     */
+    /**
+     Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
+     in iOS 11.0+.
+
+     - Parameter style: modal presentation style
+     - returns: the same WebAuth instance to allow method chaining
+     */
+    @available(iOS 11, *)
+    func useLegacyAuthentication(withStyle style: UIModalPresentationStyle) -> Self
+
+}
+
+public extension MobileWebAuthenticatable {
 
     /**
      Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
@@ -274,4 +291,107 @@ public extension WebAuth {
     func useLegacyAuthentication() -> Self {
         return useLegacyAuthentication(withStyle: .fullScreen)
     }
+
 }
+
+class MobileWebAuth: SafariWebAuth, MobileWebAuthenticatable {
+
+    let presenter: ControllerModalPresenter
+
+    private var safariPresentationStyle = UIModalPresentationStyle.fullScreen
+    private var authenticationSession = true
+
+    init(clientId: String,
+         url: URL,
+         presenter: ControllerModalPresenter = ControllerModalPresenter(),
+         storage: TransactionStore = TransactionStore.shared,
+         telemetry: Telemetry = Telemetry()) {
+        self.presenter = presenter
+        super.init(clientId: clientId, url: url, storage: storage, telemetry: telemetry)
+    }
+
+    func useLegacyAuthentication(withStyle style: UIModalPresentationStyle = .fullScreen) -> Self {
+        self.authenticationSession = false
+        self.safariPresentationStyle = style
+        return self
+    }
+
+    override func performLogin(handler: OAuth2Grant,
+                               state: String?,
+                               authorizeURL: URL,
+                               redirectURL: URL,
+                               callback: @escaping (Result<Credentials>) -> Void) -> AuthTransaction? {
+        if #available(iOS 11.0, *), self.authenticationSession {
+            return SafariAuthenticationSession(authorizeURL: authorizeURL,
+                                               redirectURL: redirectURL,
+                                               state: state,
+                                               handler: handler,
+                                               finish: callback,
+                                               logger: self.logger)
+        } else {
+            let (controller, finish) = newSafari(authorizeURL, callback: callback)
+            let session = SafariSession(controller: controller,
+                                        redirectURL: redirectURL,
+                                        state: state,
+                                        handler: handler,
+                                        finish: finish,
+                                        logger: self.logger)
+            controller.delegate = session
+            self.presenter.present(controller: controller)
+            return session
+        }
+    }
+
+    override func performLogout(logoutURL: URL,
+                                redirectURL: String,
+                                callback: @escaping (Bool) -> Void) -> AuthTransaction? {
+        if #available(iOS 11.0, *), self.authenticationSession {
+            return SafariAuthenticationSessionCallback(url: logoutURL, schemeURL: redirectURL, callback: callback)
+        } else {
+            let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
+            self.presenter.present(controller: controller)
+            return nil
+        }
+    }
+
+    func newSafari(_ authorizeURL: URL,
+                   callback: @escaping (Result<Credentials>) -> Void) -> (SFSafariViewController, (Result<Credentials>) -> Void) {
+        let controller = SFSafariViewController(url: authorizeURL)
+        controller.modalPresentationStyle = safariPresentationStyle
+
+        if #available(iOS 11.0, *) {
+            controller.dismissButtonStyle = .cancel
+        }
+
+        let finish: (Result<Credentials>) -> Void = { [weak controller] (result: Result<Credentials>) -> Void in
+            if case .failure(let cause as WebAuthError) = result, case .userCancelled = cause {
+                DispatchQueue.main.async {
+                    callback(result)
+                }
+            } else {
+                DispatchQueue.main.async {
+                    guard let presenting = controller?.presentingViewController else {
+                        return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
+                    }
+                    presenting.dismiss(animated: true) {
+                        callback(result)
+                    }
+                }
+            }
+        }
+        return (controller, finish)
+    }
+
+}
+
+extension Auth0Authentication {
+
+    func webAuth(withConnection connection: String) -> WebAuth {
+        let safari = Auth0WebAuth(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+        return safari
+            .logging(enabled: self.logger != nil)
+            .connection(connection)
+    }
+
+}
+#endif
