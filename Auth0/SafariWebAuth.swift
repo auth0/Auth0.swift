@@ -20,12 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-import SafariServices
-#if canImport(AuthenticationServices)
-import AuthenticationServices
-#endif
-
 class SafariWebAuth: WebAuthenticatable {
 
     let clientId: String
