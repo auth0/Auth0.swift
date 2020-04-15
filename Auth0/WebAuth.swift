@@ -294,7 +294,7 @@ public extension MobileWebAuthenticatable {
 
 }
 
-class MobileWebAuth: SafariWebAuth, MobileWebAuthenticatable {
+final class MobileWebAuth: SafariWebAuth, MobileWebAuthenticatable {
 
     let presenter: ControllerModalPresenter
 
