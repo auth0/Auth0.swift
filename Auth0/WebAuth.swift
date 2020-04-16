@@ -443,7 +443,7 @@ extension AuthTransaction {
     - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
     */
     func resume(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
-        self.resume(url, options: options)
+        return self.resume(url, options: options)
     }
 
 }
