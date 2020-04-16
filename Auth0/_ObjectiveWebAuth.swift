@@ -27,15 +27,15 @@ import UIKit
 // swiftlint:disable:next type_name
 public class _ObjectiveOAuth2: NSObject {
 
-    private(set) var webAuth: SafariWebAuth
+    private(set) var webAuth: Auth0WebAuth
 
     @objc public override init() {
         let values = plistValues(bundle: Bundle.main)!
-        self.webAuth = SafariWebAuth(clientId: values.clientId, url: .a0_url(values.domain))
+        self.webAuth = Auth0WebAuth(clientId: values.clientId, url: .a0_url(values.domain))
     }
 
     @objc public init(clientId: String, url: URL) {
-        self.webAuth = SafariWebAuth(clientId: clientId, url: url)
+        self.webAuth = Auth0WebAuth(clientId: clientId, url: url)
     }
 
     @objc public func addParameters(_ parameters: [String: String]) {
