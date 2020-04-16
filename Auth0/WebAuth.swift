@@ -257,7 +257,7 @@ public typealias A0URLOptionsKey = UIApplicationOpenURLOptionsKey
 
  - returns: if the url was handled by an on going session or not.
  */
-public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool { // Remove options on next major
+public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
     return TransactionStore.shared.resume(url)
 }
 
