@@ -75,3 +75,6 @@ final class AuthenticationServicesSession: SessionTransaction {
 
 }
 #endif
+
+@available(iOS 12.0, macOS 10.15, *)
+extension ASWebAuthenticationSession: AuthenticationSession {}

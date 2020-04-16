@@ -498,8 +498,6 @@ extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextP
 }
 #endif
 
-@available(iOS 12.0, *)
-extension ASWebAuthenticationSession: AuthenticationSession {}
 @available(iOS 11.0, *)
 extension SFAuthenticationSession: AuthenticationSession {}
 
