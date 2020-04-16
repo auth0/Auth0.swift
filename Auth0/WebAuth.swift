@@ -451,7 +451,7 @@ extension AuthTransaction {
 extension AuthTransaction where Self: SessionTransaction {
 
     func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        if handleUrl(url) {
+        if self.handleUrl(url) {
             authSession?.cancel()
             authSession = nil
             return true

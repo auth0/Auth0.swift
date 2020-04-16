@@ -23,7 +23,7 @@
 import UIKit
 import SafariServices
 
-class SafariSession: CancelableTransaction {
+final class SafariSession: CancelableTransaction {
 
     typealias FinishSession = (Result<Credentials>) -> Void
 
