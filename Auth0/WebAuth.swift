@@ -242,8 +242,12 @@ public protocol WebAuthenticatable: Trackable, Loggable {
 
 // TODO: MOVE to a platform-only file
 #if os(iOS)
-public typealias WebAuth = MobileWebAuthenticatable
 typealias Auth0WebAuth = MobileWebAuth
+#if swift(>=4.2)
+public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey
+#else
+public typealias A0URLOptionsKey = UIApplicationOpenURLOptionsKey
+#endif
 
 /**
  Resumes the current Auth session (if any).
@@ -253,11 +257,11 @@ typealias Auth0WebAuth = MobileWebAuth
 
  - returns: if the url was handled by an on going session or not.
  */
-public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-    return TransactionStore.shared.resume(url, options: options)
+public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool { // Remove options on next major
+    return TransactionStore.shared.resume(url)
 }
 
-public protocol MobileWebAuthenticatable: WebAuthenticatable {
+public protocol WebAuth: WebAuthenticatable {
 
     /**
      Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
@@ -271,7 +275,7 @@ public protocol MobileWebAuthenticatable: WebAuthenticatable {
 
 }
 
-public extension MobileWebAuthenticatable {
+public extension WebAuth {
 
     /**
      Use `SFSafariViewController` instead of `SFAuthenticationSession` for WebAuth
@@ -287,7 +291,7 @@ public extension MobileWebAuthenticatable {
 
 }
 
-final class MobileWebAuth: SafariWebAuth, MobileWebAuthenticatable {
+final class MobileWebAuth: SafariWebAuth, WebAuth {
 
     let presenter: ControllerModalPresenter
 
@@ -314,25 +318,34 @@ final class MobileWebAuth: SafariWebAuth, MobileWebAuthenticatable {
                                authorizeURL: URL,
                                redirectURL: URL,
                                callback: @escaping (Result<Credentials>) -> Void) -> AuthTransaction? {
+        #if canImport(AuthenticationServices)
         if #available(iOS 11.0, *), self.authenticationSession {
-            return SafariAuthenticationSession(authorizeURL: authorizeURL,
-                                               redirectURL: redirectURL,
-                                               state: state,
-                                               handler: handler,
-                                               finish: callback,
-                                               logger: self.logger)
-        } else {
-            let (controller, finish) = newSafari(authorizeURL, callback: callback)
-            let session = SafariSession(controller: controller,
-                                        redirectURL: redirectURL,
-                                        state: state,
-                                        handler: handler,
-                                        finish: finish,
-                                        logger: self.logger)
-            controller.delegate = session
-            self.presenter.present(controller: controller)
-            return session
+            if #available(iOS 12.0, *) {
+                return AuthenticationServicesSession(authorizeURL: authorizeURL,
+                                                     redirectURL: redirectURL,
+                                                     state: state,
+                                                     handler: handler,
+                                                     finish: callback,
+                                                     logger: self.logger)
+            }
+            return SafariServicesSession(authorizeURL: authorizeURL,
+                                         redirectURL: redirectURL,
+                                         state: state,
+                                         handler: handler,
+                                         finish: callback,
+                                         logger: self.logger)
         }
+        #endif
+        let (controller, finish) = newSafari(authorizeURL, callback: callback)
+        let session = SafariSession(controller: controller,
+                                    redirectURL: redirectURL,
+                                    state: state,
+                                    handler: handler,
+                                    finish: finish,
+                                    logger: self.logger)
+        controller.delegate = session
+        self.presenter.present(controller: controller)
+        return session
     }
 
     override func performLogout(logoutURL: URL,
@@ -384,6 +397,124 @@ extension Auth0Authentication {
         return safari
             .logging(enabled: self.logger != nil)
             .connection(connection)
+    }
+
+}
+
+/**
+Represents an ongoing Auth transaction with an Identity Provider (Auth0 or a third party).
+
+The Auth will be done outside of application control, Safari or third party application.
+The only way to communicate the results back is using a url with a registered custom scheme in your application so iOS can open it on success/failure.
+When that happens iOS will call a method in your `AppDelegate` and that is where you need to handle the result.
+
+Ideally Auth0.swift will handle the current transaction by itself wether is OAuth2 or Native so you only need to add the following in the AppDelegate
+
+```
+func application(app: UIApplication, openURL url: NSURL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
+   return Auth0.resumeAuth(url, options: options)
+}
+```
+
+- important: Only one AuthTransaction can be active at a given time for Auth0.swift, if you start a new one before finishing the current one it will be cancelled.
+*/
+public protocol AuthTransaction: AuthCancelable {
+
+    /**
+     Resumes the transaction when the third party application notifies the application using an url with a custom scheme.
+     This method should be called from the Application's `AppDelegate` or using `public func resumeAuth(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool` method.
+     
+     - parameter url: the url send by the third party application that contains the result of the Auth
+     - parameter options: options recieved in the openUrl method of the `AppDelegate`
+     - returns: if the url was expected and properly formatted otherwise it will return false.
+    */
+    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool // In the next major, remove `options`
+
+}
+
+extension AuthTransaction {
+
+    /**
+    Tries to resume (and complete) the OAuth2 session from the received URL
+
+    - parameter url:     url received in application's AppDelegate
+    - parameter options: a dictionary of launch options received from application's AppDelegate
+
+    - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
+    */
+    func resume(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
+        self.resume(url, options: options)
+    }
+
+}
+
+extension AuthTransaction where Self: SessionTransaction {
+
+    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
+        if handleUrl(url) {
+            authSession?.cancel()
+            authSession = nil
+            return true
+        }
+        return false
+    }
+
+}
+
+#if canImport(AuthenticationServices)
+@available(iOS 11.0, *)
+final class SafariServicesSession: SessionTransaction {
+
+    init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
+        super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
+
+        authSession = SFAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
+            guard $1 == nil, let callbackURL = $0 else {
+                let authError = $1 ?? WebAuthError.unknownError
+                if case SFAuthenticationError.canceledLogin = authError {
+                    self.finish(.failure(error: WebAuthError.userCancelled))
+                } else {
+                    self.finish(.failure(error: authError))
+                }
+                return TransactionStore.shared.clear()
+            }
+            _ = TransactionStore.shared.resume(callbackURL)
+        }
+
+         _ = authSession?.start()
+    }
+
+}
+#endif
+
+#if swift(>=5.1)
+@available(iOS 13.0, *)
+extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextProviding {
+
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return UIApplication.shared()?.keyWindow ?? ASPresentationAnchor()
+    }
+
+}
+#endif
+
+@available(iOS 12.0, *)
+extension ASWebAuthenticationSession: AuthenticationSession {}
+@available(iOS 11.0, *)
+extension SFAuthenticationSession: AuthenticationSession {}
+
+extension SafariSession: AuthTransaction {
+
+    /**
+    Tries to resume (and complete) the OAuth2 session from the received URL
+
+    - parameter url:     url received in application's AppDelegate
+    - parameter options: a dictionary of launch options received from application's AppDelegate
+
+    - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
+    */
+    func resume(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
+        return handleUrl(url)
     }
 
 }

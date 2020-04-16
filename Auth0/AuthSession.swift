@@ -20,9 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-
-class AuthSession: NSObject, AuthTransaction {
+class CancelableTransaction: NSObject, AuthCancelable {
 
     typealias FinishSession = (Result<Credentials>) -> Void
 
@@ -41,24 +39,17 @@ class AuthSession: NSObject, AuthTransaction {
         super.init()
     }
 
-    /**
-     Tries to resume (and complete) the OAuth2 session from the received URL
+    func cancel() {
+        self.finish(Result.failure(error: WebAuthError.userCancelled))
+    }
 
-     - parameter url:     url received in application's AppDelegate
-     - parameter options: a dictionary of launch options received from application's AppDelegate
-
-     - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
-     */
-    func resume(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
+    func handleUrl(_ url: URL) -> Bool {
         self.logger?.trace(url: url, source: "iOS Safari")
         guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
-
-        guard
-            let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-            else {
-                self.finish(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
-                return false
-            }
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            self.finish(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
+            return false
+        }
         let items = self.handler.values(fromComponents: components)
         guard has(state: self.state, inItems: items) else { return false }
         if items["error"] != nil {
@@ -69,11 +60,8 @@ class AuthSession: NSObject, AuthTransaction {
         return true
     }
 
-    func cancel() {
-        self.finish(Result.failure(error: WebAuthError.userCancelled))
-    }
-
     private func has(state: String?, inItems items: [String: String]) -> Bool {
         return state == nil || items["state"] == state
     }
+
 }

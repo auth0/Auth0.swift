@@ -23,7 +23,7 @@
 import UIKit
 import SafariServices
 
-class SafariSession: AuthSession {
+class SafariSession: CancelableTransaction {
 
     typealias FinishSession = (Result<Credentials>) -> Void
 
@@ -34,10 +34,13 @@ class SafariSession: AuthSession {
         super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
         controller.delegate = self
     }
+
 }
 
 extension SafariSession: SFSafariViewControllerDelegate {
+
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         TransactionStore.shared.cancel(self)
     }
+
 }

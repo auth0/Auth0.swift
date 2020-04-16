@@ -392,7 +392,7 @@ class WebAuthSpec: QuickSpec {
                     guard #available(iOS 11.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { outcome = $0 }
-                    _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!, options: [:])
+                    _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(outcome).to(beTrue())
                     expect(TransactionStore.shared.current).to(beNil())
                 }

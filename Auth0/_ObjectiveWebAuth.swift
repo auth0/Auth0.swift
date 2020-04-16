@@ -129,7 +129,7 @@ public class _ObjectiveOAuth2: NSObject {
      */
     @objc(resumeAuthWithURL:options:)
     public static func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        return TransactionStore.shared.resume(url, options: options)
+        return TransactionStore.shared.resume(url)
     }
 
     /**
