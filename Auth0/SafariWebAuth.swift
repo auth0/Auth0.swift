@@ -20,8 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// TODO: RENAME
-class SafariWebAuth: WebAuthenticatable {
+class BaseWebAuth: WebAuthenticatable {
 
     let clientId: String
     let url: URL

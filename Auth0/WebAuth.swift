@@ -291,7 +291,7 @@ public extension WebAuth {
 
 }
 
-final class MobileWebAuth: SafariWebAuth, WebAuth {
+final class MobileWebAuth: BaseWebAuth, WebAuth {
 
     let presenter: ControllerModalPresenter
 
