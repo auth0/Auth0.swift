@@ -41,6 +41,15 @@ class SessionTransaction: CancelableTransaction, AuthTransaction {
         authSession = nil
     }
 
+    override func handleUrl(_ url: URL) -> Bool {
+        if super.handleUrl(url) {
+            authSession?.cancel()
+            authSession = nil
+            return true
+        }
+        return false
+    }
+
 }
 
 #if canImport(AuthenticationServices)
