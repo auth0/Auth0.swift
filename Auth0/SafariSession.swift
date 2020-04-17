@@ -20,18 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
 import SafariServices
 
-final class SafariSession: CancelableTransaction {
+final class SafariSession: BaseAuthTransaction {
 
     typealias FinishSession = (Result<Credentials>) -> Void
 
     weak var controller: UIViewController?
 
-    init(controller: SFSafariViewController, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
+    init(controller: SFSafariViewController,
+         redirectURL: URL,
+         state: String? = nil,
+         handler: OAuth2Grant,
+         logger: Logger?,
+         finish: @escaping FinishSession) {
         self.controller = controller
-        super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
+        super.init(redirectURL: redirectURL,
+                   state: state,
+                   handler: handler,
+                   logger: logger,
+                   finish: finish)
         controller.delegate = self
     }
 

@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-
 @objc(A0WebAuth)
 /// Web-based Auth with Auth0
 // swiftlint:disable:next type_name
@@ -117,19 +115,6 @@ public class _ObjectiveOAuth2: NSObject {
                 callback(cause as NSError, nil)
             }
         }
-    }
-
-    /**
-     Resumes the current Auth session (if any).
-
-     - parameter url:     url received by iOS application in AppDelegate
-     - parameter options: dictionary with launch options received by iOS application in AppDelegate
-
-     - returns: if the url was handled by an on going session or not.
-     */
-    @objc(resumeAuthWithURL:options:)
-    public static func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        return TransactionStore.shared.resume(url)
     }
 
     /**

@@ -27,53 +27,7 @@ protocol AuthenticationSession {
 
 }
 
-class CancelableTransaction: NSObject, AuthCancelable {
-
-    typealias FinishSession = (Result<Credentials>) -> Void
-
-    let redirectURL: URL
-    let state: String?
-    let finish: FinishSession
-    let handler: OAuth2Grant
-    let logger: Logger?
-
-    init(redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
-        self.redirectURL = redirectURL
-        self.state = state
-        self.finish = finish
-        self.handler = handler
-        self.logger = logger
-        super.init()
-    }
-
-    func cancel() {
-        self.finish(Result.failure(error: WebAuthError.userCancelled))
-    }
-
-    func handleUrl(_ url: URL) -> Bool {
-        self.logger?.trace(url: url, source: "iOS Safari")
-        guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-            self.finish(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
-            return false
-        }
-        let items = self.handler.values(fromComponents: components)
-        guard has(state: self.state, inItems: items) else { return false }
-        if items["error"] != nil {
-            self.finish(.failure(error: AuthenticationError(info: items, statusCode: 0)))
-        } else {
-            self.handler.credentials(from: items, callback: self.finish)
-        }
-        return true
-    }
-
-    private func has(state: String?, inItems items: [String: String]) -> Bool {
-        return state == nil || items["state"] == state
-    }
-
-}
-
-class SessionTransaction: CancelableTransaction, AuthTransaction {
+class SessionTransaction: BaseAuthTransaction {
 
     var authSession: AuthenticationSession?
 

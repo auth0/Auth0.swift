@@ -20,69 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-import SafariServices
 #if canImport(AuthenticationServices)
 import AuthenticationServices
 #endif
 
-@available(iOS 11.0, *)
-class SafariAuthenticationSessionCallback: NSObject, AuthTransaction {
+class SessionCallbackTransaction: NSObject, AuthTransaction {
 
     var state: String?
-    var callback: (Bool) -> Void = { _ in }
+    var authSession: AuthenticationSession?
+    let callback: (Bool) -> Void
 
-    private var authSession: NSObject?
-
-    init(url: URL, schemeURL: String, callback: @escaping (Bool) -> Void) {
-        super.init()
+    init(callback: @escaping (Bool) -> Void) {
         self.callback = callback
-        #if canImport(AuthenticationServices)
-        if #available(iOS 12.0, *) {
-            let authSession = ASWebAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
-                self.callback(url != nil)
-                TransactionStore.shared.clear()
-            }
-            #if swift(>=5.1)
-            if #available(iOS 13.0, *) {
-                authSession.presentationContextProvider = self
-            }
-            #endif
-            self.authSession = authSession
-            authSession.start()
-        } else {
-            let authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
-                self.callback(url != nil)
-                TransactionStore.shared.clear()
-            }
-            self.authSession = authSession
-            authSession.start()
-        }
-        #else
-        let authSession = SFAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
-            self.callback(url != nil)
-            TransactionStore.shared.clear()
-        }
-        self.authSession = authSession
-        authSession.start()
-        #endif
-    }
-
-    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        self.callback(true)
-        return true
     }
 
     func cancel() {
         self.callback(false)
     }
+
+    func handleUrl(_ url: URL) -> Bool {
+        self.callback(true)
+        return true
+    }
+
 }
 
-#if swift(>=5.1)
-@available(iOS 13.0, *)
-extension SafariAuthenticationSessionCallback: ASWebAuthenticationPresentationContextProviding {
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return UIApplication.shared()?.keyWindow ?? ASPresentationAnchor()
+@available(iOS 12.0, *)
+final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
+
+    init(url: URL, schemeURL: String, callback: @escaping (Bool) -> Void) {
+        super.init(callback: callback)
+
+        let authSession = ASWebAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
+            self.callback(url != nil)
+            TransactionStore.shared.clear()
+        }
+
+        #if os(iOS) && swift(>=5.1)
+        if #available(iOS 13.0, *) {
+            authSession.presentationContextProvider = self
+        }
+        #endif
+
+        self.authSession = authSession
+        authSession.start()
     }
+
 }
-#endif

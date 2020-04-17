@@ -61,7 +61,7 @@ class SafariSessionSpec: QuickSpec {
 
             beforeEach {
                 controller.delegate = nil
-                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
+                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, finish: callback)
             }
 
             it("should set itself as delegate") {
@@ -80,7 +80,7 @@ class SafariSessionSpec: QuickSpec {
 
             beforeEach {
                 controller.presenting = MockViewController()
-                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
+                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, finish: callback)
             }
 
             it("should return true if URL matches redirect URL") {
@@ -96,7 +96,7 @@ class SafariSessionSpec: QuickSpec {
                 var session: SafariSession!
 
                 beforeEach {
-                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
+                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, finish: callback)
                 }
 
                 it("should not return credentials from query string") {
@@ -130,7 +130,7 @@ class SafariSessionSpec: QuickSpec {
                 let code = "123456"
 
                 beforeEach {
-                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, finish: callback, logger: nil)
+                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, finish: callback)
                     stub(condition: isToken(Domain.host!) && hasAtLeast(["code": code, "code_verifier": generator.verifier, "grant_type": "authorization_code", "redirect_uri": RedirectURL.absoluteString])) {
                         _ in return authResponse(accessToken: "AT", idToken: idToken)
                     }.name = "Code Exchange Auth"
@@ -176,9 +176,9 @@ class SafariSessionSpec: QuickSpec {
             }
 
             context("with state") {
-                let session = SafariSession(controller: controller, redirectURL: RedirectURL, state: "state", handler: handler, finish: {
+                let session = SafariSession(controller: controller, redirectURL: RedirectURL, state: "state", handler: handler, logger: nil, finish: {
                     result = $0
-                }, logger: nil)
+                })
 
                 it("should not handle url when state in url is missing") {
                     let handled = session.resume(URL(string: "https://samples.auth0.com/callback?access_token=ATOKEN&token_type=bearer")!)

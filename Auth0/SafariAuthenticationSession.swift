@@ -27,10 +27,20 @@ import AuthenticationServices
 @available(iOS 12.0, macOS 10.15, *)
 final class AuthenticationServicesSession: SessionTransaction {
 
-    init(authorizeURL: URL, redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
-        super.init(redirectURL: redirectURL, state: state, handler: handler, finish: finish, logger: logger)
+    init(authorizeURL: URL,
+         redirectURL: URL,
+         state: String? = nil,
+         handler: OAuth2Grant,
+         logger: Logger?,
+         finish: @escaping FinishTransaction) {
+        super.init(redirectURL: redirectURL,
+                   state: state,
+                   handler: handler,
+                   logger: logger,
+                   finish: finish)
 
-        let webAuthenticationSession = ASWebAuthenticationSession(url: authorizeURL, callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
+        let webAuthenticationSession = ASWebAuthenticationSession(url: authorizeURL,
+                                                                  callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
             guard $1 == nil, let callbackURL = $0 else {
                 let authError = $1 ?? WebAuthError.unknownError
                 if case ASWebAuthenticationSessionError.canceledLogin = authError {
