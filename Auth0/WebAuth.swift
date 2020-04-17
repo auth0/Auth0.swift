@@ -318,7 +318,6 @@ final class MobileWebAuth: SafariWebAuth, WebAuth {
                                authorizeURL: URL,
                                redirectURL: URL,
                                callback: @escaping (Result<Credentials>) -> Void) -> AuthTransaction? {
-        #if canImport(AuthenticationServices)
         if #available(iOS 11.0, *), self.authenticationSession {
             if #available(iOS 12.0, *) {
                 return AuthenticationServicesSession(authorizeURL: authorizeURL,
@@ -335,7 +334,6 @@ final class MobileWebAuth: SafariWebAuth, WebAuth {
                                          finish: callback,
                                          logger: self.logger)
         }
-        #endif
         let (controller, finish) = newSafari(authorizeURL, callback: callback)
         let session = SafariSession(controller: controller,
                                     redirectURL: redirectURL,
@@ -456,7 +454,6 @@ extension AuthTransaction where Self: SessionTransaction {
 
 }
 
-#if canImport(AuthenticationServices)
 @available(iOS 11.0, *)
 final class SafariServicesSession: SessionTransaction {
 
@@ -480,7 +477,6 @@ final class SafariServicesSession: SessionTransaction {
     }
 
 }
-#endif
 
 #if swift(>=5.1)
 @available(iOS 13.0, *)

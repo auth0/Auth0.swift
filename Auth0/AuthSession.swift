@@ -20,6 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+protocol AuthenticationSession {
+
+    func start() -> Bool
+    func cancel()
+
+}
+
 class CancelableTransaction: NSObject, AuthCancelable {
 
     typealias FinishSession = (Result<Credentials>) -> Void
@@ -62,6 +69,27 @@ class CancelableTransaction: NSObject, AuthCancelable {
 
     private func has(state: String?, inItems items: [String: String]) -> Bool {
         return state == nil || items["state"] == state
+    }
+
+}
+
+class SessionTransaction: CancelableTransaction, AuthTransaction {
+
+    var authSession: AuthenticationSession?
+
+    override func cancel() {
+        super.cancel()
+        authSession?.cancel()
+        authSession = nil
+    }
+
+    override func handleUrl(_ url: URL) -> Bool {
+        if super.handleUrl(url) {
+            authSession?.cancel()
+            authSession = nil
+            return true
+        }
+        return false
     }
 
 }

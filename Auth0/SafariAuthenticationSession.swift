@@ -24,35 +24,6 @@
 import AuthenticationServices
 #endif
 
-protocol AuthenticationSession {
-
-    func start() -> Bool
-    func cancel()
-
-}
-
-class SessionTransaction: CancelableTransaction, AuthTransaction {
-
-    var authSession: AuthenticationSession?
-
-    override func cancel() {
-        super.cancel()
-        authSession?.cancel()
-        authSession = nil
-    }
-
-    override func handleUrl(_ url: URL) -> Bool {
-        if super.handleUrl(url) {
-            authSession?.cancel()
-            authSession = nil
-            return true
-        }
-        return false
-    }
-
-}
-
-#if canImport(AuthenticationServices)
 @available(iOS 12.0, macOS 10.15, *)
 final class AuthenticationServicesSession: SessionTransaction {
 
@@ -83,7 +54,6 @@ final class AuthenticationServicesSession: SessionTransaction {
     }
 
 }
-#endif
 
 @available(iOS 12.0, macOS 10.15, *)
 extension ASWebAuthenticationSession: AuthenticationSession {}
