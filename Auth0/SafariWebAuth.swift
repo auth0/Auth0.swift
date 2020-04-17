@@ -165,15 +165,20 @@ class BaseWebAuth: WebAuthenticatable {
         }
 
         // performLogout must handle the callback
-        if let session = performLogout(logoutURL: logoutURL, redirectURL: redirectURL, callback: callback) {
-            logger?.trace(url: logoutURL, source: String(describing: session.self))
+        if let session = performLogout(logoutURL: logoutURL,
+                                       redirectURL: redirectURL,
+                                       federated: federated,
+                                       callback: callback) {
             self.storage.store(session)
         }
     }
 
     // TODO: USE A URL FOR REDIRECTURL
     // Must be overriden
-    func performLogout(logoutURL: URL, redirectURL: String, callback: @escaping (Bool) -> Void) -> AuthTransaction? {
+    func performLogout(logoutURL: URL,
+                       redirectURL: String,
+                       federated: Bool,
+                       callback: @escaping (Bool) -> Void) -> AuthTransaction? {
         return nil
     }
 

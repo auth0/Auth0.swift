@@ -348,6 +348,7 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
 
     override func performLogout(logoutURL: URL,
                                 redirectURL: String,
+                                federated: Bool,
                                 callback: @escaping (Bool) -> Void) -> AuthTransaction? {
         if #available(iOS 11.0, *), self.authenticationSession {
             if #available(iOS 12.0, *) {
@@ -359,8 +360,16 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
                                                  schemeURL: redirectURL,
                                                  callback: callback)
         }
-        let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
+        var urlComponents = URLComponents(url: logoutURL, resolvingAgainstBaseURL: true)!
+        if federated, let firstQueryItem = urlComponents.queryItems?.first {
+            urlComponents.queryItems = [firstQueryItem]
+        } else {
+            urlComponents.query = nil
+        }
+        let url = urlComponents.url!
+        let controller = SilentSafariViewController(url: url) { callback($0) }
         self.presenter.present(controller: controller)
+        self.logger?.trace(url: url, source: String(describing: "Safari"))
         return nil
     }
 
