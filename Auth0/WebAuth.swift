@@ -358,11 +358,10 @@ final class MobileWebAuth: SafariWebAuth, WebAuth {
             return SafariServicesSessionCallback(url: logoutURL,
                                                  schemeURL: redirectURL,
                                                  callback: callback)
-        } else {
-            let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
-            self.presenter.present(controller: controller)
-            return nil
         }
+        let controller = SilentSafariViewController(url: logoutURL) { callback($0) }
+        self.presenter.present(controller: controller)
+        return nil
     }
 
     func newSafari(_ authorizeURL: URL,
