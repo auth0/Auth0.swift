@@ -20,6 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if canImport(AuthenticationServices)
+import AuthenticationServices
+#endif
+
 class BaseWebAuth: WebAuthenticatable {
 
     let clientId: String
@@ -130,22 +134,29 @@ class BaseWebAuth: WebAuthenticatable {
                                                   state: state)
 
         // performLogin must handle the callback
-        if let session = performLogin(handler: handler,
-                                      state: state,
-                                      authorizeURL: authorizeURL,
+        if let session = performLogin(authorizeURL: authorizeURL,
                                       redirectURL: redirectURL,
+                                      state: state,
+                                      handler: handler,
                                       callback: callback) {
             logger?.trace(url: authorizeURL, source: String(describing: session.self))
             self.storage.store(session)
         }
     }
 
-    // Must be overriden
-    func performLogin(handler: OAuth2Grant,
-                      state: String?,
-                      authorizeURL: URL,
+    func performLogin(authorizeURL: URL,
                       redirectURL: URL,
+                      state: String?,
+                      handler: OAuth2Grant,
                       callback: @escaping (Result<Credentials>) -> Void) -> AuthTransaction? {
+        if #available(iOS 12.0, macOS 10.15, *) {
+            return AuthenticationServicesSession(authorizeURL: authorizeURL,
+                                                 redirectURL: redirectURL,
+                                                 state: state,
+                                                 handler: handler,
+                                                 logger: self.logger,
+                                                 finish: callback)
+        }
         return nil
     }
 
@@ -174,11 +185,15 @@ class BaseWebAuth: WebAuthenticatable {
     }
 
     // TODO: USE A URL FOR REDIRECTURL
-    // Must be overriden
     func performLogout(logoutURL: URL,
                        redirectURL: String,
                        federated: Bool,
                        callback: @escaping (Bool) -> Void) -> AuthTransaction? {
+        if #available(iOS 12.0, macOS 10.15, *) {
+            return AuthenticationServicesSessionCallback(url: logoutURL,
+                                                         schemeURL: redirectURL,
+                                                         callback: callback)
+        }
         return nil
     }
 

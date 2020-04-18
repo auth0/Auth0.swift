@@ -313,19 +313,18 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
         return self
     }
 
-    override func performLogin(handler: OAuth2Grant,
-                               state: String?,
-                               authorizeURL: URL,
+    override func performLogin(authorizeURL: URL,
                                redirectURL: URL,
+                               state: String?,
+                               handler: OAuth2Grant,
                                callback: @escaping (Result<Credentials>) -> Void) -> AuthTransaction? {
         if #available(iOS 11.0, *), self.authenticationSession {
             if #available(iOS 12.0, *) {
-                return AuthenticationServicesSession(authorizeURL: authorizeURL,
-                                                     redirectURL: redirectURL,
-                                                     state: state,
-                                                     handler: handler,
-                                                     logger: self.logger,
-                                                     finish: callback)
+                return super.performLogin(authorizeURL: authorizeURL,
+                                          redirectURL: redirectURL,
+                                          state: state,
+                                          handler: handler,
+                                          callback: callback)
             }
             return SafariServicesSession(authorizeURL: authorizeURL,
                                          redirectURL: redirectURL,
@@ -352,9 +351,10 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
                                 callback: @escaping (Bool) -> Void) -> AuthTransaction? {
         if #available(iOS 11.0, *), self.authenticationSession {
             if #available(iOS 12.0, *) {
-                return AuthenticationServicesSessionCallback(url: logoutURL,
-                                                             schemeURL: redirectURL,
-                                                             callback: callback)
+                return super.performLogout(logoutURL: logoutURL,
+                                           redirectURL: redirectURL,
+                                           federated: federated,
+                                           callback: callback)
             }
             return SafariServicesSessionCallback(url: logoutURL,
                                                  schemeURL: redirectURL,
