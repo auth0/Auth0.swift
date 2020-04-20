@@ -20,60 +20,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
+protocol AuthenticationSession {
 
-class AuthSession: NSObject, AuthTransaction {
+    func start() -> Bool
+    func cancel()
 
-    typealias FinishSession = (Result<Credentials>) -> Void
+}
 
-    let redirectURL: URL
-    let state: String?
-    let finish: FinishSession
-    let handler: OAuth2Grant
-    let logger: Logger?
+class SessionTransaction: BaseAuthTransaction {
 
-    init(redirectURL: URL, state: String? = nil, handler: OAuth2Grant, finish: @escaping FinishSession, logger: Logger?) {
-        self.redirectURL = redirectURL
-        self.state = state
-        self.finish = finish
-        self.handler = handler
-        self.logger = logger
-        super.init()
+    var authSession: AuthenticationSession?
+
+    override func cancel() {
+        super.cancel()
+        authSession?.cancel()
+        authSession = nil
     }
 
-    /**
-     Tries to resume (and complete) the OAuth2 session from the received URL
-
-     - parameter url:     url received in application's AppDelegate
-     - parameter options: a dictionary of launch options received from application's AppDelegate
-
-     - returns: `true` if the url completed (successfuly or not) this session, `false` otherwise
-     */
-    func resume(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
-        self.logger?.trace(url: url, source: "iOS Safari")
-        guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
-
-        guard
-            let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-            else {
-                self.finish(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
-                return false
-            }
-        let items = self.handler.values(fromComponents: components)
-        guard has(state: self.state, inItems: items) else { return false }
-        if items["error"] != nil {
-            self.finish(.failure(error: AuthenticationError(info: items, statusCode: 0)))
-        } else {
-            self.handler.credentials(from: items, callback: self.finish)
+    override func handleUrl(_ url: URL) -> Bool {
+        if super.handleUrl(url) {
+            authSession?.cancel()
+            authSession = nil
+            return true
         }
-        return true
+        return false
     }
 
-    func cancel() {
-        self.finish(Result.failure(error: WebAuthError.userCancelled))
-    }
-
-    private func has(state: String?, inItems items: [String: String]) -> Bool {
-        return state == nil || items["state"] == state
-    }
 }

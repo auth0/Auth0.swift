@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-
 /**
  The NativeAuthCredentials struct defines the data requirements necessary to be returned
  from a successul authentication with an IdP SDK as part of the NativeAuthTransaction process.

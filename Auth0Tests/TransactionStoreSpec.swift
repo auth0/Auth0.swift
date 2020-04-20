@@ -91,12 +91,12 @@ class TransactionStoreSpec: QuickSpec {
             }
 
             it("should resume current") {
-                expect(storage.resume(url, options: [:])) == true
+                expect(storage.resume(url)) == true
             }
 
             it("should return default when no current is available") {
                 storage.cancel(session)
-                expect(storage.resume(url, options: [:])) == false
+                expect(storage.resume(url)) == false
             }
 
         }
