@@ -1,6 +1,6 @@
-// AuthTransaction.swift
+// SessionTransaction.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-/**
-Represents an ongoing Auth transaction with an Identity Provider (Auth0 or a third party).
+class SessionTransaction: BaseAuthTransaction {
 
-The Auth will be done outside of application control, Safari or third party application.
-The only way to communicate the results back is using a url with a registered custom scheme in your application so the OS can open it on success/failure.
-When that happens the OS will call a method in your `AppDelegate` and that is where you need to handle the result.
+    var authSession: AuthSession?
 
-- important: Only one AuthTransaction can be active at a given time for Auth0.swift, if you start a new one before finishing the current one it will be cancelled.
-*/
-public protocol AuthTransaction: AuthResumable, AuthCancelable {
+    override func cancel() {
+        super.cancel()
+        authSession?.cancel()
+        authSession = nil
+    }
 
-    /// value of the OAuth 2.0 state parameter. It must be a cryptographically secure randon string used to protect the app with request forgery.
-    var state: String? { get }
+    override func handleUrl(_ url: URL) -> Bool {
+        if super.handleUrl(url) {
+            authSession?.cancel()
+            authSession = nil
+            return true
+        }
+        return false
+    }
 
 }

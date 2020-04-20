@@ -1,6 +1,6 @@
-// SafariAuthenticationSession.swift
+// AuthenticationServicesSession.swift
 //
-// Copyright (c) 2017 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,4 +66,4 @@ final class AuthenticationServicesSession: SessionTransaction {
 }
 
 @available(iOS 12.0, macOS 10.15, *)
-extension ASWebAuthenticationSession: AuthenticationSession {}
+extension ASWebAuthenticationSession: AuthSession {}
