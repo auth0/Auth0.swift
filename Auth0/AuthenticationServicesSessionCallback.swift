@@ -1,6 +1,6 @@
-// SafariAuthenticationCallback.swift
+// AuthenticationServicesSessionCallback.swift
 //
-// Copyright (c) 2017 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,34 +24,14 @@
 import AuthenticationServices
 #endif
 
-class SessionCallbackTransaction: NSObject, AuthTransaction {
-
-    var state: String?
-    var authSession: AuthenticationSession?
-    let callback: (Bool) -> Void
-
-    init(callback: @escaping (Bool) -> Void) {
-        self.callback = callback
-    }
-
-    func cancel() {
-        self.callback(false)
-    }
-
-    func handleUrl(_ url: URL) -> Bool {
-        self.callback(true)
-        return true
-    }
-
-}
-
 @available(iOS 12.0, *)
 final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
 
-    init(url: URL, schemeURL: String, callback: @escaping (Bool) -> Void) {
+    init(url: URL, schemeURL: URL, callback: @escaping (Bool) -> Void) {
         super.init(callback: callback)
 
-        let authSession = ASWebAuthenticationSession(url: url, callbackURLScheme: schemeURL) { [unowned self] url, _ in
+        let authSession = ASWebAuthenticationSession(url: url,
+                                                     callbackURLScheme: schemeURL.absoluteString) { [unowned self] url, _ in
             self.callback(url != nil)
             TransactionStore.shared.clear()
         }

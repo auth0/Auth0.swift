@@ -1,4 +1,4 @@
-// SafariWebAuth.swift
+// BaseWebAuth.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -171,7 +171,7 @@ class BaseWebAuth: WebAuthenticatable {
         let queryItems = components?.queryItems ?? []
         components?.queryItems = queryItems + [returnTo, clientId]
 
-        guard let logoutURL = components?.url, let redirectURL = returnTo.value else {
+        guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
             return callback(false)
         }
 
@@ -184,9 +184,8 @@ class BaseWebAuth: WebAuthenticatable {
         }
     }
 
-    // TODO: USE A URL FOR REDIRECTURL
     func performLogout(logoutURL: URL,
-                       redirectURL: String,
+                       redirectURL: URL,
                        federated: Bool,
                        callback: @escaping (Bool) -> Void) -> AuthTransaction? {
         if #available(iOS 12.0, macOS 10.15, *) {
@@ -240,17 +239,16 @@ class BaseWebAuth: WebAuthenticatable {
                              nonce: self.nonce)
     }
 
-}
+    func generateDefaultState() -> String? {
+        let data = Data(count: 32)
+        var tempData = data
 
-// TODO: Move to helpers
-private func generateDefaultState() -> String? {
-    let data = Data(count: 32)
-    var tempData = data
+        let result = tempData.withUnsafeMutableBytes {
+            SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
+        }
 
-    let result = tempData.withUnsafeMutableBytes {
-        SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
+        guard result == 0 else { return nil }
+        return tempData.a0_encodeBase64URLSafe()
     }
 
-    guard result == 0 else { return nil }
-    return tempData.a0_encodeBase64URLSafe()
 }

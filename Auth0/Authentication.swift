@@ -694,7 +694,6 @@ public protocol Authentication: Trackable, Loggable {
     */
     func jwks() -> Request<JWKS, AuthenticationError>
 
-// TODO: EXTRACT
 #if os(iOS)
     /**
      Creates a new WebAuth request to authenticate using Safari browser and OAuth authorize flow.
@@ -703,9 +702,9 @@ public protocol Authentication: Trackable, Loggable {
      
      ```
      Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .webAuth(withConnection: "facebook")
-     .start { print($0) }
+        .authentication(clientId: clientId, domain: "samples.auth0.com")
+        .webAuth(withConnection: "facebook")
+        .start { print($0) }
      ```
 
      If you need to show your Auth0 account login page just create the WebAuth object directly

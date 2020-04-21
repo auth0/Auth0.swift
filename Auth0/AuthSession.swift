@@ -1,6 +1,6 @@
 // AuthSession.swift
 //
-// Copyright (c) 2017 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,30 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-protocol AuthenticationSession {
+protocol AuthSession {
 
     func start() -> Bool
     func cancel()
-
-}
-
-class SessionTransaction: BaseAuthTransaction {
-
-    var authSession: AuthenticationSession?
-
-    override func cancel() {
-        super.cancel()
-        authSession?.cancel()
-        authSession = nil
-    }
-
-    override func handleUrl(_ url: URL) -> Bool {
-        if super.handleUrl(url) {
-            authSession?.cancel()
-            authSession = nil
-            return true
-        }
-        return false
-    }
 
 }
