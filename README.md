@@ -63,7 +63,7 @@ Then, run `carthage bootstrap`.
 
 ## Getting Started
 
-### Authentication with Universal Login (iOS Only)
+### Authentication with Universal Login (iOS / macOS)
 
 1. Import **Auth0** into your project.        
 ```swift
@@ -117,11 +117,11 @@ In your application bundle add a `plist` file named `Auth0.plist` with the follo
 </plist>
 ```
 
-#### Configure Callback URLs (iOS Only)
+#### Configure Callback URLs (iOS / macOS)
 
 Callback URLs are the URLs that Auth0 invokes after the authentication process. Auth0 routes your application back to this URL and appends additional parameters to it, including a token. Since callback URLs can be manipulated, you will need to add your callback URL to the **Allowed Callback URLs** field in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/). This will enable Auth0 to recognize these URLs as valid. If omitted, authentication will not be successful.
 
-In your application's `Info.plist` file, register your iOS Bundle Identifer as a custom scheme:
+In your application's `Info.plist` file, register your iOS / macOS Bundle Identifer as a custom scheme:
 
 ```xml
 <!-- Info.plist -->
@@ -197,7 +197,7 @@ Auth0
     }
 ```
 
-### Credentials Management Utility (iOS Only)
+### Credentials Management Utility (iOS / macOS / tvOS)
 
 The credentials manager utility provides a convenience to securely store and retrieve the user's credentials from the Keychain.
 
