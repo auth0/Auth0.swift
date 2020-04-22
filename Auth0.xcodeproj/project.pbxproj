@@ -41,12 +41,12 @@
 		5B7EE48020FCA0A200367724 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B7EE47F20FCA0A200367724 /* Assets.xcassets */; };
 		5B7EE48320FCA0A200367724 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B7EE48120FCA0A200367724 /* Main.storyboard */; };
 		5B7EE48D20FCA0F400367724 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
-		5B7EE48E20FCA0F400367724 /* Auth0.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5B7EE48E20FCA0F400367724 /* Auth0.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5B7EE49420FCABC600367724 /* SimpleKeychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B7EE49220FCA10100367724 /* SimpleKeychain.framework */; };
 		5B9262C01ECF0CA800F4F6D3 /* BioAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */; };
 		5B9262C31ECF0CC200F4F6D3 /* BioAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */; };
 		5BD4A9CE1DEC6EFA00D6D7AE /* ResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */; };
-		5BE65DCA1F7270DE00CADD3B /* Auth0.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5BE65DCA1F7270DE00CADD3B /* Auth0.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5BEDE1571EC1FBBE0007300D /* SilentSafariViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1561EC1FBBE0007300D /* SilentSafariViewController.swift */; };
 		5BEDE17F1EC2138C0007300D /* SimpleKeychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BEDE15B1EC202960007300D /* SimpleKeychain.framework */; };
 		5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
@@ -375,13 +375,6 @@
 			remoteGlobalIDString = 5B7EE47820FCA0A100367724;
 			remoteInfo = OAuth2Mac;
 		};
-		5B7EE48F20FCA0F400367724 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5F06DD841CC448C90011842B;
-			remoteInfo = Auth0.macOS;
-		};
 		5F06DDA61CC451540011842B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5F049B601CB42C29006F6C05 /* Project object */;
@@ -424,25 +417,26 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5B7EE49120FCA0F400367724 /* Embed Frameworks */ = {
+		5B7EE49120FCA0F400367724 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5B7EE48E20FCA0F400367724 /* Auth0.framework in Embed Frameworks */,
+				5B7EE48E20FCA0F400367724 /* Auth0.framework in Copy Files */,
 			);
-			name = "Embed Frameworks";
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5BE65DC91F7270C600CADD3B /* CopyFiles */ = {
+		5BE65DC91F7270C600CADD3B /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5BE65DCA1F7270DE00CADD3B /* Auth0.framework in CopyFiles */,
+				5BE65DCA1F7270DE00CADD3B /* Auth0.framework in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		5F1A02931CC7EEBC00D3F662 /* CopyFiles */ = {
@@ -1315,12 +1309,11 @@
 				5B7EE47720FCA0A100367724 /* Resources */,
 				5B7EE48B20FCA0AF00367724 /* Carthage */,
 				5B7EE48C20FCA0D900367724 /* Auth0 */,
-				5B7EE49120FCA0F400367724 /* Embed Frameworks */,
+				5B7EE49120FCA0F400367724 /* Copy Files */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				5B7EE49020FCA0F400367724 /* PBXTargetDependency */,
 			);
 			name = OAuth2Mac;
 			productName = OAuth2Mac;
@@ -1473,7 +1466,7 @@
 				5F3965C51CF67DD800CDE7C0 /* Resources */,
 				5BEDE1801EC213C10007300D /* Carthage */,
 				5F53F5CB1CFCDC2500476A46 /* Auth0 */,
-				5BE65DC91F7270C600CADD3B /* CopyFiles */,
+				5BE65DC91F7270C600CADD3B /* Copy Files */,
 			);
 			buildRules = (
 			);
@@ -1774,7 +1767,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks";
+			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
 		};
 		5B7EE48C20FCA0D900367724 /* Auth0 */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2197,11 +2190,6 @@
 			isa = PBXTargetDependency;
 			target = 5B7EE47820FCA0A100367724 /* OAuth2Mac */;
 			targetProxy = 5B7EE48920FCA0A600367724 /* PBXContainerItemProxy */;
-		};
-		5B7EE49020FCA0F400367724 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5F06DD841CC448C90011842B /* Auth0.macOS */;
-			targetProxy = 5B7EE48F20FCA0F400367724 /* PBXContainerItemProxy */;
 		};
 		5F06DDA71CC451540011842B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
