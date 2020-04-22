@@ -92,7 +92,7 @@ extension AuthTransaction where Self: SessionCallbackTransaction {
 
 }
 
-#if swift(>=5.1)
+#if canImport(AuthenticationServices) && swift(>=5.1)
 @available(macOS 10.15, *)
 extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextProviding {
 

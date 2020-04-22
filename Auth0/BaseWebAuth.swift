@@ -149,6 +149,7 @@ class BaseWebAuth: WebAuthenticatable {
                       state: String?,
                       handler: OAuth2Grant,
                       callback: @escaping (Result<Credentials>) -> Void) -> AuthTransaction? {
+        #if canImport(AuthenticationServices)
         if #available(iOS 12.0, macOS 10.15, *) {
             return AuthenticationServicesSession(authorizeURL: authorizeURL,
                                                  redirectURL: redirectURL,
@@ -157,6 +158,7 @@ class BaseWebAuth: WebAuthenticatable {
                                                  logger: self.logger,
                                                  finish: callback)
         }
+        #endif
         // TODO: On the next major add a new case to WebAuthError
         callback(.failure(error: WebAuthError.unknownError))
         return nil
@@ -190,11 +192,13 @@ class BaseWebAuth: WebAuthenticatable {
                        redirectURL: URL,
                        federated: Bool,
                        callback: @escaping (Bool) -> Void) -> AuthTransaction? {
+        #if canImport(AuthenticationServices)
         if #available(iOS 12.0, macOS 10.15, *) {
             return AuthenticationServicesSessionCallback(url: logoutURL,
                                                          schemeURL: redirectURL,
                                                          callback: callback)
         }
+        #endif
         callback(false)
         return nil
     }

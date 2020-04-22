@@ -22,7 +22,6 @@
 
 #if canImport(AuthenticationServices)
 import AuthenticationServices
-#endif
 
 @available(iOS 12.0, macOS 10.15, *)
 final class AuthenticationServicesSession: SessionTransaction {
@@ -67,3 +66,4 @@ final class AuthenticationServicesSession: SessionTransaction {
 
 @available(iOS 12.0, macOS 10.15, *)
 extension ASWebAuthenticationSession: AuthSession {}
+#endif

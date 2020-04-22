@@ -303,7 +303,7 @@ final class SafariServicesSessionCallback: SessionCallbackTransaction {
 
 }
 
-#if swift(>=5.1)
+#if canImport(AuthenticationServices) && swift(>=5.1)
 @available(iOS 13.0, *)
 extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextProviding {
 

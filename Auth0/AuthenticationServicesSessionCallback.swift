@@ -22,7 +22,6 @@
 
 #if canImport(AuthenticationServices)
 import AuthenticationServices
-#endif
 
 @available(iOS 12.0, macOS 10.15, *)
 final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
@@ -47,3 +46,4 @@ final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
     }
 
 }
+#endif
