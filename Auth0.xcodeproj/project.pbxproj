@@ -100,7 +100,6 @@
 		5C41F6DD244F982700252548 /* DesktopWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6DC244F982700252548 /* DesktopWebAuth.swift */; };
 		5C41F6DE244FA0E400252548 /* ResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A9CD1DEC6EFA00D6D7AE /* ResponseType.swift */; };
 		5C41F6DF244FA1EE00252548 /* NSURLComponents+OAuth2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCAB1701D09005A00331C84 /* NSURLComponents+OAuth2.swift */; };
-		5C41F6E1244FA62200252548 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5C41F6E0244FA62200252548 /* Auth0.plist */; };
 		5C41F6E3244FB15900252548 /* NSApplication+Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6E2244FB15900252548 /* NSApplication+Shared.swift */; };
 		5C49EB3523EB5A80008D562F /* JWK+RSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C49EB3423EB5A80008D562F /* JWK+RSA.swift */; };
 		5C4F550723C8FADF00C89615 /* A0SHA.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550223C8FADE00C89615 /* A0SHA.m */; };
@@ -1581,7 +1580,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B7EE48020FCA0A200367724 /* Assets.xcassets in Resources */,
-				5C41F6E1244FA62200252548 /* Auth0.plist in Resources */,
 				5B7EE48320FCA0A200367724 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
