@@ -273,7 +273,7 @@ class WebAuthSpec: QuickSpec {
 
         }
 
-
+        #if os(iOS)
         describe("session") {
             let storage = TransactionStore.shared
 
@@ -363,7 +363,7 @@ class WebAuthSpec: QuickSpec {
 
         describe("logout") {
 
-            context("SFAuthenticationSession") {
+            context("ASWebAuthenticationSession") {
 
                 var outcome: Bool?
 
@@ -372,15 +372,15 @@ class WebAuthSpec: QuickSpec {
                     TransactionStore.shared.clear()
                 }
 
-                it("should launch SafariAuthenticationSessionCallback") {
-                    guard #available(iOS 11.0, *) else { return }
+                it("should launch AuthenticationServicesSessionCallback") {
+                    guard #available(iOS 12.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
-                it("should cancel SafariAuthenticationSessionCallback") {
-                    guard #available(iOS 11.0, *) else { return }
+                it("should cancel AuthenticationServicesSessionCallback") {
+                    guard #available(iOS 12.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { outcome = $0 }
                     TransactionStore.shared.cancel(TransactionStore.shared.current!)
@@ -388,8 +388,8 @@ class WebAuthSpec: QuickSpec {
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
-                it("should resume SafariAuthenticationSessionCallback") {
-                    guard #available(iOS 11.0, *) else { return }
+                it("should resume AuthenticationServicesSessionCallback") {
+                    guard #available(iOS 12.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { outcome = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
@@ -410,17 +410,8 @@ class WebAuthSpec: QuickSpec {
 
             }
         }
+        #endif
 
     }
 
-}
-
-func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQueryItem]> {
-    return Predicate<[URLQueryItem]>.define("contain item with name <\(name)>") { expression, failureMessage -> PredicateResult in
-        guard let items = try expression.evaluate() else { return PredicateResult(status: .doesNotMatch, message: failureMessage) }
-        let outcome = items.contains { item -> Bool in
-            return item.name == name && ((value == nil && item.value != nil) || item.value == value)
-        }
-        return PredicateResult(bool: outcome, message: failureMessage)
-    }
 }

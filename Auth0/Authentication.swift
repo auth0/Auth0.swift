@@ -694,7 +694,7 @@ public protocol Authentication: Trackable, Loggable {
     */
     func jwks() -> Request<JWKS, AuthenticationError>
 
-#if os(iOS)
+#if WEB_AUTH_PLATFORM
     /**
      Creates a new WebAuth request to authenticate using Safari browser and OAuth authorize flow.
 

@@ -1490,7 +1490,7 @@ class AuthenticationSpec: QuickSpec {
             }
         }
 
-#if os(iOS)
+#if WEB_AUTH_PLATFORM
         describe("spawn WebAuth instance") {
 
             it("should return a WebAuth instance with matching credentials") {

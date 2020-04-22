@@ -24,7 +24,7 @@ import Quick
 import Nimble
 import OHHTTPStubs
 import SimpleKeychain
-#if os(iOS)
+#if WEB_AUTH_PLATFORM
 import LocalAuthentication
 #endif
 

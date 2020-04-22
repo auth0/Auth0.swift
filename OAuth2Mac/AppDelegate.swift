@@ -7,11 +7,10 @@
 //
 
 import Cocoa
+import Auth0
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
-
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
@@ -21,6 +20,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
+    func application(_ application: NSApplication, open urls: [URL]) {
+        Auth0.resumeAuth(urls)
+    }
 
 }
-

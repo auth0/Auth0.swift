@@ -157,6 +157,8 @@ class BaseWebAuth: WebAuthenticatable {
                                                  logger: self.logger,
                                                  finish: callback)
         }
+        // TODO: On the next major add a new case to WebAuthError
+        callback(.failure(error: WebAuthError.unknownError))
         return nil
     }
 
@@ -193,6 +195,7 @@ class BaseWebAuth: WebAuthenticatable {
                                                          schemeURL: redirectURL,
                                                          callback: callback)
         }
+        callback(false)
         return nil
     }
 
@@ -249,6 +252,17 @@ class BaseWebAuth: WebAuthenticatable {
 
         guard result == 0 else { return nil }
         return tempData.a0_encodeBase64URLSafe()
+    }
+
+}
+
+extension Auth0Authentication {
+
+    func webAuth(withConnection connection: String) -> WebAuth {
+        let webAuth = Auth0WebAuth(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+        return webAuth
+            .logging(enabled: self.logger != nil)
+            .connection(connection)
     }
 
 }
