@@ -88,7 +88,11 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
          storage: TransactionStore = TransactionStore.shared,
          telemetry: Telemetry = Telemetry()) {
         self.presenter = presenter
-        super.init(clientId: clientId, url: url, storage: storage, telemetry: telemetry)
+        super.init(platform: "ios",
+                   clientId: clientId,
+                   url: url,
+                   storage: storage,
+                   telemetry: telemetry)
     }
 
     func useLegacyAuthentication(withStyle style: UIModalPresentationStyle = .fullScreen) -> Self {

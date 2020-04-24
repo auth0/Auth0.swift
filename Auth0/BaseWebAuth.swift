@@ -33,6 +33,7 @@ class BaseWebAuth: WebAuthenticatable {
     var logger: Logger?
     var universalLink = false
 
+    private let platform: String
     private(set) var parameters: [String: String] = [:]
     private var responseType: [ResponseType] = [.code]
     private var nonce: String?
@@ -44,12 +45,13 @@ class BaseWebAuth: WebAuthenticatable {
         var components = URLComponents(url: self.url, resolvingAgainstBaseURL: true)
         components?.scheme = self.universalLink ? "https" : bundleIdentifier
         return components?.url?
-            .appendingPathComponent("ios")
+            .appendingPathComponent(self.platform)
             .appendingPathComponent(bundleIdentifier)
             .appendingPathComponent("callback")
     }()
 
-    init(clientId: String, url: URL, storage: TransactionStore, telemetry: Telemetry) {
+    init(platform: String, clientId: String, url: URL, storage: TransactionStore, telemetry: Telemetry) {
+        self.platform = platform
         self.clientId = clientId
         self.url = url
         self.storage = storage

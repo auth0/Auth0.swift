@@ -23,7 +23,7 @@
 import Foundation
 import SimpleKeychain
 import JWTDecode
-#if WEB_AUTH_PLATFORM
+#if canImport(LocalAuthentication)
 import LocalAuthentication
 #endif
 
@@ -33,7 +33,7 @@ public struct CredentialsManager {
     private let storage: A0SimpleKeychain
     private let storeKey: String
     private let authentication: Authentication
-    #if WEB_AUTH_PLATFORM
+    #if canImport(LocalAuthentication)
     private var bioAuth: BioAuthentication?
     #endif
 
@@ -55,7 +55,7 @@ public struct CredentialsManager {
     ///   - title: main message to display in TouchID prompt
     ///   - cancelTitle: cancel message to display in TouchID prompt (iOS 10+)
     ///   - fallbackTitle: fallback message to display in TouchID prompt after a failed match
-    #if WEB_AUTH_PLATFORM
+    #if canImport(LocalAuthentication)
     @available(*, deprecated, message: "see enableBiometrics(withTitle title:, cancelTitle:, fallbackTitle:)")
     public mutating func enableTouchAuth(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
         self.enableBiometrics(withTitle: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
@@ -68,7 +68,7 @@ public struct CredentialsManager {
     ///   - title: main message to display when Touch ID is used
     ///   - cancelTitle: cancel message to display when Touch ID is used (iOS 10+)
     ///   - fallbackTitle: fallback message to display when Touch ID is used after a failed match
-    #if WEB_AUTH_PLATFORM
+    #if canImport(LocalAuthentication)
     public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
         self.bioAuth = BioAuthentication(authContext: LAContext(), title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
@@ -146,7 +146,7 @@ public struct CredentialsManager {
     ///   - callback: callback with the user's credentials or the cause of the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/refresh-token)
-    #if WEB_AUTH_PLATFORM
+    #if canImport(LocalAuthentication)
     public func credentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid() else { return callback(.noCredentials, nil) }
         if #available(iOS 9.0, macOS 10.15, *), let bioAuth = self.bioAuth {

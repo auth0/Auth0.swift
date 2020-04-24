@@ -256,15 +256,20 @@ class WebAuthSpec: QuickSpec {
         }
 
         describe("redirect uri") {
+            #if os(iOS)
+            let platform = "ios"
+            #else
+            let platform = "macos"
+            #endif
 
             it("should build with custom scheme") {
                 let bundleId = Bundle.main.bundleIdentifier!
-                expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/ios/\(bundleId)/callback"
+                expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/\(platform)/\(bundleId)/callback"
             }
 
             it("should build with universal link") {
                 let bundleId = Bundle.main.bundleIdentifier!
-                expect(newWebAuth().useUniversalLink().redirectURL?.absoluteString) == "https://\(Domain)/ios/\(bundleId)/callback"
+                expect(newWebAuth().useUniversalLink().redirectURL?.absoluteString) == "https://\(Domain)/\(platform)/\(bundleId)/callback"
             }
 
             it("should build with a custom url") {

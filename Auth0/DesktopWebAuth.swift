@@ -39,11 +39,15 @@ public func resumeAuth(_ urls: [URL]) {
 
 final class DesktopWebAuth: BaseWebAuth {
 
-    override init(clientId: String,
-                  url: URL,
-                  storage: TransactionStore = TransactionStore.shared,
-                  telemetry: Telemetry = Telemetry()) {
-        super.init(clientId: clientId, url: url, storage: storage, telemetry: telemetry)
+    init(clientId: String,
+         url: URL,
+         storage: TransactionStore = TransactionStore.shared,
+         telemetry: Telemetry = Telemetry()) {
+        super.init(platform: "macos",
+                   clientId: clientId,
+                   url: url,
+                   storage: storage,
+                   telemetry: telemetry)
     }
 
 }
