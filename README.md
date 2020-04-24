@@ -88,9 +88,20 @@ Auth0
 > This snippet sets the `audience` to ensure OIDC compliant responses, this can also be achieved by enabling the **OIDC Conformant** switch in your Auth0 dashboard under `Application / Settings / Advanced / OAuth`. For more information please check the [OIDC Conformant Authentication Adoption Guide](https://auth0.com/docs/api-auth/tutorials/adoption).
 
 3. Allow Auth0 to handle authentication callbacks. In your `AppDelegate.swift` add the following:
+
+#### iOS
+
 ```swift
-func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
-    return Auth0.resumeAuth(url, options: options)
+func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
+    return Auth0.resumeAuth(url)
+}
+```
+
+#### macOS
+
+```swift
+func application(_ application: NSApplication, open urls: [URL]) {
+    Auth0.resumeAuth(urls)
 }
 ```
 
