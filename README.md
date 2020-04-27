@@ -63,7 +63,7 @@ Then, run `carthage bootstrap`.
 
 ## Getting Started
 
-### Authentication with Universal Login (iOS / macOS)
+### Authentication with Universal Login (iOS / macOS 10.15+)
 
 1. Import **Auth0** into your project.        
 ```swift
