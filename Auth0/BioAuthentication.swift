@@ -33,12 +33,13 @@ struct BioAuthentication {
         set { self.authContext.localizedFallbackTitle = newValue }
     }
 
-    @available(iOS 10.0, *)
+    @available(iOS 10.0, macOS 10.15, *)
     var cancelTitle: String? {
         get { return self.authContext.localizedCancelTitle }
         set { self.authContext.localizedCancelTitle = newValue }
     }
 
+    @available(iOS 9.0, macOS 10.15, *)
     var available: Bool {
         return self.authContext.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: nil)
     }
@@ -46,14 +47,16 @@ struct BioAuthentication {
     init(authContext: LAContext, title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
         self.authContext = authContext
         self.title = title
-        if #available(iOS 10, *) { self.cancelTitle = cancelTitle }
+        if #available(iOS 10.0, macOS 10.15, *) { self.cancelTitle = cancelTitle }
         self.fallbackTitle = fallbackTitle
     }
 
+    @available(iOS 9.0, macOS 10.15, *)
     func validateBiometric(callback: @escaping (Error?) -> Void) {
         self.authContext.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: self.title) {
             guard $1 == nil else { return callback($1) }
             callback($0 ? nil : LAError(LAError.authenticationFailed))
         }
     }
+
 }

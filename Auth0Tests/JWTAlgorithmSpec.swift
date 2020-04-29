@@ -47,7 +47,7 @@ class JWTAlgorithmSpec: QuickSpec {
                     expect(JWTAlgorithm.rs256.verify(jwt, using: jwk)).to(beFalse())
                 }
                 
-                if #available(iOS 10, *) {
+                if #available(iOS 10.0, *) {
                     it("should return false with an incorrect signature") {
                         let jwt = generateJWT(alg: alg, signature: "abc123")
                         

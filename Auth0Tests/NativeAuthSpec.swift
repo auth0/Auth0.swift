@@ -63,11 +63,19 @@ class MockNativeAuthTransaction: NativeAuthTransaction {
         self.delayed = { _ in }
     }
 
+    #if os(iOS)
     func resume(_ url: URL, options: [A0URLOptionsKey : Any]) -> Bool {
         self.delayed(self.onNativeAuth())
         self.delayed = { _ in }
         return true
     }
+    #else
+    func resume(_ url: URL) -> Bool {
+        self.delayed(self.onNativeAuth())
+        self.delayed = { _ in }
+        return true
+    }
+    #endif
 
     /// Test Hooks
     var onNativeAuth: () -> Result<NativeAuthCredentials> = {
@@ -123,7 +131,11 @@ class NativeAuthSpec: QuickSpec {
 
             it("should nil transaction in store after resume") {
                 nativeTransaction.start { _ in }
+                #if os(iOS)
                 _ = Auth0.resumeAuth(DomainURL, options: [:])
+                #else
+                _ = Auth0.resumeAuth([DomainURL])
+                #endif
                 expect(TransactionStore.shared.current).to(beNil())
             }
 
@@ -139,7 +151,7 @@ class NativeAuthSpec: QuickSpec {
                             break
                         }
                     }
-                    _ = nativeTransaction.resume(DomainURL, options: [:])
+                    _ = nativeTransaction.resume(DomainURL)
                 }
 
             }
@@ -158,7 +170,7 @@ class NativeAuthSpec: QuickSpec {
                             break
                         }
                     }
-                    _ = nativeTransaction.resume(DomainURL, options: [:])
+                    _ = nativeTransaction.resume(DomainURL)
                 }
 
             }
@@ -172,7 +184,7 @@ class NativeAuthSpec: QuickSpec {
                         expect(result).to(haveAuthenticationError(code: "invalid_token", description: "invalid_token"))
                         done()
                     }
-                    _ = nativeTransaction.resume(DomainURL, options: [:])
+                    _ = nativeTransaction.resume(DomainURL)
                 }
 
             }

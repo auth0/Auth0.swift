@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-
 /**
  The AuthProvider protocol is adopted by objects that are to be used as Native Authentication
  handlers. An object implementing this protocol is intended to supersede the default authentication

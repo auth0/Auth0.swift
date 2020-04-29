@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
-![Swift 5.0](https://img.shields.io/badge/Swift-5.0-orange.svg?style=flat-square)
+![Swift 5.2](https://img.shields.io/badge/Swift-5.2-orange.svg?style=flat-square)
 
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
 
@@ -63,7 +63,7 @@ Then, run `carthage bootstrap`.
 
 ## Getting Started
 
-### Authentication with Universal Login (iOS Only)
+### Authentication with Universal Login (iOS / macOS 10.15+)
 
 1. Import **Auth0** into your project.        
 ```swift
@@ -88,9 +88,20 @@ Auth0
 > This snippet sets the `audience` to ensure OIDC compliant responses, this can also be achieved by enabling the **OIDC Conformant** switch in your Auth0 dashboard under `Application / Settings / Advanced / OAuth`. For more information please check the [OIDC Conformant Authentication Adoption Guide](https://auth0.com/docs/api-auth/tutorials/adoption).
 
 3. Allow Auth0 to handle authentication callbacks. In your `AppDelegate.swift` add the following:
+
+#### iOS
+
 ```swift
-func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
-    return Auth0.resumeAuth(url, options: options)
+func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
+    return Auth0.resumeAuth(url)
+}
+```
+
+#### macOS
+
+```swift
+func application(_ application: NSApplication, open urls: [URL]) {
+    Auth0.resumeAuth(urls)
 }
 ```
 
@@ -117,11 +128,11 @@ In your application bundle add a `plist` file named `Auth0.plist` with the follo
 </plist>
 ```
 
-#### Configure Callback URLs (iOS Only)
+#### Configure Callback URLs (iOS / macOS)
 
 Callback URLs are the URLs that Auth0 invokes after the authentication process. Auth0 routes your application back to this URL and appends additional parameters to it, including a token. Since callback URLs can be manipulated, you will need to add your callback URL to the **Allowed Callback URLs** field in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/). This will enable Auth0 to recognize these URLs as valid. If omitted, authentication will not be successful.
 
-In your application's `Info.plist` file, register your iOS Bundle Identifer as a custom scheme:
+In your application's `Info.plist` file, register your iOS / macOS Bundle Identifer as a custom scheme:
 
 ```xml
 <!-- Info.plist -->
@@ -197,7 +208,7 @@ Auth0
     }
 ```
 
-### Credentials Management Utility (iOS Only)
+### Credentials Management Utility (iOS / macOS / tvOS)
 
 The credentials manager utility provides a convenience to securely store and retrieve the user's credentials from the Keychain.
 

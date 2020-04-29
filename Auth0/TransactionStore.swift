@@ -20,16 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
-
 /// Keeps track of current Auth Transaction
 class TransactionStore {
+
     static let shared = TransactionStore()
 
     private(set) var current: AuthTransaction?
 
-    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        let resumed = self.current?.resume(url, options: options) ?? false
+    func resume(_ url: URL) -> Bool {
+        let resumed = self.current?.resume(url) ?? false
         if resumed {
             self.current = nil
         }
@@ -51,4 +50,5 @@ class TransactionStore {
     func clear() {
         self.current = nil
     }
+
 }

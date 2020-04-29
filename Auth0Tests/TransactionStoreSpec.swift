@@ -91,12 +91,12 @@ class TransactionStoreSpec: QuickSpec {
             }
 
             it("should resume current") {
-                expect(storage.resume(url, options: [:])) == true
+                expect(storage.resume(url)) == true
             }
 
             it("should return default when no current is available") {
                 storage.cancel(session)
-                expect(storage.resume(url, options: [:])) == false
+                expect(storage.resume(url)) == false
             }
 
         }
@@ -115,7 +115,14 @@ class MockSession: AuthTransaction {
         self.cancelled = true
     }
 
+    #if os(iOS)
     func resume(_ url: URL, options: [A0URLOptionsKey : Any]) -> Bool {
         return self.resumeResult
     }
+    #else
+    func resume(_ url: URL) -> Bool {
+        return self.resumeResult
+    }
+    #endif
+
 }
