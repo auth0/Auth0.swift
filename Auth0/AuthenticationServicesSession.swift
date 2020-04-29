@@ -22,7 +22,6 @@
 
 #if canImport(AuthenticationServices)
 import AuthenticationServices
-#endif
 
 @available(iOS 12.0, macOS 10.15, *)
 final class AuthenticationServicesSession: SessionTransaction {
@@ -40,20 +39,20 @@ final class AuthenticationServicesSession: SessionTransaction {
                    finish: finish)
 
         let webAuthenticationSession = ASWebAuthenticationSession(url: authorizeURL,
-                                                                  callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
+                                                                  callbackURLScheme: self.redirectURL.scheme) { [weak self] in
             guard $1 == nil, let callbackURL = $0 else {
                 let authError = $1 ?? WebAuthError.unknownError
                 if case ASWebAuthenticationSessionError.canceledLogin = authError {
-                    self.finish(.failure(error: WebAuthError.userCancelled))
+                    self?.finish(.failure(error: WebAuthError.userCancelled))
                 } else {
-                    self.finish(.failure(error: authError))
+                    self?.finish(.failure(error: authError))
                 }
                 return TransactionStore.shared.clear()
             }
             _ = TransactionStore.shared.resume(callbackURL)
         }
 
-        #if os(iOS) && swift(>=5.1)
+        #if swift(>=5.1)
         if #available(iOS 13.0, *) {
             webAuthenticationSession.presentationContextProvider = self
         }
@@ -67,3 +66,4 @@ final class AuthenticationServicesSession: SessionTransaction {
 
 @available(iOS 12.0, macOS 10.15, *)
 extension ASWebAuthenticationSession: AuthSession {}
+#endif

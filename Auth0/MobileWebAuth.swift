@@ -88,7 +88,11 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
          storage: TransactionStore = TransactionStore.shared,
          telemetry: Telemetry = Telemetry()) {
         self.presenter = presenter
-        super.init(clientId: clientId, url: url, storage: storage, telemetry: telemetry)
+        super.init(platform: "ios",
+                   clientId: clientId,
+                   url: url,
+                   storage: storage,
+                   telemetry: telemetry)
     }
 
     func useLegacyAuthentication(withStyle style: UIModalPresentationStyle = .fullScreen) -> Self {
@@ -187,17 +191,6 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
 
 }
 
-extension Auth0Authentication {
-
-    func webAuth(withConnection connection: String) -> WebAuth {
-        let safari = Auth0WebAuth(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
-        return safari
-            .logging(enabled: self.logger != nil)
-            .connection(connection)
-    }
-
-}
-
 public extension _ObjectiveOAuth2 {
 
     /**
@@ -210,7 +203,7 @@ public extension _ObjectiveOAuth2 {
      */
     @objc(resumeAuthWithURL:options:)
     static func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        return TransactionStore.shared.resume(url)
+        return resumeAuth(url, options: options)
     }
 
 }
@@ -223,13 +216,14 @@ public protocol AuthResumable {
      
      - parameter url: the url send by the third party application that contains the result of the Auth
      - parameter options: options recieved in the openUrl method of the `AppDelegate`
-     - returns: if the url was expected and properly formatted otherwise it will return false.
+
+     - returns: if the url was expected and properly formatted otherwise it will return `false`.
     */
     func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool
 
 }
 
-public extension AuthTransaction {
+public extension AuthResumable {
 
     /**
     Tries to resume (and complete) the OAuth2 session from the received URL
@@ -313,12 +307,12 @@ final class SafariServicesSessionCallback: SessionCallbackTransaction {
 
 }
 
-#if swift(>=5.1)
+#if canImport(AuthenticationServices) && swift(>=5.1)
 @available(iOS 13.0, *)
 extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return UIApplication.shared()?.keyWindow ?? ASPresentationAnchor()
+        return UIApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()
     }
 
 }
@@ -327,7 +321,7 @@ extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextP
 extension AuthenticationServicesSessionCallback: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return UIApplication.shared()?.keyWindow ?? ASPresentationAnchor()
+        return UIApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()
     }
 
 }

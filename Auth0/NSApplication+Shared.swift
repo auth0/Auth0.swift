@@ -1,4 +1,4 @@
-// AuthenticationServicesSessionCallback.swift
+// NSApplication+Shared.swift
 //
 // Copyright (c) 2020 Auth0 (http://auth0.com)
 //
@@ -20,30 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if canImport(AuthenticationServices)
-import AuthenticationServices
+import Cocoa
 
-@available(iOS 12.0, macOS 10.15, *)
-final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
+extension NSApplication {
 
-    init(url: URL, schemeURL: URL, callback: @escaping (Bool) -> Void) {
-        super.init(callback: callback)
-
-        let authSession = ASWebAuthenticationSession(url: url,
-                                                     callbackURLScheme: schemeURL.scheme) { [weak self] url, _ in
-            self?.callback(url != nil)
-            TransactionStore.shared.clear()
-        }
-
-        #if swift(>=5.1)
-        if #available(iOS 13.0, *) {
-            authSession.presentationContextProvider = self
-        }
-        #endif
-
-        self.authSession = authSession
-        authSession.start()
+    static func shared() -> NSApplication? {
+        return NSApplication.perform(NSSelectorFromString("sharedApplication"))?.takeUnretainedValue() as? NSApplication
     }
 
 }
-#endif

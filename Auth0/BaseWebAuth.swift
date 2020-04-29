@@ -33,6 +33,7 @@ class BaseWebAuth: WebAuthenticatable {
     var logger: Logger?
     var universalLink = false
 
+    private let platform: String
     private(set) var parameters: [String: String] = [:]
     private var responseType: [ResponseType] = [.code]
     private var nonce: String?
@@ -44,12 +45,13 @@ class BaseWebAuth: WebAuthenticatable {
         var components = URLComponents(url: self.url, resolvingAgainstBaseURL: true)
         components?.scheme = self.universalLink ? "https" : bundleIdentifier
         return components?.url?
-            .appendingPathComponent("ios")
+            .appendingPathComponent(self.platform)
             .appendingPathComponent(bundleIdentifier)
             .appendingPathComponent("callback")
     }()
 
-    init(clientId: String, url: URL, storage: TransactionStore, telemetry: Telemetry) {
+    init(platform: String, clientId: String, url: URL, storage: TransactionStore, telemetry: Telemetry) {
+        self.platform = platform
         self.clientId = clientId
         self.url = url
         self.storage = storage
@@ -149,6 +151,7 @@ class BaseWebAuth: WebAuthenticatable {
                       state: String?,
                       handler: OAuth2Grant,
                       callback: @escaping (Result<Credentials>) -> Void) -> AuthTransaction? {
+        #if canImport(AuthenticationServices)
         if #available(iOS 12.0, macOS 10.15, *) {
             return AuthenticationServicesSession(authorizeURL: authorizeURL,
                                                  redirectURL: redirectURL,
@@ -157,6 +160,9 @@ class BaseWebAuth: WebAuthenticatable {
                                                  logger: self.logger,
                                                  finish: callback)
         }
+        #endif
+        // TODO: On the next major add a new case to WebAuthError
+        callback(.failure(error: WebAuthError.unknownError))
         return nil
     }
 
@@ -188,11 +194,14 @@ class BaseWebAuth: WebAuthenticatable {
                        redirectURL: URL,
                        federated: Bool,
                        callback: @escaping (Bool) -> Void) -> AuthTransaction? {
+        #if canImport(AuthenticationServices)
         if #available(iOS 12.0, macOS 10.15, *) {
             return AuthenticationServicesSessionCallback(url: logoutURL,
                                                          schemeURL: redirectURL,
                                                          callback: callback)
         }
+        #endif
+        callback(false)
         return nil
     }
 
@@ -249,6 +258,17 @@ class BaseWebAuth: WebAuthenticatable {
 
         guard result == 0 else { return nil }
         return tempData.a0_encodeBase64URLSafe()
+    }
+
+}
+
+extension Auth0Authentication {
+
+    func webAuth(withConnection connection: String) -> WebAuth {
+        let webAuth = Auth0WebAuth(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+        return webAuth
+            .logging(enabled: self.logger != nil)
+            .connection(connection)
     }
 
 }

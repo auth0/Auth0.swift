@@ -26,7 +26,9 @@ web_auth_files = [
   'Auth0/JWT+Header.swift',
   'Auth0/JWTAlgorithm.swift',
   'Auth0/NativeAuth.swift',
+  'Auth0/NSURLComponents+OAuth2.swift',
   'Auth0/OAuth2Grant.swift',
+  'Auth0/ResponseType.swift',
   'Auth0/SessionCallbackTransaction.swift',
   'Auth0/SessionTransaction.swift',
   'Auth0/TransactionStore.swift',
@@ -43,11 +45,23 @@ ios_files = [
   'Auth0/UIApplication+Shared.swift'
 ]
 
+macos_files = [
+  'Auth0/DesktopWebAuth.swift',
+  'Auth0/NSApplication+Shared.swift'
+]
+
 watchos_exclude_files = [
   *web_auth_files,
   *ios_files,
+  *macos_files,
   'Auth0/CredentialsManager.swift',
   'Auth0/CredentialsManagerError.swift'
+]
+
+tvos_exclude_files = [
+  *web_auth_files,
+  *ios_files,
+  *macos_files
 ]
 
 Pod::Spec.new do |s|
@@ -74,15 +88,16 @@ Pod::Spec.new do |s|
   s.ios.weak_framework = 'AuthenticationServices'
   s.ios.dependency 'SimpleKeychain'
   s.ios.dependency 'JWTDecode'
-  s.osx.source_files = 'Auth0/*.swift'
-  s.osx.exclude_files = [*web_auth_files, *ios_files]
+  s.ios.exclude_files = macos_files
+  s.osx.source_files = 'Auth0/*.{swift,h,m}'
+  s.osx.exclude_files = ios_files
   s.osx.dependency 'SimpleKeychain'
   s.osx.dependency 'JWTDecode'
   s.watchos.source_files = 'Auth0/*.swift'
   s.watchos.exclude_files = watchos_exclude_files
   s.watchos.dependency 'JWTDecode'
   s.tvos.source_files = 'Auth0/*.swift'
-  s.tvos.exclude_files = [*web_auth_files, *ios_files]
+  s.tvos.exclude_files = tvos_exclude_files
   s.tvos.dependency 'SimpleKeychain'
   s.tvos.dependency 'JWTDecode'
 
