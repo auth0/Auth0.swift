@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.24.1](https://github.com/auth0/Auth0.swift/tree/1.24.1) (2020-04-30)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.24.0...1.24.1)
+
+**Fixed**
+- Added compilation conditions to Podspec [\#384](https://github.com/auth0/Auth0.swift/pull/384) ([Widcket](https://github.com/Widcket))
+
 ## [1.24.0](https://github.com/auth0/Auth0.swift/tree/1.24.0) (2020-04-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.23.0...1.24.0)
 
