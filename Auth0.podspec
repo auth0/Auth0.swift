@@ -89,13 +89,22 @@ Pod::Spec.new do |s|
   s.ios.dependency 'SimpleKeychain'
   s.ios.dependency 'JWTDecode'
   s.ios.exclude_files = macos_files
+  s.ios.pod_target_xcconfig = {
+    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'
+  }
+
   s.osx.source_files = 'Auth0/*.{swift,h,m}'
   s.osx.exclude_files = ios_files
   s.osx.dependency 'SimpleKeychain'
   s.osx.dependency 'JWTDecode'
+  s.osx.pod_target_xcconfig = {
+    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'
+  }
+
   s.watchos.source_files = 'Auth0/*.swift'
   s.watchos.exclude_files = watchos_exclude_files
   s.watchos.dependency 'JWTDecode'
+
   s.tvos.source_files = 'Auth0/*.swift'
   s.tvos.exclude_files = tvos_exclude_files
   s.tvos.dependency 'SimpleKeychain'
