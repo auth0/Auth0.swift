@@ -27,6 +27,7 @@ import LocalAuthentication
 
 @testable import Auth0
 
+@available(iOS 9.0, OSX 10.15, *)
 class BioAuthenticationSpec: QuickSpec {
 
     override func spec() {

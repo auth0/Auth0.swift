@@ -142,6 +142,17 @@ func hasBearerToken(_ token: String) -> OHHTTPStubsTestBlock {
     }
 }
 
+func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQueryItem]> {
+    return Predicate<[URLQueryItem]>.define("contain item with name <\(name)>") { expression, failureMessage -> PredicateResult in
+        guard let items = try expression.evaluate() else { return PredicateResult(status: .doesNotMatch, message: failureMessage) }
+        let outcome = items.contains { item -> Bool in
+            return item.name == name && ((value == nil && item.value != nil) || item.value == value)
+        }
+        return PredicateResult(bool: outcome, message: failureMessage)
+    }
+}
+
+
 func haveAuthenticationError<T>(code: String, description: String) -> Predicate<Result<T>> {
     return Predicate<Result<T>>.define("an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .failure(let cause as AuthenticationError) = actual {

@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.24.1](https://github.com/auth0/Auth0.swift/tree/1.24.1) (2020-04-30)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.24.0...1.24.1)
+
+**Fixed**
+- Added compilation conditions to Podspec [\#384](https://github.com/auth0/Auth0.swift/pull/384) ([Widcket](https://github.com/Widcket))
+
+## [1.24.0](https://github.com/auth0/Auth0.swift/tree/1.24.0) (2020-04-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.23.0...1.24.0)
+
+**Added**
+- Added WebAuth support to macOS [SDK-1545] [\#381](https://github.com/auth0/Auth0.swift/pull/381) ([Widcket](https://github.com/Widcket))
+
 ## [1.23.0](https://github.com/auth0/Auth0.swift/tree/1.23.0) (2020-03-30)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.22.1...1.23.0)
 

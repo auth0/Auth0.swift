@@ -1,6 +1,6 @@
-// Auth0.h
+// NSApplication+Shared.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Cocoa
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
+extension NSApplication {
 
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
+    static func shared() -> NSApplication? {
+        return NSApplication.perform(NSSelectorFromString("sharedApplication"))?.takeUnretainedValue() as? NSApplication
+    }
 
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
-
-#if TARGET_OS_IOS || TARGET_OS_OSX
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
-#endif
+}

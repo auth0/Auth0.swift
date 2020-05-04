@@ -39,7 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [A0URLOptionsKey : Any]) -> Bool {
-        return Auth0.resumeAuth(url, options: options)
+        return Auth0.resumeAuth(url)
     }
 }
 

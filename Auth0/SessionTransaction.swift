@@ -1,6 +1,6 @@
-// Auth0.h
+// SessionTransaction.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+class SessionTransaction: BaseAuthTransaction {
 
-//! Project version number for Auth0.
-FOUNDATION_EXPORT double Auth0VersionNumber;
+    var authSession: AuthSession?
 
-//! Project version string for Auth0.
-FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
+    override func cancel() {
+        super.cancel()
+        authSession?.cancel()
+        authSession = nil
+    }
 
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
+    override func handleUrl(_ url: URL) -> Bool {
+        if super.handleUrl(url) {
+            authSession?.cancel()
+            authSession = nil
+            return true
+        }
+        return false
+    }
 
-#if TARGET_OS_IOS || TARGET_OS_OSX
-#import <Auth0/A0ChallengeGenerator.h>
-#import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
-#endif
+}

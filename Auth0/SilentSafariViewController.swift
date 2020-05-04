@@ -20,20 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import UIKit
 import SafariServices
 
 class SilentSafariViewController: SFSafariViewController, SFSafariViewControllerDelegate {
-    var onResult: (Bool) -> Void = { _ in }
+
+    private let onResult: (Bool) -> Void
 
     required init(url URL: URL, callback: @escaping (Bool) -> Void) {
+        self.onResult = callback
+
         if #available(iOS 11.0, *) {
             super.init(url: URL, configuration: SFSafariViewController.Configuration())
         } else {
             super.init(url: URL, entersReaderIfAvailable: false)
         }
 
-        self.onResult = callback
         self.delegate = self
         self.view.alpha = 0.05 // Apple does not allow invisible SafariViews, this is the threshold.
         self.modalPresentationStyle = .overCurrentContext
@@ -42,4 +43,5 @@ class SilentSafariViewController: SFSafariViewController, SFSafariViewController
     func safariViewController(_ controller: SFSafariViewController, didCompleteInitialLoad didLoadSuccessfully: Bool) {
         controller.dismiss(animated: false) { self.onResult(didLoadSuccessfully) }
     }
+
 }

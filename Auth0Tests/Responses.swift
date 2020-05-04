@@ -124,7 +124,7 @@ func managementErrorResponse(error: String, description: String, code: String, s
 }
 
 func jwksResponse(kid: String? = JWKKid) -> OHHTTPStubsResponse {
-    #if os(iOS)
+    #if WEB_AUTH_PLATFORM
     let jwk = generateRSAJWK()
     let jwks = ["keys": [["alg": jwk.algorithm,
                           "kty": jwk.keyType,
