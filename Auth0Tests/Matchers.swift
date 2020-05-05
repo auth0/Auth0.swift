@@ -25,7 +25,7 @@ import OHHTTPStubs
 import Nimble
 @testable import Auth0
 
-func hasAllOf(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
+func hasAllOf(_ parameters: [String: String]) -> HTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload else { return false }
         return parameters.count == payload.count && parameters.reduce(true, { (initial, entry) -> Bool in
@@ -34,7 +34,7 @@ func hasAllOf(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
     }
 }
 
-func hasAtLeast(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
+func hasAtLeast(_ parameters: [String: String]) -> HTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload else { return false }
         let entries = parameters.filter { (key, _) in payload.contains { (name, _) in  key == name } }
@@ -44,11 +44,11 @@ func hasAtLeast(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
     }
 }
 
-func hasUserMetadata(_ metadata: [String: String]) -> OHHTTPStubsTestBlock {
+func hasUserMetadata(_ metadata: [String: String]) -> HTTPStubsTestBlock {
     return hasObjectAttribute("user_metadata", value: metadata)
 }
 
-func hasObjectAttribute(_ name: String, value: [String: String]) -> OHHTTPStubsTestBlock {
+func hasObjectAttribute(_ name: String, value: [String: String]) -> HTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload, let actualValue = payload[name] as? [String: Any] else { return false }
         return value.count == actualValue.count && value.reduce(true, { (initial, entry) -> Bool in
@@ -58,18 +58,18 @@ func hasObjectAttribute(_ name: String, value: [String: String]) -> OHHTTPStubsT
     }
 }
 
-func hasNoneOf(_ names: [String]) -> OHHTTPStubsTestBlock {
+func hasNoneOf(_ names: [String]) -> HTTPStubsTestBlock {
     return { request in
         guard let payload = request.a0_payload else { return false }
         return payload.filter { names.contains($0.0) }.isEmpty
     }
 }
 
-func hasNoneOf(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
+func hasNoneOf(_ parameters: [String: String]) -> HTTPStubsTestBlock {
     return !hasAtLeast(parameters)
 }
 
-func hasQueryParameters(_ parameters: [String: String]) -> OHHTTPStubsTestBlock {
+func hasQueryParameters(_ parameters: [String: String]) -> HTTPStubsTestBlock {
     return { request in
         guard
             let url = request.url,
@@ -82,43 +82,43 @@ func hasQueryParameters(_ parameters: [String: String]) -> OHHTTPStubsTestBlock 
     }
 }
 
-func isResourceOwner(_ domain: String) -> OHHTTPStubsTestBlock {
+func isResourceOwner(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
 }
 
-func isToken(_ domain: String) -> OHHTTPStubsTestBlock {
+func isToken(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/token")
 }
 
-func isSignUp(_ domain: String) -> OHHTTPStubsTestBlock {
+func isSignUp(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/dbconnections/signup")
 }
 
-func isResetPassword(_ domain: String) -> OHHTTPStubsTestBlock {
+func isResetPassword(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/dbconnections/change_password")
 }
 
-func isPasswordless(_ domain: String) -> OHHTTPStubsTestBlock {
+func isPasswordless(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/passwordless/start")
 }
 
-func isTokenInfo(_ domain: String) -> OHHTTPStubsTestBlock {
+func isTokenInfo(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/tokeninfo")
 }
 
-func isUserInfo(_ domain: String) -> OHHTTPStubsTestBlock {
+func isUserInfo(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodGET() && isHost(domain) && isPath("/userinfo")
 }
 
-func isOAuthAccessToken(_ domain: String) -> OHHTTPStubsTestBlock {
+func isOAuthAccessToken(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/access_token")
 }
 
-func isRevokeToken(_ domain: String) -> OHHTTPStubsTestBlock {
+func isRevokeToken(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/revoke")
 }
 
-func isUsersPath(_ domain: String, identifier: String? = nil) -> OHHTTPStubsTestBlock {
+func isUsersPath(_ domain: String, identifier: String? = nil) -> HTTPStubsTestBlock {
     let path: String
     if let identifier = identifier {
         path = "/api/v2/users/\(identifier)"
@@ -128,15 +128,15 @@ func isUsersPath(_ domain: String, identifier: String? = nil) -> OHHTTPStubsTest
     return isHost(domain) && isPath(path)
 }
 
-func isLinkPath(_ domain: String, identifier: String) -> OHHTTPStubsTestBlock {
+func isLinkPath(_ domain: String, identifier: String) -> HTTPStubsTestBlock {
     return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")
 }
 
-func isJWKSPath(_ domain: String) -> OHHTTPStubsTestBlock {
+func isJWKSPath(_ domain: String) -> HTTPStubsTestBlock {
     return isHost(domain) && isPath("/.well-known/jwks.json")
 }
 
-func hasBearerToken(_ token: String) -> OHHTTPStubsTestBlock {
+func hasBearerToken(_ token: String) -> HTTPStubsTestBlock {
     return { request in
         return request.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)"
     }

@@ -126,9 +126,9 @@ class OAuth2GrantSpec: QuickSpec {
             }
 
             afterEach {
-                OHHTTPStubs.removeAllStubs()
+                HTTPStubs.removeAllStubs()
                 stub(condition: isHost(domain.host!)) { _ in
-                    return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                    return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
                     }.name = "YOU SHALL NOT PASS!"
             }
 
@@ -195,9 +195,9 @@ class OAuth2GrantSpec: QuickSpec {
             }
 
             afterEach {
-                OHHTTPStubs.removeAllStubs()
+                HTTPStubs.removeAllStubs()
                 stub(condition: isHost(domain.host!)) { _ in
-                    return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                    return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
                     }.name = "YOU SHALL NOT PASS!"
             }
 

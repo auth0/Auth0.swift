@@ -92,14 +92,14 @@ class NativeAuthSpec: QuickSpec {
 
         beforeEach {
             stub(condition: isHost(Domain)) { _ in
-                return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
                 }.name = "YOU SHALL NOT PASS!"
 
             nativeTransaction = MockNativeAuthTransaction(connection: Connection , scope: Scope, parameters: Parameters, authentication: authentication)
         }
 
         afterEach {
-            OHHTTPStubs.removeAllStubs()
+            HTTPStubs.removeAllStubs()
         }
 
         describe("Initializer values set") {

@@ -65,7 +65,7 @@ class BaseAuthTransactionSpec: QuickSpec {
         }
         
         afterEach {
-            OHHTTPStubs.removeAllStubs()
+            HTTPStubs.removeAllStubs()
         }
 
         describe("code exchange") {
