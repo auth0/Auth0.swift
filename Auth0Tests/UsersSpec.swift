@@ -38,8 +38,8 @@ class UsersSpec: QuickSpec {
         let users = Auth0.users(token: Token, domain: Domain)
 
         afterEach {
-            OHHTTPStubs.removeAllStubs()
-            stub(condition: isHost(Domain)) { _ in OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }
+            HTTPStubs.removeAllStubs()
+            stub(condition: isHost(Domain)) { _ in HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }
                 .name = "YOU SHALL NOT PASS!"
         }
 

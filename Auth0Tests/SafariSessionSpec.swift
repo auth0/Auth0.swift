@@ -138,9 +138,9 @@ class SafariSessionSpec: QuickSpec {
                 }
 
                 afterEach {
-                    OHHTTPStubs.removeAllStubs()
+                    HTTPStubs.removeAllStubs()
                     stub(condition: isHost("samples.auth0.com")) { _ in
-                        return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                        return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
                         }.name = "YOU SHALL NOT PASS!"
                 }
 
