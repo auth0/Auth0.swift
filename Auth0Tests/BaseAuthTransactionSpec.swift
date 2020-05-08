@@ -53,7 +53,7 @@ class BaseAuthTransactionSpec: QuickSpec {
                                               state: "state",
                                               handler: handler,
                                               logger: nil,
-                                              finish: callback)
+                                              callback: callback)
             result = nil
             stub(condition: isToken(self.Domain.host!) && hasAtLeast(["code": code,
                                                                  "code_verifier": generator.verifier,

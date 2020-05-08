@@ -1,4 +1,4 @@
-// WebAuth.swift
+// WebAuthenticatable.swift
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -172,6 +172,15 @@ public protocol WebAuthenticatable: Trackable, Loggable {
     /// - Parameter maxAge: number of milliseconds
     /// - Returns: the same WebAuth instance to allow method chaining
     func maxAge(_ maxAge: Int) -> Self
+
+    /**
+     Disable Single Sign On (SSO).
+     On iOS 13+ and macOS, it will use `prefersEphemeralWebBrowserSession`.
+     On older versions of iOS it will fallback to` SFSafariViewController`.
+
+     - returns: the same WebAuth instance to allow method chaining
+     */
+    func useEphemeralSession() -> Self
 
     /**
      Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)

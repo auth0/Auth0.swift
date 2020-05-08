@@ -32,6 +32,7 @@ class BaseWebAuth: WebAuthenticatable {
     var telemetry: Telemetry
     var logger: Logger?
     var universalLink = false
+    var ephemeralSession = false
 
     private let platform: String
     private(set) var parameters: [String: String] = [:]
@@ -122,6 +123,11 @@ class BaseWebAuth: WebAuthenticatable {
         return self
     }
 
+    func useEphemeralSession() -> Self {
+        self.ephemeralSession = true
+        return self
+    }
+
     func start(_ callback: @escaping (Result<Credentials>) -> Void) {
         guard let redirectURL = self.redirectURL else {
             return callback(Result.failure(error: WebAuthError.noBundleIdentifierFound))
@@ -158,7 +164,8 @@ class BaseWebAuth: WebAuthenticatable {
                                                  state: state,
                                                  handler: handler,
                                                  logger: self.logger,
-                                                 finish: callback)
+                                                 ephemeralSession: self.ephemeralSession,
+                                                 callback: callback)
         }
         #endif
         // TODO: On the next major add a new case to WebAuthError
@@ -198,6 +205,7 @@ class BaseWebAuth: WebAuthenticatable {
         if #available(iOS 12.0, macOS 10.15, *) {
             return AuthenticationServicesSessionCallback(url: logoutURL,
                                                          schemeURL: redirectURL,
+                                                         ephemeralSession: self.ephemeralSession,
                                                          callback: callback)
         }
         #endif

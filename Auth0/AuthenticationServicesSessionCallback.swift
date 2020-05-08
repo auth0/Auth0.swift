@@ -26,7 +26,7 @@ import AuthenticationServices
 @available(iOS 12.0, macOS 10.15, *)
 final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
 
-    init(url: URL, schemeURL: URL, callback: @escaping (Bool) -> Void) {
+    init(url: URL, schemeURL: URL, ephemeralSession: Bool, callback: @escaping (Bool) -> Void) {
         super.init(callback: callback)
 
         let authSession = ASWebAuthenticationSession(url: url,
@@ -35,11 +35,12 @@ final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
             TransactionStore.shared.clear()
         }
 
-        #if swift(>=5.1)
         if #available(iOS 13.0, *) {
+            #if swift(>=5.1)
             authSession.presentationContextProvider = self
+            #endif
+            authSession.prefersEphemeralWebBrowserSession = ephemeralSession
         }
-        #endif
 
         self.authSession = authSession
         authSession.start()

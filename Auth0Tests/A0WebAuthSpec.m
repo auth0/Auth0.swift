@@ -52,6 +52,11 @@ describe(@"init", ^{
         A0WebAuth *webAuth = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
         expect(@(webAuth.universalLink)).to(beFalsy());
     });
+
+    it(@"should not use an ephemeral session", ^{
+        A0WebAuth *webAuth = [[A0WebAuth alloc] initWithClientId:clientId url:domain];
+        expect(@(webAuth.ephemeralSession)).to(beFalsy());
+    });
 });
 
 describe(@"options", ^{
@@ -70,6 +75,11 @@ describe(@"options", ^{
     it(@"should set universal link flag", ^{
         webAuth.universalLink = YES;
         expect(@(webAuth.universalLink)).to(beTruthy());
+    });
+    
+    it(@"should set ephemeral session flag", ^{
+        webAuth.ephemeralSession = YES;
+        expect(@(webAuth.ephemeralSession)).to(beTruthy());
     });
 
     it(@"should set connection", ^{

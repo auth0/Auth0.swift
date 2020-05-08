@@ -101,6 +101,15 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
         return self
     }
 
+    override func useEphemeralSession() -> Self {
+        if #available(iOS 13.0, *) {
+            _ = super.useEphemeralSession()
+        } else {
+            self.authenticationSession = false
+        }
+        return self
+    }
+
     override func performLogin(authorizeURL: URL,
                                redirectURL: URL,
                                state: String?,
@@ -119,7 +128,7 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
                                          state: state,
                                          handler: handler,
                                          logger: self.logger,
-                                         finish: callback)
+                                         callback: callback)
         }
         let (controller, finish) = newSafari(authorizeURL, callback: callback)
         let session = SafariSession(controller: controller,
@@ -127,7 +136,7 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
                                     state: state,
                                     handler: handler,
                                     logger: self.logger,
-                                    finish: finish)
+                                    callback: finish)
         controller.delegate = session
         self.presenter.present(controller: controller)
         return session
@@ -263,21 +272,21 @@ final class SafariServicesSession: SessionTransaction {
          state: String? = nil,
          handler: OAuth2Grant,
          logger: Logger?,
-         finish: @escaping FinishTransaction) {
+         callback: @escaping FinishTransaction) {
         super.init(redirectURL: redirectURL,
                    state: state,
                    handler: handler,
                    logger: logger,
-                   finish: finish)
+                   callback: callback)
 
         authSession = SFAuthenticationSession(url: authorizeURL,
                                               callbackURLScheme: self.redirectURL.absoluteString) { [unowned self] in
             guard $1 == nil, let callbackURL = $0 else {
                 let authError = $1 ?? WebAuthError.unknownError
                 if case SFAuthenticationError.canceledLogin = authError {
-                    self.finish(.failure(error: WebAuthError.userCancelled))
+                    self.callback(.failure(error: WebAuthError.userCancelled))
                 } else {
-                    self.finish(.failure(error: authError))
+                    self.callback(.failure(error: authError))
                 }
                 return TransactionStore.shared.clear()
             }

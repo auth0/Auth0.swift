@@ -26,36 +26,40 @@ class BaseAuthTransaction: NSObject, AuthTransaction {
 
     let redirectURL: URL
     let state: String?
-    let finish: FinishTransaction
     let handler: OAuth2Grant
     let logger: Logger?
+    let callback: FinishTransaction
 
-    init(redirectURL: URL, state: String? = nil, handler: OAuth2Grant, logger: Logger?, finish: @escaping FinishTransaction) {
+    init(redirectURL: URL,
+         state: String? = nil,
+         handler: OAuth2Grant,
+         logger: Logger?,
+         callback: @escaping FinishTransaction) {
         self.redirectURL = redirectURL
         self.state = state
         self.handler = handler
         self.logger = logger
-        self.finish = finish
+        self.callback = callback
         super.init()
     }
 
     func cancel() {
-        self.finish(Result.failure(error: WebAuthError.userCancelled))
+        self.callback(Result.failure(error: WebAuthError.userCancelled))
     }
 
     func handleUrl(_ url: URL) -> Bool {
         self.logger?.trace(url: url, source: "iOS Safari")
         guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-            self.finish(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
+            self.callback(.failure(error: AuthenticationError(string: url.absoluteString, statusCode: 200)))
             return false
         }
         let items = self.handler.values(fromComponents: components)
         guard has(state: self.state, inItems: items) else { return false }
         if items["error"] != nil {
-            self.finish(.failure(error: AuthenticationError(info: items, statusCode: 0)))
+            self.callback(.failure(error: AuthenticationError(info: items, statusCode: 0)))
         } else {
-            self.handler.credentials(from: items, callback: self.finish)
+            self.handler.credentials(from: items, callback: self.callback)
         }
         return true
     }

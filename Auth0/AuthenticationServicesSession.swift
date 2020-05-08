@@ -31,35 +31,37 @@ final class AuthenticationServicesSession: SessionTransaction {
          state: String? = nil,
          handler: OAuth2Grant,
          logger: Logger?,
-         finish: @escaping FinishTransaction) {
+         ephemeralSession: Bool,
+         callback: @escaping FinishTransaction) {
         super.init(redirectURL: redirectURL,
                    state: state,
                    handler: handler,
                    logger: logger,
-                   finish: finish)
+                   callback: callback)
 
-        let webAuthenticationSession = ASWebAuthenticationSession(url: authorizeURL,
-                                                                  callbackURLScheme: self.redirectURL.scheme) { [weak self] in
+        let authSession = ASWebAuthenticationSession(url: authorizeURL,
+                                                     callbackURLScheme: self.redirectURL.scheme) { [weak self] in
             guard $1 == nil, let callbackURL = $0 else {
                 let authError = $1 ?? WebAuthError.unknownError
                 if case ASWebAuthenticationSessionError.canceledLogin = authError {
-                    self?.finish(.failure(error: WebAuthError.userCancelled))
+                    self?.callback(.failure(error: WebAuthError.userCancelled))
                 } else {
-                    self?.finish(.failure(error: authError))
+                    self?.callback(.failure(error: authError))
                 }
                 return TransactionStore.shared.clear()
             }
             _ = TransactionStore.shared.resume(callbackURL)
         }
 
-        #if swift(>=5.1)
         if #available(iOS 13.0, *) {
-            webAuthenticationSession.presentationContextProvider = self
+            #if swift(>=5.1)
+            authSession.presentationContextProvider = self
+            #endif
+            authSession.prefersEphemeralWebBrowserSession = ephemeralSession
         }
-        #endif
 
-        authSession = webAuthenticationSession
-        _ = authSession?.start()
+        self.authSession = authSession
+        authSession.start()
     }
 
 }

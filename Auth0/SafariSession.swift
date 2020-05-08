@@ -33,13 +33,13 @@ final class SafariSession: BaseAuthTransaction {
          state: String? = nil,
          handler: OAuth2Grant,
          logger: Logger?,
-         finish: @escaping FinishSession) {
+         callback: @escaping FinishSession) {
         self.controller = controller
         super.init(redirectURL: redirectURL,
                    state: state,
                    handler: handler,
                    logger: logger,
-                   finish: finish)
+                   callback: callback)
         controller.delegate = self
     }
 
