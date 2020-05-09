@@ -42,7 +42,7 @@ If you are using [Cocoapods](https://cocoapods.org), add this line to your `Podf
 pod 'Auth0', '~> 1.24'
 ```
 
-Then, run `pod install`.
+Then run `pod install`.
 
 > For more information on Cocoapods, check [their official documentation](https://guides.cocoapods.org/using/getting-started.html).
 
@@ -54,7 +54,7 @@ If you are using [Carthage](https://github.com/Carthage/Carthage), add the follo
 github "auth0/Auth0.swift" ~> 1.24
 ```
 
-Then, run `carthage bootstrap`.
+Then run `carthage bootstrap`.
 
 > For more information about Carthage usage, check [their official documentation](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos).
 
@@ -87,7 +87,7 @@ Auth0
 
 > This snippet sets the `audience` to ensure OIDC compliant responses, this can also be achieved by enabling the **OIDC Conformant** switch in your Auth0 dashboard under `Application / Settings / Advanced / OAuth`. For more information please check the [OIDC Conformant Authentication Adoption Guide](https://auth0.com/docs/api-auth/tutorials/adoption).
 
-3. Allow Auth0 to handle authentication callbacks. In your `AppDelegate.swift` add the following:
+3. Allow Auth0 to handle authentication callbacks. In your `AppDelegate.swift`, add the following:
 
 #### iOS
 
