@@ -32,7 +32,7 @@ web_auth_files = [
   'Auth0/SessionCallbackTransaction.swift',
   'Auth0/SessionTransaction.swift',
   'Auth0/TransactionStore.swift',
-  'Auth0/WebAuth.swift',
+  'Auth0/WebAuthenticatable.swift',
   'Auth0/WebAuthError.swift',
   'Auth0/_ObjectiveWebAuth.swift'
 ]
