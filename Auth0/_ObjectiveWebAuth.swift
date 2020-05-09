@@ -54,7 +54,6 @@ public class _ObjectiveOAuth2: NSObject {
         }
     }
 
-    #if swift(>=5.1)
     /**
      Disable Single Sign On (SSO).
 
@@ -69,7 +68,6 @@ public class _ObjectiveOAuth2: NSObject {
             return self.webAuth.ephemeralSession
         }
     }
-    #endif
 
     /**
      Specify a connection name to be used to authenticate.
