@@ -35,12 +35,14 @@ final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
             TransactionStore.shared.clear()
         }
 
+        #if swift(>=5.0)
         if #available(iOS 13.0, *) {
             #if swift(>=5.1)
             authSession.presentationContextProvider = self
             #endif
             authSession.prefersEphemeralWebBrowserSession = ephemeralSession
         }
+        #endif
 
         self.authSession = authSession
         authSession.start()
