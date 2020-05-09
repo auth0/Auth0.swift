@@ -280,43 +280,60 @@ class WebAuthSpec: QuickSpec {
 
         #if os(iOS)
         describe("session") {
-            let storage = TransactionStore.shared
 
-            beforeEach {
-                if let current = storage.current {
-                    storage.cancel(current)
+            context("before start") {
+
+                it("should not use ephemeral session by default") {
+                    expect(newWebAuth().ephemeralSession).to(beFalse())
                 }
+
+                it("should use ephemeral session") {
+                    expect(newWebAuth().useEphemeralSession().ephemeralSession).to(beTrue())
+                }
+
             }
 
-            it("should save started session") {
-                newWebAuth().start({ _ in})
-                expect(storage.current).toNot(beNil())
-            }
+            context("after start") {
 
-            it("should hava a generated state") {
-                let auth = newWebAuth()
-                auth.start({ _ in})
-                expect(storage.current?.state).toNot(beNil())
-            }
+                let storage = TransactionStore.shared
 
-            it("should honor supplied state") {
-                let state = UUID().uuidString
-                newWebAuth().state(state).start({ _ in})
-                expect(storage.current?.state) == state
-            }
+                beforeEach {
+                    if let current = storage.current {
+                        storage.cancel(current)
+                    }
+                }
 
-            it("should honor supplied state via parameters") {
-                let state = UUID().uuidString
-                newWebAuth().parameters(["state": state]).start({ _ in})
-                expect(storage.current?.state) == state
-            }
+                it("should save started session") {
+                    newWebAuth().start({ _ in})
+                    expect(storage.current).toNot(beNil())
+                }
 
-            it("should generate different state on every start") {
-                let auth = newWebAuth()
-                auth.start({ _ in})
-                let state = storage.current?.state
-                auth.start({ _ in})
-                expect(storage.current?.state) != state
+                it("should hava a generated state") {
+                    let auth = newWebAuth()
+                    auth.start({ _ in})
+                    expect(storage.current?.state).toNot(beNil())
+                }
+
+                it("should honor supplied state") {
+                    let state = UUID().uuidString
+                    newWebAuth().state(state).start({ _ in})
+                    expect(storage.current?.state) == state
+                }
+
+                it("should honor supplied state via parameters") {
+                    let state = UUID().uuidString
+                    newWebAuth().parameters(["state": state]).start({ _ in})
+                    expect(storage.current?.state) == state
+                }
+
+                it("should generate different state on every start") {
+                    let auth = newWebAuth()
+                    auth.start({ _ in})
+                    let state = storage.current?.state
+                    auth.start({ _ in})
+                    expect(storage.current?.state) != state
+                }
+
             }
 
         }
