@@ -101,16 +101,6 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
         return self
     }
 
-    #if swift(>=5.1)
-    override func useEphemeralSession() -> Self {
-        if #available(iOS 13.0, *) {
-            _ = super.useEphemeralSession()
-            return self
-        }
-        return self.useLegacyAuthentication()
-    }
-    #endif
-
     override func performLogin(authorizeURL: URL,
                                redirectURL: URL,
                                state: String?,

@@ -175,9 +175,8 @@ public protocol WebAuthenticatable: Trackable, Loggable {
 
     #if swift(>=5.1)
     /**
-     Disable Single Sign On (SSO).
-     On iOS 13+ and macOS, it will use `prefersEphemeralWebBrowserSession`.
-     On older versions of iOS it will fall back to` SFSafariViewController`.
+     Disable Single Sign On (SSO) on iOS 13+ and macOS.
+     Has no effect on older versions of iOS.
 
      - returns: the same WebAuth instance to allow method chaining
      */

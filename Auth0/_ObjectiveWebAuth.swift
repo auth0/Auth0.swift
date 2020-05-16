@@ -55,10 +55,9 @@ public class _ObjectiveOAuth2: NSObject {
     }
 
     /**
-     Disable Single Sign On (SSO).
+     Disable Single Sign On (SSO) on iOS 13+ and macOS.
 
-     On iOS 13+ and macOS, it will use `prefersEphemeralWebBrowserSession`.
-     On older versions of iOS it will fall back to` SFSafariViewController`.
+     Has no effect on older versions of iOS.
     */
     @objc public var ephemeralSession: Bool {
         set {
