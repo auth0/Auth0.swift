@@ -93,7 +93,7 @@
 		5C41F6D5244F974B00252548 /* SessionCallbackTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* SessionCallbackTransaction.swift */; };
 		5C41F6D6244F975200252548 /* SessionTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A6244DC9DB00252548 /* SessionTransaction.swift */; };
 		5C41F6D7244F975A00252548 /* TransactionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCAB1751D0900CF00331C84 /* TransactionStore.swift */; };
-		5C41F6D8244F976200252548 /* WebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */; };
+		5C41F6D8244F976200252548 /* WebAuthenticatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C11CF67CF000CDE7C0 /* WebAuthenticatable.swift */; };
 		5C41F6D9244F977900252548 /* WebAuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B91D14F70B00387ECB /* WebAuthError.swift */; };
 		5C41F6DA244F978200252548 /* _ObjectiveWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF2866E1D8A417B00314B72 /* _ObjectiveWebAuth.swift */; };
 		5C41F6DB244F97AB00252548 /* BaseWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FAE9C901D8878D400A871CE /* BaseWebAuth.swift */; };
@@ -227,7 +227,7 @@
 		5F331B201D4BCC1500AE4382 /* Quick.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F331B121D4BCBD400AE4382 /* Quick.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F331B211D4BCC1500AE4382 /* Nimble.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F331B131D4BCBD400AE4382 /* Nimble.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5F331B221D4BCC1500AE4382 /* OHHTTPStubs.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5F331B141D4BCBD400AE4382 /* OHHTTPStubs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5F3965C21CF67CF000CDE7C0 /* WebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */; };
+		5F3965C21CF67CF000CDE7C0 /* WebAuthenticatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C11CF67CF000CDE7C0 /* WebAuthenticatable.swift */; };
 		5F3965CA1CF67DD800CDE7C0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C91CF67DD800CDE7C0 /* AppDelegate.swift */; };
 		5F3965CC1CF67DD800CDE7C0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965CB1CF67DD800CDE7C0 /* ViewController.swift */; };
 		5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965CD1CF67DD800CDE7C0 /* Main.storyboard */; };
@@ -579,7 +579,7 @@
 		5F331B121D4BCBD400AE4382 /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quick.framework; path = Carthage/Build/tvOS/Quick.framework; sourceTree = "<group>"; };
 		5F331B131D4BCBD400AE4382 /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = Carthage/Build/tvOS/Nimble.framework; sourceTree = "<group>"; };
 		5F331B141D4BCBD400AE4382 /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = Carthage/Build/tvOS/OHHTTPStubs.framework; sourceTree = "<group>"; };
-		5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebAuth.swift; path = Auth0/WebAuth.swift; sourceTree = SOURCE_ROOT; };
+		5F3965C11CF67CF000CDE7C0 /* WebAuthenticatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebAuthenticatable.swift; path = Auth0/WebAuthenticatable.swift; sourceTree = SOURCE_ROOT; };
 		5F3965C71CF67DD800CDE7C0 /* OAuth2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F3965C91CF67DD800CDE7C0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5F3965CB1CF67DD800CDE7C0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -1007,7 +1007,7 @@
 				5BEDE1561EC1FBBE0007300D /* SilentSafariViewController.swift */,
 				5B16D8901F7141E5009476A5 /* AuthTransactions */,
 				5FCAB1751D0900CF00331C84 /* TransactionStore.swift */,
-				5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */,
+				5F3965C11CF67CF000CDE7C0 /* WebAuthenticatable.swift */,
 				5FAE9C901D8878D400A871CE /* BaseWebAuth.swift */,
 				5FD255B91D14F70B00387ECB /* WebAuthError.swift */,
 			);
@@ -1892,7 +1892,7 @@
 				5C41F6BB244E1DC100252548 /* UIApplication+Shared.swift in Sources */,
 				5FE2F8A91CCE54F1003628F4 /* Result.swift in Sources */,
 				5C41F6A4244DC94E00252548 /* BaseAuthTransaction.swift in Sources */,
-				5F3965C21CF67CF000CDE7C0 /* WebAuth.swift in Sources */,
+				5F3965C21CF67CF000CDE7C0 /* WebAuthenticatable.swift in Sources */,
 				5FDE87511D8A424700EA27DC /* _ObjectiveAuthenticationAPI.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* TransactionStore.swift in Sources */,
 				5FDE87611D8A424700EA27DC /* Identity.swift in Sources */,
@@ -1965,7 +1965,7 @@
 				5C4F551B23C8FB8E00C89615 /* String+URLSafe.swift in Sources */,
 				5FDE875A1D8A424700EA27DC /* Authentication.swift in Sources */,
 				5C41F6C1244F964000252548 /* A0SHA.m in Sources */,
-				5C41F6D8244F976200252548 /* WebAuth.swift in Sources */,
+				5C41F6D8244F976200252548 /* WebAuthenticatable.swift in Sources */,
 				5FE2F8AA1CCE54F1003628F4 /* Result.swift in Sources */,
 				5C41F6CC244F96F200252548 /* ClaimValidators.swift in Sources */,
 				5C41F6D9244F977900252548 /* WebAuthError.swift in Sources */,
