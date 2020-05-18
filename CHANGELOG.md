@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.25.0](https://github.com/auth0/Auth0.swift/tree/1.25.0) (2020-05-18)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.24.1...1.25.0)
+
+**Added**
+- Added support for ephemeral sessions [SDK-1559] [\#388](https://github.com/auth0/Auth0.swift/pull/388) ([Widcket](https://github.com/Widcket))
+- Bumped dependencies [SDK-1630] [\#386](https://github.com/auth0/Auth0.swift/pull/386) ([Widcket](https://github.com/Widcket))
+
 ## [1.24.1](https://github.com/auth0/Auth0.swift/tree/1.24.1) (2020-04-30)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.24.0...1.24.1)
 
