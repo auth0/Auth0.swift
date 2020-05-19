@@ -48,12 +48,12 @@ class AuthenticationSpec: QuickSpec {
 
         beforeEach {
             stub(condition: isHost(Domain)) { _ in
-                return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
                 }.name = "YOU SHALL NOT PASS!"
         }
 
         afterEach {
-            OHHTTPStubs.removeAllStubs()
+            HTTPStubs.removeAllStubs()
         }
 
         describe("login") {
@@ -61,7 +61,7 @@ class AuthenticationSpec: QuickSpec {
             beforeEach {
                 stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
                 stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": InvalidPassword])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": InvalidPassword])) { _ in return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
             }
 
             it("should login with username and password") {
@@ -1309,7 +1309,7 @@ class AuthenticationSpec: QuickSpec {
             beforeEach {
                 stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook", "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Facebook Auth OpenID"
                 stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook"]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Facebook Auth"
-                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": InvalidFacebookToken])) { _ in return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
+                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": InvalidFacebookToken])) { _ in return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
             }
 
             it("should login with social IdP token") {

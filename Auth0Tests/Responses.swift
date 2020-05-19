@@ -46,7 +46,7 @@ let OTP = "123456"
 let MFAToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 let JWKKid = "key123"
 
-func authResponse(accessToken: String, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Double? = nil) -> OHHTTPStubsResponse {
+func authResponse(accessToken: String, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Double? = nil) -> HTTPStubsResponse {
     var json = [
         "access_token": accessToken,
         "token_type": "bearer",
@@ -63,10 +63,10 @@ func authResponse(accessToken: String, idToken: String? = nil, refreshToken: Str
     if let expires = expiresIn {
         json["expires_in"] = String(expires)
     }
-    return OHHTTPStubsResponse(jsonObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
+    return HTTPStubsResponse(jsonObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
-func createdUser(email: String, username: String? = nil, verified: Bool = true) -> OHHTTPStubsResponse {
+func createdUser(email: String, username: String? = nil, verified: Bool = true) -> HTTPStubsResponse {
     var json: [String: Any] = [
         "email": email,
         "email_verified": verified ? "true" : "false",
@@ -75,37 +75,37 @@ func createdUser(email: String, username: String? = nil, verified: Bool = true) 
     if let username = username {
         json["username"] = username
     }
-    return OHHTTPStubsResponse(jsonObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
+    return HTTPStubsResponse(jsonObject: json, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
-func resetPasswordResponse() -> OHHTTPStubsResponse {
+func resetPasswordResponse() -> HTTPStubsResponse {
     let data = "We've just sent you an email to reset your password.".data(using: .utf8)!
-    return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
+    return HTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
-func revokeTokenResponse() -> OHHTTPStubsResponse {
+func revokeTokenResponse() -> HTTPStubsResponse {
     let data = "".data(using: .utf8)!
-    return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
+    return HTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
-func authFailure(code: String, description: String, name: String? = nil) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(jsonObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: ["Content-Type": "application/json"])
+func authFailure(code: String, description: String, name: String? = nil) -> HTTPStubsResponse {
+    return HTTPStubsResponse(jsonObject: ["code": code, "description": description, "statusCode": 400, "name": name ?? code], statusCode: 400, headers: ["Content-Type": "application/json"])
 }
 
-func authFailure(error: String, description: String) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(jsonObject: ["error": error, "error_description": description], statusCode: 400, headers: ["Content-Type": "application/json"])
+func authFailure(error: String, description: String) -> HTTPStubsResponse {
+    return HTTPStubsResponse(jsonObject: ["error": error, "error_description": description], statusCode: 400, headers: ["Content-Type": "application/json"])
 }
 
-func passwordless(_ email: String, verified: Bool) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(jsonObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: ["Content-Type": "application/json"])
+func passwordless(_ email: String, verified: Bool) -> HTTPStubsResponse {
+    return HTTPStubsResponse(jsonObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
-func tokenInfo() -> OHHTTPStubsResponse {
+func tokenInfo() -> HTTPStubsResponse {
     return userInfo(withProfile: basicProfile())
 }
 
-func userInfo(withProfile profile: [String: Any]) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(jsonObject: profile, statusCode: 200, headers: nil)
+func userInfo(withProfile profile: [String: Any]) -> HTTPStubsResponse {
+    return HTTPStubsResponse(jsonObject: profile, statusCode: 200, headers: nil)
 }
 
 func basicProfile(_ id: String = UserId, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, createdAt: String = CreatedAtUnix) -> [String: Any] {
@@ -115,15 +115,15 @@ func basicProfile(_ id: String = UserId, name: String = Support, nickname: Strin
 func basicProfileOIDC(_ sub: String = Sub, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, updatedAt: String = UpdatedAtUnix) -> [String: Any] {
     return ["sub": sub, "name": name, "nickname": nickname, "picture": picture, "updated_at": updatedAt]
 }
-func managementResponse(_ payload: Any) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(jsonObject: payload, statusCode: 200, headers: ["Content-Type": "application/json"])
+func managementResponse(_ payload: Any) -> HTTPStubsResponse {
+    return HTTPStubsResponse(jsonObject: payload, statusCode: 200, headers: ["Content-Type": "application/json"])
 }
 
-func managementErrorResponse(error: String, description: String, code: String, statusCode: Int = 400) -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(jsonObject: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: Int32(statusCode), headers: ["Content-Type": "application/json"])
+func managementErrorResponse(error: String, description: String, code: String, statusCode: Int = 400) -> HTTPStubsResponse {
+    return HTTPStubsResponse(jsonObject: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: Int32(statusCode), headers: ["Content-Type": "application/json"])
 }
 
-func jwksResponse(kid: String? = JWKKid) -> OHHTTPStubsResponse {
+func jwksResponse(kid: String? = JWKKid) -> HTTPStubsResponse {
     #if WEB_AUTH_PLATFORM
     let jwk = generateRSAJWK()
     let jwks = ["keys": [["alg": jwk.algorithm,
@@ -141,9 +141,9 @@ func jwksResponse(kid: String? = JWKKid) -> OHHTTPStubsResponse {
                           "kid": kid]]]
     #endif
     
-    return OHHTTPStubsResponse(jsonObject: jwks, statusCode: 200, headers: nil)
+    return HTTPStubsResponse(jsonObject: jwks, statusCode: 200, headers: nil)
 }
 
-func jwksErrorResponse() -> OHHTTPStubsResponse {
-    return OHHTTPStubsResponse(jsonObject: [], statusCode: 500, headers: nil)
+func jwksErrorResponse() -> HTTPStubsResponse {
+    return HTTPStubsResponse(jsonObject: [], statusCode: 500, headers: nil)
 }

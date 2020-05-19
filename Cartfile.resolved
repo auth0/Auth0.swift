@@ -1,5 +1,5 @@
-github "AliSoftware/OHHTTPStubs" "8.0.0"
-github "Quick/Nimble" "v8.0.5"
+github "AliSoftware/OHHTTPStubs" "9.0.0"
+github "Quick/Nimble" "v8.0.7"
 github "Quick/Quick" "v2.2.0"
 github "auth0/JWTDecode.swift" "2.4.1"
-github "auth0/SimpleKeychain" "0.11.0"
+github "auth0/SimpleKeychain" "0.11.1"

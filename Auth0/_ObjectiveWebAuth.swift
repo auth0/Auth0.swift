@@ -55,6 +55,20 @@ public class _ObjectiveOAuth2: NSObject {
     }
 
     /**
+     Disable Single Sign On (SSO) on iOS 13+ and macOS.
+
+     Has no effect on older versions of iOS.
+    */
+    @objc public var ephemeralSession: Bool {
+        set {
+            self.webAuth.ephemeralSession = newValue
+        }
+        get {
+            return self.webAuth.ephemeralSession
+        }
+    }
+
+    /**
      Specify a connection name to be used to authenticate.
 
      By default no connection is specified, so the hosted login page will be displayed

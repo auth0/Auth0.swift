@@ -61,7 +61,7 @@ class SafariSessionSpec: QuickSpec {
 
             beforeEach {
                 controller.delegate = nil
-                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, finish: callback)
+                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, callback: callback)
             }
 
             it("should set itself as delegate") {
@@ -80,7 +80,7 @@ class SafariSessionSpec: QuickSpec {
 
             beforeEach {
                 controller.presenting = MockViewController()
-                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, finish: callback)
+                session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, callback: callback)
             }
 
             it("should return true if URL matches redirect URL") {
@@ -96,7 +96,7 @@ class SafariSessionSpec: QuickSpec {
                 var session: SafariSession!
 
                 beforeEach {
-                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, finish: callback)
+                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, callback: callback)
                 }
 
                 it("should not return credentials from query string") {
@@ -130,7 +130,7 @@ class SafariSessionSpec: QuickSpec {
                 let code = "123456"
 
                 beforeEach {
-                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, finish: callback)
+                    session = SafariSession(controller: controller, redirectURL: RedirectURL, handler: handler, logger: nil, callback: callback)
                     stub(condition: isToken(Domain.host!) && hasAtLeast(["code": code, "code_verifier": generator.verifier, "grant_type": "authorization_code", "redirect_uri": RedirectURL.absoluteString])) {
                         _ in return authResponse(accessToken: "AT", idToken: idToken)
                     }.name = "Code Exchange Auth"
@@ -138,9 +138,9 @@ class SafariSessionSpec: QuickSpec {
                 }
 
                 afterEach {
-                    OHHTTPStubs.removeAllStubs()
+                    HTTPStubs.removeAllStubs()
                     stub(condition: isHost("samples.auth0.com")) { _ in
-                        return OHHTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                        return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
                         }.name = "YOU SHALL NOT PASS!"
                 }
 
@@ -176,7 +176,7 @@ class SafariSessionSpec: QuickSpec {
             }
 
             context("with state") {
-                let session = SafariSession(controller: controller, redirectURL: RedirectURL, state: "state", handler: handler, logger: nil, finish: {
+                let session = SafariSession(controller: controller, redirectURL: RedirectURL, state: "state", handler: handler, logger: nil, callback: {
                     result = $0
                 })
 

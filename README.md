@@ -28,8 +28,8 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 ## Requirements
 
 - iOS 9+ / macOS 10.11+ / tvOS 9.0+ / watchOS 2.0+
-- Xcode 10.x/11.x
-- Swift 4.x/5.x
+- Xcode 10.x / 11.x
+- Swift 4.x / 5.x
 
 
 ## Installation
@@ -39,10 +39,10 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 If you are using [Cocoapods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 1.24'
+pod 'Auth0', '~> 1.25'
 ```
 
-Then, run `pod install`.
+Then run `pod install`.
 
 > For more information on Cocoapods, check [their official documentation](https://guides.cocoapods.org/using/getting-started.html).
 
@@ -51,10 +51,10 @@ Then, run `pod install`.
 If you are using [Carthage](https://github.com/Carthage/Carthage), add the following line to your `Cartfile`:
 
 ```ruby
-github "auth0/Auth0.swift" ~> 1.24
+github "auth0/Auth0.swift" ~> 1.25
 ```
 
-Then, run `carthage bootstrap`.
+Then run `carthage bootstrap`.
 
 > For more information about Carthage usage, check [their official documentation](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos).
 
@@ -87,7 +87,7 @@ Auth0
 
 > This snippet sets the `audience` to ensure OIDC compliant responses, this can also be achieved by enabling the **OIDC Conformant** switch in your Auth0 dashboard under `Application / Settings / Advanced / OAuth`. For more information please check the [OIDC Conformant Authentication Adoption Guide](https://auth0.com/docs/api-auth/tutorials/adoption).
 
-3. Allow Auth0 to handle authentication callbacks. In your `AppDelegate.swift` add the following:
+3. Allow Auth0 to handle authentication callbacks. In your `AppDelegate.swift`, add the following:
 
 #### iOS
 
@@ -160,7 +160,7 @@ Finally, go to your [Auth0 Dashboard](https://manage.auth0.com/#/applications/) 
 YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
 ```
 
-e.g. If your bundle identifier was `com.company.myapp` and your Auth0 domain was `company.auth0.com` then this value would be
+e.g. If your bundle identifier was `com.company.myapp` and your Auth0 domain was `company.auth0.com`, then this value would be:
 
 ```text
 com.company.myapp://company.auth0.com/ios/com.company.myapp/callback
@@ -199,7 +199,7 @@ Auth0
     .authentication()
     .renew(withRefreshToken: refreshToken)
     .start { result in
-        switch(result) {
+        switch result {
         case .success(let credentials):
             print("Obtained new credentials: \(credentials)")
         case .failure(let error):
@@ -269,7 +269,7 @@ credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 
 #### Sign in With Apple
 
-If you've added [the Sign In with Apple flow](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) to your app, you can use the string value from the  `authorizationCode` property obtained after a successful Apple authentication to perform a token exchange for Auth0 tokens.
+If you've added [the Sign In with Apple flow](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) to your app, you can use the string value from the `authorizationCode` property obtained after a successful Apple authentication to perform a token exchange for Auth0 tokens.
 
 ```swift
 Auth0
@@ -365,7 +365,7 @@ Auth0
 If you are using the [Custom Domains](https://auth0.com/docs/custom-domains) feature and need to use an Auth0 endpoint
 such as `/userinfo`, please use the Auth0 domain specified for your Application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
-Example:  `.audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")`
+Example: `.audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")`
 
 ### Management API (Users)
 

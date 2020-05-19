@@ -35,15 +35,15 @@ NSString *token = @"A TOKEN";
 NSString *bearer = @"bearer";
 
 beforeEach(^{
-    [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+    [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
         return YES;
-    } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-        return [OHHTTPStubsResponse responseWithError:[NSError errorWithDomain:@"com.auth0" code:-9999999 userInfo:nil]];
+    } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+        return [HTTPStubsResponse responseWithError:[NSError errorWithDomain:@"com.auth0" code:-9999999 userInfo:nil]];
     }];
 });
 
 afterEach(^{
-    [OHHTTPStubs removeAllStubs];
+    [HTTPStubs removeAllStubs];
 });
 
 describe(@"init", ^{
@@ -70,10 +70,10 @@ describe(@"login", ^{
     });
 
     it(@"should authenticate", ^{
-        [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+        [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/oauth/ro"];
-        } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"access_token": token, @"token_type": bearer}
+        } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+            return [HTTPStubsResponse responseWithJSONObject:@{@"access_token": token, @"token_type": bearer}
                                                     statusCode:200
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -94,10 +94,10 @@ describe(@"login", ^{
     });
 
     it(@"should handle error", ^{
-        [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+        [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/oauth/ro"];
-        } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_user_password", @"error_description": @"invalid password"}
+        } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+            return [HTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_user_password", @"error_description": @"invalid password"}
                                                     statusCode:401
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -131,10 +131,10 @@ describe(@"create user", ^{
     });
 
     it(@"should create user", ^{
-        [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+        [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/dbconnections/signup"];
-        } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"email": @"support@auth0.com", @"email_verified": @"true"}
+        } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+            return [HTTPStubsResponse responseWithJSONObject:@{@"email": @"support@auth0.com", @"email_verified": @"true"}
                                                     statusCode:200
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -154,10 +154,10 @@ describe(@"create user", ^{
     });
 
     it(@"should handle error", ^{
-        [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+        [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/dbconnections/signup"];
-        } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_user_password", @"error_description": @"invalid password"}
+        } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+            return [HTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_user_password", @"error_description": @"invalid password"}
                                                     statusCode:401
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -191,10 +191,10 @@ describe(@"reset password", ^{
     });
 
     it(@"should request change password", ^{
-        [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+        [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/dbconnections/change_password"];
-        } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{}
+        } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+            return [HTTPStubsResponse responseWithJSONObject:@{}
                                                     statusCode:204
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -210,10 +210,10 @@ describe(@"reset password", ^{
     });
 
     it(@"should handle error", ^{
-        [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+        [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/dbconnections/change_password"];
-        } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_user_password", @"error_description": @"invalid password"}
+        } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+            return [HTTPStubsResponse responseWithJSONObject:@{@"error": @"invalid_user_password", @"error_description": @"invalid password"}
                                                     statusCode:401
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -243,17 +243,17 @@ describe(@"signup", ^{
     });
 
     it(@"should authenticate", ^{
-        [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+        [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/dbconnections/signup"];
-        } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"email": @"support@auth0.com", @"email_verified": @"true"}
+        } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+            return [HTTPStubsResponse responseWithJSONObject:@{@"email": @"support@auth0.com", @"email_verified": @"true"}
                                                     statusCode:200
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
-        [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+        [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/oauth/ro"];
-        } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"access_token": token, @"token_type": bearer}
+        } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+            return [HTTPStubsResponse responseWithJSONObject:@{@"access_token": token, @"token_type": bearer}
                                                     statusCode:200
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
@@ -276,10 +276,10 @@ describe(@"signup", ^{
     });
 
     it(@"should handle error", ^{
-        [OHHTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
+        [HTTPStubs stubRequestsPassingTest:^BOOL(NSURLRequest *request) {
             return [request.URL.host isEqualToString:domain.host] && [request.URL.path isEqualToString:@"/dbconnections/signup"];
-        } withStubResponse:^OHHTTPStubsResponse*(NSURLRequest *request) {
-            return [OHHTTPStubsResponse responseWithJSONObject:@{@"code": @"invalid_password", @"description": @"invalid password", @"name": @"PasswordStrengthError"}
+        } withStubResponse:^HTTPStubsResponse*(NSURLRequest *request) {
+            return [HTTPStubsResponse responseWithJSONObject:@{@"code": @"invalid_password", @"description": @"invalid password", @"name": @"PasswordStrengthError"}
                                                     statusCode:401
                                                        headers:@{@"Content-Type":@"application/json"}];
         }];
