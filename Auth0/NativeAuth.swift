@@ -78,6 +78,17 @@ public protocol NativeAuthTransaction: AuthTransaction {
      - parameter callback: callback with the IdP credentials on success or the cause of the error.
      */
     func auth(callback: @escaping Callback)
+
+    /**
+     Starts the Auth transaction by trying to authenticate the user with the IdP SDK first,
+     then on success it will try to auth with Auth0 using /oauth/access_token sending at least the IdP access_token.
+
+     If Auth0 needs more parameters in order to authenticate a given IdP, they must be added in the `extra` attribute of `NativeAuthCredentials`
+
+     - parameter callback: closure that will notify with the result of the Auth transaction. On success it will yield the Auth0 credentilas of the user otherwise it will yield the cause of the failure.
+     - important: Only one `AuthTransaction` can be active at a given time, if there is a pending one (OAuth or Native) it will be cancelled and replaced by the new one.
+     */
+    func start(callback: @escaping (Result<Credentials>) -> Void)
 }
 
 /**
