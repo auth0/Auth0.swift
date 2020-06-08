@@ -267,6 +267,14 @@ class AuthenticationSpec: QuickSpec {
                     "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
                     hasNoneOf(["user_profile"])
                     ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with missing user profile"
+
+
+                    stub(condition: isToken(Domain) && hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
+                    "subject_token": "VALIDNAMEANDPROFILECODE",
+                    "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
+                    (hasAtLeast(["user_profile": "{\"name\":{\"firstName\":\"John\"},\"user_metadata\":{\"custom_key\":\"custom_value\"}}"]) || hasAtLeast(["user_profile": "{\"user_metadata\":{\"custom_key\":\"custom_value\"},\"name\":{\"firstName\":\"John\"}}"]))
+                    ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with user profile"
                 }
 
                 it("should exchange apple auth code for credentials") {
@@ -382,6 +390,24 @@ class AuthenticationSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         auth.tokenExchange(withAppleAuthorizationCode: "VALIDMISSINGNAMECODE",
                                            fullName: fullName)
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+                }
+
+                it("should exchange apple auth code for credentials with fullName and profile") {
+                    var fullName = PersonNameComponents()
+                    fullName.givenName = "John"
+                    fullName.familyName = nil
+                    fullName.middleName = "Ignored"
+                    let profile = ["user_metadata": ["custom_key": "custom_value"]]
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(appleAuthorizationCode: "VALIDNAMEANDPROFILECODE",
+                                   fullName: fullName,
+                                   profile: profile)
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()

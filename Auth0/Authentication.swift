@@ -256,13 +256,14 @@ public protocol Authentication: Trackable, Loggable {
     ```
 
     - parameter authCode: Authorization Code retrieved from Apple Authorization
+    - parameter fullName: The full name property returned with the Apple ID Credentials
+    - parameter profile: Additional user profile data returned with the Apple ID Credentials
     - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
     - parameter audience: API Identifier that the client is requesting access to
-    - parameter fullName: The full name property returned with the Apple ID Credentials
 
     - returns: a request that will yield Auth0 user's credentials
     */
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, scope: String?, audience: String?) -> Request<Credentials, AuthenticationError>
+    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, scope: String?, audience: String?) -> Request<Credentials, AuthenticationError>
 
     /**
     Authenticate a user with their Facebook session info access token and profile data.
@@ -946,14 +947,15 @@ public extension Authentication {
     ```
 
     - parameter authCode: Authorization Code retrieved from Apple Authorization
+    - parameter fullName: The full name property returned with the Apple ID Credentials
+    - parameter profile: Additional user profile data returned with the Apple ID Credentials
     - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
     - parameter audience: API Identifier that the client is requesting access to
-    - parameter fullName: The full name property returned with the Apple ID Credentials
 
     - returns: a request that will yield Auth0 user's credentials
     */
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents? = nil, scope: String? = "openid profile offline_access", audience: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(appleAuthorizationCode: authorizationCode, fullName: fullName, scope: scope, audience: audience)
+    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents? = nil, profile: [String: Any]? = nil, scope: String? = "openid profile offline_access", audience: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(appleAuthorizationCode: authorizationCode, fullName: fullName, profile: profile, scope: scope, audience: audience)
     }
 
     /**
