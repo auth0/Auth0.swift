@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.26.0](https://github.com/auth0/Auth0.swift/tree/1.26.0) (2020-06-10)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.25.0...1.26.0)
+
+**Added**
+- Added Sign In with Apple profile parameter [\#392](https://github.com/auth0/Auth0.swift/pull/392) ([ejensen](https://github.com/ejensen))
+
+**Changed**
+- Moved NativeAuth.start() into the NativeAuth protocol declaration [\#390](https://github.com/auth0/Auth0.swift/pull/390) ([ejensen](https://github.com/ejensen))
+
 ## [1.25.0](https://github.com/auth0/Auth0.swift/tree/1.25.0) (2020-05-18)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.24.1...1.25.0)
 
