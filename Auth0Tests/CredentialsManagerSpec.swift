@@ -454,6 +454,46 @@ class CredentialsManagerSpec: QuickSpec {
                         }
                     }
                 }
+                
+                it("should yield new credentials when credentials expire in the future") {
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: 3600))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        expect(credentialsManager.hasExpired(credentials)).to(beFalse())
+                        credentialsManager.renew(refreshToken: RefreshToken) { error, newCredentials in
+                            expect(newCredentials?.accessToken) == NewAccessToken
+                            expect(newCredentials?.refreshToken) == RefreshToken
+                            expect(newCredentials?.idToken) == NewIdToken
+                            
+                            credentialsManager.credentials { error, storedCredentials in
+                                expect(storedCredentials?.accessToken) == newCredentials?.accessToken
+                                expect(storedCredentials?.refreshToken) == newCredentials?.refreshToken
+                                expect(storedCredentials?.idToken) == newCredentials?.idToken
+                                done()
+                            }
+                        }
+                    }
+                }
+                
+                it("should yield new credentials when credentials have expired") {
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        expect(credentialsManager.hasExpired(credentials)).to(beTrue())
+                        credentialsManager.renew(refreshToken: RefreshToken) { error, newCredentials in
+                            expect(newCredentials?.accessToken) == NewAccessToken
+                            expect(newCredentials?.refreshToken) == RefreshToken
+                            expect(newCredentials?.idToken) == NewIdToken
+                            
+                            credentialsManager.credentials { error, storedCredentials in
+                                expect(storedCredentials?.accessToken) == newCredentials?.accessToken
+                                expect(storedCredentials?.refreshToken) == newCredentials?.refreshToken
+                                expect(storedCredentials?.idToken) == newCredentials?.idToken
+                                done()
+                            }
+                        }
+                    }
+                }
             }
             
             context("custom keychain") {

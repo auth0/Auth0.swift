@@ -167,6 +167,41 @@ public struct CredentialsManager {
         self.retrieveCredentials(withScope: scope, callback: callback)
     }
     #endif
+    
+    /// Renew credentials regardless of expiry time. This will yield new credentials using the refreshToken regardless of whether the accessToken has expired.
+    /// Renewed credentials will be stored in the keychain.
+    ///
+    ///
+    /// ```
+    /// credentialsManager.renew(refreshToken: "some_refresh_token") { error, credential in
+    ///    guard error == nil else { return }
+    ///    print(credential)
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - refreshToken: refreshToken to request new credentials.
+    ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth
+    ///   - callback: callback with the user's credentials or the cause of the error.
+    /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/refresh-token)
+    public func renew(refreshToken: String, scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+        self.authentication.renew(withRefreshToken: refreshToken, scope: scope).start {
+            switch $0 {
+            case .success(let credentials):
+                let newCredentials = Credentials(accessToken: credentials.accessToken,
+                                                 tokenType: credentials.tokenType,
+                                                 idToken: credentials.idToken,
+                                                 refreshToken: refreshToken,
+                                                 expiresIn: credentials.expiresIn,
+                                                 scope: credentials.scope)
+                _ = self.store(credentials: newCredentials)
+                callback(nil, newCredentials)
+            case .failure(let error):
+                callback(.failedRefresh(error), nil)
+            }
+        }
+    }
 
     private func retrieveCredentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard
