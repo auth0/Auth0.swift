@@ -460,7 +460,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
                         expect(credentialsManager.hasExpired(credentials)).to(beFalse())
-                        credentialsManager.renew(refreshToken: RefreshToken) { error, newCredentials in
+                        credentialsManager.renew { error, newCredentials in
                             expect(newCredentials?.accessToken) == NewAccessToken
                             expect(newCredentials?.refreshToken) == RefreshToken
                             expect(newCredentials?.idToken) == NewIdToken
@@ -480,7 +480,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
                         expect(credentialsManager.hasExpired(credentials)).to(beTrue())
-                        credentialsManager.renew(refreshToken: RefreshToken) { error, newCredentials in
+                        credentialsManager.renew { error, newCredentials in
                             expect(newCredentials?.accessToken) == NewAccessToken
                             expect(newCredentials?.refreshToken) == RefreshToken
                             expect(newCredentials?.idToken) == NewIdToken
