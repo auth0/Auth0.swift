@@ -455,7 +455,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
                 
-                it("should yield new credentials when credentials expire in the future") {
+                it("should yield new credentials on explicit renew") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: 3600))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
@@ -475,22 +475,16 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
                 
-                it("should yield new credentials when credentials have expired") {
+                it("should yield error on failed explicit renew") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authFailure(code: "invalid_request", description: "missing_params") }.name = "renew failed"
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
                         expect(credentialsManager.hasExpired(credentials)).to(beTrue())
                         credentialsManager.renew { error, newCredentials in
-                            expect(newCredentials?.accessToken) == NewAccessToken
-                            expect(newCredentials?.refreshToken) == RefreshToken
-                            expect(newCredentials?.idToken) == NewIdToken
-                            
-                            credentialsManager.credentials { error, storedCredentials in
-                                expect(storedCredentials?.accessToken) == newCredentials?.accessToken
-                                expect(storedCredentials?.refreshToken) == newCredentials?.refreshToken
-                                expect(storedCredentials?.idToken) == newCredentials?.idToken
-                                done()
-                            }
+                            expect(error).to(matchError(CredentialsManagerError.failedRefresh(AuthenticationError())))
+                            expect(newCredentials).to(beNil())
+                            done()
                         }
                     }
                 }
