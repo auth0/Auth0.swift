@@ -40,7 +40,7 @@ public enum WebAuthError: CustomNSError {
     case pkceNotAllowed(String)
     case noNonceProvided
     case missingResponseParam(String)
-    case invalidIdTokenNonce // TODO: Remove on the next major
+    case invalidIdTokenNonce
     case missingAccessToken
     case unknownError
 

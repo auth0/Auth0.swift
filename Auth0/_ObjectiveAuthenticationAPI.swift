@@ -78,7 +78,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
             }
     }
 
-#if os(iOS) // TODO: Remove on next major (this method shouldn't be here)
+#if os(iOS)
     @objc(resumeAuthWithURL:options:)
     public static func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
         return resumeAuth(url, options: options)

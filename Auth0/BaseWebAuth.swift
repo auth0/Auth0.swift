@@ -170,7 +170,6 @@ class BaseWebAuth: WebAuthenticatable {
                                                  callback: callback)
         }
         #endif
-        // TODO: On the next major add a new case to WebAuthError
         callback(.failure(error: WebAuthError.unknownError))
         return nil
     }

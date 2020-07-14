@@ -38,27 +38,43 @@
 }
 
 - (NSData *)sign:(NSData *)plainData {
+    NSData* signedHash = nil;
+
+#if TARGET_OS_OSX
+    NSData* result = nil;
+    CFErrorRef* error = nil;
+    result = CFBridgingRelease(SecKeyCreateSignature(self.key, kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256, (CFDataRef)plainData, error));
+    
+    if (error == nil) {
+        signedHash = result;
+    }
+#else
     size_t signedHashBytesSize = SecKeyGetBlockSize(self.key);
     uint8_t signedHashBytes[signedHashBytesSize];
     memset(signedHashBytes, 0x0, signedHashBytesSize);
-
+    
     OSStatus result = SecKeyRawSign(self.key,
                                     kSecPaddingPKCS1SHA256,
                                     plainData.bytes,
                                     plainData.length,
                                     signedHashBytes,
                                     &signedHashBytesSize);
-
-    NSData* signedHash = nil;
+    
     if (result == errSecSuccess) {
         signedHash = [NSData dataWithBytes:signedHashBytes
                                     length:(NSUInteger)signedHashBytesSize];
     }
+#endif
 
     return signedHash;
 }
 
 - (Boolean)verify:(NSData *)plainData signature:(NSData *)signature {
+    
+#if TARGET_OS_OSX
+    CFErrorRef* error = nil;
+    return SecKeyVerifySignature(self.key, kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256, (CFDataRef)plainData, (CFDataRef)signature, error);
+#else
     OSStatus result = SecKeyRawVerify(self.key,
                                       kSecPaddingPKCS1SHA256,
                                       plainData.bytes,
@@ -66,6 +82,8 @@
                                       signature.bytes,
                                       signature.length);
     return result == errSecSuccess;
+#endif
+
 }
 
 @end
