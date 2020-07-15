@@ -37,7 +37,7 @@ private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: 
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-private let Timeout: TimeInterval = 2
+private let Timeout = DispatchTimeInterval.seconds(2)
 private let TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange"
 private let PasswordlessGrantType = "http://auth0.com/oauth/grant-type/passwordless/otp"
 

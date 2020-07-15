@@ -40,7 +40,7 @@
 - (NSData *)sign:(NSData *)plainData {
     NSData* signedHash = nil;
 
-#if TARGET_OS_OSX
+#if TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1012
     NSData* result = nil;
     CFErrorRef* error = nil;
     result = CFBridgingRelease(SecKeyCreateSignature(self.key, kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256, (CFDataRef)plainData, error));
@@ -71,7 +71,7 @@
 
 - (Boolean)verify:(NSData *)plainData signature:(NSData *)signature {
     
-#if TARGET_OS_OSX
+#if TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1012
     CFErrorRef* error = nil;
     return SecKeyVerifySignature(self.key, kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256, (CFDataRef)plainData, (CFDataRef)signature, error);
 #else

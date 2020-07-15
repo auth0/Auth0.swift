@@ -33,7 +33,7 @@ private let DomainURL = URL(fileURLWithPath: Domain)
 private let Connection = "facebook"
 private let Scope = "openid"
 private let Parameters: [String: Any] = [:]
-private let Timeout: TimeInterval = 2
+private let Timeout = DispatchTimeInterval.seconds(2)
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let IdToken = generateJWT().string
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -203,7 +203,7 @@ class NativeAuthSpec: QuickSpec {
                             break
                         }
                     }
-                    _ = nativeTransaction.cancel()
+                    nativeTransaction.cancel()
                 }
                 
             }

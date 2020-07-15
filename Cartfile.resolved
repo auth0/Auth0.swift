@@ -1,5 +1,5 @@
 github "AliSoftware/OHHTTPStubs" "9.0.0"
-github "Quick/Nimble" "v8.1.1"
-github "Quick/Quick" "v3.0.0"
 github "auth0/JWTDecode.swift" "2.4.1"
 github "auth0/SimpleKeychain" "0.11.1"
+github "cocojoe/Nimble" "a472fd5486f016ca7ee57d934bf93a3957bbf55b"
+github "cocojoe/Quick" "dcc413f1250f517404d97de362259aac3c97c656"

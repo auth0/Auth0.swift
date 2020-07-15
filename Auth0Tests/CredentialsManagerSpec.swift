@@ -38,6 +38,7 @@ private let NewIdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let NewRefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let ExpiresIn: TimeInterval = 3600
+private let Timeout = DispatchTimeInterval.seconds(2)
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 private let ExpiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NzE4NTI0NjMsImV4cCI6MTU0MDIzMDA2MywiYXVkIjoiYXVkaWVuY2UiLCJzdWIiOiIxMjM0NSJ9.Lcz79P1AFAZDI4Yr1teFapFVAmBbdfhGBGbj9dQVeRM"
@@ -89,7 +90,7 @@ class CredentialsManagerSpec: QuickSpec {
             }
             
             it("should clear credentials and revoke the refresh token") {
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke {
                         expect($0).to(beNil())
                         expect(credentialsManager.hasValid()).to(beFalse())
@@ -101,7 +102,7 @@ class CredentialsManagerSpec: QuickSpec {
             it("should not return an error if there were no credentials stored") {
                 _ = credentialsManager.clear()
                 
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke {
                         expect($0).to(beNil())
                         expect(credentialsManager.hasValid()).to(beFalse())
@@ -119,7 +120,7 @@ class CredentialsManagerSpec: QuickSpec {
                 
                 _ = credentialsManager.store(credentials: credentials)
                 
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke {
                         expect($0).to(beNil())
                         expect(credentialsManager.hasValid()).to(beFalse())
@@ -133,7 +134,7 @@ class CredentialsManagerSpec: QuickSpec {
                     return authFailure(code: "400", description: "Revoke failed")
                 }
                 
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke {
                         expect($0).to(matchError(
                             CredentialsManagerError.revokeFailed(AuthenticationError(string: "Revoke failed", statusCode: 400))
@@ -160,7 +161,7 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(secondaryCredentialsManager.store(credentials: secondaryCredentials)).to(beTrue())
                                 
-                waitUntil(timeout: 200) { done in
+                waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials {
                         expect($0).to(beNil())
                         expect($1!.accessToken) == AccessToken
@@ -170,7 +171,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
                 
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: Timeout) { done in
                     secondaryCredentialsManager.credentials {
                         expect($0).to(beNil())
                         expect($1!.accessToken) == "SecondaryAccessToken"
@@ -193,7 +194,7 @@ class CredentialsManagerSpec: QuickSpec {
                 
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials {
                         expect($0).to(beNil())
                         expect($1!.accessToken) == AccessToken
@@ -203,7 +204,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
-                waitUntil(timeout: 2) { done in
+                waitUntil(timeout: Timeout) { done in
                     secondaryCredentialsManager.credentials {
                         expect($0).to(beNil())
                         expect($1!.accessToken) == AccessToken
@@ -368,7 +369,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                     _ = credentialsManager.store(credentials: credentials)
 
-                    waitUntil(timeout: 2) { done in
+                    waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
                             expect(error).to(matchError(CredentialsManagerError.touchFailed(LAError(LAError.touchIDNotAvailable))))
                             expect(newCredentials).to(beNil())
@@ -384,7 +385,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should yield new credentials without refresh token rotation") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                     _ = credentialsManager.store(credentials: credentials)
-                    waitUntil(timeout: 2) { done in
+                    waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == NewAccessToken
@@ -401,7 +402,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                     _ = credentialsManager.store(credentials: credentials)
-                    waitUntil(timeout: 2) { done in
+                    waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == NewAccessToken
@@ -415,7 +416,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should yield new credentials when idToken expired") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: 10))
                     _ = credentialsManager.store(credentials: credentials)
-                    waitUntil(timeout: 2) { done in
+                    waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == NewAccessToken
@@ -429,7 +430,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should store new credentials") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                     _ = credentialsManager.store(credentials: credentials)
-                    waitUntil(timeout: 2) { done in
+                    waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
                             expect(error).to(beNil())
                             credentialsManager.credentials {
@@ -446,7 +447,7 @@ class CredentialsManagerSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authFailure(code: "invalid_request", description: "missing_params") }.name = "renew failed"
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                     _ = credentialsManager.store(credentials: credentials)
-                    waitUntil(timeout: 2) { done in
+                    waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
                             expect(error).to(matchError(CredentialsManagerError.failedRefresh(AuthenticationError())))
                             expect(newCredentials).to(beNil())
