@@ -147,7 +147,7 @@ public struct CredentialsManager {
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/concepts/refresh-tokens)
     #if WEB_AUTH_PLATFORM
-    public func credentials(withScope scope: String? = nil, minTTL: Float = 0, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid() else { return callback(.noCredentials, nil) }
         if #available(iOS 9.0, macOS 10.15, *), let bioAuth = self.bioAuth {
             guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
@@ -162,13 +162,13 @@ public struct CredentialsManager {
         }
     }
     #else
-    public func credentials(withScope scope: String? = nil, minTTL: Float = 0, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid() else { return callback(.noCredentials, nil) }
         self.retrieveCredentials(withScope: scope, minTTL: minTTL, callback: callback)
     }
     #endif
 
-    private func retrieveCredentials(withScope scope: String?, minTTL: Float, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    private func retrieveCredentials(withScope scope: String?, minTTL: Int, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return callback(.noCredentials, nil) }
         guard credentials.expiresIn != nil else { return callback(.noCredentials, nil) }
@@ -200,7 +200,7 @@ public struct CredentialsManager {
         }
     }
 
-    func willExpire(_ credentials: Credentials, within ttl: Float) -> Bool {
+    func willExpire(_ credentials: Credentials, within ttl: Int) -> Bool {
         if let expiresIn = credentials.expiresIn {
             return expiresIn < Date(timeIntervalSinceNow: TimeInterval(ttl * 1000))
         }

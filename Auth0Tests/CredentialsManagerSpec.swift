@@ -266,13 +266,13 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should not expire soon when the min ttl is less than the at expiry") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                let ttl = Float((ExpiresIn - 100) / 1000)
+                let ttl = Int((ExpiresIn - 1000) / 1000)
                 expect(credentialsManager.willExpire(credentials, within: ttl)).to(beFalse())
             }
 
             it("should expire soon when the min ttl is greater than the at expiry") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                let ttl = Float((ExpiresIn + 100) / 1000)
+                let ttl = Int((ExpiresIn + 1000) / 1000)
                 expect(credentialsManager.willExpire(credentials, within: ttl)).to(beTrue())
             }
 
@@ -483,7 +483,7 @@ class CredentialsManagerSpec: QuickSpec {
             context("forced renew") {
 
                 it("should not yield a new access token by default") {
-                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile")
+                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
                         credentialsManager.credentials { error, newCredentials in
@@ -534,7 +534,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
-                        let ttl = Float((ExpiresIn - 100) / 1000)
+                        let ttl = Int((ExpiresIn - 1000) / 1000)
                         credentialsManager.credentials(withScope: nil, minTTL: ttl) { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == AccessToken
@@ -547,7 +547,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
-                        let ttl = Float((ExpiresIn + 100) / 1000)
+                        let ttl = Int((ExpiresIn + 1000) / 1000)
                         credentialsManager.credentials(withScope: nil, minTTL: ttl) { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == NewAccessToken
