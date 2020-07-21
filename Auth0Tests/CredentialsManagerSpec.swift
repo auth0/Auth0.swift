@@ -222,7 +222,7 @@ class CredentialsManagerSpec: QuickSpec {
             
         }
 
-        describe("valididity") {
+        describe("validity") {
 
             afterEach {
                 _ = credentialsManager.clear()
@@ -261,11 +261,17 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.hasValid()).to(beFalse())
             }
         }
-        
-        describe("validity expiry") {
-            
-            afterEach {
-                _ = credentialsManager.clear()
+
+        describe("expiry") {
+
+            it("should not expire soon when the min ttl is less than the at expiry") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.willExpire(credentials, within: Int(ExpiresIn - 100))).to(beFalse())
+            }
+
+            it("should expire soon when the min ttl is greater than the at expiry") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.willExpire(credentials, within: Int(ExpiresIn + 100))).to(beTrue())
             }
 
             it("should not be expired when expiry of at is + 1 hour") {
@@ -287,10 +293,25 @@ class CredentialsManagerSpec: QuickSpec {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.hasExpired(credentials)).to(beTrue())
             }
-            
+
         }
-        
-        describe("validity with id token") {
+
+        describe("scope") {
+
+            it("should return true when the scopes differ") {
+                let credentials = Credentials(scope: "openid email")
+                expect(credentialsManager.hasDifferentScope(credentials, than: "openid email offline_access")).to(beTrue())
+            }
+
+            it("should return false when the scopes do not differ") {
+                let credentials = Credentials(scope: "openid email")
+                expect(credentialsManager.hasDifferentScope(credentials, than: "openid email")).to(beFalse())
+                expect(credentialsManager.hasDifferentScope(credentials, than: "email openid")).to(beFalse())
+            }
+
+        }
+
+        describe("id token") {
             
             afterEach {
                 _ = credentialsManager.clear()
@@ -454,8 +475,85 @@ class CredentialsManagerSpec: QuickSpec {
                         }
                     }
                 }
+
             }
-            
+
+            context("forced renew") {
+
+                it("should not yield a new access token without a new scope") {
+                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile")
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials(withScope: nil, minTTL: 0) { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.accessToken) == AccessToken
+                            done()
+                        }
+                    }
+                }
+
+                it("should not yield a new access token with the same scope") {
+                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile")
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials(withScope: "openid profile", minTTL: 0) { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.accessToken) == AccessToken
+                            done()
+                        }
+                    }
+                }
+
+                it("should yield a new access token with a new scope") {
+                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile")
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials(withScope: "openid profile offline_access", minTTL: 0) { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.accessToken) == NewAccessToken
+                            done()
+                        }
+                    }
+                }
+
+                it("should not yield a new access token with a min ttl less than its expiry") {
+                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials(withScope: nil, minTTL: Int(ExpiresIn - 100)) { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.accessToken) == AccessToken
+                            done()
+                        }
+                    }
+                }
+
+                it("should yield a new access token with a min ttl greater than its expiry") {
+                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials(withScope: nil, minTTL: Int(ExpiresIn + 100)) { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.accessToken) == NewAccessToken
+                            done()
+                        }
+                    }
+                }
+
+                it("should fail to yield a renewed access token with a min ttl greater than its expiry") {
+                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: 2) { done in
+                        credentialsManager.credentials(withScope: nil, minTTL: 100000) { error = $0; newCredentials = $1
+                            expect(error).toNot(beNil())
+                            expect(newCredentials).to(beNil())
+                            done()
+                        }
+                    }
+                }
+
+            }
+
             context("custom keychain") {
                 let storage = A0SimpleKeychain(service: "test_service")
                 beforeEach {
