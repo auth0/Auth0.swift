@@ -119,7 +119,8 @@ public struct CredentialsManager {
 
     /// Checks if a non-expired set of credentials are stored
     ///
-    /// - Returns: if there are valid and non-expired credentials stored
+    /// - Parameter minTTL: minimum lifetime in seconds the access token must have left.
+    /// - Returns: if there are valid and non-expired credentials stored.
     public func hasValid(minTTL: Int = 0) -> Bool {
         guard let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
