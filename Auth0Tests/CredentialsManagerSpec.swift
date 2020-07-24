@@ -537,10 +537,10 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should yield a new access token with a new scope") {
-                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile")
+                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile offline_access")
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
-                        credentialsManager.credentials(withScope: "openid profile offline_access", minTTL: 0) { error, newCredentials in
+                        credentialsManager.credentials(withScope: "openid profile", minTTL: 0) { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == NewAccessToken
                             done()
