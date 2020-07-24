@@ -120,13 +120,11 @@ public struct CredentialsManager {
     /// Checks if a non-expired set of credentials are stored
     ///
     /// - Returns: if there are valid and non-expired credentials stored
-    public func hasValid() -> Bool {
-        guard
-            let data = self.storage.data(forKey: self.storeKey),
+    public func hasValid(minTTL: Int = 0) -> Bool {
+        guard let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
-            credentials.accessToken != nil
-            else { return false }
-        return !self.hasExpired(credentials) || credentials.refreshToken != nil
+            credentials.accessToken != nil else { return false }
+        return (!self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)) || credentials.refreshToken != nil
     }
 
     /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired
@@ -171,7 +169,7 @@ public struct CredentialsManager {
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return callback(.noCredentials, nil) }
-        guard credentials.expiresIn != nil else { return callback(.noCredentials, nil) }
+        guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
         guard self.willExpire(credentials, within: minTTL) ||
             self.hasExpired(credentials) ||
             self.hasScopeChanged(credentials, than: scope) else { return callback(nil, credentials) }
@@ -187,8 +185,11 @@ public struct CredentialsManager {
                                                  expiresIn: credentials.expiresIn,
                                                  scope: credentials.scope)
                 if self.willExpire(newCredentials, within: minTTL) {
+                    let accessTokenLifetime = Int(expiresIn.timeIntervalSinceNow / 1000)
                     // TODO: On the next major add a new case to CredentialsManagerError
-                    let error = NSError(domain: "The lifetime of the renewed Access Token is less than minTTL", code: -99999, userInfo: nil)
+                    let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
+                        code: -99999,
+                        userInfo: nil)
                     callback(.failedRefresh(error), nil)
                 } else {
                     _ = self.store(credentials: newCredentials)

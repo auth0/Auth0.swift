@@ -38,6 +38,8 @@ private let NewIdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let NewRefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let ExpiresIn: TimeInterval = 3600
+private let ValidTTL = Int((ExpiresIn - 1000) / 1000)
+private let InvalidTTL = Int((ExpiresIn + 1000) / 1000)
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 private let ExpiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NzE4NTI0NjMsImV4cCI6MTU0MDIzMDA2MywiYXVkIjoiYXVkaWVuY2UiLCJzdWIiOiIxMjM0NSJ9.Lcz79P1AFAZDI4Yr1teFapFVAmBbdfhGBGbj9dQVeRM"
@@ -255,6 +257,24 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.hasValid()).to(beFalse())
             }
 
+            it("should have valid credentials when the ttl is less than the token lifetime") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.hasValid(minTTL: ValidTTL)).to(beTrue())
+            }
+
+            it("should have valid credentials when the ttl is greater than the token lifetime and refresh token present") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.hasValid(minTTL: InvalidTTL)).to(beTrue())
+            }
+
+            it("should not have valid credentials when the ttl is greater than the token lifetime and no refresh token present") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.hasValid(minTTL: InvalidTTL)).to(beFalse())
+            }
+
             it("should not have valid credentials when no access token") {
                 let credentials = Credentials(accessToken: nil, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
@@ -266,14 +286,12 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should not expire soon when the min ttl is less than the at expiry") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                let ttl = Int((ExpiresIn - 1000) / 1000)
-                expect(credentialsManager.willExpire(credentials, within: ttl)).to(beFalse())
+                expect(credentialsManager.willExpire(credentials, within: ValidTTL)).to(beFalse())
             }
 
             it("should expire soon when the min ttl is greater than the at expiry") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: nil, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                let ttl = Int((ExpiresIn + 1000) / 1000)
-                expect(credentialsManager.willExpire(credentials, within: ttl)).to(beTrue())
+                expect(credentialsManager.willExpire(credentials, within: InvalidTTL)).to(beTrue())
             }
 
             it("should not be expired when expiry of at is + 1 hour") {
@@ -301,8 +319,8 @@ class CredentialsManagerSpec: QuickSpec {
         describe("scope") {
 
             it("should return true when the scope has changed") {
-                let credentials = Credentials(scope: "openid email")
-                expect(credentialsManager.hasScopeChanged(credentials, than: "openid email offline_access")).to(beTrue())
+                let credentials = Credentials(scope: "openid email profile")
+                expect(credentialsManager.hasScopeChanged(credentials, than: "openid email")).to(beTrue())
             }
 
             it("should return false when the scope has not changed") {
@@ -534,8 +552,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
-                        let ttl = Int((ExpiresIn - 1000) / 1000)
-                        credentialsManager.credentials(withScope: nil, minTTL: ttl) { error, newCredentials in
+                        credentialsManager.credentials(withScope: nil, minTTL: ValidTTL) { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == AccessToken
                             done()
@@ -547,8 +564,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
-                        let ttl = Int((ExpiresIn + 1000) / 1000)
-                        credentialsManager.credentials(withScope: nil, minTTL: ttl) { error, newCredentials in
+                        credentialsManager.credentials(withScope: nil, minTTL: InvalidTTL) { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == NewAccessToken
                             done()
@@ -557,11 +573,14 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should fail to yield a renewed access token with a min ttl greater than its expiry") {
+                    let expectedError = CredentialsManagerError.failedRefresh(NSError(domain: "The lifetime of the renewed Access Token (\(ExpiresIn / 1000)s) is less than minTTL requested (\(100)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
+                        code: -99999,
+                        userInfo: nil))
                     credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
                         credentialsManager.credentials(withScope: nil, minTTL: 100) { error, newCredentials in
-                            expect(error).toNot(beNil())
+                            expect(error).to(matchError(expectedError))
                             expect(newCredentials).to(beNil())
                             done()
                         }
