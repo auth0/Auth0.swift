@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.27.0](https://github.com/auth0/Auth0.swift/tree/1.27.0) (2020-07-27)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.26.0...1.27.0)
+
+**Added**
+- Added TTL renewal of credentials in CredentialsManager [SDK-1818] [\#399](https://github.com/auth0/Auth0.swift/pull/399) ([Widcket](https://github.com/Widcket))
+
 ## [1.26.0](https://github.com/auth0/Auth0.swift/tree/1.26.0) (2020-06-10)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.25.0...1.26.0)
 
