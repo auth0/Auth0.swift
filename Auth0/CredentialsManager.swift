@@ -119,20 +119,18 @@ public struct CredentialsManager {
 
     /// Checks if a non-expired set of credentials are stored
     ///
-    /// - Returns: if there are valid and non-expired credentials stored
-    public func hasValid() -> Bool {
-        guard
-            let data = self.storage.data(forKey: self.storeKey),
+    /// - Parameter minTTL: minimum lifetime in seconds the access token must have left.
+    /// - Returns: if there are valid and non-expired credentials stored.
+    public func hasValid(minTTL: Int = 0) -> Bool {
+        guard let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
-            credentials.accessToken != nil
-            else { return false }
-        return !self.hasExpired(credentials) || credentials.refreshToken != nil
+            credentials.accessToken != nil else { return false }
+        return (!self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)) || credentials.refreshToken != nil
     }
 
-    /// Retrieve credentials from keychain and yield new credentials using refreshToken if accessToken has expired
+    /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired
     /// otherwise the retrieved credentails will be returned as they have not expired. Renewed credentials will be
     /// stored in the keychain.
-    ///
     ///
     /// ```
     /// credentialsManager.credentials {
@@ -142,12 +140,13 @@ public struct CredentialsManager {
     /// ```
     ///
     /// - Parameters:
-    ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth
+    ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
+    ///   - minTTL: minimum time in seconds the access token must remain valid to avoid being renewed.
     ///   - callback: callback with the user's credentials or the cause of the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
-    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/refresh-token)
+    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/concepts/refresh-tokens)
     #if WEB_AUTH_PLATFORM
-    public func credentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid() else { return callback(.noCredentials, nil) }
         if #available(iOS 9.0, macOS 10.15, *), let bioAuth = self.bioAuth {
             guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
@@ -155,26 +154,26 @@ public struct CredentialsManager {
                 guard $0 == nil else {
                     return callback(.touchFailed($0!), nil)
                 }
-                self.retrieveCredentials(withScope: scope, callback: callback)
+                self.retrieveCredentials(withScope: scope, minTTL: minTTL, callback: callback)
             }
         } else {
-            self.retrieveCredentials(withScope: scope, callback: callback)
+            self.retrieveCredentials(withScope: scope, minTTL: minTTL, callback: callback)
         }
     }
     #else
-    public func credentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid() else { return callback(.noCredentials, nil) }
-        self.retrieveCredentials(withScope: scope, callback: callback)
+        self.retrieveCredentials(withScope: scope, minTTL: minTTL, callback: callback)
     }
     #endif
 
-    private func retrieveCredentials(withScope scope: String? = nil, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard
-            let data = self.storage.data(forKey: self.storeKey),
-            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials
-            else { return callback(.noCredentials, nil) }
-        guard credentials.expiresIn != nil else { return callback(.noCredentials, nil) }
-        guard self.hasExpired(credentials) else { return callback(nil, credentials) }
+    private func retrieveCredentials(withScope scope: String?, minTTL: Int, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+        guard let data = self.storage.data(forKey: self.storeKey),
+            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return callback(.noCredentials, nil) }
+        guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
+        guard self.willExpire(credentials, within: minTTL) ||
+            self.hasExpired(credentials) ||
+            self.hasScopeChanged(credentials, than: scope) else { return callback(nil, credentials) }
         guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
 
         self.authentication.renew(withRefreshToken: refreshToken, scope: scope).start {
@@ -186,12 +185,29 @@ public struct CredentialsManager {
                                                  refreshToken: credentials.refreshToken ?? refreshToken,
                                                  expiresIn: credentials.expiresIn,
                                                  scope: credentials.scope)
-                _ = self.store(credentials: newCredentials)
-                callback(nil, newCredentials)
+                if self.willExpire(newCredentials, within: minTTL) {
+                    let accessTokenLifetime = Int(expiresIn.timeIntervalSinceNow / 1000)
+                    // TODO: On the next major add a new case to CredentialsManagerError
+                    let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
+                        code: -99999,
+                        userInfo: nil)
+                    callback(.failedRefresh(error), nil)
+                } else {
+                    _ = self.store(credentials: newCredentials)
+                    callback(nil, newCredentials)
+                }
             case .failure(let error):
                 callback(.failedRefresh(error), nil)
             }
         }
+    }
+
+    func willExpire(_ credentials: Credentials, within ttl: Int) -> Bool {
+        if let expiresIn = credentials.expiresIn {
+            return expiresIn < Date(timeIntervalSinceNow: TimeInterval(ttl * 1000))
+        }
+
+        return false
     }
 
     func hasExpired(_ credentials: Credentials) -> Bool {
@@ -205,4 +221,16 @@ public struct CredentialsManager {
 
         return false
     }
+
+    func hasScopeChanged(_ credentials: Credentials, than scope: String?) -> Bool {
+        if let newScope = scope, let lastScope = credentials.scope {
+            let newScopeList = newScope.lowercased().split(separator: " ").sorted()
+            let lastScopeList = lastScope.lowercased().split(separator: " ").sorted()
+
+            return newScopeList != lastScopeList
+        }
+
+        return false
+    }
+
 }
