@@ -58,6 +58,7 @@ final class DesktopWebAuth: BaseWebAuth {
         if #available(macOS 10.15, *){
             return super.performLogin(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, callback: callback)
         } else if #available(macOS 10.11, *) {
+            #if canImport(AppKit)
             return AuthenticationLegacySession(authorizeURL: authorizeURL,
                                                             redirectURL: redirectURL,
                                                             state: state,
@@ -65,6 +66,7 @@ final class DesktopWebAuth: BaseWebAuth {
                                                             logger: self.logger,
                                                             ephemeralSession: self.ephemeralSession,
                                                             callback: callback)
+            #endif
         }
         // TODO: On the next major add a new case to WebAuthError
         callback(.failure(error: WebAuthError.unknownError))
