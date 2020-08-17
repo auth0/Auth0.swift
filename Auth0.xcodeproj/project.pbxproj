@@ -350,6 +350,7 @@
 		5FF2866F1D8A417B00314B72 /* _ObjectiveWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF2866E1D8A417B00314B72 /* _ObjectiveWebAuth.swift */; };
 		5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF465BB1CE2AC4500F7ED8C /* Management.swift */; };
 		5FF465BD1CE2AC4500F7ED8C /* Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF465BB1CE2AC4500F7ED8C /* Management.swift */; };
+		E849386924EAF9B70033C7CE /* AuthenticationLegacySession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E849386824EAF9B70033C7CE /* AuthenticationLegacySession.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -653,6 +654,7 @@
 		5FF346491CEFEC04000799DE /* Auth0Tests.iOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auth0Tests.iOS-Bridging-Header.h"; sourceTree = "<group>"; };
 		5FF3464A1CEFEC04000799DE /* Auth0Tests.OSX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auth0Tests.OSX-Bridging-Header.h"; sourceTree = "<group>"; };
 		5FF465BB1CE2AC4500F7ED8C /* Management.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Management.swift; path = Auth0/Management.swift; sourceTree = SOURCE_ROOT; };
+		E849386824EAF9B70033C7CE /* AuthenticationLegacySession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationLegacySession.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -759,6 +761,7 @@
 				5B16D88D1F7141A0009476A5 /* SafariSession.swift */,
 				5B16D88C1F7141A0009476A5 /* AuthenticationServicesSession.swift */,
 				5BFB98A41F7D1232001FE50D /* AuthenticationServicesSessionCallback.swift */,
+				E849386824EAF9B70033C7CE /* AuthenticationLegacySession.swift */,
 			);
 			name = AuthTransactions;
 			sourceTree = "<group>";
@@ -1947,6 +1950,7 @@
 				5C4F552423C8FBA100C89615 /* JWKS.swift in Sources */,
 				5C41F6C9244F969F00252548 /* AuthenticationServicesSessionCallback.swift in Sources */,
 				5C41F6D2244F972B00252548 /* JWTAlgorithm.swift in Sources */,
+				E849386924EAF9B70033C7CE /* AuthenticationLegacySession.swift in Sources */,
 				5C41F6D7244F975A00252548 /* TransactionStore.swift in Sources */,
 				5FE1182B1D8A4A2B00A374BF /* Telemetry.swift in Sources */,
 				5FDE875E1D8A424700EA27DC /* AuthenticationError.swift in Sources */,

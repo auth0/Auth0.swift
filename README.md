@@ -96,13 +96,36 @@ func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpe
 }
 ```
 
-#### macOS
+#### macOS 10.15+
 
 ```swift
 func application(_ application: NSApplication, open urls: [URL]) {
     Auth0.resumeAuth(urls)
 }
 ```
+
+#### macOS 10.11 - 10.14
+
+```swift
+    func applicationDidFinishLaunching(_ aNotification: Notification) {
+        // Initalize apple event manager for operating systems prior to 10.15
+        let appleEventManager = NSAppleEventManager.shared()
+        appleEventManager.setEventHandler(self, andSelector: #selector(handleGetURLEvent(event:withReplyEvent:)), forEventClass: AEEventClass(kInternetEventClass), andEventID: AEEventID(kAEGetURL))
+    }
+    
+    // Url handling for operating systems prior to 10.15
+    @objc fileprivate func handleGetURLEvent(event: NSAppleEventDescriptor?, withReplyEvent replyEvent: NSAppleEventDescriptor?) {
+        guard let event = event else {
+            return
+        }
+        guard let stringVal = event.paramDescriptor(forKeyword: AEKeyword(keyDirectObject))?.stringValue, let url = URL(string: stringVal) else {
+            return
+        }
+        
+       Auth0.resumeAuth([url])
+    }
+```
+
 
 ### Configuration
 
@@ -140,7 +163,7 @@ In your application's `Info.plist` file, register your iOS / macOS Bundle Identi
 <array>
     <dict>
         <key>CFBundleTypeRole</key>
-        <string>None</string>
+        <string>None</string> 
         <key>CFBundleURLName</key>
         <string>auth0</string>
         <key>CFBundleURLSchemes</key>
@@ -152,6 +175,8 @@ In your application's `Info.plist` file, register your iOS / macOS Bundle Identi
 ```
 
 > If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As / Source Code**.
+
+> If you are targeting web auth for 10.11 - 10.14 macOS, your CFBundleTypeRole may need to be set to Editor to properly receive the callback
 
 Finally, go to your [Auth0 Dashboard](https://manage.auth0.com/#/applications/) and make sure that your application's **Allowed Callback URLs** field contains the following entry:
 

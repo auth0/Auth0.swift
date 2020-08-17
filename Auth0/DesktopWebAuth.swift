@@ -50,6 +50,26 @@ final class DesktopWebAuth: BaseWebAuth {
                    telemetry: telemetry)
     }
 
+    /**
+        Performs the web based login.  If the os is >= 10.15 we can delegate to our super class to handle, if we are 10.11 to 10.14 we will instead call out to a direct web load
+     */
+    override func performLogin(authorizeURL: URL, redirectURL: URL, state: String?, handler: OAuth2Grant, callback: @escaping (Result<Credentials>) -> Void) -> AuthTransaction? {
+        
+        if #available(macOS 10.15, *){
+            return super.performLogin(authorizeURL: authorizeURL, redirectURL: redirectURL, state: state, handler: handler, callback: callback)
+        } else if #available(macOS 10.11, *) {
+            return AuthenticationLegacySession(authorizeURL: authorizeURL,
+                                                            redirectURL: redirectURL,
+                                                            state: state,
+                                                            handler: handler,
+                                                            logger: self.logger,
+                                                            ephemeralSession: self.ephemeralSession,
+                                                            callback: callback)
+        }
+        // TODO: On the next major add a new case to WebAuthError
+        callback(.failure(error: WebAuthError.unknownError))
+        return nil
+    }
 }
 
 public extension _ObjectiveOAuth2 {
