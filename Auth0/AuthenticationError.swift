@@ -139,6 +139,11 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
         return self.code == "too_many_attempts"
     }
 
+    /// When an additional verification step is required
+    public var isVerificationRequired: Bool {
+        return self.code == "requires_verification"
+    }
+
     /**
      Returns a value from error `info` dictionary
 
