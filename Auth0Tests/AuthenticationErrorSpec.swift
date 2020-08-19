@@ -223,6 +223,15 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isMultifactorTokenInvalid) == true
             }
 
+            it("should detect verification required") {
+                let values = [
+                    "error": "requires_verification",
+                    "error_description": "Suspicious request requires verification"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isVerificationRequired) == true
+            }
+
         }
 
     }
