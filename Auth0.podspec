@@ -50,7 +50,7 @@ macos_files = [
   'Auth0/NSApplication+Shared.swift'
 ]
 
-exclude_files = [
+excluded_files = [
   *web_auth_files,
   *ios_files,
   *macos_files
@@ -94,11 +94,11 @@ Pod::Spec.new do |s|
   }
 
   s.watchos.source_files = 'Auth0/*.swift'
-  s.watchos.exclude_files = exclude_files
+  s.watchos.exclude_files = excluded_files
   s.watchos.dependency 'JWTDecode'
 
   s.tvos.source_files = 'Auth0/*.swift'
-  s.tvos.exclude_files = exclude_files
+  s.tvos.exclude_files = excluded_files
   s.tvos.dependency 'SimpleKeychain'
   s.tvos.dependency 'JWTDecode'
 
