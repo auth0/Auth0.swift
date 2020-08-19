@@ -429,14 +429,16 @@ Auth0
          case .failure(let error):
             if let error = error as? AuthenticationError,
                 error.isVerificationRequired {
-                Auth0
-                    .webAuth()
-                    .parameters(["realm": realm,
-                                 "login_hint": email])
-                                 /// ☝🏼 So the user doesn't have to type it again
-                    .scope(scope)
-                    .start { result in
-                        // Handle result
+                    DispatchQueue.main.async {
+                        Auth0
+                            .webAuth()
+                            .parameters(["realm": realm,
+                                        "login_hint": email])
+                                        // ☝🏼 So the user doesn't have to type it again
+                            .scope(scope)
+                            .start { result in
+                                // Handle result
+                            }
                     }
             } else {
                 print("Failed with \(error)")
