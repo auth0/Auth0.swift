@@ -36,10 +36,10 @@ class BaseWebAuth: WebAuthenticatable {
 
     private let platform: String
     private(set) var parameters: [String: String] = [:]
+    private(set) var issuer: String
+    private(set) var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
     private var responseType: [ResponseType] = [.code]
     private var nonce: String?
-    private var issuer: String
-    private var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
     private var maxAge: Int?
 
     lazy var redirectURL: URL? = {
