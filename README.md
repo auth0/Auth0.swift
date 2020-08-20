@@ -432,10 +432,10 @@ Auth0
                     DispatchQueue.main.async {
                         Auth0
                             .webAuth()
-                            .parameters(["connection": realm,
-                                        "login_hint": email])
-                                        // ☝🏼 So the user doesn't have to type it again
+                            .connection(realm)
                             .scope(scope)
+                            .parameters(["login_hint": email])
+                            // ☝🏼 So the user doesn't have to type it again
                             .start { result in
                                 // Handle result
                             }
