@@ -198,9 +198,9 @@ struct PKCE: OAuth2Grant {
 
 // This method will skip the validation if the response type does not contain "id_token"
 private func validateFrontChannelIdToken(idToken: String?,
-                      for responseType: [ResponseType],
-                      with context: IDTokenValidatorContext,
-                      callback: @escaping (LocalizedError?) -> Void) {
+                                         for responseType: [ResponseType],
+                                         with context: IDTokenValidatorContext,
+                                         callback: @escaping (LocalizedError?) -> Void) {
     guard responseType.contains(.idToken) else { return callback(nil) }
     validate(idToken: idToken, with: context) { error in
         if let error = error { return callback(error) }
