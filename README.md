@@ -430,23 +430,20 @@ Auth0
          switch result {
          case .success(let credentials):
             print("Obtained credentials: \(credentials)")
-         case .failure(let error):
-            if let error = error as? AuthenticationError,
-                error.isVerificationRequired {
-                    DispatchQueue.main.async {
-                        Auth0
-                            .webAuth()
-                            .connection(realm)
-                            .scope(scope)
-                            .parameters(["login_hint": email])
-                            // ☝🏼 So the user doesn't have to type it again
-                            .start { result in
-                                // Handle result
-                            }
+         case .failure(let error as AuthenticationError) where error.isVerificationRequired:
+            DispatchQueue.main.async {
+                Auth0
+                    .webAuth()
+                    .connection(realm)
+                    .scope(scope)
+                    .parameters(["login_hint": email])
+                    // ☝🏼 So the user doesn't have to type it again
+                    .start { result in
+                        // Handle result
                     }
-            } else {
-                print("Failed with \(error)")
             }
+         case .failure(let error):
+            print("Failed with \(error)")
          }
      }
 ```
