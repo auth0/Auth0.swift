@@ -33,7 +33,7 @@ class ChallengeGeneratorSpec: QuickSpec {
             let seed: [UInt8] = [116, 24, 223, 180, 151, 153, 224, 37, 79, 250, 96, 125, 216, 173,
                                  187, 186, 22, 212, 37, 77, 105, 214, 191, 240, 91, 88, 5, 88, 83,
                                  132, 141, 121]
-            let verifier = Data(bytes: UnsafePointer<UInt8>(seed), count: seed.count * MemoryLayout<UInt8>.size)
+            let verifier = Data(bytes: seed, count: seed.count * MemoryLayout<UInt8>.size)
 
             let generator = A0SHA256ChallengeGenerator(verifier: verifier)
 
