@@ -159,6 +159,13 @@ public protocol WebAuthenticatable: Trackable, Loggable {
     /// - Returns: the same WebAuth instance to allow method chaining
     func audience(_ audience: String) -> Self
 
+    /// Specify a custom issuer for ID Token validation.
+    /// This value will be used instead of the Auth0 domain.
+    ///
+    /// - Parameter issuer: custom issuer value like: `https://example.com/`
+    /// - Returns: the same WebAuth instance to allow method chaining
+    func issuer(_ issuer: String) -> Self
+
     /// Add a leeway amount for ID Token validation.
     /// This value represents the clock skew for the validation of date claims e.g. `exp`.
     ///

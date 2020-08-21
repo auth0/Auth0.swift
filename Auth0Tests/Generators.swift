@@ -186,7 +186,13 @@ func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String =
         guard let (end, exponent) = extractData(from: exponentBytes) else { return nil }
         guard abs(end.distance(to: modulusBytes)) == totalLength else { return nil }
         
-        let encodedModulus = modulus.a0_encodeBase64URLSafe()
+        var mutableModulus = modulus
+        
+        if mutableModulus.first == 0 {
+            mutableModulus.removeFirst() // See https://tools.ietf.org/html/rfc7518#section-6.3.1.1
+        }
+        
+        let encodedModulus = mutableModulus.a0_encodeBase64URLSafe()
         let encodedExponent = exponent.a0_encodeBase64URLSafe()
         
         return JWK(keyType: "RSA",

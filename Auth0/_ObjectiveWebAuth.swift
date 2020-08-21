@@ -46,11 +46,11 @@ public class _ObjectiveOAuth2: NSObject {
      Before enabling this flag you'll need to configure Universal Links
     */
     @objc public var universalLink: Bool {
-        set {
-            self.webAuth.universalLink = newValue
-        }
         get {
             return self.webAuth.universalLink
+        }
+        set {
+            self.webAuth.universalLink = newValue
         }
     }
 
@@ -60,11 +60,11 @@ public class _ObjectiveOAuth2: NSObject {
      Has no effect on older versions of iOS.
     */
     @objc public var ephemeralSession: Bool {
-        set {
-            self.webAuth.ephemeralSession = newValue
-        }
         get {
             return self.webAuth.ephemeralSession
+        }
+        set {
+            self.webAuth.ephemeralSession = newValue
         }
     }
 
@@ -74,13 +74,13 @@ public class _ObjectiveOAuth2: NSObject {
      By default no connection is specified, so the hosted login page will be displayed
     */
     @objc public var connection: String? {
+        get {
+            return self.webAuth.parameters["connection"]
+        }
         set {
             if let value = newValue {
                 _ = self.webAuth.connection(value)
             }
-        }
-        get {
-            return self.webAuth.parameters["connection"]
         }
     }
 
@@ -88,13 +88,13 @@ public class _ObjectiveOAuth2: NSObject {
      Scopes that will be requested during auth
     */
     @objc public var scope: String? {
+        get {
+            return self.webAuth.parameters["scope"]
+        }
         set {
             if let value = newValue {
                 _ = self.webAuth.scope(value)
             }
-        }
-        get {
-            return self.webAuth.parameters["scope"]
         }
     }
 

@@ -278,6 +278,34 @@ class WebAuthSpec: QuickSpec {
 
         }
 
+        describe("other builder methods") {
+
+            context("leeway") {
+
+                it("should use the default leeway value") {
+                    expect(newWebAuth().leeway).to(equal(60000)) // 60 seconds
+                }
+
+                it("should use a custom leeway value") {
+                    expect(newWebAuth().leeway(30000).leeway).to(equal(30000)) // 30 seconds
+                }
+
+            }
+
+            context("issuer") {
+
+                it("should use the default issuer value") {
+                    expect(newWebAuth().issuer).to(equal("\(DomainURL.absoluteString)/"))
+                }
+
+                it("should use a custom issuer value") {
+                    expect(newWebAuth().issuer("https://example.com/").issuer).to(equal("https://example.com/"))
+                }
+
+            }
+
+        }
+
         #if os(iOS)
         describe("session") {
             

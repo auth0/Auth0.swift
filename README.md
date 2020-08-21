@@ -406,14 +406,18 @@ such as `/userinfo`, please use the Auth0 domain specified for your Application 
 
 Example: `.audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")`
 
+Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains#background) need to specify a custom issuer to match the Auth0 domain before starting the authentication. Otherwise, the ID Token validation will fail.
+
+Example: `.issuer("https://{YOUR_AUTH0_DOMAIN}/")`
+
 ### Bot Protection
 
-If you are using the [Bot Protection](https://auth0.com/docs/anomaly-detection/bot-protection) feature and performing database login/sign up via the Authentication API, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Universal Login to complete it.
+If you are using the [Bot Protection](https://auth0.com/docs/anomaly-detection/bot-protection) feature and performing database login/signup via the Authentication API, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Universal Login to complete it.
 
 ```swift
 let email = "support@auth0.com"
-let scope = "openid profile"
 let realm = "Username-Password-Authentication"
+let scope = "openid profile"
 
 Auth0
     .authentication()
@@ -426,25 +430,29 @@ Auth0
          switch result {
          case .success(let credentials):
             print("Obtained credentials: \(credentials)")
-         case .failure(let error):
-            if let error = error as? AuthenticationError,
-                error.isVerificationRequired {
-                    DispatchQueue.main.async {
-                        Auth0
-                            .webAuth()
-                            .connection(realm)
-                            .scope(scope)
-                            .parameters(["login_hint": email])
-                            // ☝🏼 So the user doesn't have to type it again
-                            .start { result in
-                                // Handle result
-                            }
+         case .failure(let error as AuthenticationError) where error.isVerificationRequired:
+            DispatchQueue.main.async {
+                Auth0
+                    .webAuth()
+                    .connection(realm)
+                    .scope(scope)
+                    .parameters(["login_hint": email])
+                    // ☝🏼 So the user doesn't have to type it again
+                    .start { result in
+                        // Handle result
                     }
-            } else {
-                print("Failed with \(error)")
             }
+         case .failure(let error):
+            print("Failed with \(error)")
          }
      }
+```
+
+In the case of signup, you can add [an additional parameter](https://auth0.com/docs/universal-login/new-experience#signup) to make the user land directly on the signup tab:
+
+```swift
+.parameters(["login_hint": email,
+             "screen_hint": "signup"])
 ```
 
 Check out how to set up Universal Login in the [Getting Started](#getting-started) section.
