@@ -38,8 +38,19 @@ class JWKSpec: QuickSpec {
             if #available(iOS 10.0, macOS 10.12, *) {
                 context("successful generation") {
                     it("should generate a RSA public key") {
-                        let publicKey = jwk.rsaPublicKey!
-                        let keyAttributes = SecKeyCopyAttributes(publicKey) as! [String: Any]
+                        let publicKey = JWK(keyType: "RSA",
+                                            keyId: "NUZFNkFDNUVDNzIxMjAyQTU5RUEzQ0UyMEQ2Mjc5OUZFREFCQ0E2MA",
+                                            usage: "sig",
+                                            algorithm: JWTAlgorithm.rs256.rawValue,
+                                            certUrl: nil,
+                                            certThumbprint: nil,
+                                            certChain: nil,
+                                            rsaModulus: "42xFiJGFLj6e8PgJ-zDQE_KhXNscWFHmJylilVhpD0KUoNKict4IUBvmLYrKMiFLggBS-ttadXeJn7XMnsu6Dz8OzE6r9ELxjZK9sljwx-KWn3ojX8XB8c4LB4NLCEzcwAmE-1zEymJSRg7GJ1g5CHQ_uPeZgxPpEKg5XbrVjZO0KmKE2vCIEVFJIxXNIIu-yC4zR0dPLLEN0lPDZLwwYVRF5y9F_WzDX8fr2nGPQQHQdebBHe_ystvlNc1RdZvyM7BjN9z0l3CXTyR18bLNhJdRDU39NvS7IzGmnqL3WLAwZGtJ6rMhYCPsj-Dla4tUJCy6Yc4V7Gr8zBGQWmLKlQ",
+                                            rsaExponent: "AQAB").rsaPublicKey
+                        
+                        expect(publicKey).notTo(beNil())
+                        
+                        let keyAttributes = SecKeyCopyAttributes(publicKey!) as! [String: Any]
                         
                         expect(keyAttributes[String(kSecAttrKeyType)] as? String).to(equal(String(kSecAttrKeyTypeRSA)))
                     }

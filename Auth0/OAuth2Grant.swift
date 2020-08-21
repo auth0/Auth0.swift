@@ -63,7 +63,7 @@ struct ImplicitGrant: OAuth2Grant {
                                                        leeway: leeway,
                                                        maxAge: maxAge,
                                                        nonce: self.defaults["nonce"])
-        validate(idToken: values["id_token"], for: responseType, with: validatorContext) { error in
+        validateFrontChannelIdToken(idToken: values["id_token"], for: responseType, with: validatorContext) { error in
             if let error = error { return callback(.failure(error: error)) }
             guard !responseType.contains(.token) || values["access_token"] != nil else {
                 return callback(.failure(error: WebAuthError.missingAccessToken))
@@ -158,7 +158,7 @@ struct PKCE: OAuth2Grant {
                                                        leeway: leeway,
                                                        maxAge: maxAge,
                                                        nonce: nonce)
-        validate(idToken: idToken, for: responseType, with: validatorContext) { error in
+        validateFrontChannelIdToken(idToken: idToken, for: responseType, with: validatorContext) { error in
             if let error = error { return callback(.failure(error: error)) }
             authentication
                 .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
@@ -171,7 +171,7 @@ struct PKCE: OAuth2Grant {
                     case .failure(let error): return callback(.failure(error: error))
                     case .success(let credentials):
                         guard isFrontChannelIdTokenExpected else {
-                            return validate(idToken: credentials.idToken, for: responseType, with: validatorContext) { error in
+                            return validate(idToken: credentials.idToken, with: validatorContext) { error in
                                 if let error = error { return callback(.failure(error: error)) }
                                 callback(result)
                             }
@@ -197,7 +197,7 @@ struct PKCE: OAuth2Grant {
 }
 
 // This method will skip the validation if the response type does not contain "id_token"
-private func validate(idToken: String?,
+private func validateFrontChannelIdToken(idToken: String?,
                       for responseType: [ResponseType],
                       with context: IDTokenValidatorContext,
                       callback: @escaping (LocalizedError?) -> Void) {

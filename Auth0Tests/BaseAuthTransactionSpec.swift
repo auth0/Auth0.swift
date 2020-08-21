@@ -47,7 +47,7 @@ class BaseAuthTransactionSpec: QuickSpec {
                            issuer: Issuer,
                            leeway: Leeway,
                            nonce: nil)
-        let idToken = generateJWT().string
+        let idToken = generateJWT(iss: Issuer, aud: [ClientId]).string
         let code = "123456"
 
         beforeEach {
