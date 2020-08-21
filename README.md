@@ -412,7 +412,7 @@ Example: `.issuer("https://{YOUR_AUTH0_DOMAIN}/")`
 
 ### Bot Protection
 
-If you are using the [Bot Protection](https://auth0.com/docs/anomaly-detection/bot-protection) feature and performing database login/sign up via the Authentication API, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Universal Login to complete it.
+If you are using the [Bot Protection](https://auth0.com/docs/anomaly-detection/bot-protection) feature and performing database login/signup via the Authentication API, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Universal Login to complete it.
 
 ```swift
 let email = "support@auth0.com"
@@ -446,6 +446,13 @@ Auth0
             print("Failed with \(error)")
          }
      }
+```
+
+In the case of signup, you can add [an additional parameter](https://auth0.com/docs/universal-login/new-experience#signup) to make the user land directly on the signup tab:
+
+```swift
+.parameters(["login_hint": email,
+             "screen_hint": "signup"])
 ```
 
 Check out how to set up Universal Login in the [Getting Started](#getting-started) section.
