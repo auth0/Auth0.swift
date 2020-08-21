@@ -38,7 +38,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 If you are using [Cocoapods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 1.26'
+pod 'Auth0', '~> 1.28'
 ```
 
 Then run `pod install`.
@@ -50,7 +50,7 @@ Then run `pod install`.
 If you are using [Carthage](https://github.com/Carthage/Carthage), add the following line to your `Cartfile`:
 
 ```ruby
-github "auth0/Auth0.swift" ~> 1.26
+github "auth0/Auth0.swift" ~> 1.28
 ```
 
 Then run `carthage bootstrap`.
@@ -448,7 +448,7 @@ Auth0
      }
 ```
 
-In the case of signup, you can add [an additional parameter](https://auth0.com/docs/universal-login/new-experience#signup) to make the user land directly on the signup tab:
+In the case of signup, you can add [an additional parameter](https://auth0.com/docs/universal-login/new-experience#signup) to make the user land directly on the signup page:
 
 ```swift
 .parameters(["login_hint": email,
