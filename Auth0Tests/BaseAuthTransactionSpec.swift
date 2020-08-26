@@ -26,12 +26,13 @@ import OHHTTPStubs
 
 @testable import Auth0
 
+private let ClientId = "CLIENT_ID"
+private let Domain = URL(string: "https://samples.auth0.com")!
+private let Issuer = "\(Domain.absoluteString)/"
+private let Leeway = 60 * 1000
+private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
+
 class BaseAuthTransactionSpec: QuickSpec {
-    
-    private let ClientId = "CLIENT_ID"
-    private let Domain = URL(string: "https://samples.auth0.com")!
-    private let Leeway = 60 * 1000
-    private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 
     override func spec() {
         var transaction: BaseAuthTransaction!
@@ -43,25 +44,26 @@ class BaseAuthTransactionSpec: QuickSpec {
                            redirectURL: RedirectURL,
                            generator: generator,
                            responseType: [.code],
+                           issuer: Issuer,
                            leeway: Leeway,
                            nonce: nil)
-        let idToken = generateJWT().string
+        let idToken = generateJWT(iss: Issuer, aud: [ClientId]).string
         let code = "123456"
 
         beforeEach {
-            transaction = BaseAuthTransaction(redirectURL: self.RedirectURL,
+            transaction = BaseAuthTransaction(redirectURL: RedirectURL,
                                               state: "state",
                                               handler: handler,
                                               logger: nil,
                                               callback: callback)
             result = nil
-            stub(condition: isToken(self.Domain.host!) && hasAtLeast(["code": code,
+            stub(condition: isToken(Domain.host!) && hasAtLeast(["code": code,
                                                                  "code_verifier": generator.verifier,
                                                                  "grant_type": "authorization_code",
-                                                                 "redirect_uri": self.RedirectURL.absoluteString])) {
+                                                                 "redirect_uri": RedirectURL.absoluteString])) {
                 _ in return authResponse(accessToken: "AT", idToken: idToken)
             }
-            stub(condition: isJWKSPath(self.Domain.host!)) { _ in jwksResponse() }
+            stub(condition: isJWKSPath(Domain.host!)) { _ in jwksResponse() }
         }
         
         afterEach {

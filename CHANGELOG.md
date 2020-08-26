@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.28.0](https://github.com/auth0/Auth0.swift/tree/1.28.0) (2020-08-21)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.27.0...1.28.0)
+
+**Added**
+- Added support for custom issuer for ID Token validation [SDK-1909] [\#411](https://github.com/auth0/Auth0.swift/pull/411) ([Widcket](https://github.com/Widcket))
+- Added CredentialsManager to watchOS target [SDK-1906] [\#409](https://github.com/auth0/Auth0.swift/pull/409) ([Widcket](https://github.com/Widcket))
+- Added isVerificationRequired error [SDK-1865] [\#408](https://github.com/auth0/Auth0.swift/pull/408) ([Widcket](https://github.com/Widcket))
+
 ## [1.27.0](https://github.com/auth0/Auth0.swift/tree/1.27.0) (2020-07-27)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.26.0...1.27.0)
 

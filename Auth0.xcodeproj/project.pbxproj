@@ -135,6 +135,8 @@
 		5CB41D7123D0BED200074024 /* ClaimValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimValidators.swift */; };
 		5CB41D7623D0C15000074024 /* IDTokenValidatorBaseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7523D0C15000074024 /* IDTokenValidatorBaseSpec.swift */; };
 		5CB41D8223D611AE00074024 /* ClaimValidatorsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D8123D611AE00074024 /* ClaimValidatorsSpec.swift */; };
+		5CC9940324ED9EC50027DC74 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
+		5CC9940424ED9EC90027DC74 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5CDB7FA723FC78A300AE8B42 /* AuthenticationAPISpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCC3101CF4D4FF00901E2E /* AuthenticationAPISpec.m */; };
 		5CDB7FA823FC78CF00AE8B42 /* AuthenticationAPISpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FCCC3101CF4D4FF00901E2E /* AuthenticationAPISpec.m */; };
 		5CDB7FAC23FC7AC200AE8B42 /* A0WebAuthSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FBEF3DD1D07A4B700D90941 /* A0WebAuthSpec.m */; };
@@ -2075,6 +2077,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F23E6E91D4ACD9200C3F2D9 /* Auth0.swift in Sources */,
+				5CC9940424ED9EC90027DC74 /* CredentialsManagerError.swift in Sources */,
 				5F23E6EA1D4ACD9600C3F2D9 /* Auth0Error.swift in Sources */,
 				5FDE876F1D8A424700EA27DC /* Handlers.swift in Sources */,
 				5FDE87571D8A424700EA27DC /* Auth0Authentication.swift in Sources */,
@@ -2094,6 +2097,7 @@
 				5F23E6E21D4ACD7F00C3F2D9 /* Users.swift in Sources */,
 				5FDE876B1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5FE1182A1D8A4A2B00A374BF /* Telemetry.swift in Sources */,
+				5CC9940324ED9EC50027DC74 /* CredentialsManager.swift in Sources */,
 				5F23E6E41D4ACD8500C3F2D9 /* JSONObjectPayload.swift in Sources */,
 				5F7504F71D8C3F2900E3BA1C /* NSError+Helper.swift in Sources */,
 				5C4F551C23C8FB8E00C89615 /* String+URLSafe.swift in Sources */,

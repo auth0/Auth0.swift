@@ -38,7 +38,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 If you are using [Cocoapods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 1.26'
+pod 'Auth0', '~> 1.28'
 ```
 
 Then run `pod install`.
@@ -50,7 +50,7 @@ Then run `pod install`.
 If you are using [Carthage](https://github.com/Carthage/Carthage), add the following line to your `Cartfile`:
 
 ```ruby
-github "auth0/Auth0.swift" ~> 1.26
+github "auth0/Auth0.swift" ~> 1.28
 ```
 
 Then run `carthage bootstrap`.
@@ -261,7 +261,7 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 
 #### Store Credentials
 
-Store user credentials securely in the KeyChain.
+Store user credentials securely in the Keychain.
 
 ```swift
 credentialsManager.store(credentials: credentials)
@@ -282,13 +282,13 @@ credentialsManager.credentials { error, credentials in
 
 #### Clearing credentials and revoking refresh tokens
 
-Credentials can be cleared by using the `clear` function, which clears credentials from the keychain:
+Credentials can be cleared by using the `clear` function, which clears credentials from the Keychain:
 
 ```swift
 let didClear = credentialsManager.clear()
 ```
 
-In addition, credentials can be cleared and the refresh token revoked using a single call to `revoke`. This function will attempt to revoke the current refresh token stored by the credential manager and then clear credentials from the keychain. If revoking the token results in an error, then the credentials are not cleared:
+In addition, credentials can be cleared and the refresh token revoked using a single call to `revoke`. This function will attempt to revoke the current refresh token stored by the credential manager and then clear credentials from the Keychain. If revoking the token results in an error, then the credentials are not cleared:
 
 ```swift
 credentialsManager.revoke { error in
@@ -368,7 +368,7 @@ Auth0
         usernameOrEmail: "support@auth0.com",
         password: "secret-password",
         realm: "Username-Password-Authentication",
-        scope: "openid")
+        scope: "openid profile")
      .start { result in
          switch result {
          case .success(let credentials):
@@ -381,7 +381,7 @@ Auth0
 
 > This requires `Password` Grant or `http://auth0.com/oauth/grant-type/password-realm`.
 
-#### Sign Up with database connection
+#### Sign up with database connection
 
 ```swift
 Auth0
@@ -391,8 +391,7 @@ Auth0
         password: "secret-password",
         connection: "Username-Password-Authentication",
         userMetadata: ["first_name": "First",
-                       "last_name": "Last"]
-    )
+                       "last_name": "Last"])
     .start { result in
         switch result {
         case .success(let user):
@@ -402,13 +401,6 @@ Auth0
         }
     }
 ```
-
-### Custom Domains
-
-If you are using the [Custom Domains](https://auth0.com/docs/custom-domains) feature and need to use an Auth0 endpoint
-such as `/userinfo`, please use the Auth0 domain specified for your Application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
-
-Example: `.audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")`
 
 ### Management API (Users)
 
@@ -431,6 +423,66 @@ Auth0
         }
     }
 ```
+
+### Custom Domains
+
+If you are using [Custom Domains](https://auth0.com/docs/custom-domains) and need to call an Auth0 endpoint
+such as `/userinfo`, please use the Auth0 domain specified for your Application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+
+Example: `.audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")`
+
+Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains#background) need to specify a custom issuer to match the Auth0 domain before starting the authentication. Otherwise, the ID Token validation will fail.
+
+Example: `.issuer("https://{YOUR_AUTH0_DOMAIN}/")`
+
+### Bot Protection
+
+If you are using the [Bot Protection](https://auth0.com/docs/anomaly-detection/bot-protection) feature and performing database login/signup via the Authentication API, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Universal Login to complete it.
+
+```swift
+let email = "support@auth0.com"
+let realm = "Username-Password-Authentication"
+let scope = "openid profile"
+
+Auth0
+    .authentication()
+    .login(
+        usernameOrEmail: email,
+        password: "secret-password",
+        realm: realm,
+        scope: scope)
+     .start { result in
+         switch result {
+         case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+         case .failure(let error as AuthenticationError) where error.isVerificationRequired:
+            DispatchQueue.main.async {
+                Auth0
+                    .webAuth()
+                    .connection(realm)
+                    .scope(scope)
+                    .parameters(["login_hint": email])
+                    // ☝🏼 So the user doesn't have to type it again
+                    .start { result in
+                        // Handle result
+                    }
+            }
+         case .failure(let error):
+            print("Failed with \(error)")
+         }
+     }
+```
+
+In the case of signup, you can add [an additional parameter](https://auth0.com/docs/universal-login/new-experience#signup) to make the user land directly on the signup page:
+
+```swift
+.parameters(["login_hint": email,
+             "screen_hint": "signup"])
+```
+
+Check out how to set up Universal Login in the [Getting Started](#getting-started) section.
+
+> You don't need to handle this error if you're using the deprecated login methods.
 
 ### Logging
 
