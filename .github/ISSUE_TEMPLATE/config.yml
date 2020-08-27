@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Auth0 Community
+    url: https://community.auth0.com/tags/c/sdks/5/swift
+    about: Discuss this SDK in the Auth0 Community forums
+  - name: Common Tasks
+    url: https://github.com/auth0/Auth0.swift#common-tasks
+    about: Read the Common Tasks section of the README to get up to speed with the library
+  - name: Library Documentation
+    url: https://auth0.com/docs/libraries/auth0-swift
+    about: Read the library docs on Auth0.com
