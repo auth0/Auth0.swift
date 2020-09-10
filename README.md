@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
 ![Swift 5.2](https://img.shields.io/badge/Swift-5.2-orange.svg?style=flat-square)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fauth0%2FAuth0.swift.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fauth0%2FAuth0.swift?ref=badge_shield)
 
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
 
@@ -544,3 +545,6 @@ If you have found a bug or to request a feature, please [raise an issue](https:/
 ## License
 
 This project is licensed under the MIT license. See the [LICENSE](https://github.com/auth0/Auth0.swift/blob/master/LICENSE) file for more info.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fauth0%2FAuth0.swift.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fauth0%2FAuth0.swift?ref=badge_large)
