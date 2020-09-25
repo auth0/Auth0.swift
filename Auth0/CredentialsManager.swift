@@ -186,7 +186,7 @@ public struct CredentialsManager {
                                                  expiresIn: credentials.expiresIn,
                                                  scope: credentials.scope)
                 if self.willExpire(newCredentials, within: minTTL) {
-                    let accessTokenLifetime = Int(expiresIn.timeIntervalSinceNow / 1000)
+                    let accessTokenLifetime = Int(expiresIn.timeIntervalSinceNow)
                     // TODO: On the next major add a new case to CredentialsManagerError
                     let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
                         code: -99999,
@@ -204,7 +204,7 @@ public struct CredentialsManager {
 
     func willExpire(_ credentials: Credentials, within ttl: Int) -> Bool {
         if let expiresIn = credentials.expiresIn {
-            return expiresIn < Date(timeIntervalSinceNow: TimeInterval(ttl * 1000))
+            return expiresIn < Date(timeIntervalSinceNow: TimeInterval(ttl))
         }
 
         return false
