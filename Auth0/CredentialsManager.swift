@@ -147,7 +147,7 @@ public struct CredentialsManager {
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/concepts/refresh-tokens)
     #if WEB_AUTH_PLATFORM
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard self.hasValid() else { return callback(.noCredentials, nil) }
+        guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
         if #available(iOS 9.0, macOS 10.15, *), let bioAuth = self.bioAuth {
             guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
             bioAuth.validateBiometric {
@@ -162,7 +162,7 @@ public struct CredentialsManager {
     }
     #else
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard self.hasValid() else { return callback(.noCredentials, nil) }
+        guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
         self.retrieveCredentials(withScope: scope, minTTL: minTTL, callback: callback)
     }
     #endif
