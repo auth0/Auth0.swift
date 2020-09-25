@@ -38,8 +38,8 @@ private let NewIdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let NewRefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let ExpiresIn: TimeInterval = 3600
-private let ValidTTL = Int((ExpiresIn - 1000) / 1000)
-private let InvalidTTL = Int((ExpiresIn + 1000) / 1000)
+private let ValidTTL = Int(ExpiresIn - 1000)
+private let InvalidTTL = Int(ExpiresIn + 1000)
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 private let ExpiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NzE4NTI0NjMsImV4cCI6MTU0MDIzMDA2MywiYXVkIjoiYXVkaWVuY2UiLCJzdWIiOiIxMjM0NSJ9.Lcz79P1AFAZDI4Yr1teFapFVAmBbdfhGBGbj9dQVeRM"
@@ -573,13 +573,14 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should fail to yield a renewed access token with a min ttl greater than its expiry") {
-                    let expectedError = CredentialsManagerError.failedRefresh(NSError(domain: "The lifetime of the renewed Access Token (\(ExpiresIn / 1000)s) is less than minTTL requested (\(100)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
+                    let minTTL = 100_000
+                    let expectedError = CredentialsManagerError.failedRefresh(NSError(domain: "The lifetime of the renewed Access Token (\(ExpiresIn)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
                         code: -99999,
                         userInfo: nil))
                     credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: 2) { done in
-                        credentialsManager.credentials(withScope: nil, minTTL: 100) { error, newCredentials in
+                        credentialsManager.credentials(withScope: nil, minTTL: minTTL) { error, newCredentials in
                             expect(error).to(matchError(expectedError))
                             expect(newCredentials).to(beNil())
                             done()
