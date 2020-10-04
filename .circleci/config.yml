@@ -17,7 +17,7 @@ jobs:
       - run: |
           echo "ruby-2.7.1p83" > ~/.ruby-version
           brew install swiftlint
-          bundle install --without=development
+          bundle check || bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
       - run:
           name: Bootstrap
@@ -60,7 +60,7 @@ jobs:
       - run: |
           echo "ruby-2.7.1p83" > ~/.ruby-version
           brew install swiftlint
-          bundle install --without=development
+          bundle check || bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
       - run:
           name: Bootstrap
@@ -95,7 +95,7 @@ jobs:
       - run: |
           echo "ruby-2.7.1p83" > ~/.ruby-version
           brew install swiftlint
-          bundle install --without=development
+          bundle check || bundle install --without=development
           grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
       - run:
           name: Bootstrap
