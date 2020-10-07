@@ -5,13 +5,14 @@
 [![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
 [![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
-![Swift 5.2](https://img.shields.io/badge/Swift-5.2-orange.svg?style=flat-square)
+![Swift 5.3](https://img.shields.io/badge/Swift-5.3-orange.svg?style=flat-square)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fauth0%2FAuth0.swift.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fauth0%2FAuth0.swift?ref=badge_shield)
 
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
 
-## Important Notice
-[Behaviour changes in iOS 13](https://github.com/auth0/Auth0.swift/pull/297) related to Web Authentication require that developers using Xcode 11 with this library **must** compile using Swift 5.x. This *should* be the default setting applied when updating, unless it has been manually set. However, we recommend checking that this value is set correctly.
+## Important Notices
+- [The latest majors of Quick and Nimble](https://github.com/auth0/Auth0.swift/pull/421) require that developers using Carthage **must** use Xcode 11.4+ only, starting from Auth0.swift [1.29.0](https://github.com/auth0/Auth0.swift/releases/tag/1.29.0).
+- [Behaviour changes in iOS 13](https://github.com/auth0/Auth0.swift/pull/297) related to Web Authentication require that developers using Xcode 11 with this library **must** compile using Swift 5.x. This *should* be the default setting applied when updating, unless it has been manually set. However, we recommend checking that this value is set correctly.
 
 ## Table of Contents
 
