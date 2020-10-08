@@ -40,7 +40,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 If you are using [Cocoapods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 1.28'
+pod 'Auth0', '~> 1.29'
 ```
 
 Then run `pod install`.
@@ -52,7 +52,7 @@ Then run `pod install`.
 If you are using [Carthage](https://github.com/Carthage/Carthage), add the following line to your `Cartfile`:
 
 ```ruby
-github "auth0/Auth0.swift" ~> 1.28
+github "auth0/Auth0.swift" ~> 1.29
 ```
 
 Then run `carthage bootstrap`.
