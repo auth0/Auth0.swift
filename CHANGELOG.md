@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.29.0](https://github.com/auth0/Auth0.swift/tree/1.29.0) (2020-10-08)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.28.0...1.29.0)
+
+**Changed**
+- Updated Quick and Nimble [\#421](https://github.com/auth0/Auth0.swift/pull/421) ([Widcket](https://github.com/Widcket))
+
+**Fixed**
+- Bugfix for minTTL on CredentialsManager.swift [\#420](https://github.com/auth0/Auth0.swift/pull/420) ([heyzooi](https://github.com/heyzooi))
+
 ## [1.28.0](https://github.com/auth0/Auth0.swift/tree/1.28.0) (2020-08-21)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.27.0...1.28.0)
 
