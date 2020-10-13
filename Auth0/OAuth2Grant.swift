@@ -22,6 +22,9 @@
 
 import Foundation
 import JWTDecode
+#if SWIFT_PACKAGE
+import Auth0ObjectiveC
+#endif
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }

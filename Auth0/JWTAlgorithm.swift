@@ -22,6 +22,9 @@
 
 import Foundation
 import JWTDecode
+#if SWIFT_PACKAGE
+import Auth0ObjectiveC
+#endif
 
 enum JWTAlgorithm: String {
     case rs256 = "RS256"

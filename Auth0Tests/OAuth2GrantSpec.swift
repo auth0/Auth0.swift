@@ -23,6 +23,9 @@
 import Quick
 import Nimble
 import OHHTTPStubs
+#if SWIFT_PACKAGE
+import Auth0ObjectiveC
+#endif
 
 @testable import Auth0
 

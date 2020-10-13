@@ -1,12 +1,12 @@
 version = `agvtool mvers -terse1`.strip
 
 web_auth_files = [
-  'Auth0/A0ChallengeGenerator.h',
-  'Auth0/A0ChallengeGenerator.m',
-  'Auth0/A0RSA.h',
-  'Auth0/A0RSA.m',
-  'Auth0/A0SHA.h',
-  'Auth0/A0SHA.m',
+  'Auth0/ObjectiveC/A0ChallengeGenerator.h',
+  'Auth0/ObjectiveC/A0ChallengeGenerator.m',
+  'Auth0/ObjectiveC/A0RSA.h',
+  'Auth0/ObjectiveC/A0RSA.m',
+  'Auth0/ObjectiveC/A0SHA.h',
+  'Auth0/ObjectiveC/A0SHA.m',
   'Auth0/A0SimpleKeychain+RSAPublicKey.swift',
   'Auth0/Array+Encode.swift',
   'Auth0/AuthCancelable.swift',

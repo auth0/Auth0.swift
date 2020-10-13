@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <A0RSA.h>
+#import "A0RSA.h"
 #import <CommonCrypto/CommonCrypto.h>
 
 @interface A0RSA ()
