@@ -20,9 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+import Foundation
 import Quick
 import Nimble
 import OHHTTPStubs
+#if SWIFT_PACKAGE
+import OHHTTPStubsSwift
+#endif
 
 @testable import Auth0
 

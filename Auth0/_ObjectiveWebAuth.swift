@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+import Foundation
+
 @objc(A0WebAuth)
 /// Web-based Auth with Auth0
 // swiftlint:disable:next type_name

@@ -621,14 +621,14 @@
 		5FBBF0371CC964BC0024D2AF /* Matchers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Matchers.swift; path = Auth0Tests/Matchers.swift; sourceTree = SOURCE_ROOT; };
 		5FBBF03A1CC96AA70024D2AF /* Responses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Responses.swift; path = Auth0Tests/Responses.swift; sourceTree = SOURCE_ROOT; };
 		5FBBF0421CCA90300024D2AF /* AuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthenticationSpec.swift; path = Auth0Tests/AuthenticationSpec.swift; sourceTree = SOURCE_ROOT; };
-		5FBEF3DD1D07A4B700D90941 /* A0WebAuthSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = A0WebAuthSpec.m; path = Auth0Tests/A0WebAuthSpec.m; sourceTree = SOURCE_ROOT; };
+		5FBEF3DD1D07A4B700D90941 /* A0WebAuthSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = A0WebAuthSpec.m; path = Auth0Tests/ObjectiveC/A0WebAuthSpec.m; sourceTree = SOURCE_ROOT; };
 		5FC34AF51D0101BF000F28F5 /* A0ChallengeGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = A0ChallengeGenerator.h; path = Auth0/ObjectiveC/A0ChallengeGenerator.h; sourceTree = SOURCE_ROOT; };
 		5FC34AF61D0101BF000F28F5 /* A0ChallengeGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = A0ChallengeGenerator.m; path = Auth0/ObjectiveC/A0ChallengeGenerator.m; sourceTree = SOURCE_ROOT; };
 		5FCAB1701D09005A00331C84 /* NSURLComponents+OAuth2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSURLComponents+OAuth2.swift"; path = "Auth0/NSURLComponents+OAuth2.swift"; sourceTree = SOURCE_ROOT; };
 		5FCAB1721D09009600331C84 /* NSData+URLSafe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSData+URLSafe.swift"; path = "Auth0/NSData+URLSafe.swift"; sourceTree = SOURCE_ROOT; };
 		5FCAB1751D0900CF00331C84 /* TransactionStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TransactionStore.swift; path = Auth0/TransactionStore.swift; sourceTree = SOURCE_ROOT; };
 		5FCAB1781D09124D00331C84 /* NSURL+Auth0.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSURL+Auth0.swift"; path = "Auth0/NSURL+Auth0.swift"; sourceTree = SOURCE_ROOT; };
-		5FCCC3101CF4D4FF00901E2E /* AuthenticationAPISpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AuthenticationAPISpec.m; path = Auth0Tests/AuthenticationAPISpec.m; sourceTree = SOURCE_ROOT; };
+		5FCCC3101CF4D4FF00901E2E /* AuthenticationAPISpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AuthenticationAPISpec.m; path = Auth0Tests/ObjectiveC/AuthenticationAPISpec.m; sourceTree = SOURCE_ROOT; };
 		5FCCC31B1CF51DF300901E2E /* _ObjectiveManagementAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = _ObjectiveManagementAPI.swift; path = Auth0/_ObjectiveManagementAPI.swift; sourceTree = SOURCE_ROOT; };
 		5FD255B01D14A9E000387ECB /* AuthenticationErrorSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthenticationErrorSpec.swift; path = Auth0Tests/AuthenticationErrorSpec.swift; sourceTree = SOURCE_ROOT; };
 		5FD255B31D14DD2600387ECB /* ManagementError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ManagementError.swift; path = Auth0/ManagementError.swift; sourceTree = SOURCE_ROOT; };
@@ -2640,7 +2640,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
@@ -2667,7 +2667,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
@@ -2694,7 +2694,7 @@
 				);
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
@@ -2722,7 +2722,7 @@
 				);
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0Tests;
 				PRODUCT_NAME = Auth0Tests;
@@ -2868,7 +2868,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2TV.app/OAuth2TV";
-				TVOS_DEPLOYMENT_TARGET = 10.0;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Debug;
 		};
@@ -2892,7 +2892,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OAuth2TV.app/OAuth2TV";
-				TVOS_DEPLOYMENT_TARGET = 10.0;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Release;
 		};

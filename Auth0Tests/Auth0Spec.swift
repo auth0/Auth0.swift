@@ -90,6 +90,7 @@ class Auth0Spec: QuickSpec {
 
         }
 
+        #if !SWIFT_PACKAGE
         describe("plist loading") {
 
             let bundle = Bundle(for: Auth0Spec.classForCoder())
@@ -106,6 +107,7 @@ class Auth0Spec: QuickSpec {
             }
 
         }
+        #endif
 
     }
 }

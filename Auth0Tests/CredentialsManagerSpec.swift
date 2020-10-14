@@ -22,8 +22,11 @@
 
 import Quick
 import Nimble
-import OHHTTPStubs
 import SimpleKeychain
+import OHHTTPStubs
+#if SWIFT_PACKAGE
+import OHHTTPStubsSwift
+#endif
 #if WEB_AUTH_PLATFORM
 import LocalAuthentication
 #endif

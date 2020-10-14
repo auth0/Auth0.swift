@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if os(iOS)
 import UIKit
 import SafariServices
 #if canImport(AuthenticationServices)
@@ -329,3 +330,4 @@ extension AuthenticationServicesSessionCallback: ASWebAuthenticationPresentation
 
 @available(iOS 11.0, *)
 extension SFAuthenticationSession: AuthSession {}
+#endif

@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if os(macOS)
+import Cocoa
 #if canImport(AuthenticationServices)
 import AuthenticationServices
 #endif
@@ -114,4 +116,5 @@ extension AuthenticationServicesSessionCallback: ASWebAuthenticationPresentation
     }
 
 }
+#endif
 #endif

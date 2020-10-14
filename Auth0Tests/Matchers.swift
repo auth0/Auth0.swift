@@ -21,8 +21,12 @@
 // THE SOFTWARE.
 
 import Foundation
-import OHHTTPStubs
 import Nimble
+import OHHTTPStubs
+#if SWIFT_PACKAGE
+import OHHTTPStubsSwift
+#endif
+
 @testable import Auth0
 
 func hasAllOf(_ parameters: [String: String]) -> HTTPStubsTestBlock {

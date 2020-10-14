@@ -7,8 +7,11 @@ let package = Package(
     platforms: [.iOS(.v9), .macOS(.v10_11), .tvOS(.v9), .watchOS(.v2)],
     products: [.library(name: "Auth0", targets: ["Auth0"])],
     dependencies: [
-        .package(url: "https://github.com/auth0/SimpleKeychain.git", .upToNextMajor(from: "0.11.0")),
-        .package(url: "https://github.com/auth0/JWTDecode.swift.git", .upToNextMajor(from: "2.4.0"))
+        .package(url: "https://github.com/auth0/SimpleKeychain.git", .branch("chore/update-dependencies")),
+        .package(url: "https://github.com/auth0/JWTDecode.swift.git", .branch("chore/update-dependencies")),
+        .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "3.0.0")),
+        .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "9.0.0")),
+        .package(url: "https://github.com/AliSoftware/OHHTTPStubs.git", .upToNextMajor(from: "9.0.0"))
     ],
     targets: [
         .target(
@@ -16,9 +19,17 @@ let package = Package(
             dependencies: ["SimpleKeychain", "JWTDecode", "Auth0ObjectiveC"], 
             path: "Auth0",
             exclude: ["ObjectiveC"],
-            cSettings: [
-                .define("WEBAUTH_PLATFORM", .when(platforms: [.iOS, .macOS]))
+            swiftSettings: [
+                .define("WEB_AUTH_PLATFORM", .when(platforms: [.iOS, .macOS]))
             ]),
-        .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC")
+        .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC"),
+        .testTarget(
+            name: "Auth0Tests",
+            dependencies: ["Auth0", "Quick", "Nimble", "OHHTTPStubsSwift"],
+            path: "Auth0Tests",
+            exclude: ["ObjectiveC"],
+            swiftSettings: [
+                .define("WEB_AUTH_PLATFORM", .when(platforms: [.iOS, .macOS]))
+            ])
     ]
 )
