@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 /**
  The NativeAuthCredentials struct defines the data requirements necessary to be returned
  from a successul authentication with an IdP SDK as part of the NativeAuthTransaction process.
@@ -125,3 +126,4 @@ public extension NativeAuthTransaction {
         }
     }
 }
+#endif

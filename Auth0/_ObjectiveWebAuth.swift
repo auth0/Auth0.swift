@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 import Foundation
 
 @objc(A0WebAuth)
@@ -143,3 +144,4 @@ public class _ObjectiveOAuth2: NSObject {
         self.webAuth.tracking(enabled: enabled)
     }
 }
+#endif

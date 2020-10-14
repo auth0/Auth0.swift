@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 #if canImport(AuthenticationServices)
 import AuthenticationServices
 #endif
@@ -290,3 +291,4 @@ extension Auth0Authentication {
     }
 
 }
+#endif

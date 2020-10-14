@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 import Foundation
 
 /**
@@ -252,3 +253,4 @@ public protocol WebAuthenticatable: Trackable, Loggable {
      */
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void)
 }
+#endif

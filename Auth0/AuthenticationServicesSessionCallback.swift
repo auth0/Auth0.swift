@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if canImport(AuthenticationServices)
+#if WEB_AUTH_PLATFORM && canImport(AuthenticationServices)
 import AuthenticationServices
 
 @available(iOS 12.0, macOS 10.15, *)

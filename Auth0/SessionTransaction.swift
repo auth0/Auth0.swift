@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 import Foundation
 
 class SessionTransaction: BaseAuthTransaction {
@@ -42,3 +43,4 @@ class SessionTransaction: BaseAuthTransaction {
     }
 
 }
+#endif

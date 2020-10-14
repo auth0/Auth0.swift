@@ -2,6 +2,11 @@
 
 import PackageDescription
 
+let webAuthFlag: (name: String, condition: BuildSettingCondition) = ("WEB_AUTH_PLATFORM",
+                                                                     .when(platforms: [.iOS, .macOS]))
+let cSettings: [CSetting] = [.define(webAuthFlag.name, webAuthFlag.condition)]
+let swiftSettings: [SwiftSetting] = [.define(webAuthFlag.name, webAuthFlag.condition)]
+
 let package = Package(
     name: "Auth0",
     platforms: [.iOS(.v9), .macOS(.v10_11), .tvOS(.v9), .watchOS(.v2)],
@@ -19,17 +24,15 @@ let package = Package(
             dependencies: ["SimpleKeychain", "JWTDecode", "Auth0ObjectiveC"], 
             path: "Auth0",
             exclude: ["ObjectiveC"],
-            swiftSettings: [
-                .define("WEB_AUTH_PLATFORM", .when(platforms: [.iOS, .macOS]))
-            ]),
-        .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC"),
+            cSettings: cSettings,
+            swiftSettings: swiftSettings),
+        .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC", cSettings: cSettings),
         .testTarget(
             name: "Auth0Tests",
             dependencies: ["Auth0", "Quick", "Nimble", "OHHTTPStubsSwift"],
             path: "Auth0Tests",
             exclude: ["ObjectiveC"],
-            swiftSettings: [
-                .define("WEB_AUTH_PLATFORM", .when(platforms: [.iOS, .macOS]))
-            ])
+            cSettings: cSettings,
+            swiftSettings: swiftSettings)
     ]
 )

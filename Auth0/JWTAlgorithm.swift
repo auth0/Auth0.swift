@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
 #if SWIFT_PACKAGE
@@ -45,3 +46,4 @@ enum JWTAlgorithm: String {
         }
     }
 }
+#endif

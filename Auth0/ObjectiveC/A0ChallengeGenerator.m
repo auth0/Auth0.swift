@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 #import "A0ChallengeGenerator.h"
 #import <CommonCrypto/CommonCrypto.h>
 
@@ -69,3 +70,4 @@ const NSUInteger kVerifierSize = 32;
             stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"="]];
 }
 @end
+#endif
