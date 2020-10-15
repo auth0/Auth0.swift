@@ -24,7 +24,9 @@ jobs:
           command: bundle exec fastlane ios bootstrap
       - run:
           name: Run test suite
-          command: bundle exec fastlane ios ci
+          command: |
+            bundle exec fastlane ios ci
+            swift test
           environment:
             SCHEME: Auth0.iOS
             DEVICE: iPhone 11
