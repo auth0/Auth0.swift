@@ -77,10 +77,10 @@
     CFErrorRef error = NULL;
 
     result = SecKeyVerifySignature(self.key,
-                                 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
-                                 (__bridge CFDataRef) plainData,
-                                 (__bridge CFDataRef) signature,
-                                 &error);
+                                   kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
+                                   (__bridge CFDataRef) plainData,
+                                   (__bridge CFDataRef) signature,
+                                   &error);
     return result;
     #else
     OSStatus result = SecKeyRawVerify(self.key,
