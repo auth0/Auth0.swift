@@ -44,7 +44,7 @@
     CFErrorRef error = NULL;
 
     signature = CFBridgingRelease(SecKeyCreateSignature(self.key,
-                                                        kSecKeyAlgorithmRSASignatureMessagePKCS1v15SHA256,
+                                                        kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
                                                         (__bridge CFDataRef) plainData,
                                                         &error));
 
@@ -77,7 +77,7 @@
     CFErrorRef error = NULL;
 
     result = SecKeyVerifySignature(self.key,
-                                 kSecKeyAlgorithmRSASignatureMessagePKCS1v15SHA256,
+                                 kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
                                  (__bridge CFDataRef) plainData,
                                  (__bridge CFDataRef) signature,
                                  &error);
