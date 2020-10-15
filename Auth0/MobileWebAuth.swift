@@ -115,12 +115,16 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
                                           handler: handler,
                                           callback: callback)
             }
+            #if !targetEnvironment(macCatalyst)
             return SafariServicesSession(authorizeURL: authorizeURL,
                                          redirectURL: redirectURL,
                                          state: state,
                                          handler: handler,
                                          logger: self.logger,
                                          callback: callback)
+            #else
+            return nil // Will never get executed because Catalyst will use AuthenticationServices
+            #endif
         }
         let (controller, finish) = newSafari(authorizeURL, callback: callback)
         let session = SafariSession(controller: controller,
@@ -256,6 +260,7 @@ extension AuthTransaction where Self: SessionCallbackTransaction {
 
 }
 
+#if !targetEnvironment(macCatalyst)
 @available(iOS 11.0, *)
 final class SafariServicesSession: SessionTransaction {
 
@@ -308,6 +313,10 @@ final class SafariServicesSessionCallback: SessionCallbackTransaction {
 
 }
 
+@available(iOS 11.0, *)
+extension SFAuthenticationSession: AuthSession {}
+#endif
+
 #if canImport(AuthenticationServices) && swift(>=5.1)
 @available(iOS 13.0, *)
 extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextProviding {
@@ -327,7 +336,4 @@ extension AuthenticationServicesSessionCallback: ASWebAuthenticationPresentation
 
 }
 #endif
-
-@available(iOS 11.0, *)
-extension SFAuthenticationSession: AuthSession {}
 #endif
