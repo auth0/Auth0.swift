@@ -149,9 +149,13 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
                                            federated: federated,
                                            callback: callback)
             }
+            #if !targetEnvironment(macCatalyst)
             return SafariServicesSessionCallback(url: logoutURL,
                                                  schemeURL: redirectURL,
                                                  callback: callback)
+            #else
+            return nil // Will never get executed because Catalyst will use AuthenticationServices
+            #endif
         }
         var urlComponents = URLComponents(url: logoutURL, resolvingAgainstBaseURL: true)!
         if federated, let firstQueryItem = urlComponents.queryItems?.first {
