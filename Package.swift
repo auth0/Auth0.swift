@@ -12,7 +12,7 @@ let package = Package(
     platforms: [.iOS(.v9), .macOS(.v10_11), .tvOS(.v9), .watchOS(.v2)],
     products: [.library(name: "Auth0", targets: ["Auth0"])],
     dependencies: [
-        .package(url: "https://github.com/auth0/SimpleKeychain.git", .branch("chore/update-dependencies")),
+        .package(url: "https://github.com/auth0/SimpleKeychain.git", .upToNextMajor(from: "0.12.0")),
         .package(url: "https://github.com/auth0/JWTDecode.swift.git", .branch("chore/update-dependencies")),
         .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "3.0.0")),
         .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "9.0.0")),
