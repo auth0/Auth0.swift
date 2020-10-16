@@ -2342,7 +2342,7 @@
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"$(inherited)",
 					"WEB_AUTH_PLATFORM=1",
 				);
 				INFOPLIST_FILE = OAuth2Mac/Info.plist;
@@ -2524,7 +2524,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"$(inherited)",
 					"WEB_AUTH_PLATFORM=1",
 				);
 				INFOPLIST_FILE = Auth0/Info.plist;
@@ -2590,7 +2590,7 @@
 				);
 				FRAMEWORK_VERSION = A;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"$(inherited)",
 					"WEB_AUTH_PLATFORM=1",
 				);
 				INFOPLIST_FILE = Auth0/Info.plist;
@@ -2655,7 +2655,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"$(inherited)",
 					"WEB_AUTH_PLATFORM=1",
 				);
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
@@ -2713,7 +2713,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"$(inherited)",
 					"WEB_AUTH_PLATFORM=1",
 				);
 				INFOPLIST_FILE = Auth0Tests/Info.plist;
@@ -2936,7 +2936,7 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"$(inherited)",
 					"WEB_AUTH_PLATFORM=1",
 				);
 				INFOPLIST_FILE = App/Info.plist;
