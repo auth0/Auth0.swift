@@ -36,7 +36,6 @@ class JWKSpec: QuickSpec {
             
             let jwk = generateRSAJWK()
             
-
             context("successful generation") {
                 it("should generate a RSA public key") {
                     let publicKey = JWK(keyType: "RSA",
