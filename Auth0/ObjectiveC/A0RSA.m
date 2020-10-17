@@ -39,7 +39,7 @@
 }
 
 - (NSData *)sign:(NSData *)plainData {
-    #if TARGET_OS_OSX
+    #if TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= 101200
     NSData * signature;
     CFErrorRef error = NULL;
 
@@ -72,7 +72,7 @@
 }
 
 - (Boolean)verify:(NSData *)plainData signature:(NSData *)signature {
-    #if TARGET_OS_OSX
+    #if TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= 101200
     BOOL result = NO;
     CFErrorRef error = NULL;
 
