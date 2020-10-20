@@ -11,7 +11,6 @@
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
 
 ## Important Notices
-- [The latest majors of Quick and Nimble](https://github.com/auth0/Auth0.swift/pull/421) require that developers using Carthage **must** use Xcode 11.4+ only, starting from Auth0.swift [1.29.0](https://github.com/auth0/Auth0.swift/releases/tag/1.29.0).
 - [Behaviour changes in iOS 13](https://github.com/auth0/Auth0.swift/pull/297) related to Web Authentication require that developers using Xcode 11 with this library **must** compile using Swift 5.x. This *should* be the default setting applied when updating, unless it has been manually set. However, we recommend checking that this value is set correctly.
 
 ## Table of Contents
@@ -29,9 +28,8 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 ## Requirements
 
 - iOS 9+ / macOS 10.11+ / tvOS 9.0+ / watchOS 2.0+
-- Xcode 10.x / 11.x
+- Xcode 11.4+ / 12.x
 - Swift 4.x / 5.x
-
 
 ## Installation
 
@@ -58,6 +56,22 @@ github "auth0/Auth0.swift" ~> 1.29
 Then run `carthage bootstrap`.
 
 > For more information about Carthage usage, check [their official documentation](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos).
+
+#### SPM
+
+If you are using the Swift Package Manager, open the following menu item in Xcode:
+
+**File > Swift Packages > Add Package Dependency...**
+
+In the **Choose Package Repository** prompt add this url: 
+
+```
+https://github.com/auth0/Auth0.swift.git
+```
+
+Then press **Next** and complete the remaining steps.
+
+> For further reference on SPM, check [its official documentation](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
 
 > ### Upgrade Notes
 > If you are using the [clearSession](https://github.com/auth0/Auth0.swift/blob/master/Auth0/WebAuthenticatable.swift#L251) method in iOS 11+, you will need to ensure that the **Callback URL** has been added to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
@@ -520,7 +534,7 @@ If you have found a bug or to request a feature, please [raise an issue](https:/
 
 ## License
 
-This project is licensed under the MIT license. See the [LICENSE](https://github.com/auth0/Auth0.swift/blob/master/LICENSE) file for more info.
+This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
 
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fauth0%2FAuth0.swift.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fauth0%2FAuth0.swift?ref=badge_large)
