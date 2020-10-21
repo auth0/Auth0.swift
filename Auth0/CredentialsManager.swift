@@ -171,8 +171,8 @@ public struct CredentialsManager {
         guard let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return callback(.noCredentials, nil) }
         guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
-        guard self.willExpire(credentials, within: minTTL) ||
-            self.hasExpired(credentials) ||
+        guard self.hasExpired(credentials) ||
+            self.willExpire(credentials, within: minTTL) ||
             self.hasScopeChanged(credentials, from: scope) else { return callback(nil, credentials) }
         guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
 
