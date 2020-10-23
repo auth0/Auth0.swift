@@ -1,4 +1,4 @@
-// A0ChallengeGenerator.h
+// A0SHA.h
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -20,16 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@interface A0SHA256ChallengeGenerator : NSObject
-@property (readonly, strong, nonatomic) NSString *verifier;
-@property (readonly, strong, nonatomic) NSString *challenge;
-@property (readonly, strong, nonatomic) NSString *method;
+@interface A0SHA: NSObject
 
-- (instancetype)init;
-- (instancetype)initWithVerifier:(NSData *)verifier;
+- (nullable instancetype)initWithAlgorithm: (NSString *)algorithm;
+
+- (NSData *)hash: (NSData *)data;
 
 @end
 NS_ASSUME_NONNULL_END
+#endif

@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 import Foundation
 
 extension Array where Element == UInt8 {
@@ -38,3 +39,4 @@ extension Array where Element == UInt8 {
         return encodedBytes
     }
 }
+#endif

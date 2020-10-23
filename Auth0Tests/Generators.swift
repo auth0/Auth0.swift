@@ -31,6 +31,7 @@ fileprivate let defaultKid = "key123"
 
 // MARK: - Keys
 
+@available(iOS 10.0, macOS 10.12, *)
 enum TestKeys {
     static let rsaPrivate: SecKey = {
         let query: [String: Any] = [String(kSecAttrKeyType): kSecAttrKeyTypeRSA,
@@ -112,6 +113,7 @@ private func generateJWTPayload(iss: String?,
     return encodeJWTPart(from: bodyDict)
 }
 
+@available(iOS 10.0, macOS 10.12, *)
 func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  kid: String? = defaultKid,
                  iss: String? = "https://tokens-test.auth0.com/",
@@ -176,6 +178,7 @@ private func extractData(from bytes: UnsafePointer<UInt8>) -> (UnsafePointer<UIn
     return (pointer, data)
 }
 
+@available(iOS 10.0, macOS 10.12, *)
 func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String = defaultKid) -> JWK {
     let asn = { (bytes: UnsafePointer<UInt8>) -> JWK? in
         guard bytes.pointee == 0x30 else { return nil } // Checks that this is a SEQUENCE triplet

@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <A0RSA.h>
+#if WEB_AUTH_PLATFORM
+#import "A0RSA.h"
 #import <CommonCrypto/CommonCrypto.h>
 
 @interface A0RSA ()
@@ -38,6 +39,17 @@
 }
 
 - (NSData *)sign:(NSData *)plainData {
+    #if TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
+    NSData * signature;
+    CFErrorRef error = NULL;
+
+    signature = CFBridgingRelease(SecKeyCreateSignature(self.key,
+                                                        kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
+                                                        (__bridge CFDataRef) plainData,
+                                                        &error));
+
+    return signature;
+    #else
     size_t signedHashBytesSize = SecKeyGetBlockSize(self.key);
     uint8_t signedHashBytes[signedHashBytesSize];
     memset(signedHashBytes, 0x0, signedHashBytesSize);
@@ -56,9 +68,21 @@
     }
 
     return signedHash;
+    #endif
 }
 
 - (Boolean)verify:(NSData *)plainData signature:(NSData *)signature {
+    #if TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
+    BOOL result = NO;
+    CFErrorRef error = NULL;
+
+    result = SecKeyVerifySignature(self.key,
+                                   kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
+                                   (__bridge CFDataRef) plainData,
+                                   (__bridge CFDataRef) signature,
+                                   &error);
+    return result;
+    #else
     OSStatus result = SecKeyRawVerify(self.key,
                                       kSecPaddingPKCS1SHA256,
                                       plainData.bytes,
@@ -66,6 +90,8 @@
                                       signature.bytes,
                                       signature.length);
     return result == errSecSuccess;
+    #endif
 }
 
 @end
+#endif

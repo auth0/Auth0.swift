@@ -74,7 +74,9 @@ jobs:
             security unlock-keychain -p circle "/Users/distiller/Library/Keychains/cikeychain-db"
       - run:
           name: Run test suite
-          command: xcodebuild test -scheme Auth0.macOS -destination 'platform=macOS,arch=x86_64' | xcpretty
+          command: |
+            xcodebuild test -scheme Auth0.macOS -destination 'platform=macOS,arch=x86_64' | xcpretty
+            swift test
       - save_cache:
           key: dependency-cache
           paths:

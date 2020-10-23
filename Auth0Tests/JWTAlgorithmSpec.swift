@@ -26,6 +26,7 @@ import Nimble
 
 @testable import Auth0
 
+@available(iOS 10.0, macOS 10.12, *)
 class JWTAlgorithmSpec: QuickSpec {
 
     override func spec() {
@@ -47,12 +48,10 @@ class JWTAlgorithmSpec: QuickSpec {
                     expect(JWTAlgorithm.rs256.verify(jwt, using: jwk)).to(beFalse())
                 }
                 
-                if #available(iOS 10.0, *) {
-                    it("should return false with an incorrect signature") {
-                        let jwt = generateJWT(alg: alg, signature: "abc123")
-                        
-                        expect(JWTAlgorithm.rs256.verify(jwt, using: jwk)).to(beFalse())
-                    }
+                it("should return false with an incorrect signature") {
+                    let jwt = generateJWT(alg: alg, signature: "abc123")
+                    
+                    expect(JWTAlgorithm.rs256.verify(jwt, using: jwk)).to(beFalse())
                 }
             }
             

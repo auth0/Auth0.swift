@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 /**
 Represents a cancelable Auth operation with an Identity Provider (Auth0 or a third party).
 */
@@ -31,3 +32,4 @@ public protocol AuthCancelable {
     func cancel()
 
 }
+#endif

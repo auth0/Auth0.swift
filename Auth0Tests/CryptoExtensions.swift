@@ -22,15 +22,20 @@
 
 import Foundation
 import Security
+#if SWIFT_PACKAGE
+import Auth0ObjectiveC
+#endif
 
 @testable import Auth0
 
+@available(iOS 10.0, macOS 10.12, *)
 extension SecKey {
     func export() -> Data {
         return SecKeyCopyExternalRepresentation(self, nil)! as Data
     }
 }
 
+@available(iOS 10.0, macOS 10.12, *)
 extension JWTAlgorithm {
     func sign(value: Data, key: SecKey = TestKeys.rsaPrivate) -> Data {
         switch self {

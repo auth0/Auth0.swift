@@ -24,9 +24,13 @@ import Foundation
 import Quick
 import Nimble
 import OHHTTPStubs
+#if SWIFT_PACKAGE
+import OHHTTPStubsSwift
+#endif
 
 @testable import Auth0
 
+@available(iOS 10.0, macOS 10.12, *)
 class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
     
     override func spec() {

@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 /**
 Represents an ongoing Auth transaction with an Identity Provider (Auth0 or a third party).
 
@@ -35,3 +36,4 @@ public protocol AuthTransaction: AuthResumable, AuthCancelable {
     var state: String? { get }
 
 }
+#endif

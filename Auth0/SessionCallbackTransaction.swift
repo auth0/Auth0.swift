@@ -20,6 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
+import Foundation
+
 class SessionCallbackTransaction: NSObject, AuthTransaction {
 
     var state: String?
@@ -40,3 +43,4 @@ class SessionCallbackTransaction: NSObject, AuthTransaction {
     }
 
 }
+#endif

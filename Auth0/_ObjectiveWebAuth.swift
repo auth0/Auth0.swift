@@ -20,6 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
+import Foundation
+
 @objc(A0WebAuth)
 /// Web-based Auth with Auth0
 // swiftlint:disable:next type_name
@@ -172,3 +175,4 @@ public class _ObjectiveOAuth2: NSObject {
         self.webAuth.tracking(enabled: enabled)
     }
 }
+#endif

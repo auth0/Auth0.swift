@@ -1,12 +1,12 @@
 version = `agvtool mvers -terse1`.strip
 
 web_auth_files = [
-  'Auth0/A0ChallengeGenerator.h',
-  'Auth0/A0ChallengeGenerator.m',
-  'Auth0/A0RSA.h',
-  'Auth0/A0RSA.m',
-  'Auth0/A0SHA.h',
-  'Auth0/A0SHA.m',
+  'Auth0/ObjectiveC/A0ChallengeGenerator.h',
+  'Auth0/ObjectiveC/A0ChallengeGenerator.m',
+  'Auth0/ObjectiveC/A0RSA.h',
+  'Auth0/ObjectiveC/A0RSA.m',
+  'Auth0/ObjectiveC/A0SHA.h',
+  'Auth0/ObjectiveC/A0SHA.m',
   'Auth0/A0SimpleKeychain+RSAPublicKey.swift',
   'Auth0/Array+Encode.swift',
   'Auth0/AuthCancelable.swift',
@@ -75,22 +75,24 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target = '9.0'
   s.requires_arc = true
 
-  s.ios.source_files = 'Auth0/*.{swift,h,m}'
+  s.ios.source_files = 'Auth0/*.{swift,h,m}', 'Auth0/ObjectiveC/*.{h,m}'
   s.ios.frameworks = 'UIKit', 'SafariServices', 'LocalAuthentication'
   s.ios.weak_framework = 'AuthenticationServices'
   s.ios.dependency 'SimpleKeychain'
   s.ios.dependency 'JWTDecode'
   s.ios.exclude_files = macos_files
   s.ios.pod_target_xcconfig = {
-    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'
+    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM',
+    'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) WEB_AUTH_PLATFORM=1'
   }
 
-  s.osx.source_files = 'Auth0/*.{swift,h,m}'
+  s.osx.source_files = 'Auth0/*.{swift,h,m}', 'Auth0/ObjectiveC/*.{h,m}'
   s.osx.exclude_files = ios_files
   s.osx.dependency 'SimpleKeychain'
   s.osx.dependency 'JWTDecode'
   s.osx.pod_target_xcconfig = {
-    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'
+    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM',
+    'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) WEB_AUTH_PLATFORM=1'
   }
 
   s.watchos.source_files = 'Auth0/*.swift'

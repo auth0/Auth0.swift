@@ -22,8 +22,11 @@
 
 import Quick
 import Nimble
-import OHHTTPStubs
 import SimpleKeychain
+import OHHTTPStubs
+#if SWIFT_PACKAGE
+import OHHTTPStubsSwift
+#endif
 #if WEB_AUTH_PLATFORM
 import LocalAuthentication
 #endif
@@ -321,13 +324,13 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should return true when the scope has changed") {
                 let credentials = Credentials(scope: "openid email profile")
-                expect(credentialsManager.hasScopeChanged(credentials, than: "openid email")).to(beTrue())
+                expect(credentialsManager.hasScopeChanged(credentials, from: "openid email")).to(beTrue())
             }
 
             it("should return false when the scope has not changed") {
                 let credentials = Credentials(scope: "openid email")
-                expect(credentialsManager.hasScopeChanged(credentials, than: "openid email")).to(beFalse())
-                expect(credentialsManager.hasScopeChanged(credentials, than: "email openid")).to(beFalse())
+                expect(credentialsManager.hasScopeChanged(credentials, from: "openid email")).to(beFalse())
+                expect(credentialsManager.hasScopeChanged(credentials, from: "email openid")).to(beFalse())
             }
 
         }

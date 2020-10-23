@@ -20,10 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if os(iOS)
 import Quick
 import Nimble
 import SafariServices
 import OHHTTPStubs
+#if SWIFT_PACKAGE
+import OHHTTPStubsSwift
+import Auth0ObjectiveC
+#endif
 
 @testable import Auth0
 
@@ -42,6 +47,7 @@ class MockSafariViewController: SFSafariViewController {
 
 private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 
+@available(iOS 10.0, *)
 class SafariSessionSpec: QuickSpec {
 
     override func spec() {
@@ -199,3 +205,4 @@ class SafariSessionSpec: QuickSpec {
     }
 
 }
+#endif

@@ -23,9 +23,14 @@
 import Quick
 import Nimble
 import OHHTTPStubs
+#if SWIFT_PACKAGE
+import OHHTTPStubsSwift
+import Auth0ObjectiveC
+#endif
 
 @testable import Auth0
 
+@available(iOS 10.0, macOS 10.12, *)
 class OAuth2GrantSpec: QuickSpec {
 
     override func spec() {

@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <A0SHA.h>
+#if WEB_AUTH_PLATFORM
+#import "A0SHA.h"
 #import <CommonCrypto/CommonHMAC.h>
 
 static NSString * const kDefaultSHAAlgorithm = @"sha256";
@@ -59,3 +60,4 @@ static NSString * const kDefaultSHAAlgorithm = @"sha256";
 }
 
 @end
+#endif

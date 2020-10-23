@@ -20,8 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
+#if SWIFT_PACKAGE
+import Auth0ObjectiveC
+#endif
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
@@ -207,3 +211,4 @@ private func validateFrontChannelIDToken(idToken: String?,
         callback(nil)
     }
 }
+#endif

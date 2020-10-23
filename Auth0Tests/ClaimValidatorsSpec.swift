@@ -23,10 +23,10 @@
 import Foundation
 import Quick
 import Nimble
-import OHHTTPStubs
 
 @testable import Auth0
 
+@available(iOS 10.0, macOS 10.12, *)
 class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
     
     override func spec() {

@@ -1,4 +1,4 @@
-// A0SHA.h
+// A0RSA.h
 //
 // Copyright (c) 2016 Auth0 (http://auth0.com)
 //
@@ -20,14 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@interface A0SHA: NSObject
+@interface A0RSA: NSObject
 
-- (nullable instancetype)initWithAlgorithm: (NSString *)algorithm;
+- (nullable instancetype)initWithKey: (SecKeyRef)key;
 
-- (NSData *)hash: (NSData *)data;
+- (NSData *)sign: (NSData *)data;
+
+- (Boolean)verify: (NSData *)data  signature: (NSData *)signature;
 
 @end
 NS_ASSUME_NONNULL_END
+#endif

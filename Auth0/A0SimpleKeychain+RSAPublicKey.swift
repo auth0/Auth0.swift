@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 import Foundation
 import SimpleKeychain
 
@@ -38,3 +39,4 @@ extension A0SimpleKeychain {
         return result == errSecSuccess
     }
 }
+#endif

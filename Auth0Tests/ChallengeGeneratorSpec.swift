@@ -23,7 +23,13 @@
 import Quick
 import Nimble
 
+#if SWIFT_PACKAGE
+import Auth0
+
+@testable import Auth0ObjectiveC
+#else
 @testable import Auth0
+#endif
 
 class ChallengeGeneratorSpec: QuickSpec {
 

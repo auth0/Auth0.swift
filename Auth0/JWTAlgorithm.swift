@@ -20,8 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
+#if SWIFT_PACKAGE
+import Auth0ObjectiveC
+#endif
 
 enum JWTAlgorithm: String {
     case rs256 = "RS256"
@@ -42,3 +46,4 @@ enum JWTAlgorithm: String {
         }
     }
 }
+#endif
