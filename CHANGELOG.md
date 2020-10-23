@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.30.0](https://github.com/auth0/Auth0.swift/tree/1.30.0) (2020-10-23)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.29.0...1.30.0)
+
+**Added**
+- Added clearSession to the Objective-C WebAuth wrapper [\#426](https://github.com/auth0/Auth0.swift/pull/426) ([Widcket](https://github.com/Widcket))
+- Added Swift Package Manager support [SDK-2014] [\#425](https://github.com/auth0/Auth0.swift/pull/425) ([Widcket](https://github.com/Widcket))
+
 ## [1.29.0](https://github.com/auth0/Auth0.swift/tree/1.29.0) (2020-10-08)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.28.0...1.29.0)
 
