@@ -101,7 +101,10 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
     /// When MFA code sent is invalid or expired
     public var isMultifactorCodeInvalid: Bool {
-        return self.code == "a0.mfa_invalid_code" || self.code == "invalid_grant" && self.description == "Invalid otp_code."
+        return self.code == "a0.mfa_invalid_code"
+            || self.code == "invalid_grant" && self.description == "Invalid otp_code."
+            || self.code == "invalid_grant" && self.description == "Wrong email or verification code."
+            || self.code == "invalid_grant" && self.description == "Wrong phone number or verification code."
     }
 
     /// When MFA code sent is invalid or expired
