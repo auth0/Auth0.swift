@@ -205,6 +205,24 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isInvalidCredentials) == true
             }
 
+            it("should detect invalid credentials email") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Wrong email or verification code."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                expect(error.isInvalidCredentials) == true
+            }
+
+            it("should detect invalid credentials phone number") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Wrong phone number or verification code."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                expect(error.isInvalidCredentials) == true
+            }
+
             it("should detect invalid mfa token") {
                 let values = [
                     "error": "expired_token",
