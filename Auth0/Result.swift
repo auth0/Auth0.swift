@@ -24,11 +24,15 @@ import Foundation
 
 /**
  Result object for Auth0 APIs requests
-
- - Success: request completed successfuly with it's response body
- - Failure: request failed with a specific error
  */
-public enum Result<T> {
-    case success(result: T)
-    case failure(error: Error)
+public typealias Result<T> = Swift.Result<T, Error>
+
+extension Result {
+    static func success(result: Success) -> Self {
+        return .success(result)
+    }
+
+    static func failure(error: Failure) -> Self {
+        return .failure(error)
+    }
 }
