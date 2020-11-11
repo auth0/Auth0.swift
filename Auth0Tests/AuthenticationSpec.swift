@@ -151,9 +151,7 @@ class AuthenticationSpec: QuickSpec {
 
             beforeEach {
                 stub(condition: isToken(Domain) && hasAtLeast(["otp": OTP, "mfa_token": MFAToken])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                stub(condition: isToken(Domain) && hasAtLeast(["otp": "bad_otp_1", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Invalid otp_code.") }.name = "invalid otp with generic error description"
-                stub(condition: isToken(Domain) && hasAtLeast(["otp": "bad_otp_2", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Wrong email or verification code.") }.name = "invalid otp with wrong email error description"
-                stub(condition: isToken(Domain) && hasAtLeast(["otp": "bad_otp_3", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Wrong phone number or verification code.") }.name = "invalid otp with wrong phone number error description"
+                stub(condition: isToken(Domain) && hasAtLeast(["otp": "bad_otp", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Invalid otp_code.") }.name = "invalid otp"
                 stub(condition: isToken(Domain) && hasAtLeast(["otp": OTP, "mfa_token": "bad_token"])) { _ in return authFailure(code: "invalid_grant", description: "Malformed mfa_token") }.name = "invalid mfa_token"
             }
 
@@ -166,28 +164,10 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should fail login with invalid otp and generic error description") {
+            it("should fail login with bad otp") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(withOTP: "bad_otp_1", mfaToken: MFAToken).start { result in
+                    auth.login(withOTP: "bad_otp", mfaToken: MFAToken).start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid otp_code."))
-                        done()
-                    }
-                }
-            }
-
-            it("should fail login with invalid otp and wrong email error description") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withOTP: "bad_otp_2", mfaToken: MFAToken).start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Wrong email or verification code."))
-                        done()
-                    }
-                }
-            }
-
-            it("should fail login with invalid otp and wrong phone number error description") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(withOTP: "bad_otp_3", mfaToken: MFAToken).start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Wrong phone number or verification code."))
                         done()
                     }
                 }
