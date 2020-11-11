@@ -248,7 +248,7 @@ Auth0
     }
 ```
 
-### Credentials Management Utility (iOS / macOS / tvOS)
+### Credentials Management Utility
 
 The credentials manager utility provides a convenience to securely store and retrieve the user's credentials from the Keychain.
 
@@ -267,6 +267,8 @@ credentialsManager.store(credentials: credentials)
 #### Retrieve stored credentials 
 
 Credentials will automatically be renewed (if expired) using the refresh token. The scope `offline_access` is required to ensure the refresh token is returned.
+
+> This method is not thread-safe, so if you're using Refresh Token Rotation you should avoid calling this method concurrently (might result in more than one renew request being fired, and only the first one will succeed).
 
 ```swift
 credentialsManager.credentials { error, credentials in
