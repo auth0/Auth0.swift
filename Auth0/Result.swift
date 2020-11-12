@@ -25,7 +25,7 @@ import Foundation
 /**
  Result object for Auth0 APIs requests
  */
-public typealias Result<T> = Swift.Result<T, Error>
+typealias Result<T> = Swift.Result<T, Error>
 
 extension Result {
     static func success(result: Success) -> Self {
