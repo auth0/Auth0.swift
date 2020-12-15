@@ -231,7 +231,7 @@ Auth0
 
 #### Disable Single Sign On Consent Alert (iOS 13+ / macOS)
 
-Add the `useEphemeralSession()` method to the chain to disable SSO on iOS 13+ and macOS. This way the system will not display the consent alert that otherwise shows up when SSO is enabled. It has no effect on older versions of iOS.
+To suppress the alert box, add the `useEphemeralSession()` method to the chain. This has the impact of disabling [Single Sign On (SSO)](https://auth0.com/docs/sso) on iOS 13+ and macOS, but will also not display the consent alert that otherwise shows up when SSO is enabled. It has no effect on older versions of iOS.
 
 ![sso-alert](./sso-alert.png)
 
