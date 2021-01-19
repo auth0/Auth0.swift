@@ -53,18 +53,15 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
     }
 
     convenience required public init(json: [String: Any]) {
-        var expiresIn: Date?
-        switch json["expires_in"] {
-        case let string as String:
-            guard let double = Double(string) else { break }
-            expiresIn = Date(timeIntervalSinceNow: double)
-        case let int as Int:
-            expiresIn = Date(timeIntervalSinceNow: Double(int))
-        case let double as Double:
-            expiresIn = Date(timeIntervalSinceNow: double)
-        default:
-            expiresIn = nil
+        var expiresIn: Date? = nil
+        
+        if let value = json["expires_in"] {
+            let string = String(describing: value)
+            if let double = NumberFormatter().number(from: string)?.doubleValue {
+                expiresIn = Date(timeIntervalSinceNow: double)
+            }
         }
+
         self.init(accessToken: json["access_token"] as? String, tokenType: json["token_type"] as? String, idToken: json["id_token"] as? String, refreshToken: json["refresh_token"] as? String, expiresIn: expiresIn, scope: json["scope"] as? String)
     }
 
