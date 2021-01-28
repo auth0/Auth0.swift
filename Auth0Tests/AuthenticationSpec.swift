@@ -147,7 +147,7 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        describe("login MFA") {
+        describe("login MFA OTP") {
 
             beforeEach {
                 stub(condition: isToken(Domain) && hasAtLeast(["otp": OTP, "mfa_token": MFAToken])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
@@ -176,6 +176,78 @@ class AuthenticationSpec: QuickSpec {
             it("should fail login with invalid mfa") {
                 waitUntil(timeout: Timeout) { done in
                     auth.login(withOTP: OTP, mfaToken: "bad_token").start { result in
+                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("login MFA OOB") {
+
+            beforeEach {
+                stub(condition: isToken(Domain) && hasAtLeast(["oob_code": OOB, "mfa_token": MFAToken])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                stub(condition: isToken(Domain) && hasAtLeast(["oob_code": "bad_oob", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Invalid oob_code.") }.name = "invalid oob_code"
+                stub(condition: isToken(Domain) && hasAtLeast(["oob_code": OOB, "mfa_token": "bad_token"])) { _ in return authFailure(code: "invalid_grant", description: "Malformed mfa_token") }.name = "invalid mfa_token"
+            }
+
+            it("should login with oob code and mfa tokens") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withOOBCode: OOB, mfaToken: MFAToken, bindingCode: nil).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail login with bad oob code") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withOOBCode: "bad_oob", mfaToken: MFAToken, bindingCode: nil).start { result in
+                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid oob_code."))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail login with invalid mfa") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withOOBCode: OOB, mfaToken: "bad_token", bindingCode: nil).start { result in
+                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("login MFA recovery code") {
+
+            beforeEach {
+                stub(condition: isToken(Domain) && hasAtLeast(["recovery_code": RecoveryCode, "mfa_token": MFAToken])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                stub(condition: isToken(Domain) && hasAtLeast(["recovery_code": "bad_recovery", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Invalid recovery_code.") }.name = "invalid recovery code"
+                stub(condition: isToken(Domain) && hasAtLeast(["recovery_code": RecoveryCode, "mfa_token": "bad_token"])) { _ in return authFailure(code: "invalid_grant", description: "Malformed mfa_token") }.name = "invalid mfa_token"
+            }
+
+            it("should login with recovery code and mfa tokens") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withRecoveryCode: RecoveryCode, mfaToken: MFAToken).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail login with bad recovery code") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withRecoveryCode: "bad_recovery", mfaToken: MFAToken).start { result in
+                        expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid recovery_code."))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail login with invalid mfa") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withRecoveryCode: RecoveryCode, mfaToken: "bad_token").start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
                         done()
                     }

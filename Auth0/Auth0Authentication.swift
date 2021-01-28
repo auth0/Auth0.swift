@@ -133,6 +133,73 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError> {
+        let url = URL(string: "/oauth/token", relativeTo: self.url)!
+        var payload: [String: Any] = [
+            "oob_code": oobCode,
+            "mfa_token": mfaToken,
+            "grant_type": "http://auth0.com/oauth/grant-type/mfa-oob",
+            "client_id": self.clientId
+        ]
+
+        if let bindingCode = bindingCode {
+            payload["binding_code"] = bindingCode
+        }
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: authenticationObject,
+                       payload: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
+        let url = URL(string: "/oauth/token", relativeTo: self.url)!
+        let payload: [String: Any] = [
+            "recovery_code": recoveryCode,
+            "mfa_token": mfaToken,
+            "grant_type": "http://auth0.com/oauth/grant-type/mfa-recovery-code",
+            "client_id": self.clientId
+        ]
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: authenticationObject,
+                       payload: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
+    func multifactorChallenge(mfaToken: String, types: [String]?, channel: String?, authenticatorId: String?) -> Request<Challenge, AuthenticationError> {
+        let url = URL(string: "/mfa/challenge", relativeTo: self.url)!
+        var payload: [String: String] = [
+            "mfa_token": mfaToken,
+            "client_id": self.clientId
+        ]
+
+        if let types = types {
+            payload["challenge_type"] = types.joined(separator: " ")
+        }
+
+        if let channel = channel {
+            payload["oob_channel"] = channel
+        }
+
+        if let authenticatorId = authenticatorId {
+            payload["authenticator_id"] = authenticatorId
+        }
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: codable,
+                       payload: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, scope: String?, audience: String?) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = [:]
         var profile: [String: Any] = profile ?? [:]
