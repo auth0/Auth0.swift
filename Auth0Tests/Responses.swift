@@ -44,6 +44,7 @@ let LocaleUS = "en-US"
 let ZoneEST = "US/Eastern"
 let OTP = "123456"
 let OOB = "654321"
+let BindingCode = "214365"
 let RecoveryCode = "162534"
 let MFAToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 let JWKKid = "key123"
