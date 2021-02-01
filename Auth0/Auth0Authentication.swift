@@ -24,6 +24,7 @@
 
 import Foundation
 
+// swiftlint:disable:next type_body_length
 struct Auth0Authentication: Authentication {
 
     let clientId: String
