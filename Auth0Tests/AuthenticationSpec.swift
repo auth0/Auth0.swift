@@ -186,14 +186,14 @@ class AuthenticationSpec: QuickSpec {
         describe("login MFA OOB") {
 
             beforeEach {
-                stub(condition: isToken(Domain) && hasAtLeast(["oob_code": OOB, "mfa_token": MFAToken])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                stub(condition: isToken(Domain) && hasAtLeast(["oob_code": OOB, "mfa_token": MFAToken, "binding_code": BindingCode])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
                 stub(condition: isToken(Domain) && hasAtLeast(["oob_code": "bad_oob", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Invalid oob_code.") }.name = "invalid oob_code"
                 stub(condition: isToken(Domain) && hasAtLeast(["oob_code": OOB, "mfa_token": "bad_token"])) { _ in return authFailure(code: "invalid_grant", description: "Malformed mfa_token") }.name = "invalid mfa_token"
             }
 
             it("should login with oob code and mfa tokens") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(withOOBCode: OOB, mfaToken: MFAToken, bindingCode: nil).start { result in
+                    auth.login(withOOBCode: OOB, mfaToken: MFAToken, bindingCode: BindingCode).start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
