@@ -140,6 +140,10 @@ func isJWKSPath(_ domain: String) -> HTTPStubsTestBlock {
     return isHost(domain) && isPath("/.well-known/jwks.json")
 }
 
+func isMultifactorChallenge(_ domain: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(domain) && isPath("/mfa/challenge")
+}
+
 func hasBearerToken(_ token: String) -> HTTPStubsTestBlock {
     return { request in
         return request.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)"
