@@ -164,6 +164,7 @@ struct Auth0Authentication: Authentication {
             "grant_type": "http://auth0.com/oauth/grant-type/mfa-recovery-code",
             "client_id": self.clientId
         ]
+
         return Request(session: session,
                        url: url,
                        method: "POST",
