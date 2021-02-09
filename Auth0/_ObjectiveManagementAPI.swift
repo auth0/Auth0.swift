@@ -28,8 +28,8 @@ public class _ObjectiveManagementAPI: NSObject {
 
     private var users: Users
 
-    @objc public init(token: String) {
-        self.users = Auth0.users(token: token)
+    @objc public init(token: String, session: URLSession = .shared) {
+        self.users = Auth0.users(token: token, session: session)
     }
 
     @objc public convenience init(token: String, url: URL) {

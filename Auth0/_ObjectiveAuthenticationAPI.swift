@@ -29,7 +29,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     private var authentication: Authentication
 
     @objc public override init () {
-        self.authentication = Auth0.authentication()
+        self.authentication = Auth0.authentication(session: .shared)
     }
 
     @objc public convenience init(clientId: String, url: URL) {

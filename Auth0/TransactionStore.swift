@@ -30,8 +30,8 @@ class TransactionStore {
 
     private(set) var current: AuthTransaction?
 
-    func resume(_ url: URL) -> Bool {
-        let resumed = self.current?.resume(url) ?? false
+    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
+        let resumed = self.current?.resume(url, options: options) ?? false
         if resumed {
             self.current = nil
         }

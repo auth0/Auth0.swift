@@ -30,9 +30,7 @@ class BaseWebAuth: WebAuthenticatable {
     let clientId: String
     let url: URL
     let session: URLSession
-    var telemetry: Telemetry
 
-    let presenter: ControllerModalPresenter
     let storage: TransactionStore
     var telemetry: Telemetry
     var logger: Logger?
@@ -61,15 +59,14 @@ class BaseWebAuth: WebAuthenticatable {
     private var safariPresentationStyle = UIModalPresentationStyle.fullScreen
 
     convenience init(platform: String, clientId: String, url: URL, session: URLSession, presenter: ControllerModalPresenter = ControllerModalPresenter(), telemetry: Telemetry = Telemetry()) {
-        self.init(clientId: clientId, url: url, session: session, presenter: presenter, storage: TransactionStore.shared, telemetry: telemetry)
+        self.init(platform: platform, clientId: clientId, url: url, session: session, storage: TransactionStore.shared, telemetry: telemetry)
     }
 
-    init(platform: String, clientId: String, url: URL, session: URLSession, presenter: ControllerModalPresenter, storage: TransactionStore, telemetry: Telemetry) {
+    init(platform: String, clientId: String, url: URL, session: URLSession, storage: TransactionStore, telemetry: Telemetry) {
         self.platform = platform
         self.clientId = clientId
         self.url = url
         self.session = session
-        self.presenter = presenter
         self.storage = storage
         self.telemetry = telemetry
         self.issuer = "\(url.absoluteString)/"
@@ -297,7 +294,7 @@ class BaseWebAuth: WebAuthenticatable {
 extension Auth0Authentication {
 
     func webAuth(withConnection connection: String) -> WebAuth {
-        let webAuth = Auth0WebAuth(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+        let webAuth = Auth0WebAuth(clientId: self.clientId, url: self.url, session: self.session, telemetry: self.telemetry)
         return webAuth
             .logging(enabled: self.logger != nil)
             .connection(connection)

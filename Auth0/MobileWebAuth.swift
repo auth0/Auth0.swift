@@ -43,7 +43,7 @@ public typealias A0URLOptionsKey = UIApplicationOpenURLOptionsKey
  - returns: if the url was handled by an on going session or not.
  */
 public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
-    return TransactionStore.shared.resume(url)
+    return TransactionStore.shared.resume(url, options: options)
 }
 
 public protocol WebAuth: WebAuthenticatable {
@@ -86,12 +86,14 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
     init(clientId: String,
          url: URL,
          presenter: ControllerModalPresenter = ControllerModalPresenter(),
+         session: URLSession,
          storage: TransactionStore = TransactionStore.shared,
          telemetry: Telemetry = Telemetry()) {
         self.presenter = presenter
         super.init(platform: "ios",
                    clientId: clientId,
                    url: url,
+                   session: session,
                    storage: storage,
                    telemetry: telemetry)
     }
@@ -291,7 +293,7 @@ final class SafariServicesSession: SessionTransaction {
                 }
                 return TransactionStore.shared.clear()
             }
-            _ = TransactionStore.shared.resume(callbackURL)
+            _ = TransactionStore.shared.resume(callbackURL, options: [:])
         }
 
          _ = authSession?.start()

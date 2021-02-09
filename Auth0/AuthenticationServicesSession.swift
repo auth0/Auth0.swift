@@ -50,7 +50,7 @@ final class AuthenticationServicesSession: SessionTransaction {
                 }
                 return TransactionStore.shared.clear()
             }
-            _ = TransactionStore.shared.resume(callbackURL)
+            _ = TransactionStore.shared.resume(callbackURL, options: [:])
         }
 
         #if swift(>=5.1)

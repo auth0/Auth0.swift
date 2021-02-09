@@ -68,19 +68,7 @@ public func webAuth(session: URLSession, bundle: Bundle = Bundle.main) -> WebAut
  - returns: Auth0 WebAuth component
  */
 public func webAuth(clientId: String, domain: String, session: URLSession = .shared) -> WebAuth {
-    return SafariWebAuth(clientId: clientId, url: .a0_url(domain), session: session)
-}
-
-/**
- Resumes the current Auth session (if any).
-
- - parameter url:     url received by iOS application in AppDelegate
- - parameter options: dictionary with launch options received by iOS application in AppDelegate
-
- - returns: if the url was handled by an on going session or not.
- */
-public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-    return TransactionStore.shared.resume(url, options: options)
+    return Auth0WebAuth(clientId: clientId, url: .a0_url(domain), session: session)
 }
 
 /// WebAuth Authentication using Auth0
