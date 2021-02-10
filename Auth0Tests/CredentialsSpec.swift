@@ -71,18 +71,28 @@ class CredentialsSpec: QuickSpec {
 
             context("expires_in responses") {
 
-                it("should have valid exiresIn from string") {
+                it("should have valid expiresIn from string") {
                     let credentials = Credentials(json: ["expires_in": "3600"])
                     expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
                 }
 
-                it("should have valid exiresIn from int") {
+                it("should have valid expiresIn from int") {
                     let credentials = Credentials(json: ["expires_in": 3600])
                     expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
                 }
 
-                it("should have valid exiresIn from double") {
+                it("should have valid expiresIn from double") {
                     let credentials = Credentials(json: ["expires_in": 3600.0])
+                    expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+                }
+                
+                it("should have valid expiresIn from Int64") {
+                    let credentials = Credentials(json: ["expires_in": Int64(3600)])
+                    expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+                }
+
+                it("should have valid expiresIn from float") {
+                    let credentials = Credentials(json: ["expires_in": Float(3600.0)])
                     expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
                 }
 
