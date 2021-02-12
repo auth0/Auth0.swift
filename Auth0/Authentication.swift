@@ -233,6 +233,40 @@ public protocol Authentication: Trackable, Loggable {
      */
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
+    /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either Push notification, SMS, or Voice).
+    ///
+    /// - Parameters:
+    ///   - oobCode: The oob code received from the challenge request
+    ///   - mfaToken: Token returned when authentication fails due to MFA requirement
+    ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message
+    ///
+    /// - returns: authentication request that will yield Auth0 User Credentials
+    /// - requires: Grant `http://auth0.com/oauth/grant-type/mfa-oob`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
+
+    /// Verifies multi-factor authentication (MFA) using a recovery code.
+    /// Some multi-factor authentication (MFA) providers (such as Guardian) support using a recovery code to login. Use this method to authenticate when the user's enrolled device is unavailable, or the user cannot receive the challenge or accept it due to connectivity issues.
+    ///
+    /// - Parameters:
+    ///   - recoveryCode: Recovery code provided by the end-user
+    ///   - mfaToken: Token returned when authentication fails due to MFA requirement
+    ///
+    /// - returns: authentication request that will yield Auth0 User Credentials
+    /// - requires: Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
+
+    /// Request a challenge for multi-factor authentication (MFA) based on the challenge types supported by the application and user.
+    /// The `type` is how the user will get the challenge and prove possession. Supported challenge types include:
+    /// `otp`: for one-time password (OTP)
+    /// `oob`: for SMS/Voice messages or out-of-band (OOB)
+    ///
+    /// - Parameters:
+    ///   - mfaToken: Token returned when authentication fails due to MFA requirement
+    ///   - types: A list of the challenges types accepted by your application. Accepted challenge types are `oob` or `otp`. Excluding this parameter means that your client application accepts all supported challenge types
+    ///   - channel: The channel to use for OOB. Can only be provided when challenge type is `oob`. Accepted values are `sms`, `voice`, or `auth0`. Excluding this parameter means that your client application will accept all supported OOB channels
+    ///   - authenticatorId: The ID of the authenticator to challenge. You can get the ID by querying the list of available authenticators for the user
+    func multifactorChallenge(mfaToken: String, types: [String]?, channel: String?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
+
     /**
     Authenticate a user with their Sign In With Apple authorization code.
 

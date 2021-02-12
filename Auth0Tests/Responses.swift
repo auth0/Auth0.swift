@@ -43,7 +43,13 @@ let Sub = "auth0|\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
 let LocaleUS = "en-US"
 let ZoneEST = "US/Eastern"
 let OTP = "123456"
+let OOB = "654321"
+let OOBChannel = "sms"
+let BindingCode = "214365"
+let RecoveryCode = "162534"
 let MFAToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+let AuthenticatorId = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+let ChallengeTypes = ["oob", "otp"]
 let JWKKid = "key123"
 
 func authResponse(accessToken: String, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Double? = nil) -> HTTPStubsResponse {
@@ -148,4 +154,8 @@ func jwksResponse(kid: String? = JWKKid) -> HTTPStubsResponse {
 
 func jwksErrorResponse() -> HTTPStubsResponse {
     return HTTPStubsResponse(jsonObject: [], statusCode: 500, headers: nil)
+}
+
+func multifactorChallengeResponse(challengeType: String, oobCode: String? = nil, bindingMethod: String? = nil) -> HTTPStubsResponse {
+    return HTTPStubsResponse(jsonObject: ["challenge_type": challengeType, "oob_code": oobCode, "binding_method": bindingMethod], statusCode: 200, headers: nil)
 }
