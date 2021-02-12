@@ -232,11 +232,12 @@ class BaseWebAuth: WebAuthenticatable {
         entries["scope"] = "openid"
         entries["state"] = state
         entries["response_type"] = self.responseType.map { $0.label! }.joined(separator: " ")
+
+        if let maxAge = self.maxAge {
+            entries["max_age"] = String(maxAge)
+        }
         if self.responseType.contains(.idToken) {
             entries["nonce"] = self.nonce
-            if let maxAge = self.maxAge {
-                entries["max_age"] = String(maxAge)
-            }
         }
 
         self.parameters.forEach { entries[$0] = $1 }
