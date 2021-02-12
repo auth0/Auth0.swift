@@ -37,7 +37,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 If you are using [Cocoapods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 1.30'
+pod 'Auth0', '~> 1.31'
 ```
 
 Then run `pod install`.
@@ -49,7 +49,7 @@ Then run `pod install`.
 If you are using [Carthage](https://github.com/Carthage/Carthage), add the following line to your `Cartfile`:
 
 ```ruby
-github "auth0/Auth0.swift" ~> 1.30
+github "auth0/Auth0.swift" ~> 1.31
 ```
 
 Then run `carthage bootstrap`.
@@ -85,7 +85,7 @@ import Auth0
 ```swift
 Auth0
     .webAuth()
-    .audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")
+    .audience("https://YOUR_AUTH0_DOMAIN/userinfo")
     .start { result in
         switch result {
         case .success(let credentials):
@@ -143,10 +143,10 @@ As an alternative, you can pass the ClientId & Domain programmatically.
 
 ```swift
 // When using Universal Login
-Auth0.webAuth(clientId: "{YOUR_AUTH0_CLIENT_ID}", domain: "{YOUR_AUTH0_DOMAIN}")
+Auth0.webAuth(clientId: "YOUR_AUTH0_CLIENT_ID", domain: "YOUR_AUTH0_DOMAIN")
 
 // When using the Authentication API
-Auth0.authentication(clientId: "{YOUR_AUTH0_CLIENT_ID}", domain: "{YOUR_AUTH0_DOMAIN}")
+Auth0.authentication(clientId: "YOUR_AUTH0_CLIENT_ID", domain: "YOUR_AUTH0_DOMAIN")
 ```
 
 #### Configure Callback URLs (iOS / macOS)
@@ -238,7 +238,7 @@ To suppress the alert box, add the `useEphemeralSession()` method to the chain. 
 ```swift
 Auth0
     .webAuth()
-    .audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")
+    .audience("https://YOUR_AUTH0_DOMAIN/userinfo")
     .useEphemeralSession()
     .start { result in
         switch result {
@@ -427,11 +427,11 @@ Auth0
 If you are using [Custom Domains](https://auth0.com/docs/custom-domains) and need to call an Auth0 endpoint
 such as `/userinfo`, please use the Auth0 domain specified for your Application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
-Example: `.audience("https://{YOUR_AUTH0_DOMAIN}/userinfo")`
+Example: `.audience("https://YOUR_AUTH0_DOMAIN/userinfo")`
 
 Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 domain before starting the authentication. Otherwise, the ID Token validation will fail.
 
-Example: `.issuer("https://{YOUR_AUTH0_DOMAIN}/")`
+Example: `.issuer("https://YOUR_AUTH0_DOMAIN/")`
 
 ### Bot Detection
 
@@ -458,6 +458,8 @@ Auth0
                     .webAuth()
                     .connection(realm)
                     .scope(scope)
+                    .useEphemeralSession()
+                    // ☝🏼 Otherwise a session cookie will remain
                     .parameters(["login_hint": email])
                     // ☝🏼 So the user doesn't have to type it again
                     .start { result in

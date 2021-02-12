@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.31.0](https://github.com/auth0/Auth0.swift/tree/1.31.0) (2021-02-12)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.30.1...1.31.0)
+
+**Added**
+- Added support for OOB and Recovery code MFA challenges [\#442](https://github.com/auth0/Auth0.swift/pull/442) ([ejensen](https://github.com/ejensen))
+- Added support for a wider variety of primitive types for the Credentials expiration date [\#440](https://github.com/auth0/Auth0.swift/pull/440) ([seanmcneil](https://github.com/seanmcneil))
+
+**Fixed**
+- Always add a max_age if one was provided [\#452](https://github.com/auth0/Auth0.swift/pull/452) ([Widcket](https://github.com/Widcket))
+
 ## [1.30.1](https://github.com/auth0/Auth0.swift/tree/1.30.1) (2020-11-11)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.30.0...1.30.1)
 
