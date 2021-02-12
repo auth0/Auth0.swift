@@ -132,6 +132,9 @@ public struct CredentialsManager {
     /// otherwise the retrieved credentails will be returned as they have not expired. Renewed credentials will be
     /// stored in the keychain.
     ///
+    /// This method is not thread-safe, so if you're using Refresh Token Rotation you should avoid calling this method
+    /// concurrently (might result in more than one renew request being fired, and only the first one will succeed).
+    ///
     /// ```
     /// credentialsManager.credentials {
     ///    guard $0 == nil else { return }
