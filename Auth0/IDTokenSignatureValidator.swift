@@ -54,9 +54,11 @@ struct IDTokenSignatureValidator: JWTAsyncValidator {
 
     func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
         if let error = validateAlg(jwt) { return callback(error) }
-        if let error = validateKid(jwt) { return callback(error) }
         let algorithm = jwt.algorithm!
+        guard algorithm.shouldVerify else { return callback(nil) }
+        if let error = validateKid(jwt) { return callback(error) }
         let kid = jwt.kid!
+
         context
             .jwksRequest
             .start { result in

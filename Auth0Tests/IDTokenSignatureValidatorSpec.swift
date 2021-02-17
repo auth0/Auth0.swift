@@ -23,6 +23,7 @@
 import Foundation
 import Quick
 import Nimble
+import JWTDecode
 import OHHTTPStubs
 #if SWIFT_PACKAGE
 import OHHTTPStubsSwift
@@ -40,11 +41,9 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
             let signatureValidator = IDTokenSignatureValidator(context: validatorContext)
             
             context("algorithm support") {
-                beforeEach {
-                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse() }
-                }
-                
                 it("should support RS256") {
+                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse() }
+                    
                     let jwt = generateJWT(alg: "RS256")
                     
                     waitUntil { done in
@@ -56,7 +55,8 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should support HS256") {
-                    let jwt = generateJWT(alg: "HS256")
+                    let jwtString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjJ9.tbDepxpstvGdW8TC3G8zg4B6rUYAOvfzdceoH48wgRQ"
+                    let jwt = try! decode(jwt: jwtString)
                     
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
