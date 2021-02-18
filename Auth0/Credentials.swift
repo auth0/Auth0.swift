@@ -53,8 +53,8 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
     }
 
     convenience required public init(json: [String: Any]) {
-        var expiresIn: Date? = nil
-        
+        var expiresIn: Date?
+
         if let value = json["expires_in"] {
             let string = String(describing: value)
             if let double = NumberFormatter().number(from: string)?.doubleValue {
