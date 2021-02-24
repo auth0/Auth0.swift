@@ -134,6 +134,8 @@ public struct CredentialsManager {
     ///
     /// This method is not thread-safe, so if you're using Refresh Token Rotation you should avoid calling this method
     /// concurrently (might result in more than one renew request being fired, and only the first one will succeed).
+    /// Note that this will also happen if you call this method repeatedly from the same thread, so we recommend using
+    /// a queue to ensure that only one request can be in flight at any given time.
     ///
     /// ```
     /// credentialsManager.credentials {
