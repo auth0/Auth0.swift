@@ -172,6 +172,16 @@ public struct CredentialsManager {
     }
     #endif
 
+    /// Retrieve credentials from keychain without any validation of the expiration.
+    /// No attempts to renew the credentials will be made so it's up to to caller to make the expiration date checks if they are relevant.
+    public var credentials: Credentials? {
+        guard let data = self.storage.data(forKey: self.storeKey),
+              let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else {
+            return nil
+        }
+        return credentials
+    }
+
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard let data = self.storage.data(forKey: self.storeKey),
             let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return callback(.noCredentials, nil) }

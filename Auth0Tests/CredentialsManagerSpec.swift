@@ -80,6 +80,21 @@ class CredentialsManagerSpec: QuickSpec {
             it("should fail to clear credentials") {
                 expect(credentialsManager.clear()).to(beFalse())
             }
+
+
+            context("given a stored credentials") {
+                beforeEach {
+                    _ = credentialsManager.store(credentials: credentials)
+                }
+
+                it("retrieves the credentials") {
+                    let credentials = credentialsManager.credentials
+                    expect(credentials).notTo(beNil())
+                    expect(credentials!.accessToken) == AccessToken
+                    expect(credentials!.refreshToken) == RefreshToken
+                    expect(credentials!.idToken) == IdToken
+                }
+            }
         }
         
         describe("clearing and revoking refresh token") {
