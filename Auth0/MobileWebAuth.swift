@@ -34,27 +34,6 @@ public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey
 public typealias A0URLOptionsKey = UIApplicationOpenURLOptionsKey
 #endif
 
-public func handleInvitation(_ url: URL) {
-    let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
-
-    guard let invitation = queryItems?.first(where: { $0.name == "invitation" })?.value else {
-        return print("URL does not contain 'invitation' parameter")
-    }
-
-    guard let organization = queryItems?.first(where: { $0.name == "organization" })?.value else {
-        return print("URL does not contain 'organization' parameter")
-    }
-
-    webAuth()
-        .parameters(["invitation": invitation, "organization": organization])
-        .start { result in
-            switch result {
-            case .success: print("Login successful")
-            case .failure(let error): print("Login failed: \(error)")
-            }
-    }
-}
-
 /**
  Resumes the current Auth session (if any).
 

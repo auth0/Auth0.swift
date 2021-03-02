@@ -193,6 +193,8 @@ public protocol WebAuthenticatable: Trackable, Loggable {
     func useEphemeralSession() -> Self
     #endif
 
+    func invitationURL(_ invitationURL: URL) -> Self
+
     /**
      Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)
 

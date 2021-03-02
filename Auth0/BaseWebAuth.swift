@@ -42,6 +42,7 @@ class BaseWebAuth: WebAuthenticatable {
     private var responseType: [ResponseType] = [.code]
     private var nonce: String?
     private var maxAge: Int?
+    private var invitationURL: URL?
 
     lazy var redirectURL: URL? = {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
@@ -138,6 +139,11 @@ class BaseWebAuth: WebAuthenticatable {
     }
     #endif
 
+    func invitationURL(_ invitationURL: URL) -> Self {
+        self.invitationURL = invitationURL
+        return self
+    }
+
     func start(_ callback: @escaping (Result<Credentials>) -> Void) {
         guard let redirectURL = self.redirectURL else {
             return callback(Result.failure(error: WebAuthError.noBundleIdentifierFound))
@@ -147,6 +153,15 @@ class BaseWebAuth: WebAuthenticatable {
         }
         let handler = self.handler(redirectURL)
         let state = self.parameters["state"] ?? generateDefaultState()
+        if let invitationURL = self.invitationURL {
+            guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
+                let invitation = queryItems.first(where: { $0.name == "invitation" })?.value,
+                let organization = queryItems.first(where: { $0.name == "organization" })?.value else {
+                    return callback(.failure(error: WebAuthError.unknownError))
+            }
+            self.parameters["invitation"] = invitation
+            self.parameters["organization"] = organization
+        }
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL,
                                                   defaults: handler.defaults,
                                                   state: state)
