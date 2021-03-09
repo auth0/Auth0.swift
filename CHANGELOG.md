@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.31.1](https://github.com/auth0/Auth0.swift/tree/1.31.1) (2021-03-09)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.31.0...1.31.1)
+
+**Fixed**
+- Skipped kid validation when alg is HS256 [SDK-2328] [\#455](https://github.com/auth0/Auth0.swift/pull/455) ([Widcket](https://github.com/Widcket))
+
 ## [1.31.0](https://github.com/auth0/Auth0.swift/tree/1.31.0) (2021-02-12)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.30.1...1.31.0)
 
