@@ -351,7 +351,34 @@ Auth0
 
 Find out more about [Setting up Facebook Login](https://auth0.com/docs/connections/nativesocial/facebook) with Auth0.
 
-### Organizations
+### Organizations (Closed Beta)
+
+Organizations is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. 
+
+Using Organizations, you can:
+
+- Represent teams, business customers, partner companies, or any logical grouping of users that should have different ways of accessing your applications, as organizations.
+- Manage their membership in a variety of ways, including user invitation.
+- Configure branded, federated login flows for each organization.
+- Implement role-based access control, such that users can have different roles when authenticating in the context of different organizations.
+- Build administration capabilities into your products, using Organizations APIs, so that those businesses can manage their own organizations.
+
+Note that Organizations is currently only available to customers on our Enterprise and Startup subscription plans.
+
+#### Log in to an organization
+
+```swift
+Auth0.webAuth()
+    .organization(organizationId)
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
 
 #### Accept user invitations
 
@@ -372,7 +399,7 @@ if let url = URLContexts.first?.url {
                 .invitationURL(url)
                 .start { result in
                     switch result {
-                    case .success:
+                    case .success(let credentials):
                         print("Obtained credentials: \(credentials)")
                     case .failure(let error):
                         print("Failed with \(error)")
@@ -380,21 +407,6 @@ if let url = URLContexts.first?.url {
                 }
         }
 }
-```
-
-#### Log in to an organization
-
-```swift
-Auth0.webAuth()
-    .organization(organizationId)
-    .start { result in
-        switch result {
-        case .success:
-            print("Obtained credentials: \(credentials)")
-        case .failure(let error):
-            print("Failed with \(error)")
-        }
-    }
 ```
 
 ### Authentication API (iOS / macOS / tvOS)
