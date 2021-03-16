@@ -467,7 +467,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                 }
             }
             
-            context("mismatched nonce") {
+            context("mismatched org_id") {
                 it("should return an error if org_id does not match the request organization") {
                     let organization = "xyz6789"
                     let jwt = generateJWT(organization: organization)
