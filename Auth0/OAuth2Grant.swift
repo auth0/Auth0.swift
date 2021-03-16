@@ -41,13 +41,15 @@ struct ImplicitGrant: OAuth2Grant {
     let issuer: String
     let leeway: Int
     let maxAge: Int?
+    let organization: String?
 
     init(authentication: Authentication,
          responseType: [ResponseType] = [.token],
          issuer: String,
          leeway: Int,
          maxAge: Int? = nil,
-         nonce: String? = nil) {
+         nonce: String? = nil,
+         organization: String? = nil) {
         self.authentication = authentication
         self.responseType = responseType
         self.issuer = issuer
@@ -58,6 +60,7 @@ struct ImplicitGrant: OAuth2Grant {
         } else {
             self.defaults = [:]
         }
+        self.organization = organization
     }
 
     func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void) {
@@ -66,7 +69,8 @@ struct ImplicitGrant: OAuth2Grant {
                                                        issuer: issuer,
                                                        leeway: leeway,
                                                        maxAge: maxAge,
-                                                       nonce: self.defaults["nonce"])
+                                                       nonce: self.defaults["nonce"],
+                                                       organization: self.organization)
         validateFrontChannelIDToken(idToken: values["id_token"], for: responseType, with: validatorContext) { error in
             if let error = error { return callback(.failure(error: error)) }
             guard !responseType.contains(.token) || values["access_token"] != nil else {
@@ -92,6 +96,7 @@ struct PKCE: OAuth2Grant {
     let issuer: String
     let leeway: Int
     let maxAge: Int?
+    let organization: String?
 
     init(authentication: Authentication,
          redirectURL: URL,
@@ -100,7 +105,8 @@ struct PKCE: OAuth2Grant {
          issuer: String,
          leeway: Int,
          maxAge: Int? = nil,
-         nonce: String? = nil) {
+         nonce: String? = nil,
+         organization: String? = nil) {
         self.init(authentication: authentication,
                   redirectURL: redirectURL,
                   verifier: generator.verifier,
@@ -110,7 +116,8 @@ struct PKCE: OAuth2Grant {
                   issuer: issuer,
                   leeway: leeway,
                   maxAge: maxAge,
-                  nonce: nonce)
+                  nonce: nonce,
+                  organization: organization)
     }
 
     init(authentication: Authentication,
@@ -122,7 +129,8 @@ struct PKCE: OAuth2Grant {
          issuer: String,
          leeway: Int,
          maxAge: Int? = nil,
-         nonce: String? = nil) {
+         nonce: String? = nil,
+         organization: String? = nil) {
         self.authentication = authentication
         self.redirectURL = redirectURL
         self.verifier = verifier
@@ -130,6 +138,7 @@ struct PKCE: OAuth2Grant {
         self.issuer = issuer
         self.leeway = leeway
         self.maxAge = maxAge
+        self.organization = organization
         var newDefaults: [String: String] = [
             "code_challenge": challenge,
             "code_challenge_method": method
@@ -140,7 +149,6 @@ struct PKCE: OAuth2Grant {
         self.defaults = newDefaults
     }
 
-    // swiftlint:disable function_body_length
     func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void) {
         guard let code = values["code"] else {
             let string = "No code found in parameters \(values)"
@@ -149,19 +157,16 @@ struct PKCE: OAuth2Grant {
         let idToken = values["id_token"]
         let responseType = self.responseType
         let authentication = self.authentication
-        let issuer = self.issuer
-        let leeway = self.leeway
-        let nonce = self.defaults["nonce"]
-        let maxAge = self.maxAge
         let verifier = self.verifier
         let redirectUrlString = self.redirectURL.absoluteString
         let clientId = authentication.clientId
         let isFrontChannelIdTokenExpected = responseType.contains(.idToken)
         let validatorContext = IDTokenValidatorContext(authentication: authentication,
-                                                       issuer: issuer,
-                                                       leeway: leeway,
-                                                       maxAge: maxAge,
-                                                       nonce: nonce)
+                                                       issuer: self.issuer,
+                                                       leeway: self.leeway,
+                                                       maxAge: self.maxAge,
+                                                       nonce: self.defaults["nonce"],
+                                                       organization: self.organization)
         validateFrontChannelIDToken(idToken: idToken, for: responseType, with: validatorContext) { error in
             if let error = error { return callback(.failure(error: error)) }
             authentication

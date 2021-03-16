@@ -85,11 +85,14 @@ func validate(idToken: String?,
     if let nonce = context.nonce {
         claimValidators.append(IDTokenNonceValidator(nonce: nonce))
     }
-    if let aud = jwt.audience, aud.count > 1 {
+    if let audience = jwt.audience, audience.count > 1 {
         claimValidators.append(IDTokenAzpValidator(authorizedParty: context.audience))
     }
     if let maxAge = context.maxAge {
         claimValidators.append(IDTokenAuthTimeValidator(leeway: context.leeway, maxAge: maxAge))
+    }
+    if let organization = context.organization {
+        claimValidators.append(IDTokenOrgIdValidator(organization: organization))
     }
     let validator = IDTokenValidator(signatureValidator: signatureValidator ?? IDTokenSignatureValidator(context: context),
                                      claimsValidator: claimsValidator ?? IDTokenClaimsValidator(validators: claimValidators),
