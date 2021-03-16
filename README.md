@@ -351,6 +351,52 @@ Auth0
 
 Find out more about [Setting up Facebook Login](https://auth0.com/docs/connections/nativesocial/facebook) with Auth0.
 
+### Organizations
+
+#### Accept invitations
+
+To accept organization invitations on your app you need:
+1. A tenant configured to use a [Custom Domain](https://auth0.com/docs/custom-domains).
+2. [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app) support for that domain (invitations links are `https` only). Tapping on the invitation link should open your app.
+
+When your app gets opened by an invitation link, grab the invitation URL and pass it to `.invitationURL()`:
+
+```swift
+if let url = URLContexts.first?.url {
+    // You need to wait for the app to enter the foreground before launching WebAuth
+    _ = NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
+        .subscribe(on: DispatchQueue.main)
+        .prefix(1)
+        .sink { _ in
+            Auth0.webAuth()
+                .invitationURL(url)
+                .start { result in
+                    switch result {
+                    case .success:
+                        print("Obtained credentials: \(credentials)")
+                    case .failure(let error):
+                        print("Failed with \(error)")
+                    }
+                }
+        }
+}
+```
+
+#### Log in to an organization
+
+```swift
+Auth0.webAuth()
+    .organization(organizationId)
+    .start { result in
+        switch result {
+        case .success:
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
+
 ### Authentication API (iOS / macOS / tvOS)
 
 The Authentication API exposes AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
