@@ -353,7 +353,7 @@ Find out more about [Setting up Facebook Login](https://auth0.com/docs/connectio
 
 ### Organizations
 
-#### Accept invitations
+#### Accept user invitations
 
 To accept organization invitations on your app you need:
 1. A tenant configured to use a [Custom Domain](https://auth0.com/docs/custom-domains).
