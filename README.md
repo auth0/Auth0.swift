@@ -382,9 +382,7 @@ Auth0.webAuth()
 
 #### Accept user invitations
 
-To accept organization invitations on your app you need:
-1. A tenant configured to use a [Custom Domain](https://auth0.com/docs/custom-domains).
-2. [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app) support for that domain (invitations links are `https` only). Tapping on the invitation link should open your app.
+To accept organization invitations your app needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app). Tapping on the invitation link should open your app (invitations links are `https` only).
 
 When your app gets opened by an invitation link, grab the invitation URL and pass it to `.invitationURL()`:
 
