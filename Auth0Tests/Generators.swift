@@ -71,7 +71,8 @@ private func generateJWTPayload(iss: String?,
                                 azp: String?,
                                 nonce: String?,
                                 maxAge: Int?,
-                                authTime: Date?) -> String {
+                                authTime: Date?,
+                                organization: String?) -> String {
     var bodyDict: [String: Any] = [:]
     
     if let iss = iss {
@@ -110,6 +111,10 @@ private func generateJWTPayload(iss: String?,
         bodyDict["nonce"] = nonce
     }
     
+    if let organization = organization {
+        bodyDict["org_id"] = organization
+    }
+    
     return encodeJWTPart(from: bodyDict)
 }
 
@@ -125,6 +130,7 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  nonce: String? = "a1b2c3d4e5",
                  maxAge: Int? = nil,
                  authTime: Date? = nil,
+                 organization: String? = nil,
                  signature: String? = nil) -> JWT {
     let header = generateJWTHeader(alg: alg, kid: kid)
     let body = generateJWTPayload(iss: iss,
@@ -135,7 +141,8 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                                   azp: azp,
                                   nonce: nonce,
                                   maxAge: maxAge,
-                                  authTime: authTime)
+                                  authTime: authTime,
+                                  organization: organization)
     
     let signableParts = "\(header).\(body)"
     var signaturePart = ""

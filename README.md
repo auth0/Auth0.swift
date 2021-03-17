@@ -351,6 +351,62 @@ Auth0
 
 Find out more about [Setting up Facebook Login](https://auth0.com/docs/connections/nativesocial/facebook) with Auth0.
 
+### Organizations (Closed Beta)
+
+Organizations is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. 
+
+Using Organizations, you can:
+
+- Represent teams, business customers, partner companies, or any logical grouping of users that should have different ways of accessing your applications, as organizations.
+- Manage their membership in a variety of ways, including user invitation.
+- Configure branded, federated login flows for each organization.
+- Implement role-based access control, such that users can have different roles when authenticating in the context of different organizations.
+- Build administration capabilities into your products, using Organizations APIs, so that those businesses can manage their own organizations.
+
+Note that Organizations is currently only available to customers on our Enterprise and Startup subscription plans.
+
+#### Log in to an organization
+
+```swift
+Auth0.webAuth()
+    .organization(organizationId)
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
+
+#### Accept user invitations
+
+To accept organization invitations your app needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app). Tapping on the invitation link should open your app (invitations links are `https` only).
+
+When your app gets opened by an invitation link, grab the invitation URL and pass it to `.invitationURL()`:
+
+```swift
+if let url = URLContexts.first?.url {
+    // You need to wait for the app to enter the foreground before launching WebAuth
+    _ = NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
+        .subscribe(on: DispatchQueue.main)
+        .prefix(1)
+        .sink { _ in
+            Auth0.webAuth()
+                .invitationURL(url)
+                .start { result in
+                    switch result {
+                    case .success(let credentials):
+                        print("Obtained credentials: \(credentials)")
+                    case .failure(let error):
+                        print("Failed with \(error)")
+                    }
+                }
+        }
+}
+```
+
 ### Authentication API (iOS / macOS / tvOS)
 
 The Authentication API exposes AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.

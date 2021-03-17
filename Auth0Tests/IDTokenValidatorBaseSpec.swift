@@ -31,6 +31,7 @@ class IDTokenValidatorBaseSpec: QuickSpec {
     let nonce = "a1b2c3d4e5"
     let leeway = 60 * 1000 // 60 seconds
     let maxAge = 1000 // 1 second
+    let organization = "abc1234"
     
     // Can't override the initWithInvocation: initializer, because NSInvocation is not available in Swift
     lazy var authentication = Auth0.authentication(clientId: clientId, domain: domain)
@@ -39,5 +40,6 @@ class IDTokenValidatorBaseSpec: QuickSpec {
                                                         jwksRequest: authentication.jwks(),
                                                         leeway: leeway,
                                                         maxAge: maxAge,
-                                                        nonce: nonce)
+                                                        nonce: nonce,
+                                                        organization: organization)
 }

@@ -269,4 +269,33 @@ struct IDTokenAuthTimeValidator: JWTValidator {
         return nil
     }
 }
+
+struct IDTokenOrgIdValidator: JWTValidator {
+    enum ValidationError: LocalizedError {
+        case missingOrgId
+        case mismatchedOrgId(actual: String, expected: String)
+
+        var errorDescription: String? {
+            switch self {
+            case .missingOrgId: return "Organization Id (org_id) claim must be a string present in the ID token"
+            case .mismatchedOrgId(let actual, let expected):
+                return "Organization Id (org_id) claim value mismatch in the ID token; expected (\(expected)), found (\(actual))"
+            }
+        }
+    }
+
+    private let expectedOrganization: String
+
+    init(organization: String) {
+        self.expectedOrganization = organization
+    }
+
+    func validate(_ jwt: JWT) -> LocalizedError? {
+        guard let actualOrganization = jwt.claim(name: "org_id").string else { return ValidationError.missingOrgId }
+        guard actualOrganization == expectedOrganization else {
+            return ValidationError.mismatchedOrgId(actual: actualOrganization, expected: expectedOrganization)
+        }
+        return nil
+    }
+}
 #endif
