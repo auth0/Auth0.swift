@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.32.0](https://github.com/auth0/Auth0.swift/tree/1.32.0) (2021-03-18)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.31.1...1.32.0)
+
+**Added**
+- Added support for organizations [SDK-2397] [\#463](https://github.com/auth0/Auth0.swift/pull/463) ([Widcket](https://github.com/Widcket))
+
 ## [1.31.1](https://github.com/auth0/Auth0.swift/tree/1.31.1) (2021-03-09)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.31.0...1.31.1)
 
