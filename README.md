@@ -351,9 +351,9 @@ Auth0
 
 Find out more about [Setting up Facebook Login](https://auth0.com/docs/connections/nativesocial/facebook) with Auth0.
 
-### Organizations (Closed Beta)
+### Organizations
 
-Organizations is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. 
+[Organizations](https://auth0.com/docs/organizations) is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. 
 
 Using Organizations, you can:
 
