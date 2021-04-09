@@ -187,7 +187,7 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
             } else {
                 DispatchQueue.main.async {
                     guard let presenting = controller?.presentingViewController else {
-                        return callback(Result.failure(error: WebAuthError.cannotDismissWebAuthController))
+                        return callback(Result.failure(WebAuthError.cannotDismissWebAuthController))
                     }
                     presenting.dismiss(animated: true) {
                         callback(result)
@@ -285,9 +285,9 @@ final class SafariServicesSession: SessionTransaction {
             guard $1 == nil, let callbackURL = $0 else {
                 let authError = $1 ?? WebAuthError.unknownError
                 if case SFAuthenticationError.canceledLogin = authError {
-                    self.callback(.failure(error: WebAuthError.userCancelled))
+                    self.callback(.failure(WebAuthError.userCancelled))
                 } else {
-                    self.callback(.failure(error: authError))
+                    self.callback(.failure(authError))
                 }
                 return TransactionStore.shared.clear()
             }

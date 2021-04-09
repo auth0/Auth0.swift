@@ -44,9 +44,9 @@ final class AuthenticationServicesSession: SessionTransaction {
             guard $1 == nil, let callbackURL = $0 else {
                 let authError = $1 ?? WebAuthError.unknownError
                 if case ASWebAuthenticationSessionError.canceledLogin = authError {
-                    self?.callback(.failure(error: WebAuthError.userCancelled))
+                    self?.callback(.failure(WebAuthError.userCancelled))
                 } else {
-                    self?.callback(.failure(error: authError))
+                    self?.callback(.failure(authError))
                 }
                 return TransactionStore.shared.clear()
             }

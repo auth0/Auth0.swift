@@ -62,7 +62,7 @@ class MockNativeAuthTransaction: NativeAuthTransaction {
     }
 
     func cancel() {
-        self.delayed(.failure(error: WebAuthError.userCancelled))
+        self.delayed(.failure(WebAuthError.userCancelled))
         self.delayed = { _ in }
     }
 
@@ -82,7 +82,7 @@ class MockNativeAuthTransaction: NativeAuthTransaction {
 
     /// Test Hooks
     var onNativeAuth: () -> Result<NativeAuthCredentials> = {
-        return .success(result: NativeAuthCredentials(token: FacebookToken, extras: [:]))
+        return .success(NativeAuthCredentials(token: FacebookToken, extras: [:]))
     }
 }
 
@@ -162,7 +162,7 @@ class NativeAuthSpec: QuickSpec {
 
             it("should yield error on native auth failure") {
                 nativeTransaction.onNativeAuth =  {
-                    return .failure(error: WebAuthError.missingAccessToken)
+                    return .failure(WebAuthError.missingAccessToken)
                 }
                 waitUntil(timeout: Timeout) { done in
                     nativeTransaction.start { result in
@@ -181,7 +181,7 @@ class NativeAuthSpec: QuickSpec {
 
             it("should yield auth error on invalid native access token") {
                 nativeTransaction.onNativeAuth = {
-                    return .success(result: NativeAuthCredentials(token: InvalidFacebookToken, extras: [:]))
+                    return .success(NativeAuthCredentials(token: InvalidFacebookToken, extras: [:]))
                 }
                 waitUntil(timeout: Timeout) { done in
                     nativeTransaction.start { result in
