@@ -25,13 +25,13 @@ import Foundation
 func plainJson(from response: Response<AuthenticationError>, callback: Request<[String: Any], AuthenticationError>.Callback) {
     do {
         if let dictionary = try response.result() as? [String: Any] {
-            callback(.success(result: dictionary))
+            callback(.success(dictionary))
         } else {
-            callback(.failure(error: AuthenticationError(string: string(response.data))))
+            callback(.failure(AuthenticationError(string: string(response.data))))
         }
 
     } catch let error {
-        callback(.failure(error: error))
+        callback(.failure(error))
     }
 }
 
@@ -41,26 +41,26 @@ func codable<T: Codable>(from response: Response<AuthenticationError>, callback:
             let data = try JSONSerialization.data(withJSONObject: dictionary)
             let decoder = JSONDecoder()
             let decodedObject = try decoder.decode(T.self, from: data)
-            callback(.success(result: decodedObject))
+            callback(.success(decodedObject))
         } else {
-            callback(.failure(error: AuthenticationError(string: string(response.data))))
+            callback(.failure(AuthenticationError(string: string(response.data))))
         }
 
     } catch let error {
-        callback(.failure(error: error))
+        callback(.failure(error))
     }
 }
 
 func authenticationObject<T: JSONObjectPayload>(from response: Response<AuthenticationError>, callback: Request<T, AuthenticationError>.Callback) {
     do {
         if let dictionary = try response.result() as? [String: Any], let object = T(json: dictionary) {
-            callback(.success(result: object))
+            callback(.success(object))
         } else {
-            callback(.failure(error: AuthenticationError(string: string(response.data))))
+            callback(.failure(AuthenticationError(string: string(response.data))))
         }
 
     } catch let error {
-        callback(.failure(error: error))
+        callback(.failure(error))
     }
 }
 
@@ -69,23 +69,23 @@ func databaseUser(from response: Response<AuthenticationError>, callback: Reques
         if let dictionary = try response.result() as? [String: Any], let email = dictionary["email"] as? String {
             let username = dictionary["username"] as? String
             let verified = dictionary["email_verified"] as? Bool ?? false
-            callback(.success(result: (email: email, username: username, verified: verified)))
+            callback(.success((email: email, username: username, verified: verified)))
         } else {
-            callback(.failure(error: AuthenticationError(string: string(response.data))))
+            callback(.failure(AuthenticationError(string: string(response.data))))
         }
 
     } catch let error {
-        callback(.failure(error: error))
+        callback(.failure(error))
     }
 }
 
 func noBody(from response: Response<AuthenticationError>, callback: Request<Void, AuthenticationError>.Callback) {
     do {
         _ = try response.result()
-        callback(.success(result: ()))
+        callback(.success(()))
     } catch let error as Auth0Error where error.code == emptyBodyError {
-        callback(.success(result: ()))
+        callback(.success(()))
     } catch let error {
-        callback(.failure(error: error))
+        callback(.failure(error))
     }
 }

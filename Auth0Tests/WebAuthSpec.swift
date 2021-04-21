@@ -425,13 +425,13 @@ class WebAuthSpec: QuickSpec {
 
             it("should fail if controller is not presented") {
                 let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
-                callback(.success(result: Credentials(json: ["access_token": "at", "token_type": "bearer"])))
+                callback(.success(Credentials(json: ["access_token": "at", "token_type": "bearer"])))
                 expect(result).toEventually(beFailure())
             }
 
             it("should fail if user dismissed safari viewcontroller") {
                 let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
-                callback(.failure(error: WebAuthError.userCancelled))
+                callback(.failure(WebAuthError.userCancelled))
                 expect(result).toEventually(beFailure())
             }
             

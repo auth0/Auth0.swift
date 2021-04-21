@@ -45,24 +45,24 @@ struct Management: Trackable, Loggable {
     func managementObject(response: Response<ManagementError>, callback: Request<ManagementObject, ManagementError>.Callback) {
         do {
             if let dictionary = try response.result() as? ManagementObject {
-                callback(.success(result: dictionary))
+                callback(.success(dictionary))
             } else {
-                callback(.failure(error: ManagementError(string: string(response.data))))
+                callback(.failure(ManagementError(string: string(response.data))))
             }
         } catch let error {
-            callback(.failure(error: error))
+            callback(.failure(error))
         }
     }
 
     func managementObjects(response: Response<ManagementError>, callback: Request<[ManagementObject], ManagementError>.Callback) {
         do {
             if let list = try response.result() as? [ManagementObject] {
-                callback(.success(result: list))
+                callback(.success(list))
             } else {
-                callback(.failure(error: ManagementError(string: string(response.data))))
+                callback(.failure(ManagementError(string: string(response.data))))
             }
         } catch let error {
-            callback(.failure(error: error))
+            callback(.failure(error))
         }
     }
 

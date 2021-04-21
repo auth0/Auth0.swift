@@ -116,7 +116,7 @@ public struct ConcatRequest<F, S, E: Auth0Error>: Requestable {
         first.start { result in
             switch result {
             case .failure(let cause):
-                callback(.failure(error: cause))
+                callback(.failure(cause))
             case .success:
                 second.start(callback)
             }

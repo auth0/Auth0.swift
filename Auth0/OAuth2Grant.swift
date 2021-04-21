@@ -72,11 +72,11 @@ struct ImplicitGrant: OAuth2Grant {
                                                        nonce: self.defaults["nonce"],
                                                        organization: self.organization)
         validateFrontChannelIDToken(idToken: values["id_token"], for: responseType, with: validatorContext) { error in
-            if let error = error { return callback(.failure(error: error)) }
+            if let error = error { return callback(.failure(error)) }
             guard !responseType.contains(.token) || values["access_token"] != nil else {
-                return callback(.failure(error: WebAuthError.missingAccessToken))
+                return callback(.failure(WebAuthError.missingAccessToken))
             }
-            callback(.success(result: Credentials(json: values as [String: Any])))
+            callback(.success(Credentials(json: values as [String: Any])))
         }
     }
 
@@ -152,7 +152,7 @@ struct PKCE: OAuth2Grant {
     func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void) {
         guard let code = values["code"] else {
             let string = "No code found in parameters \(values)"
-            return callback(.failure(error: AuthenticationError(string: string)))
+            return callback(.failure(AuthenticationError(string: string)))
         }
         let idToken = values["id_token"]
         let responseType = self.responseType
@@ -168,7 +168,7 @@ struct PKCE: OAuth2Grant {
                                                        nonce: self.defaults["nonce"],
                                                        organization: self.organization)
         validateFrontChannelIDToken(idToken: idToken, for: responseType, with: validatorContext) { error in
-            if let error = error { return callback(.failure(error: error)) }
+            if let error = error { return callback(.failure(error)) }
             authentication
                 .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
                 .start { result in
@@ -176,12 +176,12 @@ struct PKCE: OAuth2Grant {
                     case .failure(let error as AuthenticationError) where error.description == "Unauthorized":
                         // Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
                         let webAuthError = WebAuthError.pkceNotAllowed("Unable to complete authentication with PKCE. PKCE support can be enabled by setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app at 'https://manage.auth0.com/#/applications/\(clientId)/settings'.")
-                        return callback(.failure(error: webAuthError))
-                    case .failure(let error): return callback(.failure(error: error))
+                        return callback(.failure(webAuthError))
+                    case .failure(let error): return callback(.failure(error))
                     case .success(let credentials):
                         guard isFrontChannelIdTokenExpected else {
                             return validate(idToken: credentials.idToken, with: validatorContext) { error in
-                                if let error = error { return callback(.failure(error: error)) }
+                                if let error = error { return callback(.failure(error)) }
                                 callback(result)
                             }
                         }
@@ -191,7 +191,7 @@ struct PKCE: OAuth2Grant {
                                                          refreshToken: credentials.refreshToken,
                                                          expiresIn: credentials.expiresIn,
                                                          scope: credentials.scope)
-                        return callback(.success(result: newCredentials))
+                        return callback(.success(newCredentials))
                     }
             }
         }
