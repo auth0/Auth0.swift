@@ -10,6 +10,7 @@
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
 
 ## Important Notices
+
 [Behaviour changes in iOS 13](https://github.com/auth0/Auth0.swift/pull/297) related to Web Authentication require that developers using Xcode 11 with this library **must** compile using Swift 5.x. This *should* be the default setting applied when updating, unless it has been manually set. However, we recommend checking that this value is set correctly.
 
 ## Table of Contents
