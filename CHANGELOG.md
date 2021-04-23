@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.33.0](https://github.com/auth0/Auth0.swift/tree/1.33.0) (2021-04-23)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.32.0...1.33.0)
+
+**Changed**
+- Use Swift's built-in Result type when available [\#467](https://github.com/auth0/Auth0.swift/pull/467) ([ejensen](https://github.com/ejensen))
+
 ## [1.32.0](https://github.com/auth0/Auth0.swift/tree/1.32.0) (2021-03-18)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.31.1...1.32.0)
 
