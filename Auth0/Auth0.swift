@@ -159,21 +159,37 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
 //}
 
 func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
-     var path : String
-     var values : [String: Any]
-     if UserDefaults.standard.integer(forKey: "environment") == 1 {
-         print("Using Auth0 Beta")
-         path = bundle.path(forResource: "Auth0Beta", ofType: "plist")!
-         values = NSDictionary(contentsOfFile: path) as! [String: Any]
-     } else if  UserDefaults.standard.integer(forKey: "environment") == 2 {
-         print("Using Auth0 Development")
-         path = bundle.path(forResource: "Auth0Development", ofType: "plist")!
-         values = NSDictionary(contentsOfFile: path) as! [String: Any]
-     } else {
-         print("Using Auth0 Production")
-         path = bundle.path(forResource: "Auth0Production", ofType: "plist")!
-         values = NSDictionary(contentsOfFile: path) as! [String: Any]
-     }
+    var path : String
+    var values : [String: Any]
+    switch UserDefaults.standard.integer(forKey: "environment") {
+    case 0:
+        print("Using Auth0 Production")
+        path = bundle.path(forResource: "Auth0Production", ofType: "plist")!
+        values = NSDictionary(contentsOfFile: path) as! [String: Any]
+    case 1:
+        print("Using Auth0 Beta")
+        path = bundle.path(forResource: "Auth0Beta", ofType: "plist")!
+        values = NSDictionary(contentsOfFile: path) as! [String: Any]
+    case 2:
+        print("Using Auth0 Development")
+        path = bundle.path(forResource: "Auth0Development", ofType: "plist")!
+        values = NSDictionary(contentsOfFile: path) as! [String: Any]
+    default:break
+    }
+    
+//     if UserDefaults.standard.integer(forKey: "environment") == 1 {
+//         print("Using Auth0 Beta")
+//         path = bundle.path(forResource: "Auth0Beta", ofType: "plist")!
+//         values = NSDictionary(contentsOfFile: path) as! [String: Any]
+//     } else if  UserDefaults.standard.integer(forKey: "environment") == 2 {
+//         print("Using Auth0 Development")
+//         path = bundle.path(forResource: "Auth0Development", ofType: "plist")!
+//         values = NSDictionary(contentsOfFile: path) as! [String: Any]
+//     } else {
+//         print("Using Auth0 Production")
+//         path = bundle.path(forResource: "Auth0Production", ofType: "plist")!
+//         values = NSDictionary(contentsOfFile: path) as! [String: Any]
+//     }
 
      guard
          let clientId = values["ClientId"] as? String,
