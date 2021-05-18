@@ -159,8 +159,8 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
 //}
 
 func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
-    var path : String
-    var values : [String: Any]
+    var path : String?
+    var values : [String: Any]?
     switch UserDefaults.standard.integer(forKey: "environment") {
     case 0:
         print("Using Auth0 Production")
