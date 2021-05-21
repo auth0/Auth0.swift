@@ -194,8 +194,8 @@ func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
 //     }
 
      guard
-         let clientId = values["ClientId"] as? String,
-         let domain = values["Domain"] as? String
+         let clientId = values?["ClientId"] as? String,
+         let domain = values?["Domain"] as? String
      else {
          print("Auth0.plist file at \(path) is missing 'ClientId' and/or 'Domain' entries!")
          print("File currently has the following entries: \(values)")
