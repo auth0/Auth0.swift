@@ -175,7 +175,7 @@ func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
         path = bundle.path(forResource: "Auth0Development", ofType: "plist")!
         values = NSDictionary(contentsOfFile: path!) as! [String: Any]
     default:
-        print("Inknown environment")
+        print("Unknown environment")
         break
     }
     
