@@ -137,27 +137,6 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
     return Management(token: token, url: .a0_url(domain), session: session)
 }
 
-//func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
-//    guard
-//        let path = bundle.path(forResource: "Info", ofType: "plist"),
-//        let values = NSDictionary(contentsOfFile: path) as? [String: Any],
-//        let auth0 = values["Auth0"] as? [String: String]
-//        else {
-//            print("Missing Auth0 dictionary with 'ClientId' and 'Domain' entries in main bundle!")
-//            return nil
-//        }
-//
-//    guard
-//        let clientId = auth0["ClientId"] as? String,
-//        let domain = auth0["Domain"] as? String
-//        else {
-//            print("Info.plist file at \(path) is missing 'ClientId' and/or 'Domain' entries!")
-//            print("File currently has the following entries: \(values)")
-//            return nil
-//        }
-//    return (clientId: clientId, domain: domain)
-//}
-
 func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
     var path : String?
     var values : [String: Any]?
@@ -179,27 +158,14 @@ func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
         break
     }
     
-//     if UserDefaults.standard.integer(forKey: "environment") == 1 {
-//         print("Using Auth0 Beta")
-//         path = bundle.path(forResource: "Auth0Beta", ofType: "plist")!
-//         values = NSDictionary(contentsOfFile: path) as! [String: Any]
-//     } else if  UserDefaults.standard.integer(forKey: "environment") == 2 {
-//         print("Using Auth0 Development")
-//         path = bundle.path(forResource: "Auth0Development", ofType: "plist")!
-//         values = NSDictionary(contentsOfFile: path) as! [String: Any]
-//     } else {
-//         print("Using Auth0 Production")
-//         path = bundle.path(forResource: "Auth0Production", ofType: "plist")!
-//         values = NSDictionary(contentsOfFile: path) as! [String: Any]
-//     }
-
-     guard
-         let clientId = values?["ClientId"] as? String,
-         let domain = values?["Domain"] as? String
-     else {
+    guard
+        let clientId = values?["ClientId"] as? String,
+        let domain = values?["Domain"] as? String
+    else {
          print("Auth0.plist file at \(path) is missing 'ClientId' and/or 'Domain' entries!")
          print("File currently has the following entries: \(values)")
          return nil
-     }
-     return (clientId: clientId, domain: domain)
+    }
+    
+    return (clientId: clientId, domain: domain)
  }
