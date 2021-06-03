@@ -29,7 +29,12 @@ let package = Package(
         .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC", cSettings: cSettings),
         .testTarget(
             name: "Auth0Tests",
-            dependencies: ["Auth0", "Quick", "Nimble", "OHHTTPStubs"],
+            dependencies: [
+                "Auth0", 
+                "Quick", 
+                "Nimble", 
+                .product(name: "OHHTTPStubsSwift", package: "OHHTTPStubs")
+            ],
             path: "Auth0Tests",
             exclude: ["ObjectiveC"],
             cSettings: cSettings,
