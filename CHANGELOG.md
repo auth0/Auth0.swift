@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.33.1](https://github.com/auth0/Auth0.swift/tree/1.33.1) (2021-06-07)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.33.0...1.33.1)
+
+**Changed**
+- Make test dependencies not resolve when installing with SPM [SDK-2600] [\#476](https://github.com/auth0/Auth0.swift/pull/476) ([Widcket](https://github.com/Widcket))
+
 ## [1.33.0](https://github.com/auth0/Auth0.swift/tree/1.33.0) (2021-04-23)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.32.0...1.33.0)
 
