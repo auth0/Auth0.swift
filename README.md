@@ -230,6 +230,33 @@ Auth0
     }
 ```
 
+#### Signup with Universal Login
+
+You can make users land directly on the Signup page instead of the Login page by specifying the `"screen_hint": "signup"` parameter when performing Web Authentication. Note that this can be combined with `"prompt": "login"`, which indicates whether you want to always show the authentication page or you want to skip if there's an existing session.
+
+| Parameters                                     | No existing session   | Existing session              |
+|:----------------------------------------------:|:---------------------:|:-----------------------------:|
+| no extra parameters                            | Shows the login page  | Redirects to the callback url |
+| `"screen_hint": "signup"`                      | Shows the signup page | Redirects to the callback url |
+| `"prompt": "login"`                            | Shows the login page  | Shows the login page          |
+| `"prompt": "login", "screen_hint": "signup"`   | Shows the signup page | Shows the signup page         |
+
+```swift
+Auth0
+    .webAuth()
+    .parameters(["screen_hint": "signup"])
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
+
+> The `screen_hint` parameter can only be used with the **New Universal Login Experience**, not the **Classic Experience**.
+
 #### Disable Single Sign On Consent Alert (iOS 13+ / macOS)
 
 To suppress the alert box, add the `useEphemeralSession()` method to the chain. This has the impact of disabling [Single Sign On (SSO)](https://auth0.com/docs/sso) on iOS 13+ and macOS, but will also not display the consent alert that otherwise shows up when SSO is enabled. It has no effect on older versions of iOS.
