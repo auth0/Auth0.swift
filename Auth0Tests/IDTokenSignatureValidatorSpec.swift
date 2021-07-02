@@ -97,7 +97,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
             
             context("kid validation") {
                 let jwt = generateJWT()
-                let expectedError = IDTokenSignatureValidator.ValidationError.missingPublicKey(kid: "key123")
+                let expectedError = IDTokenSignatureValidator.ValidationError.missingPublicKey(kid: Kid)
                 
                 it("should fail if the jwk has no kid") {
                     stub(condition: isJWKSPath(domain)) { _ in jwksResponse(kid: nil) }

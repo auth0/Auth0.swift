@@ -228,6 +228,36 @@ class CredentialsManagerSpec: QuickSpec {
             
         }
 
+        describe("user") {
+            
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should retrieve the user profile when there is an id token stored") {
+                let credentials = Credentials(idToken: ValidToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.user).toNot(beNil())
+            }
+
+            it("should not retrieve the user profile when there are no credentials stored") {
+                expect(credentialsManager.user).to(beNil())
+            }
+
+            it("should not retrieve the user profile when the credentials have no id token") {
+                let credentials = Credentials(accessToken: AccessToken, idToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.user).to(beNil())
+            }
+
+            it("should not retrieve the user profile when the id token is not a jwt") {
+                let credentials = Credentials(accessToken: AccessToken, idToken: "not a jwt", expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.user).to(beNil())
+            }
+            
+        }
+
         describe("validity") {
 
             afterEach {

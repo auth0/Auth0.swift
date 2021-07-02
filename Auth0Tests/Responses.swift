@@ -39,7 +39,8 @@ let UpdatedAtTimestamp = 1440004681.000
 let CreatedAt = "2015-08-19T17:18:00.000Z"
 let CreatedAtUnix = "1440004680"
 let CreatedAtTimestamp = 1440004680.000
-let Sub = "auth0|\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+let Sub = "auth0|123456789"
+let Kid = "key123"
 let LocaleUS = "en-US"
 let ZoneEST = "US/Eastern"
 let OTP = "123456"
@@ -50,7 +51,6 @@ let RecoveryCode = "162534"
 let MFAToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 let AuthenticatorId = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 let ChallengeTypes = ["oob", "otp"]
-let JWKKid = "key123"
 
 func authResponse(accessToken: String, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Double? = nil) -> HTTPStubsResponse {
     var json = [
@@ -129,7 +129,7 @@ func managementErrorResponse(error: String, description: String, code: String, s
     return HTTPStubsResponse(jsonObject: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: Int32(statusCode), headers: ["Content-Type": "application/json"])
 }
 
-func jwksResponse(kid: String? = JWKKid) -> HTTPStubsResponse {
+func jwksResponse(kid: String? = Kid) -> HTTPStubsResponse {
     var jwks: [String: Any] = ["keys": [["alg": "RS256",
                                          "kty": "RSA",
                                          "use": "sig",
