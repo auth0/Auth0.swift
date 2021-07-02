@@ -194,8 +194,8 @@ public struct CredentialsManager {
     }
 
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard let credentials = retrieveCredentials() else { return callback(.noCredentials, nil) }
-        guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
+        guard let credentials = retrieveCredentials(),
+            let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
         guard self.hasExpired(credentials) ||
             self.willExpire(credentials, within: minTTL) ||
             self.hasScopeChanged(credentials, from: scope) else { return callback(nil, credentials) }
