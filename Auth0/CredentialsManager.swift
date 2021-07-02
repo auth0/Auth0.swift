@@ -49,7 +49,21 @@ public struct CredentialsManager {
         self.storage = storage
     }
 
-    /// Enable Touch ID Authentication for additional security during credentials retrieval.
+    /// Retrieve the user profile from keychain synchronously, without checking if the credentials are expired
+    ///
+    /// ```
+    /// let user = credentialsManager.user
+    /// ```
+    /// - Important: Access to this property will not be protected by Biometric Authentication.
+    public var user: UserInfo? {
+        guard let credentials = retrieveCredentials(),
+            let idToken = credentials.idToken,
+            let jwt = try? decode(jwt: idToken) else { return nil }
+
+        return UserInfo(json: jwt.body)
+    }
+
+    /// Enable Biometric Authentication for additional security during credentials retrieval
     ///
     /// - Parameters:
     ///   - title: main message to display in TouchID prompt
@@ -62,7 +76,7 @@ public struct CredentialsManager {
     }
     #endif
 
-    /// Enable Biometric Authentication for additional security during credentials retrieval.
+    /// Enable Biometric Authentication for additional security during credentials retrieval
     ///
     /// - Parameters:
     ///   - title: main message to display when Touch ID is used
@@ -172,9 +186,15 @@ public struct CredentialsManager {
     }
     #endif
 
-    private func retrieveCredentials(withScope scope: String?, minTTL: Int, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    private func retrieveCredentials() -> Credentials? {
         guard let data = self.storage.data(forKey: self.storeKey),
-            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return callback(.noCredentials, nil) }
+            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return nil }
+
+        return credentials
+    }
+
+    private func retrieveCredentials(withScope scope: String?, minTTL: Int, callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+        guard let credentials = retrieveCredentials() else { return callback(.noCredentials, nil) }
         guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
         guard self.hasExpired(credentials) ||
             self.willExpire(credentials, within: minTTL) ||

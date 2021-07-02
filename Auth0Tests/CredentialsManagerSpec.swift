@@ -228,6 +228,26 @@ class CredentialsManagerSpec: QuickSpec {
             
         }
 
+        describe("user") {
+            
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should retrieve user profile when there is an id token stored") {
+                let credentials = Credentials(idToken: ValidToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.user).toNot(beNil())
+            }
+
+            it("should not be valid when at valid and id token expired") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.hasValid()).to(beFalse())
+            }
+            
+        }
+
         describe("validity") {
 
             afterEach {

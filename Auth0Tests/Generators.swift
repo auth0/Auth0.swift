@@ -25,10 +25,6 @@ import JWTDecode
 
 @testable import Auth0
 
-// MARK: - Constants
-
-fileprivate let defaultKid = "key123"
-
 // MARK: - Keys
 
 @available(iOS 10.0, macOS 10.12, *)
@@ -120,9 +116,9 @@ private func generateJWTPayload(iss: String?,
 
 @available(iOS 10.0, macOS 10.12, *)
 func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
-                 kid: String? = defaultKid,
+                 kid: String? = Kid,
                  iss: String? = "https://tokens-test.auth0.com/",
-                 sub: String? = "auth0|123456789",
+                 sub: String? = Sub,
                  aud: [String]? = ["e31f6f9827c187e8aebdb0839a0c963a"],
                  exp: Date? = Date().addingTimeInterval(86400000), // 1 day in milliseconds
                  iat: Date? = Date().addingTimeInterval(-3600000), // 1 hour in milliseconds
@@ -186,7 +182,7 @@ private func extractData(from bytes: UnsafePointer<UInt8>) -> (UnsafePointer<UIn
 }
 
 @available(iOS 10.0, macOS 10.12, *)
-func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String = defaultKid) -> JWK {
+func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String = Kid) -> JWK {
     let asn = { (bytes: UnsafePointer<UInt8>) -> JWK? in
         guard bytes.pointee == 0x30 else { return nil } // Checks that this is a SEQUENCE triplet
         
