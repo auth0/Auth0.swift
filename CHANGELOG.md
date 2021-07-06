@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.34.0](https://github.com/auth0/Auth0.swift/tree/1.34.0) (2021-07-05)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.33.1...1.34.0)
+
+**Added**
+- Add `user` property to CredentialsManager [SDK-2633] [\#482](https://github.com/auth0/Auth0.swift/pull/482) ([Widcket](https://github.com/Widcket))
+
 ## [1.33.1](https://github.com/auth0/Auth0.swift/tree/1.33.1) (2021-06-07)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.33.0...1.33.1)
 
