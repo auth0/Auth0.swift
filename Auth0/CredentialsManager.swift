@@ -71,20 +71,23 @@ public struct CredentialsManager {
     ///   - fallbackTitle: fallback message to display in TouchID prompt after a failed match
     #if WEB_AUTH_PLATFORM
     @available(*, deprecated, message: "see enableBiometrics(withTitle title:, cancelTitle:, fallbackTitle:)")
+    @available(iOS 9.0, macOS 10.15, *)
     public mutating func enableTouchAuth(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
         self.enableBiometrics(withTitle: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
     #endif
 
+    #if WEB_AUTH_PLATFORM
     /// Enable Biometric Authentication for additional security during credentials retrieval
     ///
     /// - Parameters:
     ///   - title: main message to display when Touch ID is used
     ///   - cancelTitle: cancel message to display when Touch ID is used (iOS 10+)
     ///   - fallbackTitle: fallback message to display when Touch ID is used after a failed match
-    #if WEB_AUTH_PLATFORM
-    public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
-        self.bioAuth = BioAuthentication(authContext: LAContext(), title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
+    ///   - evaluationPolicy: policy to be used for authentication policy evaluation
+    @available(iOS 9.0, macOS 10.15, *)
+    public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil, evaluationPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics) {
+        self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
     #endif
 
