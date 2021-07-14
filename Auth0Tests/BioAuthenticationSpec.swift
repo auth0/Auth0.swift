@@ -31,13 +31,14 @@ import LocalAuthentication
 class BioAuthenticationSpec: QuickSpec {
 
     override func spec() {
-
+        var evaluationPolicy: LAPolicy!
         var mockContext: MockLAContext!
         var bioAuthentication: BioAuthentication!
 
         beforeEach {
+            evaluationPolicy = .deviceOwnerAuthenticationWithBiometrics
             mockContext = MockLAContext()
-            bioAuthentication = BioAuthentication(authContext: mockContext, title: "Touch Auth")
+            bioAuthentication = BioAuthentication(authContext: mockContext, evaluationPolicy: evaluationPolicy, title: "Touch Auth")
         }
 
         describe("touch availablility") {
@@ -49,6 +50,11 @@ class BioAuthenticationSpec: QuickSpec {
             it("touch should be disabled") {
                 mockContext.enabled = false
                 expect(bioAuthentication.available).to(beFalse())
+            }
+            
+            it("touch should check passed evaluate policy") {
+                _ = bioAuthentication.available
+                expect(mockContext.canEvaluatePolicyReceivedPolicy).to(equal(evaluationPolicy))
             }
         }
 
@@ -90,22 +96,30 @@ class BioAuthenticationSpec: QuickSpec {
                 bioAuthentication.validateBiometric { error = $0 }
                 expect(error).toEventually(matchError(touchError))
             }
-
+            
+            it("should evaluate passed policy") {
+                bioAuthentication.validateBiometric { _ in }
+                expect(mockContext.evaluatePolicyReceivedPolicy).to(equal(evaluationPolicy))
+            }
         }
     }
 }
 
 class MockLAContext: LAContext {
-
+    
+    var canEvaluatePolicyReceivedPolicy: LAPolicy?
+    var evaluatePolicyReceivedPolicy: LAPolicy?
     var enabled = true
     var replySuccess = true
     var replyError: Error? = nil
 
     override func canEvaluatePolicy(_ policy: LAPolicy, error: NSErrorPointer) -> Bool {
+        canEvaluatePolicyReceivedPolicy = policy
         return self.enabled
     }
 
     override func evaluatePolicy(_ policy: LAPolicy, localizedReason: String, reply: @escaping (Bool, Error?) -> Void) {
+        evaluatePolicyReceivedPolicy = policy
         reply(replySuccess, replyError)
     }
 }

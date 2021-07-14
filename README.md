@@ -337,6 +337,12 @@ You can enable an additional level of user authentication before retrieving cred
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
+If needed, you are able to specify specific `LAPolicy` to be used - i.e. you might want to support FaceID, but allow fallback to pin code.
+
+```swift
+credentialsManager.enableBiometrics(withTitle: "Touch or enter pincode to Login", evaluationPolicy: .deviceOwnerAuthentication)
+```
+
 ### Native Social Login
 
 #### Sign in With Apple
