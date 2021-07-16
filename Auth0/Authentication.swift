@@ -251,7 +251,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - recoveryCode: Recovery code provided by the end-user
     ///   - mfaToken: Token returned when authentication fails due to MFA requirement
     ///
-    /// - returns: authentication request that will yield Auth0 User Credentials
+    /// - returns: authentication request that will yield Auth0 User Credentials. Might include a recovery code, which the application must display to the end-user to be stored securely for future use
     /// - requires: Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
