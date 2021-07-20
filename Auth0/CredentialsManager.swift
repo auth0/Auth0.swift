@@ -191,46 +191,46 @@ public struct CredentialsManager {
 
     private func retrieveCredentials() -> Credentials? {
         guard let data = self.storage.data(forKey: self.storeKey),
-            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return nil }
+              let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return nil }
 
         return credentials
     }
 
-	private func retrieveCredentials(withScope scope: String?, minTTL: Int, withParameters parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    private func retrieveCredentials(withScope scope: String?, minTTL: Int, withParameters parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard let credentials = retrieveCredentials(),
-            let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
+              let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
         guard self.hasExpired(credentials) ||
-            self.willExpire(credentials, within: minTTL) ||
-            self.hasScopeChanged(credentials, from: scope) else { return callback(nil, credentials) }
+                self.willExpire(credentials, within: minTTL) ||
+                self.hasScopeChanged(credentials, from: scope) else { return callback(nil, credentials) }
         guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
 
-		self.authentication
-			.renew(withRefreshToken: refreshToken, scope: scope)
-			.payload(parameters)
-			.start {
-				switch $0 {
-				case .success(let credentials):
-					let newCredentials = Credentials(accessToken: credentials.accessToken,
-													 tokenType: credentials.tokenType,
-													 idToken: credentials.idToken,
-													 refreshToken: credentials.refreshToken ?? refreshToken,
-													 expiresIn: credentials.expiresIn,
-													 scope: credentials.scope)
-					if self.willExpire(newCredentials, within: minTTL) {
-						let accessTokenLifetime = Int(expiresIn.timeIntervalSinceNow)
-						// TODO: On the next major add a new case to CredentialsManagerError
-						let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
-											code: -99999,
-											userInfo: nil)
-						callback(.failedRefresh(error), nil)
-					} else {
-						_ = self.store(credentials: newCredentials)
-						callback(nil, newCredentials)
-					}
-				case .failure(let error):
-					callback(.failedRefresh(error), nil)
-				}
-        }
+        self.authentication
+            .renew(withRefreshToken: refreshToken, scope: scope)
+            .payload(parameters)
+            .start {
+                switch $0 {
+                case .success(let credentials):
+                    let newCredentials = Credentials(accessToken: credentials.accessToken,
+                                                     tokenType: credentials.tokenType,
+                                                     idToken: credentials.idToken,
+                                                     refreshToken: credentials.refreshToken ?? refreshToken,
+                                                     expiresIn: credentials.expiresIn,
+                                                     scope: credentials.scope)
+                    if self.willExpire(newCredentials, within: minTTL) {
+                        let accessTokenLifetime = Int(expiresIn.timeIntervalSinceNow)
+                        // TODO: On the next major add a new case to CredentialsManagerError
+                        let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
+                                            code: -99999,
+                                            userInfo: nil)
+                        callback(.failedRefresh(error), nil)
+                    } else {
+                        _ = self.store(credentials: newCredentials)
+                        callback(nil, newCredentials)
+                    }
+                case .failure(let error):
+                    callback(.failedRefresh(error), nil)
+                }
+            }
     }
 
     func willExpire(_ credentials: Credentials, within ttl: Int) -> Bool {
