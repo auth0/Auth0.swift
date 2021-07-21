@@ -164,6 +164,7 @@ public struct CredentialsManager {
     /// - Parameters:
     ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
     ///   - minTTL: minimum time in seconds the access token must remain valid to avoid being renewed.
+	///   - parameters: additional Parameter to add to a possible Token refresh, parameters will be set via Request.payload.
     ///   - callback: callback with the user's credentials or the cause of the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/concepts/refresh-tokens)

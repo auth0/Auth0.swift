@@ -96,9 +96,9 @@ public struct Request<T, E: Auth0Error>: Requestable {
     }
 
     /**
-     Modify the Parameter
+     Modify the Parameter, by creating a copy of self and adding the provided payload.
 
-     - parameter callback: called when the request finishes and yield it's result
+     - parameter payload: Additional Parameters for the Request, provided map will be added to `paylaod`.
      */
     public func payload(_ payload: [String: Any]) -> Self {
         var parameter = self.payload
