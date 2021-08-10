@@ -207,7 +207,7 @@ public struct CredentialsManager {
 
         self.authentication
             .renew(withRefreshToken: refreshToken, scope: scope)
-            .payload(parameters)
+            .parameters(parameters)
             .start {
                 switch $0 {
                 case .success(let credentials):
