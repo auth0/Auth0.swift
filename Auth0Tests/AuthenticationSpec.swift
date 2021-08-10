@@ -336,17 +336,17 @@ class AuthenticationSpec: QuickSpec {
             it("add and override parameters") {
                 let request = auth.renew(withRefreshToken: refreshToken)
                     .parameters([
-                        "client_id": ClientId + ClientId,
+                        "client_id": "new Client ID",
                         "phone": Phone
                     ])
 
                 expect(request.payload["refresh_token"] as? String) == refreshToken
                 expect(request.payload["grant_type"] as? String) == "refresh_token"
-                expect(request.payload["client_id"] as? String) != "CLIENT_ID"
+                expect(request.payload["client_id"] as? String) == "new Client ID"
                 expect(request.payload["phone"] as? String) == Phone
             }
         }
-        
+
         // MARK:- Token Exchange
 
         describe("native social token exchange") {
