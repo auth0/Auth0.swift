@@ -318,6 +318,34 @@ class AuthenticationSpec: QuickSpec {
             }
 
         }
+
+        // MARK:- Modify and Create Requests
+
+        describe("Requests create and update") {
+
+            let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+
+            it("should contain payload") {
+                let request = auth.renew(withRefreshToken: refreshToken)
+
+                expect(request.payload["refresh_token"] as? String) == refreshToken
+                expect(request.payload["grant_type"] as? String) == "refresh_token"
+                expect(request.payload["client_id"] as? String) == ClientId
+            }
+
+            it("add and override parameters") {
+                let request = auth.renew(withRefreshToken: refreshToken)
+                    .parameters([
+                        "client_id": ClientId + ClientId,
+                        "phone": Phone
+                    ])
+
+                expect(request.payload["refresh_token"] as? String) == refreshToken
+                expect(request.payload["grant_type"] as? String) == "refresh_token"
+                expect(request.payload["client_id"] as? String) != "CLIENT_ID"
+                expect(request.payload["phone"] as? String) == Phone
+            }
+        }
         
         // MARK:- Token Exchange
 
