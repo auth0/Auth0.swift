@@ -345,6 +345,17 @@ class AuthenticationSpec: QuickSpec {
                 expect(request.payload["client_id"] as? String) == "new Client ID"
                 expect(request.payload["phone"] as? String) == Phone
             }
+
+            it("copy contains same informations") {
+                let baseRequest = auth.renew(withRefreshToken: refreshToken)
+                let modifiedRequest = baseRequest.parameters([:])
+
+                expect(baseRequest.session) == modifiedRequest.session
+                expect(baseRequest.url) == modifiedRequest.url
+                expect(baseRequest.method) == modifiedRequest.method
+                expect(baseRequest.payload as? [String: String]) == modifiedRequest.payload as? [String: String]
+                expect(baseRequest.headers) == modifiedRequest.headers
+            }
         }
 
         // MARK:- Token Exchange
