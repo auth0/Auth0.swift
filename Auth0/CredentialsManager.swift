@@ -164,12 +164,12 @@ public struct CredentialsManager {
     /// - Parameters:
     ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
     ///   - minTTL: minimum time in seconds the access token must remain valid to avoid being renewed.
-    ///   - parameters: additional Parameter to add to a possible Token refresh, parameters will be set via Request.payload.
+    ///   - parameters: additional parameters to add to a possible Token refresh. The parameters will be set via Request.payload.
     ///   - callback: callback with the user's credentials or the cause of the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/concepts/refresh-tokens)
     #if WEB_AUTH_PLATFORM
-    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, withParameters parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
         if #available(iOS 9.0, macOS 10.15, *), let bioAuth = self.bioAuth {
             guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
@@ -177,16 +177,16 @@ public struct CredentialsManager {
                 guard $0 == nil else {
                     return callback(.touchFailed($0!), nil)
                 }
-                self.retrieveCredentials(withScope: scope, minTTL: minTTL, withParameters: parameters, callback: callback)
+                self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
             }
         } else {
-            self.retrieveCredentials(withScope: scope, minTTL: minTTL, withParameters: parameters, callback: callback)
+            self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
         }
     }
     #else
-    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, withParameters parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
-        self.retrieveCredentials(withScope: scope, minTTL: minTTL, withParameters: parameters, callback: callback)
+        self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
     }
     #endif
 
@@ -197,7 +197,7 @@ public struct CredentialsManager {
         return credentials
     }
 
-    private func retrieveCredentials(withScope scope: String?, minTTL: Int, withParameters parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard let credentials = retrieveCredentials(),
               let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
         guard self.hasExpired(credentials) ||
