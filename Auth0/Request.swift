@@ -98,7 +98,7 @@ public struct Request<T, E: Auth0Error>: Requestable {
     /**
      Modify the parameters by creating a copy of self and adding the provided parameters to `payload`.
 
-     - parameter payload: Additional parameters for the Request. The provided map will be added to `payload`.
+     - parameter payload: Additional parameters for the request. The provided map will be added to `payload`.
      */
     public func parameters(_ payload: [String: Any]) -> Self {
         var parameter = self.payload
