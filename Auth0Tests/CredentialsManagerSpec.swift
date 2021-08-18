@@ -530,7 +530,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
-                it("Request should contain Parameter on renew") {
+                it("request should include custom parameters on renew") {
                     let someId = UUID().uuidString
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])) {
                         _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: 86400)
