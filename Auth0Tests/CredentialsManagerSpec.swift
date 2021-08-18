@@ -530,6 +530,23 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
+                it("request should include custom parameters on renew") {
+                    let someId = UUID().uuidString
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])) {
+                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: 86400)
+                    }
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.credentials(parameters: ["some_id": someId]) { error = $0; newCredentials = $1
+                            expect(error).to(beNil())
+                            expect(newCredentials?.accessToken) == NewAccessToken
+                            expect(newCredentials?.refreshToken) == NewRefreshToken
+                            expect(newCredentials?.idToken) == NewIdToken
+                            done()
+                        }
+                    }
+                }
             }
 
             context("forced renew") {
