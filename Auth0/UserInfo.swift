@@ -25,7 +25,7 @@ import Foundation
 /// OIDC Standard Claims user information
 /// - note: [Claims](https://auth0.com/docs/protocols/oidc#claims)
 @objc(A0UserInfo)
-@objcMembers public class UserInfo: NSObject, JSONObjectPayload {
+@objcMembers public class UserInfo: NSObject, JSONObjectPayload, Codable {
 
     public static let publicClaims = ["sub", "name", "given_name", "family_name", "middle_name", "nickname", "preferred_username", "profile", "picture", "website", "email", "email_verified", "gender", "birthdate", "zoneinfo", "locale", "phone_number", "phone_number_verified", "address", "updated_at"]
 
@@ -58,6 +58,38 @@ import Foundation
     public let updatedAt: Date?
 
     public let customClaims: [String: Any]?
+
+    enum CodingKeys: String, CodingKey {
+        case sub
+
+        case name
+        case givenName = "given_name"
+        case familyName = "family_name"
+        case middleName = "middle_name"
+        case nickname
+        case preferredUsername = "preferred_username"
+
+        case profile
+        case picture
+        case website
+
+        case email
+        case emailVerified = "email_verified"
+
+        case gender
+        case birthdate
+
+        case zoneinfo
+        case locale
+
+        case phoneNumber = "phone_number"
+        case phoneNumberVerified = "phone_number_verified"
+
+        case address
+        case updatedAt = "updated_at"
+
+        case customClaims = "custom_claims"
+    }
 
     required public init(sub: String, name: String?, givenName: String?, familyName: String?, middleName: String?, nickname: String?, preferredUsername: String?, profile: URL?, picture: URL?, website: URL?, email: String?, emailVerified: Bool?, gender: String?, birthdate: String?, zoneinfo: TimeZone?, locale: Locale?, phoneNumber: String?, phoneNumberVerified: Bool?, address: [String: String]?, updatedAt: Date?, customClaims: [String: Any]?) {
         self.sub = sub
@@ -135,5 +167,81 @@ import Foundation
         UserInfo.publicClaims.forEach { customClaims.removeValue(forKey: $0) }
 
         self.init(sub: sub, name: name, givenName: givenName, familyName: familyName, middleName: middleName, nickname: nickname, preferredUsername: preferredUsername, profile: profile, picture: picture, website: website, email: email, emailVerified: emailVerified, gender: gender, birthdate: birthdate, zoneinfo: zoneinfo, locale: locale, phoneNumber: phoneNumber, phoneNumberVerified: phoneNumberVerified, address: address, updatedAt: updatedAt, customClaims: customClaims)
+    }
+
+    public required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.sub = try container.decode(String.self, forKey: .sub)
+
+        self.name = try? container.decodeIfPresent(String.self, forKey: .name)
+        self.givenName = try? container.decodeIfPresent(String.self, forKey: .givenName)
+        self.familyName = try? container.decodeIfPresent(String.self, forKey: .familyName)
+        self.middleName = try? container.decodeIfPresent(String.self, forKey: .middleName)
+        self.nickname = try? container.decodeIfPresent(String.self, forKey: .nickname)
+        self.preferredUsername = try? container.decodeIfPresent(String.self, forKey: .preferredUsername)
+
+        self.profile = try? container.decodeIfPresent(URL.self, forKey: .profile)
+        self.picture = try? container.decodeIfPresent(URL.self, forKey: .picture)
+        self.website = try? container.decodeIfPresent(URL.self, forKey: .website)
+
+        self.email = try? container.decodeIfPresent(String.self, forKey: .email)
+        self.emailVerified = try? container.decodeIfPresent(Bool.self, forKey: .emailVerified)
+
+        self.gender = try? container.decodeIfPresent(String.self, forKey: .gender)
+        self.birthdate = try? container.decodeIfPresent(String.self, forKey: .birthdate)
+
+        self.zoneinfo = try? container.decodeIfPresent(TimeZone.self, forKey: .zoneinfo)
+        self.locale = try? container.decodeIfPresent(Locale.self, forKey: .locale)
+
+        self.phoneNumber = try? container.decodeIfPresent(String.self, forKey: .phoneNumber)
+        self.phoneNumberVerified = try? container.decodeIfPresent(Bool.self, forKey: .phoneNumberVerified)
+        self.address = try? container.decodeIfPresent([String: String].self, forKey: .address)
+
+        self.updatedAt = try? container.decodeIfPresent(Date.self, forKey: .updatedAt)
+
+        if let codableCustomClaims = try? container.decodeIfPresent([String: AnyCodable].self, forKey: .customClaims) {
+            var customClaims = [String: Any]()
+            codableCustomClaims.forEach { key, value in customClaims[key] = value.value }
+            self.customClaims = customClaims
+        } else {
+            self.customClaims = [String: Any]()
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.sub, forKey: .sub)
+
+        try container.encodeIfPresent(self.name, forKey: .name)
+        try container.encodeIfPresent(self.givenName, forKey: .givenName)
+        try container.encodeIfPresent(self.familyName, forKey: .familyName)
+        try container.encodeIfPresent(self.middleName, forKey: .middleName)
+        try container.encodeIfPresent(self.nickname, forKey: .nickname)
+        try container.encodeIfPresent(self.preferredUsername, forKey: .preferredUsername)
+
+        try container.encodeIfPresent(self.profile, forKey: .profile)
+        try container.encodeIfPresent(self.picture, forKey: .picture)
+        try container.encodeIfPresent(self.website, forKey: .website)
+
+        try container.encodeIfPresent(self.email, forKey: .email)
+        try container.encodeIfPresent(self.emailVerified, forKey: .emailVerified)
+
+        try container.encodeIfPresent(self.gender, forKey: .gender)
+        try container.encodeIfPresent(self.birthdate, forKey: .birthdate)
+
+        try container.encodeIfPresent(self.zoneinfo, forKey: .zoneinfo)
+        try container.encodeIfPresent(self.locale, forKey: .locale)
+
+        try container.encodeIfPresent(self.phoneNumber, forKey: .phoneNumber)
+        try container.encodeIfPresent(self.phoneNumberVerified, forKey: .phoneNumberVerified)
+        try container.encodeIfPresent(self.address, forKey: .address)
+
+        try container.encodeIfPresent(self.updatedAt, forKey: .updatedAt)
+
+        var codableCustomClaims = [String: AnyCodable]()
+        customClaims?.forEach { key, value in codableCustomClaims[key] = AnyCodable(value) }
+        try container.encodeIfPresent(codableCustomClaims, forKey: .customClaims)
     }
 }
