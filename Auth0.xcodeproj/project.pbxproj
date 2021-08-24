@@ -11,6 +11,25 @@
 		3F1A8B8126CFD58A00FB503F /* AnyDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1A8B7F26CFD58A00FB503F /* AnyDecodable.swift */; };
 		3F1A8B8226CFD58B00FB503F /* AnyDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1A8B7F26CFD58A00FB503F /* AnyDecodable.swift */; };
 		3F1A8B8326CFD58B00FB503F /* AnyDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1A8B7F26CFD58A00FB503F /* AnyDecodable.swift */; };
+		3F23F70326D4DF2200499713 /* AnyCodable+HashableSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70226D4DF2200499713 /* AnyCodable+HashableSpec.swift */; };
+		3F23F70426D4DF2200499713 /* AnyCodable+HashableSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70226D4DF2200499713 /* AnyCodable+HashableSpec.swift */; };
+		3F23F70526D4DF2200499713 /* AnyCodable+HashableSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70226D4DF2200499713 /* AnyCodable+HashableSpec.swift */; };
+		3F23F70726D4DF3A00499713 /* UserInfo+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70626D4DF3A00499713 /* UserInfo+Equatable.swift */; };
+		3F23F70826D4DF3A00499713 /* UserInfo+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70626D4DF3A00499713 /* UserInfo+Equatable.swift */; };
+		3F23F70926D4DF3A00499713 /* UserInfo+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70626D4DF3A00499713 /* UserInfo+Equatable.swift */; };
+		3F23F70B26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70A26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift */; };
+		3F23F70C26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70A26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift */; };
+		3F23F70D26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70A26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift */; };
+		3F23F70F26D4E15100499713 /* UserInfo+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70E26D4E15100499713 /* UserInfo+Equatable.swift */; };
+		3F23F71026D4E15100499713 /* UserInfo+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70E26D4E15100499713 /* UserInfo+Equatable.swift */; };
+		3F23F71126D4E15100499713 /* UserInfo+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70E26D4E15100499713 /* UserInfo+Equatable.swift */; };
+		3F23F71226D4E15100499713 /* UserInfo+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F23F70E26D4E15100499713 /* UserInfo+Equatable.swift */; };
+		3F3C0A5F26D517C6000359DD /* AnyCodable+EquatableSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3C0A5E26D517C6000359DD /* AnyCodable+EquatableSpec.swift */; };
+		3F3C0A6026D517C6000359DD /* AnyCodable+EquatableSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3C0A5E26D517C6000359DD /* AnyCodable+EquatableSpec.swift */; };
+		3F3C0A6126D517C6000359DD /* AnyCodable+EquatableSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3C0A5E26D517C6000359DD /* AnyCodable+EquatableSpec.swift */; };
+		3F3C0A6326D51EA0000359DD /* AnyCodableSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3C0A6226D51EA0000359DD /* AnyCodableSpec.swift */; };
+		3F3C0A6426D51EA0000359DD /* AnyCodableSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3C0A6226D51EA0000359DD /* AnyCodableSpec.swift */; };
+		3F3C0A6526D51EA0000359DD /* AnyCodableSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3C0A6226D51EA0000359DD /* AnyCodableSpec.swift */; };
 		3F471D0126CFA97E00B97A6F /* AnyCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F471D0026CFA97E00B97A6F /* AnyCodable.swift */; };
 		3F471D0226CFA97E00B97A6F /* AnyCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F471D0026CFA97E00B97A6F /* AnyCodable.swift */; };
 		3F471D0326CFA97E00B97A6F /* AnyCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F471D0026CFA97E00B97A6F /* AnyCodable.swift */; };
@@ -514,6 +533,12 @@
 
 /* Begin PBXFileReference section */
 		3F1A8B7F26CFD58A00FB503F /* AnyDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyDecodable.swift; sourceTree = "<group>"; };
+		3F23F70226D4DF2200499713 /* AnyCodable+HashableSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AnyCodable+HashableSpec.swift"; sourceTree = "<group>"; };
+		3F23F70626D4DF3A00499713 /* UserInfo+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserInfo+Equatable.swift"; sourceTree = "<group>"; };
+		3F23F70A26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AnyCodable+StringConvertibleSpec.swift"; sourceTree = "<group>"; };
+		3F23F70E26D4E15100499713 /* UserInfo+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserInfo+Equatable.swift"; sourceTree = "<group>"; };
+		3F3C0A5E26D517C6000359DD /* AnyCodable+EquatableSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AnyCodable+EquatableSpec.swift"; sourceTree = "<group>"; };
+		3F3C0A6226D51EA0000359DD /* AnyCodableSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyCodableSpec.swift; sourceTree = "<group>"; };
 		3F471D0026CFA97E00B97A6F /* AnyCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyCodable.swift; sourceTree = "<group>"; };
 		3F471D0526CFA99E00B97A6F /* UserInfo+CodableSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserInfo+CodableSpec.swift"; sourceTree = "<group>"; };
 		3FA463FE26CFD5F400276CAF /* AnyEncodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyEncodable.swift; sourceTree = "<group>"; };
@@ -1129,6 +1154,11 @@
 				5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */,
 				5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */,
 				3F471D0526CFA99E00B97A6F /* UserInfo+CodableSpec.swift */,
+				3F23F70626D4DF3A00499713 /* UserInfo+Equatable.swift */,
+				3F3C0A6226D51EA0000359DD /* AnyCodableSpec.swift */,
+				3F3C0A5E26D517C6000359DD /* AnyCodable+EquatableSpec.swift */,
+				3F23F70226D4DF2200499713 /* AnyCodable+HashableSpec.swift */,
+				3F23F70A26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift */,
 				5F74CB421CEFDFB800226823 /* IdentitySpec.swift */,
 				5FE2F8C51CD1522F003628F4 /* ProfileSpec.swift */,
 				5C4F553423C9124200C89615 /* JWKSpec.swift */,
@@ -1235,6 +1265,7 @@
 				5FDE874C1D8A424700EA27DC /* Identity.swift */,
 				5FDE874D1D8A424700EA27DC /* Profile.swift */,
 				5B2860CD1EEAC30500C75D54 /* UserInfo.swift */,
+				3F23F70E26D4E15100499713 /* UserInfo+Equatable.swift */,
 				5C4F552223C8FBA100C89615 /* JWKS.swift */,
 				5FDE874E1D8A424700EA27DC /* Credentials.swift */,
 				5FDE874F1D8A424700EA27DC /* Handlers.swift */,
@@ -1915,6 +1946,7 @@
 				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */,
 				5FCAB1731D09009600331C84 /* NSData+URLSafe.swift in Sources */,
+				3F23F70F26D4E15100499713 /* UserInfo+Equatable.swift in Sources */,
 				5B16D88E1F7141A0009476A5 /* AuthenticationServicesSession.swift in Sources */,
 				5FD255BA1D14F70B00387ECB /* WebAuthError.swift in Sources */,
 				5B25A52F1E3F520300563AE5 /* NativeAuth.swift in Sources */,
@@ -1981,6 +2013,7 @@
 				5C41F6BF244F962C00252548 /* A0RSA.m in Sources */,
 				5C41F6D4244F974100252548 /* OAuth2Grant.swift in Sources */,
 				5C41F6D5244F974B00252548 /* SessionCallbackTransaction.swift in Sources */,
+				3F23F71026D4E15100499713 /* UserInfo+Equatable.swift in Sources */,
 				5C29743423FDBD5500BC18FA /* Optional+DebugDescription.swift in Sources */,
 				5C41F6E3244FB15900252548 /* NSApplication+Shared.swift in Sources */,
 				5C41F6C6244F968100252548 /* AuthSession.swift in Sources */,
@@ -2053,7 +2086,9 @@
 				5FE686AA1D1894AA0075874C /* TelemetrySpec.swift in Sources */,
 				5C41F6B6244DCF2F00252548 /* BaseAuthTransactionSpec.swift in Sources */,
 				5CB41D6523D0BACF00074024 /* IDTokenValidatorMocks.swift in Sources */,
+				3F23F70326D4DF2200499713 /* AnyCodable+HashableSpec.swift in Sources */,
 				5FBBF03B1CC96AA70024D2AF /* Responses.swift in Sources */,
+				3F3C0A5F26D517C6000359DD /* AnyCodable+EquatableSpec.swift in Sources */,
 				5FCAB1681D07AC2700331C84 /* ControllerModalPresenterSpec.swift in Sources */,
 				5FCAB16A1D07AC3500331C84 /* ChallengeGeneratorSpec.swift in Sources */,
 				5CB41D6923D0BAD600074024 /* IDTokenSignatureValidatorSpec.swift in Sources */,
@@ -2067,10 +2102,13 @@
 				5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
 				5FE2F8A61CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
+				3F3C0A6326D51EA0000359DD /* AnyCodableSpec.swift in Sources */,
 				5FADB6091CED500900D4BB50 /* ManagementSpec.swift in Sources */,
+				3F23F70726D4DF3A00499713 /* UserInfo+Equatable.swift in Sources */,
 				3F471D0626CFA99E00B97A6F /* UserInfo+CodableSpec.swift in Sources */,
 				5FCAB16D1D07AC3500331C84 /* WebAuthSpec.swift in Sources */,
 				5F28B4671D8300D50000EB23 /* LoggerSpec.swift in Sources */,
+				3F23F70B26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift in Sources */,
 				5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5B2860D61EEF210A00C75D54 /* UserInfoSpec.swift in Sources */,
 				5FCAB16B1D07AC3500331C84 /* OAuth2GrantSpec.swift in Sources */,
@@ -2106,11 +2144,13 @@
 				5CE775B4244FD72500D054A0 /* JWKSpec.swift in Sources */,
 				5CE775A4244FCF3A00D054A0 /* BioAuthenticationSpec.swift in Sources */,
 				5F93BC0C1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
+				3F23F70826D4DF3A00499713 /* UserInfo+Equatable.swift in Sources */,
 				5CE775AD244FD66300D054A0 /* WebAuthErrorSpec.swift in Sources */,
 				5FE2F8A71CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
 				5CE775A2244FCF2000D054A0 /* Generators.swift in Sources */,
 				5CE775AF244FD66D00D054A0 /* OAuth2GrantSpec.swift in Sources */,
 				5FD255B21D14A9E000387ECB /* AuthenticationErrorSpec.swift in Sources */,
+				3F3C0A6026D517C6000359DD /* AnyCodable+EquatableSpec.swift in Sources */,
 				5FADB60A1CED500900D4BB50 /* ManagementSpec.swift in Sources */,
 				5F28B4681D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
@@ -2119,8 +2159,10 @@
 				5CE775A3244FCF3600D054A0 /* CryptoExtensions.swift in Sources */,
 				5CE775B3244FD71000D054A0 /* WebAuthSpec.swift in Sources */,
 				5FE2F8C71CD1522F003628F4 /* ProfileSpec.swift in Sources */,
+				3F3C0A6426D51EA0000359DD /* AnyCodableSpec.swift in Sources */,
 				5B7EE47220FCA00300367724 /* CredentialsManagerSpec.swift in Sources */,
 				5CE775A6244FCF4100D054A0 /* IDTokenValidatorMocks.swift in Sources */,
+				3F23F70C26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift in Sources */,
 				5CE775AC244FD66000D054A0 /* BaseAuthTransactionSpec.swift in Sources */,
 				5FADB6041CEC0C3300D4BB50 /* UsersSpec.swift in Sources */,
 				5F74CB441CEFDFB800226823 /* IdentitySpec.swift in Sources */,
@@ -2128,6 +2170,7 @@
 				5CE775A8244FCF4600D054A0 /* IDTokenSignatureValidatorSpec.swift in Sources */,
 				5F1FBB9B1D8A44C1006B0B85 /* ResponseSpec.swift in Sources */,
 				5CE775A5244FCF3F00D054A0 /* IDTokenValidatorBaseSpec.swift in Sources */,
+				3F23F70426D4DF2200499713 /* AnyCodable+HashableSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2147,6 +2190,7 @@
 				5F23E6E81D4ACD8500C3F2D9 /* Result.swift in Sources */,
 				5F23E6DD1D4ACD6100C3F2D9 /* NSURL+Auth0.swift in Sources */,
 				5F23E6E71D4ACD8500C3F2D9 /* Response.swift in Sources */,
+				3F23F71126D4E15100499713 /* UserInfo+Equatable.swift in Sources */,
 				5B2860D11EEAC30A00C75D54 /* UserInfo.swift in Sources */,
 				5F28B4631D8216180000EB23 /* Loggable.swift in Sources */,
 				3FA4640A26CFF38000276CAF /* AnyCodable+Hashable.swift in Sources */,
@@ -2192,6 +2236,7 @@
 				5F23E7101D4B88FC00C3F2D9 /* Response.swift in Sources */,
 				5B2860D01EEAC30A00C75D54 /* UserInfo.swift in Sources */,
 				5F28B4641D8216180000EB23 /* Loggable.swift in Sources */,
+				3F23F71226D4E15100499713 /* UserInfo+Equatable.swift in Sources */,
 				5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */,
 				5F23E7091D4B88F600C3F2D9 /* Management.swift in Sources */,
 				3FA4640B26CFF38000276CAF /* AnyCodable+Hashable.swift in Sources */,
@@ -2228,17 +2273,22 @@
 				3F471D0826CFA99E00B97A6F /* UserInfo+CodableSpec.swift in Sources */,
 				5F331B0F1D4BB80700AE4382 /* Responses.swift in Sources */,
 				5B6EE39620F8AEDB00264AC7 /* CredentialsManagerSpec.swift in Sources */,
+				3F23F70926D4DF3A00499713 /* UserInfo+Equatable.swift in Sources */,
 				5F331B061D4BB7DA00AE4382 /* CredentialsSpec.swift in Sources */,
 				5F331B0B1D4BB7F900AE4382 /* UserPatchAttributesSpec.swift in Sources */,
 				5F331B051D4BB7D400AE4382 /* AuthenticationSpec.swift in Sources */,
+				3F23F70526D4DF2200499713 /* AnyCodable+HashableSpec.swift in Sources */,
 				5F28B4691D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				5F1FBB9A1D8A44C0006B0B85 /* ResponseSpec.swift in Sources */,
+				3F3C0A6526D51EA0000359DD /* AnyCodableSpec.swift in Sources */,
+				3F23F70D26D4DF6500499713 /* AnyCodable+StringConvertibleSpec.swift in Sources */,
 				5F331B0C1D4BB7F900AE4382 /* UsersSpec.swift in Sources */,
 				5F331B0E1D4BB80700AE4382 /* Matchers.swift in Sources */,
 				5F331B071D4BB7E300AE4382 /* IdentitySpec.swift in Sources */,
 				5F331B0A1D4BB7F900AE4382 /* ManagementSpec.swift in Sources */,
 				5F331B091D4BB7EE00AE4382 /* AuthenticationErrorSpec.swift in Sources */,
 				5F331B101D4BB80700AE4382 /* Auth0Spec.swift in Sources */,
+				3F3C0A6126D517C6000359DD /* AnyCodable+EquatableSpec.swift in Sources */,
 				5F331B041D4BB78C00AE4382 /* TelemetrySpec.swift in Sources */,
 				5F331B081D4BB7EA00AE4382 /* ProfileSpec.swift in Sources */,
 			);

@@ -1,5 +1,5 @@
 //
-//  AnyCodable+StringSpec.swift
+//  AnyCodable+StringConvertibleSpec.swift
 //  Auth0
 //
 //  Created by Kimi on 24/8/21.
@@ -13,71 +13,50 @@ import JWTDecode
 
 @testable import Auth0
 
-class AnyCodableStringSpec: QuickSpec {
+class AnyCodableStringConvertibleSpec: QuickSpec {
     override func spec() {
 
-        describe("compare AnyCodable instances hash") {
-            it("should be equal for bool") {
+        describe("print the description of a AnyCodable instances") {
+            it("should not start with \"AnyCodable") {
+                let value = true
+                let a = AnyCodable(value)
+
+                expect(a.description.starts(with: "AnyCodable")).to(be(false))
+                expect(a.description) == "\(value)"
+            }
+
+            it("should describe the content of an instance that implements CustomStringConvertible") {
+                let value: CustomStringConvertible = "A String to test"
+                let a = AnyCodable(value)
+
+                expect(a.description) == value.description
+            }
+        }
+
+        describe("print the debug description of a AnyCodable instances") {
+            it("should start with \"AnyCodable") {
                 let a = AnyCodable(true)
-                let b = AnyCodable(true)
-                
-                expect(a.hashValue) == b.hashValue
+
+                expect(a.debugDescription.starts(with: "AnyCodable")).to(be(true))
             }
-            
-            it("should be equal for String") {
-                let a = AnyCodable(Sub)
-                let b = AnyCodable(Sub)
-                
-                expect(a.hashValue) == b.hashValue
+            it("should contain value between parentesis") {
+                let a = AnyCodable(true).debugDescription.replacingOccurrences(of: "AnyCodable", with: "")
+
+                expect(a.hasPrefix("(")).to(be(true))
+                expect(a.hasSuffix(")")).to(be(true))
             }
-            
-            it("should be equal for Int") {
-                let a = AnyCodable(10)
-                let b = AnyCodable(10)
-                
-                expect(a.hashValue) == b.hashValue
+
+            it("should describe the content of a Bool") {
+                let a = AnyCodable(true)
+
+                expect(a.debugDescription) == "AnyCodable(true)"
             }
-            
-            it("should be equal for Double") {
-                let a = AnyCodable(UpdatedAtTimestamp)
-                let b = AnyCodable(UpdatedAtTimestamp)
-                
-                expect(a.hashValue) == b.hashValue
-            }
-            
-            it("should be equal for sorted Arrays") {
-                let a = AnyCodable([1, true, "String"])
-                let b = AnyCodable([1, true, "String"])
-                
-                expect(a.hashValue) == b.hashValue
-            }
-            
-            it("should be equal for unsorted Arrays") {
-                let a = AnyCodable([1, true, "String"])
-                let b = AnyCodable([true, "String", 1])
-                
-                expect(a.hashValue) == b.hashValue
-            }
-            
-            it("should be equal for Dictionaries") {
-                let a: [String: AnyCodable] = ["key1": 1, "key2": true, "key3": "value3"]
-                let b: [String: AnyCodable] = ["key1": 1, "key2": true, "key3": "value3"]
-                
-                expect(a.hashValue) == b.hashValue
-            }
-            
-            it("should not be equal for Dictionaries with at least one different value") {
-                let a: [String: AnyCodable] = ["key1": 1, "key2": true, "key3": "value3"]
-                let b: [String: AnyCodable] = ["key1": 1, "key2": false, "key3": "value3"]
-                
-                expect(a.hashValue) != b.hashValue
-            }
-            
-            it("should not be equal if there are not from the same type") {
-                let a = AnyCodable(10)
-                let b = AnyCodable("10")
-                
-                expect(a.hashValue) != b.hashValue
+
+            it("should describe the content of an instance that implements CustomDebugStringConvertible") {
+                let value: CustomDebugStringConvertible = "A String to test"
+                let a = AnyCodable(value)
+
+                expect(a.debugDescription) == "AnyCodable(\(value.debugDescription))"
             }
         }
     }

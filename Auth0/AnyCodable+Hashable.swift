@@ -51,6 +51,7 @@ extension AnyCodable: Hashable {
     }
 
     public var hashValue: Int {
+        // swiftlint:disable implicit_getter
         get {
             var hasher = Hasher()
             hash(into: &hasher)

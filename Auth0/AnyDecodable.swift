@@ -48,8 +48,7 @@ protocol _AnyDecodable {
 extension AnyDecodable: _AnyDecodable {}
 
 extension _AnyDecodable {
-    
-    // swiftlint:disable:next cyclomatic_complexity
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
 
@@ -75,120 +74,6 @@ extension _AnyDecodable {
             self.init(dictionary.mapValues { $0.value })
         } else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyDecodable value cannot be decoded")
-        }
-    }
-}
-
-extension AnyDecodable: Equatable {
-    
-    // swiftlint:disable:next cyclomatic_complexity
-    public static func == (lhs: AnyDecodable, rhs: AnyDecodable) -> Bool {
-        switch (lhs.value, rhs.value) {
-#if canImport(Foundation)
-        case is (NSNull, NSNull), is (Void, Void):
-            return true
-#endif
-        case let (lhs as Bool, rhs as Bool):
-            return lhs == rhs
-        case let (lhs as Int, rhs as Int):
-            return lhs == rhs
-        case let (lhs as Int8, rhs as Int8):
-            return lhs == rhs
-        case let (lhs as Int16, rhs as Int16):
-            return lhs == rhs
-        case let (lhs as Int32, rhs as Int32):
-            return lhs == rhs
-        case let (lhs as Int64, rhs as Int64):
-            return lhs == rhs
-        case let (lhs as UInt, rhs as UInt):
-            return lhs == rhs
-        case let (lhs as UInt8, rhs as UInt8):
-            return lhs == rhs
-        case let (lhs as UInt16, rhs as UInt16):
-            return lhs == rhs
-        case let (lhs as UInt32, rhs as UInt32):
-            return lhs == rhs
-        case let (lhs as UInt64, rhs as UInt64):
-            return lhs == rhs
-        case let (lhs as Float, rhs as Float):
-            return lhs == rhs
-        case let (lhs as Double, rhs as Double):
-            return lhs == rhs
-        case let (lhs as String, rhs as String):
-            return lhs == rhs
-        case let (lhs as [String: AnyDecodable], rhs as [String: AnyDecodable]):
-            return lhs == rhs
-        case let (lhs as [AnyDecodable], rhs as [AnyDecodable]):
-            return lhs == rhs
-        default:
-            return false
-        }
-    }
-}
-
-extension AnyDecodable: CustomStringConvertible {
-    public var description: String {
-        switch value {
-        case is Void:
-            return String(describing: nil as Any?)
-        case let value as CustomStringConvertible:
-            return value.description
-        default:
-            return String(describing: value)
-        }
-    }
-}
-
-extension AnyDecodable: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        switch value {
-        case let value as CustomDebugStringConvertible:
-            return "AnyDecodable(\(value.debugDescription))"
-        default:
-            return "AnyDecodable(\(description))"
-        }
-    }
-}
-
-extension AnyDecodable: Hashable {
-    
-    // swiftlint:disable:next cyclomatic_complexity
-    public func hash(into hasher: inout Hasher) {
-        switch value {
-        case let value as Bool:
-            hasher.combine(value)
-        case let value as Int:
-            hasher.combine(value)
-        case let value as Int8:
-            hasher.combine(value)
-        case let value as Int16:
-            hasher.combine(value)
-        case let value as Int32:
-            hasher.combine(value)
-        case let value as Int64:
-            hasher.combine(value)
-        case let value as UInt:
-            hasher.combine(value)
-        case let value as UInt8:
-            hasher.combine(value)
-        case let value as UInt16:
-            hasher.combine(value)
-        case let value as UInt32:
-            hasher.combine(value)
-        case let value as UInt64:
-            hasher.combine(value)
-        case let value as Float:
-            hasher.combine(value)
-        case let value as Double:
-            hasher.combine(value)
-        case let value as String:
-            hasher.combine(value)
-        case let value as [String: AnyDecodable]:
-            hasher.combine(value)
-        case let value as [AnyDecodable]:
-            hasher.combine(value)
-        default:
-            break
         }
     }
 }
