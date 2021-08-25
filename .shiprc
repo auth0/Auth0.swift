@@ -1,0 +1,8 @@
+{
+    "files": {
+        "Auth0/Info.plist": [],
+        "README.md": ["~> {MAJOR}.{MINOR}"]
+    },
+    "postbump": "bundle update",
+    "prefixVersion": false
+}
