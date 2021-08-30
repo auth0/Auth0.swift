@@ -83,7 +83,7 @@ public protocol WebAuthenticatable: Trackable, Loggable {
      Before enabling this flag you'll need to configure Universal Links
 
      - returns: the same WebAuth instance to allow method chaining
-     - warning: this method is deprecated as Universal Links cannot be used as OAuth callbacks anymore. See https://openradar.appspot.com/51091611
+     - warning: deprecated as Universal Links cannot be used as OAuth callbacks anymore. See https://openradar.appspot.com/51091611
      */
     @available(*, deprecated, message: "cannot be used anymore, see https://openradar.appspot.com/51091611")
     func useUniversalLink() -> Self

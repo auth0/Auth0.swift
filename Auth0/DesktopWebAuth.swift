@@ -33,7 +33,7 @@ typealias Auth0WebAuth = DesktopWebAuth
  Resumes the current Auth session (if any).
 
  - parameter urls: urls received by the macOS application in AppDelegate
- - warning: this method is deprecated, as the SDK will not support macOS versions older than Catalina
+ - warning: deprecated as the SDK will not support macOS versions older than Catalina
  */
 @available(*, deprecated, message: "the SDK will not support macOS versions older than Catalina")
 public func resumeAuth(_ urls: [URL]) {
@@ -62,7 +62,7 @@ public extension _ObjectiveOAuth2 {
      Resumes the current Auth session (if any).
 
      - parameter urls: urls received by the macOS application in AppDelegate
-     - warning: this method is deprecated, as the SDK will not support macOS versions older than Catalina
+     - warning: deprecated as the SDK will not support macOS versions older than Catalina
      */
     @available(*, deprecated, message: "the SDK will not support macOS versions older than Catalina")
     @objc(resumeAuthWithURLs:)
@@ -81,7 +81,7 @@ public protocol AuthResumable {
      - parameter url: the url sent by the third party application that contains the result of the Auth
 
      - returns: if the url was expected and properly formatted otherwise it will return `false`.
-     - warning: this method is deprecated, as the SDK will not support macOS versions older than Catalina
+     - warning: deprecated as the SDK will not support macOS versions older than Catalina
     */
     @available(*, deprecated, message: "the SDK will not support macOS versions older than Catalina")
     func resume(_ url: URL) -> Bool
