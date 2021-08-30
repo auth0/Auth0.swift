@@ -23,7 +23,7 @@
 #if WEB_AUTH_PLATFORM
 /**
  The NativeAuthCredentials struct defines the data requirements necessary to be returned
- from a successul authentication with an IdP SDK as part of the NativeAuthTransaction process.
+ from a successful authentication with an IdP SDK as part of the NativeAuthTransaction process.
  */
 public struct NativeAuthCredentials {
     /// Access token returned by the IdP SDK
@@ -47,7 +47,7 @@ public struct NativeAuthCredentials {
  Represent a Auth transaction where the user first authenticates with a third party Identity Provider (IdP) and then tries to perform Auth with Auth0.
  This is usually used when a Social connection has a native SDK, e.g. Facebook, and for usability or need to call the IdP API the SDK should be used to login.
 
- When implemeting this protocol you only need to take care of the IdP authentication and yield it's results so the Auth0 part of the flow will be taken care of for you
+ When implementing this protocol you only need to take care of the IdP authentication and yield it's results so the Auth0 part of the flow will be taken care of for you
  
  To accomplish this the results of the IdP authentication should be send using the callback received when the method `func auth(callback: @escaping Callback) -> ()` is called.
 
@@ -61,7 +61,7 @@ public protocol NativeAuthTransaction: AuthTransaction {
     var connection: String { get }
     /// Additional authentication parameters sent to Auth0 to perform the final auth
     var parameters: [String: Any] { get }
-    /// Authenticaton object to perform the Auth0 social auth
+    /// Authentication object to perform the Auth0 social auth
     var authentication: Authentication { get }
 
     /// Callback where the result of the native authentication is sent
@@ -70,10 +70,10 @@ public protocol NativeAuthTransaction: AuthTransaction {
     /**
      Starts the native Auth flow using the IdP SDK and once completed it will notify the result using the callback.
 
-     On sucesss the IdP access token, and any parameter needed by Auth0 to authenticate, should be used to create a `NativeAuthCredentials`.
+     On success the IdP access token, and any parameter needed by Auth0 to authenticate, should be used to create a `NativeAuthCredentials`.
 
      ```
-     let credetials = NativeAuthCredentials(token: "{IdP Token}", extras: [:])
+     let credentials = NativeAuthCredentials(token: "{IdP Token}", extras: [:])
      let result = Auth0.Result.success(credentials)
      ```
      - parameter callback: callback with the IdP credentials on success or the cause of the error.
