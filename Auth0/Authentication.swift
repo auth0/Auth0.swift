@@ -559,8 +559,9 @@ public protocol Authentication: Trackable, Loggable {
      - parameter token: token obtained by authenticating the user
 
      - returns: a request that will yield user information
-     - warning: for OIDC-conformant clients please use `userInfo(withAccessToken accessToken:)`
+     - warning: deprecated in favor of `userInfo(withAccessToken accessToken:)`
      */
+    @available(*, deprecated, message: "see userInfo(withAccessToken accessToken:)")
     func userInfo(token: String) -> Request<Profile, AuthenticationError>
 
     /**
@@ -606,9 +607,10 @@ public protocol Authentication: Trackable, Loggable {
      - parameter parameters: additional parameters sent during authentication
 
      - returns: a request that will yield Auth0 user's credentials
-     - warning: disabled for OIDC-conformant clients, an alternative will be added in a future release
+     - warning: deprecated as it is not available for OIDC-conformant clients
      - requires: Legacy Grant `http://auth0.com/oauth/legacy/grant-type/access_token`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
      */
+    @available(*, deprecated, message: "not available for OIDC-conformant clients")
     func loginSocial(token: String, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
 
     /**
@@ -710,9 +712,11 @@ public protocol Authentication: Trackable, Loggable {
     /**
      Calls delegation endpoint with the given parameters.
      The only parameters it adds by default are `grant_type` and `client_id`.
-     - parameter parametes: dictionary with delegation parameters to send in the request.
+     - parameter parameters: dictionary with delegation parameters to send in the request.
      - returns: a request that will yield the result of delegation
+     - warning: this method is deprecated due to the `/delegation` endpoint being deprecated
     */
+    @available(*, deprecated, message: "the delegation endpoint is deprecated")
     func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
 
     /**
