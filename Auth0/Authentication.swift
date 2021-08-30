@@ -170,7 +170,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - returns: authentication request that will yield Auth0 User Credentials
      - seeAlso: Credentials
-     - warning: this method is deprecated in favor of `login(usernameOrEmail username:, password:, realm:, audience:, scope:)` for Database connections. For Passwordless connections use `login(email:, code:, audience:, scope:, parameters:)` or `login(phoneNumber:, code:, audience:, scope:, parameters:)` instead.
+     - warning: deprecated in favor of `login(usernameOrEmail username:, password:, realm:, audience:, scope:)` for Database connections. For Passwordless connections use `login(email:, code:, audience:, scope:, parameters:)` or `login(phoneNumber:, code:, audience:, scope:, parameters:)` instead.
      - requires: Legacy Grant `http://auth0.com/oauth/legacy/grant-type/ro`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
      */
     @available(*, deprecated, message: "see login(usernameOrEmail username:, password:, realm:, audience:, scope:)")
@@ -540,7 +540,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
      
      - parameter token: token obtained by authenticating the user
-     - warning: this method is deprecated in favor of `userInfo(withAccessToken accessToken:)`
+     - warning: deprecated in favor of `userInfo(withAccessToken accessToken:)`
      - returns: a request that will yield token information
      */
     @available(*, deprecated, message: "see userInfo(withAccessToken accessToken:)")
@@ -559,8 +559,9 @@ public protocol Authentication: Trackable, Loggable {
      - parameter token: token obtained by authenticating the user
 
      - returns: a request that will yield user information
-     - warning: for OIDC-conformant clients please use `userInfo(withAccessToken accessToken:)`
+     - warning: deprecated in favor of `userInfo(withAccessToken accessToken:)`
      */
+    @available(*, deprecated, message: "see userInfo(withAccessToken accessToken:)")
     func userInfo(token: String) -> Request<Profile, AuthenticationError>
 
     /**
@@ -606,9 +607,10 @@ public protocol Authentication: Trackable, Loggable {
      - parameter parameters: additional parameters sent during authentication
 
      - returns: a request that will yield Auth0 user's credentials
-     - warning: disabled for OIDC-conformant clients, an alternative will be added in a future release
+     - warning: deprecated as it is not available for OIDC-conformant clients
      - requires: Legacy Grant `http://auth0.com/oauth/legacy/grant-type/access_token`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
      */
+    @available(*, deprecated, message: "not available for OIDC-conformant clients")
     func loginSocial(token: String, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
 
     /**
@@ -677,7 +679,7 @@ public protocol Authentication: Trackable, Loggable {
     - parameter fullName: The full name property returned with the Apple ID Credentials
 
     - returns: a request that will yield Auth0 user's credentials
-    - warning: this method is deprecated in favor of `login(appleAuthorizationCode authorizationCode:, fullName:, scope:, audience:)`
+    - warning: deprecated in favor of `login(appleAuthorizationCode authorizationCode:, fullName:, scope:, audience:)`
     */
     @available(*, deprecated, message: "see login(appleAuthorizationCode authorizationCode:, fullName:, scope:, audience:)")
     func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String?, audience: String?, fullName: PersonNameComponents?) -> Request<Credentials, AuthenticationError>
@@ -710,9 +712,11 @@ public protocol Authentication: Trackable, Loggable {
     /**
      Calls delegation endpoint with the given parameters.
      The only parameters it adds by default are `grant_type` and `client_id`.
-     - parameter parametes: dictionary with delegation parameters to send in the request.
+     - parameter parameters: dictionary with delegation parameters to send in the request.
      - returns: a request that will yield the result of delegation
+     - warning: deprecated due to the `/delegation` endpoint being deprecated
     */
+    @available(*, deprecated, message: "the delegation endpoint is deprecated")
     func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
 
     /**

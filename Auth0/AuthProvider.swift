@@ -41,6 +41,7 @@
 
  ```
  */
+@available(*, deprecated, message: "not available for OIDC-conformant clients")
 public protocol AuthProvider {
     func login(withConnection connection: String, scope: String, parameters: [String: Any]) -> NativeAuthTransaction
 
