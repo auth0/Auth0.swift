@@ -33,7 +33,9 @@ typealias Auth0WebAuth = DesktopWebAuth
  Resumes the current Auth session (if any).
 
  - parameter urls: urls received by the macOS application in AppDelegate
+ - warning: deprecated as the SDK will not support macOS versions older than Catalina
  */
+@available(*, deprecated, message: "the SDK will not support macOS versions older than Catalina")
 public func resumeAuth(_ urls: [URL]) {
     guard let url = urls.first else { return }
     _ = TransactionStore.shared.resume(url)
@@ -60,7 +62,9 @@ public extension _ObjectiveOAuth2 {
      Resumes the current Auth session (if any).
 
      - parameter urls: urls received by the macOS application in AppDelegate
+     - warning: deprecated as the SDK will not support macOS versions older than Catalina
      */
+    @available(*, deprecated, message: "the SDK will not support macOS versions older than Catalina")
     @objc(resumeAuthWithURLs:)
     static func resume(_ urls: [URL]) {
         resumeAuth(urls)
@@ -71,13 +75,15 @@ public extension _ObjectiveOAuth2 {
 public protocol AuthResumable {
 
     /**
-     Resumes the transaction when the third party application notifies the application using an url with a custom scheme.
+     Resumes the transaction when the third party application notifies the application using a url with a custom scheme.
      This method should be called from the Application's `AppDelegate` or by using the `public func resumeAuth(_ urls: [URL])` method.
      
      - parameter url: the url sent by the third party application that contains the result of the Auth
 
      - returns: if the url was expected and properly formatted otherwise it will return `false`.
+     - warning: deprecated as the SDK will not support macOS versions older than Catalina
     */
+    @available(*, deprecated, message: "the SDK will not support macOS versions older than Catalina")
     func resume(_ url: URL) -> Bool
 
 }
