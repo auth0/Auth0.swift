@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.36.0](https://github.com/auth0/Auth0.swift/tree/1.36.0) (2021-09-01)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.35.0...1.36.0)
+
+**Added**
+- Add parameter option to `Request` [\#494](https://github.com/auth0/Auth0.swift/pull/494) ([konDeichmann](https://github.com/konDeichmann))
+
+**Deprecated**
+- Deprecate methods [SDK-2749] [\#499](https://github.com/auth0/Auth0.swift/pull/499) ([Widcket](https://github.com/Widcket))
+
 ## [1.35.0](https://github.com/auth0/Auth0.swift/tree/1.35.0) (2021-07-19)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.34.0...1.35.0)
 
