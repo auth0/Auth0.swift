@@ -183,6 +183,21 @@ public struct CredentialsManager {
             self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
         }
     }
+    
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, headers: [String: String] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+        guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
+        if #available(iOS 9.0, macOS 10.15, *), let bioAuth = self.bioAuth {
+            guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
+            bioAuth.validateBiometric {
+                guard $0 == nil else {
+                    return callback(.touchFailed($0!), nil)
+                }
+                self.retrieveCredentials(withScope: scope, minTTL: minTTL, headers: headers, callback: callback)
+            }
+        } else {
+            self.retrieveCredentials(withScope: scope, minTTL: minTTL, headers: headers, callback: callback)
+        }
+    }
     #else
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
@@ -232,6 +247,41 @@ public struct CredentialsManager {
                     callback(.failedRefresh(error), nil)
                 }
             }
+    }
+    
+    private func retrieveCredentials(withScope scope: String?, minTTL: Int, headers: [String: String] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+        guard let data = self.storage.data(forKey: self.storeKey),
+              let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return callback(.noCredentials, nil) }
+        guard let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
+        guard self.hasExpired(credentials) ||
+                self.willExpire(credentials, within: minTTL) ||
+                self.hasScopeChanged(credentials, from: scope) else { return callback(nil, credentials) }
+        guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
+        
+        self.authentication.renew(withRefreshToken: refreshToken, scope: scope, headers: headers).start {
+            switch $0 {
+                case .success(let credentials):
+                    let newCredentials = Credentials(accessToken: credentials.accessToken,
+                                                     tokenType: credentials.tokenType,
+                                                     idToken: credentials.idToken,
+                                                     refreshToken: credentials.refreshToken ?? refreshToken,
+                                                     expiresIn: credentials.expiresIn,
+                                                     scope: credentials.scope)
+                    if self.willExpire(newCredentials, within: minTTL) {
+                        let accessTokenLifetime = Int(expiresIn.timeIntervalSinceNow)
+                        // TODO: On the next major add a new case to CredentialsManagerError
+                        let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
+                                            code: -99999,
+                                            userInfo: nil)
+                        callback(.failedRefresh(error), nil)
+                    } else {
+                        _ = self.store(credentials: newCredentials)
+                        callback(nil, newCredentials)
+                    }
+                case .failure(let error):
+                    callback(.failedRefresh(error), nil)
+            }
+        }
     }
 
     func willExpire(_ credentials: Credentials, within ttl: Int) -> Bool {

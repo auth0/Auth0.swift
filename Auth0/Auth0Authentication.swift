@@ -420,6 +420,24 @@ struct Auth0Authentication: Authentication {
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
+    
+    func renew(withRefreshToken refreshToken: String, scope: String? = nil, headers: [String: String] = [:]) -> Request<Credentials, AuthenticationError> {
+        var payload: [String: Any] = [
+            "refresh_token": refreshToken,
+            "grant_type": "refresh_token",
+            "client_id": self.clientId
+        ]
+        payload["scope"] = scope
+        let oauthToken = URL(string: "/oauth/token", relativeTo: self.url)!
+        return Request(session: session,
+                       url: oauthToken,
+                       method: "POST",
+                       handle: authenticationObject,
+                       payload: payload,
+                       headers: headers,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
 
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError> {
         let payload: [String: Any] = [

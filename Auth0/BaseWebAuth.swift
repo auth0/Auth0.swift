@@ -42,6 +42,7 @@ class BaseWebAuth: WebAuthenticatable {
     private(set) var organization: String?
     private(set) var invitationURL: URL?
     private var responseType: [ResponseType] = [.code]
+    private(set) var additionalHeaders: [String: String] = [:]
     private var nonce: String?
     private var maxAge: Int?
 
@@ -91,6 +92,11 @@ class BaseWebAuth: WebAuthenticatable {
 
     func parameters(_ parameters: [String: String]) -> Self {
         parameters.forEach { self.parameters[$0] = $1 }
+        return self
+    }
+    
+    func additionalHeaders(_ headers: [String: String]) -> Self {
+        headers.forEach { self.additionalHeaders[$0] = $1 }
         return self
     }
 
@@ -283,9 +289,15 @@ class BaseWebAuth: WebAuthenticatable {
         components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
         return components.url!
     }
+    
+    private func urlSessionWithAdditionalHeaders() -> URLSession {
+        let configurations = URLSessionConfiguration.default
+        configurations.httpAdditionalHeaders = self.additionalHeaders
+        return URLSession(configuration: configurations)
+    }
 
     private func handler(_ redirectURL: URL) -> OAuth2Grant {
-        var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
+        var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, session: urlSessionWithAdditionalHeaders(), telemetry: self.telemetry)
         if self.responseType.contains([.code]) { // both Hybrid and Code flow
             authentication.logger = self.logger
             return PKCE(authentication: authentication,
