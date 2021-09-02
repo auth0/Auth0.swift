@@ -101,8 +101,6 @@ Auth0
 
 3. If your app targets iOS <11, allow Auth0 to handle authentication callbacks (otherwise, skip this step). In your `AppDelegate.swift`, add the following:
 
-#### iOS
-
 ```swift
 func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
     return Auth0.resumeAuth(url)
@@ -251,9 +249,13 @@ Auth0
 
 #### Disable Single Sign On Consent Alert (iOS 13+ / macOS)
 
-To suppress the alert box, add the `useEphemeralSession()` method to the chain. This has the impact of disabling [Single Sign On (SSO)](https://auth0.com/docs/sso) on iOS 13+ and macOS, but will also not display the consent alert that otherwise shows up when SSO is enabled. It has no effect on older versions of iOS.
+This SDK uses `ASWebAuthenticationSession` under the hood to perform Web Authentication on iOS 12+ and macOS. It is Apple's current API for performing web-based authentication. By default, `ASWebAuthenticationSession` will store the Web Authentication cookies in Safari's shared cookie jar. This makes [Single Sign On (SSO)](https://auth0.com/docs/sso) possible, but it also means that `ASWebAuthenticationSession` will prompt the user for consent.
 
 ![sso-alert](./sso-alert.png)
+
+To suppress the alert box, add the `useEphemeralSession()` method to the chain. Doing so will make the SDK configure `ASWebAuthenticationSession` with `prefersEphemeralWebBrowserSession` enabled. This will disable SSO, but will also not display the consent alert that otherwise shows up when SSO is enabled. 
+
+ > `prefersEphemeralWebBrowserSession` is only available on iOS 13+ and macOS, so `useEphemeralSession()` will have no effect on older versions of iOS. For more information on `prefersEphemeralBrowserSession`, check [its documentation](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio).
 
 ```swift
 Auth0
@@ -269,6 +271,8 @@ Auth0
         }
     }
 ```
+
+If you're using `useEphemeralSession()`, you do not need to call `clearSession()` to perform logout as there will be no cookies to remove. Just deleting the credentials will suffice. 
 
 ### Credentials Management Utility
 
