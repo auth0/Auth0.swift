@@ -289,8 +289,6 @@ DEPENDENCIES
   cocoapods (~> 1.7)
   fastlane (>= 2.129.0)
   fastlane-plugin-auth0_shipper
-  mini_magick (>= 4.9.4)
-  semantic (~> 1.5)
   slather (>= 2.4.7)
 
 BUNDLED WITH
