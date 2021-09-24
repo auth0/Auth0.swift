@@ -1,4 +1,4 @@
 scheme "Auth0.iOS"
-devices ["iPhone 8"]
+devices ["iPhone 12"]
 
 clean true

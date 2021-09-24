@@ -4,23 +4,14 @@ default_platform :ios
 
 platform :ios do
 
-  desc "Installs dependencies using Carthage"
-  lane :dependencies do |options|
-    action = options[:action]
-    carthage(use_binaries: false, command: action, cache_builds: true, platform: 'iOS')
-  end
-
-  desc "Bootstrap the development environment"
-  lane :bootstrap do
-    dependencies
-  end
-
   desc "Run code linter"
   lane :lint do
   	swiftlint(
+      strict: true,
   		mode: :lint,
    		config_file: '.swiftlint.yml',
-      reporter: 'emoji'
+      reporter: 'emoji',
+      raise_if_swiftlint_error: true
   	)
   end
 
@@ -41,7 +32,6 @@ platform :ios do
   lane :pod_lint do
     pod_lib_lint(verbose: false, allow_warnings: true)
   end
-
 
   desc "Runs all the tests in a CI environment"
   lane :ci do
