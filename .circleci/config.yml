@@ -1,119 +1,137 @@
-version: 2
-jobs:
-  build-iOS-Swift-5.2:
-    macos:
-      xcode: "11.7.0"
+version: 2.1
+
+executors:
+  macos-executor:
+    parameters:
+      xcode:
+        type: string
     shell: /bin/bash --login -eo pipefail
+    macos:
+      xcode: << parameters.xcode >>
     environment:
-          LC_ALL: en_US.UTF-8
-          LANG: en_US.UTF-8
-          BUNDLE_JOBS: 4
-          BUNDLE_RETRY: 3
-          HOMEBREW_LOGS: ~/homebrew-logs
-          HOMEBREW_TEMP: ~/homebrew-temp
-          HOMEBREW_NO_AUTO_UPDATE: 1
+      LC_ALL: en_US.UTF-8
+      LANG: en_US.UTF-8
+      BUNDLE_JOBS: 4
+      BUNDLE_RETRY: 3
+      BUNDLE_PATH: vendor/bundle
+      HOMEBREW_LOGS: ~/homebrew-logs
+      HOMEBREW_TEMP: ~/homebrew-temp
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+      FL_OUTPUT_DIR: output
+      FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
+
+commands:
+  prepare:
+    parameters:
+      scheme:
+        type: string
     steps:
-      - checkout
-      - run: |
-          echo "ruby-2.7.1p83" > ~/.ruby-version
-          brew install swiftlint
-          bundle check || bundle install --without=development
-          grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
+      - restore_cache:
+          keys:
+            - << parameters.scheme >>-v1-gems-{{ checksum "Gemfile.lock" }}
       - run:
-          name: Bootstrap
-          command: bundle exec fastlane ios bootstrap
+          name: Install gems
+          command: |
+            bundle check || bundle install --without=development
+      - save_cache:
+          key: << parameters.scheme >>-v1-gems-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
       - run:
-          name: Run test suite
+          name: Install Swiftlint
+          command: brew install swiftlint
+      - run:
+          name: Save Xcode version
+          command: xcodebuild -version | tee .xcode-version
+      - restore_cache:
+          keys:
+            - << parameters.scheme >>-v1-carthage-{{ checksum "Cartfile.resolved" }}-{{ checksum ".xcode-version" }}
+      - run:
+          name: Install dependencies
+          command: carthage bootstrap --use-xcframeworks --no-use-binaries --cache-builds
+      - save_cache:
+          key: << parameters.scheme >>-v1-carthage-{{ checksum "Cartfile.resolved" }}-{{ checksum ".xcode-version" }}
+          paths:
+            - Carthage/Build
+  test-ios:
+    parameters:
+      scheme:
+        type: string
+    steps:
+      - run:
+          name: Run iOS tests
           command: bundle exec fastlane ios ci
-          environment:
-            SCHEME: Auth0.iOS
-            DEVICE: iPhone 11
-            FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
-      - run: 
+      - run:
+          name: Upload coverage report
+          command: bash <(curl -s https://codecov.io/bash) -J '<< parameters.scheme >>'
+      - run:
           name: Run pod lib lint
           command: bundle exec fastlane ios pod_lint
-      - run: |
-          slather
-          mkdir /tmp/artifacts
-          cp ./fastlane/test_output/* /tmp/artifacts/
-          cp ./cobertura.xml /tmp/artifacts/
-          bash <(curl -s https://codecov.io/bash) -J Auth0 -f ./cobertura.xml
-      - save_cache:
-          key: dependency-cache
-          paths:
-            - Carthage/Build
+      - store_test_results:
+          path: output/scan
       - store_artifacts:
-          path: /tmp/artifacts
-  build-macOS-Swift-5.2:
-    macos:
-      xcode: "11.7.0"
-    environment:
-          LC_ALL: en_US.UTF-8
-          LANG: en_US.UTF-8
-          BUNDLE_JOBS: 4
-          BUNDLE_RETRY: 3
-          HOMEBREW_LOGS: ~/homebrew-logs
-          HOMEBREW_TEMP: ~/homebrew-temp
-          HOMEBREW_NO_AUTO_UPDATE: 1
+          path: output
+  test-macos:
+    parameters:
+      scheme:
+        type: string
     steps:
-      - checkout
-      - run: |
-          echo "ruby-2.7.1p83" > ~/.ruby-version
-          brew install swiftlint
-          bundle check || bundle install --without=development
-          grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
       - run:
-          name: Bootstrap
-          command: carthage bootstrap --platform mac
-      - run: 
-          name: Setup Keychain
+          name: Run macOS tests
           command: |
-            security create-keychain -p circle cikeychain
-            security list-keychains -d user -s "/Users/distiller/Library/Keychains/xcode.keychain-db" /Users/distiller/Library/Keychains/cikeychain-db
-            security default-keychain -s /Users/distiller/Library/Keychains/cikeychain-db
-            security unlock-keychain -p circle "/Users/distiller/Library/Keychains/cikeychain-db"
-      - run:
-          name: Run test suite
-          command: |
-            xcodebuild test -scheme Auth0.macOS -destination 'platform=macOS,arch=x86_64' | xcpretty
+            xcodebuild test -scheme << parameters.scheme >>.macOS -destination 'platform=macOS,arch=x86_64' | xcpretty
             swift test
-      - save_cache:
-          key: dependency-cache
-          paths:
-            - Carthage/Build
-  build-tvOS-Swift-5.2:
-    macos:
-      xcode: "11.7.0"
-    environment:
-          LC_ALL: en_US.UTF-8
-          LANG: en_US.UTF-8
-          BUNDLE_JOBS: 4
-          BUNDLE_RETRY: 3
-          HOMEBREW_LOGS: ~/homebrew-logs
-          HOMEBREW_TEMP: ~/homebrew-temp
-          HOMEBREW_NO_AUTO_UPDATE: 1
+  test-tvos:
+    parameters:
+      scheme:
+        type: string
+    steps:
+      - run:
+          name: Run tvOS tests
+          command: xcodebuild test -scheme << parameters.scheme >>.tvOS -destination 'platform=tvOS Simulator,name=Apple TV' | xcpretty
+
+jobs:
+  build-and-test:
+    parameters:
+      platform:
+        type: string
+      xcode:
+        type: string
+      scheme:
+        type: string
+    executor:
+      name: macos-executor
+      xcode: << parameters.xcode >>
     steps:
       - checkout
-      - run: |
-          echo "ruby-2.7.1p83" > ~/.ruby-version
-          brew install swiftlint
-          bundle check || bundle install --without=development
-          grep -lR "shouldUseLaunchSchemeArgsEnv" *.* --null | xargs -0 sed -i '' -e 's/shouldUseLaunchSchemeArgsEnv = "YES"/shouldUseLaunchSchemeArgsEnv = "YES" codeCoverageEnabled = "YES"/g'
-      - run:
-          name: Bootstrap
-          command: carthage bootstrap --platform tvOS
-      - run:
-          name: Run test suite
-          command: xcodebuild test -scheme Auth0.tvOS -destination 'platform=tvOS Simulator,name=Apple TV' | xcpretty
-      - save_cache:
-          key: dependency-cache
-          paths:
-            - Carthage/Build
+      - prepare:
+          scheme: << parameters.scheme >>
+      - when:
+          condition:
+            equal: [ios, << parameters.platform >>]
+          steps:
+            - test-ios:
+                scheme: << parameters.scheme >>
+      - when:
+          condition:
+            equal: [macos, << parameters.platform >>]
+          steps:
+            - test-macos:
+                scheme: << parameters.scheme >>
+      - when:
+          condition:
+            equal: [tvos, << parameters.platform >>]
+          steps:
+            - test-tvos:
+                scheme: << parameters.scheme >>
 
 workflows:
-  version: 2
   build:
     jobs:
-      -  build-iOS-Swift-5.2
-      -  build-macOS-Swift-5.2
-      -  build-tvOS-Swift-5.2
+      - build-and-test:
+          scheme: "Auth0"
+          matrix:
+            parameters:
+              platform: ["ios", "macos", "tvos"]
+              xcode: ["13.0.0", "12.5.1"]

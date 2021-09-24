@@ -7,7 +7,6 @@ platform :ios do
   desc "Run code linter"
   lane :lint do
   	swiftlint(
-      strict: true,
   		mode: :lint,
    		config_file: '.swiftlint.yml',
       reporter: 'emoji',
