@@ -115,6 +115,8 @@
 		5C4F553123C9123000C89615 /* CryptoExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552D23C9123000C89615 /* CryptoExtensions.swift */; };
 		5C4F553523C9124200C89615 /* JWKSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F553423C9124200C89615 /* JWKSpec.swift */; };
 		5C4F553A23C9125600C89615 /* JWTAlgorithmSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F553923C9125600C89615 /* JWTAlgorithmSpec.swift */; };
+		5C53A7E92703A23200A7C0A3 /* UserInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */; };
+		5C53A7EA2703A23300A7C0A3 /* UserInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */; };
 		5CB41D4023D0BA2C00074024 /* IDTokenValidatorContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3C23D0BA2C00074024 /* IDTokenValidatorContext.swift */; };
 		5CB41D4423D0BA2C00074024 /* IDTokenSignatureValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3D23D0BA2C00074024 /* IDTokenSignatureValidator.swift */; };
 		5CB41D4823D0BA2C00074024 /* IDTokenValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3E23D0BA2C00074024 /* IDTokenValidator.swift */; };
@@ -1926,6 +1928,7 @@
 				5CE775A2244FCF2000D054A0 /* Generators.swift in Sources */,
 				5CE775AF244FD66D00D054A0 /* OAuth2GrantSpec.swift in Sources */,
 				5FD255B21D14A9E000387ECB /* AuthenticationErrorSpec.swift in Sources */,
+				5C53A7E92703A23200A7C0A3 /* UserInfoSpec.swift in Sources */,
 				5FADB60A1CED500900D4BB50 /* ManagementSpec.swift in Sources */,
 				5F28B4681D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
@@ -2031,6 +2034,7 @@
 				5F331B0F1D4BB80700AE4382 /* Responses.swift in Sources */,
 				5B6EE39620F8AEDB00264AC7 /* CredentialsManagerSpec.swift in Sources */,
 				5F331B061D4BB7DA00AE4382 /* CredentialsSpec.swift in Sources */,
+				5C53A7EA2703A23300A7C0A3 /* UserInfoSpec.swift in Sources */,
 				5F331B0B1D4BB7F900AE4382 /* UserPatchAttributesSpec.swift in Sources */,
 				5F331B051D4BB7D400AE4382 /* AuthenticationSpec.swift in Sources */,
 				5F28B4691D8300D50000EB23 /* LoggerSpec.swift in Sources */,

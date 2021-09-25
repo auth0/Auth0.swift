@@ -61,7 +61,38 @@ commands:
     steps:
       - run:
           name: Run iOS tests
-          command: bundle exec fastlane ios ci
+          command: |
+            if [ $(xcodebuild -version | awk '/Xcode/ { print $2 }' | cut -d . -f 1) -ge 13 ]; then
+              SIMULATOR='platform=iOS Simulator,name=iPhone 13'
+
+              xcodebuild test \
+              -scheme Auth0.iOS \
+              -destination "$SIMULATOR" \
+              -configuration Debug \
+              -only-testing:Auth0Tests.iOS/AuthenticationAPISpec \
+              -only-testing:Auth0Tests.iOS/AuthenticationSpec \
+              -only-testing:Auth0Tests.iOS/CredentialsManagerSpec \
+              -only-testing:Auth0Tests.iOS/IDTokenSignatureValidatorSpec \
+              -only-testing:Auth0Tests.iOS/IDTokenValidatorSpec \
+              -only-testing:Auth0Tests.iOS/NativeAuthSpec \
+              -only-testing:Auth0Tests.iOS/OAuth2GrantSpec \
+              -only-testing:Auth0Tests.iOS/UsersSpec | xcpretty
+
+              xcodebuild test \
+              -scheme Auth0.iOS \
+              -destination "$SIMULATOR" \
+              -configuration Debug \
+              -skip-testing:Auth0Tests.iOS/AuthenticationAPISpec \
+              -skip-testing:Auth0Tests.iOS/AuthenticationSpec \
+              -skip-testing:Auth0Tests.iOS/CredentialsManagerSpec \
+              -skip-testing:Auth0Tests.iOS/IDTokenSignatureValidatorSpec \
+              -skip-testing:Auth0Tests.iOS/IDTokenValidatorSpec \
+              -skip-testing:Auth0Tests.iOS/NativeAuthSpec \
+              -skip-testing:Auth0Tests.iOS/OAuth2GrantSpec \
+              -skip-testing:Auth0Tests.iOS/UsersSpec | xcpretty
+            else
+                bundle exec fastlane ios ci
+            fi
       - run:
           name: Upload coverage report
           command: bash <(curl -s https://codecov.io/bash) -J '<< parameters.scheme >>'
