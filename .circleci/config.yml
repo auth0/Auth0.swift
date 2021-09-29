@@ -69,27 +69,13 @@ commands:
               -scheme Auth0.iOS \
               -destination "$SIMULATOR" \
               -configuration Debug \
-              -only-testing:$TEST_SCHEME/AuthenticationAPISpec \
-              -only-testing:$TEST_SCHEME/AuthenticationSpec \
-              -only-testing:$TEST_SCHEME/CredentialsManagerSpec \
-              -only-testing:$TEST_SCHEME/IDTokenSignatureValidatorSpec \
-              -only-testing:$TEST_SCHEME/IDTokenValidatorSpec \
-              -only-testing:$TEST_SCHEME/NativeAuthSpec \
-              -only-testing:$TEST_SCHEME/OAuth2GrantSpec \
-              -only-testing:$TEST_SCHEME/UsersSpec | xcpretty
+              -only-testing:$TEST_SCHEME/ControllerModalPresenterSpec | xcpretty
 
               xcodebuild test \
               -scheme Auth0.iOS \
               -destination "$SIMULATOR" \
               -configuration Debug \
-              -skip-testing:$TEST_SCHEME/AuthenticationAPISpec \
-              -skip-testing:$TEST_SCHEME/AuthenticationSpec \
-              -skip-testing:$TEST_SCHEME/CredentialsManagerSpec \
-              -skip-testing:$TEST_SCHEME/IDTokenSignatureValidatorSpec \
-              -skip-testing:$TEST_SCHEME/IDTokenValidatorSpec \
-              -skip-testing:$TEST_SCHEME/NativeAuthSpec \
-              -skip-testing:$TEST_SCHEME/OAuth2GrantSpec \
-              -skip-testing:$TEST_SCHEME/UsersSpec | xcpretty
+              -skip-testing:$TEST_SCHEME/ControllerModalPresenterSpec | xcpretty
             else
                 bundle exec fastlane ios ci
             fi
