@@ -63,19 +63,18 @@ commands:
           command: |
             if [ $(xcodebuild -version | awk '/Xcode/ { print $2 }' | cut -d . -f 1) -ge 13 ]; then
               SIMULATOR='platform=iOS Simulator,name=iPhone 13'
-              TEST_SCHEME='Auth0Tests.iOS'
 
               xcodebuild test \
               -scheme Auth0.iOS \
               -destination "$SIMULATOR" \
               -configuration Debug \
-              -only-testing:$TEST_SCHEME/ControllerModalPresenterSpec | xcpretty
+              -only-testing:Auth0Tests.iOS/ControllerModalPresenterSpec | xcpretty
 
               xcodebuild test \
               -scheme Auth0.iOS \
               -destination "$SIMULATOR" \
               -configuration Debug \
-              -skip-testing:$TEST_SCHEME/ControllerModalPresenterSpec | xcpretty
+              -skip-testing:Auth0Tests.iOS/ControllerModalPresenterSpec | xcpretty
             else
                 bundle exec fastlane ios ci
             fi
