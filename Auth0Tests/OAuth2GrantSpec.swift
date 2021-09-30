@@ -145,6 +145,7 @@ class OAuth2GrantSpec: QuickSpec {
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
                     return authResponse(accessToken: token, idToken: idToken)
                 }.name = "Code Exchange Auth"
+                stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
                 waitUntil { done in
                     pkce.credentials(from: values) {
                         expect($0).to(haveCredentials(token))

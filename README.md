@@ -5,13 +5,9 @@
 [![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
 [![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
 [![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)](https://cocoadocs.org/docsets/Auth0)
-![Swift 5.3](https://img.shields.io/badge/Swift-5.3-orange.svg?style=flat-square)
+![Swift 5.5](https://img.shields.io/badge/Swift-5.5-orange.svg?style=flat-square)
 
 Swift toolkit that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api/info) functions and enables you to seamlessly integrate the Auth0 login.
-
-## Important Notices
-
-[Behaviour changes in iOS 13](https://github.com/auth0/Auth0.swift/pull/297) related to Web Authentication require that developers using Xcode 11 with this library **must** compile using Swift 5.x. This *should* be the default setting applied when updating, unless it has been manually set. However, we recommend checking that this value is set correctly.
 
 ## Table of Contents
 
@@ -28,7 +24,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 ## Requirements
 
 - iOS 9+ / macOS 10.11+ / tvOS 9.0+ / watchOS 2.0+
-- Xcode 11.4+ / 12.x
+- Xcode 12.x / 13.x
 - Swift 4.x / 5.x
 
 ## Installation
@@ -53,7 +49,7 @@ If you are using [Carthage](https://github.com/Carthage/Carthage), add the follo
 github "auth0/Auth0.swift" ~> 1.36
 ```
 
-Then run `carthage bootstrap`.
+Then run `carthage bootstrap --use-xcframeworks`.
 
 > For more information about Carthage usage, check [their official documentation](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos).
 
