@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.36.1](https://github.com/auth0/Auth0.swift/tree/1.36.1) (2021-09-30)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.36.0...1.36.1)
+
+**Changed**
+- Updated dependencies [\#505](https://github.com/auth0/Auth0.swift/pull/505) ([Widcket](https://github.com/Widcket))
+
 ## [1.36.0](https://github.com/auth0/Auth0.swift/tree/1.36.0) (2021-09-01)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.35.0...1.36.0)
 
