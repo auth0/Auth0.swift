@@ -106,7 +106,8 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
     /// When MFA code sent is invalid or expired
     public var isMultifactorTokenInvalid: Bool {
-        return self.code == "expired_token" && self.description == "mfa_token is expired" || self.code == "invalid_grant" && self.description == "Malformed mfa_token"
+        return self.code == "expired_token" && self.description == "mfa_token is expired"
+            || self.code == "invalid_grant" && self.description == "Malformed mfa_token"
     }
 
     /// When password used for SignUp does not match connection's strength requirements. More info will be available in `info`
@@ -119,7 +120,7 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
         return self.code == "invalid_password" && self.value("name") == "PasswordHistoryError"
     }
 
-    /// When Auth0 rule returns an error. The message returned by the rull will be in `description`
+    /// When Auth0 rule returns an error. The message returned by the rule will be in `description`
     public var isRuleError: Bool {
         return self.code == "unauthorized"
     }
@@ -130,6 +131,13 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
             || self.code == "invalid_grant" && self.description == "Wrong email or password."
             || self.code == "invalid_grant" && self.description == "Wrong email or verification code."
             || self.code == "invalid_grant" && self.description == "Wrong phone number or verification code."
+    }
+
+    /// When the user was deleted
+    public var isRefreshTokenDeleted: Bool {
+        return self.code == "invalid_grant"
+            && self.description == "The refresh_token was generated for a user who doesn't exist anymore."
+
     }
 
     /// When authenticating with web-based authentication and the resource server denied access per OAuth2 spec
