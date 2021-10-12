@@ -42,6 +42,7 @@ public typealias A0URLOptionsKey = UIApplicationOpenURLOptionsKey
 
  - returns: if the url was handled by an on going session or not.
  */
+@available(*, deprecated, message: "this method is not needed when targeting iOS 11+")
 public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
     return TransactionStore.shared.resume(url)
 }
@@ -56,6 +57,7 @@ public protocol WebAuth: WebAuthenticatable {
      - returns: the same WebAuth instance to allow method chaining
      */
     @available(iOS 11, *)
+    @available(*, deprecated, message: "SFSafariViewController support will be removed in the next major release")
     func useLegacyAuthentication(withStyle style: UIModalPresentationStyle) -> Self
 
 }
