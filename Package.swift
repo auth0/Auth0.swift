@@ -2,8 +2,13 @@
 
 import PackageDescription
 
-let webAuthFlag: (name: String, condition: BuildSettingCondition) = ("WEB_AUTH_PLATFORM",
-                                                                     .when(platforms: [.iOS, .macOS]))
+var webAuthPlatforms: [Platform] = [.iOS, .macOS]
+
+#if swift(>=5.5)
+webAuthPlatforms.append(.macCatalyst)
+#endif
+
+let webAuthFlag: (name: String, condition: BuildSettingCondition) = ("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms))
 let cSettings: [CSetting] = [.define(webAuthFlag.name, webAuthFlag.condition)]
 let swiftSettings: [SwiftSetting] = [.define(webAuthFlag.name, webAuthFlag.condition)]
 
