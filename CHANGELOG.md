@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.37.1](https://github.com/auth0/Auth0.swift/tree/1.37.1) (2021-10-15)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.37.0...1.37.1)
+
+**Fixed**
+- Add `Carthage/Build` to the frameworks search path [\#521](https://github.com/auth0/Auth0.swift/pull/521) ([Widcket](https://github.com/Widcket))
+- Add `.macCatalyst` to Package.swift [\#518](https://github.com/auth0/Auth0.swift/pull/518) ([Widcket](https://github.com/Widcket))
+
 ## [1.37.0](https://github.com/auth0/Auth0.swift/tree/1.37.0) (2021-10-12)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.36.0...1.37.0)
 
