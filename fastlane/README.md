@@ -36,16 +36,11 @@ Cocoapods library lint
 fastlane ios ci
 ```
 Runs all the tests in a CI environment
-### ios release_perform
+### ios release
 ```
-fastlane ios release_perform
+fastlane ios release
 ```
-Performs the prepared release by creating a tag and pushing to remote
-### ios release_publish
-```
-fastlane ios release_publish
-```
-Releases the library to CocoaPods trunk & Github Releases
+Tags the release and pushes the Podspec to CocoaPods
 
 ----
 
