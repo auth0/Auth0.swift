@@ -140,7 +140,7 @@ public protocol WebAuthenticatable: Trackable, Loggable {
 
     /// Specify the response types to be used for authentcation
     ///
-    /// - parameter response: Array of ResponseOptions
+    /// - parameter response: Array of ResponseType
     /// - returns: the same WebAuth instance to allow method chaining
     /// - warning: deprecated as the next major release will only use `code`.
     @available(*, deprecated, message: "the next major release will only use 'code'")
