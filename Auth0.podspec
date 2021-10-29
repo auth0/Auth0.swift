@@ -56,7 +56,7 @@ excluded_files = [
 
 Pod::Spec.new do |s|
   s.name             = 'Auth0'
-  s.version          = '1.37.1'
+  s.version          = '1.38.0'
   s.summary          = "Swift toolkit for Auth0 API"
   s.description      = <<-DESC
                         Auth0 API toolkit written in Swift for iOS, watchOS, tvOS & macOS apps
