@@ -140,8 +140,10 @@ public protocol WebAuthenticatable: Trackable, Loggable {
 
     /// Specify the response types to be used for authentcation
     ///
-    /// - Parameter response: Array of ResponseOptions
-    /// - Returns: the same WebAuth instance to allow method chaining
+    /// - parameter response: Array of ResponseType
+    /// - returns: the same WebAuth instance to allow method chaining
+    /// - warning: deprecated as the next major release will only use `code`.
+    @available(*, deprecated, message: "the next major release will only use 'code'")
     func responseType(_ response: [ResponseType]) -> Self
 
     /// Specify a redirect url to be used instead of a custom scheme
