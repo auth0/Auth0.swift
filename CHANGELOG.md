@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.38.0](https://github.com/auth0/Auth0.swift/tree/1.38.0) (2021-10-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.37.1...1.38.0)
+
+**Deprecated**
+- Deprecate the `responseType` Web Auth method [\#525](https://github.com/auth0/Auth0.swift/pull/525) ([Widcket](https://github.com/Widcket))
+
 ## [1.37.1](https://github.com/auth0/Auth0.swift/tree/1.37.1) (2021-10-15)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.37.0...1.37.1)
 
