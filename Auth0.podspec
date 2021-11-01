@@ -12,7 +12,6 @@ web_auth_files = [
   'Auth0/AuthTransaction.swift',
   'Auth0/AuthenticationServicesSession.swift',
   'Auth0/AuthenticationServicesSessionCallback.swift',
-  'Auth0/BaseAuthTransaction.swift',
   'Auth0/Auth0WebAuth.swift',
   'Auth0/BioAuthentication.swift',
   'Auth0/ClaimValidators.swift',
@@ -35,9 +34,7 @@ web_auth_files = [
 ]
 
 ios_files = [
-  'Auth0/ControllerModalPresenter.swift',
   'Auth0/MobileWebAuth.swift',
-  'Auth0/SafariSession.swift',
   'Auth0/UIApplication+Shared.swift'
 ]
 
