@@ -68,14 +68,6 @@ public protocol AuthResumable {
 
 }
 
-extension AuthTransaction where Self: BaseAuthTransaction {
-
-    func resume(_ url: URL) -> Bool {
-        return self.handleUrl(url)
-    }
-
-}
-
 extension AuthTransaction where Self: SessionCallbackTransaction {
 
     func resume(_ url: URL) -> Bool {

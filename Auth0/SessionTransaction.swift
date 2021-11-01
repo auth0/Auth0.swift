@@ -1,4 +1,4 @@
-// SessionTransaction.swift
+// BaseAuthTransaction.swift
 //
 // Copyright (c) 2020 Auth0 (http://auth0.com)
 //
@@ -23,23 +23,64 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-class SessionTransaction: BaseAuthTransaction {
+class SessionTransaction: NSObject, AuthTransaction {
 
+    typealias FinishTransaction = (Result<Credentials>) -> Void
+    
     var authSession: AuthSession?
+    let state: String?
+    let redirectURL: URL
+    let handler: OAuth2Grant
+    let logger: Logger?
+    let callback: FinishTransaction
 
-    override func cancel() {
-        super.cancel()
+    init(redirectURL: URL,
+         state: String? = nil,
+         handler: OAuth2Grant,
+         logger: Logger?,
+         callback: @escaping FinishTransaction) {
+        self.redirectURL = redirectURL
+        self.state = state
+        self.handler = handler
+        self.logger = logger
+        self.callback = callback
+        super.init()
+    }
+
+    func cancel() {
+        self.callback(Result.failure(WebAuthError.userCancelled))
         authSession?.cancel()
         authSession = nil
     }
 
-    override func handleUrl(_ url: URL) -> Bool {
-        if super.handleUrl(url) {
+    func handleUrl(_ url: URL) -> Bool {
+        self.logger?.trace(url: url, source: "iOS Safari")
+        if self.resume(url) {
             authSession?.cancel()
             authSession = nil
             return true
         }
         return false
+    }
+
+    private func resume(_ url: URL) -> Bool {
+        guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            self.callback(.failure(AuthenticationError(string: url.absoluteString, statusCode: 200)))
+            return false
+        }
+        let items = self.handler.values(fromComponents: components)
+        guard has(state: self.state, inItems: items) else { return false }
+        if items["error"] != nil {
+            self.callback(.failure(AuthenticationError(info: items, statusCode: 0)))
+        } else {
+            self.handler.credentials(from: items, callback: self.callback)
+        }
+        return true
+    }
+
+    private func has(state: String?, inItems items: [String: String]) -> Bool {
+        return state == nil || items["state"] == state
     }
 
 }

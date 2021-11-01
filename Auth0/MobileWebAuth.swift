@@ -92,14 +92,6 @@ public extension AuthResumable {
 
 }
 
-extension AuthTransaction where Self: BaseAuthTransaction {
-
-    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        return self.handleUrl(url)
-    }
-
-}
-
 extension AuthTransaction where Self: SessionCallbackTransaction {
 
     func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {

@@ -25,8 +25,8 @@ import Foundation
 
 class SessionCallbackTransaction: NSObject, AuthTransaction {
 
-    var state: String?
     var authSession: AuthSession?
+    var state: String?
     let callback: (Bool) -> Void
 
     init(callback: @escaping (Bool) -> Void) {

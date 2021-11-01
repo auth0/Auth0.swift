@@ -36,10 +36,10 @@ private let Issuer = "\(Domain.absoluteString)/"
 private let Leeway = 60 * 1000
 private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 
-class BaseAuthTransactionSpec: QuickSpec {
+class SessionTransactionSpec: QuickSpec {
 
     override func spec() {
-        var transaction: BaseAuthTransaction!
+        var transaction: SessionTransaction!
         var result: Result<Credentials>? = nil
         let callback: (Result<Credentials>) -> () = { result = $0 }
         let authentication = Auth0Authentication(clientId: ClientId, url: Domain)
@@ -55,7 +55,7 @@ class BaseAuthTransactionSpec: QuickSpec {
         let code = "123456"
 
         beforeEach {
-            transaction = BaseAuthTransaction(redirectURL: RedirectURL,
+            transaction = SessionTransaction(redirectURL: RedirectURL,
                                               state: "state",
                                               handler: handler,
                                               logger: nil,
