@@ -22,12 +22,7 @@
 
 #if os(macOS)
 import Cocoa
-#if canImport(AuthenticationServices)
 import AuthenticationServices
-#endif
-
-public typealias WebAuth = WebAuthenticatable
-typealias Auth0WebAuth = DesktopWebAuth
 
 /**
  Resumes the current Auth session (if any).
@@ -39,21 +34,6 @@ typealias Auth0WebAuth = DesktopWebAuth
 public func resumeAuth(_ urls: [URL]) {
     guard let url = urls.first else { return }
     _ = TransactionStore.shared.resume(url)
-}
-
-final class DesktopWebAuth: BaseWebAuth {
-
-    init(clientId: String,
-         url: URL,
-         storage: TransactionStore = TransactionStore.shared,
-         telemetry: Telemetry = Telemetry()) {
-        super.init(platform: "macos",
-                   clientId: clientId,
-                   url: url,
-                   storage: storage,
-                   telemetry: telemetry)
-    }
-
 }
 
 public extension _ObjectiveOAuth2 {
@@ -104,8 +84,7 @@ extension AuthTransaction where Self: SessionCallbackTransaction {
 
 }
 
-#if canImport(AuthenticationServices) && swift(>=5.1)
-@available(macOS 10.15, *)
+#if swift(>=5.1)
 extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
@@ -114,7 +93,6 @@ extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextP
 
 }
 
-@available(macOS 10.15, *)
 extension AuthenticationServicesSessionCallback: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {

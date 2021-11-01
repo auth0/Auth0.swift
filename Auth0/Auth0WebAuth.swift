@@ -21,11 +21,9 @@
 // THE SOFTWARE.
 
 #if WEB_AUTH_PLATFORM
-#if canImport(AuthenticationServices)
 import AuthenticationServices
-#endif
 
-class BaseWebAuth: WebAuthenticatable {
+final class Auth0WebAuth: WebAuth {
 
     let clientId: String
     let url: URL
@@ -35,7 +33,12 @@ class BaseWebAuth: WebAuthenticatable {
     var universalLink = false
     var ephemeralSession = false
 
-    private let platform: String
+    #if os(macOS)
+    private let platform = "macos"
+    #else
+    private let platform = "ios"
+    #endif
+
     private(set) var parameters: [String: String] = [:]
     private(set) var issuer: String
     private(set) var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
@@ -55,8 +58,10 @@ class BaseWebAuth: WebAuthenticatable {
             .appendingPathComponent("callback")
     }()
 
-    init(platform: String, clientId: String, url: URL, storage: TransactionStore, telemetry: Telemetry) {
-        self.platform = platform
+    init(clientId: String,
+         url: URL,
+         storage: TransactionStore = TransactionStore.shared,
+         telemetry: Telemetry = Telemetry()) {
         self.clientId = clientId
         self.url = url
         self.storage = storage
@@ -176,37 +181,15 @@ class BaseWebAuth: WebAuthenticatable {
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
-
-        // performLogin must handle the callback
-        if let session = performLogin(authorizeURL: authorizeURL,
-                                      redirectURL: redirectURL,
-                                      state: state,
-                                      handler: handler,
-                                      callback: callback) {
-            logger?.trace(url: authorizeURL, source: String(describing: session.self))
-            self.storage.store(session)
-        }
-    }
-
-    func performLogin(authorizeURL: URL,
-                      redirectURL: URL,
-                      state: String?,
-                      handler: OAuth2Grant,
-                      callback: @escaping (Result<Credentials>) -> Void) -> AuthTransaction? {
-        #if canImport(AuthenticationServices)
-        if #available(iOS 12.0, macOS 10.15, *) {
-            return AuthenticationServicesSession(authorizeURL: authorizeURL,
-                                                 redirectURL: redirectURL,
-                                                 state: state,
-                                                 handler: handler,
-                                                 logger: self.logger,
-                                                 ephemeralSession: self.ephemeralSession,
-                                                 callback: callback)
-        }
-        #endif
-        // TODO: On the next major add a new case to WebAuthError
-        callback(.failure(WebAuthError.unknownError))
-        return nil
+        let session = AuthenticationServicesSession(authorizeURL: authorizeURL,
+                                                    redirectURL: redirectURL,
+                                                    state: state,
+                                                    handler: handler,
+                                                    logger: self.logger,
+                                                    ephemeralSession: self.ephemeralSession,
+                                                    callback: callback)
+        logger?.trace(url: authorizeURL, source: String(describing: session.self))
+        self.storage.store(session)
     }
 
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void) {
@@ -224,28 +207,10 @@ class BaseWebAuth: WebAuthenticatable {
             return callback(false)
         }
 
-        // performLogout must handle the callback
-        if let session = performLogout(logoutURL: logoutURL,
-                                       redirectURL: redirectURL,
-                                       federated: federated,
-                                       callback: callback) {
-            self.storage.store(session)
-        }
-    }
-
-    func performLogout(logoutURL: URL,
-                       redirectURL: URL,
-                       federated: Bool,
-                       callback: @escaping (Bool) -> Void) -> AuthTransaction? {
-        #if canImport(AuthenticationServices)
-        if #available(iOS 12.0, macOS 10.15, *) {
-            return AuthenticationServicesSessionCallback(url: logoutURL,
-                                                         schemeURL: redirectURL,
-                                                         callback: callback)
-        }
-        #endif
-        callback(false)
-        return nil
+        let session = AuthenticationServicesSessionCallback(url: logoutURL,
+                                                            schemeURL: redirectURL,
+                                                            callback: callback)
+        self.storage.store(session)
     }
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,

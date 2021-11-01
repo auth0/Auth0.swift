@@ -5,7 +5,6 @@ web_auth_files = [
   'Auth0/ObjectiveC/A0RSA.m',
   'Auth0/ObjectiveC/A0SHA.h',
   'Auth0/ObjectiveC/A0SHA.m',
-  'Auth0/A0SimpleKeychain+RSAPublicKey.swift',
   'Auth0/Array+Encode.swift',
   'Auth0/AuthCancelable.swift',
   'Auth0/AuthProvider.swift',
@@ -14,7 +13,7 @@ web_auth_files = [
   'Auth0/AuthenticationServicesSession.swift',
   'Auth0/AuthenticationServicesSessionCallback.swift',
   'Auth0/BaseAuthTransaction.swift',
-  'Auth0/BaseWebAuth.swift',
+  'Auth0/Auth0WebAuth.swift',
   'Auth0/BioAuthentication.swift',
   'Auth0/ClaimValidators.swift',
   'Auth0/IDTokenSignatureValidator.swift',
@@ -30,7 +29,7 @@ web_auth_files = [
   'Auth0/SessionCallbackTransaction.swift',
   'Auth0/SessionTransaction.swift',
   'Auth0/TransactionStore.swift',
-  'Auth0/WebAuthenticatable.swift',
+  'Auth0/WebAuth.swift',
   'Auth0/WebAuthError.swift',
   'Auth0/_ObjectiveWebAuth.swift'
 ]
@@ -39,7 +38,6 @@ ios_files = [
   'Auth0/ControllerModalPresenter.swift',
   'Auth0/MobileWebAuth.swift',
   'Auth0/SafariSession.swift',
-  'Auth0/SilentSafariViewController.swift',
   'Auth0/UIApplication+Shared.swift'
 ]
 

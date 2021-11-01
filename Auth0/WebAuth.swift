@@ -72,7 +72,7 @@ public func webAuth(clientId: String, domain: String) -> WebAuth {
 }
 
 /// WebAuth Authentication using Auth0
-public protocol WebAuthenticatable: Trackable, Loggable {
+public protocol WebAuth: Trackable, Loggable {
     var clientId: String { get }
     var url: URL { get }
     var telemetry: Telemetry { get set }
