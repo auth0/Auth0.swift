@@ -36,7 +36,6 @@ private let Issuer = "\(Domain.absoluteString)/"
 private let Leeway = 60 * 1000
 private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 
-@available(iOS 10.0, macOS 10.12, *)
 class BaseAuthTransactionSpec: QuickSpec {
 
     override func spec() {

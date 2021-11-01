@@ -20,10 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if WEB_AUTH_PLATFORM && canImport(AuthenticationServices)
+#if WEB_AUTH_PLATFORM
 import AuthenticationServices
 
-@available(iOS 12.0, macOS 10.15, *)
 final class AuthenticationServicesSession: SessionTransaction {
 
     init(authorizeURL: URL,
@@ -66,6 +65,5 @@ final class AuthenticationServicesSession: SessionTransaction {
 
 }
 
-@available(iOS 12.0, macOS 10.15, *)
 extension ASWebAuthenticationSession: AuthSession {}
 #endif

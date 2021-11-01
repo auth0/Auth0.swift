@@ -32,13 +32,7 @@ extension JWK {
             let modulus = rsaModulus?.a0_decodeBase64URLSafe(),
             let exponent = rsaExponent?.a0_decodeBase64URLSafe() else { return nil }
         let encodedKey = encodeRSAPublicKey(modulus: [UInt8](modulus), exponent: [UInt8](exponent))
-        if #available(iOS 10.0, macOS 10.12, *) {
-            return generateRSAPublicKey(from: encodedKey)
-        }
-        let tag = "com.auth0.tmp.RSAPublicKey"
-        let keychain = A0SimpleKeychain()
-        guard keychain.setRSAPublicKey(data: encodedKey, forKey: tag) else { return nil }
-        return keychain.keyRefOfRSAKey(withTag: tag)?.takeRetainedValue()
+        return generateRSAPublicKey(from: encodedKey)
     }
 
     private func encodeRSAPublicKey(modulus: [UInt8], exponent: [UInt8]) -> Data {
@@ -50,7 +44,6 @@ extension JWK {
         return Data(encodedSequence)
     }
 
-    @available(iOS 10.0, macOS 10.12, *)
     private func generateRSAPublicKey(from derEncodedData: Data) -> SecKey? {
         let sizeInBits = derEncodedData.count * MemoryLayout<UInt8>.size
         let attributes: [CFString: Any] = [kSecAttrKeyType: kSecAttrKeyTypeRSA,

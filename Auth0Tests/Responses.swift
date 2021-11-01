@@ -138,15 +138,13 @@ func jwksResponse(kid: String? = Kid) -> HTTPStubsResponse {
                                          "kid": kid]]]
 
     #if WEB_AUTH_PLATFORM
-    if #available(iOS 10.0, macOS 10.12, *) { // Necessary for SPM
-        let jwk = generateRSAJWK()
-        jwks = ["keys": [["alg": jwk.algorithm,
-                          "kty": jwk.keyType,
-                          "use": jwk.usage,
-                          "n": jwk.rsaModulus,
-                          "e": jwk.rsaExponent,
-                          "kid": kid]]]
-    }
+    let jwk = generateRSAJWK()
+    jwks = ["keys": [["alg": jwk.algorithm,
+                      "kty": jwk.keyType,
+                      "use": jwk.usage,
+                      "n": jwk.rsaModulus,
+                      "e": jwk.rsaExponent,
+                      "kid": kid]]]
     #endif
 
     return HTTPStubsResponse(jsonObject: jwks, statusCode: 200, headers: nil)

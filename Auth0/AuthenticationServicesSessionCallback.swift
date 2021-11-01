@@ -20,10 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if WEB_AUTH_PLATFORM && canImport(AuthenticationServices)
+#if WEB_AUTH_PLATFORM
 import AuthenticationServices
 
-@available(iOS 12.0, macOS 10.15, *)
 final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
 
     init(url: URL, schemeURL: URL, callback: @escaping (Bool) -> Void) {

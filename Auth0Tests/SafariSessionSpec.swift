@@ -47,7 +47,6 @@ class MockSafariViewController: SFSafariViewController {
 
 private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 
-@available(iOS 10.0, *)
 class SafariSessionSpec: QuickSpec {
 
     override func spec() {
