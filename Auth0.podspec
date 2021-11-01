@@ -56,7 +56,7 @@ excluded_files = [
 
 Pod::Spec.new do |s|
   s.name             = 'Auth0'
-  s.version          = '1.38.0'
+  s.version          = '2.0.0-beta'
   s.summary          = "Swift toolkit for Auth0 API"
   s.description      = <<-DESC
                         Auth0 API toolkit written in Swift for iOS, watchOS, tvOS & macOS apps
@@ -67,10 +67,10 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/auth0/Auth0.swift.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/auth0'
 
-  s.ios.deployment_target = '9.0'
-  s.osx.deployment_target = '10.11'
-  s.watchos.deployment_target = '2.0'
-  s.tvos.deployment_target = '9.0'
+  s.ios.deployment_target = '12.0'
+  s.osx.deployment_target = '10.15'
+  s.watchos.deployment_target = '6.2'
+  s.tvos.deployment_target = '12.0'
   s.requires_arc = true
 
   s.ios.source_files = 'Auth0/*.{swift,h,m}', 'Auth0/ObjectiveC/*.{h,m}'

@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.3
 
 import PackageDescription
 
@@ -15,7 +15,7 @@ let swiftSettings: [SwiftSetting] = [.define(webAuthFlag, webAuthCondition)]
 
 let package = Package(
     name: "Auth0",
-    platforms: [.iOS(.v9), .macOS(.v10_11), .tvOS(.v9), .watchOS(.v2)],
+    platforms: [.iOS(.v12), .macOS(.v10_15), .tvOS(.v12), .watchOS("6.2")],
     products: [.library(name: "Auth0", targets: ["Auth0"])],
     dependencies: [
         .package(name: "SimpleKeychain", url: "https://github.com/auth0/SimpleKeychain.git", .upToNextMajor(from: "0.12.0")),
@@ -29,7 +29,7 @@ let package = Package(
             name: "Auth0", 
             dependencies: ["SimpleKeychain", "JWTDecode", "Auth0ObjectiveC"], 
             path: "Auth0",
-            exclude: ["ObjectiveC"],
+            exclude: ["ObjectiveC", "Info.plist", "Info-tvOS.plist"],
             cSettings: cSettings,
             swiftSettings: swiftSettings),
         .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC", cSettings: cSettings),
@@ -42,7 +42,7 @@ let package = Package(
                 .product(name: "OHHTTPStubsSwift", package: "OHHTTPStubs")
             ],
             path: "Auth0Tests",
-            exclude: ["ObjectiveC"],
+            exclude: ["ObjectiveC", "Info.plist", "Auth0.plist"],
             cSettings: cSettings,
             swiftSettings: swiftSettings)
     ]
