@@ -182,12 +182,12 @@ final class Auth0WebAuth: WebAuth {
                                                   organization: organization,
                                                   invitation: invitation)
         let session = ASTransaction(authorizeURL: authorizeURL,
-                                                    redirectURL: redirectURL,
-                                                    state: state,
-                                                    handler: handler,
-                                                    logger: self.logger,
-                                                    ephemeralSession: self.ephemeralSession,
-                                                    callback: callback)
+                                    redirectURL: redirectURL,
+                                    state: state,
+                                    handler: handler,
+                                    logger: self.logger,
+                                    ephemeralSession: self.ephemeralSession,
+                                    callback: callback)
         logger?.trace(url: authorizeURL, source: String(describing: session.self))
         self.storage.store(session)
     }
@@ -208,8 +208,8 @@ final class Auth0WebAuth: WebAuth {
         }
 
         let session = ASCallbackTransaction(url: logoutURL,
-                                                            schemeURL: redirectURL,
-                                                            callback: callback)
+                                            schemeURL: redirectURL,
+                                            callback: callback)
         self.storage.store(session)
     }
 
