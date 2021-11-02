@@ -147,6 +147,11 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
         return self.code == "requires_verification"
     }
 
+    /// When state is missing
+    public var isStateMissing: Bool {
+        return self.info["state"] == nil
+    }
+
     /**
      Returns a value from error `info` dictionary
 
