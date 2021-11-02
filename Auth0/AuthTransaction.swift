@@ -21,6 +21,8 @@
 // THE SOFTWARE.
 
 #if WEB_AUTH_PLATFORM
+import Foundation
+
 /**
 Represents an ongoing Auth transaction with an Identity Provider (Auth0 or a third party).
 
