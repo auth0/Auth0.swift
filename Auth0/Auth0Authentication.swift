@@ -41,12 +41,12 @@ struct Auth0Authentication: Authentication {
         self.telemetry = telemetry
     }
 
-    func login(email username: String, code otp: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
-        return login(username: username, otp: otp, realm: "email", audience: audience, scope: scope, parameters: parameters)
+    func login(email username: String, code otp: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError> {
+        return login(username: username, otp: otp, realm: "email", audience: audience, scope: scope)
     }
 
-    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
-        return login(username: username, otp: otp, realm: "sms", audience: audience, scope: scope, parameters: parameters)
+    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError> {
+        return login(username: username, otp: otp, realm: "sms", audience: audience, scope: scope)
     }
 
     // swiftlint:disable:next function_parameter_count
@@ -71,8 +71,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    // swiftlint:disable:next function_parameter_count
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError> {
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "username": username,
@@ -83,9 +82,6 @@ struct Auth0Authentication: Authentication {
             ]
         payload["audience"] = audience
         payload["scope"] = scope
-        if let parameters = parameters {
-            parameters.forEach { key, value in payload[key] = value }
-        }
         return Request(session: session,
                        url: resourceOwner,
                        method: "POST",
@@ -95,7 +91,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String? = nil, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "username": username,
@@ -105,9 +101,6 @@ struct Auth0Authentication: Authentication {
         ]
         payload["audience"] = audience
         payload["scope"] = scope
-        if let parameters = parameters {
-            parameters.forEach { key, value in payload[key] = value }
-        }
         return Request(session: session,
                        url: resourceOwner,
                        method: "POST",
@@ -376,11 +369,10 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func tokenExchange(withParameters parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
-        var payload: [String: Any] = [
+    func tokenExchange() -> Request<Credentials, AuthenticationError> {
+        let payload: [String: Any] = [
             "client_id": self.clientId
-            ]
-        parameters.forEach { payload[$0] = $1 }
+        ]
         let token = URL(string: "/oauth/token", relativeTo: self.url)!
         return Request(session: session,
                        url: token,
@@ -392,12 +384,12 @@ struct Auth0Authentication: Authentication {
     }
 
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
-        return self.tokenExchange(withParameters: [
+        return self.tokenExchange().parameters([
             "code": code,
             "code_verifier": codeVerifier,
             "redirect_uri": redirectURI,
             "grant_type": "authorization_code"
-            ])
+        ])
     }
 
     func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String?, audience: String?, fullName: PersonNameComponents?) -> Request<Credentials, AuthenticationError> {
@@ -467,8 +459,7 @@ struct Auth0Authentication: Authentication {
 // MARK: - Private Methods
 
 private extension Auth0Authentication {
-    // swiftlint:disable:next function_parameter_count
-    func login(username: String, otp: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
+    func login(username: String, otp: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "/oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "username": username,
@@ -483,7 +474,6 @@ private extension Auth0Authentication {
         if let scope = scope {
             payload["scope"] = scope
         }
-        parameters.forEach { key, value in payload[key] = value }
         return Request(session: session, url: url, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
@@ -498,6 +488,6 @@ private extension Auth0Authentication {
         if let audience = audience {
             parameters["audience"] = audience
         }
-        return self.tokenExchange(withParameters: parameters)
+        return self.tokenExchange().parameters(parameters)
     }
 }
