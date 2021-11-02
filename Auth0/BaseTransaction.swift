@@ -23,10 +23,10 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-class SessionTransaction: NSObject, AuthTransaction {
+class BaseTransaction: NSObject, AuthTransaction {
 
     typealias FinishTransaction = (Result<Credentials>) -> Void
-    
+
     var authSession: AuthSession?
     let state: String?
     let redirectURL: URL
@@ -53,9 +53,9 @@ class SessionTransaction: NSObject, AuthTransaction {
         authSession = nil
     }
 
-    func handleUrl(_ url: URL) -> Bool {
+    func resume(_ url: URL) -> Bool {
         self.logger?.trace(url: url, source: "iOS Safari")
-        if self.resume(url) {
+        if self.handleURL(url) {
             authSession?.cancel()
             authSession = nil
             return true
@@ -63,7 +63,7 @@ class SessionTransaction: NSObject, AuthTransaction {
         return false
     }
 
-    private func resume(_ url: URL) -> Bool {
+    private func handleURL(_ url: URL) -> Bool {
         guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             self.callback(.failure(AuthenticationError(string: url.absoluteString, statusCode: 200)))

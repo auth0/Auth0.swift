@@ -36,10 +36,10 @@ private let Issuer = "\(Domain.absoluteString)/"
 private let Leeway = 60 * 1000
 private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 
-class SessionTransactionSpec: QuickSpec {
+class BaseTransactionSpec: QuickSpec {
 
     override func spec() {
-        var transaction: SessionTransaction!
+        var transaction: BaseTransaction!
         var result: Result<Credentials>? = nil
         let callback: (Result<Credentials>) -> () = { result = $0 }
         let authentication = Auth0Authentication(clientId: ClientId, url: Domain)
@@ -55,11 +55,11 @@ class SessionTransactionSpec: QuickSpec {
         let code = "123456"
 
         beforeEach {
-            transaction = SessionTransaction(redirectURL: RedirectURL,
-                                              state: "state",
-                                              handler: handler,
-                                              logger: nil,
-                                              callback: callback)
+            transaction = BaseTransaction(redirectURL: RedirectURL,
+                                          state: "state",
+                                          handler: handler,
+                                          logger: nil,
+                                          callback: callback)
             result = nil
             stub(condition: isToken(Domain.host!) && hasAtLeast(["code": code,
                                                                  "code_verifier": generator.verifier,
@@ -78,19 +78,19 @@ class SessionTransactionSpec: QuickSpec {
             context("handle url") {
                 it("should handle url") {
                     let url = URL(string: "https://samples.auth0.com/callback?code=\(code)&state=state")!
-                    expect(transaction.handleUrl(url)) == true
+                    expect(transaction.resume(url)) == true
                     expect(result).toEventually(haveCredentials())
                 }
 
                 it("should handle url with error") {
                     let url = URL(string: "https://samples.auth0.com/callback?error=error&error_description=description&state=state")!
-                    expect(transaction.handleUrl(url)) == true
+                    expect(transaction.resume(url)) == true
                     expect(result).toEventually(haveAuthenticationError(code: "error", description: "description"))
                 }
 
                 it("should fail to handle url without state") {
                     let url = URL(string: "https://samples.auth0.com/callback?code=\(code)")!
-                    expect(transaction.handleUrl(url)) == false
+                    expect(transaction.resume(url)) == false
                 }
             }
             

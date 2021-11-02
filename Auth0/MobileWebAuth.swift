@@ -56,53 +56,14 @@ public extension _ObjectiveOAuth2 {
      */
     @objc(resumeAuthWithURL:options:)
     static func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        return resumeAuth(url, options: options)
-    }
-
-}
-
-public protocol AuthResumable {
-
-    /**
-     Resumes the transaction when the third party application notifies the application using a url with a custom scheme.
-     This method should be called from the Application's `AppDelegate` or using `public func resumeAuth(_ url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool` method.
-     
-     - parameter url: the url send by the third party application that contains the result of the Auth
-     - parameter options: options received in the openUrl method of the `AppDelegate`
-
-     - returns: if the url was expected and properly formatted otherwise it will return `false`.
-    */
-    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool
-
-}
-
-public extension AuthResumable {
-
-    /**
-    Tries to resume (and complete) the OAuth2 session from the received URL
-
-    - parameter url:     url received in application's AppDelegate
-    - parameter options: a dictionary of launch options received from application's AppDelegate
-
-    - returns: `true` if the url completed (successfully or not) this session, `false` otherwise
-    */
-    func resume(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
-        return self.resume(url, options: options)
-    }
-
-}
-
-extension AuthTransaction where Self: SessionCallbackTransaction {
-
-    func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        return self.handleUrl(url)
+        return resumeAuth(url)
     }
 
 }
 
 #if swift(>=5.1)
 @available(iOS 13.0, *)
-extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextProviding {
+extension ASTransaction: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return UIApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()
@@ -111,7 +72,7 @@ extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextP
 }
 
 @available(iOS 13.0, *)
-extension AuthenticationServicesSessionCallback: ASWebAuthenticationPresentationContextProviding {
+extension ASCallbackTransaction: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return UIApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()

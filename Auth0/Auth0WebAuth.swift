@@ -181,7 +181,7 @@ final class Auth0WebAuth: WebAuth {
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
-        let session = AuthenticationServicesSession(authorizeURL: authorizeURL,
+        let session = ASTransaction(authorizeURL: authorizeURL,
                                                     redirectURL: redirectURL,
                                                     state: state,
                                                     handler: handler,
@@ -207,7 +207,7 @@ final class Auth0WebAuth: WebAuth {
             return callback(false)
         }
 
-        let session = AuthenticationServicesSessionCallback(url: logoutURL,
+        let session = ASCallbackTransaction(url: logoutURL,
                                                             schemeURL: redirectURL,
                                                             callback: callback)
         self.storage.store(session)

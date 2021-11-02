@@ -23,7 +23,7 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-class SessionCallbackTransaction: NSObject, AuthTransaction {
+class BaseCallbackTransaction: NSObject, AuthTransaction {
 
     var authSession: AuthSession?
     var state: String?
@@ -37,7 +37,7 @@ class SessionCallbackTransaction: NSObject, AuthTransaction {
         self.callback(false)
     }
 
-    func handleUrl(_ url: URL) -> Bool {
+    func resume(_ url: URL) -> Bool {
         self.callback(true)
         return true
     }

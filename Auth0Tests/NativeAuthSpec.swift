@@ -66,19 +66,11 @@ class MockNativeAuthTransaction: NativeAuthTransaction {
         self.delayed = { _ in }
     }
 
-    #if os(iOS)
-    func resume(_ url: URL, options: [A0URLOptionsKey : Any]) -> Bool {
-        self.delayed(self.onNativeAuth())
-        self.delayed = { _ in }
-        return true
-    }
-    #else
     func resume(_ url: URL) -> Bool {
         self.delayed(self.onNativeAuth())
         self.delayed = { _ in }
         return true
     }
-    #endif
 
     /// Test Hooks
     var onNativeAuth: () -> Result<NativeAuthCredentials> = {

@@ -1,4 +1,4 @@
-// AuthenticationServicesSessionCallback.swift
+// ASTransaction.swift
 //
 // Copyright (c) 2020 Auth0 (http://auth0.com)
 //
@@ -23,20 +23,39 @@
 #if WEB_AUTH_PLATFORM
 import AuthenticationServices
 
-final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
+final class ASTransaction: BaseTransaction {
 
-    init(url: URL, schemeURL: URL, callback: @escaping (Bool) -> Void) {
-        super.init(callback: callback)
+    init(authorizeURL: URL,
+         redirectURL: URL,
+         state: String? = nil,
+         handler: OAuth2Grant,
+         logger: Logger?,
+         ephemeralSession: Bool,
+         callback: @escaping FinishTransaction) {
+        super.init(redirectURL: redirectURL,
+                   state: state,
+                   handler: handler,
+                   logger: logger,
+                   callback: callback)
 
-        let authSession = ASWebAuthenticationSession(url: url,
-                                                     callbackURLScheme: schemeURL.scheme) { [weak self] url, _ in
-            self?.callback(url != nil)
-            TransactionStore.shared.clear()
+        let authSession = ASWebAuthenticationSession(url: authorizeURL,
+                                                     callbackURLScheme: self.redirectURL.scheme) { [weak self] in
+            guard $1 == nil, let callbackURL = $0 else {
+                let authError = $1 ?? WebAuthError.unknownError
+                if case ASWebAuthenticationSessionError.canceledLogin = authError {
+                    self?.callback(.failure(WebAuthError.userCancelled))
+                } else {
+                    self?.callback(.failure(authError))
+                }
+                return TransactionStore.shared.clear()
+            }
+            _ = TransactionStore.shared.resume(callbackURL)
         }
 
         #if swift(>=5.1)
         if #available(iOS 13.0, *) {
             authSession.presentationContextProvider = self
+            authSession.prefersEphemeralWebBrowserSession = ephemeralSession
         }
         #endif
 
@@ -45,4 +64,6 @@ final class AuthenticationServicesSessionCallback: SessionCallbackTransaction {
     }
 
 }
+
+extension ASWebAuthenticationSession: AuthSession {}
 #endif

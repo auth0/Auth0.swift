@@ -52,32 +52,8 @@ public extension _ObjectiveOAuth2 {
 
 }
 
-public protocol AuthResumable {
-
-    /**
-     Resumes the transaction when the third party application notifies the application using a url with a custom scheme.
-     This method should be called from the Application's `AppDelegate` or by using the `public func resumeAuth(_ urls: [URL])` method.
-     
-     - parameter url: the url sent by the third party application that contains the result of the Auth
-
-     - returns: if the url was expected and properly formatted otherwise it will return `false`.
-     - warning: deprecated as the SDK will not support macOS versions older than Catalina
-    */
-    @available(*, deprecated, message: "the SDK will not support macOS versions older than Catalina")
-    func resume(_ url: URL) -> Bool
-
-}
-
-extension AuthTransaction where Self: SessionCallbackTransaction {
-
-    func resume(_ url: URL) -> Bool {
-        return self.handleUrl(url)
-    }
-
-}
-
 #if swift(>=5.1)
-extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextProviding {
+extension ASTransaction: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return NSApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()
@@ -85,7 +61,7 @@ extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextP
 
 }
 
-extension AuthenticationServicesSessionCallback: ASWebAuthenticationPresentationContextProviding {
+extension ASCallbackTransaction: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return NSApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()

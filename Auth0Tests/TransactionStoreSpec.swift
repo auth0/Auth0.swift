@@ -116,14 +116,8 @@ class MockSession: AuthTransaction {
         self.cancelled = true
     }
 
-    #if os(iOS)
-    func resume(_ url: URL, options: [A0URLOptionsKey : Any]) -> Bool {
-        return self.resumeResult
-    }
-    #else
     func resume(_ url: URL) -> Bool {
         return self.resumeResult
     }
-    #endif
 
 }
