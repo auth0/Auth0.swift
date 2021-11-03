@@ -59,11 +59,11 @@ public protocol Authentication: Trackable, Loggable {
        .login(email: "support@auth0.com",
             code: "123456",
             audience: "https://myapi.com/api",
-            scope: "openid email")
+            scope: "openid profile email offline_access")
        .start { print($0) }
     ```
 
-    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a `Credentials` object
 
     - parameter email:             email the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via email
@@ -101,11 +101,11 @@ public protocol Authentication: Trackable, Loggable {
        .login(phoneNumber: "+4599134762367",
             code: "123456",
             audience: "https://myapi.com/api",
-            scope: "openid email")
+            scope: "openid profile email offline_access")
        .start { print($0) }
     ```
 
-    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a `Credentials` object
 
     - parameter phoneNumber:       phone number the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via sms
@@ -799,7 +799,7 @@ public extension Authentication {
        .start { print($0) }
     ```
 
-    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a `Credentials` object
 
     - parameter email:             email the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via email
@@ -831,7 +831,7 @@ public extension Authentication {
        }
     ```
 
-    You can also specify audience, scope, and additional parameters
+    You can also specify audience and scope
 
     ```
     Auth0
@@ -843,7 +843,7 @@ public extension Authentication {
        .start { print($0) }
     ```
 
-    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a`Credentials` object
 
     - parameter phoneNumber:       phone number the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via sms
