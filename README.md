@@ -25,7 +25,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 
 - iOS 12+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+
 - Xcode 12.x / 13.x
-- Swift 4.x / 5.x
+- Swift 5.3+
 
 ## Installation
 

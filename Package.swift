@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.3
 
 import PackageDescription
 
@@ -29,7 +29,7 @@ let package = Package(
             name: "Auth0", 
             dependencies: ["SimpleKeychain", "JWTDecode", "Auth0ObjectiveC"], 
             path: "Auth0",
-            exclude: ["ObjectiveC"],
+            exclude: ["ObjectiveC", "Info.plist", "Info-tvOS.plist"],
             cSettings: cSettings,
             swiftSettings: swiftSettings),
         .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC", cSettings: cSettings),
@@ -42,7 +42,7 @@ let package = Package(
                 .product(name: "OHHTTPStubsSwift", package: "OHHTTPStubs")
             ],
             path: "Auth0Tests",
-            exclude: ["ObjectiveC"],
+            exclude: ["ObjectiveC", "Info.plist", "Auth0.plist"],
             cSettings: cSettings,
             swiftSettings: swiftSettings)
     ]

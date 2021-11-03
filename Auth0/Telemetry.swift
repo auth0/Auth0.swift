@@ -100,13 +100,7 @@ public struct Telemetry {
     }
 
     static func swiftVersion() -> String {
-        #if swift(>=5.0)
         return "5.x"
-        #elseif swift(>=4.0)
-        return "4.x"
-        #elseif swift(>=3.0)
-        return "3.x"
-        #endif
     }
 
     static func osPlatform() -> String {

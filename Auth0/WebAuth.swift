@@ -187,7 +187,6 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: the same WebAuth instance to allow method chaining
     func maxAge(_ maxAge: Int) -> Self
 
-    #if swift(>=5.1)
     /**
      Disable Single Sign On (SSO) on iOS 13+ and macOS.
      Has no effect on older versions of iOS.
@@ -195,7 +194,6 @@ public protocol WebAuth: Trackable, Loggable {
      - returns: the same WebAuth instance to allow method chaining
      */
     func useEphemeralSession() -> Self
-    #endif
 
     /// Specify an invitation URL to join an organization.
     ///

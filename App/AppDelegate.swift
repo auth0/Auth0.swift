@@ -23,11 +23,7 @@
 import UIKit
 import Auth0
 
-#if swift(>=4.2)
 typealias A0ApplicationLaunchOptionsKey = UIApplication.LaunchOptionsKey
-#else
-typealias A0ApplicationLaunchOptionsKey = UIApplicationLaunchOptionsKey
-#endif
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

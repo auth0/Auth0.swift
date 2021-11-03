@@ -354,7 +354,6 @@ class WebAuthSpec: QuickSpec {
         #if os(iOS)
         describe("session") {
             
-            #if swift(>=5.1)
             context("before start") {
                 
                 it("should not use ephemeral session by default") {
@@ -366,7 +365,6 @@ class WebAuthSpec: QuickSpec {
                 }
 
             }
-            #endif
 
             context("after start") {
 
