@@ -843,7 +843,7 @@ public extension Authentication {
        .start { print($0) }
     ```
 
-    When result is `.success`, its associated value will be a`Credentials` object
+    When result is `.success`, its associated value will be a `Credentials` object
 
     - parameter phoneNumber:       phone number the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via sms
