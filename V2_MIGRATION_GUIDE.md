@@ -12,7 +12,7 @@ The deployment targets for each platform have been raised to:
 - tvOS 12.0
 - watchOS 6.2
 
-## Removed protocols
+## Protocols removed
 
 The following public protocols have been removed:
 
@@ -20,6 +20,29 @@ The following public protocols have been removed:
 - `AuthCancelable`
 
 Both have been subsumed in `AuthTransaction`.
+
+## Method signatures changed
+
+### Authentication client
+
+The following methods lost the `parameters` parameter:
+
+- `login(phoneNumber:code:audience:scope:)`
+- `login(usernameOrEmail:password:realm:audience:scope:)`
+- `loginDefaultDirectory(withUsername:password:audience:scope:)`
+- `tokenExchange()`
+
+To pass custom parameters to those (or any) method, use the `parameters()` method from `Request`:
+
+```swift
+Auth0
+    .authentication()
+    .tokenExchange() // Returns a Request
+    .parameters(["key": "value"]) // 👈🏻
+    .start { result in
+        print(result)
+    }
+```
 
 ## Title of change
 
