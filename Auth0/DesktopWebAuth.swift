@@ -22,12 +22,7 @@
 
 #if os(macOS)
 import Cocoa
-#if canImport(AuthenticationServices)
 import AuthenticationServices
-#endif
-
-public typealias WebAuth = WebAuthenticatable
-typealias Auth0WebAuth = DesktopWebAuth
 
 /**
  Resumes the current Auth session (if any).
@@ -39,21 +34,6 @@ typealias Auth0WebAuth = DesktopWebAuth
 public func resumeAuth(_ urls: [URL]) {
     guard let url = urls.first else { return }
     _ = TransactionStore.shared.resume(url)
-}
-
-final class DesktopWebAuth: BaseWebAuth {
-
-    init(clientId: String,
-         url: URL,
-         storage: TransactionStore = TransactionStore.shared,
-         telemetry: Telemetry = Telemetry()) {
-        super.init(platform: "macos",
-                   clientId: clientId,
-                   url: url,
-                   storage: storage,
-                   telemetry: telemetry)
-    }
-
 }
 
 public extension _ObjectiveOAuth2 {
@@ -72,41 +52,8 @@ public extension _ObjectiveOAuth2 {
 
 }
 
-public protocol AuthResumable {
-
-    /**
-     Resumes the transaction when the third party application notifies the application using a url with a custom scheme.
-     This method should be called from the Application's `AppDelegate` or by using the `public func resumeAuth(_ urls: [URL])` method.
-     
-     - parameter url: the url sent by the third party application that contains the result of the Auth
-
-     - returns: if the url was expected and properly formatted otherwise it will return `false`.
-     - warning: deprecated as the SDK will not support macOS versions older than Catalina
-    */
-    @available(*, deprecated, message: "the SDK will not support macOS versions older than Catalina")
-    func resume(_ url: URL) -> Bool
-
-}
-
-extension AuthTransaction where Self: BaseAuthTransaction {
-
-    func resume(_ url: URL) -> Bool {
-        return self.handleUrl(url)
-    }
-
-}
-
-extension AuthTransaction where Self: SessionCallbackTransaction {
-
-    func resume(_ url: URL) -> Bool {
-        return self.handleUrl(url)
-    }
-
-}
-
-#if canImport(AuthenticationServices) && swift(>=5.1)
-@available(macOS 10.15, *)
-extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextProviding {
+#if swift(>=5.1)
+extension ASTransaction: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return NSApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()
@@ -114,8 +61,7 @@ extension AuthenticationServicesSession: ASWebAuthenticationPresentationContextP
 
 }
 
-@available(macOS 10.15, *)
-extension AuthenticationServicesSessionCallback: ASWebAuthenticationPresentationContextProviding {
+extension ASCallbackTransaction: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return NSApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()

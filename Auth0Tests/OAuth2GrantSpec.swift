@@ -30,7 +30,6 @@ import Auth0ObjectiveC
 
 @testable import Auth0
 
-@available(iOS 10.0, macOS 10.12, *)
 class OAuth2GrantSpec: QuickSpec {
 
     override func spec() {

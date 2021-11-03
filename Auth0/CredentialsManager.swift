@@ -71,7 +71,6 @@ public struct CredentialsManager {
     ///   - fallbackTitle: fallback message to display in TouchID prompt after a failed match
     #if WEB_AUTH_PLATFORM
     @available(*, deprecated, message: "see enableBiometrics(withTitle title:, cancelTitle:, fallbackTitle:)")
-    @available(iOS 9.0, macOS 10.15, *)
     public mutating func enableTouchAuth(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
         self.enableBiometrics(withTitle: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
@@ -85,7 +84,6 @@ public struct CredentialsManager {
     ///   - cancelTitle: cancel message to display when Touch ID is used (iOS 10+)
     ///   - fallbackTitle: fallback message to display when Touch ID is used after a failed match
     ///   - evaluationPolicy: policy to be used for authentication policy evaluation
-    @available(iOS 9.0, macOS 10.15, *)
     public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil, evaluationPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics) {
         self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
@@ -171,7 +169,7 @@ public struct CredentialsManager {
     #if WEB_AUTH_PLATFORM
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
-        if #available(iOS 9.0, macOS 10.15, *), let bioAuth = self.bioAuth {
+        if let bioAuth = self.bioAuth {
             guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
             bioAuth.validateBiometric {
                 guard $0 == nil else {

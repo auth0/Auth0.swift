@@ -1,6 +1,6 @@
-// SafariSession.swift
+// ASTransaction.swift
 //
-// Copyright (c) 2016 Auth0 (http://auth0.com)
+// Copyright (c) 2020 Auth0 (http://auth0.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,37 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if os(iOS)
-import SafariServices
+#if WEB_AUTH_PLATFORM
+import AuthenticationServices
 
-final class SafariSession: BaseAuthTransaction {
+final class ASTransaction: BaseTransaction {
 
-    typealias FinishSession = (Result<Credentials>) -> Void
-
-    weak var controller: UIViewController?
-
-    init(controller: SFSafariViewController,
+    init(authorizeURL: URL,
          redirectURL: URL,
          state: String? = nil,
          handler: OAuth2Grant,
          logger: Logger?,
-         callback: @escaping FinishSession) {
-        self.controller = controller
+         ephemeralSession: Bool,
+         callback: @escaping FinishTransaction) {
         super.init(redirectURL: redirectURL,
                    state: state,
                    handler: handler,
                    logger: logger,
                    callback: callback)
-        controller.delegate = self
+
+        let authSession = ASWebAuthenticationSession(url: authorizeURL,
+                                                     callbackURLScheme: self.redirectURL.scheme) { [weak self] in
+            guard $1 == nil, let callbackURL = $0 else {
+                let authError = $1 ?? WebAuthError.unknownError
+                if case ASWebAuthenticationSessionError.canceledLogin = authError {
+                    self?.callback(.failure(WebAuthError.userCancelled))
+                } else {
+                    self?.callback(.failure(authError))
+                }
+                return TransactionStore.shared.clear()
+            }
+            _ = TransactionStore.shared.resume(callbackURL)
+        }
+
+        #if swift(>=5.1)
+        if #available(iOS 13.0, *) {
+            authSession.presentationContextProvider = self
+            authSession.prefersEphemeralWebBrowserSession = ephemeralSession
+        }
+        #endif
+
+        self.authSession = authSession
+        authSession.start()
     }
 
 }
 
-extension SafariSession: SFSafariViewControllerDelegate {
-
-    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        TransactionStore.shared.cancel(self)
-    }
-
-}
+extension ASWebAuthenticationSession: AuthSession {}
 #endif
