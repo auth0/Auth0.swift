@@ -132,21 +132,8 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     }
                 }
                 
-                it("should validate a token signed with HS256") {
-                    let jwt = generateJWT(alg: "HS256")
-                    
-                    waitUntil { done in
-                        validate(idToken: jwt.string,
-                                 with: validatorContext,
-                                 claimsValidator: mockClaimsValidator) { error in
-                            expect(error).to(beNil())
-                            done()
-                        }
-                    }
-                }
-                
                 it("should not validate a token signed with an unsupported algorithm") {
-                    let jwt = generateJWT(alg: "ES256")
+                    let jwt = generateJWT(alg: "HS256")
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,

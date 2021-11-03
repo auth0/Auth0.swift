@@ -29,12 +29,10 @@ import Auth0ObjectiveC
 
 enum JWTAlgorithm: String {
     case rs256 = "RS256"
-    case hs256 = "HS256"
 
     var shouldVerify: Bool {
         switch self {
         case .rs256: return true
-        case .hs256: return false
         }
     }
 
@@ -49,7 +47,6 @@ enum JWTAlgorithm: String {
             guard let publicKey = jwk.rsaPublicKey, let rsa = A0RSA(key: publicKey) else { return false }
             let sha256 = A0SHA()
             return rsa.verify(sha256.hash(data), signature: signature)
-        case .hs256: return true
         }
     }
 }

@@ -57,26 +57,6 @@ class JWTAlgorithmSpec: QuickSpec {
                     expect(JWTAlgorithm.rs256.verify(jwt, using: jwk)).to(beFalse())
                 }
             }
-            
-            context("HS256") {
-                let alg = "HS256"
-                
-                it("should not verify the signature") {
-                    expect(JWTAlgorithm.hs256.shouldVerify).to(beFalse())
-                }
-                
-                it("should return true with any signature") {
-                    let jwt = generateJWT(alg: alg, signature: "abc123")
-                    
-                    expect(JWTAlgorithm.hs256.verify(jwt, using: jwk)).to(beTrue())
-                }
-                
-                it("should return false with an empty signature") {
-                    let jwt = generateJWT(alg: alg, signature: "")
-                    
-                    expect(JWTAlgorithm.hs256.verify(jwt, using: jwk)).to(beFalse())
-                }
-            }
         }
     }
 

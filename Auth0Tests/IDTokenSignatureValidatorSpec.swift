@@ -53,20 +53,8 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     }
                 }
                 
-                it("should support HS256") {
-                    let jwtString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjJ9.tbDepxpstvGdW8TC3G8zg4B6rUYAOvfzdceoH48wgRQ"
-                    let jwt = try! decode(jwt: jwtString)
-                    
-                    waitUntil { done in
-                        signatureValidator.validate(jwt) { error in
-                            expect(error).to(beNil())
-                            done()
-                        }
-                    }
-                }
-                
                 it("should not support other algorithms") {
-                    let alg = "ES256"
+                    let alg = "HS256"
                     let jwt = generateJWT(alg: alg)
                     let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: alg, expected: "RS256")
                     
