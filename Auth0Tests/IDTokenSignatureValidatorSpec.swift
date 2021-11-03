@@ -31,7 +31,6 @@ import OHHTTPStubsSwift
 
 @testable import Auth0
 
-@available(iOS 10.0, macOS 10.12, *)
 class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
     
     override func spec() {

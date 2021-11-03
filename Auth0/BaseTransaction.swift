@@ -23,12 +23,13 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-class BaseAuthTransaction: NSObject, AuthTransaction {
+class BaseTransaction: NSObject, AuthTransaction {
 
     typealias FinishTransaction = (Result<Credentials>) -> Void
 
-    let redirectURL: URL
+    var authSession: AuthSession?
     let state: String?
+    let redirectURL: URL
     let handler: OAuth2Grant
     let logger: Logger?
     let callback: FinishTransaction
@@ -48,10 +49,21 @@ class BaseAuthTransaction: NSObject, AuthTransaction {
 
     func cancel() {
         self.callback(Result.failure(WebAuthError.userCancelled))
+        authSession?.cancel()
+        authSession = nil
     }
 
-    func handleUrl(_ url: URL) -> Bool {
+    func resume(_ url: URL) -> Bool {
         self.logger?.trace(url: url, source: "iOS Safari")
+        if self.handleURL(url) {
+            authSession?.cancel()
+            authSession = nil
+            return true
+        }
+        return false
+    }
+
+    private func handleURL(_ url: URL) -> Bool {
         guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             self.callback(.failure(AuthenticationError(string: url.absoluteString, statusCode: 200)))

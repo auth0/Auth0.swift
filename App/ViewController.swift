@@ -8,9 +8,7 @@
 
 import UIKit
 import Auth0
-#if canImport(AuthenticationServices)
 import AuthenticationServices
-#endif
 
 class ViewController: UIViewController {
     

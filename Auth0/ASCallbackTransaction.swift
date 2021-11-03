@@ -1,4 +1,4 @@
-// AuthCancelable.swift
+// ASCallbackTransaction.swift
 //
 // Copyright (c) 2020 Auth0 (http://auth0.com)
 //
@@ -21,15 +21,28 @@
 // THE SOFTWARE.
 
 #if WEB_AUTH_PLATFORM
-/**
-Represents a cancelable Auth operation with an Identity Provider (Auth0 or a third party).
-*/
-public protocol AuthCancelable {
+import AuthenticationServices
 
-    /**
-     Terminates the operation and reports back that it was cancelled.
-    */
-    func cancel()
+final class ASCallbackTransaction: BaseCallbackTransaction {
+
+    init(url: URL, schemeURL: URL, callback: @escaping (Bool) -> Void) {
+        super.init(callback: callback)
+
+        let authSession = ASWebAuthenticationSession(url: url,
+                                                     callbackURLScheme: schemeURL.scheme) { [weak self] url, _ in
+            self?.callback(url != nil)
+            TransactionStore.shared.clear()
+        }
+
+        #if swift(>=5.1)
+        if #available(iOS 13.0, *) {
+            authSession.presentationContextProvider = self
+        }
+        #endif
+
+        self.authSession = authSession
+        authSession.start()
+    }
 
 }
 #endif

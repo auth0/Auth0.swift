@@ -1,4 +1,4 @@
-// A0SimpleKeychain+RSAPublicKey.swift
+// SessionCallbackTransaction.swift
 //
 // Copyright (c) 2020 Auth0 (http://auth0.com)
 //
@@ -22,21 +22,25 @@
 
 #if WEB_AUTH_PLATFORM
 import Foundation
-import SimpleKeychain
 
-extension A0SimpleKeychain {
-    func setRSAPublicKey(data: Data, forKey tag: String) -> Bool {
-        let sizeInBits = data.count * MemoryLayout<UInt8>.size
-        let query: [CFString: Any] = [kSecClass: kSecClassKey,
-                                      kSecAttrKeyType: kSecAttrKeyTypeRSA,
-                                      kSecAttrKeyClass: kSecAttrKeyClassPublic,
-                                      kSecAttrAccessible: kSecAttrAccessibleAlways,
-                                      kSecAttrKeySizeInBits: NSNumber(value: sizeInBits),
-                                      kSecAttrApplicationTag: tag,
-                                      kSecValueData: data]
-        if hasRSAKey(withTag: tag) { deleteRSAKey(withTag: tag) }
-        let result = SecItemAdd(query as CFDictionary, nil)
-        return result == errSecSuccess
+class BaseCallbackTransaction: NSObject, AuthTransaction {
+
+    var authSession: AuthSession?
+    var state: String?
+    let callback: (Bool) -> Void
+
+    init(callback: @escaping (Bool) -> Void) {
+        self.callback = callback
     }
+
+    func cancel() {
+        self.callback(false)
+    }
+
+    func resume(_ url: URL) -> Bool {
+        self.callback(true)
+        return true
+    }
+
 }
 #endif

@@ -35,13 +35,11 @@ struct BioAuthentication {
         set { self.authContext.localizedFallbackTitle = newValue }
     }
 
-    @available(iOS 10.0, macOS 10.15, *)
     var cancelTitle: String? {
         get { return self.authContext.localizedCancelTitle }
         set { self.authContext.localizedCancelTitle = newValue }
     }
 
-    @available(iOS 9.0, macOS 10.15, *)
     var available: Bool {
         return self.authContext.canEvaluatePolicy(evaluationPolicy, error: nil)
     }
@@ -50,11 +48,10 @@ struct BioAuthentication {
         self.authContext = authContext
         self.evaluationPolicy = evaluationPolicy
         self.title = title
-        if #available(iOS 10.0, macOS 10.15, *) { self.cancelTitle = cancelTitle }
+        self.cancelTitle = cancelTitle
         self.fallbackTitle = fallbackTitle
     }
 
-    @available(iOS 9.0, macOS 10.15, *)
     func validateBiometric(callback: @escaping (Error?) -> Void) {
         self.authContext.evaluatePolicy(evaluationPolicy, localizedReason: self.title) {
             guard $1 == nil else { return callback($1) }

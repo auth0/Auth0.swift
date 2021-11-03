@@ -413,51 +413,6 @@ class WebAuthSpec: QuickSpec {
 
         }
 
-        describe("safari") {
-
-            var result: Result<Credentials>?
-
-            beforeEach { result = nil }
-
-            it("should build new controller") {
-                expect(newWebAuth().newSafari(DomainURL, callback: {_ in}).0).toNot(beNil())
-            }
-
-            it("should fail if controller is not presented") {
-                let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
-                callback(.success(Credentials(json: ["access_token": "at", "token_type": "bearer"])))
-                expect(result).toEventually(beFailure())
-            }
-
-            it("should fail if user dismissed safari viewcontroller") {
-                let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
-                callback(.failure(WebAuthError.userCancelled))
-                expect(result).toEventually(beFailure())
-            }
-            
-            it("should present a default presentation style") {
-                let auth = newWebAuth().useLegacyAuthentication()
-                let controller = auth.newSafari(DomainURL, callback: { _ in }).0
-                expect(controller.modalPresentationStyle) == .fullScreen
-            }
-            
-            it("should present user overridden presentation style") {
-                let auth = newWebAuth().useLegacyAuthentication(withStyle: .overFullScreen)
-                let controller = auth.newSafari(DomainURL, callback: { _ in }).0
-                expect(controller.modalPresentationStyle) == .overFullScreen
-            }
-            
-            if #available(iOS 11.0, *) {
-                it("should present user with the .cancel dismiss button style") {
-                    let auth = newWebAuth()
-                        .useLegacyAuthentication(withStyle: .overFullScreen)
-                    let controller = auth.newSafari(DomainURL, callback: { _ in }).0
-                    
-                    expect(controller.dismissButtonStyle) == .cancel
-                }
-            }
-        }
-
         describe("logout") {
 
             context("ASWebAuthenticationSession") {
@@ -470,14 +425,12 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should launch AuthenticationServicesSessionCallback") {
-                    guard #available(iOS 12.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
                 it("should cancel AuthenticationServicesSessionCallback") {
-                    guard #available(iOS 12.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { outcome = $0 }
                     TransactionStore.shared.cancel(TransactionStore.shared.current!)
@@ -486,7 +439,6 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should resume AuthenticationServicesSessionCallback") {
-                    guard #available(iOS 12.0, *) else { return }
                     let auth = newWebAuth()
                     auth.clearSession(federated: false) { outcome = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
@@ -496,16 +448,6 @@ class WebAuthSpec: QuickSpec {
 
             }
 
-            context("SFSafariViewController") {
-
-                it("should launch silent safari viewcontroller") {
-                    let auth = newWebAuth()
-                    _ = auth.useLegacyAuthentication()
-                    auth.clearSession(federated: false) { _ in }
-                    expect(auth.presenter.topViewController is SilentSafariViewController).toNot(beNil())
-                }
-
-            }
         }
         #endif
 
