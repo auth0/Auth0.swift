@@ -42,7 +42,6 @@ extension JWTAlgorithm {
             let rsa = A0RSA(key: key)!
             
             return rsa.sign(sha256.hash(value))
-        case .hs256: return value
         }
     }
 }

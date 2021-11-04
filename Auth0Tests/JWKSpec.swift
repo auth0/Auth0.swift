@@ -74,7 +74,7 @@ class JWKSpec: QuickSpec {
                     let jwkWithInvalidAlgorithm = JWK(keyType: jwk.keyType,
                                                       keyId: jwk.keyId,
                                                       usage: jwk.usage,
-                                                      algorithm: "ES256",
+                                                      algorithm: "HS256",
                                                       certUrl: nil,
                                                       certThumbprint: nil,
                                                       certChain: nil,
