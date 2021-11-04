@@ -25,11 +25,7 @@ import UIKit
 import SafariServices
 import AuthenticationServices
 
-#if swift(>=4.2)
 public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey
-#else
-public typealias A0URLOptionsKey = UIApplicationOpenURLOptionsKey
-#endif
 
 /**
  Resumes the current Auth session (if any).
@@ -61,7 +57,6 @@ public extension _ObjectiveOAuth2 {
 
 }
 
-#if swift(>=5.1)
 @available(iOS 13.0, *)
 extension ASTransaction: ASWebAuthenticationPresentationContextProviding {
 
@@ -79,5 +74,4 @@ extension ASCallbackTransaction: ASWebAuthenticationPresentationContextProviding
     }
 
 }
-#endif
 #endif

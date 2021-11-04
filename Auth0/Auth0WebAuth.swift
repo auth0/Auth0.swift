@@ -138,12 +138,10 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    #if swift(>=5.1)
     func useEphemeralSession() -> Self {
         self.ephemeralSession = true
         return self
     }
-    #endif
 
     func invitationURL(_ invitationURL: URL) -> Self {
         self.invitationURL = invitationURL

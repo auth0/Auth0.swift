@@ -52,12 +52,10 @@ final class ASTransaction: BaseTransaction {
             _ = TransactionStore.shared.resume(callbackURL)
         }
 
-        #if swift(>=5.1)
         if #available(iOS 13.0, *) {
             authSession.presentationContextProvider = self
             authSession.prefersEphemeralWebBrowserSession = ephemeralSession
         }
-        #endif
 
         self.authSession = authSession
         authSession.start()

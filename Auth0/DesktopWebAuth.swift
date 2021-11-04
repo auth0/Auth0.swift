@@ -52,7 +52,6 @@ public extension _ObjectiveOAuth2 {
 
 }
 
-#if swift(>=5.1)
 extension ASTransaction: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
@@ -68,5 +67,4 @@ extension ASCallbackTransaction: ASWebAuthenticationPresentationContextProviding
     }
 
 }
-#endif
 #endif

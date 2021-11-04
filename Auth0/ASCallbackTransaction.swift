@@ -34,11 +34,9 @@ final class ASCallbackTransaction: BaseCallbackTransaction {
             TransactionStore.shared.clear()
         }
 
-        #if swift(>=5.1)
         if #available(iOS 13.0, *) {
             authSession.presentationContextProvider = self
         }
-        #endif
 
         self.authSession = authSession
         authSession.start()
