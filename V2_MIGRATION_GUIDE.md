@@ -12,6 +12,20 @@ The deployment targets for each platform have been raised to:
 - tvOS 12.0
 - watchOS 6.2
 
+## Supported Swift versions
+
+The minimum supported Swift version is now 5.3.
+
+## HS256 support
+
+ID Tokens signed with the HS256 algorithm are no longer allowed. 
+This is because HS256 is a symmetric algorithm, which is not suitable for public clients like mobile apps.
+The only algorithm supported now is RS256, an asymmetric algorithm.
+
+If your app is using HS256, you'll need to switch it to RS256 in the dashboard or login will fail with an error:
+
+**Your app's settings > Advanced settings > JSON Web Token (JWT) Signature Algorithm**
+
 ## Protocols removed
 
 The following public protocols have been removed:
@@ -20,6 +34,17 @@ The following public protocols have been removed:
 - `AuthCancelable`
 
 Both have been subsumed in `AuthTransaction`.
+
+## Type properties changed
+
+### Credentials class
+
+The following properties are no longer optional:
+
+- `accessToken`
+- `tokenType`
+- `expiresIn`
+- `idToken`
 
 ## Method signatures changed
 
