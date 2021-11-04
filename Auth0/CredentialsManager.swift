@@ -235,10 +235,7 @@ public struct CredentialsManager {
     }
 
     func hasExpired(_ credentials: Credentials) -> Bool {
-        if credentials.expiresIn < Date() { return true }
-        if let jwt = try? decode(jwt: credentials.idToken) { return jwt.expired }
-
-        return false
+        return credentials.expiresIn < Date()
     }
 
     func hasScopeChanged(_ credentials: Credentials, from scope: String?) -> Bool {
