@@ -321,19 +321,9 @@ class CredentialsManagerSpec: QuickSpec {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.hasExpired(credentials)).to(beFalse())
             }
-            
-            it("should not be expired when expiry of at is +1 hour and idt not expired") {
-                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ValidToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                expect(credentialsManager.hasExpired(credentials)).to(beFalse())
-            }
-            
+
             it("should be expired when expiry of at is - 1 hour") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                expect(credentialsManager.hasExpired(credentials)).to(beTrue())
-            }
-            
-            it("should be expired when expiry of at is + 1 hour and idt is expired") {
-                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.hasExpired(credentials)).to(beTrue())
             }
 
@@ -355,23 +345,17 @@ class CredentialsManagerSpec: QuickSpec {
         }
 
         describe("id token") {
-            
+
             afterEach {
                 _ = credentialsManager.clear()
             }
 
-            it("should be valid when at valid and id token valid") {
-                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ValidToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+            it("should be valid when at valid and id token expired") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid()).to(beTrue())
             }
-            
-            it("should not be valid when at valid and id token expired") {
-                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
-                expect(credentialsManager.hasValid()).to(beFalse())
-            }
-            
+
         }
 
         describe("retrieval") {
@@ -468,20 +452,6 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
                 
-                it("should yield new credentials when idToken expired") {
-                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: ExpiredToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: 10))
-                    _ = credentialsManager.store(credentials: credentials)
-                    waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials { error = $0; newCredentials = $1
-                            expect(error).to(beNil())
-                            expect(newCredentials?.accessToken) == NewAccessToken
-                            expect(newCredentials?.refreshToken) == RefreshToken
-                            expect(newCredentials?.idToken) == NewIdToken
-                            done()
-                        }
-                    }
-                }
-
                 it("should store new credentials") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -3600))
                     _ = credentialsManager.store(credentials: credentials)
