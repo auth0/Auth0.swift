@@ -31,21 +31,27 @@ import Foundation
 public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
 
     /// Token used that allows calling to the requested APIs (audience sent on Auth)
-    @objc public let accessToken: String?
+    @objc public let accessToken: String
     /// Type of the access token
-    @objc public let tokenType: String?
+    @objc public let tokenType: String
     /// When the access_token expires
-    @objc public let expiresIn: Date?
+    @objc public let expiresIn: Date
     /// If the API allows you to request new access tokens and the scope `offline_access` was included on Auth
     @objc public let refreshToken: String?
     /// Token that details the user identity after authentication
-    @objc public let idToken: String?
+    @objc public let idToken: String
     /// Granted scopes, only populated when a requested scope or scopes was not granted and Auth is OIDC Conformant
     @objc public let scope: String?
     /// MFA recovery code that the application must display to the end-user to be stored securely for future use
     @objc public let recoveryCode: String?
 
-    @objc public init(accessToken: String? = nil, tokenType: String? = nil, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Date? = nil, scope: String? = nil, recoveryCode: String? = nil) {
+    @objc public init(accessToken: String = "",
+                      tokenType: String = "",
+                      idToken: String = "",
+                      refreshToken: String? = nil,
+                      expiresIn: Date = Date(),
+                      scope: String? = nil,
+                      recoveryCode: String? = nil) {
         self.accessToken = accessToken
         self.tokenType = tokenType
         self.idToken = idToken
@@ -65,7 +71,13 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
             }
         }
 
-        self.init(accessToken: json["access_token"] as? String, tokenType: json["token_type"] as? String, idToken: json["id_token"] as? String, refreshToken: json["refresh_token"] as? String, expiresIn: expiresIn, scope: json["scope"] as? String, recoveryCode: json["recovery_code"] as? String)
+        self.init(accessToken: json["access_token"] as? String ?? "",
+                  tokenType: json["token_type"] as? String ?? "",
+                  idToken: json["id_token"] as? String ?? "",
+                  refreshToken: json["refresh_token"] as? String,
+                  expiresIn: expiresIn ?? Date(),
+                  scope: json["scope"] as? String,
+                  recoveryCode: json["recovery_code"] as? String)
     }
 
     // MARK: - NSSecureCoding
@@ -79,7 +91,13 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
         let scope = aDecoder.decodeObject(forKey: "scope")
         let recoveryCode = aDecoder.decodeObject(forKey: "recoveryCode")
 
-        self.init(accessToken: accessToken as? String, tokenType: tokenType as? String, idToken: idToken as? String, refreshToken: refreshToken as? String, expiresIn: expiresIn as? Date, scope: scope as? String, recoveryCode: recoveryCode as? String)
+        self.init(accessToken: accessToken as? String ?? "",
+                  tokenType: tokenType as? String ?? "",
+                  idToken: idToken as? String ?? "",
+                  refreshToken: refreshToken as? String,
+                  expiresIn: expiresIn as? Date ?? Date(),
+                  scope: scope as? String,
+                  recoveryCode: recoveryCode as? String)
     }
 
     public func encode(with aCoder: NSCoder) {

@@ -59,23 +59,20 @@ struct IDTokenValidator: JWTAsyncValidator {
 }
 
 enum IDTokenDecodingError: LocalizedError {
-    case missingToken
     case cannotDecode
 
     var errorDescription: String? {
         switch self {
-        case .missingToken: return "ID token is required but missing"
         case .cannotDecode: return "ID token could not be decoded"
         }
     }
 }
 
-func validate(idToken: String?,
+func validate(idToken: String,
               with context: IDTokenValidatorContext,
               signatureValidator: JWTAsyncValidator? = nil, // for testing
               claimsValidator: JWTValidator? = nil,
               callback: @escaping (LocalizedError?) -> Void) {
-    guard let idToken = idToken else { return callback(IDTokenDecodingError.missingToken) }
     guard let jwt = try? decode(jwt: idToken) else { return callback(IDTokenDecodingError.cannotDecode) }
     var claimValidators: [JWTValidator] = [IDTokenIssValidator(issuer: context.issuer),
                                            IDTokenSubValidator(),

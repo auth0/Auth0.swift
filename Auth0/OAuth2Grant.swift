@@ -154,20 +154,20 @@ struct PKCE: OAuth2Grant {
             let string = "No code found in parameters \(values)"
             return callback(.failure(AuthenticationError(string: string)))
         }
-        let idToken = values["id_token"]
+        let isFrontChannelIdTokenExpected = responseType.contains(.idToken)
+        let frontChannelIdToken = values["id_token"]
         let responseType = self.responseType
         let authentication = self.authentication
         let verifier = self.verifier
         let redirectUrlString = self.redirectURL.absoluteString
         let clientId = authentication.clientId
-        let isFrontChannelIdTokenExpected = responseType.contains(.idToken)
         let validatorContext = IDTokenValidatorContext(authentication: authentication,
                                                        issuer: self.issuer,
                                                        leeway: self.leeway,
                                                        maxAge: self.maxAge,
                                                        nonce: self.defaults["nonce"],
                                                        organization: self.organization)
-        validateFrontChannelIDToken(idToken: idToken, for: responseType, with: validatorContext) { error in
+        validateFrontChannelIDToken(idToken: frontChannelIdToken, for: responseType, with: validatorContext) { error in
             if let error = error { return callback(.failure(error)) }
             authentication
                 .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
@@ -187,7 +187,7 @@ struct PKCE: OAuth2Grant {
                         }
                         let newCredentials = Credentials(accessToken: credentials.accessToken,
                                                          tokenType: credentials.tokenType,
-                                                         idToken: idToken,
+                                                         idToken: frontChannelIdToken!,
                                                          refreshToken: credentials.refreshToken,
                                                          expiresIn: credentials.expiresIn,
                                                          scope: credentials.scope)
@@ -210,7 +210,7 @@ private func validateFrontChannelIDToken(idToken: String?,
                                          for responseType: [ResponseType],
                                          with context: IDTokenValidatorContext,
                                          callback: @escaping (LocalizedError?) -> Void) {
-    guard responseType.contains(.idToken) else { return callback(nil) }
+    guard responseType.contains(.idToken), let idToken = idToken else { return callback(nil) }
     validate(idToken: idToken, with: context) { error in
         if let error = error { return callback(error) }
         callback(nil)

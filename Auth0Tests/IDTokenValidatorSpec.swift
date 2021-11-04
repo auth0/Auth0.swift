@@ -40,23 +40,6 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
         
         describe("top level validation api") {
             
-            context("sanity checks") {
-                it("should fail to validate a nil id token") {
-                    let expectedError = IDTokenDecodingError.missingToken
-                    
-                    waitUntil { done in
-                        validate(idToken: nil,
-                                 with: validatorContext,
-                                 signatureValidator: mockSignatureValidator,
-                                 claimsValidator: mockClaimsValidator) { error in
-                            expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
-                            done()
-                        }
-                    }
-                }
-            }
-            
             context("id token decoding") {
                 let expectedError = IDTokenDecodingError.cannotDecode
                 

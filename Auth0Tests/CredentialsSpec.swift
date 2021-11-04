@@ -39,8 +39,7 @@ class CredentialsSpec: QuickSpec {
         describe("init from json") {
 
             it("should have all tokens and token_type") {
-                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken, "expires_in" : expiresIn, "scope": Scope, "recovery_code": RecoveryCode])
-                expect(credentials).toNot(beNil())
+                let credentials = Credentials(json: ["access_token": AccessToken, "id_token": IdToken, "token_type": Bearer, "refresh_token": RefreshToken, "expires_in" : expiresIn, "scope": Scope, "recovery_code": RecoveryCode])
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == Bearer
                 expect(credentials.idToken) == IdToken
@@ -50,25 +49,15 @@ class CredentialsSpec: QuickSpec {
                 expect(credentials.recoveryCode) == RecoveryCode
             }
 
-            it("should have only access_token and token_type") {
-                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer])
-                expect(credentials).toNot(beNil())
+            it("should have only access_token, id_token, and token_type") {
+                let credentials = Credentials(json: ["access_token": AccessToken, "id_token": IdToken, "token_type": Bearer])
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == Bearer
-                expect(credentials.idToken).to(beNil())
-                expect(credentials.expiresIn).to(beNil())
+                expect(credentials.idToken) == IdToken
+                expect(credentials.refreshToken).to(beNil())
+                expect(credentials.expiresIn).to(beCloseTo(Date(), within: 5))
                 expect(credentials.scope).to(beNil())
                 expect(credentials.recoveryCode).to(beNil())
-            }
-
-            it("should have id_token") {
-                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken])
-                expect(credentials.idToken) == IdToken
-            }
-
-            it("should have refresh_token") {
-                let credentials = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "refresh_token": RefreshToken])
-                expect(credentials.refreshToken) == RefreshToken
             }
 
             context("expires_in responses") {
@@ -98,30 +87,20 @@ class CredentialsSpec: QuickSpec {
                     expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
                 }
 
-                it("should be nil") {
-                    let credentials = Credentials(json: ["expires_in": "invalid"])
-                    expect(credentials.expiresIn).to(beNil())
-                }
-
-                it("should be nil") {
-                    let credentials = Credentials(json: ["expires_in": ""])
-                    expect(credentials.expiresIn).to(beNil())
-                }
-
             }
         }
 
         describe("secure coding") {
 
             it("should unarchive as credentials type") {
-                let credentialsOrig = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken, "expires_in" : expiresIn, "scope" : Scope, "recovery_code": RecoveryCode])
+                let credentialsOrig = Credentials(json: ["access_token": AccessToken, "id_token": IdToken, "token_type": Bearer, "refresh_token": RefreshToken, "expires_in" : expiresIn, "scope": Scope, "recovery_code": RecoveryCode])
                 let saveData = NSKeyedArchiver.archivedData(withRootObject: credentialsOrig)
                 let credentials = NSKeyedUnarchiver.unarchiveObject(with: saveData)
                 expect(credentials as? Credentials).toNot(beNil())
             }
 
             it("should have all properties") {
-                let credentialsOrig = Credentials(json: ["access_token": AccessToken, "token_type": Bearer, "id_token": IdToken, "refresh_token": RefreshToken, "expires_in" : expiresIn, "scope" : Scope, "recovery_code": RecoveryCode])
+                let credentialsOrig = Credentials(json: ["access_token": AccessToken, "id_token": IdToken, "token_type": Bearer, "refresh_token": RefreshToken, "expires_in" : expiresIn, "scope": Scope, "recovery_code": RecoveryCode])
                 let saveData = NSKeyedArchiver.archivedData(withRootObject: credentialsOrig)
                 let credentials = NSKeyedUnarchiver.unarchiveObject(with: saveData) as! Credentials
                 expect(credentials.accessToken) == AccessToken
@@ -132,27 +111,15 @@ class CredentialsSpec: QuickSpec {
                 expect(credentials.recoveryCode) == RecoveryCode
             }
 
-            it("should have access_token only") {
-                let credentialsOrig = Credentials(json: ["access_token": AccessToken])
+            it("should have access_token, id_token, and token_type") {
+                let credentialsOrig = Credentials(json: ["access_token": AccessToken, "id_token": IdToken, "token_type": Bearer])
                 let saveData = NSKeyedArchiver.archivedData(withRootObject: credentialsOrig)
                 let credentials = NSKeyedUnarchiver.unarchiveObject(with: saveData) as! Credentials
                 expect(credentials.accessToken) == AccessToken
-                expect(credentials.tokenType).to(beNil())
-                expect(credentials.idToken).to(beNil())
-                expect(credentials.expiresIn).to(beNil())
-                expect(credentials.scope).to(beNil())
-                expect(credentials.recoveryCode).to(beNil())
-            }
-
-            it("should have refresh_token and expires_in only") {
-                let credentialsOrig = Credentials(json: ["refresh_token": RefreshToken, "expires_in" : expiresIn])
-                let saveData = NSKeyedArchiver.archivedData(withRootObject: credentialsOrig)
-                let credentials = NSKeyedUnarchiver.unarchiveObject(with: saveData) as! Credentials
-                expect(credentials.accessToken).to(beNil())
-                expect(credentials.refreshToken) == RefreshToken
-                expect(credentials.tokenType).to(beNil())
-                expect(credentials.idToken).to(beNil())
-                expect(credentials.expiresIn).to(beCloseTo(Date(timeIntervalSinceNow: expiresIn), within: 5))
+                expect(credentials.tokenType) == Bearer
+                expect(credentials.idToken) == IdToken
+                expect(credentials.refreshToken).to(beNil())
+                expect(credentials.expiresIn).to(beCloseTo(Date(), within: 5))
                 expect(credentials.scope).to(beNil())
                 expect(credentials.recoveryCode).to(beNil())
             }

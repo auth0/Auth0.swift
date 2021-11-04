@@ -100,16 +100,6 @@ class OAuth2GrantSpec: QuickSpec {
                     }
                 }
 
-                it("should fail with no id_token") {
-                    let values = ["": ""]
-                    waitUntil { done in
-                        implicit.credentials(from: values) {
-                            expect($0).to(beFailure())
-                            done()
-                        }
-                    }
-                }
-
             }
 
         }
