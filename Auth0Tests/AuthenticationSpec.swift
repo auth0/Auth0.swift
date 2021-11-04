@@ -798,17 +798,6 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should send additional parameters") {
-                let state = UUID().uuidString
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm" : "customconnection", "state": state])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Parameter Auth"
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "customconnection", audience: "https://myapi.com/api", scope: "openid", parameters: ["state": state]).start { result in
-                        expect(result).to(haveCredentials())
-                        done()
-                    }
-                }
-            }
-
         }
         
         // MARK:- password grant type
@@ -864,18 +853,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
-            it("should send additional parameters") {
-                let state = UUID().uuidString
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "state": state])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Parameter Auth"
-                waitUntil(timeout: Timeout) { done in
-                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api", scope: "openid", parameters: ["state": state]).start { result in
-                        expect(result).to(haveCredentials())
-                        done()
-                    }
-                }
-            }
-            
+
         }
 
         describe("create user") {
@@ -1136,7 +1114,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: "https://myapi.com/api", scope: nil, parameters: [:]).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: "https://myapi.com/api", scope: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1148,7 +1126,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1160,7 +1138,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, scope: nil, parameters: [:]).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, scope: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1172,7 +1150,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: "openid profile email", parameters: [:]).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: "openid profile email").start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1184,7 +1162,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1196,48 +1174,13 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, parameters: [:]).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
                     }
                 }
-                
-                it("should include extra parameters") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["foo": "bar"])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil, parameters: ["foo": "bar"]).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should not include extra parameters if they're empty") {
-                    stub(condition: isToken(Domain) && hasAllOf(["username": SupportAtAuth0, "otp": OTP, "realm": emailRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should not include extra parameters by default") {
-                    stub(condition: isToken(Domain) && hasAllOf(["username": SupportAtAuth0, "otp": OTP, "realm": emailRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
+
             }
         }
 
@@ -1294,7 +1237,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: "https://myapi.com/api", scope: nil, parameters: [:]).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: "https://myapi.com/api", scope: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1306,7 +1249,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1318,7 +1261,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, scope: nil, parameters: [:]).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, scope: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1330,7 +1273,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: "openid profile email", parameters: [:]).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: "openid profile email").start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1342,7 +1285,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1354,48 +1297,13 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, parameters: [:]).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
                     }
                 }
-                
-                it("should include extra parameters") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["foo": "bar"])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil, parameters: ["foo": "bar"]).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should not include extra parameters if they're empty") {
-                    stub(condition: isToken(Domain) && hasAllOf(["username": Phone, "otp": OTP, "realm": smsRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil, parameters: [:]).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should not include extra parameters by default") {
-                    stub(condition: isToken(Domain) && hasAllOf(["username": Phone, "otp": OTP, "realm": smsRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
+
             }
         }
 

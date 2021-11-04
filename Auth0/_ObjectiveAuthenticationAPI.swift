@@ -52,7 +52,7 @@ public class _ObjectiveAuthenticationAPI: NSObject {
     // swiftlint:disable:next function_parameter_count
     public func login(withUsernameOrEmail username: String, password: String, realm: String, audience: String, scope: String, parameters: [String: Any]?, callback: @escaping (NSError?, Credentials?) -> Void) {
         self.authentication
-            .login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope, parameters: parameters ?? [:])
+            .login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope)
             .start(handleResult(callback: callback))
     }
 

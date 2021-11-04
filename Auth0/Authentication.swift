@@ -51,7 +51,7 @@ public protocol Authentication: Trackable, Loggable {
        }
     ```
 
-    You can also specify audience, scope, and additional parameters
+    You can also specify audience and scope
 
     ```
     Auth0
@@ -59,24 +59,22 @@ public protocol Authentication: Trackable, Loggable {
        .login(email: "support@auth0.com",
             code: "123456",
             audience: "https://myapi.com/api",
-            scope: "openid email",
-            parameters: ["state": "a random state"])
+            scope: "openid profile email offline_access")
        .start { print($0) }
     ```
 
-    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a `Credentials` object
 
     - parameter email:             email the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via email
     - parameter audience:          API Identifier that the client is requesting access to. Default is `nil`
     - parameter scope:             scope value requested when authenticating the user. Default is `openid`
-    - parameter parameters:        additional parameters that are optionally sent with the authentication request
 
     - returns: authentication request that will yield Auth0 User Credentials
     - seeAlso: Credentials
     - requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     */
-    func login(email username: String, code otp: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
+    func login(email username: String, code otp: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
     Logs in a user using a phone number and an OTP code received via sms (last part of the passwordless login flow)
@@ -95,7 +93,7 @@ public protocol Authentication: Trackable, Loggable {
        }
     ```
 
-    You can also specify audience, scope, and additional parameters
+    You can also specify audience and scope
 
     ```
     Auth0
@@ -103,24 +101,22 @@ public protocol Authentication: Trackable, Loggable {
        .login(phoneNumber: "+4599134762367",
             code: "123456",
             audience: "https://myapi.com/api",
-            scope: "openid email",
-            parameters: ["state": "a random state"])
+            scope: "openid profile email offline_access")
        .start { print($0) }
     ```
 
-    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a `Credentials` object
 
     - parameter phoneNumber:       phone number the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via sms
     - parameter audience:          API Identifier that the client is requesting access to. Default is `nil`
     - parameter scope:             scope value requested when authenticating the user. Default is `openid`
-    - parameter parameters:        additional parameters that are optionally sent with the authentication request
 
     - returns: authentication request that will yield Auth0 User Credentials
     - seeAlso: Credentials
     - requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     */
-    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
+    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs in an user using email|username and password using a Database and Passwordless connection
@@ -207,14 +203,12 @@ public protocol Authentication: Trackable, Loggable {
      - parameter realm:       domain of the realm or connection name
      - parameter audience:    API Identifier that the client is requesting access to.
      - parameter scope:       scope value requested when authenticating the user.
-     - parameter parameters:  additional parameters that are optionally sent with the authentication request
 
      - important: This only works if you have the OAuth 2.0 API Authorization flag on
      - returns: authentication request that will yield Auth0 User Credentials
      - requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
      */
-    // swiftlint:disable:next function_parameter_count
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError>
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Login using One Time Password and MFA token.
@@ -356,12 +350,11 @@ public protocol Authentication: Trackable, Loggable {
      - parameter password:    password of the user
      - parameter audience:    API Identifier that the client is requesting access to.
      - parameter scope:       scope value requested when authenticating the user.
-     - parameter parameters:  additional parameters that are optionally sent with the authentication request
      
      - important: This only works if you have the OAuth 2.0 API Authorization flag on
      - returns: authentication request that will yield Auth0 User Credentials
      */
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError>
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Creates a user in a Database connection
@@ -619,16 +612,15 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
         .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .tokenExchange(withParameters: ["key": "value"])
+        .tokenExchange()
+        .parameters(["key": "value"])
         .start { print($0) }
      ```
-
-     - parameter parameters: request parameters
 
      - returns: a request that will yield Auth0 user's credentials
      - seeAlso: exchangeCode(codeVerifier:, redirectURI:) for PKCE
      */
-    func tokenExchange(withParameters parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
+    func tokenExchange() -> Request<Credentials, AuthenticationError>
 
     /**
      Performs the last step of Proof Key for Code Exchange [RFC 7636](https://tools.ietf.org/html/rfc7636).
@@ -686,7 +678,7 @@ public protocol Authentication: Trackable, Loggable {
 
     /**
      Renew user's credentials with a refresh_token grant for `/oauth/token`
-     If you are not using OAuth 2.0 API Authorization please use `delegation(parameters:)`
+
      - parameter refreshToken: the client's refresh token
      - parameter scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during Auth.
      - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
@@ -795,7 +787,7 @@ public extension Authentication {
        }
     ```
 
-    You can also specify audience, scope, and additional parameters
+    You can also specify audience and scope
 
     ```
     Auth0
@@ -803,25 +795,23 @@ public extension Authentication {
        .login(email: "support@auth0.com",
             code: "123456",
             audience: "https://myapi.com/api",
-            scope: "openid email",
-            parameters: ["state": "a random state"])
+            scope: "openid profile email offline_access")
        .start { print($0) }
     ```
 
-    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a `Credentials` object
 
     - parameter email:             email the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via email
     - parameter audience:          API Identifier that the client is requesting access to. Default is `nil`
     - parameter scope:             scope value requested when authenticating the user. Default is `openid`
-    - parameter parameters:        additional parameters that are optionally sent with the authentication request
 
     - returns: authentication request that will yield Auth0 User Credentials
     - seeAlso: Credentials
     - requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     */
-    func login(email username: String, code otp: String, audience: String? = nil, scope: String? = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
-        return self.login(email: username, code: otp, audience: audience, scope: scope, parameters: parameters)
+    func login(email username: String, code otp: String, audience: String? = nil, scope: String? = "openid") -> Request<Credentials, AuthenticationError> {
+        return self.login(email: username, code: otp, audience: audience, scope: scope)
     }
 
     /**
@@ -841,7 +831,7 @@ public extension Authentication {
        }
     ```
 
-    You can also specify audience, scope, and additional parameters
+    You can also specify audience and scope
 
     ```
     Auth0
@@ -849,25 +839,23 @@ public extension Authentication {
        .login(phoneNumber: "+4599134762367",
             code: "123456",
             audience: "https://myapi.com/api",
-            scope: "openid email",
-            parameters: ["state": "a random state"])
+            scope: "openid profile email offline_access")
        .start { print($0) }
     ```
 
-    When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
+    When result is `.success`, its associated value will be a `Credentials` object
 
     - parameter phoneNumber:       phone number the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via sms
     - parameter audience:          API Identifier that the client is requesting access to. Default is `nil`
     - parameter scope:             scope value requested when authenticating the user. Default is `openid`
-    - parameter parameters:        additional parameters that are optionally sent with the authentication request
 
     - returns: authentication request that will yield Auth0 User Credentials
     - seeAlso: Credentials
     - requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     */
-    func login(phoneNumber username: String, code otp: String, audience: String? = nil, scope: String? = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
-        return self.login(phoneNumber: username, code: otp, audience: audience, scope: scope, parameters: parameters)
+    func login(phoneNumber username: String, code otp: String, audience: String? = nil, scope: String? = "openid") -> Request<Credentials, AuthenticationError> {
+        return self.login(phoneNumber: username, code: otp, audience: audience, scope: scope)
     }
 
     /**
@@ -930,10 +918,9 @@ public extension Authentication {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(
-             usernameOrEmail: "support@auth0.com",
-             password: "a secret password",
-             realm: "mydatabase")
+         .login(usernameOrEmail: "support@auth0.com",
+                password: "a secret password",
+                realm: "mydatabase")
      ```
 
      You can also specify audience and scope
@@ -954,12 +941,12 @@ public extension Authentication {
      - parameter realm: domain realm or connection name
      - parameter audience: API Identifier that the client is requesting access to.
      - parameter scope: scope value requested when authenticating the user.
-     - parameter parameters: additional parameters that are optionally sent with the authentication request
-     - Returns: authentication request that will yield Auth0 User Credentials
+
+     - returns: authentication request that will yield Auth0 User Credentials
      - requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
      */
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope, parameters: parameters)
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope)
     }
 
     /**
@@ -1055,13 +1042,12 @@ public extension Authentication {
      - parameter password:    password of the user
      - parameter audience:    API Identifier that the client is requesting access to.
      - parameter scope:       scope value requested when authenticating the user.
-     - parameter parameters:  additional parameters that are optionally sent with the authentication request
      
      - important: This only works if you have the OAuth 2.0 API Authorization flag on
      - returns: authentication request that will yield Auth0 User Credentials
      */
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String? = nil, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope, parameters: parameters)
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope)
     }
 
     /**
@@ -1277,8 +1263,6 @@ public extension Authentication {
         .renew(withRefreshToken: refreshToken)
         .start { print($0) }
      ```
-
-     - precondition: if you are not using OAuth 2.0 API Authorization please use `delegation(parameters:)`
 
      - parameter refreshToken: the client's refresh token
      - parameter scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during Auth.
