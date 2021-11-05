@@ -21,7 +21,7 @@ class ViewController: UIViewController {
                 }
             case .success(let credentials):
                 DispatchQueue.main.async {
-                    let token = credentials.accessToken ?? credentials.idToken
+                    let token = credentials.accessToken
                     let alert = UIAlertController(title: "Auth Success!", message: "Authorized and got a token \(String(describing: token))", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
                     self?.present(alert, animated: true, completion: nil)
@@ -48,7 +48,6 @@ class ViewController: UIViewController {
         Auth0.webAuth()
             .logging(enabled: true)
             .connection("google-oauth2")
-            .responseType([.token])
             .start(onAuth)
     }
     
@@ -56,7 +55,6 @@ class ViewController: UIViewController {
         Auth0.webAuth()
             .logging(enabled: true)
             .connection("google-oauth2")
-            .responseType([.idToken])
             .nonce("abc1234")
             .start(onAuth)
     }
@@ -65,7 +63,6 @@ class ViewController: UIViewController {
         Auth0.webAuth()
             .logging(enabled: true)
             .connection("google-oauth2")
-            .responseType([.token, .idToken])
             .nonce("abc1234")
             .start(onAuth)
     }
@@ -75,7 +72,6 @@ class ViewController: UIViewController {
             .logging(enabled: true)
             .connection("google-oauth2")
             .scope("read:entity")
-            .responseType([.code , .idToken])
             .nonce("abc1234")
             .start(onAuth)
     }

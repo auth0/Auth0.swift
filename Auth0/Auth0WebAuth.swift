@@ -17,13 +17,13 @@ final class Auth0WebAuth: WebAuth {
     private let platform = "ios"
     #endif
 
+    private let responseType = "code"
     private let requiredScope = "openid"
     private(set) var parameters: [String: String] = [:]
     private(set) var issuer: String
     private(set) var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
     private(set) var organization: String?
     private(set) var invitationURL: URL?
-    private var responseType: [ResponseType] = [.code]
     private var nonce: String?
     private var maxAge: Int?
 
@@ -78,11 +78,6 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    func responseType(_ responseType: [ResponseType]) -> Self {
-        self.responseType = responseType
-        return self
-    }
-
     func redirectURL(_ redirectURL: URL) -> Self {
         self.redirectURL = redirectURL
         return self
@@ -91,10 +86,6 @@ final class Auth0WebAuth: WebAuth {
     func nonce(_ nonce: String) -> Self {
         self.nonce = nonce
         return self
-    }
-
-    func usingImplicitGrant() -> Self {
-        return self.responseType([.token])
     }
 
     func audience(_ audience: String) -> Self {
@@ -135,9 +126,6 @@ final class Auth0WebAuth: WebAuth {
     func start(_ callback: @escaping (Result<Credentials>) -> Void) {
         guard let redirectURL = self.redirectURL else {
             return callback(Result.failure(WebAuthError.noBundleIdentifierFound))
-        }
-        if self.responseType.contains(.idToken) {
-            guard self.nonce != nil else { return callback(Result.failure(WebAuthError.noNonceProvided)) }
         }
         let handler = self.handler(redirectURL)
         let state = self.parameters["state"] ?? generateDefaultState()
@@ -199,23 +187,18 @@ final class Auth0WebAuth: WebAuth {
         var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true)!
         var items: [URLQueryItem] = []
         var entries = defaults
+
         entries["client_id"] = self.clientId
         entries["redirect_uri"] = redirectURL.absoluteString
+        entries["response_type"] = responseType
         entries["scope"] = requiredScope // TODO: Change when setting the new default scope
         entries["state"] = state
-        entries["response_type"] = self.responseType.map { $0.label! }.joined(separator: " ")
+        entries["nonce"] = nonce
+        entries["organization"] = organization
+        entries["invitation"] = invitation
 
         if let maxAge = self.maxAge {
             entries["max_age"] = String(maxAge)
-        }
-        if self.responseType.contains(.idToken) {
-            entries["nonce"] = self.nonce
-        }
-        if let organization = organization {
-            entries["organization"] = organization
-        }
-        if let invitation = invitation {
-            entries["invitation"] = invitation
         }
 
         self.parameters.forEach { entries[$0] = $1 }
@@ -232,24 +215,14 @@ final class Auth0WebAuth: WebAuth {
 
     private func handler(_ redirectURL: URL) -> OAuth2Grant {
         var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
-        if self.responseType.contains([.code]) { // both Hybrid and Code flow
-            authentication.logger = self.logger
-            return PKCE(authentication: authentication,
-                        redirectURL: redirectURL,
-                        responseType: self.responseType,
-                        issuer: self.issuer,
-                        leeway: self.leeway,
-                        maxAge: self.maxAge,
-                        nonce: self.nonce,
-                        organization: self.organization)
-        }
-        return ImplicitGrant(authentication: authentication,
-                             responseType: self.responseType,
-                             issuer: self.issuer,
-                             leeway: self.leeway,
-                             maxAge: self.maxAge,
-                             nonce: self.nonce,
-                             organization: self.organization)
+        authentication.logger = self.logger
+        return PKCE(authentication: authentication,
+                    redirectURL: redirectURL,
+                    issuer: self.issuer,
+                    leeway: self.leeway,
+                    maxAge: self.maxAge,
+                    nonce: self.nonce,
+                    organization: self.organization)
     }
 
     func generateDefaultState() -> String? {
