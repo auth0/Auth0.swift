@@ -242,8 +242,8 @@ final class Auth0WebAuth: WebAuth {
 
         self.parameters.forEach { entries[$0] = $1 }
 
-        if let scope = entries["scope"], !scope.contains(requiredScope) {
-            entries["scope"] = "\(requiredScope) \(scope)"
+        if let scope = entries["scope"]?.split(separator: " ").map(String.init), !scope.contains(requiredScope) {
+            entries["scope"] = "\(requiredScope) \(entries["scope"]!)"
         }
 
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
