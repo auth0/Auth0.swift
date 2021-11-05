@@ -50,6 +50,8 @@ The following properties are no longer optional:
 
 ### Authentication client
 
+#### Removed `parameters` parameter
+
 The following methods lost the `parameters` parameter:
 
 - `login(phoneNumber:code:audience:scope:)`
@@ -68,6 +70,10 @@ Auth0
         print(result)
     }
 ```
+
+#### Removed `channel` parameter
+
+The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `channel` parameter, which is no longer necessary.
 
 ## Title of change
 
