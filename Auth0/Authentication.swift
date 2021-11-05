@@ -257,9 +257,8 @@ public protocol Authentication: Trackable, Loggable {
     /// - Parameters:
     ///   - mfaToken: Token returned when authentication fails due to MFA requirement
     ///   - types: A list of the challenges types accepted by your application. Accepted challenge types are `oob` or `otp`. Excluding this parameter means that your client application accepts all supported challenge types
-    ///   - channel: The channel to use for OOB. Can only be provided when challenge type is `oob`. Accepted values are `sms`, `voice`, or `auth0`. Excluding this parameter means that your client application will accept all supported OOB channels
     ///   - authenticatorId: The ID of the authenticator to challenge. You can get the ID by querying the list of available authenticators for the user
-    func multifactorChallenge(mfaToken: String, types: [String]?, channel: String?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
+    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
 
     /**
     Authenticate a user with their Sign In With Apple authorization code.

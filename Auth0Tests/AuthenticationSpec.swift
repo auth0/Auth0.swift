@@ -264,14 +264,13 @@ class AuthenticationSpec: QuickSpec {
                     "mfa_token": MFAToken,
                     "client_id": ClientId,
                     "challenge_type": "oob otp",
-                    "oob_channel": OOBChannel,
                     "authenticator_id": AuthenticatorId
                     ])) { _ in return multifactorChallengeResponse(challengeType: "oob") }.name = "MFA Challenge"
             }
 
             it("should request without filters") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes, channel: OOBChannel, authenticatorId: AuthenticatorId).start { result in
+                    auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes, authenticatorId: AuthenticatorId).start { result in
                         expect(result).to(beSuccessful())
                         done()
                     }
