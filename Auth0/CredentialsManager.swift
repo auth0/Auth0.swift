@@ -57,8 +57,7 @@ public struct CredentialsManager {
     /// - Important: Access to this property will not be protected by Biometric Authentication.
     public var user: UserInfo? {
         guard let credentials = retrieveCredentials(),
-            let idToken = credentials.idToken,
-            let jwt = try? decode(jwt: idToken) else { return nil }
+              let jwt = try? decode(jwt: credentials.idToken) else { return nil }
 
         return UserInfo(json: jwt.body)
     }
@@ -196,8 +195,7 @@ public struct CredentialsManager {
     }
 
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard let credentials = retrieveCredentials(),
-              let expiresIn = credentials.expiresIn else { return callback(.noCredentials, nil) }
+        guard let credentials = retrieveCredentials() else { return callback(.noCredentials, nil) }
         guard self.hasExpired(credentials) ||
                 self.willExpire(credentials, within: minTTL) ||
                 self.hasScopeChanged(credentials, from: scope) else { return callback(nil, credentials) }
@@ -216,7 +214,7 @@ public struct CredentialsManager {
                                                      expiresIn: credentials.expiresIn,
                                                      scope: credentials.scope)
                     if self.willExpire(newCredentials, within: minTTL) {
-                        let accessTokenLifetime = Int(expiresIn.timeIntervalSinceNow)
+                        let accessTokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
                         // TODO: On the next major add a new case to CredentialsManagerError
                         let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
                                             code: -99999,
@@ -233,23 +231,11 @@ public struct CredentialsManager {
     }
 
     func willExpire(_ credentials: Credentials, within ttl: Int) -> Bool {
-        if let expiresIn = credentials.expiresIn {
-            return expiresIn < Date(timeIntervalSinceNow: TimeInterval(ttl))
-        }
-
-        return false
+        return credentials.expiresIn < Date(timeIntervalSinceNow: TimeInterval(ttl))
     }
 
     func hasExpired(_ credentials: Credentials) -> Bool {
-        if let expiresIn = credentials.expiresIn {
-            if expiresIn < Date() { return true }
-        }
-
-        if let token = credentials.idToken, let jwt = try? decode(jwt: token) {
-            return jwt.expired
-        }
-
-        return false
+        return credentials.expiresIn < Date()
     }
 
     func hasScopeChanged(_ credentials: Credentials, from scope: String?) -> Bool {
