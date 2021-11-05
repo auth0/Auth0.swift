@@ -77,7 +77,7 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
         "response_type": "code",
         "redirect_uri": RedirectURL.absoluteString,
         "scope": "openid",
-        ]
+    ]
     parameters.forEach { query[$0] = $1 }
     return query
 }
@@ -130,11 +130,24 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            it("should override default values") {
-                let url = newWebAuth()
-                    .parameters(["scope": "openid email phone"])
-                    .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
-                expect(url.a0_components?.queryItems).toNot(containItem(withName: "scope", value: "openid"))
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .parameters(["scope": "openid email phone"])
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["scope": "openid email phone"]),
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .parameters(["scope": "email phone"])
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["scope": "openid email phone"]),
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
