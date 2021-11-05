@@ -16,7 +16,7 @@ The deployment targets for each platform have been raised to:
 
 The minimum supported Swift version is now 5.3.
 
-## HS256 support
+## Supported JWT signature algorithms
 
 ID Tokens signed with the HS256 algorithm are no longer allowed. 
 This is because HS256 is a symmetric algorithm, which is not suitable for public clients like mobile apps.
@@ -37,7 +37,7 @@ Both have been subsumed in `AuthTransaction`.
 
 ## Type properties changed
 
-### Credentials class
+### `Credentials` class
 
 The following properties are no longer optional:
 
@@ -59,7 +59,7 @@ The following methods lost the `parameters` parameter:
 - `loginDefaultDirectory(withUsername:password:audience:scope:)`
 - `tokenExchange()`
 
-To pass custom parameters to those (or any) method, use the `parameters()` method from `Request`:
+To pass custom parameters to those (or any) method, use the `parameters(_:)` method from `Request`:
 
 ```swift
 Auth0
@@ -74,6 +74,21 @@ Auth0
 #### Removed `channel` parameter
 
 The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `channel` parameter, which is no longer necessary.
+
+## Behavior changes
+
+### `openid` scope enforced on Web Auth
+
+If the scopes passed via the Web Auth method `.scope(_:)` do not include the `openid` scope, it will be added automatically.
+
+```swift
+Auth0
+    .webAuth()
+    .scope("profile email") // "openid profile email" will be used
+    .start { result in
+        print(result)
+    }
+```
 
 ## Title of change
 
