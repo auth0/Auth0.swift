@@ -1,11 +1,3 @@
-//
-//  ViewController.swift
-//  OAuth2
-//
-//  Created by Hernan Zalazar on 5/25/16.
-//  Copyright © 2016 Auth0. All rights reserved.
-//
-
 import UIKit
 import Auth0
 import AuthenticationServices
