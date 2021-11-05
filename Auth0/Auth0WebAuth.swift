@@ -39,6 +39,7 @@ final class Auth0WebAuth: WebAuth {
     private let platform = "ios"
     #endif
 
+    private let requiredScope = "openid"
     private(set) var parameters: [String: String] = [:]
     private(set) var issuer: String
     private(set) var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
@@ -222,7 +223,7 @@ final class Auth0WebAuth: WebAuth {
         var entries = defaults
         entries["client_id"] = self.clientId
         entries["redirect_uri"] = redirectURL.absoluteString
-        entries["scope"] = "openid"
+        entries["scope"] = requiredScope // TODO: Change when setting the new default scope
         entries["state"] = state
         entries["response_type"] = self.responseType.map { $0.label! }.joined(separator: " ")
 
@@ -240,6 +241,10 @@ final class Auth0WebAuth: WebAuth {
         }
 
         self.parameters.forEach { entries[$0] = $1 }
+
+        if let scope = entries["scope"]?.split(separator: " ").map(String.init), !scope.contains(requiredScope) {
+            entries["scope"] = "\(requiredScope) \(entries["scope"]!)"
+        }
 
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
         components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
