@@ -35,6 +35,24 @@ The following public protocols have been removed:
 
 Both have been subsumed in `AuthTransaction`.
 
+## Metods Removed
+
+### Web Auth
+
+The SDK now only supports the [authorization code flow with PKCE](https://auth0.com/blog/oauth-2-best-practices-for-native-apps/), which is used by default. For this reason, the following methods have been removed from the Web Auth builder:
+
+- `usingImplicitGrant()`
+- `responseType(_:)`
+
+## Errors Removed
+
+### `WebAuthError` enum
+
+The following cases were removed, as they are no longer necessary:
+
+- `noNonceProvided`
+- `invalidIdTokenNonce`
+
 ## Type properties changed
 
 ### `Credentials` class
