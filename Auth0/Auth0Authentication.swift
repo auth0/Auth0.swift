@@ -145,7 +145,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func multifactorChallenge(mfaToken: String, types: [String]?, channel: String?, authenticatorId: String?) -> Request<Challenge, AuthenticationError> {
+    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError> {
         let url = URL(string: "/mfa/challenge", relativeTo: self.url)!
         var payload: [String: String] = [
             "mfa_token": mfaToken,
@@ -154,10 +154,6 @@ struct Auth0Authentication: Authentication {
 
         if let types = types {
             payload["challenge_type"] = types.joined(separator: " ")
-        }
-
-        if let channel = channel {
-            payload["oob_channel"] = channel
         }
 
         if let authenticatorId = authenticatorId {
