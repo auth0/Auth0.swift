@@ -108,6 +108,10 @@ Auth0
     }
 ```
 
+### Credentials expiration on `CredentialsManager` 
+
+The `CredentialsManager` class no longer takes into account the ID Token expiration to determine if the credentials are still valid. The only value being considered now is the Access Token expiration.
+
 ## Title of change
 
 Description of change
