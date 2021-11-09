@@ -496,7 +496,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile")
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials(withScope: nil, minTTL: 0) { error, newCredentials in
+                        credentialsManager.credentials(withScope: nil) { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == AccessToken
                             done()
@@ -508,7 +508,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile")
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials(withScope: "openid profile", minTTL: 0) { error, newCredentials in
+                        credentialsManager.credentials(withScope: "openid profile") { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == AccessToken
                             done()
@@ -520,7 +520,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile offline_access")
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials(withScope: "openid profile", minTTL: 0) { error, newCredentials in
+                        credentialsManager.credentials(withScope: "openid profile") { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == NewAccessToken
                             done()

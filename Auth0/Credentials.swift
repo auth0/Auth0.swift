@@ -2,34 +2,31 @@ import Foundation
 
 /**
  User's credentials obtained from Auth0.
- What values are available depends on what type of Auth request you perfomed,
- so if you used WebAuth (`/authorize` call) the `response_type` and `scope` will determine what tokens you get
  */
-@objc(A0Credentials)
 public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
 
     /// Token used that allows calling to the requested APIs (audience sent on Auth)
-    @objc public let accessToken: String
+    public let accessToken: String
     /// Type of the access token
-    @objc public let tokenType: String
+    public let tokenType: String
     /// When the access_token expires
-    @objc public let expiresIn: Date
+    public let expiresIn: Date
     /// If the API allows you to request new access tokens and the scope `offline_access` was included on Auth
-    @objc public let refreshToken: String?
+    public let refreshToken: String?
     /// Token that details the user identity after authentication
-    @objc public let idToken: String
+    public let idToken: String
     /// Granted scopes, only populated when a requested scope or scopes was not granted and Auth is OIDC Conformant
-    @objc public let scope: String?
+    public let scope: String?
     /// MFA recovery code that the application must display to the end-user to be stored securely for future use
-    @objc public let recoveryCode: String?
+    public let recoveryCode: String?
 
-    @objc public init(accessToken: String = "",
-                      tokenType: String = "",
-                      idToken: String = "",
-                      refreshToken: String? = nil,
-                      expiresIn: Date = Date(),
-                      scope: String? = nil,
-                      recoveryCode: String? = nil) {
+    public init(accessToken: String = "",
+                tokenType: String = "",
+                idToken: String = "",
+                refreshToken: String? = nil,
+                expiresIn: Date = Date(),
+                scope: String? = nil,
+                recoveryCode: String? = nil) {
         self.accessToken = accessToken
         self.tokenType = tokenType
         self.idToken = idToken
@@ -42,11 +39,9 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
     convenience required public init(json: [String: Any]) {
         var expiresIn: Date?
 
-        if let value = json["expires_in"] {
-            let string = String(describing: value)
-            if let double = NumberFormatter().number(from: string)?.doubleValue {
-                expiresIn = Date(timeIntervalSinceNow: double)
-            }
+        if let value = json["expires_in"],
+           let double = NumberFormatter().number(from: String(describing: value))?.doubleValue {
+            expiresIn = Date(timeIntervalSinceNow: double)
         }
 
         self.init(accessToken: json["access_token"] as? String ?? "",

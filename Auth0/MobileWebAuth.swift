@@ -1,6 +1,5 @@
 #if os(iOS)
 import UIKit
-import SafariServices
 import AuthenticationServices
 
 public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey
@@ -16,23 +15,6 @@ public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey
 @available(*, deprecated, message: "this method is not needed when targeting iOS 11+")
 public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
     return TransactionStore.shared.resume(url)
-}
-
-public extension _ObjectiveOAuth2 {
-
-    /**
-     Resumes the current Auth session (if any).
-
-     - parameter url:     url received by iOS application in AppDelegate
-     - parameter options: dictionary with launch options received by iOS application in AppDelegate
-
-     - returns: if the url was handled by an on going session or not.
-     */
-    @objc(resumeAuthWithURL:options:)
-    static func resume(_ url: URL, options: [A0URLOptionsKey: Any]) -> Bool {
-        return resumeAuth(url)
-    }
-
 }
 
 @available(iOS 13.0, *)
