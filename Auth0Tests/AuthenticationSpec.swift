@@ -1276,7 +1276,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should have both token when scope is 'openid'") {
+            it("should have both tokens when scope is 'openid'") {
                 waitUntil(timeout: Timeout) { done in
                     auth.loginSocial(token: FacebookToken, connection: "facebook", scope: "openid").start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
