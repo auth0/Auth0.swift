@@ -331,6 +331,8 @@
 		970BC36C25C27095007A7745 /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* Challenge.swift */; };
 		970BC36D25C27095007A7745 /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* Challenge.swift */; };
 		970BC36E25C27095007A7745 /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* Challenge.swift */; };
+		D5E9E317273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */; };
+		D5E9E318273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -605,6 +607,7 @@
 		5FF3464A1CEFEC04000799DE /* Auth0Tests.OSX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Auth0Tests.OSX-Bridging-Header.h"; sourceTree = "<group>"; };
 		5FF465BB1CE2AC4500F7ED8C /* Management.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Management.swift; path = Auth0/Management.swift; sourceTree = SOURCE_ROOT; };
 		970BC36A25C27095007A7745 /* Challenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Challenge.swift; sourceTree = "<group>"; };
+		D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1017,6 +1020,7 @@
 				5C4F550323C8FADE00C89615 /* A0SHA.h */,
 				5C4F550223C8FADE00C89615 /* A0SHA.m */,
 				5C4F550423C8FADE00C89615 /* JWTAlgorithm.swift */,
+				D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */,
 			);
 			name = Crypto;
 			sourceTree = "<group>";
@@ -1635,6 +1639,7 @@
 				5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */,
 				5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */,
 				5F28B4611D8216180000EB23 /* Loggable.swift in Sources */,
+				D5E9E317273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */,
 				5C49EB3523EB5A80008D562F /* JWK+RSA.swift in Sources */,
 				5FDE87551D8A424700EA27DC /* Auth0Authentication.swift in Sources */,
 				5F53F5CE1CFD157300476A46 /* AuthTransaction.swift in Sources */,
@@ -1701,6 +1706,7 @@
 				5C41F6C6244F968100252548 /* AuthSession.swift in Sources */,
 				5B1748751EF2D3A70060E653 /* Date.swift in Sources */,
 				5F6FAC641D09E98000D5B4EA /* Logger.swift in Sources */,
+				D5E9E318273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */,
 				5FF465BD1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */,
 				5C41F6CD244F96FD00252548 /* IDTokenSignatureValidator.swift in Sources */,
