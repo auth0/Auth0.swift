@@ -35,6 +35,24 @@ The following public protocols have been removed:
 
 Both have been subsumed in `AuthTransaction`.
 
+## Metods Removed
+
+### Web Auth
+
+The SDK now only supports the [authorization code flow with PKCE](https://auth0.com/blog/oauth-2-best-practices-for-native-apps/), which is used by default. For this reason, the following methods have been removed from the Web Auth builder:
+
+- `usingImplicitGrant()`
+- `responseType(_:)`
+
+## Errors Removed
+
+### `WebAuthError` enum
+
+The following cases were removed, as they are no longer necessary:
+
+- `noNonceProvided`
+- `invalidIdTokenNonce`
+
 ## Type properties changed
 
 ### `Credentials` class
@@ -89,6 +107,10 @@ Auth0
         print(result)
     }
 ```
+
+### Credentials expiration on `CredentialsManager` 
+
+The `CredentialsManager` class no longer takes into account the ID Token expiration to determine if the credentials are still valid. The only value being considered now is the Access Token expiration.
 
 ## Title of change
 

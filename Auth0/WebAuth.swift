@@ -116,22 +116,13 @@ public protocol WebAuth: Trackable, Loggable {
      */
     func parameters(_ parameters: [String: String]) -> Self
 
-    /// Specify the response types to be used for authentcation
-    ///
-    /// - parameter response: Array of ResponseType
-    /// - returns: the same WebAuth instance to allow method chaining
-    /// - warning: deprecated as the next major release will only use `code`.
-    @available(*, deprecated, message: "the next major release will only use 'code'")
-    func responseType(_ response: [ResponseType]) -> Self
-
     /// Specify a redirect url to be used instead of a custom scheme
     ///
     /// - Parameter redirectURL: custom redirect url
     /// - Returns: the same WebAuth instance to allow method chaining
     func redirectURL(_ redirectURL: URL) -> Self
 
-    /// Add `nonce` parameter for authentication, this is a requirement
-    /// when response type `.idToken` is specified.
+    /// Add `nonce` parameter for ID Token validation
     ///
     /// - Parameter nonce: nonce string
     /// - Returns: the same WebAuth instance to allow method chaining
@@ -184,14 +175,6 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Parameter organization: organization Id
     /// - Returns: the same WebAuth instance to allow method chaining
     func organization(_ organization: String) -> Self
-
-    /**
-     Change the default grant used for auth from `code` (w/PKCE) to `token` (implicit grant)
-
-     - returns: the same WebAuth instance to allow method chaining
-     */
-    @available(*, deprecated, message: "use response([.token])")
-    func usingImplicitGrant() -> Self
 
     /**
      Starts the WebAuth flow by modally presenting a ViewController in the top-most controller.
