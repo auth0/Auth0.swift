@@ -1,6 +1,11 @@
 import Foundation
 
 /**
+ Default scope value used across Auth0.swift
+ */
+public let defaultScope = "openid profile email"
+
+/**
  Auth0 Authentication API to authenticate your user using a Database, Social, Enterprise or Passwordless connections
 
  ```

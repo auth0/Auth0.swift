@@ -201,7 +201,7 @@ final class Auth0WebAuth: WebAuth {
         var entries = defaults
         entries["client_id"] = self.clientId
         entries["redirect_uri"] = redirectURL.absoluteString
-        entries["scope"] = requiredScope // TODO: Change when setting the new default scope
+        entries["scope"] = defaultScope
         entries["state"] = state
         entries["response_type"] = self.responseType.map { $0.label! }.joined(separator: " ")
 

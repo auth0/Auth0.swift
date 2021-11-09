@@ -19,11 +19,11 @@ struct Auth0Authentication: Authentication {
         self.telemetry = telemetry
     }
 
-    func login(email username: String, code otp: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError> {
+    func login(email username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         return login(username: username, otp: otp, realm: "email", audience: audience, scope: scope)
     }
 
-    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError> {
+    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         return login(username: username, otp: otp, realm: "sms", audience: audience, scope: scope)
     }
 
@@ -49,7 +49,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError> {
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "username": username,
@@ -69,7 +69,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "username": username,
@@ -169,7 +169,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, scope: String?, audience: String?) -> Request<Credentials, AuthenticationError> {
+    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = [:]
         var profile: [String: Any] = profile ?? [:]
 
@@ -192,7 +192,7 @@ struct Auth0Authentication: Authentication {
                                   parameters: parameters)
     }
 
-    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], scope: String?, audience: String?) -> Request<Credentials, AuthenticationError> {
+    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any],  audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: String] = [:]
         if let jsonData = try? JSONSerialization.data(withJSONObject: profile, options: []),
             let json = String(data: jsonData, encoding: .utf8) {
@@ -367,7 +367,7 @@ struct Auth0Authentication: Authentication {
     }
 
     func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String?, audience: String?, fullName: PersonNameComponents?) -> Request<Credentials, AuthenticationError> {
-        return self.login(appleAuthorizationCode: authCode, fullName: fullName, scope: scope, audience: audience)
+        return self.login(appleAuthorizationCode: authCode, fullName: fullName, audience: audience, scope: scope ?? defaultScope)
     }
 
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
@@ -433,7 +433,7 @@ struct Auth0Authentication: Authentication {
 // MARK: - Private Methods
 
 private extension Auth0Authentication {
-    func login(username: String, otp: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError> {
+    func login(username: String, otp: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "/oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "username": username,
@@ -442,26 +442,18 @@ private extension Auth0Authentication {
             "grant_type": "http://auth0.com/oauth/grant-type/passwordless/otp",
             "client_id": self.clientId
         ]
-        if let audience = audience {
-            payload["audience"] = audience
-        }
-        if let scope = scope {
-            payload["scope"] = scope
-        }
+        payload["audience"] = audience
+        payload["scope"] = scope
         return Request(session: session, url: url, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String?, audience: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError> {
+    func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = parameters ?? [:]
         parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
         parameters["subject_token"] = subjectToken
         parameters["subject_token_type"] = subjectTokenType
-        if let scope = scope {
-            parameters["scope"] = scope
-        }
-        if let audience = audience {
-            parameters["audience"] = audience
-        }
+        parameters["audience"] = audience
+        parameters["scope"] = scope
         return self.tokenExchange().parameters(parameters)
     }
 }
