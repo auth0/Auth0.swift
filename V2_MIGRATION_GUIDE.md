@@ -84,6 +84,10 @@ All the properties are no longer marked with the `@objc` attribute. Additionally
 - `expiresIn`
 - `idToken`
 
+### `UserInfo` struct
+
+All the properties are no longer marked with the `@objc` attribute.
+
 ### `NSError` extension
 
 These properties have been removed:
