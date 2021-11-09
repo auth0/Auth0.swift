@@ -1,5 +1,5 @@
 #if os(macOS)
-import Cocoa
+import AppKit
 
 extension NSApplication {
 

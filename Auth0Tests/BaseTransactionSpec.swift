@@ -23,9 +23,8 @@ class BaseTransactionSpec: QuickSpec {
         let authentication = Auth0Authentication(clientId: ClientId, url: Domain)
         let generator = A0SHA256ChallengeGenerator()
         let handler = PKCE(authentication: authentication,
-                           redirectURL: RedirectURL,
                            generator: generator,
-                           responseType: [.code],
+                           redirectURL: RedirectURL,
                            issuer: Issuer,
                            leeway: Leeway,
                            nonce: nil)

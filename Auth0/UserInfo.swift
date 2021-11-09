@@ -1,11 +1,31 @@
 import Foundation
 
 /// OIDC Standard Claims user information
-/// - note: [Claims](https://auth0.com/docs/protocols/oidc#claims)
-@objc(A0UserInfo)
-@objcMembers public class UserInfo: NSObject, JSONObjectPayload {
+/// - note: [Claims](https://auth0.com/docs/security/tokens/json-web-tokens/json-web-token-claims)
+public struct UserInfo: JSONObjectPayload {
 
-    public static let publicClaims = ["sub", "name", "given_name", "family_name", "middle_name", "nickname", "preferred_username", "profile", "picture", "website", "email", "email_verified", "gender", "birthdate", "zoneinfo", "locale", "phone_number", "phone_number_verified", "address", "updated_at"]
+    public static let publicClaims = [
+        "sub",
+        "name",
+        "given_name",
+        "family_name",
+        "middle_name",
+        "nickname",
+        "preferred_username",
+        "profile",
+        "picture",
+        "website",
+        "email",
+        "email_verified",
+        "gender",
+        "birthdate",
+        "zoneinfo",
+        "locale",
+        "phone_number",
+        "phone_number_verified",
+        "address",
+        "updated_at"
+    ]
 
     public let sub: String
 
@@ -37,7 +57,27 @@ import Foundation
 
     public let customClaims: [String: Any]?
 
-    required public init(sub: String, name: String?, givenName: String?, familyName: String?, middleName: String?, nickname: String?, preferredUsername: String?, profile: URL?, picture: URL?, website: URL?, email: String?, emailVerified: Bool?, gender: String?, birthdate: String?, zoneinfo: TimeZone?, locale: Locale?, phoneNumber: String?, phoneNumberVerified: Bool?, address: [String: String]?, updatedAt: Date?, customClaims: [String: Any]?) {
+    public init(sub: String,
+                name: String?,
+                givenName: String?,
+                familyName: String?,
+                middleName: String?,
+                nickname: String?,
+                preferredUsername: String?,
+                profile: URL?,
+                picture: URL?,
+                website: URL?,
+                email: String?,
+                emailVerified: Bool?,
+                gender: String?,
+                birthdate: String?,
+                zoneinfo: TimeZone?,
+                locale: Locale?,
+                phoneNumber: String?,
+                phoneNumberVerified: Bool?,
+                address: [String: String]?,
+                updatedAt: Date?,
+                customClaims: [String: Any]?) {
         self.sub = sub
 
         self.name = name
@@ -69,7 +109,8 @@ import Foundation
         self.customClaims = customClaims
     }
 
-    convenience required public init?(json: [String: Any]) {
+    // swiftlint:disable:next type_body_length
+    public init?(json: [String: Any]) {
         guard let sub = json["sub"] as? String else { return nil }
 
         let name = json["name"] as? String
@@ -112,6 +153,26 @@ import Foundation
         var customClaims = json
         UserInfo.publicClaims.forEach { customClaims.removeValue(forKey: $0) }
 
-        self.init(sub: sub, name: name, givenName: givenName, familyName: familyName, middleName: middleName, nickname: nickname, preferredUsername: preferredUsername, profile: profile, picture: picture, website: website, email: email, emailVerified: emailVerified, gender: gender, birthdate: birthdate, zoneinfo: zoneinfo, locale: locale, phoneNumber: phoneNumber, phoneNumberVerified: phoneNumberVerified, address: address, updatedAt: updatedAt, customClaims: customClaims)
+        self.init(sub: sub,
+                  name: name,
+                  givenName: givenName,
+                  familyName: familyName,
+                  middleName: middleName,
+                  nickname: nickname,
+                  preferredUsername: preferredUsername,
+                  profile: profile,
+                  picture: picture,
+                  website: website,
+                  email: email,
+                  emailVerified: emailVerified,
+                  gender: gender,
+                  birthdate: birthdate,
+                  zoneinfo: zoneinfo,
+                  locale: locale,
+                  phoneNumber: phoneNumber,
+                  phoneNumberVerified: phoneNumberVerified,
+                  address: address,
+                  updatedAt: updatedAt,
+                  customClaims: customClaims)
     }
 }

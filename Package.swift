@@ -42,7 +42,7 @@ let package = Package(
                 .product(name: "OHHTTPStubsSwift", package: "OHHTTPStubs")
             ],
             path: "Auth0Tests",
-            exclude: ["ObjectiveC", "Info.plist", "Auth0.plist"],
+            exclude: ["Info.plist", "Auth0.plist"],
             cSettings: cSettings,
             swiftSettings: swiftSettings)
     ]
