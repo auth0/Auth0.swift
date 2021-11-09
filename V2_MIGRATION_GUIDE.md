@@ -12,9 +12,15 @@ The deployment targets for each platform have been raised to:
 - tvOS 12.0
 - watchOS 6.2
 
-## Supported Swift versions
+## Supported languages
+
+### Swift
 
 The minimum supported Swift version is now 5.3.
+
+### Objective-C
+
+Auth0.swift no longer supports Objective-C.
 
 ## Supported JWT signature algorithms
 
@@ -26,7 +32,9 @@ If your app is using HS256, you'll need to switch it to RS256 in the dashboard o
 
 **Your app's settings > Advanced settings > JSON Web Token (JWT) Signature Algorithm**
 
-## Protocols removed
+## Types removed
+
+### Protocols
 
 The following public protocols have been removed:
 
@@ -35,11 +43,19 @@ The following public protocols have been removed:
 
 Both have been subsumed in `AuthTransaction`.
 
+### Classes
+
+The following Objective-C compatibility wrappers have been removed:
+
+- `_ObjectiveAuthenticationAPI`
+- `_ObjectiveManagementAPI`
+- `_ObjectiveOAuth2`
+
 ## Metods Removed
 
 ### Web Auth
 
-The SDK now only supports the [authorization code flow with PKCE](https://auth0.com/blog/oauth-2-best-practices-for-native-apps/), which is used by default. For this reason, the following methods have been removed from the Web Auth builder:
+Auth0.swift now only supports the [authorization code flow with PKCE](https://auth0.com/blog/oauth-2-best-practices-for-native-apps/), which is used by default. For this reason, the following methods have been removed from the Web Auth builder:
 
 - `usingImplicitGrant()`
 - `responseType(_:)`
@@ -53,16 +69,27 @@ The following cases were removed, as they are no longer necessary:
 - `noNonceProvided`
 - `invalidIdTokenNonce`
 
+## Types changed
+
+- `UserInfo` was changed from class to struct
+
 ## Type properties changed
 
 ### `Credentials` class
 
-The following properties are no longer optional:
+All the properties are no longer marked with the `@objc` attribute. Additionally, the following properties are no longer optional:
 
 - `accessToken`
 - `tokenType`
 - `expiresIn`
 - `idToken`
+
+### `NSError` extension
+
+These properties have been removed:
+
+- `a0_isManagementError`
+- `a0_isAuthenticationError`
 
 ## Method signatures changed
 
