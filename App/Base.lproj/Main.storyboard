@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -21,66 +20,26 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="dou-iM-i9N">
-                                <rect key="frame" x="0.0" y="183.5" width="375" height="300"/>
+                                <rect key="frame" x="0.0" y="283.5" width="375" height="100"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="llV-hD-gxU">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="llV-hD-gxU">
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="K1g-Yy-Mio"/>
                                         </constraints>
-                                        <state key="normal" title="OAuth2 Authorize Flow"/>
+                                        <state key="normal" title="Login"/>
                                         <connections>
-                                            <action selector="startOAuth2:" destination="BYZ-38-t0r" eventType="touchUpInside" id="EAP-xs-ig7"/>
+                                            <action selector="login:" destination="BYZ-38-t0r" eventType="touchUpInside" id="8Ds-Gb-Q8d"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zcg-eY-U9Y">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zcg-eY-U9Y">
                                         <rect key="frame" x="0.0" y="50" width="375" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="eQj-8L-WyL"/>
                                         </constraints>
-                                        <state key="normal" title="OAuth2 Google"/>
+                                        <state key="normal" title="Logout"/>
                                         <connections>
-                                            <action selector="startGoogleOAuth2:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mWx-q0-Sah"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6wW-2J-mhK">
-                                        <rect key="frame" x="0.0" y="100" width="375" height="50"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="xjq-Ya-Xpo"/>
-                                        </constraints>
-                                        <state key="normal" title="OAuth2 Google Token"/>
-                                        <connections>
-                                            <action selector="startTokenGoogleOAuth2:" destination="dkx-z0-nzr" eventType="touchUpInside" id="vxw-EM-p02"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6NK-qX-0S3">
-                                        <rect key="frame" x="0.0" y="150" width="375" height="50"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="i3B-r0-Gcm"/>
-                                        </constraints>
-                                        <state key="normal" title="OAuth2 Google ID Token"/>
-                                        <connections>
-                                            <action selector="startIDTokenGoogleOAuth2:" destination="dkx-z0-nzr" eventType="touchUpInside" id="3tq-vP-Ee4"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="APd-Uy-9cV">
-                                        <rect key="frame" x="0.0" y="200" width="375" height="50"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="FMK-mf-ew7"/>
-                                        </constraints>
-                                        <state key="normal" title="OAuth2 Google Token, ID Token"/>
-                                        <connections>
-                                            <action selector="startTokenIDTokenGoogleOAuth2:" destination="dkx-z0-nzr" eventType="touchUpInside" id="e9l-Rj-FKl"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1cD-4W-zdw">
-                                        <rect key="frame" x="0.0" y="250" width="375" height="50"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="nnu-iB-OEO"/>
-                                        </constraints>
-                                        <state key="normal" title="OAuth2 Google Code, IDToken"/>
-                                        <connections>
-                                            <action selector="startCodeIDTokenGoogleOAuth2:" destination="dkx-z0-nzr" eventType="touchUpInside" id="GPs-41-F5E"/>
+                                            <action selector="logout:" destination="BYZ-38-t0r" eventType="touchUpInside" id="jft-05-41l"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -93,12 +52,10 @@
                             <constraint firstItem="dou-iM-i9N" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="dnQ-Fe-p1U"/>
                         </constraints>
                     </view>
-                    <connections>
-                        <outlet property="oauth2" destination="llV-hD-gxU" id="3Y1-JB-EiO"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="98" y="133"/>
         </scene>
     </scenes>
 </document>

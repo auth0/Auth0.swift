@@ -8,7 +8,6 @@ web_auth_files = [
   'Auth0/Array+Encode.swift',
   'Auth0/ASCallbackTransaction.swift',
   'Auth0/ASTransaction.swift',
-  'Auth0/AuthCancelable.swift',
   'Auth0/AuthProvider.swift',
   'Auth0/AuthSession.swift',
   'Auth0/AuthTransaction.swift',
@@ -26,7 +25,6 @@ web_auth_files = [
   'Auth0/NativeAuth.swift',
   'Auth0/NSURLComponents+OAuth2.swift',
   'Auth0/OAuth2Grant.swift',
-  'Auth0/ResponseType.swift',
   'Auth0/TransactionStore.swift',
   'Auth0/WebAuth.swift',
   'Auth0/WebAuthError.swift'
