@@ -188,10 +188,10 @@ final class Auth0WebAuth: WebAuth {
         var items: [URLQueryItem] = []
         var entries = defaults
 
+        entries["scope"] = defaultScope
         entries["client_id"] = self.clientId
+        entries["response_type"] = self.responseType
         entries["redirect_uri"] = redirectURL.absoluteString
-        entries["response_type"] = responseType
-        entries["scope"] = requiredScope // TODO: Change when setting the new default scope
         entries["state"] = state
         entries["nonce"] = nonce
         entries["organization"] = organization

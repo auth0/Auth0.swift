@@ -41,8 +41,8 @@ class AuthenticationSpec: QuickSpec {
         describe("login") {
 
             beforeEach {
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": defaultScope])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
+                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": defaultScope])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
                 stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": InvalidPassword])) { _ in return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
             }
 
@@ -64,9 +64,9 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should have both token when scope is 'openid'") {
+            it("should have both tokens when scope contains 'openid'") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "openid").start { result in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "openid profile email").start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
                     }
@@ -345,7 +345,7 @@ class AuthenticationSpec: QuickSpec {
                         "grant_type": TokenExchangeGrantType,
                         "subject_token": "VALIDCODE",
                         "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
-                        "scope": "openid profile offline_access",
+                        "scope": defaultScope,
                         "client_id": ClientId
                         ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success"
                     
@@ -403,7 +403,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                     
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE")
+                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid profile email")
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -449,7 +449,7 @@ class AuthenticationSpec: QuickSpec {
                 
                 it("should exchange apple auth code for credentials with custom scope and audience") {
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(appleAuthorizationCode: "VALIDCODE", scope: "openid email", audience: "https://myapi.com/api")
+                        auth.login(appleAuthorizationCode: "VALIDCODE", audience: "https://myapi.com/api", scope: "openid email")
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -541,7 +541,7 @@ class AuthenticationSpec: QuickSpec {
                         "grant_type": TokenExchangeGrantType,
                         "subject_token": sessionAccessToken,
                         "subject_token_type": "http://auth0.com/oauth/token-type/facebook-info-session-access-token",
-                        "scope": "openid profile offline_access",
+                        "scope": defaultScope,
                         "user_profile": "{\"name\":\"John Smith\"}",
                         "client_id": ClientId
                     ])) { _ in
@@ -606,37 +606,6 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
 
-                it("should include scope if it is not nil") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email"])) { _ in
-                        return authResponse(accessToken: AccessToken, idToken: IdToken)
-                    }
-
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(facebookSessionAccessToken: sessionAccessToken,
-                                           profile: profile,
-                                           scope: "openid email")
-                            .start { result in
-                                expect(result).to(haveCredentials(AccessToken, IdToken))
-                                done()
-                        }
-                    }
-                }
-
-                it("should not include scope if it is nil") {
-                    stub(condition: isToken(Domain) && hasNoneOf(["scope"])) { _ in
-                        return authResponse(accessToken: AccessToken, idToken: IdToken)
-                    }
-
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(facebookSessionAccessToken: sessionAccessToken,
-                                           profile: profile,
-                                           scope: nil)
-                            .start { result in
-                                expect(result).to(haveCredentials(AccessToken, IdToken))
-                                done()
-                        }
-                    }
-                }
             }
 
         }
@@ -1075,7 +1044,7 @@ class AuthenticationSpec: QuickSpec {
                 let emailRealm = "email"
                 
                 it("should login with email code") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "otp": OTP, "realm": emailRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
+                    stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "otp": OTP, "realm": emailRealm, "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
@@ -1091,7 +1060,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: "https://myapi.com/api", scope: nil).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: "https://myapi.com/api").start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1103,7 +1072,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1115,48 +1084,13 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, scope: nil).start { result in
+                        auth.login(email: SupportAtAuth0, code: OTP).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
                     }
                 }
                 
-                it("should include scope if it is not nil") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid profile email"])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: "openid profile email").start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should not include scope if it is nil") {
-                    stub(condition: isToken(Domain) && hasNoneOf(["scope"])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil, scope: nil).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should use 'openid' as the default scope") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid"])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(email: SupportAtAuth0, code: OTP, audience: nil).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
 
             }
         }
@@ -1198,7 +1132,7 @@ class AuthenticationSpec: QuickSpec {
                 let smsRealm = "sms"
                 
                 it("should login with sms code") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["username": Phone, "otp": OTP, "realm": smsRealm, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
+                    stub(condition: isToken(Domain) && hasAtLeast(["username": Phone, "otp": OTP, "realm": smsRealm, "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
@@ -1214,7 +1148,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: "https://myapi.com/api", scope: nil).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: "https://myapi.com/api").start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1226,7 +1160,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP, audience: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1238,43 +1172,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, scope: nil).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should include scope if it is not nil") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid profile email"])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: "openid profile email").start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should not include scope if it is nil") {
-                    stub(condition: isToken(Domain) && hasNoneOf(["scope"])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil, scope: nil).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-                
-                it("should use 'openid' as the default scope") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid"])) { _ in
-                        return authResponse(accessToken: AccessToken)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(phoneNumber: Phone, code: OTP, audience: nil).start { result in
+                        auth.login(phoneNumber: Phone, code: OTP).start { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1378,7 +1276,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should have both token when scope is 'openid'") {
+            it("should have both tokens when scope is 'openid'") {
                 waitUntil(timeout: Timeout) { done in
                     auth.loginSocial(token: FacebookToken, connection: "facebook", scope: "openid").start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))

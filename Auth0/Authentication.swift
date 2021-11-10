@@ -46,13 +46,13 @@ public protocol Authentication: Trackable, Loggable {
     - parameter email:             email the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via email
     - parameter audience:          API Identifier that the client is requesting access to. Default is `nil`
-    - parameter scope:             scope value requested when authenticating the user. Default is `openid`
+    - parameter scope:             scope value requested when authenticating the user. Default is `openid profile email`
 
     - returns: authentication request that will yield Auth0 User Credentials
     - seeAlso: Credentials
     - requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     */
-    func login(email username: String, code otp: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
+    func login(email username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
     Logs in a user using a phone number and an OTP code received via sms (last part of the passwordless login flow)
@@ -88,13 +88,13 @@ public protocol Authentication: Trackable, Loggable {
     - parameter phoneNumber:       phone number the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via sms
     - parameter audience:          API Identifier that the client is requesting access to. Default is `nil`
-    - parameter scope:             scope value requested when authenticating the user. Default is `openid`
+    - parameter scope:             scope value requested when authenticating the user. Default is `openid profile email`
 
     - returns: authentication request that will yield Auth0 User Credentials
     - seeAlso: Credentials
     - requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     */
-    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
+    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs in an user using email|username and password using a Database and Passwordless connection
@@ -173,7 +173,7 @@ public protocol Authentication: Trackable, Loggable {
          password: "a secret password",
          realm: "mydatabase",
          audience: "https://myapi.com/api",
-         scope: "openid profile")
+         scope: "openid profile email offline_access")
      ```
 
      - parameter username:    username or email used of the user to authenticate
@@ -186,7 +186,7 @@ public protocol Authentication: Trackable, Loggable {
      - returns: authentication request that will yield Auth0 User Credentials
      - requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
      */
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Login using One Time Password and MFA token.
@@ -255,7 +255,7 @@ public protocol Authentication: Trackable, Loggable {
        .authentication(clientId: clientId, domain: "samples.auth0.com")
        .login(appleAuthorizationCode: authCode,
             fullName: credentials.fullName,
-            scope: "openid profile email",
+            scope: "openid profile email offline_access",
             audience: "https://myapi.com/api")
        .start { print($0) }
     ```
@@ -263,12 +263,12 @@ public protocol Authentication: Trackable, Loggable {
     - parameter authCode: Authorization Code retrieved from Apple Authorization
     - parameter fullName: The full name property returned with the Apple ID Credentials
     - parameter profile: Additional user profile data returned with the Apple ID Credentials
-    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
+    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile email`
     - parameter audience: API Identifier that the client is requesting access to
 
     - returns: a request that will yield Auth0 user's credentials
     */
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, scope: String?, audience: String?) -> Request<Credentials, AuthenticationError>
+    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
     Authenticate a user with their Facebook session info access token and profile data.
@@ -286,19 +286,19 @@ public protocol Authentication: Trackable, Loggable {
     Auth0
        .authentication(clientId: clientId, domain: "samples.auth0.com")
        .login(facebookSessionAccessToken: sessionAccessToken,
-            scope: "openid profile email",
+            scope: "openid profile email offline_access",
             audience: "https://myapi.com/api")
        .start { print($0) }
     ```
 
     - parameter sessionAccessToken: Session info access token retrieved from Facebook
     - parameter profile: The user profile returned by Facebook
-    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
+    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile email`
     - parameter audience: API Identifier that the client is requesting access to
 
     - returns: a request that will yield Auth0 user's credentials
     */
-    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], scope: String?, audience: String?) -> Request<Credentials, AuthenticationError>
+    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Login using username and password in the default directory
@@ -320,7 +320,7 @@ public protocol Authentication: Trackable, Loggable {
             withUsername: "support@auth0.com",
             password: "a secret password",
             audience: "https://myapi.com/api",
-            scope: "openid profile")
+            scope: "openid profile email offline_access")
      ```
      
      - parameter username:    username or email used of the user to authenticate
@@ -331,7 +331,7 @@ public protocol Authentication: Trackable, Loggable {
      - important: This only works if you have the OAuth 2.0 API Authorization flag on
      - returns: authentication request that will yield Auth0 User Credentials
      */
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Creates a user in a Database connection
@@ -657,7 +657,7 @@ public protocol Authentication: Trackable, Loggable {
      Renew user's credentials with a refresh_token grant for `/oauth/token`
 
      - parameter refreshToken: the client's refresh token
-     - parameter scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during Auth.
+     - parameter scope: scopes to request for the new tokens. By default is `nil`, which will ask for the same ones requested during Auth.
      - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
      - returns: a request that will yield Auth0 user's credentials
      */
@@ -781,13 +781,13 @@ public extension Authentication {
     - parameter email:             email the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via email
     - parameter audience:          API Identifier that the client is requesting access to. Default is `nil`
-    - parameter scope:             scope value requested when authenticating the user. Default is `openid`
+    - parameter scope:             scope value requested when authenticating the user. Default is `openid profile email`
 
     - returns: authentication request that will yield Auth0 User Credentials
     - seeAlso: Credentials
     - requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     */
-    func login(email username: String, code otp: String, audience: String? = nil, scope: String? = "openid") -> Request<Credentials, AuthenticationError> {
+    func login(email username: String, code otp: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         return self.login(email: username, code: otp, audience: audience, scope: scope)
     }
 
@@ -825,13 +825,13 @@ public extension Authentication {
     - parameter phoneNumber:       phone number the user used to start the passwordless login flow
     - parameter code:              one time password (OTP) code the user received via sms
     - parameter audience:          API Identifier that the client is requesting access to. Default is `nil`
-    - parameter scope:             scope value requested when authenticating the user. Default is `openid`
+    - parameter scope:             scope value requested when authenticating the user. Default is `openid profile email`
 
     - returns: authentication request that will yield Auth0 User Credentials
     - seeAlso: Credentials
     - requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
     */
-    func login(phoneNumber username: String, code otp: String, audience: String? = nil, scope: String? = "openid") -> Request<Credentials, AuthenticationError> {
+    func login(phoneNumber username: String, code otp: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         return self.login(phoneNumber: username, code: otp, audience: audience, scope: scope)
     }
 
@@ -910,7 +910,7 @@ public extension Authentication {
              password: "a secret password",
              realm: "mydatabase",
              audience: "https://myapi.com/api",
-             scope: "openid profile")
+             scope: "openid profile email offline_access")
      ```
 
      - parameter username: username or email used of the user to authenticate
@@ -922,7 +922,7 @@ public extension Authentication {
      - returns: authentication request that will yield Auth0 User Credentials
      - requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
      */
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+    func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope)
     }
 
@@ -943,7 +943,7 @@ public extension Authentication {
        .authentication(clientId: clientId, domain: "samples.auth0.com")
        .login(appleAuthorizationCode: authCode,
             fullName: credentials.fullName,
-            scope: "openid profile email",
+            scope: "openid profile email offline_access",
             audience: "https://myapi.com/api")
        .start { print($0) }
     ```
@@ -951,13 +951,13 @@ public extension Authentication {
     - parameter authCode: Authorization Code retrieved from Apple Authorization
     - parameter fullName: The full name property returned with the Apple ID Credentials
     - parameter profile: Additional user profile data returned with the Apple ID Credentials
-    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
+    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile email`
     - parameter audience: API Identifier that the client is requesting access to
 
     - returns: a request that will yield Auth0 user's credentials
     */
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents? = nil, profile: [String: Any]? = nil, scope: String? = "openid profile offline_access", audience: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(appleAuthorizationCode: authorizationCode, fullName: fullName, profile: profile, scope: scope, audience: audience)
+    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents? = nil, profile: [String: Any]? = nil, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+        return self.login(appleAuthorizationCode: authorizationCode, fullName: fullName, profile: profile, audience: audience, scope: scope)
     }
 
     /**
@@ -976,20 +976,20 @@ public extension Authentication {
     Auth0
        .authentication(clientId: clientId, domain: "samples.auth0.com")
        .login(facebookSessionAccessToken: sessionAccessToken,
-            scope: "openid profile email",
+            scope: "openid profile email offline_access",
             audience: "https://myapi.com/api")
        .start { print($0) }
     ```
 
     - parameter sessionAccessToken: Session info access token retrieved from Facebook
     - parameter profile: The user profile returned by Facebook
-    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
+    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile email`
     - parameter audience: API Identifier that the client is requesting access to
 
     - returns: a request that will yield Auth0 user's credentials
     */
-    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], scope: String? = "openid profile offline_access", audience: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(facebookSessionAccessToken: sessionAccessToken, profile: profile, scope: scope, audience: audience)
+    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+        return self.login(facebookSessionAccessToken: sessionAccessToken, profile: profile, audience: audience, scope: scope)
     }
 
     /**
@@ -1012,7 +1012,7 @@ public extension Authentication {
             withUsername: "support@auth0.com",
             password: "a secret password",
             audience: "https://myapi.com/api",
-            scope: "openid profile")
+            scope: "openid profile email offline_access")
      ```
      
      - parameter username:    username or email used of the user to authenticate
@@ -1023,7 +1023,7 @@ public extension Authentication {
      - important: This only works if you have the OAuth 2.0 API Authorization flag on
      - returns: authentication request that will yield Auth0 User Credentials
      */
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope)
     }
 
@@ -1229,7 +1229,7 @@ public extension Authentication {
      
      ```
      Auth0
-        .renew(withRefreshToken: refreshToken, scope: "openid email read:users")
+        .renew(withRefreshToken: refreshToken, scope: "openid profile email offline_access read:users")
         .start { print($0) }
      ```
 
@@ -1242,7 +1242,7 @@ public extension Authentication {
      ```
 
      - parameter refreshToken: the client's refresh token
-     - parameter scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during Auth.
+     - parameter scope: scopes to request for the new tokens. By default is `nil`, which will ask for the same ones requested during Auth.
      - important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
      - returns: a request that will yield Auth0 user's credentials
      */
