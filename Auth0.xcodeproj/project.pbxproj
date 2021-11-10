@@ -327,11 +327,6 @@
 		970BC36C25C27095007A7745 /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* Challenge.swift */; };
 		970BC36D25C27095007A7745 /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* Challenge.swift */; };
 		970BC36E25C27095007A7745 /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* Challenge.swift */; };
-		D5357351273BCB7700F6EBF6 /* JWTDecode.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D5357352273BCB7700F6EBF6 /* SimpleKeychain.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D5357353273BCB7700F6EBF6 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D5357354273BCB7700F6EBF6 /* OHHTTPStubs.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D5357355273BCB7700F6EBF6 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D5E9E317273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */; };
 		D5E9E318273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */; };
 /* End PBXBuildFile section */
@@ -454,20 +449,6 @@
 				5CD9FC7E26FE30D4009C2B27 /* Nimble.xcframework in CopyFiles */,
 				5CD9FC7F26FE30D4009C2B27 /* OHHTTPStubs.xcframework in CopyFiles */,
 				5CD9FC8026FE30D4009C2B27 /* Quick.xcframework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D5357350273BCB6800F6EBF6 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				D5357351273BCB7700F6EBF6 /* JWTDecode.xcframework in CopyFiles */,
-				D5357352273BCB7700F6EBF6 /* SimpleKeychain.xcframework in CopyFiles */,
-				D5357353273BCB7700F6EBF6 /* Nimble.xcframework in CopyFiles */,
-				D5357354273BCB7700F6EBF6 /* OHHTTPStubs.xcframework in CopyFiles */,
-				D5357355273BCB7700F6EBF6 /* Quick.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1189,7 +1170,6 @@
 				5F06DD751CC448B10011842B /* Headers */,
 				5F06DD761CC448B10011842B /* Resources */,
 				5B717B241E2E2696004A05A7 /* SwiftLint */,
-				D5357350273BCB6800F6EBF6 /* CopyFiles */,
 			);
 			buildRules = (
 			);
