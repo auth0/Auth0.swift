@@ -82,6 +82,12 @@ class Auth0Spec: QuickSpec {
                 expect(auth.url.absoluteString) == domain
             }
 
+            it("should return authentication endpoint with domain url and custom path") {
+                let domain = "https://mycustomdomain.com/authentication"
+                let auth = Auth0.authentication(clientId: ClientId, domain: domain)
+                expect(auth.url.absoluteString) == domain
+            }
+
             it("should return users endopoint") {
                 let users = Auth0.users(token: "token", domain: Domain)
                 expect(users.token) == "token"

@@ -29,14 +29,16 @@ struct Auth0Authentication: Authentication {
 
     let clientId: String
     let url: URL
+    let relativeToBaseURL: Bool
     var telemetry: Telemetry
     var logger: Logger?
 
     let session: URLSession
 
-    init(clientId: String, url: URL, session: URLSession = URLSession.shared, telemetry: Telemetry = Telemetry()) {
+    init(clientId: String, url: URL, relativeToBaseURL: Bool = true, session: URLSession = URLSession.shared, telemetry: Telemetry = Telemetry()) {
         self.clientId = clientId
         self.url = url
+        self.relativeToBaseURL = relativeToBaseURL
         self.session = session
         self.telemetry = telemetry
     }
@@ -51,7 +53,7 @@ struct Auth0Authentication: Authentication {
 
     // swiftlint:disable:next function_parameter_count
     func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
-        let resourceOwner = URL(string: "/oauth/ro", relativeTo: self.url)!
+        let resourceOwner = constructURL(for: "oauth/ro")
         var payload: [String: Any] = [
             "username": username,
             "password": password,
@@ -73,7 +75,7 @@ struct Auth0Authentication: Authentication {
 
     // swiftlint:disable:next function_parameter_count
     func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError> {
-        let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
+        let resourceOwner = constructURL(for: "oauth/token")
         var payload: [String: Any] = [
             "username": username,
             "password": password,
@@ -96,7 +98,7 @@ struct Auth0Authentication: Authentication {
     }
 
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String? = nil, parameters: [String: Any]? = nil) -> Request<Credentials, AuthenticationError> {
-        let resourceOwner = URL(string: "/oauth/token", relativeTo: self.url)!
+        let resourceOwner = constructURL(for: "oauth/token")
         var payload: [String: Any] = [
             "username": username,
             "password": password,
@@ -118,7 +120,7 @@ struct Auth0Authentication: Authentication {
     }
 
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
-        let url = URL(string: "/oauth/token", relativeTo: self.url)!
+        let url = constructURL(for: "oauth/token")
         let payload: [String: Any] = [
             "otp": otp,
             "mfa_token": mfaToken,
@@ -135,7 +137,7 @@ struct Auth0Authentication: Authentication {
     }
 
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError> {
-        let url = URL(string: "/oauth/token", relativeTo: self.url)!
+        let url = constructURL(for: "oauth/token")
         var payload: [String: Any] = [
             "oob_code": oobCode,
             "mfa_token": mfaToken,
@@ -157,7 +159,7 @@ struct Auth0Authentication: Authentication {
     }
 
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
-        let url = URL(string: "/oauth/token", relativeTo: self.url)!
+        let url = constructURL(for: "oauth/token")
         let payload: [String: Any] = [
             "recovery_code": recoveryCode,
             "mfa_token": mfaToken,
@@ -175,7 +177,7 @@ struct Auth0Authentication: Authentication {
     }
 
     func multifactorChallenge(mfaToken: String, types: [String]?, channel: String?, authenticatorId: String?) -> Request<Challenge, AuthenticationError> {
-        let url = URL(string: "/mfa/challenge", relativeTo: self.url)!
+        let url = constructURL(for: "mfa/challenge")
         var payload: [String: String] = [
             "mfa_token": mfaToken,
             "client_id": self.clientId
@@ -253,7 +255,7 @@ struct Auth0Authentication: Authentication {
             }
         }
 
-        let createUser = URL(string: "/dbconnections/signup", relativeTo: self.url)!
+        let createUser = constructURL(for: "dbconnections/signup")
         return Request(session: session,
                        url: createUser,
                        method: "POST",
@@ -269,7 +271,7 @@ struct Auth0Authentication: Authentication {
             "connection": connection,
             "client_id": self.clientId
         ]
-        let resetPassword = URL(string: "/dbconnections/change_password", relativeTo: self.url)!
+        let resetPassword = constructURL(for: "dbconnections/change_password")
         return Request(session: session,
                        url: resetPassword,
                        method: "POST",
@@ -297,7 +299,7 @@ struct Auth0Authentication: Authentication {
             payload["authParams"] = parameters
         }
 
-        let start = URL(string: "/passwordless/start", relativeTo: self.url)!
+        let start = constructURL(for: "passwordless/start")
         return Request(session: session,
                        url: start,
                        method: "POST",
@@ -314,7 +316,7 @@ struct Auth0Authentication: Authentication {
             "send": type.rawValue,
             "client_id": self.clientId
             ]
-        let start = URL(string: "/passwordless/start", relativeTo: self.url)!
+        let start = constructURL(for: "passwordless/start")
         return Request(session: session,
                        url: start,
                        method: "POST",
@@ -326,7 +328,7 @@ struct Auth0Authentication: Authentication {
 
     func tokenInfo(token: String) -> Request<Profile, AuthenticationError> {
         let payload: [String: Any] = ["id_token": token]
-        let tokenInfo = URL(string: "/tokeninfo", relativeTo: self.url)!
+        let tokenInfo = constructURL(for: "tokeninfo")
         return Request(session: session,
                        url: tokenInfo,
                        method: "POST",
@@ -337,7 +339,7 @@ struct Auth0Authentication: Authentication {
     }
 
     func userInfo(token: String) -> Request<Profile, AuthenticationError> {
-        let userInfo = URL(string: "/userinfo", relativeTo: self.url)!
+        let userInfo = constructURL(for: "userinfo")
         return Request(session: session,
                        url: userInfo,
                        method: "GET",
@@ -348,7 +350,7 @@ struct Auth0Authentication: Authentication {
     }
 
     func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError> {
-        let userInfo = URL(string: "/userinfo", relativeTo: self.url)!
+        let userInfo = constructURL(for: "userinfo")
         return Request(session: session,
                        url: userInfo,
                        method: "GET",
@@ -366,7 +368,7 @@ struct Auth0Authentication: Authentication {
             "client_id": self.clientId
             ]
         parameters.forEach { key, value in payload[key] = value }
-        let accessToken = URL(string: "/oauth/access_token", relativeTo: self.url)!
+        let accessToken = constructURL(for: "oauth/access_token")
         return Request(session: session,
                        url: accessToken,
                        method: "POST",
@@ -381,7 +383,7 @@ struct Auth0Authentication: Authentication {
             "client_id": self.clientId
             ]
         parameters.forEach { payload[$0] = $1 }
-        let token = URL(string: "/oauth/token", relativeTo: self.url)!
+        let token = constructURL(for: "oauth/token")
         return Request(session: session,
                        url: token,
                        method: "POST",
@@ -411,7 +413,7 @@ struct Auth0Authentication: Authentication {
             "client_id": self.clientId
         ]
         payload["scope"] = scope
-        let oauthToken = URL(string: "/oauth/token", relativeTo: self.url)!
+        let oauthToken = constructURL(for: "oauth/token")
         return Request(session: session,
                        url: oauthToken,
                        method: "POST",
@@ -426,7 +428,7 @@ struct Auth0Authentication: Authentication {
             "token": refreshToken,
             "client_id": self.clientId
         ]
-        let oauthToken = URL(string: "/oauth/revoke", relativeTo: self.url)!
+        let oauthToken = constructURL(for: "oauth/revoke")
         return Request(session: session,
                        url: oauthToken,
                        method: "POST",
@@ -442,7 +444,7 @@ struct Auth0Authentication: Authentication {
             "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer"
         ]
         parameters.forEach { payload[$0] = $1 }
-        let delegation = URL(string: "/delegation", relativeTo: self.url)!
+        let delegation = constructURL(for: "delegation")
         return Request(session: session,
                        url: delegation,
                        method: "POST",
@@ -453,13 +455,18 @@ struct Auth0Authentication: Authentication {
     }
 
     func jwks() -> Request<JWKS, AuthenticationError> {
-        let jwks = URL(string: "/.well-known/jwks.json", relativeTo: self.url)!
+        let jwks = constructURL(for: ".well-known/jwks.json")
         return Request(session: session,
                        url: jwks,
                        method: "GET",
                        handle: codable,
                        logger: self.logger,
                        telemetry: self.telemetry)
+    }
+
+    private func constructURL(for path: String) -> URL {
+        let relativeURLPrefix = relativeToBaseURL && !path.hasPrefix("/") ? "/": ""
+        return URL(string: relativeURLPrefix + path, relativeTo: self.url)!
     }
 
 }
@@ -469,7 +476,7 @@ struct Auth0Authentication: Authentication {
 private extension Auth0Authentication {
     // swiftlint:disable:next function_parameter_count
     func login(username: String, otp: String, realm: String, audience: String?, scope: String?, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
-        let url = URL(string: "/oauth/token", relativeTo: self.url)!
+        let url = constructURL(for: "oauth/token")
         var payload: [String: Any] = [
             "username": username,
             "otp": otp,

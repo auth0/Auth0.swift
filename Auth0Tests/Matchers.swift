@@ -86,68 +86,87 @@ func hasQueryParameters(_ parameters: [String: String]) -> HTTPStubsTestBlock {
     }
 }
 
-func isResourceOwner(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
+func isResourceOwner(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/oauth/ro")
 }
 
-func isToken(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/oauth/token")
+func isToken(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/oauth/token")
 }
 
-func isSignUp(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/dbconnections/signup")
+func isSignUp(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/dbconnections/signup")
 }
 
-func isResetPassword(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/dbconnections/change_password")
+func isResetPassword(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/dbconnections/change_password")
 }
 
-func isPasswordless(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/passwordless/start")
+func isPasswordless(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/passwordless/start")
 }
 
-func isTokenInfo(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/tokeninfo")
+func isTokenInfo(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/tokeninfo")
 }
 
-func isUserInfo(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodGET() && isHost(domain) && isPath("/userinfo")
+func isUserInfo(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodGET() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/userinfo")
 }
 
-func isOAuthAccessToken(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/oauth/access_token")
+func isOAuthAccessToken(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/oauth/access_token")
 }
 
-func isRevokeToken(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/oauth/revoke")
+func isRevokeToken(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/oauth/revoke")
 }
 
-func isUsersPath(_ domain: String, identifier: String? = nil) -> HTTPStubsTestBlock {
-    let path: String
+func isUsersPath(_ partialURL: String, identifier: String? = nil) -> HTTPStubsTestBlock {
+    var path: String = extractPath(from: partialURL)
     if let identifier = identifier {
-        path = "/api/v2/users/\(identifier)"
+        path += "/api/v2/users/\(identifier)"
     } else {
-        path = "/api/v2/users/"
+        path += "/api/v2/users/"
     }
-    return isHost(domain) && isPath(path)
+    return isHost(extractDomain(from: partialURL)) && isPath(path)
 }
 
-func isLinkPath(_ domain: String, identifier: String) -> HTTPStubsTestBlock {
-    return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")
+func isLinkPath(_ partialURL: String, identifier: String) -> HTTPStubsTestBlock {
+    return isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/api/v2/users/\(identifier)/identities")
 }
 
-func isJWKSPath(_ domain: String) -> HTTPStubsTestBlock {
-    return isHost(domain) && isPath("/.well-known/jwks.json")
+func isJWKSPath(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/.well-known/jwks.json")
 }
 
-func isMultifactorChallenge(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/mfa/challenge")
+func isMultifactorChallenge(_ partialURL: String) -> HTTPStubsTestBlock {
+    return isMethodPOST() && isHost(extractDomain(from: partialURL)) && isPath(extractPath(from: partialURL) + "/mfa/challenge")
 }
 
 func hasBearerToken(_ token: String) -> HTTPStubsTestBlock {
     return { request in
         return request.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)"
     }
+}
+
+func extractPath(from string: String) -> String {
+    guard let pathIndex = string.firstIndex(of: "/") else {
+        return ""
+    }
+
+    if string.last == "/" {
+        return String(string[pathIndex..<string.index(string.endIndex, offsetBy: -1)])
+    }
+    return String(string[pathIndex...])
+}
+
+func extractDomain(from string: String) -> String {
+    guard let pathIndex = string.firstIndex(of: "/") else {
+        return string
+    }
+
+    return String(string[..<pathIndex])
 }
 
 func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQueryItem]> {
