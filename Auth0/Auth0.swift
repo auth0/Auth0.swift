@@ -1,7 +1,12 @@
 import Foundation
 
 /**
- Default scope value used across Auth0.swift
+ Auth0.swift wrapper for the Swift `Result` type
+ */
+public typealias Auth0Result<T> = Result<T, Error>
+
+ /**
+  Default scope value used across Auth0.swift
  */
 public let defaultScope = "openid profile email"
 

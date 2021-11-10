@@ -3,7 +3,7 @@ import Foundation
 
 class BaseTransaction: NSObject, AuthTransaction {
 
-    typealias FinishTransaction = (Result<Credentials>) -> Void
+    typealias FinishTransaction = (Auth0Result<Credentials>) -> Void
 
     var authSession: AuthSession?
     let state: String?
@@ -26,7 +26,7 @@ class BaseTransaction: NSObject, AuthTransaction {
     }
 
     func cancel() {
-        self.callback(Result.failure(WebAuthError.userCancelled))
+        self.callback(.failure(WebAuthError.userCancelled))
         authSession?.cancel()
         authSession = nil
     }
