@@ -49,6 +49,10 @@ The following public protocols have been removed:
 
 Both have been subsumed in `AuthTransaction`.
 
+### Enums
+
+The custom `Result` enum has been removed, along with its shims. Auth0.swift is now using the Swift 5 `Result` type.
+
 ### Classes
 
 The following Objective-C compatibility wrappers have been removed:
@@ -83,7 +87,7 @@ The following cases were removed, as they are no longer necessary:
 
 ### `Credentials` class
 
-All the properties are no longer marked with the `@objc` attribute. Additionally, the following properties are no longer optional:
+The properties are no longer marked with the `@objc` attribute. Additionally, the following properties are no longer optional:
 
 - `accessToken`
 - `tokenType`
@@ -92,7 +96,7 @@ All the properties are no longer marked with the `@objc` attribute. Additionally
 
 ### `UserInfo` struct
 
-All the properties are no longer marked with the `@objc` attribute.
+The properties are no longer marked with the `@objc` attribute.
 
 ### `NSError` extension
 
