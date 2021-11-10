@@ -32,6 +32,12 @@ If your app is using HS256, you'll need to switch it to RS256 in the dashboard o
 
 **Your app's settings > Advanced settings > JSON Web Token (JWT) Signature Algorithm**
 
+## Default values
+
+### Scope
+
+The default scope value in Web Auth and all the Authentication client methods (except `renew(withRefreshToken:scope:)`, in which `scope` keeps defaulting to `nil`) was changed from an assortment of values to `openid profile email`.
+
 ## Types removed
 
 ### Protocols
@@ -108,7 +114,7 @@ The following methods lost the `parameters` parameter:
 - `loginDefaultDirectory(withUsername:password:audience:scope:)`
 - `tokenExchange()`
 
-To pass custom parameters to those (or any) method, use the `parameters(_:)` method from `Request`:
+To pass custom parameters to those (or any) method in the Authentication client, use the `parameters(_:)` method from `Request`:
 
 ```swift
 Auth0
@@ -119,6 +125,24 @@ Auth0
         print(result)
     }
 ```
+
+#### Reordered `scope` and `audience` parameters
+
+In the following methods the `scope` and `audience` parameters switched places, for consistency with the rest of the methods in the Authentication client:
+
+- `login(appleAuthorizationCode:fullName:profile:audience:scope:)`
+- `login(facebookSessionAccessToken:profile:audience:scope:)`
+
+#### Changed `scope` parameter to be non-optional
+
+In the following methods the `scope` parameter became non-optional (with a default value of `openid profile email`):
+
+- `login(email:code:audience:scope:)`
+- `login(phoneNumber:code:audience:scope:)`
+- `login(usernameOrEmail:password:realm:audience:scope:)`
+- `loginDefaultDirectory(withUsername:password:audience:scope:)`
+- `login(appleAuthorizationCode:fullName:profile:audience:scope:)`
+- `login(facebookSessionAccessToken:profile:audience:scope:)`
 
 #### Removed `channel` parameter
 
