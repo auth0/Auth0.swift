@@ -7,7 +7,7 @@ import Auth0ObjectiveC
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
-    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void)
+    func credentials(from values: [String: String], callback: @escaping (Auth0Result<Credentials>) -> Void)
     func values(fromComponents components: URLComponents) -> [String: String]
 }
 
@@ -69,7 +69,7 @@ struct PKCE: OAuth2Grant {
         self.defaults = newDefaults
     }
 
-    func credentials(from values: [String: String], callback: @escaping (Result<Credentials>) -> Void) {
+    func credentials(from values: [String: String], callback: @escaping (Auth0Result<Credentials>) -> Void) {
         guard let code = values["code"] else {
             let string = "No code found in parameters \(values)"
             return callback(.failure(AuthenticationError(string: string)))

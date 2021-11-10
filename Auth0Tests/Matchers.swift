@@ -138,9 +138,8 @@ func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQ
     }
 }
 
-
-func haveAuthenticationError<T>(code: String, description: String) -> Predicate<Result<T>> {
-    return Predicate<Result<T>>.define("an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
+func haveAuthenticationError<T>(code: String, description: String) -> Predicate<Auth0Result<T>> {
+    return Predicate<Auth0Result<T>>.define("an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .failure(let cause as AuthenticationError) = actual {
             return PredicateResult(bool: code == cause.code && description == cause.description, message: failureMessage)
         }
@@ -148,7 +147,7 @@ func haveAuthenticationError<T>(code: String, description: String) -> Predicate<
     }
 }
 
-func haveManagementError<T>(_ error: String, description: String, code: String, statusCode: Int) -> Predicate<Result<T>> {
+func haveManagementError<T>(_ error: String, description: String, code: String, statusCode: Int) -> Predicate<Auth0Result<T>> {
     return beFailure("server error response") { (cause: ManagementError) in
         return error == (cause.info["error"] as? String)
             && code == (cause.info["code"] as? String)
@@ -157,8 +156,8 @@ func haveManagementError<T>(_ error: String, description: String, code: String, 
     }
 }
 
-func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Predicate<Result<Credentials>> {
-    return Predicate<Result<Credentials>>.define("a successful authentication result") { expression, failureMessage -> PredicateResult in
+func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Predicate<Auth0Result<Credentials>> {
+    return Predicate<Auth0Result<Credentials>>.define("a successful authentication result") { expression, failureMessage -> PredicateResult in
         if let accessToken = accessToken {
             _ = failureMessage.appended(message: " <access_token: \(accessToken)>")
         }
@@ -172,8 +171,8 @@ func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> 
     }
 }
 
-func haveCreatedUser(_ email: String, username: String? = nil) -> Predicate<Result<DatabaseUser>> {
-    return Predicate<Result<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> PredicateResult in
+func haveCreatedUser(_ email: String, username: String? = nil) -> Predicate<Auth0Result<DatabaseUser>> {
+    return Predicate<Auth0Result<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .success(let created) = actual {
             return PredicateResult(bool: created.email == email && (username == nil || created.username == username), message: failureMessage)
         }
@@ -181,8 +180,8 @@ func haveCreatedUser(_ email: String, username: String? = nil) -> Predicate<Resu
     }
 }
 
-func beSuccessful<T>() -> Predicate<Result<T>> {
-    return Predicate<Result<T>>.define("be a successful result") { expression, failureMessage -> PredicateResult in
+func beSuccessful<T>() -> Predicate<Auth0Result<T>> {
+    return Predicate<Auth0Result<T>>.define("be a successful result") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .success = actual {
             return PredicateResult(status: .matches, message: failureMessage)
         }
@@ -190,8 +189,8 @@ func beSuccessful<T>() -> Predicate<Result<T>> {
     }
 }
 
-func beFailure<T>(_ cause: String? = nil) -> Predicate<Result<T>> {
-    return Predicate<Result<T>>.define("be a failure result") { expression, failureMessage -> PredicateResult in
+func beFailure<T>(_ cause: String? = nil) -> Predicate<Auth0Result<T>> {
+    return Predicate<Auth0Result<T>>.define("be a failure result") { expression, failureMessage -> PredicateResult in
         if let cause = cause {
             _ = failureMessage.appended(message: " with cause \(cause)")
         } else {
@@ -204,8 +203,8 @@ func beFailure<T>(_ cause: String? = nil) -> Predicate<Result<T>> {
     }
 }
 
-func beFailure<T>(_ cause: String? = nil, predicate: @escaping (AuthenticationError) -> Bool) -> Predicate<Result<T>> {
-    return Predicate<Result<T>>.define("be a failure result") { expression, failureMessage -> PredicateResult in
+func beFailure<T>(_ cause: String? = nil, predicate: @escaping (AuthenticationError) -> Bool) -> Predicate<Auth0Result<T>> {
+    return Predicate<Auth0Result<T>>.define("be a failure result") { expression, failureMessage -> PredicateResult in
         if let cause = cause {
             _ = failureMessage.appended(message: " with cause \(cause)")
         } else {
@@ -218,8 +217,8 @@ func beFailure<T>(_ cause: String? = nil, predicate: @escaping (AuthenticationEr
     }
 }
 
-func beFailure<T>(_ cause: String? = nil, predicate: @escaping (ManagementError) -> Bool) -> Predicate<Result<T>> {
-    return Predicate<Result<T>>.define("be a failure result") { expression, failureMessage -> PredicateResult in
+func beFailure<T>(_ cause: String? = nil, predicate: @escaping (ManagementError) -> Bool) -> Predicate<Auth0Result<T>> {
+    return Predicate<Auth0Result<T>>.define("be a failure result") { expression, failureMessage -> PredicateResult in
         if let cause = cause {
             _ = failureMessage.appended(message: " with cause \(cause)")
         } else {
@@ -232,8 +231,8 @@ func beFailure<T>(_ cause: String? = nil, predicate: @escaping (ManagementError)
     }
 }
 
-func haveProfile(_ userId: String) -> Predicate<Result<Profile>> {
-    return Predicate<Result<Profile>>.define("have user profile for user id <\(userId)>") { expression, failureMessage -> PredicateResult in
+func haveProfile(_ userId: String) -> Predicate<Auth0Result<Profile>> {
+    return Predicate<Auth0Result<Profile>>.define("have user profile for user id <\(userId)>") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .success(let profile) = actual {
             return PredicateResult(bool: profile.id == userId, message: failureMessage)
         }
@@ -241,8 +240,8 @@ func haveProfile(_ userId: String) -> Predicate<Result<Profile>> {
     }
 }
 
-func haveProfileOIDC(_ sub: String) -> Predicate<Result<UserInfo>> {
-    return Predicate<Result<UserInfo>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> PredicateResult in
+func haveProfileOIDC(_ sub: String) -> Predicate<Auth0Result<UserInfo>> {
+    return Predicate<Auth0Result<UserInfo>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .success(let userInfo) = actual {
             return PredicateResult(bool: userInfo.sub == sub, message: failureMessage)
         }
@@ -250,8 +249,8 @@ func haveProfileOIDC(_ sub: String) -> Predicate<Result<UserInfo>> {
     }
 }
 
-func haveObjectWithAttributes(_ attributes: [String]) -> Predicate<Result<[String: Any]>> {
-    return Predicate<Result<[String: Any]>>.define("have attribues \(attributes)") { expression, failureMessage -> PredicateResult in
+func haveObjectWithAttributes(_ attributes: [String]) -> Predicate<Auth0Result<[String: Any]>> {
+    return Predicate<Auth0Result<[String: Any]>>.define("have attribues \(attributes)") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .success(let value) = actual {
             let outcome = Array(value.keys).reduce(true, { (initial, value) -> Bool in
                 return initial && attributes.contains(value)
@@ -262,8 +261,8 @@ func haveObjectWithAttributes(_ attributes: [String]) -> Predicate<Result<[Strin
     }
 }
 
-func haveJWKS() -> Predicate<Result<JWKS>> {
-    return Predicate<Result<JWKS>>.define("have a JWKS object with at least one key") { expression, failureMessage -> PredicateResult in
+func haveJWKS() -> Predicate<Auth0Result<JWKS>> {
+    return Predicate<Auth0Result<JWKS>>.define("have a JWKS object with at least one key") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .success(let jwks) = actual {
             return PredicateResult(bool: !jwks.keys.isEmpty, message: failureMessage)
         }

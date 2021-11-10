@@ -51,7 +51,7 @@ class MockNativeAuthTransaction: NativeAuthTransaction {
     }
 
     /// Test Hooks
-    var onNativeAuth: () -> Result<NativeAuthCredentials> = {
+    var onNativeAuth: () -> Auth0Result<NativeAuthCredentials> = {
         return .success(NativeAuthCredentials(token: FacebookToken, extras: [:]))
     }
 }

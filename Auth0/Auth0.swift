@@ -1,6 +1,11 @@
 import Foundation
 
 /**
+ Auth0.swift wrapper for the Swift `Result` type
+ */
+public typealias Auth0Result<T> = Result<T, Error>
+
+/**
  Auth0 Authentication API to authenticate your user using a Database, Social, Enterprise or Passwordless connections
 
  ```
