@@ -64,7 +64,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should have both token when scope contains 'openid'") {
+            it("should have both tokens when scope contains 'openid'") {
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "openid profile email").start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
