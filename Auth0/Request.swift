@@ -15,7 +15,7 @@ import Foundation
  ```
  */
 public struct Request<T, E: Auth0Error>: Requestable {
-    public typealias Callback = (Result<T>) -> Void
+    public typealias Callback = (Auth0Result<T>) -> Void
 
     let session: URLSession
     let url: URL
@@ -100,7 +100,7 @@ public struct ConcatRequest<F, S, E: Auth0Error>: Requestable {
 
      - parameter callback: called when the request finishes and yield it's result
      */
-    public func start(_ callback: @escaping (Result<ResultType>) -> Void) {
+    public func start(_ callback: @escaping (Auth0Result<ResultType>) -> Void) {
         let second = self.second
         first.start { result in
             switch result {

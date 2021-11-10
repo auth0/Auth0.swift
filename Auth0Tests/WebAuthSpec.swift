@@ -54,7 +54,7 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
         "client_id": ClientId,
         "response_type": "code",
         "redirect_uri": RedirectURL.absoluteString,
-        "scope": "openid",
+        "scope": defaultScope,
     ]
     parameters.forEach { query[$0] = $1 }
     return query

@@ -18,8 +18,8 @@ class BaseTransactionSpec: QuickSpec {
 
     override func spec() {
         var transaction: BaseTransaction!
-        var result: Result<Credentials>? = nil
-        let callback: (Result<Credentials>) -> () = { result = $0 }
+        var result: Auth0Result<Credentials>? = nil
+        let callback: (Auth0Result<Credentials>) -> () = { result = $0 }
         let authentication = Auth0Authentication(clientId: ClientId, url: Domain)
         let generator = ChallengeGenerator()
         let handler = PKCE(authentication: authentication,
