@@ -37,6 +37,7 @@ class ChallengeGeneratorSpec: QuickSpec {
         }
 
         it("should return verifier as base64 url-safe") {
+            expect(generator.verifier.count) == 43
             expect(generator.verifier).to(beURLSafeBase64())
         }
 
