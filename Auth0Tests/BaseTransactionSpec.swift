@@ -21,7 +21,7 @@ class BaseTransactionSpec: QuickSpec {
         var result: Result<Credentials>? = nil
         let callback: (Result<Credentials>) -> () = { result = $0 }
         let authentication = Auth0Authentication(clientId: ClientId, url: Domain)
-        let generator = A0SHA256ChallengeGenerator()
+        let generator = ChallengeGenerator()
         let handler = PKCE(authentication: authentication,
                            generator: generator,
                            redirectURL: RedirectURL,

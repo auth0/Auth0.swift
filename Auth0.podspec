@@ -1,6 +1,4 @@
 web_auth_files = [
-  'Auth0/ObjectiveC/A0ChallengeGenerator.h',
-  'Auth0/ObjectiveC/A0ChallengeGenerator.m',
   'Auth0/ObjectiveC/A0RSA.h',
   'Auth0/ObjectiveC/A0RSA.m',
   'Auth0/ObjectiveC/A0SHA.h',

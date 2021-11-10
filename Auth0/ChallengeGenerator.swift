@@ -1,34 +1,31 @@
 import Foundation
-import CryptoKit
+import CommonCrypto
 
-public extension Data {
-    func a0_encodeBase64URLSafe() -> String? {
-        return self
-            .base64EncodedString(options: [])
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .trimmingCharacters(in: CharacterSet(charactersIn: "="))
-    }
-}
-
-func verifier() -> String? {
+func getVerifier() -> String? {
     let data = Data(count: 32)
     var tempData = data
-    let result = tempData.withUnsafeMutableBytes {
+    _ = tempData.withUnsafeMutableBytes {
         SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
     }
-    guard result == 0 else { return nil }
     return tempData.a0_encodeBase64URLSafe()
 }
 
-func challenge(for verifier: String) -> String? {
-    let challenge = verifier
-        .data(using: .ascii)
-        .map { SHA256.hash(data: $0) }
-
-    guard let challenge = challenge else { return nil }
-    return Data(challenge).a0_encodeBase64URLSafe()
+func getChallenge(for verifier: String) -> String? {
+    guard let data = verifier.data(using: .utf8) else { return nil }
+    var buffer = [UInt8](repeating: 0,  count: Int(CC_SHA256_DIGEST_LENGTH))
+    _ = data.withUnsafeBytes {
+        CC_SHA256($0.baseAddress, CC_LONG(data.count), &buffer)
+    }
+    return Data(buffer).a0_encodeBase64URLSafe()
 }
 
-print(verifier()?.count)
-print(challenge(for: verifier()!))
+struct ChallengeGenerator {
+    let verifier: String
+    let challenge: String
+    let method = "S256"
+
+    init(verifier: String? = nil) {
+        self.verifier = verifier ?? getVerifier()!
+        self.challenge = getChallenge(for: self.verifier)!
+    }
+}
