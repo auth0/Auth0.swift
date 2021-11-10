@@ -2,19 +2,12 @@
 import UIKit
 import AuthenticationServices
 
-public typealias A0URLOptionsKey = UIApplication.OpenURLOptionsKey
+extension UIApplication {
 
-/**
- Resumes the current Auth session (if any).
+    static func shared() -> UIApplication? {
+        return UIApplication.perform(NSSelectorFromString("sharedApplication"))?.takeUnretainedValue() as? UIApplication
+    }
 
- - parameter url:     url received by the iOS application in AppDelegate
- - parameter options: dictionary with launch options received by the iOS application in AppDelegate
-
- - returns: if the url was handled by an on going session or not.
- */
-@available(*, deprecated, message: "this method is not needed when targeting iOS 11+")
-public func resumeAuth(_ url: URL, options: [A0URLOptionsKey: Any] = [:]) -> Bool {
-    return TransactionStore.shared.resume(url)
 }
 
 @available(iOS 13.0, *)

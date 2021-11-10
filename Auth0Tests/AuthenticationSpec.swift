@@ -38,93 +38,6 @@ class AuthenticationSpec: QuickSpec {
             HTTPStubs.removeAllStubs()
         }
 
-        describe("login") {
-
-            beforeEach {
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": defaultScope])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": defaultScope])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": InvalidPassword])) { _ in return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
-            }
-
-            it("should login with username and password") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
-                        expect(result).to(haveCredentials())
-                        done()
-                    }
-                }
-            }
-
-            it("should have an access_token") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "read:users").start { result in
-                        expect(result).to(haveCredentials(AccessToken))
-                        done()
-                    }
-                }
-            }
-
-            it("should have both tokens when scope contains 'openid'") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, scope: "openid profile email").start { result in
-                        expect(result).to(haveCredentials(AccessToken, IdToken))
-                        done()
-                    }
-                }
-            }
-
-            it("should report when fails to login") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: "invalid", connection: ConnectionName).start { result in
-                        expect(result).toNot(haveCredentials())
-                        done()
-                    }
-                }
-            }
-
-            it("should provide error payload from auth api") {
-
-                waitUntil(timeout: Timeout) { done in
-                    let code = "invalid_username_password"
-                    let description = "Invalid password"
-                    let password = "return invalid password"
-                    stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }.name = "invalid password"
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: password, connection: ConnectionName).start { result in
-                        expect(result).to(haveAuthenticationError(code: code, description: description))
-                        done()
-                    }
-                }
-            }
-
-            it("should provide error payload from lock auth api") {
-
-                waitUntil(timeout: Timeout) { done in
-                    let code = "invalid_username_password"
-                    let description = "Invalid password"
-                    let password = "return invalid password"
-                    stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(error: code, description: description) }.name = "invalid password"
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: password, connection: ConnectionName).start { result in
-                        expect(result).to(haveAuthenticationError(code: code, description: description))
-                        done()
-                    }
-                }
-            }
-
-            it("should send additional parameters") {
-                let token = "special token for state"
-                let state = UUID().uuidString
-                let password = UUID().uuidString
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["password": password, "state": state])) { _ in return authResponse(accessToken: token) }.name = "Custom Parameter Auth"
-                waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: "mail@auth0.com", password: password, connection: ConnectionName, parameters: ["state": state]).start { result in
-                        expect(result).to(haveCredentials(token))
-                        done()
-                    }
-                }
-            }
-
-        }
-
         describe("login MFA OTP") {
 
             beforeEach {
@@ -401,14 +314,7 @@ class AuthenticationSpec: QuickSpec {
                                 done()
                         }
                     }
-                    
-                    waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid profile email")
-                            .start { result in
-                                expect(result).to(haveCredentials())
-                                done()
-                        }
-                    }
+
                 }
                 
                 it("should exchange apple auth code and fail") {
@@ -419,14 +325,7 @@ class AuthenticationSpec: QuickSpec {
                                 done()
                         }
                     }
-                    
-                    waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withAppleAuthorizationCode: "INVALIDCODE")
-                            .start { result in
-                                expect(result).toNot(haveCredentials())
-                                done()
-                        }
-                    }
+
                 }
                 
                 it("should exchange apple auth code for credentials with custom scope") {
@@ -437,14 +336,7 @@ class AuthenticationSpec: QuickSpec {
                                 done()
                         }
                     }
-                    
-                    waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email")
-                            .start { result in
-                                expect(result).to(haveCredentials())
-                                done()
-                        }
-                    }
+
                 }
                 
                 it("should exchange apple auth code for credentials with custom scope and audience") {
@@ -455,14 +347,7 @@ class AuthenticationSpec: QuickSpec {
                                 done()
                         }
                     }
-                    
-                    waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDCODE", scope: "openid email", audience: "https://myapi.com/api")
-                            .start { result in
-                                expect(result).to(haveCredentials())
-                                done()
-                        }
-                    }
+
                 }
                 
                 it("should exchange apple auth code for credentials with fullName") {
@@ -472,8 +357,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.middleName = "Ignored"
 
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDNAMECODE",
-                                           fullName: fullName)
+                        auth.login(appleAuthorizationCode: "VALIDNAMECODE", fullName: fullName)
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -488,8 +372,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.middleName = "Ignored"
                     
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDPARTIALNAMECODE",
-                                           fullName: fullName)
+                        auth.login(appleAuthorizationCode: "VALIDPARTIALNAMECODE", fullName: fullName)
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -504,8 +387,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.middleName = nil
                     
                     waitUntil(timeout: Timeout) { done in
-                        auth.tokenExchange(withAppleAuthorizationCode: "VALIDMISSINGNAMECODE",
-                                           fullName: fullName)
+                        auth.login(appleAuthorizationCode: "VALIDMISSINGNAMECODE", fullName: fullName)
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -633,46 +515,6 @@ class AuthenticationSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     auth.revoke(refreshToken: refreshToken).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
-                        done()
-                    }
-                }
-            }
-
-        }
-
-        // MARK:- Delegation
-        describe("delegation") {
-
-            let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-
-            beforeEach {
-                let delegationPayload = [
-                    "refresh_token": refreshToken,
-                    "client_id": ClientId,
-                    "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-                    "api_type": "app",
-                    "scope": "openid"
-                ]
-                stub(condition: isMethodPOST() && isHost(Domain) && isPath("/delegation") && hasAllOf(delegationPayload)) { _ in return authResponse(accessToken: AccessToken) }.name = "delegation with refresh token"
-            }
-
-            it("should receive access token") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.delegation(withParameters: [
-                        "refresh_token": refreshToken,
-                        "api_type": "app",
-                        "scope": "openid"
-                        ]).start { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                    }
-                }
-            }
-
-            it("should fail to recieve access token") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.delegation(withParameters: [:]).start { result in
-                        expect(result).to(beFailure())
                         done()
                     }
                 }
@@ -910,71 +752,6 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        describe("create user and login") {
-
-            it("should fail if create user fails") {
-                let code = "create_failed"
-                let description = "failed create user"
-                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "User w/email"
-                waitUntil(timeout: Timeout) { done in
-                    auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
-                        expect(result).to(haveAuthenticationError(code: code, description: description))
-                        done()
-                    }
-                }
-            }
-
-            it("should fail if login fails") {
-                let code = "invalid_password_failed"
-                let description = "failed to login"
-                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authFailure(code: code, description: description) }.name = "OpenID Auth"
-                waitUntil(timeout: Timeout) { done in
-                    auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
-                        expect(result).to(haveAuthenticationError(code: code, description: description))
-                        done()
-                    }
-                }
-            }
-
-            it("should create user and login") {
-                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                waitUntil(timeout: Timeout) { done in
-                    auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
-                        expect(result).to(haveCredentials(AccessToken, IdToken))
-                        done()
-                    }
-                }
-            }
-
-            it("should login with custom parameters") {
-                let state = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-                stub(condition: isSignUp(Domain) && hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": ConnectionName, "client_id": ClientId])) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "state": state])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                waitUntil(timeout: Timeout) { done in
-                    auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, parameters: ["state": state]).start { result in
-                        expect(result).to(haveCredentials(AccessToken, IdToken))
-                        done()
-                    }
-                }
-            }
-
-            it("should create user with metadata") {
-                let country = "Argentina"
-                let metadata = ["country": country]
-                stub(condition: isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/email"
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                waitUntil(timeout: Timeout) { done in
-                    auth.signUp(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
-                        expect(result).to(haveCredentials(AccessToken, IdToken))
-                        done()
-                    }
-                }
-            }
-
-        }
-
         describe("passwordless email") {
 
             it("should start with email with default values") {
@@ -1184,55 +961,11 @@ class AuthenticationSpec: QuickSpec {
 
         describe("user information") {
 
-            it("should return token information") {
-                stub(condition: isTokenInfo(Domain) && hasAllOf(["id_token": IdToken])) { _ in return tokenInfo() }.name = "token info"
-                waitUntil(timeout: Timeout) { done in
-                    auth.tokenInfo(token: IdToken).start { result in
-                        expect(result).to(haveProfile(UserId))
-                        done()
-                    }
-                }
-            }
-
-            it("should report failure to get token info") {
-                stub(condition: isTokenInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
-                waitUntil(timeout: Timeout) { done in
-                    auth.tokenInfo(token: IdToken).start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_token", description: "the token is invalid"))
-                        done()
-                    }
-                }
-            }
-
             it("should return user information") {
-                stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo(withProfile: basicProfile()) }.name = "user info"
-                waitUntil(timeout: Timeout) { done in
-                    auth.userInfo(token: AccessToken).start { result in
-                        expect(result).to(haveProfile(UserId))
-                        done()
-                    }
-                }
-            }
-
-            it("should report failure to get user info") {
-                stub(condition: isUserInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
-                waitUntil(timeout: Timeout) { done in
-                    auth.userInfo(token: IdToken).start { result in
-                        expect(result).to(haveAuthenticationError(code: "invalid_token", description: "the token is invalid"))
-                        done()
-                    }
-                }
-            }
-
-        }
-
-        describe("user information OIDC conformant") {
-
-            it("should return user information") {
-                stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo(withProfile: basicProfileOIDC()) }.name = "user info oidc"
+                stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo(withProfile: basicProfileOIDC()) }.name = "user info"
                 waitUntil(timeout: Timeout) { done in
                     auth.userInfo(withAccessToken: AccessToken).start { result in
-                        expect(result).to(haveProfileOIDC(Sub))
+                        expect(result).to(haveProfile(Sub))
                         done()
                     }
                 }
@@ -1248,91 +981,6 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
             
-        }
-
-        describe("social login") {
-
-            beforeEach {
-                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook", "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Facebook Auth OpenID"
-                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token":FacebookToken, "connection": "facebook"]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Facebook Auth"
-                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": InvalidFacebookToken])) { _ in return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
-            }
-
-            it("should login with social IdP token") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.loginSocial(token: FacebookToken, connection: "facebook").start { result in
-                        expect(result).to(haveCredentials())
-                        done()
-                    }
-                }
-            }
-
-            it("should have an access_token") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.loginSocial(token: FacebookToken, connection: "facebook", scope: "read:users").start { result in
-                        expect(result).to(haveCredentials(AccessToken))
-                        done()
-                    }
-                }
-            }
-
-            it("should have both tokens when scope is 'openid'") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.loginSocial(token: FacebookToken, connection: "facebook", scope: "openid").start { result in
-                        expect(result).to(haveCredentials(AccessToken, IdToken))
-                        done()
-                    }
-                }
-            }
-
-            it("should report when fails to login") {
-                waitUntil(timeout: Timeout) { done in
-                    auth.loginSocial(token: InvalidFacebookToken, connection: "facebook").start { result in
-                        expect(result).toNot(haveCredentials())
-                        done()
-                    }
-                }
-            }
-
-            it("should provide error payload from auth api") {
-                waitUntil(timeout: Timeout) { done in
-                    let code = "invalid_token"
-                    let description = "Invalid token"
-                    let token = "return invalid token"
-                    stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(code: code, description: description) }.name = "invalid token"
-                    auth.loginSocial(token: token, connection: "facebook").start { result in
-                        expect(result).to(haveAuthenticationError(code: code, description: description))
-                        done()
-                    }
-                }
-            }
-
-            it("should provide error payload from lock auth api") {
-                waitUntil(timeout: Timeout) { done in
-                    let code = "invalid_token"
-                    let description = "Invalid token"
-                    let token = "return invalid token"
-                    stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token])) { _ in return authFailure(error: code, description: description) }.name = "invalid token"
-                    auth.loginSocial(token: token, connection: "facebook").start { result in
-                        expect(result).to(haveAuthenticationError(code: code, description: description))
-                        done()
-                    }
-                }
-            }
-
-            it("should send additional parameters") {
-                let accessToken = "special token for state"
-                let state = UUID().uuidString
-                let token = UUID().uuidString
-                stub(condition: isOAuthAccessToken(Domain) && hasAtLeast(["access_token": token, "state": state])) { _ in return authResponse(accessToken: accessToken) }.name = "Custom Parameter Auth"
-                waitUntil(timeout: Timeout) { done in
-                    auth.loginSocial(token: token, connection: "facebook", parameters: ["state": state]).start { result in
-                        expect(result).to(haveCredentials(accessToken))
-                        done()
-                    }
-                }
-            }
-
         }
 
         describe("code exchange") {
@@ -1372,39 +1020,6 @@ class AuthenticationSpec: QuickSpec {
 
         }
 
-        describe("resource owner multifactor") {
-
-            var code: String!
-
-            beforeEach {
-                code = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["mfa_code"])) { _ in return authFailure(error: "a0.mfa_required", description: "need multifactor") }.name = "MFA Required"
-                stub(condition: isResourceOwner(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "mfa_code": code])) { _ in return authResponse(accessToken: AccessToken) }.name = "MFA Login"
-            }
-
-            it("should report multifactor is required") {
-                waitUntil(timeout: Timeout) { done in
-                    auth
-                        .login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, connection: ConnectionName)
-                        .start { result in
-                            expect(result).to(beFailure { (error: AuthenticationError) in return error.isMultifactorRequired })
-                            done()
-                    }
-                }
-            }
-
-            it("should login with multifactor") {
-                waitUntil(timeout: Timeout) { done in
-                    auth
-                        .login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, multifactorCode: code, connection: ConnectionName)
-                        .start { result in
-                            expect(result).to(haveCredentials())
-                            done()
-                    }
-                }
-            }
-        }
-        
         describe("jwks") {
             context("successful fetch") {
                 it("should fetch the jwks") {

@@ -8,7 +8,6 @@ web_auth_files = [
   'Auth0/Array+Encode.swift',
   'Auth0/ASCallbackTransaction.swift',
   'Auth0/ASTransaction.swift',
-  'Auth0/AuthProvider.swift',
   'Auth0/AuthSession.swift',
   'Auth0/AuthTransaction.swift',
   'Auth0/Auth0WebAuth.swift',
@@ -22,7 +21,6 @@ web_auth_files = [
   'Auth0/JWK+RSA.swift',
   'Auth0/JWT+Header.swift',
   'Auth0/JWTAlgorithm.swift',
-  'Auth0/NativeAuth.swift',
   'Auth0/NSURLComponents+OAuth2.swift',
   'Auth0/OAuth2Grant.swift',
   'Auth0/TransactionStore.swift',
@@ -31,13 +29,11 @@ web_auth_files = [
 ]
 
 ios_files = [
-  'Auth0/MobileWebAuth.swift',
-  'Auth0/UIApplication+Shared.swift'
+  'Auth0/MobileWebAuth.swift'
 ]
 
 macos_files = [
-  'Auth0/DesktopWebAuth.swift',
-  'Auth0/NSApplication+Shared.swift'
+  'Auth0/DesktopWebAuth.swift'
 ]
 
 excluded_files = [

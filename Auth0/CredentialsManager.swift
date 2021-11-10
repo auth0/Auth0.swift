@@ -40,19 +40,6 @@ public struct CredentialsManager {
         return UserInfo(json: jwt.body)
     }
 
-    /// Enable Biometric Authentication for additional security during credentials retrieval
-    ///
-    /// - Parameters:
-    ///   - title: main message to display in TouchID prompt
-    ///   - cancelTitle: cancel message to display in TouchID prompt (iOS 10+)
-    ///   - fallbackTitle: fallback message to display in TouchID prompt after a failed match
-    #if WEB_AUTH_PLATFORM
-    @available(*, deprecated, message: "see enableBiometrics(withTitle title:, cancelTitle:, fallbackTitle:)")
-    public mutating func enableTouchAuth(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
-        self.enableBiometrics(withTitle: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
-    }
-    #endif
-
     #if WEB_AUTH_PLATFORM
     /// Enable Biometric Authentication for additional security during credentials retrieval
     ///

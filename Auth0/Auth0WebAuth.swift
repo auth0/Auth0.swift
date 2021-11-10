@@ -8,7 +8,6 @@ final class Auth0WebAuth: WebAuth {
     let storage: TransactionStore
     var telemetry: Telemetry
     var logger: Logger?
-    var universalLink = false
     var ephemeralSession = false
 
     #if os(macOS)
@@ -30,7 +29,7 @@ final class Auth0WebAuth: WebAuth {
     lazy var redirectURL: URL? = {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
         var components = URLComponents(url: self.url, resolvingAgainstBaseURL: true)
-        components?.scheme = self.universalLink ? "https" : bundleIdentifier
+        components?.scheme = bundleIdentifier
         return components?.url?
             .appendingPathComponent(self.platform)
             .appendingPathComponent(bundleIdentifier)
@@ -46,11 +45,6 @@ final class Auth0WebAuth: WebAuth {
         self.storage = storage
         self.telemetry = telemetry
         self.issuer = "\(url.absoluteString)/"
-    }
-
-    func useUniversalLink() -> Self {
-        self.universalLink = true
-        return self
     }
 
     func connection(_ connection: String) -> Self {

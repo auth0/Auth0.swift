@@ -42,16 +42,29 @@ The default scope value in Web Auth and all the Authentication client methods (e
 
 ### Protocols
 
-The following public protocols have been removed:
+The following protocols have been removed:
 
 - `AuthResumable`
 - `AuthCancelable`
+- `AuthProvider`
+- `NativeAuthTransaction`
 
-Both have been subsumed in `AuthTransaction`.
+`AuthResumable` and `AuthCancelable` have been subsumed in `AuthTransaction`.
+
+### Type aliases
+
+The iOS-only type alias `A0URLOptionsKey` has been removed, as it is no longer needed.
 
 ### Enums
 
 The custom `Result` enum has been removed, along with its shims. Auth0.swift is now using the Swift 5 `Result` type.
+
+### Structs
+
+The following structs have been removed, as they are no longer in use:
+
+- `NativeAuthCredentials`
+- `ConcatRequest`
 
 ### Classes
 
@@ -61,7 +74,37 @@ The following Objective-C compatibility wrappers have been removed:
 - `_ObjectiveManagementAPI`
 - `_ObjectiveOAuth2`
 
+The following classes were also removed, as they are no longer in use:
+
+- `Profile`
+- `Identity`
+
 ## Metods Removed
+
+The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed.
+
+### Authentication client
+
+#### `login(usernameOrEmail:password:multifactorCode:connection:scope:parameters:)`
+
+Use `login(usernameOrEmail:password:realm:audience:scope:)` instead.
+
+#### `signUp(email:username:password:connection:userMetadata:scope:parameters:)`
+
+Use `createUser(email:username:password:connection:userMetadata:rootAttributes:` and then `login(usernameOrEmail:password:realm:audience:scope:)` instead.
+
+#### `tokenInfo(token:)` and `userInfo(token:)`
+
+Use `userInfo(withAccessToken:)` instead.
+
+#### `tokenExchange(withAppleAuthorizationCode:scope:audience:fullName:)`
+
+Use `login(appleAuthorizationCode:fullName:profile:audience:scope:)` instead. 
+
+The following methods have been removed and have no replacement, as they rely on deprecated endpoints:
+
+- `loginSocial(token:connection:scope:parameters:)`
+- `delegation(withParameters:)`
 
 ### Web Auth
 
@@ -69,6 +112,12 @@ Auth0.swift now only supports the [authorization code flow with PKCE](https://au
 
 - `usingImplicitGrant()`
 - `responseType(_:)`
+
+The `useUniversalLink()` method was removed as well, as Universal Links [cannot be used](https://openradar.appspot.com/51091611) for OAuth redirections without user interaction since iOS 10.
+
+### Credentials Manager
+
+The method `enableTouchAuth(withTitle:cancelTitle:fallbackTitle:)` was removed. Use `enableBiometrics(withTitle:cancelTitle:fallbackTitle:evaluationPolicy:)` instead.
 
 ## Errors Removed
 
