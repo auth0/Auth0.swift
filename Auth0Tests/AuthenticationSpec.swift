@@ -172,22 +172,6 @@ class AuthenticationSpec: QuickSpec {
                             }
                         }
                     }
-
-                    //            it("should use path prefix when specified") {
-                    //                let auth: Authentication = Auth0Authentication(clientId: ClientId, url: URL(string: "https://\(client.domainWithCustomPath)")!)
-                    //
-                    //                stub(condition: isResourceOwner(client.domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
-                    //                stub(condition: isResourceOwner(client.domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword]) && hasNoneOf(["scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Custom Scope Auth"
-                    //                stub(condition: isResourceOwner(client.domain) && hasAtLeast(["password": InvalidPassword])) { _ in return HTTPStubsResponse.init(error: NSError(client.domain: "com.auth0", code: -99999, userInfo: nil)) }.name = "Not Authorized"
-                    //                waitUntil(timeout: Timeout) { done in
-                    //                    client.auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
-                    //                        expect(result).to(haveCredentials())
-                    //                        done()
-                    //                    }
-                    //                }
-                    //
-                    //            }
-
                 }
 
                 describe("login MFA OTP") {
@@ -1854,10 +1838,6 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-//        describe("custom domain with additional custom path prefix") {
-//
-//        }
-//
             #if WEB_AUTH_PLATFORM
             describe("spawn WebAuth instance") {
 
