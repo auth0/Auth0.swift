@@ -97,61 +97,6 @@ public protocol Authentication: Trackable, Loggable {
     func login(phoneNumber username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Logs in an user using email|username and password using a Database and Passwordless connection
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(usernameOrEmail: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-        .start { result in
-            switch result {
-            case .Success(let credentials):
-                print(credentials)
-            case .Failure(let error):
-                print(error)
-            }
-        }
-     ```
-
-     you can also specify scope and additional parameters
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(usernameOrEmail: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
-        .start { print($0) }
-     ```
-
-     for passwordless connections
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(usernameOrEmail: "+4599134762367", password: "123456", connection: "sms", scope: "openid email", parameters: ["state": "a random state"])
-        .start { print($0) }
-     ```
-
-     Also some enterprise connections, like Active Directory (AD), allows authentication using username/password without using the web flow.
-
-     When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
-
-     - parameter usernameOrEmail:   username or email used of the user to authenticate, e.g. in email in Database connections or phone number for SMS connections.
-     - parameter password:          password of the user or one time password (OTP) for passwordless connection users
-     - parameter multifactorCode:   multifactor code if the user has enrolled one. e.g. Guardian. By default is `nil` and no code is sent.
-     - parameter connection:        name of any of your configured database or passwordless connections
-     - parameter scope:             scope value requested when authenticating the user. Default is 'openid'
-     - parameter parameters:        additional parameters that are optionally sent with the authentication request
-
-     - returns: authentication request that will yield Auth0 User Credentials
-     - seeAlso: Credentials
-     - warning: deprecated in favor of `login(usernameOrEmail username:, password:, realm:, audience:, scope:)` for Database connections. For Passwordless connections use `login(email:, code:, audience:, scope:, parameters:)` or `login(phoneNumber:, code:, audience:, scope:, parameters:)` instead.
-     - requires: Legacy Grant `http://auth0.com/oauth/legacy/grant-type/ro`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
-     */
-    @available(*, deprecated, message: "see login(usernameOrEmail username:, password:, realm:, audience:, scope:)")
-    // swiftlint:disable:next function_parameter_count
-    func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
-
-    /**
      Login using username and password in a realm.
 
      ```
@@ -391,58 +336,6 @@ public protocol Authentication: Trackable, Loggable {
     func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError>
 
     /**
-     Creates a database user and then authenticates the user against Auth0.
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-        .start { print($0) }
-     ```
-
-     you can also add additional attributes when creating the user
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
-        .start { print($0) }
-     ```
-
-     and if the database connection requires a username
-
-     ```
-     Auth0
-     .authentication(clientId: clientId, domain: "samples.auth0.com")
-     .signUp(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
-     .start { print($0) }
-     ```
-
-     or specifying the scope and parameters used for authentication
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
-        .start { print($0) }
-     ```
-
-     - parameter email:        email of the new user
-     - parameter username:     username of the user if connections requires username. By default is 'nil'
-     - parameter password:     password for the new user
-     - parameter connection:   name of the Database connection where the user will be created
-     - parameter userMetadata: additional userMetadata values added when creating the user
-     - parameter scope:        requested scope value when authenticating the user. By default is 'openid'
-     - parameter parameters:   additional parameters sent during authentication
-
-     - returns: an authentication request that will yield Auth0 user credentials after creating the user.
-     - requires: Legacy Grant `http://auth0.com/oauth/legacy/grant-type/ro`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
-     */
-    @available(*, deprecated, message: "use createUser(email:, username:, password:, connection:, userMetadata:) and then login(usernameOrEmail username:, password:, realm:, audience:, scope:)")
-    // swiftlint:disable:next function_parameter_count
-    func signUp(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, scope: String, parameters: [String: Any]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError>
-
-    /**
      Starts passwordless authentication by sending an email with a OTP code
 
      ```
@@ -500,41 +393,6 @@ public protocol Authentication: Trackable, Loggable {
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
     /**
-     Returns token information by performing a request to the `/tokeninfo` endpoint.
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .tokenInfo(token: token)
-        .start { print($0) }
-     ```
-     
-     - parameter token: token obtained by authenticating the user
-     - warning: deprecated in favor of `userInfo(withAccessToken accessToken:)`
-     - returns: a request that will yield token information
-     */
-    @available(*, deprecated, message: "see userInfo(withAccessToken accessToken:)")
-    func tokenInfo(token: String) -> Request<Profile, AuthenticationError>
-
-    /**
-     Returns user information by performing a request to the `/userinfo` endpoint.
-
-     ```
-     Auth0
-        .authentication(clientId, domain: "samples.auth0.com")
-        .userInfo(token: token)
-        .start { print($0) }
-     ```
-
-     - parameter token: token obtained by authenticating the user
-
-     - returns: a request that will yield user information
-     - warning: deprecated in favor of `userInfo(withAccessToken accessToken:)`
-     */
-    @available(*, deprecated, message: "see userInfo(withAccessToken accessToken:)")
-    func userInfo(token: String) -> Request<Profile, AuthenticationError>
-
-    /**
      Returns OIDC standard claims information by performing a request
      to the `/userinfo` endpoint.
 
@@ -551,37 +409,6 @@ public protocol Authentication: Trackable, Loggable {
      - important: This method should be used for OIDC Conformant clients.
      */
     func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError>
-
-    /**
-     Logs in a user using a social Identity Provider token. e.g. Facebook
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .loginSocial(token: fbToken, connection: "facebook")
-        .start { print($0) }
-     ```
-
-     and if you need to specify a scope or add additional parameters
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .loginSocial(token: fbToken, connection: "facebook", scope: "openid email", parameters: ["state": "a random state"])
-        .start { print($0) }
-     ```
-
-     - parameter token:      token obtained from a social IdP
-     - parameter connection: name of the social connection. Only works with 'google-oauth2', 'facebook' and 'twitter'
-     - parameter scope:      requested scope value when authenticating the user. By default is 'openid'
-     - parameter parameters: additional parameters sent during authentication
-
-     - returns: a request that will yield Auth0 user's credentials
-     - warning: deprecated as it is not available for OIDC-conformant clients
-     - requires: Legacy Grant `http://auth0.com/oauth/legacy/grant-type/access_token`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
-     */
-    @available(*, deprecated, message: "not available for OIDC-conformant clients")
-    func loginSocial(token: String, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
 
     /**
      Perform a OAuth2 token request against Auth0.
@@ -621,39 +448,6 @@ public protocol Authentication: Trackable, Loggable {
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
-    Authenticate a user with their Sign In With Apple authorization code.
-
-    ```
-    Auth0
-       .authentication(clientId: clientId, domain: "samples.auth0.com")
-       .tokenExchange(withAppleAuthorizationCode: authCode)
-       .start { print($0) }
-    ```
-
-    and if you need to specify a scope or add additional parameters
-
-    ```
-    Auth0
-       .authentication(clientId: clientId, domain: "samples.auth0.com")
-       .tokenExchange(withAppleAuthorizationCode: authCode,
-           scope: "openid profile email",
-           audience: "https://myapi.com/api",
-           fullName: credentials.fullName)
-       .start { print($0) }
-    ```
-
-    - parameter authCode: Authorization Code retrieved from Apple Authorization
-    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
-    - parameter audience: API Identifier that the client is requesting access to
-    - parameter fullName: The full name property returned with the Apple ID Credentials
-
-    - returns: a request that will yield Auth0 user's credentials
-    - warning: deprecated in favor of `login(appleAuthorizationCode authorizationCode:, fullName:, scope:, audience:)`
-    */
-    @available(*, deprecated, message: "see login(appleAuthorizationCode authorizationCode:, fullName:, scope:, audience:)")
-    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String?, audience: String?, fullName: PersonNameComponents?) -> Request<Credentials, AuthenticationError>
-
-    /**
      Renew user's credentials with a refresh_token grant for `/oauth/token`
 
      - parameter refreshToken: the client's refresh token
@@ -677,16 +471,6 @@ public protocol Authentication: Trackable, Loggable {
      - returns: a request
      */
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError>
-
-    /**
-     Calls delegation endpoint with the given parameters.
-     The only parameters it adds by default are `grant_type` and `client_id`.
-     - parameter parameters: dictionary with delegation parameters to send in the request.
-     - returns: a request that will yield the result of delegation
-     - warning: deprecated due to the `/delegation` endpoint being deprecated
-    */
-    @available(*, deprecated, message: "the delegation endpoint is deprecated")
-    func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError>
 
     /**
     Returns JSON Web Key Set (JWKS) information by performing a request to the `/.well-known/jwks.json` endpoint.
@@ -833,60 +617,6 @@ public extension Authentication {
     */
     func login(phoneNumber username: String, code otp: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         return self.login(phoneNumber: username, code: otp, audience: audience, scope: scope)
-    }
-
-    /**
-     Logs in an user using email|username and password using a Database and Passwordless connection
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(usernameOrEmail: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-        .start { result in
-            switch result {
-            case .Success(let credentials):
-                print(credentials)
-            case .Failure(let error):
-                print(error)
-            }
-        }
-     ```
-
-     you can also specify scope and additional parameters
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(usernameOrEmail: "support@auth0.com", password:  "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
-        .start { print($0) }
-     ```
-
-     for passwordless connections
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .login(usernameOrEmail: "+4599134762367", password: "123456", connection: "sms", scope: "openid email", parameters: ["state": "a random state"])
-        .start { print($0) }
-     ```
-
-     Also some enterprise connections, like Active Directory (AD), allows authentication using username/password without using the web flow.
-
-     When result is `.success`, its associated value will be a`Credentials` object containing at least an `access_token` (depending on the scopes used to authenticate)
-
-     - parameter usernameOrEmail:   username or email used of the user to authenticate, e.g. in email in Database connections or phone number for SMS connections.
-     - parameter password:          password of the user or one time password (OTP) for passwordless connection users
-     - parameter multifactorCode:   multifactor code if the user has enrolled one. e.g. Guardian. By default is `nil` and no code is sent.
-     - parameter connection:        name of any of your configured database or passwordless connections
-     - parameter scope:             scope value requested when authenticating the user. Default is 'openid'
-     - parameter parameters:        additional parameters that are optionally sent with the authentication request
-
-     - returns: authentication request that will yield Auth0 User Credentials
-     - seeAlso: Credentials
-     - requires: Legacy Grant `http://auth0.com/oauth/legacy/grant-type/ro`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
-     */
-    func login(usernameOrEmail username: String, password: String, multifactorCode: String? = nil, connection: String, scope: String = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
-        return self.login(usernameOrEmail: username, password: password, multifactorCode: multifactorCode, connection: connection, scope: scope, parameters: parameters)
     }
 
     /**
@@ -1084,58 +814,6 @@ public extension Authentication {
     }
 
     /**
-     Creates a database user and then authenticates the user against Auth0.
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
-        .start { print($0) }
-     ```
-
-     you can also add additional attributes when creating the user
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
-        .start { print($0) }
-     ```
-
-     and if the database connection requires a username
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .signUp(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
-        .start { print($0) }
-     ```
-
-     or specifying the scope and parameters used for authentication
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .signUp(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", scope: "openid email", parameters: ["state": "a random state"])
-        .start { print($0) }
-     ```
-
-     - parameter email:        email of the new user
-     - parameter username:     username of the user if connections requires username. By default is 'nil'
-     - parameter password:     password for the new user
-     - parameter connection:   name of the Database connection where the user will be created
-     - parameter userMetadata: additional userMetadata values added when creating the user
-     - parameter scope:        requested scope value when authenticating the user. By default is 'openid'
-     - parameter parameters:   additional parameters sent during authentication
-
-     - returns: an authentication request that will yield Auth0 user credentials after creating the user.
-     - requires: Legacy Grant `http://auth0.com/oauth/legacy/grant-type/ro`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
-     */
-    func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, scope: String = "openid", parameters: [String: Any] = [:]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError> {
-        return self.signUp(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, scope: scope, parameters: parameters)
-    }
-
-    /**
      Starts passwordless authentication by sending an email with a OTP code
 
      ```
@@ -1194,37 +872,6 @@ public extension Authentication {
     }
 
     /**
-     Logs in a user using a social Identity Provider token. e.g. Facebook
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .loginSocial(token: fbToken, connection: "facebook")
-        .start { print($0) }
-     ```
-
-     and if you need to specify a scope or add additional parameters
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .loginSocial(token: fbToken, connection: "facebook", scope: "openid email", parameters: ["state": "a random state"])
-        .start { print($0) }
-     ```
-
-     - parameter token:      token obtained from a social IdP
-     - parameter connection: name of the social connection. Only works with 'google-oauth2', 'facebook' and 'twitter'
-     - parameter scope:      requested scope value when authenticating the user. By default is 'openid'
-     - parameter parameters: additional parameters sent during authentication
-
-     - returns: a request that will yield Auth0 user's credentials
-     - requires: Legacy Grant `http://auth0.com/oauth/legacy/grant-type/access_token`. Check [our documentation](https://auth0.com/docs/clients/client-grant-types) for more info and how to enable it.
-     */
-    func loginSocial(token: String, connection: String, scope: String = "openid", parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
-        return self.loginSocial(token: token, connection: connection, scope: scope, parameters: parameters)
-    }
-
-    /**
      Renew user's credentials with a refresh_token grant for `/oauth/token`
      
      ```
@@ -1248,39 +895,6 @@ public extension Authentication {
      */
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.renew(withRefreshToken: refreshToken, scope: scope)
-    }
-
-    /**
-    Authenticate a user with their Sign In With Apple authorization code.
-
-    ```
-    Auth0
-       .authentication(clientId: clientId, domain: "samples.auth0.com")
-       .tokenExchange(withAppleAuthorizationCode: authCode)
-       .start { print($0) }
-    ```
-
-    and if you need to specify a scope or add additional parameters
-
-    ```
-    Auth0
-       .authentication(clientId: clientId, domain: "samples.auth0.com")
-       .tokenExchange(withAppleAuthorizationCode: authCode,
-           scope: "openid profile email",
-           audience: "https://myapi.com/api",
-           fullName: credentials.fullName)
-       .start { print($0) }
-    ```
-
-    - parameter authCode: Authorization Code retrieved from Apple Authorization
-    - parameter scope: Requested scope value when authenticating the user. By default is `openid profile offline_access`
-    - parameter audience: API Identifier that the client is requesting access to
-    - parameter fullName: The full name property returned with the Apple ID Credentials
-
-    - returns: a request that will yield Auth0 user's credentials
-    */
-    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String? = "openid profile offline_access", audience: String? = nil, fullName: PersonNameComponents? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.tokenExchange(withAppleAuthorizationCode: authCode, scope: scope, audience: audience, fullName: fullName)
     }
 
 }

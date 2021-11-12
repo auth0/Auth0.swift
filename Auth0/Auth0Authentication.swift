@@ -1,8 +1,5 @@
-// swiftlint:disable file_length
-
 import Foundation
 
-// swiftlint:disable:next type_body_length
 struct Auth0Authentication: Authentication {
 
     let clientId: String
@@ -25,28 +22,6 @@ struct Auth0Authentication: Authentication {
 
     func login(phoneNumber username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         return login(username: username, otp: otp, realm: "sms", audience: audience, scope: scope)
-    }
-
-    // swiftlint:disable:next function_parameter_count
-    func login(usernameOrEmail username: String, password: String, multifactorCode: String?, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
-        let resourceOwner = URL(string: "/oauth/ro", relativeTo: self.url)!
-        var payload: [String: Any] = [
-            "username": username,
-            "password": password,
-            "connection": connection,
-            "grant_type": "password",
-            "scope": scope,
-            "client_id": self.clientId
-            ]
-        payload["mfa_code"] = multifactorCode
-        parameters.forEach { key, value in payload[key] = value }
-        return Request(session: session,
-                       url: resourceOwner,
-                       method: "POST",
-                       handle: authenticationObject,
-                       payload: payload,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
     }
 
     func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
@@ -192,7 +167,7 @@ struct Auth0Authentication: Authentication {
                                   parameters: parameters)
     }
 
-    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any],  audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: String] = [:]
         if let jsonData = try? JSONSerialization.data(withJSONObject: profile, options: []),
             let json = String(data: jsonData, encoding: .utf8) {
@@ -246,13 +221,6 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    // swiftlint:disable:next function_parameter_count
-    func signUp(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]?, scope: String, parameters: [String: Any]) -> ConcatRequest<DatabaseUser, Credentials, AuthenticationError> {
-        let first = createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata)
-        let second = login(usernameOrEmail: email, password: password, connection: connection, scope: scope, parameters: parameters)
-        return ConcatRequest(first: first, second: second)
-    }
-
     func startPasswordless(email: String, type: PasswordlessType, connection: String, parameters: [String: Any]) -> Request<Void, AuthenticationError> {
         var payload: [String: Any] = [
             "email": email,
@@ -291,29 +259,6 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func tokenInfo(token: String) -> Request<Profile, AuthenticationError> {
-        let payload: [String: Any] = ["id_token": token]
-        let tokenInfo = URL(string: "/tokeninfo", relativeTo: self.url)!
-        return Request(session: session,
-                       url: tokenInfo,
-                       method: "POST",
-                       handle: authenticationObject,
-                       payload: payload,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
-    }
-
-    func userInfo(token: String) -> Request<Profile, AuthenticationError> {
-        let userInfo = URL(string: "/userinfo", relativeTo: self.url)!
-        return Request(session: session,
-                       url: userInfo,
-                       method: "GET",
-                       handle: authenticationObject,
-                       headers: ["Authorization": "Bearer \(token)"],
-                       logger: self.logger,
-                       telemetry: self.telemetry)
-    }
-
     func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError> {
         let userInfo = URL(string: "/userinfo", relativeTo: self.url)!
         return Request(session: session,
@@ -321,24 +266,6 @@ struct Auth0Authentication: Authentication {
                        method: "GET",
                        handle: authenticationObject,
                        headers: ["Authorization": "Bearer \(accessToken)"],
-                       logger: self.logger,
-                       telemetry: self.telemetry)
-    }
-
-    func loginSocial(token: String, connection: String, scope: String, parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
-        var payload: [String: Any] = [
-            "access_token": token,
-            "connection": connection,
-            "scope": scope,
-            "client_id": self.clientId
-            ]
-        parameters.forEach { key, value in payload[key] = value }
-        let accessToken = URL(string: "/oauth/access_token", relativeTo: self.url)!
-        return Request(session: session,
-                       url: accessToken,
-                       method: "POST",
-                       handle: authenticationObject,
-                       payload: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
@@ -364,10 +291,6 @@ struct Auth0Authentication: Authentication {
             "redirect_uri": redirectURI,
             "grant_type": "authorization_code"
         ])
-    }
-
-    func tokenExchange(withAppleAuthorizationCode authCode: String, scope: String?, audience: String?, fullName: PersonNameComponents?) -> Request<Credentials, AuthenticationError> {
-        return self.login(appleAuthorizationCode: authCode, fullName: fullName, audience: audience, scope: scope ?? defaultScope)
     }
 
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
@@ -397,22 +320,6 @@ struct Auth0Authentication: Authentication {
                        url: oauthToken,
                        method: "POST",
                        handle: noBody,
-                       payload: payload,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
-    }
-
-    func delegation(withParameters parameters: [String: Any]) -> Request<[String: Any], AuthenticationError> {
-        var payload: [String: Any] = [
-            "client_id": self.clientId,
-            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer"
-        ]
-        parameters.forEach { payload[$0] = $1 }
-        let delegation = URL(string: "/delegation", relativeTo: self.url)!
-        return Request(session: session,
-                       url: delegation,
-                       method: "POST",
-                       handle: plainJson,
                        payload: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)

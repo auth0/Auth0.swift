@@ -236,11 +236,6 @@ class WebAuthSpec: QuickSpec {
                 expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/\(platform)/\(bundleId)/callback"
             }
 
-            it("should build with universal link") {
-                let bundleId = Bundle.main.bundleIdentifier!
-                expect(newWebAuth().useUniversalLink().redirectURL?.absoluteString) == "https://\(Domain)/\(platform)/\(bundleId)/callback"
-            }
-
             it("should build with a custom url") {
                 expect(newWebAuth().redirectURL(RedirectURL).redirectURL) == RedirectURL
             }

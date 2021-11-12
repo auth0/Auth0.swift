@@ -85,30 +85,3 @@ public struct Request<T, E: Auth0Error>: Requestable {
         return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, payload: parameter, headers: self.headers, logger: self.logger, telemetry: self.telemetry)
     }
 }
-
-/**
- *  A concatenated request, if the first one fails it will yield it's error, otherwise it will return the last request outcome
- */
-public struct ConcatRequest<F, S, E: Auth0Error>: Requestable {
-    let first: Request<F, E>
-    let second: Request<S, E>
-
-    public typealias ResultType = S
-
-    /**
-     Starts the request to the server
-
-     - parameter callback: called when the request finishes and yield it's result
-     */
-    public func start(_ callback: @escaping (Auth0Result<ResultType>) -> Void) {
-        let second = self.second
-        first.start { result in
-            switch result {
-            case .failure(let cause):
-                callback(.failure(cause))
-            case .success:
-                second.start(callback)
-            }
-        }
-    }
-}
