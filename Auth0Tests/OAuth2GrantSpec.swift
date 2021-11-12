@@ -3,7 +3,6 @@ import Nimble
 import OHHTTPStubs
 #if SWIFT_PACKAGE
 import OHHTTPStubsSwift
-import Auth0ObjectiveC
 #endif
 
 @testable import Auth0

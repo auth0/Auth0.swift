@@ -32,7 +32,6 @@ let package = Package(
             exclude: ["ObjectiveC", "Info.plist", "Info-tvOS.plist"],
             cSettings: cSettings,
             swiftSettings: swiftSettings),
-        .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC", cSettings: cSettings),
         .testTarget(
             name: "Auth0Tests",
             dependencies: [

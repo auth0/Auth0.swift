@@ -1,8 +1,5 @@
 import Foundation
 import Security
-#if SWIFT_PACKAGE
-import Auth0ObjectiveC
-#endif
 
 @testable import Auth0
 
