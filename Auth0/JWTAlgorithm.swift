@@ -1,9 +1,5 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
-#if SWIFT_PACKAGE
-import Auth0ObjectiveC
-#endif
 
 enum JWTAlgorithm: String {
     case rs256 = "RS256"
@@ -22,10 +18,16 @@ enum JWTAlgorithm: String {
             !signature.isEmpty else { return false }
         switch self {
         case .rs256:
-            guard let publicKey = jwk.rsaPublicKey, let rsa = A0RSA(key: publicKey) else { return false }
-            let sha256 = A0SHA()
-            return rsa.verify(sha256.hash(data), signature: signature)
+            var verificationError: Unmanaged<CFError>?
+            guard
+                SecKeyVerifySignature(
+                    jwk.rsaPublicKey!, .rsaSignatureMessagePKCS1v15SHA256, data as CFData, signature as CFData, &verificationError
+                )
+            else {
+                return false
+            }
+            
+            return true
         }
     }
 }
-#endif

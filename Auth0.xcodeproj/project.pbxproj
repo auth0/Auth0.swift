@@ -54,8 +54,6 @@
 		5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */; };
 		5C41F6B6244DCF2F00252548 /* BaseTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B4244DCEED00252548 /* BaseTransactionSpec.swift */; };
 		5C41F6BB244E1DC100252548 /* UIApplication+Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6BA244E1DC100252548 /* UIApplication+Shared.swift */; };
-		5C41F6BE244F961E00252548 /* A0RSA.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C4F550623C8FADF00C89615 /* A0RSA.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5C41F6BF244F962C00252548 /* A0RSA.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550523C8FADF00C89615 /* A0RSA.m */; };
 		5C41F6C0244F963500252548 /* A0SHA.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C4F550323C8FADE00C89615 /* A0SHA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5C41F6C1244F964000252548 /* A0SHA.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550223C8FADE00C89615 /* A0SHA.m */; };
 		5C41F6C3244F965E00252548 /* Array+Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F551923C8FB8E00C89615 /* Array+Encode.swift */; };
@@ -87,8 +85,6 @@
 		5C4F550723C8FADF00C89615 /* A0SHA.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550223C8FADE00C89615 /* A0SHA.m */; };
 		5C4F550823C8FADF00C89615 /* A0SHA.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C4F550323C8FADE00C89615 /* A0SHA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5C4F550923C8FADF00C89615 /* JWTAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550423C8FADE00C89615 /* JWTAlgorithm.swift */; };
-		5C4F550A23C8FADF00C89615 /* A0RSA.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550523C8FADF00C89615 /* A0RSA.m */; };
-		5C4F550B23C8FADF00C89615 /* A0RSA.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C4F550623C8FADF00C89615 /* A0RSA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5C4F551A23C8FB8E00C89615 /* String+URLSafe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F551823C8FB8E00C89615 /* String+URLSafe.swift */; };
 		5C4F551B23C8FB8E00C89615 /* String+URLSafe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F551823C8FB8E00C89615 /* String+URLSafe.swift */; };
 		5C4F551C23C8FB8E00C89615 /* String+URLSafe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F551823C8FB8E00C89615 /* String+URLSafe.swift */; };
@@ -492,8 +488,6 @@
 		5C4F550223C8FADE00C89615 /* A0SHA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = A0SHA.m; path = ObjectiveC/A0SHA.m; sourceTree = "<group>"; };
 		5C4F550323C8FADE00C89615 /* A0SHA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = A0SHA.h; path = ObjectiveC/A0SHA.h; sourceTree = "<group>"; };
 		5C4F550423C8FADE00C89615 /* JWTAlgorithm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTAlgorithm.swift; sourceTree = "<group>"; };
-		5C4F550523C8FADF00C89615 /* A0RSA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = A0RSA.m; path = ObjectiveC/A0RSA.m; sourceTree = "<group>"; };
-		5C4F550623C8FADF00C89615 /* A0RSA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = A0RSA.h; path = ObjectiveC/A0RSA.h; sourceTree = "<group>"; };
 		5C4F551823C8FB8E00C89615 /* String+URLSafe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+URLSafe.swift"; sourceTree = "<group>"; };
 		5C4F551923C8FB8E00C89615 /* Array+Encode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Encode.swift"; sourceTree = "<group>"; };
 		5C4F552223C8FBA100C89615 /* JWKS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWKS.swift; sourceTree = "<group>"; };
@@ -1002,8 +996,6 @@
 		5FCAB16F1D09001100331C84 /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
-				5C4F550623C8FADF00C89615 /* A0RSA.h */,
-				5C4F550523C8FADF00C89615 /* A0RSA.m */,
 				5C4F550323C8FADE00C89615 /* A0SHA.h */,
 				5C4F550223C8FADE00C89615 /* A0SHA.m */,
 				5C4F550423C8FADE00C89615 /* JWTAlgorithm.swift */,
@@ -1082,7 +1074,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5C4F550B23C8FADF00C89615 /* A0RSA.h in Headers */,
 				5C4F550823C8FADF00C89615 /* A0SHA.h in Headers */,
 				5FC34AFA1D010554000F28F5 /* Auth0.h in Headers */,
 			);
@@ -1092,7 +1083,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5C41F6BE244F961E00252548 /* A0RSA.h in Headers */,
 				5F23E6D31D4ACD3A00C3F2D9 /* Auth0.h in Headers */,
 				5C41F6C0244F963500252548 /* A0SHA.h in Headers */,
 			);
@@ -1616,7 +1606,6 @@
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				970BC36B25C27095007A7745 /* Challenge.swift in Sources */,
 				5FDE87591D8A424700EA27DC /* Authentication.swift in Sources */,
-				5C4F550A23C8FADF00C89615 /* A0RSA.m in Sources */,
 				5C4F550723C8FADF00C89615 /* A0SHA.m in Sources */,
 				5B16D8931F714324009476A5 /* AuthSession.swift in Sources */,
 				5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */,
@@ -1679,7 +1668,6 @@
 				5FDE87661D8A424700EA27DC /* Profile.swift in Sources */,
 				5FDE876A1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5F28B4621D8216180000EB23 /* Loggable.swift in Sources */,
-				5C41F6BF244F962C00252548 /* A0RSA.m in Sources */,
 				5C41F6D4244F974100252548 /* OAuth2Grant.swift in Sources */,
 				5C41F6D5244F974B00252548 /* BaseCallbackTransaction.swift in Sources */,
 				5C29743423FDBD5500BC18FA /* Optional+DebugDescription.swift in Sources */,

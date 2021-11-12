@@ -32,5 +32,4 @@ FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
 
 #if WEB_AUTH_PLATFORM
 #import <Auth0/A0SHA.h>
-#import <Auth0/A0RSA.h>
 #endif
