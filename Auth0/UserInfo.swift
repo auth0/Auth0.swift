@@ -109,7 +109,7 @@ public struct UserInfo: JSONObjectPayload {
         self.customClaims = customClaims
     }
 
-    // swiftlint:disable:next type_body_length
+    // swiftlint:disable:next function_body_length
     public init?(json: [String: Any]) {
         guard let sub = json["sub"] as? String else { return nil }
 

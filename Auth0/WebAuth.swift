@@ -56,17 +56,6 @@ public protocol WebAuth: Trackable, Loggable {
     var telemetry: Telemetry { get set }
 
     /**
-     For redirect url instead of a custom scheme it will use `https` and Universal Links.
-
-     Before enabling this flag you'll need to configure Universal Links
-
-     - returns: the same WebAuth instance to allow method chaining
-     - warning: deprecated as Universal Links cannot be used as OAuth callbacks anymore. See https://openradar.appspot.com/51091611
-     */
-    @available(*, deprecated, message: "cannot be used anymore, see https://openradar.appspot.com/51091611")
-    func useUniversalLink() -> Self
-
-    /**
      Specify a connection name to be used to authenticate.
 
      By default no connection is specified, so the hosted login page will be displayed
@@ -116,7 +105,7 @@ public protocol WebAuth: Trackable, Loggable {
      */
     func parameters(_ parameters: [String: String]) -> Self
 
-    /// Specify a redirect url to be used instead of a custom scheme
+    /// Specify a custom redirect url to be used
     ///
     /// - Parameter redirectURL: custom redirect url
     /// - Returns: the same WebAuth instance to allow method chaining

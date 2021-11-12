@@ -231,16 +231,7 @@ func beFailure<T>(_ cause: String? = nil, predicate: @escaping (ManagementError)
     }
 }
 
-func haveProfile(_ userId: String) -> Predicate<Auth0Result<Profile>> {
-    return Predicate<Auth0Result<Profile>>.define("have user profile for user id <\(userId)>") { expression, failureMessage -> PredicateResult in
-        if let actual = try expression.evaluate(), case .success(let profile) = actual {
-            return PredicateResult(bool: profile.id == userId, message: failureMessage)
-        }
-        return PredicateResult(status: .doesNotMatch, message: failureMessage)
-    }
-}
-
-func haveProfileOIDC(_ sub: String) -> Predicate<Auth0Result<UserInfo>> {
+func haveProfile(_ sub: String) -> Predicate<Auth0Result<UserInfo>> {
     return Predicate<Auth0Result<UserInfo>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .success(let userInfo) = actual {
             return PredicateResult(bool: userInfo.sub == sub, message: failureMessage)
