@@ -8,6 +8,7 @@ web_auth_files = [
   'Auth0/BaseCallbackTransaction.swift',
   'Auth0/BaseTransaction.swift',
   'Auth0/BioAuthentication.swift',
+  'Auth0/ChallengeGenerator.swift',
   'Auth0/ClaimValidators.swift',
   'Auth0/IDTokenSignatureValidator.swift',
   'Auth0/IDTokenValidator.swift',
