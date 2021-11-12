@@ -38,39 +38,6 @@
     return self;
 }
 
-- (NSData *)sign:(NSData *)plainData {
-    #if TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
-    NSData * signature;
-    CFErrorRef error = NULL;
-
-    signature = CFBridgingRelease(SecKeyCreateSignature(self.key,
-                                                        kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
-                                                        (__bridge CFDataRef) plainData,
-                                                        &error));
-
-    return signature;
-    #else
-    size_t signedHashBytesSize = SecKeyGetBlockSize(self.key);
-    uint8_t signedHashBytes[signedHashBytesSize];
-    memset(signedHashBytes, 0x0, signedHashBytesSize);
-
-    OSStatus result = SecKeyRawSign(self.key,
-                                    kSecPaddingPKCS1SHA256,
-                                    plainData.bytes,
-                                    plainData.length,
-                                    signedHashBytes,
-                                    &signedHashBytesSize);
-
-    NSData* signedHash = nil;
-    if (result == errSecSuccess) {
-        signedHash = [NSData dataWithBytes:signedHashBytes
-                                    length:(NSUInteger)signedHashBytesSize];
-    }
-
-    return signedHash;
-    #endif
-}
-
 - (Boolean)verify:(NSData *)plainData signature:(NSData *)signature {
     #if TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
     BOOL result = NO;

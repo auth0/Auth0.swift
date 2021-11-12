@@ -28,8 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithKey: (SecKeyRef)key;
 
-- (NSData *)sign: (NSData *)data;
-
 - (Boolean)verify: (NSData *)data  signature: (NSData *)signature;
 
 @end
