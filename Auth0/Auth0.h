@@ -28,8 +28,4 @@ FOUNDATION_EXPORT double Auth0VersionNumber;
 //! Project version string for Auth0.
 FOUNDATION_EXPORT const unsigned char Auth0VersionString[];
 
-// In this header, you should import all the public headers of your framework using statements like #import <Auth0/PublicHeader.h>
 
-#if WEB_AUTH_PLATFORM
-#import <Auth0/A0SHA.h>
-#endif

@@ -1,6 +1,4 @@
 web_auth_files = [
-  'Auth0/ObjectiveC/A0SHA.h',
-  'Auth0/ObjectiveC/A0SHA.m',
   'Auth0/Array+Encode.swift',
   'Auth0/ASCallbackTransaction.swift',
   'Auth0/ASTransaction.swift',
