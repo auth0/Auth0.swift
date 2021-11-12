@@ -27,7 +27,7 @@ let package = Package(
     targets: [
         .target(
             name: "Auth0", 
-            dependencies: ["SimpleKeychain", "JWTDecode", "Auth0ObjectiveC"], 
+            dependencies: ["SimpleKeychain", "JWTDecode"], 
             path: "Auth0",
             exclude: ["ObjectiveC", "Info.plist", "Info-tvOS.plist"],
             cSettings: cSettings,
