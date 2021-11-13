@@ -21,7 +21,7 @@ class ChallengeGeneratorSpec: QuickSpec {
                 expect(generator.verifier) == "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
             }
 
-            it("should generate expected challenge") {
+            it("should generate challenge") {
                 expect(generator.challenge) == "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"
             }
         }
