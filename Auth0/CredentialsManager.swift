@@ -11,6 +11,8 @@ public struct CredentialsManager {
     private let storage: A0SimpleKeychain
     private let storeKey: String
     private let authentication: Authentication
+    private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.queue", attributes: .concurrent)
+    private let dispatchGroup = DispatchGroup()
     #if WEB_AUTH_PLATFORM
     private var bioAuth: BioAuthentication?
     #endif
@@ -107,13 +109,8 @@ public struct CredentialsManager {
     }
 
     /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired
-    /// otherwise the retrieved credentails will be returned as they have not expired. Renewed credentials will be
+    /// otherwise the retrieved credentials will be returned as they have not expired. Renewed credentials will be
     /// stored in the keychain.
-    ///
-    /// This method is not thread-safe, so if you're using Refresh Token Rotation you should avoid calling this method
-    /// concurrently (might result in more than one renew request being fired, and only the first one will succeed).
-    /// Note that this will also happen if you call this method repeatedly from the same thread, so we recommend using
-    /// a queue to ensure that only one request can be in flight at any given time.
     ///
     /// ```
     /// credentialsManager.credentials {
@@ -135,9 +132,7 @@ public struct CredentialsManager {
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
             bioAuth.validateBiometric {
-                guard $0 == nil else {
-                    return callback(.touchFailed($0!), nil)
-                }
+                guard $0 == nil else { return callback(.touchFailed($0!), nil) }
                 self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
             }
         } else {
@@ -158,40 +153,60 @@ public struct CredentialsManager {
         return credentials
     }
 
+    // swiftlint:disable:next function_body_length
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard let credentials = retrieveCredentials() else { return callback(.noCredentials, nil) }
-        guard self.hasExpired(credentials) ||
-                self.willExpire(credentials, within: minTTL) ||
-                self.hasScopeChanged(credentials, from: scope) else { return callback(nil, credentials) }
-        guard let refreshToken = credentials.refreshToken else { return callback(.noRefreshToken, nil) }
+        self.dispatchQueue.async(flags: .barrier) {
+            self.dispatchGroup.enter()
 
-        self.authentication
-            .renew(withRefreshToken: refreshToken, scope: scope)
-            .parameters(parameters)
-            .start {
-                switch $0 {
-                case .success(let credentials):
-                    let newCredentials = Credentials(accessToken: credentials.accessToken,
-                                                     tokenType: credentials.tokenType,
-                                                     idToken: credentials.idToken,
-                                                     refreshToken: credentials.refreshToken ?? refreshToken,
-                                                     expiresIn: credentials.expiresIn,
-                                                     scope: credentials.scope)
-                    if self.willExpire(newCredentials, within: minTTL) {
-                        let accessTokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
-                        // TODO: On the next major add a new case to CredentialsManagerError
-                        let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
-                                            code: -99999,
-                                            userInfo: nil)
-                        callback(.failedRefresh(error), nil)
-                    } else {
-                        _ = self.store(credentials: newCredentials)
-                        callback(nil, newCredentials)
-                    }
-                case .failure(let error):
-                    callback(.failedRefresh(error), nil)
+            DispatchQueue.global(qos: .userInitiated).async {
+                guard let credentials = retrieveCredentials() else {
+                    self.dispatchGroup.leave()
+                    return callback(.noCredentials, nil)
                 }
+                guard self.hasExpired(credentials) ||
+                        self.willExpire(credentials, within: minTTL) ||
+                        self.hasScopeChanged(credentials, from: scope) else {
+                            self.dispatchGroup.leave()
+                            return callback(nil, credentials)
+                        }
+                guard let refreshToken = credentials.refreshToken else {
+                    self.dispatchGroup.leave()
+                    return callback(.noRefreshToken, nil)
+                }
+                self.authentication
+                    .renew(withRefreshToken: refreshToken, scope: scope)
+                    .parameters(parameters)
+                    .start { result in
+                        switch result {
+                        case .success(let credentials):
+                            let newCredentials = Credentials(accessToken: credentials.accessToken,
+                                                             tokenType: credentials.tokenType,
+                                                             idToken: credentials.idToken,
+                                                             refreshToken: credentials.refreshToken ?? refreshToken,
+                                                             expiresIn: credentials.expiresIn,
+                                                             scope: credentials.scope)
+                            if self.willExpire(newCredentials, within: minTTL) {
+                                let accessTokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
+                                // TODO: On the next major add a new case to CredentialsManagerError
+                                let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
+                                                    code: -99999,
+                                                    userInfo: nil)
+                                self.dispatchGroup.leave()
+                                callback(.failedRefresh(error), nil)
+                            } else {
+                                _ = self.store(credentials: newCredentials)
+                                self.dispatchGroup.leave()
+                                callback(nil, newCredentials)
+                            }
+                        case .failure(let error):
+                            self.dispatchGroup.leave()
+                            callback(.failedRefresh(error), nil)
+                        }
+                    }
             }
+
+            self.dispatchGroup.wait()
+        }
     }
 
     func willExpire(_ credentials: Credentials, within ttl: Int) -> Bool {
