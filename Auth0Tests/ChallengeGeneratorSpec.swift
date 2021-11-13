@@ -17,6 +17,10 @@ class ChallengeGeneratorSpec: QuickSpec {
             
             let generator = ChallengeGenerator(verifier: verifier)
 
+            it("should convert verifier to base 64 url-safe") {
+                expect(generator.verifier) == "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+            }
+
             it("should generate expected challenge") {
                 expect(generator.challenge) == "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"
             }
