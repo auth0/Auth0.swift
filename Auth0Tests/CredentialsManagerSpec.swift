@@ -647,7 +647,7 @@ class CredentialsManagerSpec: QuickSpec {
                         return authFailure()
                     }
                     waitUntil(timeout: Timeout) { done in
-                        DispatchQueue.main.async {
+                        DispatchQueue.global(qos: .utility).async {
                             credentialsManager.credentials(parameters: ["request": "first"]) { error = $0; newCredentials = $1
                                 expect(error).to(beNil())
                                 expect(newCredentials).toNot(beNil())
@@ -672,7 +672,7 @@ class CredentialsManagerSpec: QuickSpec {
                         return authFailure()
                     }
                     waitUntil(timeout: Timeout) { done in
-                        DispatchQueue.main.async {
+                        DispatchQueue.global(qos: .utility).async {
                             credentialsManager.credentials(parameters: ["request": "first"]) { error = $0; newCredentials = $1
                                 expect(newCredentials?.accessToken) == NewAccessToken
                                 expect(newCredentials?.refreshToken) == NewRefreshToken
@@ -700,7 +700,7 @@ class CredentialsManagerSpec: QuickSpec {
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        DispatchQueue.main.async {
+                        DispatchQueue.global(qos: .utility).async {
                             credentialsManager.credentials(parameters: ["request": "first"]) { error = $0; newCredentials = $1
                                 expect(error).toNot(beNil())
                                 expect(newCredentials).to(beNil())
