@@ -50,5 +50,14 @@ class ChallengeGeneratorSpec: QuickSpec {
             expect(generator.challenge).to(beURLSafeBase64())
         }
 
+        it("should return a different verifier for a different generator") {
+            let anotherGenerator = ChallengeGenerator()
+            expect(generator.verifier).toNot(equal(anotherGenerator.verifier))
+        }
+
+        it("should return a different challenge for different generator") {
+            let anotherGenerator = ChallengeGenerator()
+            expect(generator.challenge).toNot(equal(anotherGenerator.challenge))
+        }
     }
 }

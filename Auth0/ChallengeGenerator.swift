@@ -1,7 +1,7 @@
 import Foundation
 import CommonCrypto
 
-func getVerifier() -> String? {
+private func getVerifier() -> String? {
     let data = Data(count: 32)
     var tempData = data
     _ = tempData.withUnsafeMutableBytes {
@@ -10,9 +10,9 @@ func getVerifier() -> String? {
     return tempData.a0_encodeBase64URLSafe()
 }
 
-func getChallenge(for verifier: String) -> String? {
+private func getChallenge(for verifier: String) -> String? {
     guard let data = verifier.data(using: .utf8) else { return nil }
-    var buffer = [UInt8](repeating: 0,  count: Int(CC_SHA256_DIGEST_LENGTH))
+    var buffer = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
     _ = data.withUnsafeBytes {
         CC_SHA256($0.baseAddress, CC_LONG(data.count), &buffer)
     }

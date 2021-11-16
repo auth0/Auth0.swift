@@ -10,7 +10,6 @@ webAuthPlatforms.append(.macCatalyst)
 
 let webAuthFlag = "WEB_AUTH_PLATFORM"
 let webAuthCondition: BuildSettingCondition = .when(platforms: webAuthPlatforms)
-let cSettings: [CSetting] = [.define(webAuthFlag, webAuthCondition)]
 let swiftSettings: [SwiftSetting] = [.define(webAuthFlag, webAuthCondition)]
 
 let package = Package(
@@ -30,7 +29,6 @@ let package = Package(
             dependencies: ["SimpleKeychain", "JWTDecode"], 
             path: "Auth0",
             exclude: ["Info.plist", "Info-tvOS.plist"],
-            cSettings: cSettings,
             swiftSettings: swiftSettings),
         .testTarget(
             name: "Auth0Tests",
@@ -42,7 +40,6 @@ let package = Package(
             ],
             path: "Auth0Tests",
             exclude: ["Info.plist", "Auth0.plist"],
-            cSettings: cSettings,
             swiftSettings: swiftSettings)
     ]
 )
