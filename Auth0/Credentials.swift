@@ -3,7 +3,7 @@ import Foundation
 /**
  User's credentials obtained from Auth0.
  */
-public struct Credentials {
+public final class Credentials {
 
     /// Token used that allows calling to the requested APIs (audience sent on Auth)
     public let accessToken: String
@@ -50,7 +50,7 @@ public struct Credentials {
 
 extension Credentials: Codable {
 
-    public init(from decoder: Decoder) throws {
+    public convenience init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         let accessToken = try values.decodeIfPresent(String.self, forKey: .accessToken)
         let tokenType = try values.decodeIfPresent(String.self, forKey: .tokenType)
