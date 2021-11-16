@@ -35,8 +35,8 @@ import Foundation
 
  - returns: Auth0 Authentication API
  */
-public func authentication(clientId: String, domain: String, session: URLSession = .shared) -> Authentication {
-    return Auth0Authentication(clientId: clientId, url: .a0_url(domain), session: session)
+public func authentication(clientId: String, domain: String, relativeToBaseURL: Bool = true, session: URLSession = .shared) -> Authentication {
+    return Auth0Authentication(clientId: clientId, url: .a0_url(domain), relativeToBaseURL: relativeToBaseURL, session: session)
 }
 
 /**
