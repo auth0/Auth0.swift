@@ -220,6 +220,10 @@ Auth0
 
 The `CredentialsManager` class no longer takes into account the ID Token expiration to determine if the credentials are still valid. The only value being considered now is the Access Token expiration.
 
+### Thread-safety when renewing credentials with the `CredentialsManager` 
+
+The method `credentials(withScope:minTTL:parameters:callback:)` of the `CredentialsManager` class will now execute the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
+
 ## Title of change
 
 Description of change

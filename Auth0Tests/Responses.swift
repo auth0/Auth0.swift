@@ -79,6 +79,10 @@ func authFailure(error: String, description: String) -> HTTPStubsResponse {
     return HTTPStubsResponse(jsonObject: ["error": error, "error_description": description], statusCode: 400, headers: ["Content-Type": "application/json"])
 }
 
+func authFailure() -> HTTPStubsResponse {
+    return HTTPStubsResponse(jsonObject: [], statusCode: 400, headers: nil)
+}
+
 func passwordless(_ email: String, verified: Bool) -> HTTPStubsResponse {
     return HTTPStubsResponse(jsonObject: ["email": email, "verified": "\(verified)"], statusCode: 200, headers: ["Content-Type": "application/json"])
 }
