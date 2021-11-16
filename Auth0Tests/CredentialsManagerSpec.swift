@@ -653,7 +653,7 @@ class CredentialsManagerSpec: QuickSpec {
                                 expect(newCredentials).toNot(beNil())
                             }
                         }
-                        DispatchQueue.global(qos: .background).async {
+                        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.001) {
                             credentialsManager.credentials(parameters: ["request": "second"]) { error = $0; newCredentials = $1
                                 expect(error).to(beNil())
                                 done()
@@ -679,7 +679,7 @@ class CredentialsManagerSpec: QuickSpec {
                                 expect(newCredentials?.idToken) == NewIdToken
                             }
                         }
-                        DispatchQueue.global(qos: .background).async {
+                        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.001) {
                             credentialsManager.credentials(parameters: ["request": "second"]) { error = $0; newCredentials = $1
                                 expect(newCredentials?.accessToken) == NewAccessToken
                                 expect(newCredentials?.refreshToken) == NewRefreshToken
@@ -706,7 +706,7 @@ class CredentialsManagerSpec: QuickSpec {
                                 expect(newCredentials).to(beNil())
                             }
                         }
-                        DispatchQueue.global(qos: .background).async {
+                        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.001) {
                             credentialsManager.credentials(parameters: ["request": "second"]) { error = $0; newCredentials = $1
                                 expect(error).to(beNil())
                                 expect(newCredentials).toNot(beNil())

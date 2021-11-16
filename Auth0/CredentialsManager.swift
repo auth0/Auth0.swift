@@ -11,7 +11,7 @@ public struct CredentialsManager {
     private let storage: A0SimpleKeychain
     private let storeKey: String
     private let authentication: Authentication
-    private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.queue", attributes: .concurrent)
+    private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
     private let dispatchGroup = DispatchGroup()
     #if WEB_AUTH_PLATFORM
     private var bioAuth: BioAuthentication?
@@ -155,7 +155,7 @@ public struct CredentialsManager {
 
     // swiftlint:disable:next function_body_length
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        self.dispatchQueue.async(flags: .barrier) {
+        self.dispatchQueue.async {
             self.dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
