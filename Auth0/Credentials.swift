@@ -3,7 +3,7 @@ import Foundation
 /**
  User's credentials obtained from Auth0.
  */
-public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
+public struct Credentials {
 
     /// Token used that allows calling to the requested APIs (audience sent on Auth)
     public let accessToken: String
@@ -19,6 +19,16 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
     public let scope: String?
     /// MFA recovery code that the application must display to the end-user to be stored securely for future use
     public let recoveryCode: String?
+
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+        case tokenType = "token_type"
+        case expiresIn = "expires_in"
+        case refreshToken = "refresh_token"
+        case idToken = "id_token"
+        case scope
+        case recoveryCode = "recovery_code"
+    }
 
     public init(accessToken: String = "",
                 tokenType: String = "",
@@ -36,52 +46,60 @@ public class Credentials: NSObject, JSONObjectPayload, NSSecureCoding {
         self.recoveryCode = recoveryCode
     }
 
-    convenience required public init(json: [String: Any]) {
-        var expiresIn: Date?
+}
 
-        if let value = json["expires_in"],
-           let double = NumberFormatter().number(from: String(describing: value))?.doubleValue {
+extension Credentials: Codable {
+
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let accessToken = try values.decodeIfPresent(String.self, forKey: .accessToken)
+        let tokenType = try values.decodeIfPresent(String.self, forKey: .tokenType)
+        let idToken = try values.decodeIfPresent(String.self, forKey: .idToken)
+        let refreshToken = try values.decodeIfPresent(String.self, forKey: .refreshToken)
+        let scope = try values.decodeIfPresent(String.self, forKey: .scope)
+        let recoveryCode = try values.decodeIfPresent(String.self, forKey: .recoveryCode)
+
+        var expiresIn: Date?
+        if let string = try? values.decode(String.self, forKey: .expiresIn), let double = Double(string) {
             expiresIn = Date(timeIntervalSinceNow: double)
+        } else if let double = try? values.decode(Double.self, forKey: .expiresIn) {
+            expiresIn = Date(timeIntervalSinceNow: double)
+        } else if let date = try? values.decode(Date.self, forKey: .expiresIn) {
+            expiresIn = date
         }
 
-        self.init(accessToken: json["access_token"] as? String ?? "",
-                  tokenType: json["token_type"] as? String ?? "",
-                  idToken: json["id_token"] as? String ?? "",
-                  refreshToken: json["refresh_token"] as? String,
+        self.init(accessToken: accessToken ?? "",
+                  tokenType: tokenType ?? "",
+                  idToken: idToken ?? "",
+                  refreshToken: refreshToken,
                   expiresIn: expiresIn ?? Date(),
-                  scope: json["scope"] as? String,
-                  recoveryCode: json["recovery_code"] as? String)
+                  scope: scope,
+                  recoveryCode: recoveryCode)
     }
 
-    // MARK: - NSSecureCoding
+}
 
-    convenience required public init?(coder aDecoder: NSCoder) {
-        let accessToken = aDecoder.decodeObject(forKey: "accessToken")
-        let tokenType = aDecoder.decodeObject(forKey: "tokenType")
-        let idToken = aDecoder.decodeObject(forKey: "idToken")
-        let refreshToken = aDecoder.decodeObject(forKey: "refreshToken")
-        let expiresIn = aDecoder.decodeObject(forKey: "expiresIn")
-        let scope = aDecoder.decodeObject(forKey: "scope")
-        let recoveryCode = aDecoder.decodeObject(forKey: "recoveryCode")
+// MARK: - Internal Methods
 
-        self.init(accessToken: accessToken as? String ?? "",
-                  tokenType: tokenType as? String ?? "",
-                  idToken: idToken as? String ?? "",
-                  refreshToken: refreshToken as? String,
-                  expiresIn: expiresIn as? Date ?? Date(),
-                  scope: scope as? String,
-                  recoveryCode: recoveryCode as? String)
+extension Credentials {
+
+    func archive() throws -> Data {
+        let archiver = NSKeyedArchiver(requiringSecureCoding: true)
+        try archiver.encodeEncodable(self, forKey: NSKeyedArchiveRootObjectKey)
+        archiver.finishEncoding()
+        return archiver.encodedData
     }
 
-    public func encode(with aCoder: NSCoder) {
-        aCoder.encode(self.accessToken, forKey: "accessToken")
-        aCoder.encode(self.tokenType, forKey: "tokenType")
-        aCoder.encode(self.idToken, forKey: "idToken")
-        aCoder.encode(self.refreshToken, forKey: "refreshToken")
-        aCoder.encode(self.expiresIn, forKey: "expiresIn")
-        aCoder.encode(self.scope, forKey: "scope")
-        aCoder.encode(self.recoveryCode, forKey: "recoveryCode")
+    static func unarchive(from data: Data) throws -> Credentials {
+        let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
+        guard let decoded = unarchiver.decodeDecodable(self, forKey: NSKeyedArchiveRootObjectKey) else {
+            let context = DecodingError.Context(codingPath: [],
+                                                debugDescription: "Unable to decode Credentials",
+                                                underlyingError: nil)
+            throw DecodingError.dataCorrupted(context)
+        }
+        unarchiver.finishDecoding()
+        return decoded
     }
 
-    public static var supportsSecureCoding: Bool = true
 }

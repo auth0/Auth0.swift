@@ -130,13 +130,14 @@ The following cases were removed, as they are no longer necessary:
 
 ## Types changed
 
+- `Credentials` was changed from class to struct
 - `UserInfo` was changed from class to struct
 
 ## Type properties changed
 
-### `Credentials` class
+### `Credentials` struct
 
-The properties are no longer marked with the `@objc` attribute. Additionally, the following properties are no longer optional:
+It is now a struct, so its properties are no longer marked with the `@objc` attribute. Additionally, the following properties are no longer optional:
 
 - `accessToken`
 - `tokenType`
@@ -145,7 +146,7 @@ The properties are no longer marked with the `@objc` attribute. Additionally, th
 
 ### `UserInfo` struct
 
-The properties are no longer marked with the `@objc` attribute.
+It is now a struct, so its properties are no longer marked with the `@objc` attribute.
 
 ### `NSError` extension
 

@@ -143,13 +143,13 @@ class CredentialsManagerSpec: QuickSpec {
             it("should store credentials into distinct locations") {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(secondaryCredentialsManager.store(credentials: secondaryCredentials)).to(beTrue())
-                                
+                
                 waitUntil(timeout: .seconds(200)) { done in
                     credentialsManager.credentials {
                         expect($0).to(beNil())
-                        expect($1!.accessToken) == AccessToken
-                        expect($1!.refreshToken) == RefreshToken
-                        expect($1!.idToken) == IdToken
+                        expect($1?.accessToken) == AccessToken
+                        expect($1?.refreshToken) == RefreshToken
+                        expect($1?.idToken) == IdToken
                         done()
                     }
                 }
@@ -157,9 +157,9 @@ class CredentialsManagerSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     secondaryCredentialsManager.credentials {
                         expect($0).to(beNil())
-                        expect($1!.accessToken) == "SecondaryAccessToken"
-                        expect($1!.refreshToken) == "SecondaryRefreshToken"
-                        expect($1!.idToken) == "SecondaryIdToken"
+                        expect($1?.accessToken) == "SecondaryAccessToken"
+                        expect($1?.refreshToken) == "SecondaryRefreshToken"
+                        expect($1?.idToken) == "SecondaryIdToken"
                         done()
                     }
                 }
@@ -180,9 +180,9 @@ class CredentialsManagerSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.credentials {
                         expect($0).to(beNil())
-                        expect($1!.accessToken) == AccessToken
-                        expect($1!.refreshToken) == RefreshToken
-                        expect($1!.idToken) == IdToken
+                        expect($1?.accessToken) == AccessToken
+                        expect($1?.refreshToken) == RefreshToken
+                        expect($1?.idToken) == IdToken
                         done()
                     }
                 }
@@ -190,9 +190,9 @@ class CredentialsManagerSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     secondaryCredentialsManager.credentials {
                         expect($0).to(beNil())
-                        expect($1!.accessToken) == AccessToken
-                        expect($1!.refreshToken) == RefreshToken
-                        expect($1!.idToken) == IdToken
+                        expect($1?.accessToken) == AccessToken
+                        expect($1?.refreshToken) == RefreshToken
+                        expect($1?.idToken) == IdToken
                         done()
                     }
                 }
@@ -647,13 +647,13 @@ class CredentialsManagerSpec: QuickSpec {
                         return authFailure()
                     }
                     waitUntil(timeout: Timeout) { done in
-                        DispatchQueue.global(qos: .utility).async {
+                        DispatchQueue.global(qos: .utility).sync {
                             credentialsManager.credentials(parameters: ["request": "first"]) { error = $0; newCredentials = $1
                                 expect(error).to(beNil())
                                 expect(newCredentials).toNot(beNil())
                             }
                         }
-                        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.001) {
+                        DispatchQueue.global(qos: .background).sync {
                             credentialsManager.credentials(parameters: ["request": "second"]) { error = $0; newCredentials = $1
                                 expect(error).to(beNil())
                                 done()
@@ -672,14 +672,14 @@ class CredentialsManagerSpec: QuickSpec {
                         return authFailure()
                     }
                     waitUntil(timeout: Timeout) { done in
-                        DispatchQueue.global(qos: .utility).async {
+                        DispatchQueue.global(qos: .utility).sync {
                             credentialsManager.credentials(parameters: ["request": "first"]) { error = $0; newCredentials = $1
                                 expect(newCredentials?.accessToken) == NewAccessToken
                                 expect(newCredentials?.refreshToken) == NewRefreshToken
                                 expect(newCredentials?.idToken) == NewIdToken
                             }
                         }
-                        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.001) {
+                        DispatchQueue.global(qos: .background).sync {
                             credentialsManager.credentials(parameters: ["request": "second"]) { error = $0; newCredentials = $1
                                 expect(newCredentials?.accessToken) == NewAccessToken
                                 expect(newCredentials?.refreshToken) == NewRefreshToken
@@ -700,13 +700,13 @@ class CredentialsManagerSpec: QuickSpec {
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
                     waitUntil(timeout: Timeout) { done in
-                        DispatchQueue.global(qos: .utility).async {
+                        DispatchQueue.global(qos: .utility).sync {
                             credentialsManager.credentials(parameters: ["request": "first"]) { error = $0; newCredentials = $1
                                 expect(error).toNot(beNil())
                                 expect(newCredentials).to(beNil())
                             }
                         }
-                        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.001) {
+                        DispatchQueue.global(qos: .background).sync {
                             credentialsManager.credentials(parameters: ["request": "second"]) { error = $0; newCredentials = $1
                                 expect(error).to(beNil())
                                 expect(newCredentials).toNot(beNil())

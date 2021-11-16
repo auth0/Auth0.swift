@@ -60,7 +60,8 @@ public struct CredentialsManager {
     /// - Parameter credentials: credentials instance to store
     /// - Returns: if credentials were stored
     public func store(credentials: Credentials) -> Bool {
-        return self.storage.setData(NSKeyedArchiver.archivedData(withRootObject: credentials), forKey: storeKey)
+        guard let data = try? credentials.archive() else { return false }
+        return self.storage.setData(data, forKey: storeKey)
     }
 
     /// Clear credentials stored in keychain
@@ -79,7 +80,7 @@ public struct CredentialsManager {
     public func revoke(_ callback: @escaping (CredentialsManagerError?) -> Void) {
         guard
             let data = self.storage.data(forKey: self.storeKey),
-            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials,
+            let credentials = try? Credentials.unarchive(from: data),
             let refreshToken = credentials.refreshToken else {
                 _ = self.clear()
                 return callback(nil)
@@ -104,7 +105,7 @@ public struct CredentialsManager {
     /// - Returns: if there are valid and non-expired credentials stored.
     public func hasValid(minTTL: Int = 0) -> Bool {
         guard let data = self.storage.data(forKey: self.storeKey),
-            let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return false }
+            let credentials = try? Credentials.unarchive(from: data) else { return false }
         return (!self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)) || credentials.refreshToken != nil
     }
 
@@ -148,7 +149,7 @@ public struct CredentialsManager {
 
     private func retrieveCredentials() -> Credentials? {
         guard let data = self.storage.data(forKey: self.storeKey),
-              let credentials = NSKeyedUnarchiver.unarchiveObject(with: data) as? Credentials else { return nil }
+              let credentials = try? Credentials.unarchive(from: data) else { return nil }
 
         return credentials
     }
