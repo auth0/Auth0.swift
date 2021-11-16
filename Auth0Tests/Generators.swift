@@ -122,9 +122,8 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
     if let signature = signature {
         signaturePart = signature
     } else {
-        var signingError: Unmanaged<CFError>?
         let data = SecKeyCreateSignature(
-            TestKeys.rsaPrivate, .rsaSignatureMessagePKCS1v15SHA256, signableParts.data(using: .utf8)! as CFData, &signingError
+            TestKeys.rsaPrivate, .rsaSignatureMessagePKCS1v15SHA256, signableParts.data(using: .utf8)! as CFData, nil
         )
         signaturePart = (data! as Data).a0_encodeBase64URLSafe()!
     }

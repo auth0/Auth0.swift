@@ -18,16 +18,9 @@ enum JWTAlgorithm: String {
             !signature.isEmpty else { return false }
         switch self {
         case .rs256:
-            var verificationError: Unmanaged<CFError>?
-            guard
-                SecKeyVerifySignature(
-                    jwk.rsaPublicKey!, .rsaSignatureMessagePKCS1v15SHA256, data as CFData, signature as CFData, &verificationError
-                )
-            else {
-                return false
-            }
-            
-            return true
+            return SecKeyVerifySignature(
+                jwk.rsaPublicKey!, .rsaSignatureMessagePKCS1v15SHA256, data as CFData, signature as CFData, nil
+            )
         }
     }
 }
