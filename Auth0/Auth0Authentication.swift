@@ -38,7 +38,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: resourceOwner,
                        method: "POST",
-                       handle: authenticationObject,
+                       handle: codable,
                        payload: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -57,7 +57,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: resourceOwner,
                        method: "POST",
-                       handle: authenticationObject,
+                       handle: codable,
                        payload: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -74,7 +74,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationObject,
+                       handle: codable,
                        payload: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -96,7 +96,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationObject,
+                       handle: codable,
                        payload: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -114,7 +114,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationObject,
+                       handle: codable,
                        payload: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -278,7 +278,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: token,
                        method: "POST",
-                       handle: authenticationObject,
+                       handle: codable,
                        payload: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -304,7 +304,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: oauthToken,
                        method: "POST",
-                       handle: authenticationObject,
+                       handle: codable,
                        payload: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -351,7 +351,13 @@ private extension Auth0Authentication {
         ]
         payload["audience"] = audience
         payload["scope"] = scope
-        return Request(session: session, url: url, method: "POST", handle: authenticationObject, payload: payload, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: codable,
+                       payload: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
     }
 
     func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError> {

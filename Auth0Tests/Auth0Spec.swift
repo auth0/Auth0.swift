@@ -71,7 +71,7 @@ class Auth0Spec: QuickSpec {
         #if !SWIFT_PACKAGE
         describe("plist loading") {
 
-            let bundle = Bundle(for: Auth0Spec.classForCoder())
+            let bundle = Bundle(for: Auth0Spec.self)
 
             it("should return authentication endpoint with account from plist") {
                 let auth = Auth0.authentication(bundle: bundle)
