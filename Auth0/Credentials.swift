@@ -35,6 +35,7 @@ public final class Credentials: NSObject, NSSecureCoding {
         self.scope = scope
         self.recoveryCode = recoveryCode
     }
+
     // MARK: - NSSecureCoding
 
     convenience public init?(coder aDecoder: NSCoder) {
