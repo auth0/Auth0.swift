@@ -3,7 +3,8 @@ import Foundation
 /**
  User's credentials obtained from Auth0.
  */
-public final class Credentials {
+@objc(A0Credentials)
+public final class Credentials: NSObject {
 
     /// Token used that allows calling to the requested APIs (audience sent on Auth)
     public let accessToken: String
