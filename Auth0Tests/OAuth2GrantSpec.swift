@@ -3,7 +3,6 @@ import Nimble
 import OHHTTPStubs
 #if SWIFT_PACKAGE
 import OHHTTPStubsSwift
-import Auth0ObjectiveC
 #endif
 
 @testable import Auth0
@@ -71,7 +70,7 @@ class OAuth2GrantSpec: QuickSpec {
             }
 
             it("should get values from generator") {
-                let generator = A0SHA256ChallengeGenerator()
+                let generator = ChallengeGenerator()
                 let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
                 pkce = PKCE(authentication: authentication, generator: generator, redirectURL: redirectURL, issuer: issuer, leeway: leeway, nonce: nil)
                 
@@ -162,7 +161,7 @@ class OAuth2GrantSpec: QuickSpec {
             }
 
             it("should get values from generator") {
-                let generator = A0SHA256ChallengeGenerator()
+                let generator = ChallengeGenerator()
                 let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
                 pkce = PKCE(authentication: authentication, generator: generator, redirectURL: redirectURL, issuer: issuer, leeway: leeway, nonce: nonce)
 

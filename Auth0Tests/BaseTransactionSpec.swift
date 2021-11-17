@@ -3,7 +3,6 @@ import Nimble
 import OHHTTPStubs
 #if SWIFT_PACKAGE
 import OHHTTPStubsSwift
-import Auth0ObjectiveC
 #endif
 
 @testable import Auth0
@@ -21,7 +20,7 @@ class BaseTransactionSpec: QuickSpec {
         var result: Auth0Result<Credentials>? = nil
         let callback: (Auth0Result<Credentials>) -> () = { result = $0 }
         let authentication = Auth0Authentication(clientId: ClientId, url: Domain)
-        let generator = A0SHA256ChallengeGenerator()
+        let generator = ChallengeGenerator()
         let handler = PKCE(authentication: authentication,
                            generator: generator,
                            redirectURL: RedirectURL,

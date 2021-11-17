@@ -10,7 +10,6 @@ webAuthPlatforms.append(.macCatalyst)
 
 let webAuthFlag = "WEB_AUTH_PLATFORM"
 let webAuthCondition: BuildSettingCondition = .when(platforms: webAuthPlatforms)
-let cSettings: [CSetting] = [.define(webAuthFlag, webAuthCondition)]
 let swiftSettings: [SwiftSetting] = [.define(webAuthFlag, webAuthCondition)]
 
 let package = Package(
@@ -27,12 +26,10 @@ let package = Package(
     targets: [
         .target(
             name: "Auth0", 
-            dependencies: ["SimpleKeychain", "JWTDecode", "Auth0ObjectiveC"], 
+            dependencies: ["SimpleKeychain", "JWTDecode"], 
             path: "Auth0",
-            exclude: ["ObjectiveC", "Info.plist", "Info-tvOS.plist"],
-            cSettings: cSettings,
+            exclude: ["Info.plist", "Info-tvOS.plist"],
             swiftSettings: swiftSettings),
-        .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC", cSettings: cSettings),
         .testTarget(
             name: "Auth0Tests",
             dependencies: [
@@ -43,7 +40,6 @@ let package = Package(
             ],
             path: "Auth0Tests",
             exclude: ["Info.plist", "Auth0.plist"],
-            cSettings: cSettings,
             swiftSettings: swiftSettings)
     ]
 )

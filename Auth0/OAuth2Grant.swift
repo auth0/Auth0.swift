@@ -1,9 +1,5 @@
-#if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
-#if SWIFT_PACKAGE
-import Auth0ObjectiveC
-#endif
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
@@ -23,7 +19,7 @@ struct PKCE: OAuth2Grant {
     let organization: String?
 
     init(authentication: Authentication,
-         generator: A0SHA256ChallengeGenerator = A0SHA256ChallengeGenerator(),
+         generator: ChallengeGenerator = ChallengeGenerator(),
          redirectURL: URL,
          issuer: String,
          leeway: Int,
@@ -109,4 +105,3 @@ struct PKCE: OAuth2Grant {
     }
 
 }
-#endif

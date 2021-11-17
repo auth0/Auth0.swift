@@ -1,10 +1,4 @@
 web_auth_files = [
-  'Auth0/ObjectiveC/A0ChallengeGenerator.h',
-  'Auth0/ObjectiveC/A0ChallengeGenerator.m',
-  'Auth0/ObjectiveC/A0RSA.h',
-  'Auth0/ObjectiveC/A0RSA.m',
-  'Auth0/ObjectiveC/A0SHA.h',
-  'Auth0/ObjectiveC/A0SHA.m',
   'Auth0/Array+Encode.swift',
   'Auth0/ASCallbackTransaction.swift',
   'Auth0/ASTransaction.swift',
@@ -14,6 +8,7 @@ web_auth_files = [
   'Auth0/BaseCallbackTransaction.swift',
   'Auth0/BaseTransaction.swift',
   'Auth0/BioAuthentication.swift',
+  'Auth0/ChallengeGenerator.swift',
   'Auth0/ClaimValidators.swift',
   'Auth0/IDTokenSignatureValidator.swift',
   'Auth0/IDTokenValidator.swift',
@@ -61,24 +56,22 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target = '12.0'
   s.requires_arc = true
 
-  s.ios.source_files = 'Auth0/*.{swift,h,m}', 'Auth0/ObjectiveC/*.{h,m}'
+  s.ios.source_files = 'Auth0/*.swift'
   s.ios.exclude_files = macos_files
   s.ios.frameworks = 'UIKit', 'LocalAuthentication', 'AuthenticationServices'
   s.ios.dependency 'SimpleKeychain'
   s.ios.dependency 'JWTDecode', '~> 2.0'
   s.ios.pod_target_xcconfig = {
-    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM',
-    'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) WEB_AUTH_PLATFORM=1'
+    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'
   }
 
-  s.osx.source_files = 'Auth0/*.{swift,h,m}', 'Auth0/ObjectiveC/*.{h,m}'
+  s.osx.source_files = 'Auth0/*.swift'
   s.osx.exclude_files = ios_files
   s.osx.frameworks = 'AppKit', 'LocalAuthentication', 'AuthenticationServices'
   s.osx.dependency 'SimpleKeychain'
   s.osx.dependency 'JWTDecode', '~> 2.0'
   s.osx.pod_target_xcconfig = {
-    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM',
-    'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) WEB_AUTH_PLATFORM=1'
+    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'
   }
 
   s.watchos.source_files = 'Auth0/*.swift'

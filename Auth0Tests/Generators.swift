@@ -121,10 +121,13 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
     
     if let signature = signature {
         signaturePart = signature
+    } else {
+        let data = SecKeyCreateSignature(
+            TestKeys.rsaPrivate, .rsaSignatureMessagePKCS1v15SHA256, signableParts.data(using: .utf8)! as CFData, nil
+        )
+        signaturePart = (data! as Data).a0_encodeBase64URLSafe()!
     }
-    else if let algorithm = JWTAlgorithm(rawValue: alg) {
-        signaturePart = algorithm.sign(value: signableParts.data(using: .utf8)!).a0_encodeBase64URLSafe()!
-    }
+
     
     return try! decode(jwt: "\(signableParts).\(signaturePart)")
 }
