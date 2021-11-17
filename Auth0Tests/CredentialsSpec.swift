@@ -95,7 +95,7 @@ class CredentialsSpec: QuickSpec {
                 it("should have valid expiresIn from floating point number") {
                     let json = """
                         {
-                            "expires_in": \(Int(ExpiresIn)).0
+                            "expires_in": \(ExpiresIn)
                         }
                     """.data(using: .utf8)!
                     let credentials = try decoder.decode(Credentials.self, from: json)
