@@ -131,8 +131,13 @@ The following cases were removed, as they are no longer necessary:
 ## Types changed
 
 - `UserInfo` was changed from class to struct
+- `Credentials` is now a `final` class that conforms to `Codable`
 
 ## Type properties changed
+
+### `UserInfo` struct
+
+It is now a struct, so its properties are no longer marked with the `@objc` attribute.
 
 ### `Credentials` class
 
@@ -142,10 +147,6 @@ The properties are no longer marked with the `@objc` attribute. Additionally, th
 - `tokenType`
 - `expiresIn`
 - `idToken`
-
-### `UserInfo` struct
-
-The properties are no longer marked with the `@objc` attribute.
 
 ### `NSError` extension
 
