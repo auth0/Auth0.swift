@@ -224,8 +224,7 @@ class CustomStore: CredentialsStorage {
     }
 }
 
-let credentialsManager = CredentialsManager(authentication: authentication,
-        storage: CustomStore());
+let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore());
 ```
 
 ## Behavior changes
