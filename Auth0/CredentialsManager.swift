@@ -7,7 +7,7 @@ import LocalAuthentication
 
 /// Generic storage API for storing credentials
 public protocol CredentialsStorage {
-    /// Retreive a storage entry
+    /// Retrieve a storage entry
     ///
     /// - Parameters:
     ///   - forKey: The key to get from the store
