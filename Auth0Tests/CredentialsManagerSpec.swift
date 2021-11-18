@@ -59,7 +59,44 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.clear()).to(beFalse())
             }
         }
-        
+
+        describe("custom storage") {
+
+            class CustomStore: CredentialsStorage {
+                var store: [String : Data] = [:]
+                func setData(_ data: Data, forKey: String) -> Bool {
+                    store[forKey] = data
+                    return true
+                }
+                func deleteEntry(forKey: String) -> Bool {
+                    store[forKey] = nil
+                    return true
+                }
+                func data(forKey: String) -> Data? {
+                    return store[forKey]
+                }
+            }
+            
+            beforeEach {
+                credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore());
+            }
+            
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should store credentials in custom store") {
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.hasValid()).to(beTrue())
+            }
+
+            it("should clear credentials from custom store") {
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.clear()).to(beTrue())
+                expect(credentialsManager.hasValid()).to(beFalse())
+            }
+        }
+
         describe("clearing and revoking refresh token") {
             
             beforeEach {

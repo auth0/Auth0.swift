@@ -5,10 +5,36 @@ import JWTDecode
 import LocalAuthentication
 #endif
 
+/// Generic storage API for storing credentials
+public protocol CredentialsStorage {
+    /// Retreive a storage entry
+    ///
+    /// - Parameters:
+    ///   - forKey: The key to get from the store
+    /// - Returns: The stored data
+    func data(forKey: String) -> Data?
+    /// Set a storage entry
+    ///
+    /// - Parameters:
+    ///   - _: The data to be stored
+    ///   - forKey: The key to store it to
+    /// - Returns: if credentials were stored
+    func setData(_: Data, forKey: String) -> Bool
+    /// Delete a storage entry
+    ///
+    /// - Parameters:
+    ///   - forKey: The key to delete from the store
+    /// - Returns: if credentials were deleted
+    func deleteEntry(forKey: String) -> Bool
+}
+
+extension A0SimpleKeychain: CredentialsStorage {
+}
+
 /// Credentials management utility
 public struct CredentialsManager {
 
-    private let storage: A0SimpleKeychain
+    private let storage: CredentialsStorage
     private let storeKey: String
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
@@ -23,7 +49,7 @@ public struct CredentialsManager {
     ///   - authentication: Auth0 authentication instance
     ///   - storeKey: Key used to store user credentials in the keychain, defaults to "credentials"
     ///   - storage: The A0SimpleKeychain instance used to manage credentials storage. Defaults to a standard A0SimpleKeychain instance
-    public init(authentication: Authentication, storeKey: String = "credentials", storage: A0SimpleKeychain = A0SimpleKeychain()) {
+    public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = A0SimpleKeychain()) {
         self.storeKey = storeKey
         self.authentication = authentication
         self.storage = storage
