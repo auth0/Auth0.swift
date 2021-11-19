@@ -64,16 +64,16 @@ class CredentialsManagerSpec: QuickSpec {
 
             class CustomStore: CredentialsStorage {
                 var store: [String: Data] = [:]
-                func setData(_ data: Data, forKey: String) -> Bool {
+                func getEntry(forKey: String) -> Data? {
+                    return store[forKey]
+                }
+                func setEntry(_ data: Data, forKey: String) -> Bool {
                     store[forKey] = data
                     return true
                 }
                 func deleteEntry(forKey: String) -> Bool {
                     store[forKey] = nil
                     return true
-                }
-                func data(forKey: String) -> Data? {
-                    return store[forKey]
                 }
             }
             
