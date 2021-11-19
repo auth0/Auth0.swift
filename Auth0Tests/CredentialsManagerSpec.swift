@@ -63,7 +63,7 @@ class CredentialsManagerSpec: QuickSpec {
         describe("custom storage") {
 
             class CustomStore: CredentialsStorage {
-                var store: [String : Data] = [:]
+                var store: [String: Data] = [:]
                 func setData(_ data: Data, forKey: String) -> Bool {
                     store[forKey] = data
                     return true

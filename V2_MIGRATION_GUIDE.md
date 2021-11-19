@@ -204,7 +204,7 @@ The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `cha
 
 ### Credentials Manager
 
-`CredentialsManager` now takes a `CredentialsStorage` protocol as it's storage argument rather than an instance of `SimpleKeyChain`.
+`CredentialsManager` now takes a `CredentialsStorage` protocol as it's storage argument rather than an instance of `SimpleKeychain`.
 
 This means you can now provide your own storage layer to `CredentialsManager`.
 
