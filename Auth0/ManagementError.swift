@@ -3,29 +3,9 @@ import Foundation
 /**
  *  Represents an error during a request to Auth0 Management API
  */
-public class ManagementError: Auth0Error, CustomStringConvertible {
+public struct ManagementError: Auth0APIError {
 
-    /**
-     Additional information about the error
-     - seeAlso: `code` & `description` properties
-     */
-    public let info: [String: Any]
-
-    /**
-     Creates a Auth0 Management API error when the request's response is not JSON
-
-     - parameter string:     string representation of the response (or nil)
-     - parameter statusCode: response status code
-
-     - returns: a newly created ManagementError
-     */
-    public required init(string: String? = nil, statusCode: Int = 0) {
-        self.info = [
-            "code": string != nil ? nonJSONError : emptyBodyError,
-            "description": string ?? "Empty response body",
-            "statusCode": statusCode
-            ]
-    }
+    let info: [String: Any]
 
     /**
      Creates a Auth0 Management API error from a JSON response
@@ -35,22 +15,38 @@ public class ManagementError: Auth0Error, CustomStringConvertible {
 
      - returns: a newly created ManagementError
      */
-    public required init(info: [String: Any], statusCode: Int) {
+    public init(info: [String: Any], statusCode: Int?) {
         var values = info
         values["statusCode"] = statusCode
         self.info = values
     }
 
     /**
+     Http Status Code of the response
+     */
+    public var statusCode: Int? {
+        return self.info["statusCode"] as? Int
+    }
+
+    /**
+     The underlying `Error`, if any
+     */
+    public var cause: Error? {
+        return self.info["cause"] as? Error
+    }
+
+    /**
      Auth0 error code if the server returned one or an internal library code (e.g.: when the server could not be reached)
      */
-    public var code: String { return self.info["code"] as? String ?? unknownError }
+    public var code: String {
+        return self.info["code"] as? String ?? unknownError
+    }
 
     /**
      Description of the error
      - important: You should avoid displaying description to the user, it's meant for debugging only.
      */
-    public var description: String {
+    public var localizedDescription: String {
         if let string = self.info["description"] as? String {
             return string
         }
@@ -59,15 +55,25 @@ public class ManagementError: Auth0Error, CustomStringConvertible {
 
 }
 
-extension ManagementError: CustomNSError {
+extension ManagementError: Equatable {
 
-    public static let infoKey = "com.auth0.management.error.info"
-    public static var errorDomain: String { return "com.auth0.management" }
-    public var errorCode: Int { return 1 }
-    public var errorUserInfo: [String: Any] {
-        return [
-            NSLocalizedDescriptionKey: self.description,
-            ManagementError.infoKey: self
-        ]
+    public static func == (lhs: ManagementError, rhs: ManagementError) -> Bool {
+        return lhs.code == rhs.code && lhs.statusCode == rhs.statusCode
     }
+
+}
+
+extension ManagementError {
+
+    /**
+     Returns a value from error `info` dictionary
+
+     - parameter key: key of the value to return
+
+     - returns: the value of key or nil if cannot be found or is of the wrong type.
+     */
+    subscript<T>(_ key: String) -> T? {
+        return self.info[key] as? T
+    }
+
 }

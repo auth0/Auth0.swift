@@ -5,7 +5,7 @@ func plainJson(from response: Response<AuthenticationError>, callback: Request<[
         if let dictionary = try response.result() as? [String: Any] {
             callback(.success(dictionary))
         } else {
-            callback(.failure(AuthenticationError(string: string(response.data))))
+            callback(.failure(AuthenticationError(from: response)))
         }
 
     } catch let error {
@@ -21,7 +21,7 @@ func codable<T: Codable>(from response: Response<AuthenticationError>, callback:
             let decodedObject = try decoder.decode(T.self, from: data)
             callback(.success(decodedObject))
         } else {
-            callback(.failure(AuthenticationError(string: string(response.data))))
+            callback(.failure(AuthenticationError(from: response)))
         }
 
     } catch let error {
@@ -34,7 +34,7 @@ func authenticationObject<T: JSONObjectPayload>(from response: Response<Authenti
         if let dictionary = try response.result() as? [String: Any], let object = T(json: dictionary) {
             callback(.success(object))
         } else {
-            callback(.failure(AuthenticationError(string: string(response.data))))
+            callback(.failure(AuthenticationError(from: response)))
         }
 
     } catch let error {
@@ -49,7 +49,7 @@ func databaseUser(from response: Response<AuthenticationError>, callback: Reques
             let verified = dictionary["email_verified"] as? Bool ?? false
             callback(.success((email: email, username: username, verified: verified)))
         } else {
-            callback(.failure(AuthenticationError(string: string(response.data))))
+            callback(.failure(AuthenticationError(from: response)))
         }
 
     } catch let error {
@@ -61,7 +61,7 @@ func noBody(from response: Response<AuthenticationError>, callback: Request<Void
     do {
         _ = try response.result()
         callback(.success(()))
-    } catch let error as Auth0Error where error.code == emptyBodyError {
+    } catch let error as Auth0APIError where error.code == emptyBodyError {
         callback(.success(()))
     } catch let error {
         callback(.failure(error))

@@ -133,9 +133,9 @@ public struct CredentialsManager {
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
         if let bioAuth = self.bioAuth {
-            guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
+            guard bioAuth.available else { return callback(.biometricsFailed(LAError(LAError.biometryNotAvailable)), nil) }
             bioAuth.validateBiometric {
-                guard $0 == nil else { return callback(.touchFailed($0!), nil) }
+                guard $0 == nil else { return callback(.biometricsFailed($0!), nil) }
                 self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
             }
         } else {
@@ -195,7 +195,7 @@ public struct CredentialsManager {
                                                     code: -99999,
                                                     userInfo: nil)
                                 self.dispatchGroup.leave()
-                                callback(.failedRefresh(error), nil)
+                                callback(.refreshFailed(error), nil)
                             } else {
                                 _ = self.store(credentials: newCredentials)
                                 self.dispatchGroup.leave()
@@ -203,7 +203,7 @@ public struct CredentialsManager {
                             }
                         case .failure(let error):
                             self.dispatchGroup.leave()
-                            callback(.failedRefresh(error), nil)
+                            callback(.refreshFailed(error), nil)
                         }
                     }
             }

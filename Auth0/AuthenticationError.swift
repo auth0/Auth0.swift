@@ -3,33 +3,9 @@ import Foundation
 /**
  *  Represents an error during a request to Auth0 Authentication API
  */
-public class AuthenticationError: Auth0Error, CustomStringConvertible {
+public struct AuthenticationError: Auth0APIError {
 
-    /**
-     Additional information about the error
-     - seeAlso: `code` & `description` properties
-     */
-    public let info: [String: Any]
-
-    /// Http Status Code of the response
-    public let statusCode: Int
-
-    /**
-     Creates a Auth0 Auth API error when the request's response is not JSON
-
-     - parameter string:     string representation of the response (or nil)
-     - parameter statusCode: response status code
-
-     - returns: a newly created AuthenticationError
-     */
-    public required init(string: String? = nil, statusCode: Int = 0) {
-        self.info = [
-            "code": string != nil ? nonJSONError : emptyBodyError,
-            "description": string ?? "Empty response body",
-            "statusCode": statusCode
-        ]
-        self.statusCode = statusCode
-    }
+    let info: [String: Any]
 
     /**
      Creates a Auth0 Auth API error from a JSON response
@@ -39,9 +15,24 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
      - returns: a newly created AuthenticationError
      */
-    public required init(info: [String: Any], statusCode: Int) {
-        self.statusCode = statusCode
-        self.info = info
+    public init(info: [String: Any], statusCode: Int?) {
+        var values = info
+        values["statusCode"] = statusCode
+        self.info = values
+    }
+
+    /**
+     Http Status Code of the response
+     */
+    public var statusCode: Int? {
+        return self.info["statusCode"] as? Int
+    }
+
+    /**
+     The underlying `Error`, if any
+     */
+    public var cause: Error? {
+        return self.info["cause"] as? Error
     }
 
     /**
@@ -56,7 +47,7 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
      Description of the error
      - important: You should avoid displaying description to the user, it's meant for debugging only.
      */
-    public var description: String {
+    public var localizedDescription: String {
         let description = self.info["description"] ?? self.info["error_description"]
         if let string = description as? String {
             return string
@@ -79,25 +70,25 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
     /// When MFA code sent is invalid or expired
     public var isMultifactorCodeInvalid: Bool {
-        return self.code == "a0.mfa_invalid_code" || self.code == "invalid_grant" && self.description == "Invalid otp_code."
+        return self.code == "a0.mfa_invalid_code" || self.code == "invalid_grant" && self.localizedDescription == "Invalid otp_code."
     }
 
     /// When MFA code sent is invalid or expired
     public var isMultifactorTokenInvalid: Bool {
-        return self.code == "expired_token" && self.description == "mfa_token is expired" || self.code == "invalid_grant" && self.description == "Malformed mfa_token"
+        return self.code == "expired_token" && self.localizedDescription == "mfa_token is expired" || self.code == "invalid_grant" && self.localizedDescription == "Malformed mfa_token"
     }
 
     /// When password used for SignUp does not match connection's strength requirements. More info will be available in `info`
     public var isPasswordNotStrongEnough: Bool {
-        return self.code == "invalid_password" && self.value("name") == "PasswordStrengthError"
+        return self.code == "invalid_password" && self["name"] == "PasswordStrengthError"
     }
 
     /// When password used for SignUp was already used before (Reported when password history feature is enabled). More info will be available in `info`
     public var isPasswordAlreadyUsed: Bool {
-        return self.code == "invalid_password" && self.value("name") == "PasswordHistoryError"
+        return self.code == "invalid_password" && self["name"] == "PasswordHistoryError"
     }
 
-    /// When Auth0 rule returns an error. The message returned by the rull will be in `description`
+    /// When Auth0 rule returns an error. The message returned by the rule will be in `description`
     public var isRuleError: Bool {
         return self.code == "unauthorized"
     }
@@ -105,9 +96,9 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
     /// When username and/or password used for authentication are invalid
     public var isInvalidCredentials: Bool {
         return self.code == "invalid_user_password"
-            || self.code == "invalid_grant" && self.description == "Wrong email or password."
-            || self.code == "invalid_grant" && self.description == "Wrong email or verification code."
-            || self.code == "invalid_grant" && self.description == "Wrong phone number or verification code."
+            || self.code == "invalid_grant" && self.localizedDescription == "Wrong email or password."
+            || self.code == "invalid_grant" && self.localizedDescription == "Wrong email or verification code."
+            || self.code == "invalid_grant" && self.localizedDescription == "Wrong phone number or verification code."
     }
 
     /// When authenticating with web-based authentication and the resource server denied access per OAuth2 spec
@@ -125,6 +116,18 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
         return self.code == "requires_verification"
     }
 
+}
+
+extension AuthenticationError: Equatable {
+
+    public static func == (lhs: AuthenticationError, rhs: AuthenticationError) -> Bool {
+        return lhs.code == rhs.code && lhs.statusCode == rhs.statusCode
+    }
+
+}
+
+extension AuthenticationError {
+
     /**
      Returns a value from error `info` dictionary
 
@@ -132,18 +135,8 @@ public class AuthenticationError: Auth0Error, CustomStringConvertible {
 
      - returns: the value of key or nil if cannot be found or is of the wrong type.
      */
-    public func value<T>(_ key: String) -> T? { return self.info[key] as? T }
-}
-
-extension AuthenticationError: CustomNSError {
-
-    public static let infoKey = "com.auth0.authentication.error.info"
-    public static var errorDomain: String { return "com.auth0.authentication" }
-    public var errorCode: Int { return 1 }
-    public var errorUserInfo: [String: Any] {
-        return [
-            NSLocalizedDescriptionKey: self.description,
-            AuthenticationError.infoKey: self
-        ]
+    subscript<T>(_ key: String) -> T? {
+        return self.info[key] as? T
     }
+
 }

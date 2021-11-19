@@ -14,7 +14,7 @@ import Foundation
  }
  ```
  */
-public struct Request<T, E: Auth0Error>: Requestable {
+public struct Request<T, E: Auth0APIError>: Requestable {
     public typealias Callback = (Auth0Result<T>) -> Void
 
     let session: URLSession
@@ -68,7 +68,7 @@ public struct Request<T, E: Auth0Error>: Requestable {
             if error == nil, let response = response {
                 logger?.trace(response: response, data: data)
             }
-            handler(Response(data: data, response: response, error: error), callback)
+            handler(Response(data: data, response: response as? HTTPURLResponse, error: error), callback)
         })
         task.resume()
     }

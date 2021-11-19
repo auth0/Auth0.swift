@@ -8,10 +8,16 @@ public typealias ManagementObject = [String: Any]
 struct Management: Trackable, Loggable {
     let token: String
     let url: URL
+    let session: URLSession
+
     var telemetry: Telemetry
     var logger: Logger?
 
-    let session: URLSession
+    var defaultHeaders: [String: String] {
+        return [
+            "Authorization": "Bearer \(token)"
+        ]
+    }
 
     init(token: String, url: URL, session: URLSession = .shared, telemetry: Telemetry = Telemetry()) {
         self.token = token
@@ -25,7 +31,7 @@ struct Management: Trackable, Loggable {
             if let dictionary = try response.result() as? ManagementObject {
                 callback(.success(dictionary))
             } else {
-                callback(.failure(ManagementError(string: string(response.data))))
+                callback(.failure(ManagementError(from: response)))
             }
         } catch let error {
             callback(.failure(error))
@@ -37,16 +43,10 @@ struct Management: Trackable, Loggable {
             if let list = try response.result() as? [ManagementObject] {
                 callback(.success(list))
             } else {
-                callback(.failure(ManagementError(string: string(response.data))))
+                callback(.failure(ManagementError(from: response)))
             }
         } catch let error {
             callback(.failure(error))
         }
-    }
-
-    var defaultHeaders: [String: String] {
-        return [
-            "Authorization": "Bearer \(token)"
-        ]
     }
 }

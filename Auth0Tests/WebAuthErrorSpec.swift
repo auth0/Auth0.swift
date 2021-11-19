@@ -8,33 +8,26 @@ class WebAuthErrorSpec: QuickSpec {
 
     override func spec() {
 
-        describe("foundation error") {
+        describe("error messages") {
 
-            it("should build generic NSError") {
-                let error = WebAuthError.noBundleIdentifierFound as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
-            }
-
-            it("should build error for PKCE not allowed") {
-                let message = "Not Allowed"
-                let error = WebAuthError.pkceNotAllowed(message) as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
+            it("should return message for user cancelled") {
+                let message = "User cancelled Web Authentication"
+                let error = WebAuthError.userCancelled
                 expect(error.localizedDescription) == message
             }
 
-            it("should build error for user cancelled") {
-                let error = WebAuthError.userCancelled as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 0
+            it("should return message for PKCE not allowed") {
+                let message = "Unable to complete authentication with PKCE. PKCE support can be enabled by setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app in the Auth0 Dashboard."
+                let error = WebAuthError.pkceNotAllowed
+                expect(error.localizedDescription) == message
             }
 
-            it("should build error for missing access_token") {
-                let error = WebAuthError.missingAccessToken as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
+            it("should return message for missing access token") {
+                let message = "Could not validate the token"
+                let error = WebAuthError.missingAccessToken
+                expect(error.localizedDescription) == message
             }
+
         }
     }
 }
