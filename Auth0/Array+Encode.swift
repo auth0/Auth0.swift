@@ -2,7 +2,7 @@
 import Foundation
 
 extension Array where Element == UInt8 {
-    func a0_derEncode(as dataType: UInt8) -> [UInt8] {
+    func derEncode(as dataType: UInt8) -> [UInt8] {
         var encodedBytes: [UInt8] = [dataType]
         var numberOfBytes = count
         if numberOfBytes < 128 {

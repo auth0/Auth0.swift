@@ -16,9 +16,9 @@ extension JWK {
     private func encodeRSAPublicKey(modulus: [UInt8], exponent: [UInt8]) -> Data {
         var prefixedModulus: [UInt8] = [0x00] // To indicate that the number is not negative
         prefixedModulus.append(contentsOf: modulus)
-        let encodedModulus = prefixedModulus.a0_derEncode(as: 2) // Integer
-        let encodedExponent = exponent.a0_derEncode(as: 2) // Integer
-        let encodedSequence = (encodedModulus + encodedExponent).a0_derEncode(as: 48) // Sequence
+        let encodedModulus = prefixedModulus.derEncode(as: 2) // Integer
+        let encodedExponent = exponent.derEncode(as: 2) // Integer
+        let encodedSequence = (encodedModulus + encodedExponent).derEncode(as: 48) // Sequence
         return Data(encodedSequence)
     }
 

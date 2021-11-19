@@ -32,7 +32,7 @@ class BaseTransaction: NSObject, AuthTransaction {
     }
 
     func resume(_ url: URL) -> Bool {
-        self.logger?.trace(url: url, source: "iOS Safari")
+        self.logger?.trace(url: url, source: "Callback URL")
         if self.handleURL(url) {
             authSession?.cancel()
             authSession = nil
