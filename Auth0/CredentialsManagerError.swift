@@ -11,42 +11,35 @@ public struct CredentialsManagerError: Auth0Error {
         case refreshFailed
         case biometricsFailed
         case revokeFailed
-        case largeMinTTL
+        case largeMinTTL(minTTL: Int, lifetime: Int)
     }
 
     let code: Code
-    let message: String?
+
+    init(code: Code, cause: Error? = nil) {
+        self.code = code
+        self.cause = cause
+    }
 
     /**
      The underlying `Error`, if any
      */
     public let cause: Error?
 
-    private init(code: Code, cause: Error?, message: String?) {
-        self.code = code
-        self.cause = cause
-        self.message = message
-    }
-
-    init(code: Code) {
-        self.init(code: code, cause: nil, message: nil)
-    }
-
-    init(code: Code, cause: Error) {
-        self.init(code: code, cause: cause, message: cause.localizedDescription)
-    }
-
-    init(code: Code, message: String) {
-        self.init(code: code, cause: nil, message: message)
-    }
-
     /**
      Description of the error
      - important: You should avoid displaying description to the user, it's meant for debugging only.
      */
     public var localizedDescription: String {
-        switch self.code { // TODO: Complete
-        default: return self.cause?.localizedDescription ?? self.message ?? "Failed to perform webAuth"
+        if let description = self.cause?.localizedDescription { return description }
+
+        switch self.code {
+        case .noCredentials: return "No valid credentials found."
+        case .noRefreshToken: return "No Refresh Token in the credentials."
+        case .largeMinTTL(let minTTL, let lifetime): return "The minTTL requested (\(minTTL)s) is greater than the "
+            + "lifetime of the renewed Access Token (\(lifetime)s). Request a lower minTTL or increase the "
+            + "'Token Expiration' setting of your Auth0 API in the dashboard."
+        default: return "Failed to perform Credentials Manager operation."
         }
     }
 
@@ -55,7 +48,7 @@ public struct CredentialsManagerError: Auth0Error {
     public static let refreshFailed: CredentialsManagerError = .init(code: .refreshFailed)
     public static let biometricsFailed: CredentialsManagerError = .init(code: .biometricsFailed)
     public static let revokeFailed: CredentialsManagerError = .init(code: .revokeFailed)
-    public static let largeMinTTL: CredentialsManagerError = .init(code: .largeMinTTL)
+    public static let largeMinTTL: CredentialsManagerError = .init(code: .largeMinTTL(minTTL: 0, lifetime: 0))
 
 }
 
@@ -64,9 +57,7 @@ public struct CredentialsManagerError: Auth0Error {
 extension CredentialsManagerError: Equatable {
 
     public static func == (lhs: CredentialsManagerError, rhs: CredentialsManagerError) -> Bool {
-        return lhs.code == rhs.code
-            && lhs.cause?.localizedDescription == rhs.cause?.localizedDescription
-            && lhs.message == rhs.message
+        return lhs.code == rhs.code && lhs.localizedDescription == rhs.localizedDescription
     }
 
 }

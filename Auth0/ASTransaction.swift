@@ -19,7 +19,7 @@ final class ASTransaction: BaseTransaction {
         let authSession = ASWebAuthenticationSession(url: authorizeURL,
                                                      callbackURLScheme: self.redirectURL.scheme) { [weak self] in
             guard $1 == nil, let callbackURL = $0 else {
-                let authError = $1 ?? WebAuthError(code: .unknown) // TODO: Add message
+                let authError = $1 ?? WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))
                 if case ASWebAuthenticationSessionError.canceledLogin = authError {
                     self?.callback(.failure(WebAuthError.userCancelled))
                 } else {

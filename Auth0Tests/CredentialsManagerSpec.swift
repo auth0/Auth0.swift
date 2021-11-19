@@ -552,14 +552,14 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should fail to yield a renewed access token with a min ttl greater than its expiry") {
                     let minTTL = 100_000
-                    let expectedError = CredentialsManagerError(code: .largeMinTTL, message: "The minTTL requested (\(minTTL)s) is greater than the lifetime of the renewed Access Token (\(ExpiresIn)s). Request a lower minTTL or increase the 'Token Expiration' setting of your Auth0 API in the dashboard.")
+                    // The dates are not mocked, so they won't match exactly
+                    let expectedError = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: Int(ExpiresIn - 1)))
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) {
                         _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn)
                     }
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials(withScope: nil, minTTL: minTTL) { error, newCredentials in
                             expect(error?.code) == expectedError.code
-                            // the dates are not mocked, so they won't match exactly
                             expect(error?.localizedDescription) == "The minTTL requested (\(minTTL)s) is greater than the lifetime of the renewed Access Token (\(Int(ExpiresIn - 1))s). Request a lower minTTL or increase the 'Token Expiration' setting of your Auth0 API in the dashboard."
                             expect(newCredentials).to(beNil())
                             done()

@@ -156,7 +156,6 @@ public struct CredentialsManager {
         return credentials
     }
 
-    // swiftlint:disable:next function_body_length
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         self.dispatchQueue.async {
             self.dispatchGroup.enter()
@@ -189,10 +188,8 @@ public struct CredentialsManager {
                                                              expiresIn: credentials.expiresIn,
                                                              scope: credentials.scope)
                             if self.willExpire(newCredentials, within: minTTL) {
-                                let accessTokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
-                                // TODO: On the next major add a new case to CredentialsManagerError
-                                let error = CredentialsManagerError(code: .largeMinTTL,
-                                                                    message: "The minTTL requested (\(minTTL)s) is greater than the lifetime of the renewed Access Token (\(accessTokenLifetime)s). Request a lower minTTL or increase the 'Token Expiration' setting of your Auth0 API in the dashboard.")
+                                let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
+                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
                                 self.dispatchGroup.leave()
                                 callback(error, nil)
                             } else {
