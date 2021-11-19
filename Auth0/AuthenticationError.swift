@@ -19,14 +19,13 @@ public struct AuthenticationError: Auth0APIError {
         var values = info
         values["statusCode"] = statusCode
         self.info = values
+        self.statusCode = statusCode ?? 0
     }
 
     /**
      Http Status Code of the response
      */
-    public var statusCode: Int? {
-        return self.info["statusCode"] as? Int
-    }
+    public let statusCode: Int
 
     /**
      The underlying `Error`, if any
@@ -121,7 +120,9 @@ public struct AuthenticationError: Auth0APIError {
 extension AuthenticationError: Equatable {
 
     public static func == (lhs: AuthenticationError, rhs: AuthenticationError) -> Bool {
-        return lhs.code == rhs.code && lhs.statusCode == rhs.statusCode
+        return lhs.code == rhs.code
+            && lhs.statusCode == rhs.statusCode
+            && lhs.localizedDescription == rhs.localizedDescription
     }
 
 }

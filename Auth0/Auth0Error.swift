@@ -26,8 +26,8 @@ public protocol Auth0APIError: Auth0Error {
     /// The code of the error as a String
     var code: String { get }
 
-    /// Http Status Code of the response, if any
-    var statusCode: Int? { get }
+    /// Http Status Code of the response
+    var statusCode: Int { get }
 
     /**
      Creates an error from a JSON response
