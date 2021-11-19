@@ -5,10 +5,42 @@ import JWTDecode
 import LocalAuthentication
 #endif
 
+/// Generic storage API for storing credentials
+public protocol CredentialsStorage {
+    /// Retrieve a storage entry
+    ///
+    /// - Parameters:
+    ///   - forKey: The key to get from the store
+    /// - Returns: The stored data
+    func getEntry(forKey: String) -> Data?
+    /// Set a storage entry
+    ///
+    /// - Parameters:
+    ///   - _: The data to be stored
+    ///   - forKey: The key to store it to
+    /// - Returns: if credentials were stored
+    func setEntry(_: Data, forKey: String) -> Bool
+    /// Delete a storage entry
+    ///
+    /// - Parameters:
+    ///   - forKey: The key to delete from the store
+    /// - Returns: if credentials were deleted
+    func deleteEntry(forKey: String) -> Bool
+}
+
+extension A0SimpleKeychain: CredentialsStorage {
+    public func getEntry(forKey: String) -> Data? {
+        return data(forKey: forKey)
+    }
+    public func setEntry(_ data: Data, forKey: String) -> Bool {
+        return setData(data, forKey: forKey)
+    }
+}
+
 /// Credentials management utility
 public struct CredentialsManager {
 
-    private let storage: A0SimpleKeychain
+    private let storage: CredentialsStorage
     private let storeKey: String
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
@@ -23,7 +55,7 @@ public struct CredentialsManager {
     ///   - authentication: Auth0 authentication instance
     ///   - storeKey: Key used to store user credentials in the keychain, defaults to "credentials"
     ///   - storage: The A0SimpleKeychain instance used to manage credentials storage. Defaults to a standard A0SimpleKeychain instance
-    public init(authentication: Authentication, storeKey: String = "credentials", storage: A0SimpleKeychain = A0SimpleKeychain()) {
+    public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = A0SimpleKeychain()) {
         self.storeKey = storeKey
         self.authentication = authentication
         self.storage = storage
@@ -63,7 +95,7 @@ public struct CredentialsManager {
         guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true) else {
             return false
         }
-        return self.storage.setData(data, forKey: storeKey)
+        return self.storage.setEntry(data, forKey: storeKey)
     }
 
     /// Clear credentials stored in keychain
@@ -81,7 +113,7 @@ public struct CredentialsManager {
     /// - Parameter callback: callback with an error if the refresh token could not be revoked
     public func revoke(_ callback: @escaping (CredentialsManagerError?) -> Void) {
         guard
-            let data = self.storage.data(forKey: self.storeKey),
+            let data = self.storage.getEntry(forKey: self.storeKey),
             let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
             let refreshToken = credentials.refreshToken else {
                 _ = self.clear()
@@ -106,7 +138,7 @@ public struct CredentialsManager {
     /// - Parameter minTTL: minimum lifetime in seconds the access token must have left.
     /// - Returns: if there are valid and non-expired credentials stored.
     public func hasValid(minTTL: Int = 0) -> Bool {
-        guard let data = self.storage.data(forKey: self.storeKey),
+        guard let data = self.storage.getEntry(forKey: self.storeKey),
             let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data) else { return false }
         return (!self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)) || credentials.refreshToken != nil
     }
@@ -150,7 +182,7 @@ public struct CredentialsManager {
     #endif
 
     private func retrieveCredentials() -> Credentials? {
-        guard let data = self.storage.data(forKey: self.storeKey),
+        guard let data = self.storage.getEntry(forKey: self.storeKey),
               let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data) else { return nil }
 
         return credentials
