@@ -10,7 +10,7 @@ public struct AuthenticationError: Auth0APIError {
     /**
      Creates a Auth0 Auth API error from a JSON response
 
-     - parameter info: JSON response from Auth0
+     - parameter info:          JSON response from Auth0
      - parameter statusCode:    Http Status Code of the Response
 
      - returns: a newly created AuthenticationError
@@ -44,7 +44,7 @@ public struct AuthenticationError: Auth0APIError {
 
     /**
      Description of the error
-     - important: You should avoid displaying description to the user, it's meant for debugging only.
+     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
      */
     public var localizedDescription: String {
         let description = self.info["description"] ?? self.info["error_description"]
@@ -127,10 +127,20 @@ extension AuthenticationError: Equatable {
 
 }
 
+extension AuthenticationError: CustomDebugStringConvertible {
+
+    /**
+     Description of the error, returns the same value as `localizedDescription`
+     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     */
+    public var debugDescription: String { return self.localizedDescription }
+
+}
+
 extension AuthenticationError {
 
     /**
-     Returns a value from error `info` dictionary
+     Returns a value from the error's `info` dictionary
 
      - parameter key: key of the value to return
 

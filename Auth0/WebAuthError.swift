@@ -30,19 +30,21 @@ public struct WebAuthError: Auth0Error {
 
     /**
      Description of the error
-     - important: You should avoid displaying description to the user, it's meant for debugging only.
+     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
      */
     public var localizedDescription: String {
-        if let description = self.cause?.localizedDescription { return description }
+        if let error =  self.cause { return error.localizedDescription }
 
         switch self.code {
         case .noBundleIdentifier: return "Unable to retrieve the bundle identifier."
-        case .malformedInvitationURL: return ""
+        case .malformedInvitationURL(let url): return "The invitation URL (\(url)) is missing the required query "
+            + "parameters 'invitation' and 'organization'."
         case .userCancelled: return "User cancelled Web Authentication."
         case .pkceNotAllowed: return "Unable to complete authentication with PKCE. PKCE support can be enabled by "
             + "setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app "
             + "in the Auth0 Dashboard."
-        default: return "Failed to perform Web Auth operation,"
+        case .unknown(let message): return message
+        default: return "Failed to perform Web Auth operation."
         }
     }
 
@@ -56,13 +58,21 @@ public struct WebAuthError: Auth0Error {
 
 }
 
-// MARK: - Equatable
-
 extension WebAuthError: Equatable {
 
     public static func == (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
         return lhs.code == rhs.code && lhs.localizedDescription == rhs.localizedDescription
     }
+
+}
+
+extension WebAuthError: CustomDebugStringConvertible {
+
+    /**
+     Description of the error, returns the same value as `localizedDescription`
+     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     */
+    public var debugDescription: String { return self.localizedDescription }
 
 }
 

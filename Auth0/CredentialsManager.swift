@@ -133,9 +133,15 @@ public struct CredentialsManager {
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
         if let bioAuth = self.bioAuth {
-            guard bioAuth.available else { return callback(CredentialsManagerError(code: .biometricsFailed, cause: LAError(LAError.biometryNotAvailable)), nil) }
+            guard bioAuth.available else {
+                let error = CredentialsManagerError(code: .biometricsFailed,
+                                                    cause: LAError(LAError.biometryNotAvailable))
+                return callback(error, nil)
+            }
             bioAuth.validateBiometric {
-                guard $0 == nil else { return callback(CredentialsManagerError(code: .biometricsFailed, cause: $0!), nil) }
+                guard $0 == nil else {
+                    return callback(CredentialsManagerError(code: .biometricsFailed, cause: $0!), nil)
+                }
                 self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
             }
         } else {

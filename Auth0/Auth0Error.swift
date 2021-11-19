@@ -4,16 +4,10 @@ let unknownError = "a0.sdk.internal_error.unknown"
 let nonJSONError = "a0.sdk.internal_error.plain"
 let emptyBodyError = "a0.sdk.internal_error.empty"
 
-public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
+public protocol Auth0Error: LocalizedError {
 
     /// The underlying `Error`, if any
     var cause: Error? { get }
-
-}
-
-extension Auth0Error {
-
-    public var debugDescription: String { return self.localizedDescription }
 
 }
 

@@ -43,7 +43,7 @@ public struct ManagementError: Auth0APIError {
 
     /**
      Description of the error
-     - important: You should avoid displaying description to the user, it's meant for debugging only.
+     - important: You should avoid displaying the description to the user, it's meant for debugging only.
      */
     public var localizedDescription: String {
         if let string = self.info["description"] as? String {
@@ -64,10 +64,22 @@ extension ManagementError: Equatable {
 
 }
 
+extension ManagementError: CustomDebugStringConvertible {
+
+    /**
+     Description of the error, returns the same value as `localizedDescription`
+     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     */
+    public var debugDescription: String { return self.localizedDescription }
+
+}
+
+// MARK: - Subscript
+
 extension ManagementError {
 
     /**
-     Returns a value from error `info` dictionary
+     Returns a value from the error's `info` dictionary
 
      - parameter key: key of the value to return
 
