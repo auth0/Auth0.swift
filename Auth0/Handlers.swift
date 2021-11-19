@@ -18,6 +18,7 @@ func codable<T: Codable>(from response: Response<AuthenticationError>, callback:
         if let dictionary = try response.result() as? [String: Any] {
             let data = try JSONSerialization.data(withJSONObject: dictionary)
             let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .secondsSince1970
             let decodedObject = try decoder.decode(T.self, from: data)
             callback(.success(decodedObject))
         } else {

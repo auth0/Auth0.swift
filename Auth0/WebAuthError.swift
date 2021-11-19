@@ -35,7 +35,7 @@ public struct WebAuthError: Auth0Error {
     }
 
     init(code: Code, cause: Error) {
-        self.init(code: code, cause: cause, message: nil)
+        self.init(code: code, cause: cause, message: cause.localizedDescription)
     }
 
     init(code: Code, message: String) {
@@ -61,15 +61,34 @@ public struct WebAuthError: Auth0Error {
     public static let userCancelled: WebAuthError = .init(code: .userCancelled)
     public static let missingAccessToken: WebAuthError = .init(code: .missingAccessToken)
     public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
-    public static func idTokenValidationFailed(_ error: Error) -> WebAuthError { .init(code: .idTokenValidationFailed, cause: error) }
-    public static func other(_ error: Error) -> WebAuthError { .init(code: .other, cause: error) }
-    public static func unknown(_ message: String) -> WebAuthError { .init(code: .unknown, message: message) }
+    public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
+    public static let other: WebAuthError = .init(code: .other)
+    public static let unknown: WebAuthError = .init(code: .unknown)
 
 }
+
+// MARK: - Equatable
 
 extension WebAuthError: Equatable {
 
     public static func == (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
+        return lhs.code == rhs.code
+            && lhs.cause?.localizedDescription == rhs.cause?.localizedDescription
+            && lhs.message == rhs.message
+    }
+
+}
+
+// MARK: - Pattern Matching Operator
+
+extension WebAuthError {
+
+    public static func ~= (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
+        return lhs.code == rhs.code
+    }
+
+    public static func ~= (lhs: WebAuthError, rhs: Error) -> Bool {
+        guard let rhs = rhs as? WebAuthError else { return false }
         return lhs.code == rhs.code
     }
 

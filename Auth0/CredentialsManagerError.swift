@@ -11,6 +11,7 @@ public struct CredentialsManagerError: Auth0Error {
         case refreshFailed
         case biometricsFailed
         case revokeFailed
+        case largeMinTTL
     }
 
     let code: Code
@@ -32,7 +33,7 @@ public struct CredentialsManagerError: Auth0Error {
     }
 
     init(code: Code, cause: Error) {
-        self.init(code: code, cause: cause, message: nil)
+        self.init(code: code, cause: cause, message: cause.localizedDescription)
     }
 
     init(code: Code, message: String) {
@@ -51,15 +52,35 @@ public struct CredentialsManagerError: Auth0Error {
 
     public static let noCredentials: CredentialsManagerError = .init(code: .noCredentials)
     public static let noRefreshToken: CredentialsManagerError = .init(code: .noRefreshToken)
-    public static func refreshFailed(_ error: Error) -> CredentialsManagerError { .init(code: .refreshFailed, cause: error) }
-    public static func biometricsFailed(_ error: Error) -> CredentialsManagerError { .init(code: .biometricsFailed, cause: error) }
-    public static func revokeFailed(_ error: Error) -> CredentialsManagerError { .init(code: .revokeFailed, cause: error) }
+    public static let refreshFailed: CredentialsManagerError = .init(code: .refreshFailed)
+    public static let biometricsFailed: CredentialsManagerError = .init(code: .biometricsFailed)
+    public static let revokeFailed: CredentialsManagerError = .init(code: .revokeFailed)
+    public static let largeMinTTL: CredentialsManagerError = .init(code: .largeMinTTL)
 
 }
+
+// MARK: - Equatable
 
 extension CredentialsManagerError: Equatable {
 
     public static func == (lhs: CredentialsManagerError, rhs: CredentialsManagerError) -> Bool {
+        return lhs.code == rhs.code
+            && lhs.cause?.localizedDescription == rhs.cause?.localizedDescription
+            && lhs.message == rhs.message
+    }
+
+}
+
+// MARK: - Pattern Matching Operator
+
+extension CredentialsManagerError {
+
+    public static func ~= (lhs: CredentialsManagerError, rhs: CredentialsManagerError) -> Bool {
+        return lhs.code == rhs.code
+    }
+
+    public static func ~= (lhs: CredentialsManagerError, rhs: Error) -> Bool {
+        guard let rhs = rhs as? CredentialsManagerError else { return false }
         return lhs.code == rhs.code
     }
 

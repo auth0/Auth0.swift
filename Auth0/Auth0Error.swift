@@ -3,7 +3,6 @@ import Foundation
 let unknownError = "a0.sdk.internal_error.unknown"
 let nonJSONError = "a0.sdk.internal_error.plain"
 let emptyBodyError = "a0.sdk.internal_error.empty"
-let otherError = "a0.sdk.internal_error.other"
 
 public protocol Auth0Error: LocalizedError {
 
