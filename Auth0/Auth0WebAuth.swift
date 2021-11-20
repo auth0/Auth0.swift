@@ -119,7 +119,7 @@ final class Auth0WebAuth: WebAuth {
 
     func start(_ callback: @escaping (Auth0Result<Credentials>) -> Void) {
         guard let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError.noBundleIdentifier))
+            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
         let handler = self.handler(redirectURL)
         let state = self.parameters["state"] ?? generateDefaultState()

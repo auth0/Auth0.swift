@@ -26,7 +26,7 @@ class BaseTransaction: NSObject, AuthTransaction {
     }
 
     func cancel() {
-        self.callback(.failure(WebAuthError.userCancelled))
+        self.callback(.failure(WebAuthError(code: .userCancelled)))
         authSession?.cancel()
         authSession = nil
     }

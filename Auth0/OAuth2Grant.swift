@@ -83,7 +83,7 @@ struct PKCE: OAuth2Grant {
                 switch result {
                 case .failure(let error as AuthenticationError) where error.localizedDescription == "Unauthorized":
                     // Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
-                    return callback(.failure(WebAuthError.pkceNotAllowed))
+                    return callback(.failure(WebAuthError(code: .pkceNotAllowed)))
                 case .failure(let error): return callback(.failure(WebAuthError(code: .other, cause: error)))
                 case .success(let credentials):
                     validate(idToken: credentials.idToken, with: validatorContext) { error in
