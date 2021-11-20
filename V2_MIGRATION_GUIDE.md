@@ -156,7 +156,7 @@ The following cases were removed, as they are no longer necessary:
 
 ### Properties removed
 
-- `info: [String: Any]` is no longer public.
+- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
 
 ## Properties renamed
 
@@ -166,7 +166,7 @@ The following cases were removed, as they are no longer necessary:
 
 ### Properties removed
 
-- `info: [String: Any]` is no longer public.
+- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
 
 ## Properties renamed
 
