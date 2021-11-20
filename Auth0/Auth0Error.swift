@@ -58,8 +58,4 @@ extension Auth0APIError {
         self.init(description: string(response.data), statusCode: response.response?.statusCode)
     }
 
-    public init(info: [String: Any], statusCode: Int? = 0) {
-        self.init(info: info, statusCode: statusCode)
-    }
-
 }
