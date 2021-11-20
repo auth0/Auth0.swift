@@ -119,21 +119,135 @@ The `useUniversalLink()` method was removed as well, as Universal Links [cannot 
 
 The method `enableTouchAuth(withTitle:cancelTitle:fallbackTitle:)` was removed. Use `enableBiometrics(withTitle:cancelTitle:fallbackTitle:evaluationPolicy:)` instead.
 
+### `Auth0Error`
+
+The `init(string: String?, statusCode: Int)` initializer was removed.
+
+### `AuthenticationError`
+
+The `init(string: String?, statusCode: Int)` initializer was removed.
+
+### `ManagementError`
+
+The `init(string: String?, statusCode: Int)` initializer was removed.
+
 ## Errors Removed
 
-### `WebAuthError` enum
+### `WebAuthError`
 
 The following cases were removed, as they are no longer necessary:
 
-- `noNonceProvided`
-- `invalidIdTokenNonce`
+- `.noNonceProvided`
+- `.invalidIdTokenNonce`
 
 ## Types changed
 
 - `UserInfo` was changed from class to struct
-- `Credentials` is now a `final` class that conforms to `Codable`
+- `Credentials` is now a `final` class that conforms to `Codable` instead of `JSONObjectPayload`
+- `Auth0Error` was renamed to `Auth0APIError`, and `Auth0Error` is now a different protocol
+- `AuthenticationError` was changed from class to struct, and it no longer conforms to `CustomNSError`
+- `ManagementError` was changed from class to struct, and it no longer conforms to `CustomNSError`
+- `WebAuthError` was changed from enum to struct
+- `CredentialsManagerError` was changed from enum to struct
 
 ## Type properties changed
+
+### `AuthenticationError` struct
+
+### Properties removed
+
+- `info: [String: Any]` is no longer public.
+
+## Properties renamed
+
+- `description` was renamed to `localizedDescription`, as `AuthenticationError` now conforms to `CustomStringConvertible`
+
+### `ManagementError` struct
+
+### Properties removed
+
+- `info: [String: Any]` is no longer public.
+
+## Properties renamed
+
+- `description` was renamed to `localizedDescription`, as `ManagementError` now conforms to `CustomStringConvertible`
+
+### `WebAuthError` struct
+
+All the former enum cases are now static properties, so to switch over them you will need to add a `default` clause.
+
+##### Before
+
+```swift
+switch error {
+    case .userCancelled: // handle error
+    // ...
+}
+```
+
+##### After
+
+```swift
+switch error {
+    case .userCancelled: // handle error
+    // ...
+    default: // handle unkwown errors, e.g. errors added in future versions
+}
+```
+
+### Properties removed
+
+- `.cannotDismissWebAuthController`
+- `.missingResponseParam`
+- `.missingAccessToken`
+- `infoKey`
+- `errorDomain`
+- `errorCode`
+- `errorUserInfo`
+
+#### Properties renamed
+
+- `.unknownError` was renamed to `.unknown`
+- `.noBundleIdentifierFound` was renamed to `.noBundleIdentifier` 
+
+#### Properties added
+
+- `.malformedInvitationURL`
+- `.idTokenValidationFailed`
+- `.other`
+
+### `CredentialsManagerError` struct
+
+All the former enum cases are now static properties, so to switch over them you will need to add a `default` clause.
+As static properties cannot have asociated values, to access the `Error` for `.refreshFailed`, `.biometricsFailed`, and `.revokeFailed` use the new `cause: Error?` property.
+
+##### Before
+
+```swift
+switch error {
+    case .revokeFailed(let error): print(error) // handle underlying error
+    // ...
+}
+```
+
+##### After
+
+```swift
+switch error {
+    case .revokeFailed: print(error.cause) // handle underlying error
+    // ...
+    default: // handle unkwown errors, e.g. errors added in future versions
+}
+```
+
+#### Properties renamed
+
+- `.failedRefresh` was renamed to `.refreshFailed`
+- `.touchFailed` was renamed to `.biometricsFailed`
+
+#### Properties added
+
+- `.largeMinTTL`
 
 ### `UserInfo` struct
 
