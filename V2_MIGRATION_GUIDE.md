@@ -79,7 +79,7 @@ The following classes were also removed, as they are no longer in use:
 - `Profile`
 - `Identity`
 
-## Metods Removed
+## Methods Removed
 
 The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed.
 
@@ -315,6 +315,31 @@ In the following methods the `scope` parameter became non-optional (with a defau
 #### Removed `channel` parameter
 
 The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `channel` parameter, which is no longer necessary.
+
+### Credentials Manager
+
+`CredentialsManager` now takes a `CredentialsStorage` protocol as it's storage argument rather than an instance of `SimpleKeychain`.
+
+This means you can now provide your own storage layer to `CredentialsManager`.
+
+```swift
+class CustomStore: CredentialsStorage {
+    var store: [String : Data] = [:]
+    func getEntry(forKey: String) -> Data? {
+        return store[forKey]
+    }
+    func setEntry(_ data: Data, forKey: String) -> Bool {
+        store[forKey] = data
+        return true
+    }
+    func deleteEntry(forKey: String) -> Bool {
+        store[forKey] = nil
+        return true
+    }
+}
+
+let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore());
+```
 
 ## Behavior changes
 
