@@ -225,7 +225,7 @@ As static properties cannot have asociated values, to access the `Error` for `.r
 
 ```swift
 switch error {
-    case .revokeFailed(let error): print(error) // handle underlying error
+    case .revokeFailed(let error): handleError(error) // handle underlying error
     // ...
 }
 ```
@@ -234,7 +234,7 @@ switch error {
 
 ```swift
 switch error {
-    case .revokeFailed: print(error.cause) // handle underlying error
+    case .revokeFailed: handleError(error.cause) // handle underlying error
     // ...
     default: // handle unkwown errors, e.g. errors added in future versions
 }
