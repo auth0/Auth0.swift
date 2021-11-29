@@ -153,8 +153,8 @@ final class Auth0WebAuth: WebAuth {
 
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void) {
         let endpoint = federated ?
-            URL(string: "/v2/logout?federated", relativeTo: self.url)! :
-            URL(string: "/v2/logout", relativeTo: self.url)!
+            URL(string: "v2/logout?federated", relativeTo: self.url)! :
+            URL(string: "v2/logout", relativeTo: self.url)!
 
         let returnTo = URLQueryItem(name: "returnTo", value: self.redirectURL?.absoluteString)
         let clientId = URLQueryItem(name: "client_id", value: self.clientId)
@@ -177,7 +177,7 @@ final class Auth0WebAuth: WebAuth {
                            state: String?,
                            organization: String?,
                            invitation: String?) -> URL {
-        let authorize = URL(string: "/authorize", relativeTo: self.url)!
+        let authorize = URL(string: "authorize", relativeTo: self.url)!
         var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true)!
         var items: [URLQueryItem] = []
         var entries = defaults

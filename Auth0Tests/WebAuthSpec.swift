@@ -6,7 +6,7 @@ import SafariServices
 
 private let ClientId = "ClientId"
 private let Domain = "samples.auth0.com"
-private let DomainURL = URL.a0_url(Domain)
+private let DomainURL = URL.httpsURL(from: Domain)
 private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 private let State = "state"
 

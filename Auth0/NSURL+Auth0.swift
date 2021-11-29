@@ -1,6 +1,6 @@
 import Foundation
 
-public extension URL {
+extension URL {
     /**
      Returns an Auth0 domain URL given a domain
 
@@ -8,7 +8,7 @@ public extension URL {
 
      - returns: URL of your Auth0 account
      */
-    static func a0_url(_ domain: String) -> URL {
+    static func httpsURL(from domain: String) -> URL {
         let urlString: String
         if !domain.hasPrefix("https") {
             urlString = "https://\(domain)"

@@ -46,7 +46,7 @@ public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
  - returns: Auth0 WebAuth component
  */
 public func webAuth(clientId: String, domain: String) -> WebAuth {
-    return Auth0WebAuth(clientId: clientId, url: .a0_url(domain))
+    return Auth0WebAuth(clientId: clientId, url: .httpsURL(from: domain))
 }
 
 /// WebAuth Authentication using Auth0
