@@ -46,7 +46,7 @@ class Auth0Spec: QuickSpec {
 
         describe("endpoints") {
 
-            context("without end slash") {
+            context("without trailing slash") {
 
                 it("should return authentication endpoint with clientId and domain") {
                     let auth = Auth0.authentication(clientId: ClientId, domain: Domain)
@@ -81,7 +81,7 @@ class Auth0Spec: QuickSpec {
 
             }
 
-            context("with end slash") {
+            context("with trailing slash") {
 
                 it("should return authentication endpoint with clientId and domain") {
                     let auth = Auth0.authentication(clientId: ClientId, domain: "\(Domain)/")
