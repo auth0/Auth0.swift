@@ -32,7 +32,7 @@ struct Auth0Authentication: Authentication {
             "grant_type": "http://auth0.com/oauth/grant-type/password-realm",
             "client_id": self.clientId,
             "realm": realm
-            ]
+        ]
         payload["audience"] = audience
         payload["scope"] = scope
         return Request(session: session,
@@ -186,7 +186,7 @@ struct Auth0Authentication: Authentication {
             "password": password,
             "connection": connection,
             "client_id": self.clientId
-            ]
+        ]
         payload["username"] = username
         payload["user_metadata"] = userMetadata
         if let rootAttributes = rootAttributes {
@@ -227,7 +227,7 @@ struct Auth0Authentication: Authentication {
             "connection": connection,
             "send": type.rawValue,
             "client_id": self.clientId
-            ]
+        ]
         if case .WebLink = type, !parameters.isEmpty {
             payload["authParams"] = parameters
         }
@@ -248,7 +248,7 @@ struct Auth0Authentication: Authentication {
             "connection": connection,
             "send": type.rawValue,
             "client_id": self.clientId
-            ]
+        ]
         let start = URL(string: "passwordless/start", relativeTo: self.url)!
         return Request(session: session,
                        url: start,

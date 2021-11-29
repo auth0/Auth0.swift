@@ -46,24 +46,74 @@ class Auth0Spec: QuickSpec {
 
         describe("endpoints") {
 
-            it("should return authentication endpoint with clientId and domain") {
-                let auth = Auth0.authentication(clientId: ClientId, domain: Domain)
-                expect(auth).toNot(beNil())
-                expect(auth.clientId) ==  ClientId
-                expect(auth.url.absoluteString) == "https://\(Domain)"
+            context("without end slash") {
+
+                it("should return authentication endpoint with clientId and domain") {
+                    let auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                    expect(auth).toNot(beNil())
+                    expect(auth.clientId) ==  ClientId
+                    expect(auth.url.absoluteString) == "https://\(Domain)/"
+                }
+
+                it("should return authentication endpoint with domain url") {
+                    let domain = "https://mycustomdomain.com"
+                    let auth = Auth0.authentication(clientId: ClientId, domain: domain)
+                    expect(auth.url.absoluteString) == "\(domain)/"
+                }
+
+                it("should return authentication endpoint with domain url with a subpath") {
+                    let domain = "https://mycustomdomain.com/foo"
+                    let auth = Auth0.authentication(clientId: ClientId, domain: domain)
+                    expect(auth.url.absoluteString) == "\(domain)/"
+                }
+
+                it("should return authentication endpoint with domain url with subpaths") {
+                    let domain = "https://mycustomdomain.com/foo/bar"
+                    let auth = Auth0.authentication(clientId: ClientId, domain: domain)
+                    expect(auth.url.absoluteString) == "\(domain)/"
+                }
+
+                it("should return users endpoint") {
+                    let users = Auth0.users(token: "token", domain: Domain)
+                    expect(users.token) == "token"
+                    expect(users.url.absoluteString) == "https://\(Domain)/"
+                }
+
             }
 
+            context("with end slash") {
 
-            it("should return authentication endpoint with domain url") {
-                let domain = "https://mycustomdomain.com"
-                let auth = Auth0.authentication(clientId: ClientId, domain: domain)
-                expect(auth.url.absoluteString) == domain
-            }
+                it("should return authentication endpoint with clientId and domain") {
+                    let auth = Auth0.authentication(clientId: ClientId, domain: "\(Domain)/")
+                    expect(auth).toNot(beNil())
+                    expect(auth.clientId) ==  ClientId
+                    expect(auth.url.absoluteString) == "https://\(Domain)/"
+                }
 
-            it("should return users endopoint") {
-                let users = Auth0.users(token: "token", domain: Domain)
-                expect(users.token) == "token"
-                expect(users.url.absoluteString) == "https://\(Domain)"
+                it("should return authentication endpoint with domain url") {
+                    let domain = "https://mycustomdomain.com/"
+                    let auth = Auth0.authentication(clientId: ClientId, domain: domain)
+                    expect(auth.url.absoluteString) == domain
+                }
+
+                it("should return authentication endpoint with domain url with a subpath") {
+                    let domain = "https://mycustomdomain.com/foo/"
+                    let auth = Auth0.authentication(clientId: ClientId, domain: domain)
+                    expect(auth.url.absoluteString) == domain
+                }
+
+                it("should return authentication endpoint with domain url with subpaths") {
+                    let domain = "https://mycustomdomain.com/foo/bar/"
+                    let auth = Auth0.authentication(clientId: ClientId, domain: domain)
+                    expect(auth.url.absoluteString) == domain
+                }
+
+                it("should return users endpoint") {
+                    let users = Auth0.users(token: "token", domain: Domain)
+                    expect(users.token) == "token"
+                    expect(users.url.absoluteString) == "https://\(Domain)/"
+                }
+
             }
 
         }
@@ -75,13 +125,13 @@ class Auth0Spec: QuickSpec {
 
             it("should return authentication endpoint with account from plist") {
                 let auth = Auth0.authentication(bundle: bundle)
-                expect(auth.url.absoluteString) == "https://samples.auth0.com"
+                expect(auth.url.absoluteString) == "https://samples.auth0.com/"
                 expect(auth.clientId) == "CLIENT_ID"
             }
 
             it("should return users endpoint with domain from plist") {
                 let users = Auth0.users(token: "TOKEN", bundle: bundle)
-                expect(users.url.absoluteString) == "https://samples.auth0.com"
+                expect(users.url.absoluteString) == "https://samples.auth0.com/"
             }
 
         }

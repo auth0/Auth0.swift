@@ -9,12 +9,9 @@ extension URL {
      - returns: URL of your Auth0 account
      */
     static func httpsURL(from domain: String) -> URL {
-        let urlString: String
-        if !domain.hasPrefix("https") {
-            urlString = "https://\(domain)"
-        } else {
-            urlString = domain
-        }
+        let prefix = !domain.hasPrefix("https") ? "https://" : ""
+        let suffix = !domain.hasSuffix("/") ? "/" : ""
+        let urlString = "\(prefix)\(domain)\(suffix)"
         return URL(string: urlString)!
     }
 }

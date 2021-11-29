@@ -435,7 +435,6 @@
 		5B7EE47F20FCA0A200367724 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5B7EE48220FCA0A200367724 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		5B7EE48420FCA0A200367724 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5B7EE48520FCA0A200367724 /* OAuth2Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OAuth2Mac.entitlements; sourceTree = "<group>"; };
 		5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BioAuthentication.swift; sourceTree = "<group>"; };
 		5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BioAuthenticationSpec.swift; path = Auth0Tests/BioAuthenticationSpec.swift; sourceTree = SOURCE_ROOT; };
 		5B9A54411E49E3AE004B5454 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = SOURCE_ROOT; };
@@ -671,7 +670,6 @@
 				5B7EE47D20FCA0A100367724 /* ViewController.swift */,
 				5B7EE47F20FCA0A200367724 /* Assets.xcassets */,
 				5B7EE48120FCA0A200367724 /* Main.storyboard */,
-				5B7EE48520FCA0A200367724 /* OAuth2Mac.entitlements */,
 				5B7EE48420FCA0A200367724 /* Info.plist */,
 				5C41F6E0244FA62200252548 /* Auth0.plist */,
 			);
