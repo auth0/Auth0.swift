@@ -61,13 +61,13 @@ class Auth0Spec: QuickSpec {
                     expect(auth.url.absoluteString) == "\(domain)/"
                 }
 
-                it("should return authentication endpoint with domain url with a subpath") {
+                it("should return authentication endpoint with domain url and a subpath") {
                     let domain = "https://mycustomdomain.com/foo"
                     let auth = Auth0.authentication(clientId: ClientId, domain: domain)
                     expect(auth.url.absoluteString) == "\(domain)/"
                 }
 
-                it("should return authentication endpoint with domain url with subpaths") {
+                it("should return authentication endpoint with domain url and subpaths") {
                     let domain = "https://mycustomdomain.com/foo/bar"
                     let auth = Auth0.authentication(clientId: ClientId, domain: domain)
                     expect(auth.url.absoluteString) == "\(domain)/"

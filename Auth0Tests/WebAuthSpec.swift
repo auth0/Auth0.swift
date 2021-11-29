@@ -28,8 +28,8 @@ class WebAuthSharedExamplesConfiguration: QuickConfiguration {
 
             it("should use domain \(domain)") {
                 expect(components?.scheme) == "https"
-                expect(components?.host) == domain
-                expect(components?.path) == "/authorize"
+                expect(components?.host) == String(domain.split(separator: "/").first!)
+                expect(components?.path).to(endWith("/authorize"))
             }
 
             it("should have state parameter") {
@@ -74,7 +74,43 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(),
-                    ]
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": "\(Domain)/foo",
+                    "query": defaultQuery()
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": "\(Domain)/foo/",
+                    "query": defaultQuery()
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": "\(Domain)/foo/bar",
+                    "query": defaultQuery()
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": "\(Domain)/foo/bar/",
+                    "query": defaultQuery()
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -84,7 +120,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection": "facebook"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -94,7 +130,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["scope": "openid email"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -135,7 +171,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["max_age": "10000"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -144,7 +180,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: "abc1234", invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["organization": "abc1234"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -153,7 +189,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: "abc1234", invitation: "xyz6789"),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["organization": "abc1234", "invitation": "xyz6789"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -164,7 +200,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["audience": "https://wwww.google.com"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -196,7 +232,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection_scope": "user_friends,email"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -231,9 +267,28 @@ class WebAuthSpec: QuickSpec {
             let platform = "macos"
             #endif
 
-            it("should build with custom scheme") {
+            context("custom scheme") {
+
                 let bundleId = Bundle.main.bundleIdentifier!
-                expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/\(platform)/\(bundleId)/callback"
+
+                it("should build with the domain") {
+                    expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/\(platform)/\(bundleId)/callback"
+                }
+
+                it("should build with the domain and a subpath") {
+                    let subpath = "foo"
+                    let uri = "\(bundleId)://\(Domain)/\(subpath)/\(platform)/\(bundleId)/callback"
+                    let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpath))
+                    expect(webAuth.redirectURL?.absoluteString) == uri
+                }
+
+                it("should build with the domain and subpaths") {
+                    let subpaths = "foo/bar"
+                    let uri = "\(bundleId)://\(Domain)/\(subpaths)/\(platform)/\(bundleId)/callback"
+                    let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpaths))
+                    expect(webAuth.redirectURL?.absoluteString) == uri
+                }
+
             }
 
             it("should build with a custom url") {
