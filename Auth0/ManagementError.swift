@@ -79,7 +79,7 @@ extension ManagementError: CustomDebugStringConvertible {
 extension ManagementError {
 
     /**
-     Returns a value from the error's `info` dictionary
+     Returns a value from the error data
 
      - parameter key: key of the value to return
 

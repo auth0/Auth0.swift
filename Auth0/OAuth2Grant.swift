@@ -1,5 +1,4 @@
 import Foundation
-import JWTDecode
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
