@@ -119,7 +119,7 @@ final class Auth0WebAuth: WebAuth {
 
     func start(_ callback: @escaping (Auth0Result<Credentials>) -> Void) {
         guard let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError.noBundleIdentifierFound))
+            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
         let handler = self.handler(redirectURL)
         let state = self.parameters["state"] ?? generateDefaultState()
@@ -129,7 +129,7 @@ final class Auth0WebAuth: WebAuth {
             guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
                 let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
                 let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
-                return callback(.failure(WebAuthError.unknownError)) // TODO: On the next major, create a new error case
+                    return callback(.failure(WebAuthError(code: .malformedInvitationURL(url.absoluteString))))
             }
             organization = organizationId
             invitation = invitationId

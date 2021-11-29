@@ -26,13 +26,13 @@ class BaseTransaction: NSObject, AuthTransaction {
     }
 
     func cancel() {
-        self.callback(.failure(WebAuthError.userCancelled))
+        self.callback(.failure(WebAuthError(code: .userCancelled)))
         authSession?.cancel()
         authSession = nil
     }
 
     func resume(_ url: URL) -> Bool {
-        self.logger?.trace(url: url, source: "iOS Safari")
+        self.logger?.trace(url: url, source: "Callback URL")
         if self.handleURL(url) {
             authSession?.cancel()
             authSession = nil
@@ -44,7 +44,7 @@ class BaseTransaction: NSObject, AuthTransaction {
     private func handleURL(_ url: URL) -> Bool {
         guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-            self.callback(.failure(AuthenticationError(string: url.absoluteString, statusCode: 200)))
+            self.callback(.failure(AuthenticationError(description: url.absoluteString, statusCode: 200)))
             return false
         }
         let items = self.handler.values(fromComponents: components)

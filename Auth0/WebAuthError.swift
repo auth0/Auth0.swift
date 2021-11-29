@@ -2,61 +2,92 @@
 import Foundation
 
 /**
- List of possible web-based authentication errors
-
- - NoBundleIdentifierFound:        Cannot get the App's Bundle Identifier to use for redirect_uri.
- - CannotDismissWebAuthController: When trying to dismiss WebAuth controller, no presenter controller could be found.
- - UserCancelled:                  User cancelled the web-based authentication, e.g. tapped the "Done" button in SFSafariViewController
- - PKCENotAllowed:                 PKCE for the supplied Auth0 ClientId was not allowed. You need to set the `Token Endpoint Authentication Method` to `None` in your Auth0 Dashboard
- - missingAccessToken:             access_token missing in response
+ *  Represents an error during a Web Authentication operation
  */
-public enum WebAuthError: CustomNSError {
-    case noBundleIdentifierFound
-    case cannotDismissWebAuthController
-    case userCancelled
-    case pkceNotAllowed(String)
-    case missingResponseParam(String)
-    case missingAccessToken
-    case unknownError
+public struct WebAuthError: Auth0Error {
 
-    static let genericFoundationCode = 1
-    static let cancelledFoundationCode = 0
+    enum Code: Equatable {
+        case noBundleIdentifier
+        case malformedInvitationURL(String)
+        case userCancelled
+        case pkceNotAllowed
+        case idTokenValidationFailed
+        case other
+        case unknown(String)
+    }
 
-    public static let infoKey = "com.auth0.webauth.error.info"
-    public static let errorDomain: String = "com.auth0.webauth"
+    let code: Code
 
-    public var errorCode: Int {
-        switch self {
-        case .userCancelled:
-            return WebAuthError.cancelledFoundationCode
-        default:
-            return WebAuthError.genericFoundationCode
+    init(code: Code, cause: Error? = nil) {
+        self.code = code
+        self.cause = cause
+    }
+
+    /**
+     The underlying `Error`, if any
+     */
+    public let cause: Error?
+
+    /**
+     Description of the error
+     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     */
+    public var localizedDescription: String {
+        if let error =  self.cause { return error.localizedDescription }
+
+        switch self.code {
+        case .noBundleIdentifier: return "Unable to retrieve the bundle identifier."
+        case .malformedInvitationURL(let url): return "The invitation URL (\(url)) is missing the required query "
+            + "parameters 'invitation' and 'organization'."
+        case .userCancelled: return "User cancelled Web Authentication."
+        case .pkceNotAllowed: return "Unable to complete authentication with PKCE. PKCE support can be enabled by "
+            + "setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app "
+            + "in the Auth0 Dashboard."
+        case .unknown(let message): return message
+        default: return "Failed to perform Web Auth operation."
         }
     }
 
-    public var errorUserInfo: [String: Any] {
-        switch self {
-        case .userCancelled:
-            return [
-                NSLocalizedDescriptionKey: "User Cancelled Web Authentication",
-                WebAuthError.infoKey: self
-            ]
-        case .pkceNotAllowed(let message):
-            return [
-                NSLocalizedDescriptionKey: message,
-                WebAuthError.infoKey: self
-            ]
-        case .missingAccessToken:
-            return [
-                NSLocalizedDescriptionKey: "Could not validate the token",
-                WebAuthError.infoKey: self
-            ]
-        default:
-            return [
-                NSLocalizedDescriptionKey: "Failed to perform webAuth",
-                WebAuthError.infoKey: self
-            ]
-        }
+    public static let noBundleIdentifier: WebAuthError = .init(code: .noBundleIdentifier)
+    public static let malformedInvitationURL: WebAuthError = .init(code: .malformedInvitationURL(""))
+    public static let userCancelled: WebAuthError = .init(code: .userCancelled)
+    public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
+    public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
+    public static let other: WebAuthError = .init(code: .other)
+    public static let unknown: WebAuthError = .init(code: .unknown(""))
+
+}
+
+extension WebAuthError: Equatable {
+
+    public static func == (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
+        return lhs.code == rhs.code && lhs.localizedDescription == rhs.localizedDescription
     }
+
+}
+
+extension WebAuthError: CustomDebugStringConvertible {
+
+    /**
+     Description of the error, returns the same value as `localizedDescription`
+     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     */
+    public var debugDescription: String { return self.localizedDescription }
+
+}
+
+// MARK: - Pattern Matching Operator
+
+extension WebAuthError {
+
+    public static func ~= (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
+        return lhs.code == rhs.code
+    }
+
+    public static func ~= (lhs: WebAuthError, rhs: Error) -> Bool {
+        guard let rhs = rhs as? WebAuthError else { return false }
+        return lhs.code == rhs.code
+    }
+
 }
 #endif

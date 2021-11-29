@@ -8,33 +8,40 @@ class WebAuthErrorSpec: QuickSpec {
 
     override func spec() {
 
-        describe("foundation error") {
+        describe("error message") {
 
-            it("should build generic NSError") {
-                let error = WebAuthError.noBundleIdentifierFound as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
-            }
-
-            it("should build error for PKCE not allowed") {
-                let message = "Not Allowed"
-                let error = WebAuthError.pkceNotAllowed(message) as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
+            it("should return message for no bundle identifier") {
+                let message = "Unable to retrieve the bundle identifier."
+                let error = WebAuthError(code: .noBundleIdentifier)
                 expect(error.localizedDescription) == message
             }
 
-            it("should build error for user cancelled") {
-                let error = WebAuthError.userCancelled as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 0
+            it("should return message for malformed invitation URL") {
+                let url = "https://samples.auth0.com"
+                let message = "The invitation URL (\(url)) is missing the required query parameters 'invitation' and 'organization'."
+                let error = WebAuthError(code: .malformedInvitationURL(url))
+                expect(error.localizedDescription) == message
             }
 
-            it("should build error for missing access_token") {
-                let error = WebAuthError.missingAccessToken as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
+            it("should return message for user cancelled") {
+                let message = "User cancelled Web Authentication."
+                let error = WebAuthError(code: .userCancelled)
+                expect(error.localizedDescription) == message
             }
+
+            it("should return message for PKCE not allowed") {
+                let message = "Unable to complete authentication with PKCE. PKCE support can be enabled by setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app in the Auth0 Dashboard."
+                let error = WebAuthError(code: .pkceNotAllowed)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return the default message") {
+                let message = "Failed to perform Web Auth operation."
+                let error = WebAuthError(code: .other)
+                expect(error.localizedDescription) == message
+            }
+
         }
+
     }
 }

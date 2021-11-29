@@ -59,21 +59,18 @@ struct PKCE: OAuth2Grant {
             "code_challenge": challenge,
             "code_challenge_method": method
         ]
-        if let nonce = nonce {
-            newDefaults["nonce"] = nonce
-        }
+        newDefaults["nonce"] = nonce
         self.defaults = newDefaults
     }
 
     func credentials(from values: [String: String], callback: @escaping (Auth0Result<Credentials>) -> Void) {
         guard let code = values["code"] else {
             let string = "No code found in parameters \(values)"
-            return callback(.failure(AuthenticationError(string: string)))
+            return callback(.failure(AuthenticationError(description: string)))
         }
         let authentication = self.authentication
         let verifier = self.verifier
         let redirectUrlString = self.redirectURL.absoluteString
-        let clientId = authentication.clientId
         let validatorContext = IDTokenValidatorContext(authentication: authentication,
                                                        issuer: self.issuer,
                                                        leeway: self.leeway,
@@ -84,14 +81,15 @@ struct PKCE: OAuth2Grant {
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
             .start { result in
                 switch result {
-                case .failure(let error as AuthenticationError) where error.description == "Unauthorized":
+                case .failure(let error as AuthenticationError) where error.localizedDescription == "Unauthorized":
                     // Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
-                    let webAuthError = WebAuthError.pkceNotAllowed("Unable to complete authentication with PKCE. PKCE support can be enabled by setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app at 'https://manage.auth0.com/#/applications/\(clientId)/settings'.")
-                    return callback(.failure(webAuthError))
-                case .failure(let error): return callback(.failure(error))
+                    return callback(.failure(WebAuthError(code: .pkceNotAllowed)))
+                case .failure(let error): return callback(.failure(WebAuthError(code: .other, cause: error)))
                 case .success(let credentials):
                     validate(idToken: credentials.idToken, with: validatorContext) { error in
-                        if let error = error { return callback(.failure(error)) }
+                        if let error = error {
+                            return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error)))
+                        }
                         callback(result)
                     }
             }

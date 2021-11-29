@@ -157,8 +157,8 @@ class CredentialsManagerSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke {
                         expect($0).to(matchError(
-                            CredentialsManagerError.revokeFailed(AuthenticationError(string: "Revoke failed", statusCode: 400))
-                        ))
+                            CredentialsManagerError(code: .revokeFailed, cause: AuthenticationError(description: "Revoke failed", statusCode: 400)))
+                        )
                         
                         expect(credentialsManager.hasValid()).to(beTrue())
                         done()
@@ -425,7 +425,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
-                            expect(error).to(matchError(CredentialsManagerError.touchFailed(LAError(LAError.touchIDNotAvailable))))
+                            expect(error).to(matchError(CredentialsManagerError(code: .biometricsFailed, cause: LAError(LAError.biometryNotAvailable))))
                             expect(newCredentials).to(beNil())
                             done()
                         }
@@ -489,7 +489,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { error = $0; newCredentials = $1
-                            expect(error).to(matchError(CredentialsManagerError.failedRefresh(AuthenticationError())))
+                            expect(error).to(matchError(CredentialsManagerError(code: .refreshFailed, cause: AuthenticationError(description: ""))))
                             expect(newCredentials).to(beNil())
                             done()
                         }
@@ -517,9 +517,11 @@ class CredentialsManagerSpec: QuickSpec {
 
             context("forced renew") {
 
-                it("should not yield a new access token by default") {
-                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                beforeEach {
                     _ = credentialsManager.store(credentials: credentials)
+                }
+
+                it("should not yield a new access token by default") {
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { error, newCredentials in
                             expect(error).to(beNil())
@@ -566,10 +568,8 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should not yield a new access token with a min ttl less than its expiry") {
-                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                    _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials(withScope: nil, minTTL: ValidTTL) { error, newCredentials in
+                        credentialsManager.credentials(minTTL: ValidTTL) { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == AccessToken
                             done()
@@ -578,10 +578,8 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should yield a new access token with a min ttl greater than its expiry") {
-                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                    _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials(withScope: nil, minTTL: InvalidTTL) { error, newCredentials in
+                        credentialsManager.credentials(minTTL: InvalidTTL) { error, newCredentials in
                             expect(error).to(beNil())
                             expect(newCredentials?.accessToken) == NewAccessToken
                             done()
@@ -591,14 +589,15 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should fail to yield a renewed access token with a min ttl greater than its expiry") {
                     let minTTL = 100_000
-                    let expectedError = CredentialsManagerError.failedRefresh(NSError(domain: "The lifetime of the renewed Access Token (\(ExpiresIn)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
-                        code: -99999,
-                        userInfo: nil))
-                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                    _ = credentialsManager.store(credentials: credentials)
+                    // The dates are not mocked, so they won't match exactly
+                    let expectedError = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: Int(ExpiresIn - 1)))
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) {
+                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn)
+                    }
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials(withScope: nil, minTTL: minTTL) { error, newCredentials in
-                            expect(error).to(matchError(expectedError))
+                            expect(error?.code) == expectedError.code
+                            expect(error?.localizedDescription) == "The minTTL requested (\(minTTL)s) is greater than the lifetime of the renewed Access Token (\(Int(ExpiresIn - 1))s). Request a lower minTTL or increase the 'Token Expiration' setting of your Auth0 API in the dashboard."
                             expect(newCredentials).to(beNil())
                             done()
                         }

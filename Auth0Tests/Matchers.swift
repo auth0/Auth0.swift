@@ -141,7 +141,7 @@ func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQ
 func haveAuthenticationError<T>(code: String, description: String) -> Predicate<Auth0Result<T>> {
     return Predicate<Auth0Result<T>>.define("an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         if let actual = try expression.evaluate(), case .failure(let cause as AuthenticationError) = actual {
-            return PredicateResult(bool: code == cause.code && description == cause.description, message: failureMessage)
+            return PredicateResult(bool: code == cause.code && description == cause.localizedDescription, message: failureMessage)
         }
         return PredicateResult(status: .doesNotMatch, message: failureMessage)
     }
@@ -149,10 +149,10 @@ func haveAuthenticationError<T>(code: String, description: String) -> Predicate<
 
 func haveManagementError<T>(_ error: String, description: String, code: String, statusCode: Int) -> Predicate<Auth0Result<T>> {
     return beFailure("server error response") { (cause: ManagementError) in
-        return error == (cause.info["error"] as? String)
-            && code == (cause.info["code"] as? String)
-            && description == (cause.info["description"] as? String)
-            && statusCode == (cause.info["statusCode"] as? Int)
+        return error == (cause["error"])
+            && code == (cause["code"])
+            && description == (cause["description"])
+            && statusCode == (cause["statusCode"])
     }
 }
 

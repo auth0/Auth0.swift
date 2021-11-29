@@ -10,25 +10,26 @@ func string(_ data: Data?) -> String? {
     return String(data: data, encoding: .utf8)
 }
 
-struct Response<E: Auth0Error> {
+struct Response<E: Auth0APIError> {
     let data: Data?
-    let response: URLResponse?
+    let response: HTTPURLResponse?
     let error: Error?
 
     func result() throws -> Any? {
-        guard error == nil else { throw error! }
-        guard let response = self.response as? HTTPURLResponse else { throw E(string: nil, statusCode: 0) }
+        guard error == nil else { throw E(error: error!, statusCode: response?.statusCode) }
+        guard let response = self.response else { throw E(description: nil) }
         guard (200...300).contains(response.statusCode) else {
             if let json = json(data) as? [String: Any] {
                 throw E(info: json, statusCode: response.statusCode)
             }
-            throw E(string: string(data), statusCode: response.statusCode)
+            throw E(from: self)
         }
         guard let data = self.data, !data.isEmpty else {
             if response.statusCode == 204 {
                 return nil
             }
-            throw E(string: nil, statusCode: response.statusCode)
+            // not using the custom initializer because data could be empty
+            throw E(description: nil, statusCode: response.statusCode)
         }
         if let json = json(data) {
             return json
@@ -37,7 +38,7 @@ struct Response<E: Auth0Error> {
         if response.url?.lastPathComponent == "change_password" {
             return nil
         } else {
-            throw E(string: string(data), statusCode: response.statusCode)
+            throw E(from: self)
         }
     }
 }

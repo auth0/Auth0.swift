@@ -125,7 +125,7 @@ public struct CredentialsManager {
             .start { result in
                 switch result {
                 case .failure(let error):
-                    callback(CredentialsManagerError.revokeFailed(error))
+                    callback(CredentialsManagerError(code: .revokeFailed, cause: error))
                 case .success:
                     _ = self.clear()
                     callback(nil)
@@ -165,9 +165,15 @@ public struct CredentialsManager {
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
         if let bioAuth = self.bioAuth {
-            guard bioAuth.available else { return callback(.touchFailed(LAError(LAError.touchIDNotAvailable)), nil) }
+            guard bioAuth.available else {
+                let error = CredentialsManagerError(code: .biometricsFailed,
+                                                    cause: LAError(LAError.biometryNotAvailable))
+                return callback(error, nil)
+            }
             bioAuth.validateBiometric {
-                guard $0 == nil else { return callback(.touchFailed($0!), nil) }
+                guard $0 == nil else {
+                    return callback(CredentialsManagerError(code: .biometricsFailed, cause: $0!), nil)
+                }
                 self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
             }
         } else {
@@ -188,7 +194,6 @@ public struct CredentialsManager {
         return credentials
     }
 
-    // swiftlint:disable:next function_body_length
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
         self.dispatchQueue.async {
             self.dispatchGroup.enter()
@@ -221,13 +226,10 @@ public struct CredentialsManager {
                                                              expiresIn: credentials.expiresIn,
                                                              scope: credentials.scope)
                             if self.willExpire(newCredentials, within: minTTL) {
-                                let accessTokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
-                                // TODO: On the next major add a new case to CredentialsManagerError
-                                let error = NSError(domain: "The lifetime of the renewed Access Token (\(accessTokenLifetime)s) is less than minTTL requested (\(minTTL)s). Increase the 'Token Expiration' setting of your Auth0 API in the dashboard or request a lower minTTL",
-                                                    code: -99999,
-                                                    userInfo: nil)
+                                let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
+                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
                                 self.dispatchGroup.leave()
-                                callback(.failedRefresh(error), nil)
+                                callback(error, nil)
                             } else {
                                 _ = self.store(credentials: newCredentials)
                                 self.dispatchGroup.leave()
@@ -235,7 +237,7 @@ public struct CredentialsManager {
                             }
                         case .failure(let error):
                             self.dispatchGroup.leave()
-                            callback(.failedRefresh(error), nil)
+                            callback(CredentialsManagerError(code: .refreshFailed, cause: error), nil)
                         }
                     }
             }
