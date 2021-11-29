@@ -60,8 +60,7 @@ commands:
     steps:
       - run:
           name: Run iOS tests
-          command: |
-            bundle exec fastlane ios ci
+          command: bundle exec fastlane ios ci
       - run:
           name: Upload coverage report
           command: bash <(curl -s https://codecov.io/bash) -J '<< parameters.scheme >>'
