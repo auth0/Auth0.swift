@@ -15,18 +15,29 @@ class ManagementSpec: QuickSpec {
 
             it("should init with token & url") {
                 let management = Management(token: Token, url: DomainURL)
-                expect(management).toNot(beNil())
+                expect(management.token) == Token
+                expect(management.url) == DomainURL
             }
 
             it("should init with token, url & session") {
-                let management = Management(token: Token, url: DomainURL, session: URLSession.shared)
-                expect(management).toNot(beNil())
+                let session = URLSession(configuration: URLSession.shared.configuration)
+                let management = Management(token: Token, url: DomainURL, session: session)
+                expect(management.session).to(be(session))
+            }
+
+            it("should init with token, url & telemetry") {
+                let telemetryInfo = "info"
+                var telemetry = Telemetry()
+                telemetry.info = telemetryInfo
+                let management = Management(token: Token, url: DomainURL, telemetry: telemetry)
+                expect(management.telemetry.info) == telemetryInfo
             }
 
             it("should have bearer token in authorization header") {
                 let management = Management(token: Token, url: DomainURL)
                 expect(management.defaultHeaders["Authorization"]) == "Bearer \(Token)"
             }
+
         }
 
         describe("object response handling") {

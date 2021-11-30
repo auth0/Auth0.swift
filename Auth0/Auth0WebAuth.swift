@@ -1,30 +1,32 @@
 #if WEB_AUTH_PLATFORM
-import AuthenticationServices
+import Foundation
 
 final class Auth0WebAuth: WebAuth {
 
     let clientId: String
     let url: URL
+    let session: URLSession
     let storage: TransactionStore
+
     var telemetry: Telemetry
     var logger: Logger?
-    var ephemeralSession = false
 
     #if os(macOS)
     private let platform = "macos"
     #else
     private let platform = "ios"
     #endif
-
     private let responseType = "code"
     private let requiredScope = "openid"
+
     private(set) var parameters: [String: String] = [:]
+    private(set) var ephemeralSession = false
     private(set) var issuer: String
     private(set) var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
+    private(set) var nonce: String?
+    private(set) var maxAge: Int?
     private(set) var organization: String?
     private(set) var invitationURL: URL?
-    private var nonce: String?
-    private var maxAge: Int?
 
     lazy var redirectURL: URL? = {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
@@ -38,10 +40,12 @@ final class Auth0WebAuth: WebAuth {
 
     init(clientId: String,
          url: URL,
+         session: URLSession = URLSession.shared,
          storage: TransactionStore = TransactionStore.shared,
          telemetry: Telemetry = Telemetry()) {
         self.clientId = clientId
         self.url = url
+        self.session = session
         self.storage = storage
         self.telemetry = telemetry
         self.issuer = "\(url.absoluteString)/"
@@ -207,18 +211,6 @@ final class Auth0WebAuth: WebAuth {
         return components.url!
     }
 
-    private func handler(_ redirectURL: URL) -> OAuth2Grant {
-        var authentication = Auth0Authentication(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
-        authentication.logger = self.logger
-        return PKCE(authentication: authentication,
-                    redirectURL: redirectURL,
-                    issuer: self.issuer,
-                    leeway: self.leeway,
-                    maxAge: self.maxAge,
-                    nonce: self.nonce,
-                    organization: self.organization)
-    }
-
     func generateDefaultState() -> String? {
         let data = Data(count: 32)
         var tempData = data
@@ -229,6 +221,21 @@ final class Auth0WebAuth: WebAuth {
 
         guard result == 0 else { return nil }
         return tempData.a0_encodeBase64URLSafe()
+    }
+
+    private func handler(_ redirectURL: URL) -> OAuth2Grant {
+        var authentication = Auth0Authentication(clientId: self.clientId,
+                                                 url: self.url,
+                                                 session: self.session,
+                                                 telemetry: self.telemetry)
+        authentication.logger = self.logger
+        return PKCE(authentication: authentication,
+                    redirectURL: redirectURL,
+                    issuer: self.issuer,
+                    leeway: self.leeway,
+                    maxAge: self.maxAge,
+                    nonce: self.nonce,
+                    organization: self.organization)
     }
 
 }
