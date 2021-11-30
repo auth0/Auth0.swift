@@ -33,8 +33,10 @@ struct Management: Trackable, Loggable {
             } else {
                 callback(.failure(ManagementError(from: response)))
             }
-        } catch let error {
+        } catch let error as ManagementError {
             callback(.failure(error))
+        } catch {
+            callback(.failure(ManagementError(cause: error)))
         }
     }
 
@@ -45,8 +47,10 @@ struct Management: Trackable, Loggable {
             } else {
                 callback(.failure(ManagementError(from: response)))
             }
-        } catch let error {
+        } catch let error as ManagementError {
             callback(.failure(error))
+        } catch {
+            callback(.failure(ManagementError(cause: error)))
         }
     }
 }

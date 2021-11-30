@@ -7,9 +7,10 @@ func plainJson(from response: Response<AuthenticationError>, callback: Request<[
         } else {
             callback(.failure(AuthenticationError(from: response)))
         }
-
-    } catch let error {
+    } catch let error as AuthenticationError {
         callback(.failure(error))
+    } catch {
+        callback(.failure(AuthenticationError(cause: error)))
     }
 }
 
@@ -24,9 +25,10 @@ func codable<T: Codable>(from response: Response<AuthenticationError>, callback:
         } else {
             callback(.failure(AuthenticationError(from: response)))
         }
-
-    } catch let error {
+    } catch let error as AuthenticationError {
         callback(.failure(error))
+    } catch {
+        callback(.failure(AuthenticationError(cause: error)))
     }
 }
 
@@ -37,9 +39,10 @@ func authenticationObject<T: JSONObjectPayload>(from response: Response<Authenti
         } else {
             callback(.failure(AuthenticationError(from: response)))
         }
-
-    } catch let error {
+    } catch let error as AuthenticationError {
         callback(.failure(error))
+    } catch {
+        callback(.failure(AuthenticationError(cause: error)))
     }
 }
 
@@ -52,9 +55,10 @@ func databaseUser(from response: Response<AuthenticationError>, callback: Reques
         } else {
             callback(.failure(AuthenticationError(from: response)))
         }
-
-    } catch let error {
+    } catch let error as AuthenticationError {
         callback(.failure(error))
+    } catch {
+        callback(.failure(AuthenticationError(cause: error)))
     }
 }
 
@@ -62,9 +66,11 @@ func noBody(from response: Response<AuthenticationError>, callback: Request<Void
     do {
         _ = try response.result()
         callback(.success(()))
-    } catch let error as Auth0APIError where error.code == emptyBodyError {
+    } catch let error as AuthenticationError where error.code == emptyBodyError {
         callback(.success(()))
-    } catch let error {
+    } catch let error as AuthenticationError {
         callback(.failure(error))
+    } catch {
+        callback(.failure(AuthenticationError(cause: error)))
     }
 }

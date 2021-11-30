@@ -16,7 +16,7 @@ struct Response<E: Auth0APIError> {
     let error: Error?
 
     func result() throws -> Any? {
-        guard error == nil else { throw E(error: error!, statusCode: response?.statusCode) }
+        guard error == nil else { throw E(cause: error!, statusCode: response?.statusCode) }
         guard let response = self.response else { throw E(description: nil) }
         guard (200...300).contains(response.statusCode) else {
             if let json = json(data) as? [String: Any] {

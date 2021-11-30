@@ -33,11 +33,24 @@ public protocol Auth0APIError: Auth0Error {
      */
     init(info: [String: Any], statusCode: Int?)
 
+    /**
+     Returns a value from the error data
+
+     - parameter key: key of the value to return
+
+     - returns: the value of key or nil if cannot be found or is of the wrong type.
+     */
+    subscript<T>(_ key: String) -> T? { get }
+
 }
 
 extension Auth0APIError {
 
-    init(error: Error, statusCode: Int? = 0) {
+    init(info: [String: Any], statusCode: Int? = 0) {
+        self.init(info: info, statusCode: statusCode)
+    }
+
+    init(cause error: Error, statusCode: Int? = 0) {
         let info: [String: Any] = [
             "code": nonJSONError,
             "description": error.localizedDescription,

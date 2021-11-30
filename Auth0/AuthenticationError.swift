@@ -140,13 +140,13 @@ extension AuthenticationError: CustomDebugStringConvertible {
 extension AuthenticationError {
 
     /**
-     Returns a value from the error's `info` dictionary
+     Returns a value from the error data
 
      - parameter key: key of the value to return
 
      - returns: the value of key or nil if cannot be found or is of the wrong type.
      */
-    subscript<T>(_ key: String) -> T? {
+    public subscript<T>(_ key: String) -> T? {
         return self.info[key] as? T
     }
 

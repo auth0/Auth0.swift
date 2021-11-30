@@ -213,6 +213,7 @@ switch error {
 #### Properties added
 
 - `.malformedInvitationURL`
+- `.noAuthorizationCode`
 - `.idTokenValidationFailed`
 - `.other`
 
@@ -236,7 +237,7 @@ switch error {
 switch error {
     case .revokeFailed: handleError(error.cause) // handle underlying error
     // ...
-    default: // handle unkwown errors, e.g. errors added in future versions
+    default: // handle unknown errors, e.g. errors added in future versions
 }
 ```
 
@@ -318,6 +319,8 @@ The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `cha
 
 ### Credentials Manager
 
+#### Initializer
+
 `CredentialsManager` now takes a `CredentialsStorage` protocol as it's storage argument rather than an instance of `SimpleKeychain`.
 
 This means you can now provide your own storage layer to `CredentialsManager`.
@@ -339,6 +342,31 @@ class CustomStore: CredentialsStorage {
 }
 
 let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore());
+```
+
+#### `credentials(withScope:minTTL:parameters:callback)` 
+
+This method now yields a `Result<Credentials, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Credentials>`.
+
+##### Before
+
+```swift
+credentialsManager.credentials { error, credentials in
+    guard error == nil, let credentials = credentials else { 
+        return handleError(error) 
+    }
+    ... // credentials retrieved
+```
+
+##### After
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials): ... // credentials retrieved
+    case .failure(let error): handleError(error) 
+    }
+}
 ```
 
 ## Behavior changes
