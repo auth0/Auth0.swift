@@ -66,7 +66,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
         describe("iss validation") {
             
             var issValidator: IDTokenIssValidator!
-            let expectedIss = "\(URL.httpsURL(from: domain).absoluteString)/"
+            let expectedIss = URL.httpsURL(from: domain).absoluteString
             
             beforeEach {
                 issValidator = IDTokenIssValidator(issuer: expectedIss)
