@@ -252,7 +252,7 @@ extension Users {
 extension Management: Users {
 
     func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError> {
-        let userPath = "/api/v2/users/\(identifier)"
+        let userPath = "api/v2/users/\(identifier)"
         var component = components(baseURL: self.url as URL, path: userPath)
         let value = fields.joined(separator: ",")
         if !value.isEmpty {
@@ -266,7 +266,7 @@ extension Management: Users {
     }
 
     func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError> {
-        let userPath = "/api/v2/users/\(identifier)"
+        let userPath = "api/v2/users/\(identifier)"
         let component = components(baseURL: self.url as URL, path: userPath)
 
         return Request(session: self.session, url: component.url!, method: "PATCH", handle: self.managementObject, payload: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
@@ -291,13 +291,13 @@ extension Management: Users {
     }
 
     private func link(_ identifier: String, payload: [String: Any]) -> Request<[ManagementObject], ManagementError> {
-        let identitiesPath = "/api/v2/users/\(identifier)/identities"
+        let identitiesPath = "api/v2/users/\(identifier)/identities"
         let url = components(baseURL: self.url as URL, path: identitiesPath).url!
         return Request(session: self.session, url: url, method: "POST", handle: self.managementObjects, payload: payload, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError> {
-        let identityPath = "/api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
+        let identityPath = "api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
         let url = components(baseURL: self.url as URL, path: identityPath).url!
         return Request(session: self.session, url: url, method: "DELETE", handle: self.managementObjects, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }

@@ -2,16 +2,6 @@
 
 Guide to migrating from `1.x` to `2.x`
 
-## Supported platform versions
-
-The deployment targets for each platform have been raised to:
-
-- iOS 12.0
-- macOS 10.15
-- Mac Catalyst 13.0
-- tvOS 12.0
-- watchOS 6.2
-
 ## Supported languages
 
 ### Swift
@@ -21,6 +11,16 @@ The minimum supported Swift version is now 5.3.
 ### Objective-C
 
 Auth0.swift no longer supports Objective-C.
+
+## Supported platform versions
+
+The deployment targets for each platform have been raised to:
+
+- iOS 12.0
+- macOS 10.15
+- Mac Catalyst 13.0
+- tvOS 12.0
+- watchOS 6.2
 
 ## Supported JWT signature algorithms
 
@@ -119,58 +119,66 @@ The `useUniversalLink()` method was removed as well, as Universal Links [cannot 
 
 The method `enableTouchAuth(withTitle:cancelTitle:fallbackTitle:)` was removed. Use `enableBiometrics(withTitle:cancelTitle:fallbackTitle:evaluationPolicy:)` instead.
 
-### `Auth0Error`
+### Errors
+
+#### `Auth0Error`
 
 The `init(string: String?, statusCode: Int)` initializer was removed.
 
-### `AuthenticationError`
+#### `AuthenticationError`
 
 The `init(string: String?, statusCode: Int)` initializer was removed.
 
-### `ManagementError`
+#### `ManagementError`
 
 The `init(string: String?, statusCode: Int)` initializer was removed.
+
+### Extensions
+
+#### `URL`
+
+The `a0_url(_:)` method is no longer public.
 
 ## Errors Removed
 
 ### `WebAuthError`
 
-The following cases were removed, as they are no longer necessary:
+The following cases were removed, as they are no longer in use:
 
 - `.noNonceProvided`
 - `.invalidIdTokenNonce`
 
 ## Types changed
 
-- `UserInfo` was changed from class to struct
-- `Credentials` is now a `final` class that conforms to `Codable` instead of `JSONObjectPayload`
-- `Auth0Error` was renamed to `Auth0APIError`, and `Auth0Error` is now a different protocol
-- `AuthenticationError` was changed from class to struct, and it no longer conforms to `CustomNSError`
-- `ManagementError` was changed from class to struct, and it no longer conforms to `CustomNSError`
-- `WebAuthError` was changed from enum to struct
-- `CredentialsManagerError` was changed from enum to struct
+- `UserInfo` was changed from class to struct.
+- `Credentials` is now a `final` class that conforms to `Codable` instead of `JSONObjectPayload`.
+- `Auth0Error` was renamed to `Auth0APIError`, and `Auth0Error` is now a different protocol.
+- `AuthenticationError` was changed from class to struct, and it no longer conforms to `CustomNSError`.
+- `ManagementError` was changed from class to struct, and it no longer conforms to `CustomNSError`.
+- `WebAuthError` was changed from enum to struct.
+- `CredentialsManagerError` was changed from enum to struct.
 
 ## Type properties changed
 
 ### `AuthenticationError` struct
 
-### Properties removed
+#### Properties removed
 
 - `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
 
-## Properties renamed
+#### Properties renamed
 
-- `description` was renamed to `localizedDescription`, as `AuthenticationError` now conforms to `CustomStringConvertible`
+- `description` was renamed to `localizedDescription`, as `AuthenticationError` now conforms to `CustomStringConvertible`.
 
 ### `ManagementError` struct
 
-### Properties removed
+#### Properties removed
 
 - `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
 
-## Properties renamed
+#### Properties renamed
 
-- `description` was renamed to `localizedDescription`, as `ManagementError` now conforms to `CustomStringConvertible`
+- `description` was renamed to `localizedDescription`, as `ManagementError` now conforms to `CustomStringConvertible`.
 
 ### `WebAuthError` struct
 
@@ -195,7 +203,7 @@ switch error {
 }
 ```
 
-### Properties removed
+#### Properties removed
 
 - `.cannotDismissWebAuthController`
 - `.missingResponseParam`
@@ -207,8 +215,8 @@ switch error {
 
 #### Properties renamed
 
-- `.unknownError` was renamed to `.unknown`
-- `.noBundleIdentifierFound` was renamed to `.noBundleIdentifier` 
+- `.unknownError` was renamed to `.unknown`.
+- `.noBundleIdentifierFound` was renamed to `.noBundleIdentifier`.
 
 #### Properties added
 
@@ -242,8 +250,8 @@ switch error {
 
 #### Properties renamed
 
-- `.failedRefresh` was renamed to `.refreshFailed`
-- `.touchFailed` was renamed to `.biometricsFailed`
+- `.failedRefresh` was renamed to `.refreshFailed`.
+- `.touchFailed` was renamed to `.biometricsFailed`.
 
 #### Properties added
 
@@ -325,13 +333,16 @@ This means you can now provide your own storage layer to `CredentialsManager`.
 ```swift
 class CustomStore: CredentialsStorage {
     var store: [String : Data] = [:]
+
     func getEntry(forKey: String) -> Data? {
         return store[forKey]
     }
+
     func setEntry(_ data: Data, forKey: String) -> Bool {
         store[forKey] = data
         return true
     }
+
     func deleteEntry(forKey: String) -> Bool {
         store[forKey] = nil
         return true

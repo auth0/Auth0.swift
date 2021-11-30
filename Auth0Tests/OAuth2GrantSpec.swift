@@ -11,7 +11,7 @@ class OAuth2GrantSpec: QuickSpec {
 
     override func spec() {
 
-        let domain = URL.a0_url("samples.auth0.com")
+        let domain = URL.httpsURL(from: "samples.auth0.com")
         let authentication = Auth0Authentication(clientId: "CLIENT_ID", url: domain)
         let idToken = generateJWT(iss: "\(domain.absoluteString)/", aud: [authentication.clientId]).string
         let nonce = "a1b2c3d4e5"
@@ -82,7 +82,7 @@ class OAuth2GrantSpec: QuickSpec {
 
         describe("Authorization Code w/PKCE and idToken") {
 
-            let domain = URL.a0_url("samples.auth0.com")
+            let domain = URL.httpsURL(from: "samples.auth0.com")
             let method = "S256"
             let redirectURL = URL(string: "https://samples.auth0.com/callback")!
             var verifier: String!

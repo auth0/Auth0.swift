@@ -24,7 +24,7 @@ public let defaultScope = "openid profile email"
  - returns: Auth0 Authentication API
  */
 public func authentication(clientId: String, domain: String, session: URLSession = .shared) -> Authentication {
-    return Auth0Authentication(clientId: clientId, url: .a0_url(domain), session: session)
+    return Auth0Authentication(clientId: clientId, url: .httpsURL(from: domain), session: session)
 }
 
 /**
@@ -122,7 +122,7 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
  - returns: Auth0 Management API v2
  */
 public func users(token: String, domain: String, session: URLSession = .shared) -> Users {
-    return Management(token: token, url: .a0_url(domain), session: session)
+    return Management(token: token, url: .httpsURL(from: domain), session: session)
 }
 
 func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
