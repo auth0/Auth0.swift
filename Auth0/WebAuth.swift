@@ -48,7 +48,7 @@ public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main)
  - returns: Auth0 WebAuth component
  */
 public func webAuth(clientId: String, domain: String, session: URLSession = .shared) -> WebAuth {
-    return Auth0WebAuth(clientId: clientId, url: .a0_url(domain), session: session)
+    return Auth0WebAuth(clientId: clientId, url: .httpsURL(from: domain), session: session)
 }
 
 /// WebAuth Authentication using Auth0

@@ -13,7 +13,7 @@ class IDTokenValidatorBaseSpec: QuickSpec {
     
     // Can't override the initWithInvocation: initializer, because NSInvocation is not available in Swift
     lazy var authentication = Auth0.authentication(clientId: clientId, domain: domain)
-    lazy var validatorContext = IDTokenValidatorContext(issuer: "\(URL.a0_url(domain).absoluteString)/",
+    lazy var validatorContext = IDTokenValidatorContext(issuer: URL.httpsURL(from: domain).absoluteString,
                                                         audience: clientId,
                                                         jwksRequest: authentication.jwks(),
                                                         leeway: leeway,
