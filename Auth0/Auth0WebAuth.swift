@@ -48,7 +48,7 @@ final class Auth0WebAuth: WebAuth {
         self.session = session
         self.storage = storage
         self.telemetry = telemetry
-        self.issuer = "\(url.absoluteString)/"
+        self.issuer = url.absoluteString
     }
 
     func connection(_ connection: String) -> Self {
