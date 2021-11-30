@@ -10,6 +10,7 @@ import OHHTTPStubsSwift
 
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
+private let DomainURL = URL(string: "https://\(Domain)")!
 
 private let Phone = "+144444444444"
 private let ValidPassword = "I.O.U. a password"
@@ -26,7 +27,7 @@ private let PasswordlessGrantType = "http://auth0.com/oauth/grant-type/passwordl
 class AuthenticationSpec: QuickSpec {
     override func spec() {
 
-        let auth: Authentication = Auth0Authentication(clientId: ClientId, url: URL(string: "https://\(Domain)")!)
+        let auth: Authentication = Auth0Authentication(clientId: ClientId, url: DomainURL)
 
         beforeEach {
             stub(condition: isHost(Domain)) { _ in
@@ -36,6 +37,30 @@ class AuthenticationSpec: QuickSpec {
 
         afterEach {
             HTTPStubs.removeAllStubs()
+        }
+
+        describe("init") {
+
+            it("should init with client id & url") {
+                let authentication = Auth0Authentication(clientId: ClientId, url: DomainURL)
+                expect(authentication.clientId) == ClientId
+                expect(authentication.url) == DomainURL
+            }
+
+            it("should init with client id, url & session") {
+                let session = URLSession(configuration: URLSession.shared.configuration)
+                let authentication = Auth0Authentication(clientId: ClientId, url: DomainURL, session: session)
+                expect(authentication.session).to(be(session))
+            }
+
+            it("should init with client id, url & telemetry") {
+                let telemetryInfo = "info"
+                var telemetry = Telemetry()
+                telemetry.info = telemetryInfo
+                let authentication = Auth0Authentication(clientId: ClientId, url: DomainURL, telemetry: telemetry)
+                expect(authentication.telemetry.info) == telemetryInfo
+            }
+
         }
 
         describe("login MFA OTP") {

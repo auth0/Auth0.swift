@@ -66,6 +66,36 @@ class WebAuthSpec: QuickSpec {
 
     override func spec() {
 
+        describe("init") {
+
+            it("should init with client id & url") {
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL)
+                expect(webAuth.clientId) == ClientId
+                expect(webAuth.url) == DomainURL
+            }
+
+            it("should init with client id, url & session") {
+                let session = URLSession(configuration: URLSession.shared.configuration)
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, session: session)
+                expect(webAuth.session).to(be(session))
+            }
+
+            it("should init with client id, url & storage") {
+                let storage = TransactionStore()
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, storage: storage)
+                expect(webAuth.storage).to(be(storage))
+            }
+
+            it("should init with client id, url & telemetry") {
+                let telemetryInfo = "info"
+                var telemetry = Telemetry()
+                telemetry.info = telemetryInfo
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, telemetry: telemetry)
+                expect(webAuth.telemetry.info) == telemetryInfo
+            }
+
+        }
+
         describe("authorize URL") {
 
             itBehavesLike(ValidAuthorizeURLExample) {

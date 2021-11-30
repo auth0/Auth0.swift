@@ -19,7 +19,7 @@ public let defaultScope = "openid profile email"
 
  - parameter clientId: clientId of your Auth0 application
  - parameter domain:   domain of your Auth0 account. e.g.: 'samples.auth0.com'
- - parameter session:  instance of NSURLSession used for networking. By default it will use the shared NSURLSession
+ - parameter session:  instance of URLSession used for networking. By default it will use the shared URLSession
 
  - returns: Auth0 Authentication API
  */
@@ -49,7 +49,7 @@ public func authentication(clientId: String, domain: String, session: URLSession
  </plist>
  ```
 
- - parameter session:  instance of NSURLSession used for networking. By default it will use the shared NSURLSession
+ - parameter session:  instance of URLSession used for networking. By default it will use the shared URLSession
  - parameter bundle:    bundle used to locate the `Auth0.plist` file. By default is the main bundle
 
  - returns: Auth0 Authentication API
@@ -90,7 +90,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
  ```
 
  - parameter token:     token of Management API v2 with the correct allowed scopes to perform the desired action
- - parameter session:   instance of NSURLSession used for networking. By default it will use the shared NSURLSession
+ - parameter session:   instance of URLSession used for networking. By default it will use the shared URLSession
  - parameter bundle:    bundle used to locate the `Auth0.plist` file. By default is the main bundle
 
  - returns: Auth0 Management API v2
@@ -117,7 +117,7 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
 
  - parameter token:     token of Management API v2 with the correct allowed scopes to perform the desired action
  - parameter domain:    domain of your Auth0 account. e.g.: 'samples.auth0.com'
- - parameter session:   instance of NSURLSession used for networking. By default it will use the shared NSURLSession
+ - parameter session:   instance of URLSession used for networking. By default it will use the shared URLSession
 
  - returns: Auth0 Management API v2
  */

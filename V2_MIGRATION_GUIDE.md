@@ -244,7 +244,7 @@ switch error {
 switch error {
     case .revokeFailed: handleError(error.cause) // handle underlying error
     // ...
-    default: // handle unkwown errors, e.g. errors added in future versions
+    default: // handle unknown errors, e.g. errors added in future versions
 }
 ```
 

@@ -23,14 +23,15 @@ import Foundation
  </plist>
  ```
 
+ - parameter session:   instance of URLSession used for networking. By default it will use the shared URLSession
  - parameter bundle:    bundle used to locate the `Auth0.plist` file. By default is the main bundle
 
  - returns: Auth0 WebAuth component
  - important: Calling this method without a valid `Auth0.plist` will crash your application
  */
-public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
+public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main) -> WebAuth {
     let values = plistValues(bundle: bundle)!
-    return webAuth(clientId: values.clientId, domain: values.domain)
+    return webAuth(clientId: values.clientId, domain: values.domain, session: session)
 }
 
 /**
@@ -42,11 +43,12 @@ public func webAuth(bundle: Bundle = Bundle.main) -> WebAuth {
 
  - parameter clientId: Id of your Auth0 client
  - parameter domain:   name of your Auth0 domain
+ - parameter session:  instance of URLSession used for networking. By default it will use the shared URLSession
 
  - returns: Auth0 WebAuth component
  */
-public func webAuth(clientId: String, domain: String) -> WebAuth {
-    return Auth0WebAuth(clientId: clientId, url: .httpsURL(from: domain))
+public func webAuth(clientId: String, domain: String, session: URLSession = .shared) -> WebAuth {
+    return Auth0WebAuth(clientId: clientId, url: .httpsURL(domain), session: session)
 }
 
 /// WebAuth Authentication using Auth0
