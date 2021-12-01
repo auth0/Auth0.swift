@@ -162,6 +162,17 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
             }
+            
+            it("should include custom headers") {
+                stub(condition: hasHeader("foo", value: "bar")) { _ in return revokeTokenResponse() }.name = "revoke success"
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.revoke({ error in
+                        expect(error).to(beNil())
+                        expect(credentialsManager.hasValid()).to(beFalse())
+                        done()
+                    }, headers: ["foo": "bar"])
+                }
+            }
         }
         
         describe("multi instances of credentials manager") {
@@ -479,6 +490,20 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials(parameters: ["some_id": someId]) { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should include custom headers") {
+                    stub(condition: hasHeader("foo", value: "bar")) {
+                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
+                    }
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.credentials(headers: ["foo": "bar"]) { result in
                             expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
                             done()
                         }

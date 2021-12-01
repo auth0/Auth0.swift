@@ -122,10 +122,15 @@ func isMultifactorChallenge(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/mfa/challenge")
 }
 
-func hasBearerToken(_ token: String) -> HTTPStubsTestBlock {
+
+func hasHeader(_ name: String, value: String) -> HTTPStubsTestBlock {
     return { request in
-        return request.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)"
+        return request.value(forHTTPHeaderField: name) == value
     }
+}
+
+func hasBearerToken(_ token: String) -> HTTPStubsTestBlock {
+    return hasHeader("Authorization", value: "Bearer \(token)")
 }
 
 func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQueryItem]> {
