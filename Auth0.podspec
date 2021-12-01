@@ -23,19 +23,9 @@ web_auth_files = [
   'Auth0/WebAuthError.swift'
 ]
 
-ios_files = [
-  'Auth0/MobileWebAuth.swift'
-]
-
-macos_files = [
-  'Auth0/DesktopWebAuth.swift'
-]
-
-excluded_files = [
-  *web_auth_files,
-  *ios_files,
-  *macos_files
-]
+ios_files = ['Auth0/MobileWebAuth.swift']
+macos_files = ['Auth0/DesktopWebAuth.swift']
+excluded_files = [*web_auth_files, *ios_files, *macos_files]
 
 Pod::Spec.new do |s|
   s.name             = 'Auth0'
@@ -46,43 +36,26 @@ Pod::Spec.new do |s|
                         DESC
   s.homepage         = 'https://github.com/auth0/Auth0.swift'
   s.license          = 'MIT'
-  s.authors          = { "Auth0" => "support@auth0.com" }, { "Hernan Zalazar" => "hernan@auth0.com" }, { "Martin Walsh" => "martin.walsh@auth0.com" }
+  s.authors          = { 'Auth0' => 'support@auth0.com', 'Rita Zerrizuela' => 'rita.zerrizuela@auth0.com' }
   s.source           = { :git => 'https://github.com/auth0/Auth0.swift.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/auth0'
+  s.source_files     = 'Auth0/*.swift'
+  s.swift_versions   = ['5.3', '5.4', '5.5']
 
-  s.ios.deployment_target = '12.0'
-  s.osx.deployment_target = '10.15'
-  s.watchos.deployment_target = '6.2'
+  s.dependency 'SimpleKeychain'
+  s.dependency 'JWTDecode', '~> 2.0'
+
+  s.ios.deployment_target   = '12.0'
+  s.ios.exclude_files       = macos_files
+  s.ios.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
+
+  s.osx.deployment_target   = '10.15'
+  s.osx.exclude_files       = ios_files
+  s.osx.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
+
   s.tvos.deployment_target = '12.0'
-  s.requires_arc = true
+  s.tvos.exclude_files     = excluded_files
 
-  s.ios.source_files = 'Auth0/*.swift'
-  s.ios.exclude_files = macos_files
-  s.ios.frameworks = 'UIKit', 'LocalAuthentication', 'AuthenticationServices'
-  s.ios.dependency 'SimpleKeychain'
-  s.ios.dependency 'JWTDecode', '~> 2.0'
-  s.ios.pod_target_xcconfig = {
-    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'
-  }
-
-  s.osx.source_files = 'Auth0/*.swift'
-  s.osx.exclude_files = ios_files
-  s.osx.frameworks = 'AppKit', 'LocalAuthentication', 'AuthenticationServices'
-  s.osx.dependency 'SimpleKeychain'
-  s.osx.dependency 'JWTDecode', '~> 2.0'
-  s.osx.pod_target_xcconfig = {
-    'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'
-  }
-
-  s.watchos.source_files = 'Auth0/*.swift'
-  s.watchos.exclude_files = excluded_files
-  s.watchos.dependency 'SimpleKeychain'
-  s.watchos.dependency 'JWTDecode', '~> 2.0'
-
-  s.tvos.source_files = 'Auth0/*.swift'
-  s.tvos.exclude_files = excluded_files
-  s.tvos.dependency 'SimpleKeychain'
-  s.tvos.dependency 'JWTDecode', '~> 2.0'
-
-  s.swift_versions = ['5.3', '5.4', '5.5']
+  s.watchos.deployment_target = '6.2'
+  s.watchos.exclude_files     = excluded_files
 end
