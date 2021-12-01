@@ -61,7 +61,7 @@ The custom `Result` enum has been removed, along with its shims. Auth0.swift is 
 
 ### Structs
 
-The following structs have been removed, as they are no longer in use:
+The following structs were removed, as they were no longer being used:
 
 - `NativeAuthCredentials`
 - `ConcatRequest`
@@ -74,7 +74,7 @@ The following Objective-C compatibility wrappers have been removed:
 - `_ObjectiveManagementAPI`
 - `_ObjectiveOAuth2`
 
-The following classes were also removed, as they are no longer in use:
+The following classes were also removed, as they were no longer being used:
 
 - `Profile`
 - `Identity`
@@ -100,6 +100,20 @@ Use `userInfo(withAccessToken:)` instead.
 #### `tokenExchange(withAppleAuthorizationCode:scope:audience:fullName:)`
 
 Use `login(appleAuthorizationCode:fullName:profile:audience:scope:)` instead. 
+
+#### `webAuth(withConnection:)`
+
+Use Web Auth with its `connection(_:)` method instead:
+
+```swift
+Auth0.webAuth()
+    .connection("some-connection")
+    .start { result in
+        // ...
+    }
+```
+
+#### Other methods
 
 The following methods have been removed and have no replacement, as they rely on deprecated endpoints:
 
@@ -155,21 +169,21 @@ The `a0_url(_:)` method is no longer public.
 
 #### Properties removed
 
-- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
+`info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
 
 #### Properties renamed
 
-- `description` was renamed to `localizedDescription`, as `AuthenticationError` now conforms to `CustomStringConvertible`.
+`description` was renamed to `localizedDescription`, as `AuthenticationError` now conforms to `CustomStringConvertible`.
 
 ### `ManagementError` struct
 
 #### Properties removed
 
-- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
+`info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
 
 #### Properties renamed
 
-- `description` was renamed to `localizedDescription`, as `ManagementError` now conforms to `CustomStringConvertible`.
+`description` was renamed to `localizedDescription`, as `ManagementError` now conforms to `CustomStringConvertible`.
 
 ### `WebAuthError` struct
 
@@ -179,7 +193,7 @@ All the former enum cases are now static properties, so to switch over them you 
 
 ```swift
 switch error {
-    case .userCancelled: // handle error
+    case .userCancelled: handleError(error)
     // ...
 }
 ```
@@ -188,7 +202,7 @@ switch error {
 
 ```swift
 switch error {
-    case .userCancelled: // handle error
+    case .userCancelled: handleError(error)
     // ...
     default: // handle unknown errors, e.g. errors added in future versions
 }
@@ -203,6 +217,8 @@ switch error {
 
 #### Error cases removed
 
+All the following error cases were no longer being used.
+
 - `.noNonceProvided`
 - `.invalidIdTokenNonce`
 - `.cannotDismissWebAuthController`
@@ -216,10 +232,10 @@ switch error {
 
 #### Error cases added
 
-- `.malformedInvitationURL`
-- `.noAuthorizationCode`
-- `.idTokenValidationFailed`
-- `.other`
+- `.malformedInvitationURL`, for when the invitation URL is missing the `organization` and/or the `invitation` query parameters.
+- `.noAuthorizationCode`, for when the callback URL is missing the `code` query parameter.
+- `.idTokenValidationFailed`, for when the ID Token validation performed after Web Auth login fails.
+- `.other`, for when a different `Error` happens. That error can be acessed via the `cause: Error?` property.
 
 ### `CredentialsManagerError` struct
 
@@ -252,7 +268,7 @@ switch error {
 
 #### Error cases added
 
-- `.largeMinTTL`
+`.largeMinTTL`, for when the requested `minTTL` is greater than the lifetime of the renewed Access Token.
 
 ### `UserInfo` struct
 
@@ -299,7 +315,7 @@ Auth0
     .tokenExchange() // Returns a Request
     .parameters(["key": "value"]) // 👈🏻
     .start { result in
-        print(result)
+        // ...
     }
 ```
 
@@ -382,7 +398,7 @@ credentialsManager.credentials { error, credentials in
     guard error == nil, let credentials = credentials else { 
         return handleError(error) 
     }
-    ... // credentials retrieved
+    // credentials retrieved
 ```
 
 ##### After
@@ -390,7 +406,7 @@ credentialsManager.credentials { error, credentials in
 ```swift
 credentialsManager.credentials { result in
     switch result {
-    case .success(let credentials): ... // credentials retrieved
+    case .success(let credentials): // credentials retrieved
     case .failure(let error): handleError(error) 
     }
 }
@@ -407,7 +423,7 @@ Auth0
     .webAuth()
     .scope("profile email") // "openid profile email" will be used
     .start { result in
-        print(result)
+        // ...
     }
 ```
 
