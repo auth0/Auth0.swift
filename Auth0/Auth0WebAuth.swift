@@ -48,7 +48,7 @@ final class Auth0WebAuth: WebAuth {
         self.session = session
         self.storage = storage
         self.telemetry = telemetry
-        self.issuer = "\(url.absoluteString)/"
+        self.issuer = url.absoluteString
     }
 
     func connection(_ connection: String) -> Self {
@@ -121,7 +121,7 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    func start(_ callback: @escaping (Auth0Result<Credentials>) -> Void) {
+    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         guard let redirectURL = self.redirectURL else {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }

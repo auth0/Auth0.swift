@@ -146,7 +146,7 @@ extension AuthenticationError {
 
      - returns: the value of key or nil if cannot be found or is of the wrong type.
      */
-    subscript<T>(_ key: String) -> T? {
+    public subscript<T>(_ key: String) -> T? {
         return self.info[key] as? T
     }
 

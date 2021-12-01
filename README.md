@@ -293,11 +293,12 @@ Credentials will automatically be renewed (if expired) using the refresh token. 
 > This method is thread-safe.
 
 ```swift
-credentialsManager.credentials { error, credentials in
-    guard error == nil, let credentials = credentials else { 
-        return print("Failed with \(error)") 
-    }
-    print("Obtained credentials: \(credentials)")
+credentialsManager.credentials { result in 
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(let error):
+        print("Failed with \(error)") 
 }
 ```
 
@@ -332,7 +333,8 @@ credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 If needed, you are able to specify specific `LAPolicy` to be used - i.e. you might want to support FaceID, but allow fallback to pin code.
 
 ```swift
-credentialsManager.enableBiometrics(withTitle: "Touch or enter pincode to Login", evaluationPolicy: .deviceOwnerAuthentication)
+credentialsManager.enableBiometrics(withTitle: "Touch or enter pincode to Login", 
+                                    evaluationPolicy: .deviceOwnerAuthentication)
 ```
 
 ### Native Social Login

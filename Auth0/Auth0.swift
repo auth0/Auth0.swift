@@ -1,9 +1,26 @@
 import Foundation
 
 /**
- Auth0.swift wrapper for the Swift `Result` type
+ `Result` wrapper for Authentication API operations
  */
-public typealias Auth0Result<T> = Result<T, Error>
+public typealias AuthenticationResult<T> = Result<T, AuthenticationError>
+
+/**
+ `Result` wrapper for Management API operations
+ */
+public typealias ManagementResult<T> = Result<T, ManagementError>
+
+#if WEB_AUTH_PLATFORM
+/**
+ `Result` wrapper for Web Auth operations
+ */
+public typealias WebAuthResult<T> = Result<T, WebAuthError>
+#endif
+
+/**
+ `Result` wrapper for Credentials Manager operations
+ */
+public typealias CredentialsManagerResult<T> = Result<T, CredentialsManagerError>
 
  /**
   Default scope value used across Auth0.swift
