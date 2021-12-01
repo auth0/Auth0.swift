@@ -13,6 +13,7 @@ public protocol CredentialsStorage {
     ///   - forKey: The key to get from the store
     /// - Returns: The stored data
     func getEntry(forKey: String) -> Data?
+
     /// Set a storage entry
     ///
     /// - Parameters:
@@ -20,6 +21,7 @@ public protocol CredentialsStorage {
     ///   - forKey: The key to store it to
     /// - Returns: if credentials were stored
     func setEntry(_: Data, forKey: String) -> Bool
+
     /// Delete a storage entry
     ///
     /// - Parameters:

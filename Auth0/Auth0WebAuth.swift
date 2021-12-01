@@ -239,15 +239,4 @@ final class Auth0WebAuth: WebAuth {
     }
 
 }
-
-extension Auth0Authentication {
-
-    func webAuth(withConnection connection: String) -> WebAuth {
-        let webAuth = Auth0WebAuth(clientId: self.clientId, url: self.url, telemetry: self.telemetry)
-        return webAuth
-            .logging(enabled: self.logger != nil)
-            .connection(connection)
-    }
-
-}
 #endif
