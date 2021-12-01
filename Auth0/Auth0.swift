@@ -125,6 +125,58 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
     return Management(token: token, url: .httpsURL(from: domain), session: session)
 }
 
+#if WEB_AUTH_PLATFORM
+/**
+ Auth0 component for authenticating with web-based flow
+
+ ```
+ Auth0.webAuth()
+ ```
+
+ Auth0 domain is loaded from the file `Auth0.plist` in your main bundle with the following content:
+
+ ```
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ <plist version="1.0">
+ <dict>
+    <key>ClientId</key>
+    <string>{YOUR_CLIENT_ID}</string>
+    <key>Domain</key>
+    <string>{YOUR_DOMAIN}</string>
+ </dict>
+ </plist>
+ ```
+
+ - parameter session:   instance of URLSession used for networking. By default it will use the shared URLSession
+ - parameter bundle:    bundle used to locate the `Auth0.plist` file. By default is the main bundle
+
+ - returns: Auth0 WebAuth component
+ - important: Calling this method without a valid `Auth0.plist` will crash your application
+ */
+public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main) -> WebAuth {
+    let values = plistValues(bundle: bundle)!
+    return webAuth(clientId: values.clientId, domain: values.domain, session: session)
+}
+
+/**
+ Auth0  component for authenticating with web-based flow
+
+ ```
+ Auth0.webAuth(clientId: clientId, domain: "samples.auth0.com")
+ ```
+
+ - parameter clientId: Id of your Auth0 client
+ - parameter domain:   name of your Auth0 domain
+ - parameter session:  instance of URLSession used for networking. By default it will use the shared URLSession
+
+ - returns: Auth0 WebAuth component
+ */
+public func webAuth(clientId: String, domain: String, session: URLSession = .shared) -> WebAuth {
+    return Auth0WebAuth(clientId: clientId, url: .httpsURL(from: domain), session: session)
+}
+#endif
+
 func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
     guard
         let path = bundle.path(forResource: "Auth0", ofType: "plist"),
