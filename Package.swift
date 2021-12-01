@@ -28,7 +28,7 @@ let package = Package(
             name: "Auth0", 
             dependencies: ["SimpleKeychain", "JWTDecode"], 
             path: "Auth0",
-            exclude: ["Info.plist", "Info-tvOS.plist"],
+            exclude: ["Info.plist"],
             swiftSettings: swiftSettings),
         .testTarget(
             name: "Auth0Tests",

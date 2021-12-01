@@ -2,6 +2,7 @@ import Foundation
 
 protocol Requestable {
     associatedtype ResultType
+    associatedtype ErrorType: Auth0APIError
 
-    func start(_ callback: @escaping (Auth0Result<ResultType>) -> Void)
+    func start(_ callback: @escaping (Result<ResultType, ErrorType>) -> Void)
 }

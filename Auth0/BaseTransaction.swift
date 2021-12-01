@@ -3,7 +3,7 @@ import Foundation
 
 class BaseTransaction: NSObject, AuthTransaction {
 
-    typealias FinishTransaction = (Auth0Result<Credentials>) -> Void
+    typealias FinishTransaction = (WebAuthResult<Credentials>) -> Void
 
     var authSession: AuthSession?
     let state: String?
@@ -44,13 +44,14 @@ class BaseTransaction: NSObject, AuthTransaction {
     private func handleURL(_ url: URL) -> Bool {
         guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-            self.callback(.failure(AuthenticationError(description: url.absoluteString, statusCode: 200)))
+            let error = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
+            self.callback(.failure(error))
             return false
         }
         let items = self.handler.values(fromComponents: components)
         guard has(state: self.state, inItems: items) else { return false }
         if items["error"] != nil {
-            self.callback(.failure(AuthenticationError(info: items, statusCode: 0)))
+            self.callback(.failure(WebAuthError(code: .other, cause: AuthenticationError(info: items))))
         } else {
             self.handler.credentials(from: items, callback: self.callback)
         }

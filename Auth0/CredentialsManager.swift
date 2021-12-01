@@ -162,17 +162,17 @@ public struct CredentialsManager {
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/concepts/refresh-tokens)
     #if WEB_AUTH_PLATFORM
-    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        guard self.hasValid(minTTL: minTTL) else { return callback(.failure(.noCredentials)) }
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
                 let error = CredentialsManagerError(code: .biometricsFailed,
                                                     cause: LAError(LAError.biometryNotAvailable))
-                return callback(error, nil)
+                return callback(.failure(error))
             }
             bioAuth.validateBiometric {
                 guard $0 == nil else {
-                    return callback(CredentialsManagerError(code: .biometricsFailed, cause: $0!), nil)
+                    return callback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: $0!)))
                 }
                 self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
             }
@@ -181,8 +181,8 @@ public struct CredentialsManager {
         }
     }
     #else
-    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
-        guard self.hasValid(minTTL: minTTL) else { return callback(.noCredentials, nil) }
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        guard self.hasValid(minTTL: minTTL) else { return callback(.failure(.noCredentials)) }
         self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, callback: callback)
     }
     #endif
@@ -194,24 +194,24 @@ public struct CredentialsManager {
         return credentials
     }
 
-    private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerError?, Credentials?) -> Void) {
+    private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.dispatchQueue.async {
             self.dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
                 guard let credentials = retrieveCredentials() else {
                     self.dispatchGroup.leave()
-                    return callback(.noCredentials, nil)
+                    return callback(.failure(.noCredentials))
                 }
                 guard self.hasExpired(credentials) ||
                         self.willExpire(credentials, within: minTTL) ||
                         self.hasScopeChanged(credentials, from: scope) else {
                             self.dispatchGroup.leave()
-                            return callback(nil, credentials)
+                            return callback(.success(credentials))
                         }
                 guard let refreshToken = credentials.refreshToken else {
                     self.dispatchGroup.leave()
-                    return callback(.noRefreshToken, nil)
+                    return callback(.failure(.noRefreshToken))
                 }
                 self.authentication
                     .renew(withRefreshToken: refreshToken, scope: scope)
@@ -229,15 +229,15 @@ public struct CredentialsManager {
                                 let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
                                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
                                 self.dispatchGroup.leave()
-                                callback(error, nil)
+                                callback(.failure(error))
                             } else {
                                 _ = self.store(credentials: newCredentials)
                                 self.dispatchGroup.leave()
-                                callback(nil, newCredentials)
+                                callback(.success(newCredentials))
                             }
                         case .failure(let error):
                             self.dispatchGroup.leave()
-                            callback(CredentialsManagerError(code: .refreshFailed, cause: error), nil)
+                            callback(.failure(CredentialsManagerError(code: .refreshFailed, cause: error)))
                         }
                     }
             }

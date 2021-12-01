@@ -344,7 +344,7 @@ class WebAuthSpec: QuickSpec {
             context("issuer") {
 
                 it("should use the default issuer value") {
-                    expect(newWebAuth().issuer).to(equal("\(DomainURL.absoluteString)/"))
+                    expect(newWebAuth().issuer).to(equal(DomainURL.absoluteString))
                 }
 
                 it("should use a custom issuer value") {

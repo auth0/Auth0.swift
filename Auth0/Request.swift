@@ -15,7 +15,7 @@ import Foundation
  ```
  */
 public struct Request<T, E: Auth0APIError>: Requestable {
-    public typealias Callback = (Auth0Result<T>) -> Void
+    public typealias Callback = (Result<T, E>) -> Void
 
     let session: URLSession
     let url: URL

@@ -3,7 +3,7 @@ import Auth0
 
 class ViewController: UIViewController {
     
-    var onAuth: ((Auth0Result<Credentials>) -> ())!
+    var onAuth: ((WebAuthResult<Credentials>) -> ())!
     
     override func viewDidLoad() {
         super.viewDidLoad()

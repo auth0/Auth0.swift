@@ -139,15 +139,6 @@ The `init(string: String?, statusCode: Int)` initializer was removed.
 
 The `a0_url(_:)` method is no longer public.
 
-## Errors Removed
-
-### `WebAuthError`
-
-The following cases were removed, as they are no longer in use:
-
-- `.noNonceProvided`
-- `.invalidIdTokenNonce`
-
 ## Types changed
 
 - `UserInfo` was changed from class to struct.
@@ -205,22 +196,28 @@ switch error {
 
 #### Properties removed
 
-- `.cannotDismissWebAuthController`
-- `.missingResponseParam`
-- `.missingAccessToken`
 - `infoKey`
 - `errorDomain`
 - `errorCode`
 - `errorUserInfo`
 
-#### Properties renamed
+#### Error cases removed
+
+- `.noNonceProvided`
+- `.invalidIdTokenNonce`
+- `.cannotDismissWebAuthController`
+- `.missingResponseParam`
+- `.missingAccessToken`
+
+#### Error cases renamed
 
 - `.unknownError` was renamed to `.unknown`.
 - `.noBundleIdentifierFound` was renamed to `.noBundleIdentifier`.
 
-#### Properties added
+#### Error cases added
 
 - `.malformedInvitationURL`
+- `.noAuthorizationCode`
 - `.idTokenValidationFailed`
 - `.other`
 
@@ -248,12 +245,12 @@ switch error {
 }
 ```
 
-#### Properties renamed
+#### Error cases renamed
 
 - `.failedRefresh` was renamed to `.refreshFailed`.
 - `.touchFailed` was renamed to `.biometricsFailed`.
 
-#### Properties added
+#### Error cases added
 
 - `.largeMinTTL`
 
@@ -280,6 +277,10 @@ These properties have been removed:
 ## Method signatures changed
 
 ### Authentication client
+
+#### Errors
+
+The Authentication API client methods will now only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
 
 #### Removed `parameters` parameter
 
@@ -324,7 +325,25 @@ In the following methods the `scope` parameter became non-optional (with a defau
 
 The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `channel` parameter, which is no longer necessary.
 
+### Management client
+
+#### Errors
+
+The Management API client methods will now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError`.
+
+### Web Auth
+
+#### Errors
+
+The Web Auth methods will now only yield errors of type `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError`.
+
 ### Credentials Manager
+
+#### Errors
+
+The Credentials Manager methods will now only yield errors of type `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError`.
+
+#### Initializer
 
 `CredentialsManager` now takes a `CredentialsStorage` protocol as it's storage argument rather than an instance of `SimpleKeychain`.
 
@@ -350,6 +369,31 @@ class CustomStore: CredentialsStorage {
 }
 
 let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore());
+```
+
+#### `credentials(withScope:minTTL:parameters:callback)` 
+
+This method now yields a `Result<Credentials, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Credentials>`.
+
+##### Before
+
+```swift
+credentialsManager.credentials { error, credentials in
+    guard error == nil, let credentials = credentials else { 
+        return handleError(error) 
+    }
+    ... // credentials retrieved
+```
+
+##### After
+
+```swift
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials): ... // credentials retrieved
+    case .failure(let error): handleError(error) 
+    }
+}
 ```
 
 ## Behavior changes

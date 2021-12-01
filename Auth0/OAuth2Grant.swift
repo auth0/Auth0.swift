@@ -2,7 +2,7 @@ import Foundation
 
 protocol OAuth2Grant {
     var defaults: [String: String] { get }
-    func credentials(from values: [String: String], callback: @escaping (Auth0Result<Credentials>) -> Void)
+    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void)
     func values(fromComponents components: URLComponents) -> [String: String]
 }
 
@@ -62,10 +62,9 @@ struct PKCE: OAuth2Grant {
         self.defaults = newDefaults
     }
 
-    func credentials(from values: [String: String], callback: @escaping (Auth0Result<Credentials>) -> Void) {
+    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         guard let code = values["code"] else {
-            let string = "No code found in parameters \(values)"
-            return callback(.failure(AuthenticationError(description: string)))
+            return callback(.failure(WebAuthError(code: .noAuthorizationCode(values))))
         }
         let authentication = self.authentication
         let verifier = self.verifier
@@ -80,7 +79,7 @@ struct PKCE: OAuth2Grant {
             .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
             .start { result in
                 switch result {
-                case .failure(let error as AuthenticationError) where error.localizedDescription == "Unauthorized":
+                case .failure(let error) where error.localizedDescription == "Unauthorized":
                     // Special case for PKCE when the correct method for token endpoint authentication is not set (it should be None)
                     return callback(.failure(WebAuthError(code: .pkceNotAllowed)))
                 case .failure(let error): return callback(.failure(WebAuthError(code: .other, cause: error)))
@@ -89,7 +88,7 @@ struct PKCE: OAuth2Grant {
                         if let error = error {
                             return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error)))
                         }
-                        callback(result)
+                        callback(.success(credentials))
                     }
             }
         }

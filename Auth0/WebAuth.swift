@@ -191,7 +191,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - parameter callback: callback called with the result of the WebAuth flow
      */
-    func start(_ callback: @escaping (Auth0Result<Credentials>) -> Void)
+    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider session.
