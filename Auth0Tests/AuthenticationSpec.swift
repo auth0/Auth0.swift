@@ -223,9 +223,15 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should fail to recieve access token") {
+            it("should fail to receive access token") {
+                let invalidRefreshToken = "invalidtoken"
+
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": invalidRefreshToken])) { _ in
+                    return authFailure(error: "", description: "")
+                }.name = "refresh_token login"
+
                 waitUntil(timeout: Timeout) { done in
-                    auth.renew(withRefreshToken: "invalidtoken").start { result in
+                    auth.renew(withRefreshToken: invalidRefreshToken).start { result in
                         expect(result).toNot(haveCredentials())
                         done()
                     }
@@ -277,63 +283,78 @@ class AuthenticationSpec: QuickSpec {
 
         describe("native social token exchange") {
             
+            let validCode = "VALIDCODE"
+            let validNameCode = "VALIDNAMECODE"
+            let validPartialNameCode = "VALIDPARTIALNAMECODE"
+            let validMissingNameCode = "VALIDMISSINGNAMECODE"
+            let validNameAndProfileCode = "VALIDNAMEANDPROFILECODE"
+            let invalidCode = "INVALIDCODE"
+            
             context("apple") {
                 beforeEach {
                     stub(condition: isToken(Domain) && hasAllOf([
                         "grant_type": TokenExchangeGrantType,
-                        "subject_token": "VALIDCODE",
+                        "subject_token": validCode,
                         "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
                         "scope": defaultScope,
                         "client_id": ClientId
-                        ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success"
+                    ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success"
                     
                     stub(condition: isToken(Domain) && hasAtLeast([
                         "grant_type": TokenExchangeGrantType,
-                        "subject_token": "VALIDCODE",
+                        "subject_token": validCode,
                         "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
                         "scope": "openid email"
-                        ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope"
+                    ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope"
                     
                     stub(condition: isToken(Domain) && hasAtLeast([
-                    "grant_type": TokenExchangeGrantType,
-                    "subject_token": "VALIDCODE",
-                    "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
-                    "scope": "openid email",
-                    "audience": "https://myapi.com/api"
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": validCode,
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
+                        "scope": "openid email",
+                        "audience": "https://myapi.com/api"
                     ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope and audience"
                     
                     stub(condition: isToken(Domain) && hasAtLeast([
-                    "grant_type": TokenExchangeGrantType,
-                    "subject_token": "VALIDNAMECODE",
-                    "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
-                    (hasAtLeast(["user_profile": "{\"name\":{\"lastName\":\"Smith\",\"firstName\":\"John\"}}" ]) || hasAtLeast(["user_profile": "{\"name\":{\"firstName\":\"John\",\"lastName\":\"Smith\"}}" ]))
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": validNameCode,
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
+                        (hasAtLeast(["user_profile": "{\"name\":{\"lastName\":\"Smith\",\"firstName\":\"John\"}}" ]) || hasAtLeast(["user_profile": "{\"name\":{\"firstName\":\"John\",\"lastName\":\"Smith\"}}" ]))
                     ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with user profile"
                     
                     stub(condition: isToken(Domain) && hasAtLeast([
-                    "grant_type": TokenExchangeGrantType,
-                    "subject_token": "VALIDPARTIALNAMECODE",
-                    "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
-                    "user_profile": "{\"name\":{\"firstName\":\"John\"}}"
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": validPartialNameCode,
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
+                        "user_profile": "{\"name\":{\"firstName\":\"John\"}}"
                     ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with partial user profile"
                     
                     stub(condition: isToken(Domain) && hasAtLeast([
-                    "grant_type": TokenExchangeGrantType,
-                    "subject_token": "VALIDMISSINGNAMECODE",
-                    "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
-                    hasNoneOf(["user_profile"])
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": validMissingNameCode,
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
+                        hasNoneOf(["user_profile"])
                     ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with missing user profile"
 
                     stub(condition: isToken(Domain) && hasAtLeast([
-                    "grant_type": TokenExchangeGrantType,
-                    "subject_token": "VALIDNAMEANDPROFILECODE",
-                    "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
-                    (hasAtLeast(["user_profile": "{\"name\":{\"firstName\":\"John\"},\"user_metadata\":{\"custom_key\":\"custom_value\"}}"]) || hasAtLeast(["user_profile": "{\"user_metadata\":{\"custom_key\":\"custom_value\"},\"name\":{\"firstName\":\"John\"}}"]))
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": validNameAndProfileCode,
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
+                        (hasAtLeast(["user_profile": "{\"name\":{\"firstName\":\"John\"},\"user_metadata\":{\"custom_key\":\"custom_value\"}}"]) || hasAtLeast(["user_profile": "{\"user_metadata\":{\"custom_key\":\"custom_value\"},\"name\":{\"firstName\":\"John\"}}"]))
                     ) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with user profile"
+                    
+                    stub(condition: isToken(Domain) && hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": invalidCode,
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
+                        "scope": defaultScope,
+                        "client_id": ClientId
+                    ])) { _ in return authFailure(error: "", description: "") }.name = "Token Exchange Apple Failure"
                 }
 
                 it("should exchange apple auth code for credentials") {
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(appleAuthorizationCode: "VALIDCODE")
+                        auth.login(appleAuthorizationCode: validCode)
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -344,7 +365,7 @@ class AuthenticationSpec: QuickSpec {
                 
                 it("should exchange apple auth code and fail") {
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(appleAuthorizationCode: "INVALIDCODE")
+                        auth.login(appleAuthorizationCode: invalidCode)
                             .start { result in
                                 expect(result).toNot(haveCredentials())
                                 done()
@@ -355,7 +376,7 @@ class AuthenticationSpec: QuickSpec {
                 
                 it("should exchange apple auth code for credentials with custom scope") {
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(appleAuthorizationCode: "VALIDCODE", scope: "openid email")
+                        auth.login(appleAuthorizationCode: validCode, scope: "openid email")
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -366,7 +387,7 @@ class AuthenticationSpec: QuickSpec {
                 
                 it("should exchange apple auth code for credentials with custom scope and audience") {
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(appleAuthorizationCode: "VALIDCODE", audience: "https://myapi.com/api", scope: "openid email")
+                        auth.login(appleAuthorizationCode: validCode, audience: "https://myapi.com/api", scope: "openid email")
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -382,7 +403,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.middleName = "Ignored"
 
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(appleAuthorizationCode: "VALIDNAMECODE", fullName: fullName)
+                        auth.login(appleAuthorizationCode: validNameCode, fullName: fullName)
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -397,7 +418,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.middleName = "Ignored"
                     
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(appleAuthorizationCode: "VALIDPARTIALNAMECODE", fullName: fullName)
+                        auth.login(appleAuthorizationCode: validPartialNameCode, fullName: fullName)
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -412,7 +433,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.middleName = nil
                     
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(appleAuthorizationCode: "VALIDMISSINGNAMECODE", fullName: fullName)
+                        auth.login(appleAuthorizationCode: validMissingNameCode, fullName: fullName)
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -428,7 +449,7 @@ class AuthenticationSpec: QuickSpec {
                     let profile = ["user_metadata": ["custom_key": "custom_value"]]
 
                     waitUntil(timeout: Timeout) { done in
-                        auth.login(appleAuthorizationCode: "VALIDNAMEANDPROFILECODE",
+                        auth.login(appleAuthorizationCode: validNameAndProfileCode,
                                    fullName: fullName,
                                    profile: profile)
                             .start { result in
@@ -551,7 +572,7 @@ class AuthenticationSpec: QuickSpec {
         describe("authenticating with credentials in a realm") {
 
             it("should receive token with username and password") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
 
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "myrealm").start { result in
@@ -562,9 +583,9 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should fail to return token") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": InvalidPassword, "realm": "myrealm"])) { _ in return authFailure(error: "", description: "") }.name = "Grant Password"
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: "invalid", realm: "myrealm").start { result in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: InvalidPassword, realm: "myrealm").start { result in
                         expect(result).toNot(haveCredentials())
                         done()
                     }
@@ -572,7 +593,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should specify scope in request") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "myrealm", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
@@ -582,7 +603,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should specify audience in request") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "audience" : "https://myapi.com/api", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : "https://myapi.com/api", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "myrealm", audience: "https://myapi.com/api").start { result in
                         expect(result).to(haveCredentials())
@@ -592,7 +613,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should specify audience and scope in request") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "myrealm", audience: "https://myapi.com/api", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
@@ -602,7 +623,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should specify audience,scope and realm in request") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm" : "customconnection"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom audience, scope and realm"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm" : "customconnection"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom audience, scope and realm"
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "customconnection", audience: "https://myapi.com/api", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
@@ -628,9 +649,9 @@ class AuthenticationSpec: QuickSpec {
             }
             
             it("should fail to return token") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": InvalidPassword])) { _ in return authFailure(error: "", description: "") }.name = "Grant Password"
                 waitUntil(timeout: Timeout) { done in
-                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: "invalid").start { result in
+                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: InvalidPassword).start { result in
                         expect(result).toNot(haveCredentials())
                         done()
                     }
@@ -638,7 +659,7 @@ class AuthenticationSpec: QuickSpec {
             }
             
             it("should specify scope in request") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword,  scope: "openid").start { result in
                         expect(result).to(haveCredentials())
@@ -648,7 +669,7 @@ class AuthenticationSpec: QuickSpec {
             }
             
             it("should specify audience in request") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Audience"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Audience"
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api").start { result in
                         expect(result).to(haveCredentials())
@@ -658,7 +679,7 @@ class AuthenticationSpec: QuickSpec {
             }
             
             it("should specify audience and scope in request") {
-                stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
