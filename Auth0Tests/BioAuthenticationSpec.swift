@@ -1,6 +1,5 @@
 import Quick
 import Nimble
-import OHHTTPStubs
 import LocalAuthentication
 
 @testable import Auth0

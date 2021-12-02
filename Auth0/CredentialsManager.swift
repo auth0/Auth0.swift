@@ -4,6 +4,9 @@ import JWTDecode
 #if WEB_AUTH_PLATFORM
 import LocalAuthentication
 #endif
+#if canImport(Combine)
+import Combine
+#endif
 
 /// Generic storage API for storing credentials
 public protocol CredentialsStorage {
@@ -113,15 +116,14 @@ public struct CredentialsManager {
     /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
     ///
     /// - Parameters:
-    ///   - headers: additional headers to add to a possible token revokation. The headers will be set via Request.headers.
+    ///   - headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
     ///   - callback: callback with an error if the refresh token could not be revoked
     public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerError?) -> Void) {
-        guard
-            let data = self.storage.getEntry(forKey: self.storeKey),
-            let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
-            let refreshToken = credentials.refreshToken else {
-                _ = self.clear()
-                return callback(nil)
+        guard let data = self.storage.getEntry(forKey: self.storeKey),
+              let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
+              let refreshToken = credentials.refreshToken else {
+                  _ = self.clear()
+                  return callback(nil)
         }
 
         self.authentication
@@ -153,20 +155,24 @@ public struct CredentialsManager {
     /// stored in the keychain.
     ///
     /// ```
-    /// credentialsManager.credentials {
-    ///    guard $0 == nil else { return }
-    ///    print($1)
+    /// credentialsManager.credentials { result in
+    ///    switch result {
+    ///    case .success(let credentials):
+    ///        print("Obtained credentials: \(credentials)")
+    ///    case .failure(let error):
+    ///        print("Failed with \(error)")
+    ///    }
     /// }
     /// ```
     ///
     /// - Parameters:
     ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
     ///   - minTTL: minimum time in seconds the access token must remain valid to avoid being renewed.
-    ///   - parameters: additional parameters to add to a possible token refresh. The parameters will be set via Request.payload.
+    ///   - parameters: additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
     ///   - headers: additional headers to add to a possible token refresh. The headers will be set via Request.headers.
     ///   - callback: callback with the user's credentials or the cause of the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
-    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/tokens/concepts/refresh-tokens)
+    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     #if WEB_AUTH_PLATFORM
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         guard self.hasValid(minTTL: minTTL) else { return callback(.failure(.noCredentials)) }
@@ -270,6 +276,68 @@ public struct CredentialsManager {
         }
 
         return false
+    }
+
+}
+
+// MARK: - Combine
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+extension CredentialsManager {
+
+    /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// the credentials are not cleared and an error is raised through the callback.
+    ///
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
+    ///
+    /// - parameter headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
+    /// - Returns: a type-erased publisher.
+    public func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
+        return Deferred {
+            Future { callback in
+                return self.revoke(headers: headers) { error in
+                    if let error = error { return callback(.failure(error)) }
+                    callback(.success(()))
+                }
+            }
+        }.eraseToAnyPublisher()
+    }
+
+    /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired
+    /// otherwise the retrieved credentials will be returned as they have not expired. Renewed credentials will be
+    /// stored in the keychain.
+    ///
+    /// ```
+    /// credentialsManager
+    ///     .credentials()
+    ///     .sink(receiveCompletion: { completion in
+    ///         if case .failure(let error) = completion {
+    ///             print("Failed with \(error)")
+    ///         }
+    ///     }, receiveValue: { credentials in
+    ///         print("Obtained credentials: \(credentials)")
+    ///     })
+    ///     .store(in: &cancellables)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
+    ///   - minTTL: minimum time in seconds the access token must remain valid to avoid being renewed.
+    ///   - parameters: additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
+    ///   - headers: additional headers to add to a possible token refresh. The headers will be set via Request.headers.
+    /// - Returns: a type-erased publisher.
+    /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
+    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
+        return Deferred {
+            Future { callback in
+                return self.credentials(withScope: scope,
+                                        minTTL: minTTL,
+                                        parameters: parameters,
+                                        headers: headers,
+                                        callback: callback)
+            }
+        }.eraseToAnyPublisher()
     }
 
 }

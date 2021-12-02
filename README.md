@@ -95,13 +95,23 @@ Auth0
 
 > This snippet sets the `audience` to ensure OIDC compliant responses, this can also be achieved by enabling the **OIDC Conformant** switch in your Auth0 dashboard under `Application / Settings / Advanced / OAuth`.
 
-3. If your app targets iOS <11, allow Auth0 to handle authentication callbacks (otherwise, skip this step). In your `AppDelegate.swift`, add the following:
+<details>
+  <summary>Using Combine</summary>
 
 ```swift
-func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
-    return Auth0.resumeAuth(url)
-}
+Auth0
+    .webAuth()
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
 ```
+</details>
 
 ### Configuration
 
@@ -198,6 +208,25 @@ Auth0
    }
 ```
 
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+   .authentication()
+   .userInfo(withAccessToken: accessToken)
+   .publisher()
+   .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { profile in
+        print("User Profile: \(profile)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
 #### Renew user credentials
 
 Use a [Refresh Token](https://auth0.com/docs/tokens/refresh-tokens) to renew user credentials. It's recommended that you read and understand the refresh token process before implementing.
@@ -215,6 +244,25 @@ Auth0
         }
     }
 ```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+   .authentication()
+   .renew(withRefreshToken: refreshToken)
+   .publisher()
+   .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained new credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
 
 #### Signup with Universal Login
 
@@ -302,6 +350,23 @@ credentialsManager.credentials { result in
 }
 ```
 
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+credentialsManager
+    .credentials()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
 #### Clearing credentials and revoking refresh tokens
 
 Credentials can be cleared by using the `clear` function, which clears credentials from the Keychain.
@@ -321,6 +386,22 @@ credentialsManager.revoke { error in
     print("Success")
 }
 ```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+credentialsManager
+    .revoke()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+        print("Success")
+    }, receiveValue: { _ in })
+    .store(in: &cancellables)
+```
+</details>
 
 #### Biometric authentication
 

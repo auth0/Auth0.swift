@@ -1,5 +1,8 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
+#if canImport(Combine)
+import Combine
+#endif
 
 final class Auth0WebAuth: WebAuth {
 
@@ -239,4 +242,24 @@ final class Auth0WebAuth: WebAuth {
     }
 
 }
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+extension Auth0WebAuth {
+
+    public func publisher() -> AnyPublisher<Credentials, WebAuthError> {
+        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+    }
+
+    public func clearSession(federated: Bool) -> AnyPublisher<Bool, Never> {
+        return Deferred {
+            Future { callback in
+                self.clearSession(federated: federated) { result in
+                    callback(.success(result))
+                }
+            }
+        }.eraseToAnyPublisher()
+    }
+
+}
+
 #endif

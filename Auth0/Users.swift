@@ -269,7 +269,7 @@ extension Management: Users {
         let userPath = "api/v2/users/\(identifier)"
         let component = components(baseURL: self.url as URL, path: userPath)
 
-        return Request(session: self.session, url: component.url!, method: "PATCH", handle: self.managementObject, payload: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session, url: component.url!, method: "PATCH", handle: self.managementObject, parameters: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError> {
@@ -278,7 +278,7 @@ extension Management: Users {
     }
 
     func link(_ identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError> {
-        return link(identifier, payload: ["link_with": token])
+        return link(identifier, parameters: ["link_with": token])
     }
 
     func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
@@ -287,13 +287,13 @@ extension Management: Users {
             "provider": provider
         ]
         payload["connection_id"] = connectionId
-        return link(identifier, payload: payload)
+        return link(identifier, parameters: payload)
     }
 
-    private func link(_ identifier: String, payload: [String: Any]) -> Request<[ManagementObject], ManagementError> {
+    private func link(_ identifier: String, parameters: [String: Any]) -> Request<[ManagementObject], ManagementError> {
         let identitiesPath = "api/v2/users/\(identifier)/identities"
         let url = components(baseURL: self.url as URL, path: identitiesPath).url!
-        return Request(session: self.session, url: url, method: "POST", handle: self.managementObjects, payload: payload, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session, url: url, method: "POST", handle: self.managementObjects, parameters: parameters, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError> {

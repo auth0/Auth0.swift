@@ -1,7 +1,6 @@
 import Foundation
 import Quick
 import Nimble
-import OHHTTPStubs
 
 @testable import Auth0
 
