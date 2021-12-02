@@ -107,7 +107,7 @@ class OAuth2GrantSpec: QuickSpec {
             it("shoud build credentials") {
                 let token = UUID().uuidString
                 let code = UUID().uuidString
-                let values = ["code": code, "id_token": idToken, "nonce": nonce]
+                let values = ["code": code, "nonce": nonce]
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
                 stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
                 waitUntil { done in
@@ -118,26 +118,14 @@ class OAuth2GrantSpec: QuickSpec {
                 }
             }
 
-            it("should fail if no nonce is provided to compare against the id_token") {
-                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nil)
-                let token = UUID().uuidString
-                let code = UUID().uuidString
-                let values = ["code": code, "id_token": idToken]
-                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
-                waitUntil { done in
-                    pkce.credentials(from: values) {
-                        expect($0).to(beFailure())
-                        done()
-                    }
-                }
-            }
-
             it("should fail with an invalid id_token") {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
                 let token = UUID().uuidString
                 let code = UUID().uuidString
-                let values = ["code": code, "id_token": generateJWT(iss: nil, nonce: nonce).string, "nonce": nonce]
+                let values = ["code": code, "nonce": nonce]
+                let idToken = generateJWT(iss: nil, nonce: nonce).string
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
+                stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
                 waitUntil { done in
                     pkce.credentials(from: values) {
                         expect($0).to(beFailure())

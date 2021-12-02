@@ -64,10 +64,6 @@ func hasQueryParameters(_ parameters: [String: String]) -> HTTPStubsTestBlock {
     }
 }
 
-func isResourceOwner(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/oauth/ro")
-}
-
 func isToken(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/token")
 }
@@ -84,17 +80,10 @@ func isPasswordless(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/passwordless/start")
 }
 
-func isTokenInfo(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/tokeninfo")
-}
-
 func isUserInfo(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodGET() && isHost(domain) && isPath("/userinfo")
 }
 
-func isOAuthAccessToken(_ domain: String) -> HTTPStubsTestBlock {
-    return isMethodPOST() && isHost(domain) && isPath("/oauth/access_token")
-}
 
 func isRevokeToken(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/revoke")
@@ -122,10 +111,15 @@ func isMultifactorChallenge(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/mfa/challenge")
 }
 
-func hasBearerToken(_ token: String) -> HTTPStubsTestBlock {
+
+func hasHeader(_ name: String, value: String) -> HTTPStubsTestBlock {
     return { request in
-        return request.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)"
+        return request.value(forHTTPHeaderField: name) == value
     }
+}
+
+func hasBearerToken(_ token: String) -> HTTPStubsTestBlock {
+    return hasHeader("Authorization", value: "Bearer \(token)")
 }
 
 func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQueryItem]> {
@@ -197,7 +191,7 @@ func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> 
 #endif
 
 func haveCredentials(_ accessToken: String, _ idToken: String? = nil, _ refreshToken: String? = nil) -> Predicate<CredentialsManagerResult<Credentials>> {
-    return Predicate<CredentialsManagerResult<Credentials>>.define("a successful authentication result") { expression, failureMessage -> PredicateResult in
+    return Predicate<CredentialsManagerResult<Credentials>>.define("a successful credentials retrieval") { expression, failureMessage -> PredicateResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
                                    refreshToken: refreshToken,
@@ -207,7 +201,7 @@ func haveCredentials(_ accessToken: String, _ idToken: String? = nil, _ refreshT
 }
 
 func haveCredentials() -> Predicate<CredentialsManagerResult<Credentials>> {
-    return Predicate<CredentialsManagerResult<Credentials>>.define("a successful authentication result") { expression, failureMessage -> PredicateResult in
+    return Predicate<CredentialsManagerResult<Credentials>>.define("a successful credentials retrieval") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage)
     }
 }
