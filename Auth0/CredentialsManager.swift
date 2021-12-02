@@ -115,7 +115,7 @@ public struct CredentialsManager {
     /// - Parameters:
     /// - callback: callback with an error if the refresh token could not be revoked
     ///   - headers: additional headers to add to a possible token revokation. The headers will be set via Request.headers.
-    public func revoke(_ callback: @escaping (CredentialsManagerError?) -> Void, headers: [String: String] = [:]) {
+    public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerError?) -> Void) {
         guard
             let data = self.storage.getEntry(forKey: self.storeKey),
             let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),

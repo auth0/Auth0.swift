@@ -166,11 +166,10 @@ class CredentialsManagerSpec: QuickSpec {
             it("should include custom headers") {
                 stub(condition: hasHeader("foo", value: "bar")) { _ in return revokeTokenResponse() }.name = "revoke success"
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.revoke({ error in
+                    credentialsManager.revoke(headers: ["foo": "bar"], { error in
                         expect(error).to(beNil())
-                        expect(credentialsManager.hasValid()).to(beFalse())
                         done()
-                    }, headers: ["foo": "bar"])
+                    })
                 }
             }
         }
@@ -504,7 +503,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials(headers: ["foo": "bar"]) { result in
-                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(result).to(beSuccessful())
                             done()
                         }
                     }
