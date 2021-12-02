@@ -112,7 +112,8 @@ public struct CredentialsManager {
     ///
     /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
     ///
-    /// - Parameter callback: callback with an error if the refresh token could not be revoked
+    /// - Parameters:
+    /// - callback: callback with an error if the refresh token could not be revoked
     ///   - headers: additional headers to add to a possible token revokation. The headers will be set via Request.headers.
     public func revoke(_ callback: @escaping (CredentialsManagerError?) -> Void, headers: [String: String] = [:]) {
         guard
@@ -199,7 +200,7 @@ public struct CredentialsManager {
         return credentials
     }
 
-    private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+    private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any], headers: [String: String], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.dispatchQueue.async {
             self.dispatchGroup.enter()
 
