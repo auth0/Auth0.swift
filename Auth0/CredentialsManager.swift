@@ -113,8 +113,8 @@ public struct CredentialsManager {
     /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
     ///
     /// - Parameters:
-    /// - callback: callback with an error if the refresh token could not be revoked
     ///   - headers: additional headers to add to a possible token revokation. The headers will be set via Request.headers.
+    ///   - callback: callback with an error if the refresh token could not be revoked
     public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerError?) -> Void) {
         guard
             let data = self.storage.getEntry(forKey: self.storeKey),
