@@ -84,4 +84,15 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
         return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, payload: parameter, headers: self.headers, logger: self.logger, telemetry: self.telemetry)
     }
+
+    /**
+     Modify the headers by creating a copy of self and adding the provided headers to `headers`.
+
+     - parameter extraHeaders: Additional headers for the request. The provided map will be added to `headers`.
+     */
+    public func headers(_ extraHeaders: [String: String]) -> Self {
+        let headers = extraHeaders.merging(self.headers) {(current, _) in current}
+
+        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, payload: self.payload, headers: headers, logger: self.logger, telemetry: self.telemetry)
+    }
 }
