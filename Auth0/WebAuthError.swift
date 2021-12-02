@@ -34,8 +34,6 @@ public struct WebAuthError: Auth0Error {
      - important: You should avoid displaying the error description to the user, it's meant for debugging only.
      */
     public var localizedDescription: String {
-        if let error =  self.cause { return error.localizedDescription }
-
         switch self.code {
         case .noBundleIdentifier: return "Unable to retrieve the bundle identifier."
         case .malformedInvitationURL(let url): return "The invitation URL (\(url)) is missing the required query "

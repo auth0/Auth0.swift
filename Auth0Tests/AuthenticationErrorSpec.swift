@@ -78,6 +78,17 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.statusCode) == 400
             }
 
+            it("should not have an underlying error") {
+                let values = [
+                    "code": "invalid_password",
+                    "description": "You may not reuse any of the last 2 passwords. This password was used a day ago.",
+                    "name": "PasswordHistoryError",
+                    "message": "Password has previously been used",
+                ]
+                let error = AuthenticationError(info: values, statusCode: 400)
+                expect(error.cause).to(beNil())
+            }
+
             it("should detect password already used") {
                 let values: [String: Any] = [
                     "code": "invalid_password",
@@ -280,7 +291,7 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
             var values = [
                 "code": code,
                 "description": description,
-                ]
+            ]
             extras?.forEach { values[$0] = $1 }
             let error = AuthenticationError(info: values, statusCode: 401)
 
