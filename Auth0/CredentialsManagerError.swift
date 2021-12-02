@@ -31,8 +31,6 @@ public struct CredentialsManagerError: Auth0Error {
      - important: You should avoid displaying the error description to the user, it's meant for debugging only.
      */
     public var localizedDescription: String {
-        if let error =  self.cause { return error.localizedDescription }
-
         switch self.code {
         case .noCredentials: return "No valid credentials found."
         case .noRefreshToken: return "No Refresh Token in the credentials."

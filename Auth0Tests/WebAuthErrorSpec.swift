@@ -29,6 +29,13 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for no authorization code") {
+                let values: [String: String] = ["foo": "bar"]
+                let message = "No authorization code found in \(values)"
+                let error = WebAuthError(code: .noAuthorizationCode(values))
+                expect(error.localizedDescription) == message
+            }
+
             it("should return message for PKCE not allowed") {
                 let message = "Unable to complete authentication with PKCE. PKCE support can be enabled by setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app in the Auth0 Dashboard."
                 let error = WebAuthError(code: .pkceNotAllowed)
