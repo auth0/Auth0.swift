@@ -70,13 +70,13 @@ extension CredentialsManagerError: CustomDebugStringConvertible {
 
 // MARK: - Pattern Matching Operator
 
-extension CredentialsManagerError {
+public extension CredentialsManagerError {
 
-    public static func ~= (lhs: CredentialsManagerError, rhs: CredentialsManagerError) -> Bool {
+    static func ~= (lhs: CredentialsManagerError, rhs: CredentialsManagerError) -> Bool {
         return lhs.code == rhs.code
     }
 
-    public static func ~= (lhs: CredentialsManagerError, rhs: Error) -> Bool {
+    static func ~= (lhs: CredentialsManagerError, rhs: Error) -> Bool {
         guard let rhs = rhs as? CredentialsManagerError else { return false }
         return lhs.code == rhs.code
     }

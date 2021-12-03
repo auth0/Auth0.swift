@@ -4,7 +4,7 @@ import Foundation
  User's credentials obtained from Auth0.
  */
 @objc(A0Credentials)
-public final class Credentials: NSObject, Codable, NSSecureCoding {
+public final class Credentials: NSObject {
 
     /// Token used that allows calling to the requested APIs (audience sent on Auth)
     public let accessToken: String
@@ -37,7 +37,11 @@ public final class Credentials: NSObject, Codable, NSSecureCoding {
         self.recoveryCode = recoveryCode
     }
 
-    // MARK: - Codable
+}
+
+// MARK: - Codable
+
+extension Credentials: Codable {
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
@@ -76,7 +80,11 @@ public final class Credentials: NSObject, Codable, NSSecureCoding {
                   recoveryCode: recoveryCode)
     }
 
-    // MARK: - NSSecureCoding
+}
+
+// MARK: - NSSecureCoding
+
+extension Credentials: NSSecureCoding {
 
     public convenience init?(coder aDecoder: NSCoder) {
         let accessToken = aDecoder.decodeObject(of: NSString.self, forKey: "accessToken")
@@ -106,6 +114,6 @@ public final class Credentials: NSObject, Codable, NSSecureCoding {
         aCoder.encode(self.recoveryCode as NSString?, forKey: "recoveryCode")
     }
 
-    public static var supportsSecureCoding: Bool = true
+    public static var supportsSecureCoding: Bool { return true }
 
 }

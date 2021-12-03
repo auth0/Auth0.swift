@@ -76,7 +76,7 @@ extension ManagementError: CustomDebugStringConvertible {
 
 // MARK: - Subscript
 
-extension ManagementError {
+public extension ManagementError {
 
     /**
      Returns a value from the error data
@@ -85,7 +85,7 @@ extension ManagementError {
 
      - returns: the value of key or nil if cannot be found or is of the wrong type.
      */
-    public subscript<T>(_ key: String) -> T? {
+    subscript<T>(_ key: String) -> T? {
         return self.info[key] as? T
     }
 

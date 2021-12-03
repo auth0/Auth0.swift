@@ -13,7 +13,7 @@ public protocol WebAuth: Trackable, Loggable {
     /**
      Specify a connection name to be used to authenticate.
 
-     By default no connection is specified, so the hosted login page will be displayed
+     By default no connection is specified, so the Universal Login  page will be displayed
 
      - parameter connection: name of the connection to use
 
@@ -228,7 +228,7 @@ public protocol WebAuth: Trackable, Loggable {
 
 // MARK: - Combine
 
-extension WebAuth {
+public extension WebAuth {
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider session.
@@ -254,7 +254,7 @@ extension WebAuth {
      - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
      - Parameter callback: callback called with bool outcome of the call.
      */
-    public func clearSession(federated: Bool = false, callback: @escaping (Bool) -> Void) {
+    func clearSession(federated: Bool = false, callback: @escaping (Bool) -> Void) {
         self.clearSession(federated: federated, callback: callback)
     }
 
@@ -287,7 +287,7 @@ extension WebAuth {
      - Returns: a type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
-    public func clearSession(federated: Bool = false) -> AnyPublisher<Bool, Never> {
+    func clearSession(federated: Bool = false) -> AnyPublisher<Bool, Never> {
         return self.clearSession(federated: federated)
     }
 

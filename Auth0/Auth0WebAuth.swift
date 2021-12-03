@@ -243,6 +243,8 @@ final class Auth0WebAuth: WebAuth {
 
 }
 
+// MARK: - Combine
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 extension Auth0WebAuth {
 
