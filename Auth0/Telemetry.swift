@@ -106,14 +106,14 @@ public protocol Trackable {
 
 }
 
-extension Trackable {
+public extension Trackable {
     /**
      Avoid Auth0.swift sending its version on every request to Auth0 API.
      By default we collect our libraries and SDKs versions to help us during support and evaluate usage.
      
      - parameter enabled: if Auth0.swift should send it's version on every request.
      */
-    public mutating func tracking(enabled: Bool) {
+    mutating func tracking(enabled: Bool) {
         self.telemetry.enabled = enabled
     }
 
@@ -123,7 +123,7 @@ extension Trackable {
      - parameter name:    name of library or framework that uses Auth0.swift
      - parameter version: version of library or framework
      */
-    public mutating func using(inLibrary name: String, version: String) {
+    mutating func using(inLibrary name: String, version: String) {
         self.telemetry.wrapped(inLibrary: name, version: version)
     }
 }

@@ -180,7 +180,7 @@ public protocol Users: Trackable, Loggable {
     func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError>
 }
 
-extension Users {
+public extension Users {
 
     /**
      Fetch a user using the it's identifier.
@@ -220,7 +220,7 @@ extension Users {
      - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id)
      - important: The token must have the scope `read:users` scope
      */
-    public func get(_ identifier: String, fields: [String] = [], include: Bool = true) -> Request<ManagementObject, ManagementError> {
+    func get(_ identifier: String, fields: [String] = [], include: Bool = true) -> Request<ManagementObject, ManagementError> {
         return self.get(identifier, fields: fields, include: include)
     }
 
@@ -244,7 +244,7 @@ extension Users {
      - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
      - important: The token must have the following scope `update:users`
      */
-    public func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
+    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
         return self.link(identifier, withUser: userId, provider: provider, connectionId: connectionId)
     }
 }

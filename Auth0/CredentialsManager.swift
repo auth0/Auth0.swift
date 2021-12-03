@@ -37,6 +37,7 @@ extension A0SimpleKeychain: CredentialsStorage {
     public func getEntry(forKey: String) -> Data? {
         return data(forKey: forKey)
     }
+
     public func setEntry(_ data: Data, forKey: String) -> Bool {
         return setData(data, forKey: forKey)
     }
@@ -283,7 +284,7 @@ public struct CredentialsManager {
 // MARK: - Combine
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
-extension CredentialsManager {
+public extension CredentialsManager {
 
     /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
     /// the credentials are not cleared and the subscription completes with an error.
@@ -293,7 +294,7 @@ extension CredentialsManager {
     ///
     /// - Parameter headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
     /// - Returns: a type-erased publisher.
-    public func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
+    func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {
             Future { callback in
                 return self.revoke(headers: headers) { error in
@@ -329,7 +330,7 @@ extension CredentialsManager {
     /// - Returns: a type-erased publisher.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
-    public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
+    func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
             Future { callback in
                 return self.credentials(withScope: scope,
