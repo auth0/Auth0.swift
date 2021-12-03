@@ -1,7 +1,10 @@
 import Foundation
+#if canImport(Combine)
+import Combine
+#endif
 
 #if DEBUG
-    let parameterPropertyKey = "com.auth0.parameter"
+let parameterPropertyKey = "com.auth0.parameter"
 #endif
 
 /**
@@ -21,17 +24,17 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let url: URL
     let method: String
     let handle: (Response<E>, Callback) -> Void
-    let payload: [String: Any]
+    let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
 
-    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, payload: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
+    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, parameters: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
         self.session = session
         self.url = url
         self.method = method
         self.handle = handle
-        self.payload = payload
+        self.parameters = parameters
         self.headers = headers
         self.logger = logger
         self.telemetry = telemetry
@@ -40,10 +43,10 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     var request: URLRequest {
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = method
-        if !payload.isEmpty, let httpBody = try? JSONSerialization.data(withJSONObject: payload, options: []) {
+        if !parameters.isEmpty, let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) {
             request.httpBody = httpBody
             #if DEBUG
-            URLProtocol.setProperty(payload, forKey: parameterPropertyKey, in: request)
+            URLProtocol.setProperty(parameters, forKey: parameterPropertyKey, in: request)
             #endif
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -53,9 +56,9 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     }
 
     /**
-     Starts the request to the server
+     Starts the request to the server.
 
-     - parameter callback: called when the request finishes and yield it's result
+     - parameter callback: called when the request finishes and yield it's result.
      */
     public func start(_ callback: @escaping Callback) {
         let handler = self.handle
@@ -74,25 +77,40 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     }
 
     /**
-     Modify the parameters by creating a copy of self and adding the provided parameters to `payload`.
+     Modify the parameters by creating a copy of self and adding the provided parameters to `parameters`.
 
-     - parameter payload: Additional parameters for the request. The provided map will be added to `payload`.
+     - parameter extraParameters: Additional parameters for the request. The provided dictionary will be added to `parameters`.
      */
-    public func parameters(_ payload: [String: Any]) -> Self {
-        var parameter = self.payload
-        payload.forEach { parameter[$0] = $1 }
+    public func parameters(_ extraParameters: [String: Any]) -> Self {
+        let parameters = extraParameters.merging(self.parameters) {(current, _) in current}
 
-        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, payload: parameter, headers: self.headers, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, parameters: parameters, headers: self.headers, logger: self.logger, telemetry: self.telemetry)
     }
 
     /**
      Modify the headers by creating a copy of self and adding the provided headers to `headers`.
 
-     - parameter extraHeaders: Additional headers for the request. The provided map will be added to `headers`.
+     - parameter extraHeaders: Additional headers for the request. The provided dictionary will be added to `headers`.
      */
     public func headers(_ extraHeaders: [String: String]) -> Self {
         let headers = extraHeaders.merging(self.headers) {(current, _) in current}
 
-        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, payload: self.payload, headers: headers, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, parameters: self.parameters, headers: headers, logger: self.logger, telemetry: self.telemetry)
     }
+}
+
+// MARK: - Combine
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+extension Request {
+
+    /**
+     Combine publisher for the request.
+
+     - Returns: a type-erased publisher.
+     */
+    public func publisher() -> AnyPublisher<T, E> {
+        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+    }
+
 }

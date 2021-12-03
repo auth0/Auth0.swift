@@ -1,5 +1,8 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
+#if canImport(Combine)
+import Combine
+#endif
 
 /// WebAuth Authentication using Auth0
 public protocol WebAuth: Trackable, Loggable {
@@ -118,36 +121,58 @@ public protocol WebAuth: Trackable, Loggable {
     func organization(_ organization: String) -> Self
 
     /**
-     Starts the WebAuth flow by modally presenting a ViewController in the top-most controller.
+     Starts the WebAuth flow.
 
      ```
      Auth0
          .webAuth(clientId: clientId, domain: "samples.auth0.com")
          .start { result in
-             print(result)
+             switch result {
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
          }
-     ```
-
-     Then from `AppDelegate` we just need to resume the WebAuth Auth like this
-
-     ```
-     func application(app: UIApplication, openURL url: NSURL, options: [String : Any]) -> Bool {
-         return Auth0.resumeAuth(url, options: options)
      }
      ```
 
      Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
-     and it's corresponding callback with be called with a failure result of `Authentication.Error.Cancelled`
+     and it's corresponding callback with be called with a failure result of `AuthenticationError.userCancelled`.
 
-     - parameter callback: callback called with the result of the WebAuth flow
+     - Parameter callback: callback called with the result of the WebAuth flow.
      */
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
 
     /**
-     Removes Auth0 session and optionally remove the Identity Provider session.
-     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/logout)
+     Starts the WebAuth flow.
 
-     For iOS 11+ you will need to ensure that the **Callback URL** has been added
+     ```
+     Auth0
+         .webAuth(clientId: clientId, domain: "samples.auth0.com")
+         .publisher()
+         .sink(receiveCompletion: { completion in
+             if case .failure(let error) = completion {
+                 print("Failed with \(error)")
+             }
+         }, receiveValue: { credentials in
+             print("Obtained credentials: \(credentials)")
+         })
+         .store(in: &cancellables)
+     ```
+
+     Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
+     and the subscription will complete with a failure result of `AuthenticationError.userCancelled`.
+
+     - Returns: a type-erased publisher.
+     */
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    func publisher() -> AnyPublisher<Credentials, WebAuthError>
+
+    /**
+     Removes Auth0 session and optionally remove the Identity Provider session.
+     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+
+     You will need to ensure that the **Callback URL** has been added
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
      ```
@@ -156,7 +181,7 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession { print($0) }
      ```
 
-     Remove Auth0 session and remove the IdP session.
+     Remove Auth0 session and remove the IdP session:
 
      ```
      Auth0
@@ -164,9 +189,107 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession(federated: true) { print($0) }
      ```
 
-     - parameter federated: Bool to remove the IdP session
-     - parameter callback: callback called with bool outcome of the call
+     - parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
+     - parameter callback: callback called with bool outcome of the call.
      */
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void)
+
+    /**
+     Removes Auth0 session and optionally remove the Identity Provider session.
+     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+
+     You will need to ensure that the **Callback URL** has been added
+     to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+
+     ```
+     Auth0
+         .webAuth()
+         .clearSession()
+         .sink(receiveValue: { print($0) })
+         .store(in: &cancellables)
+     ```
+
+     Remove Auth0 session and remove the IdP session:
+
+     ```
+     Auth0
+         .webAuth()
+         .clearSession(federated: true)
+         .sink(receiveValue: { print($0) })
+         .store(in: &cancellables)
+     ```
+
+     - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
+     - Returns: a type-erased publisher.
+     */
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    func clearSession(federated: Bool) -> AnyPublisher<Bool, Never>
+}
+
+// MARK: - Combine
+
+extension WebAuth {
+
+    /**
+     Removes Auth0 session and optionally remove the Identity Provider session.
+     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+
+     You will need to ensure that the **Callback URL** has been added
+     to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+
+     ```
+     Auth0
+         .webAuth()
+         .clearSession { print($0) }
+     ```
+
+     Remove Auth0 session and remove the IdP session:
+
+     ```
+     Auth0
+         .webAuth()
+         .clearSession(federated: true) { print($0) }
+     ```
+
+     - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
+     - Parameter callback: callback called with bool outcome of the call.
+     */
+    public func clearSession(federated: Bool = false, callback: @escaping (Bool) -> Void) {
+        self.clearSession(federated: federated, callback: callback)
+    }
+
+    /**
+     Removes Auth0 session and optionally remove the Identity Provider session.
+     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+
+     You will need to ensure that the **Callback URL** has been added
+     to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+
+     ```
+     Auth0
+         .webAuth()
+         .clearSession()
+         .sink(receiveValue: { print($0) })
+         .store(in: &cancellables)
+     ```
+
+     Remove Auth0 session and remove the IdP session:
+
+     ```
+     Auth0
+         .webAuth()
+         .clearSession(federated: true)
+         .sink(receiveValue: { print($0) })
+         .store(in: &cancellables)
+     ```
+
+     - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
+     - Returns: a type-erased publisher.
+     */
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    public func clearSession(federated: Bool = false) -> AnyPublisher<Bool, Never> {
+        return self.clearSession(federated: federated)
+    }
+
 }
 #endif

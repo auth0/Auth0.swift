@@ -1,3 +1,4 @@
+import Combine
 import Quick
 import Nimble
 import SimpleKeychain
@@ -38,6 +39,9 @@ class CredentialsManagerSpec: QuickSpec {
         beforeEach {
             credentialsManager = CredentialsManager(authentication: authentication)
             credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+            stub(condition: isHost(Domain)) { _
+                in HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+            }.name = "YOU SHALL NOT PASS!"
         }
 
         describe("storage") {
@@ -548,10 +552,10 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should yield a new access token with a new scope") {
-                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile offline_access")
+                    credentials = Credentials(accessToken: AccessToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "openid profile")
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials(withScope: "openid profile") { result in
+                        credentialsManager.credentials(withScope: "openid profile offline_access") { result in
                             expect(result).to(haveCredentials(NewAccessToken))
                             done()
                         }
@@ -742,5 +746,154 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
         }
+
+        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+            describe("combine") {
+                var cancellables: Set<AnyCancellable> = []
+
+                afterEach {
+                    _ = credentialsManager.clear()
+                    cancellables.removeAll()
+                }
+
+                context("credentials") {
+
+                    it("should emit only one value") {
+                        _ = credentialsManager.store(credentials: credentials)
+                        waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .credentials()
+                                .assertNoFailure()
+                                .count()
+                                .sink(receiveValue: { count in
+                                    expect(count).to(equal(1))
+                                    done()
+                                })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                    it("should complete using the default parameter values") {
+                        _ = credentialsManager.store(credentials: credentials)
+                        waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .credentials()
+                                .sink(receiveCompletion: { completion in
+                                    guard case .finished = completion else { return }
+                                    done()
+                                }, receiveValue: { _ in })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                    it("should complete using custom parameter values") {
+                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "foo": "bar"]) && hasHeader("foo", value: "bar")) { _ in
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
+                        }
+                        credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn), scope: "openid profile")
+                        _ = credentialsManager.store(credentials: credentials)
+                        waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .credentials(withScope: "openid profile offline_access",
+                                             minTTL: ValidTTL,
+                                             parameters: ["foo": "bar"],
+                                             headers: ["foo": "bar"])
+                                .sink(receiveCompletion: { completion in
+                                    guard case .finished = completion else { return }
+                                    done()
+                                }, receiveValue: { _ in })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                    it("should complete with an error") {
+                        waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .credentials()
+                                .ignoreOutput()
+                                .sink(receiveCompletion: { completion in
+                                    guard case .failure = completion else { return }
+                                    done()
+                                }, receiveValue: { _ in })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                }
+
+                context("revoke") {
+
+                    it("should emit only one value") {
+                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                            return revokeTokenResponse()
+                        }
+                        _ = credentialsManager.store(credentials: credentials)
+                        waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .revoke()
+                                .assertNoFailure()
+                                .count()
+                                .sink(receiveValue: { count in
+                                    expect(count).to(equal(1))
+                                    done()
+                                })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                    it("should complete using the default parameter values") {
+                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                            return revokeTokenResponse()
+                        }
+                        _ = credentialsManager.store(credentials: credentials)
+                        waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .revoke()
+                                .sink(receiveCompletion: { completion in
+                                    guard case .finished = completion else { return }
+                                    done()
+                                }, receiveValue: { _ in })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                    it("should complete using custom parameter values") {
+                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader("foo", value: "bar")) { _ in
+                            return revokeTokenResponse()
+                        }
+                        _ = credentialsManager.store(credentials: credentials)
+                        waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .revoke(headers: ["foo": "bar"])
+                                .sink(receiveCompletion: { completion in
+                                    guard case .finished = completion else { return }
+                                    done()
+                                }, receiveValue: { _ in })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                    it("should complete with an error") {
+                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                            return authFailure()
+                        }
+                        _ = credentialsManager.store(credentials: credentials)
+                        waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .revoke()
+                                .ignoreOutput()
+                                .sink(receiveCompletion: { completion in
+                                    guard case .failure = completion else { return }
+                                    done()
+                                }, receiveValue: { _ in })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                }
+
+            }
+        }
+
     }
 }

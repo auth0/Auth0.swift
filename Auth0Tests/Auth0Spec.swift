@@ -1,6 +1,6 @@
+import Foundation
 import Quick
 import Nimble
-import OHHTTPStubs
 
 @testable import Auth0
 
@@ -18,7 +18,7 @@ class Auth0Spec: QuickSpec {
 
                 it("should return authentication client with client id & domain") {
                     let authentication = Auth0.authentication(clientId: ClientId,
-                                                              domain: Domain) as! Auth0Authentication
+                                                              domain: Domain)
                     expect(authentication.clientId) == ClientId
                     expect(authentication.url.absoluteString) == "https://\(Domain)/"
                 }
@@ -36,7 +36,7 @@ class Auth0Spec: QuickSpec {
             context("users") {
 
                 it("should return users client with token & domain") {
-                    let users = Auth0.users(token: Token, domain: Domain) as! Management
+                    let users = Auth0.users(token: Token, domain: Domain)
                     expect(users.token) == Token
                     expect(users.url.absoluteString) == "https://\(Domain)/"
                 }
@@ -55,8 +55,7 @@ class Auth0Spec: QuickSpec {
             context("web auth") {
 
                 it("should return web auth client with client id & domain") {
-                    let webAuth = Auth0.webAuth(clientId: ClientId,
-                                                domain: Domain) as! Auth0WebAuth
+                    let webAuth = Auth0.webAuth(clientId: ClientId, domain: Domain)
                     expect(webAuth.clientId) == ClientId
                     expect(webAuth.url.absoluteString) == "https://\(Domain)/"
                 }
