@@ -181,7 +181,7 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession { print($0) }
      ```
 
-     Remove Auth0 session and remove the IdP session.
+     Remove Auth0 session and remove the IdP session:
 
      ```
      Auth0
@@ -209,7 +209,7 @@ public protocol WebAuth: Trackable, Loggable {
          .store(in: &cancellables)
      ```
 
-     Remove Auth0 session and remove the IdP session.
+     Remove Auth0 session and remove the IdP session:
 
      ```
      Auth0
@@ -243,7 +243,7 @@ extension WebAuth {
          .clearSession { print($0) }
      ```
 
-     Remove Auth0 session and remove the IdP session.
+     Remove Auth0 session and remove the IdP session:
 
      ```
      Auth0
@@ -273,7 +273,7 @@ extension WebAuth {
          .store(in: &cancellables)
      ```
 
-     Remove Auth0 session and remove the IdP session.
+     Remove Auth0 session and remove the IdP session:
 
      ```
      Auth0

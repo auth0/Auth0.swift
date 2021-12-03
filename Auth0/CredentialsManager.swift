@@ -286,9 +286,10 @@ public struct CredentialsManager {
 extension CredentialsManager {
 
     /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
-    /// the credentials are not cleared and an error is raised through the callback.
+    /// the credentials are not cleared and the subscription completes with an error.
     ///
-    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the subscription completes
+    /// without an error.
     ///
     /// - parameter headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
     /// - Returns: a type-erased publisher.
@@ -303,9 +304,9 @@ extension CredentialsManager {
         }.eraseToAnyPublisher()
     }
 
-    /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired
-    /// otherwise the retrieved credentials will be returned as they have not expired. Renewed credentials will be
-    /// stored in the keychain.
+    /// Retrieve credentials from the keychain and yield new credentials using `refreshToken` if `accessToken` has expired,
+    /// otherwise the subscription will complete with the retrieved credentials as they have not expired. Renewed credentials will
+    /// be stored in the keychain.
     ///
     /// ```
     /// credentialsManager
