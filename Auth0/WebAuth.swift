@@ -139,7 +139,7 @@ public protocol WebAuth: Trackable, Loggable {
      Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
      and it's corresponding callback with be called with a failure result of `AuthenticationError.userCancelled`.
 
-     - parameter callback: callback called with the result of the WebAuth flow.
+     - Parameter callback: callback called with the result of the WebAuth flow.
      */
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
 
