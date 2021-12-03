@@ -123,7 +123,6 @@ class RequestSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         request
                             .publisher()
-                            .assertNoFailure()
                             .sink(receiveCompletion: { completion in
                                 guard case .finished = completion else { return }
                                 done()

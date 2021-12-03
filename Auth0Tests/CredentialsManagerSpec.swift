@@ -798,7 +798,6 @@ class CredentialsManagerSpec: QuickSpec {
                                              minTTL: ValidTTL,
                                              parameters: ["foo": "bar"],
                                              headers: ["foo": "bar"])
-                                .assertNoFailure()
                                 .sink(receiveCompletion: { completion in
                                     guard case .finished = completion else { return }
                                     done()
@@ -850,7 +849,6 @@ class CredentialsManagerSpec: QuickSpec {
                         waitUntil(timeout: Timeout) { done in
                             credentialsManager
                                 .revoke()
-                                .assertNoFailure()
                                 .sink(receiveCompletion: { completion in
                                     guard case .finished = completion else { return }
                                     done()
@@ -867,7 +865,6 @@ class CredentialsManagerSpec: QuickSpec {
                         waitUntil(timeout: Timeout) { done in
                             credentialsManager
                                 .revoke(headers: ["foo": "bar"])
-                                .assertNoFailure()
                                 .sink(receiveCompletion: { completion in
                                     guard case .finished = completion else { return }
                                     done()
