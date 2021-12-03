@@ -10,8 +10,6 @@ import OHHTTPStubsSwift
 @testable import Auth0
 
 private let Url = URL(string: "https://samples.auth0.com")!
-private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let Timeout: DispatchTimeInterval = .seconds(2)
 
 class RequestSpec: QuickSpec {
@@ -99,7 +97,7 @@ class RequestSpec: QuickSpec {
 
                 it("should emit only one value") {
                     stub(condition: isHost(Url.host!)) { _ in
-                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                        return HTTPStubsResponse(jsonObject: [:], statusCode: 200, headers: nil)
                     }
                     let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                     waitUntil(timeout: Timeout) { done in
@@ -117,7 +115,7 @@ class RequestSpec: QuickSpec {
 
                 it("should complete with the response") {
                     stub(condition: isHost(Url.host!)) { _ in
-                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                        return HTTPStubsResponse(jsonObject: ["foo": "bar"], statusCode: 200, headers: nil)
                     }
                     let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                     waitUntil(timeout: Timeout) { done in
