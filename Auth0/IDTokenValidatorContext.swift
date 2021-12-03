@@ -5,26 +5,13 @@ struct IDTokenValidatorContext: IDTokenSignatureValidatorContext, IDTokenClaimsV
     let issuer: String
     let audience: String
     let jwksRequest: Request<JWKS, AuthenticationError>
-    let nonce: String?
     let leeway: Int
     let maxAge: Int?
+    let nonce: String?
     let organization: String?
+}
 
-    init(issuer: String,
-         audience: String,
-         jwksRequest: Request<JWKS, AuthenticationError>,
-         leeway: Int,
-         maxAge: Int?,
-         nonce: String?,
-         organization: String?) {
-        self.issuer = issuer
-        self.audience = audience
-        self.jwksRequest = jwksRequest
-        self.leeway = leeway
-        self.maxAge = maxAge
-        self.nonce = nonce
-        self.organization = organization
-    }
+extension IDTokenValidatorContext {
 
     init(authentication: Authentication,
          issuer: String,
@@ -40,5 +27,6 @@ struct IDTokenValidatorContext: IDTokenSignatureValidatorContext, IDTokenClaimsV
                   nonce: nonce,
                   organization: organization)
     }
+
 }
 #endif
