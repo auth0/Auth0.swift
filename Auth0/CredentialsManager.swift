@@ -291,7 +291,7 @@ extension CredentialsManager {
     /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the subscription completes
     /// without an error.
     ///
-    /// - parameter headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
+    /// - Parameter headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
     /// - Returns: a type-erased publisher.
     public func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {

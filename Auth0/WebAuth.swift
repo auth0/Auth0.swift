@@ -139,7 +139,7 @@ public protocol WebAuth: Trackable, Loggable {
      Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
      and it's corresponding callback with be called with a failure result of `AuthenticationError.userCancelled`.
 
-     - parameter callback: callback called with the result of the WebAuth flow.
+     - Parameter callback: callback called with the result of the WebAuth flow.
      */
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
 
@@ -219,7 +219,7 @@ public protocol WebAuth: Trackable, Loggable {
          .store(in: &cancellables)
      ```
 
-     - parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
+     - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
      - Returns: a type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
@@ -251,8 +251,8 @@ extension WebAuth {
          .clearSession(federated: true) { print($0) }
      ```
 
-     - parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
-     - parameter callback: callback called with bool outcome of the call.
+     - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
+     - Parameter callback: callback called with bool outcome of the call.
      */
     public func clearSession(federated: Bool = false, callback: @escaping (Bool) -> Void) {
         self.clearSession(federated: federated, callback: callback)
@@ -283,7 +283,7 @@ extension WebAuth {
          .store(in: &cancellables)
      ```
 
-     - parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
+     - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
      - Returns: a type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
