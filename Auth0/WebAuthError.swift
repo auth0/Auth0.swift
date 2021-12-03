@@ -39,7 +39,7 @@ public struct WebAuthError: Auth0Error {
         case .malformedInvitationURL(let url): return "The invitation URL (\(url)) is missing the required query "
             + "parameters 'invitation' and 'organization'."
         case .userCancelled: return "User cancelled Web Authentication."
-        case .noAuthorizationCode(let values): return "No authorization code found in \(values)"
+        case .noAuthorizationCode(let values): return "No authorization code found in \(values)."
         case .pkceNotAllowed: return "Unable to complete authentication with PKCE. PKCE support can be enabled by "
             + "setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app "
             + "in the Auth0 Dashboard."

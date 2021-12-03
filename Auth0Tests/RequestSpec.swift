@@ -110,7 +110,7 @@ class RequestSpec: QuickSpec {
                             .assertNoFailure()
                             .count()
                             .sink(receiveValue: { count in
-                                expect(count).to(equal(1))
+                                expect(count) == 1
                                 done()
                             })
                             .store(in: &cancellables)
