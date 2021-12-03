@@ -57,60 +57,12 @@ public struct UserInfo: JSONObjectPayload {
 
     public let customClaims: [String: Any]?
 
-    public init(sub: String,
-                name: String?,
-                givenName: String?,
-                familyName: String?,
-                middleName: String?,
-                nickname: String?,
-                preferredUsername: String?,
-                profile: URL?,
-                picture: URL?,
-                website: URL?,
-                email: String?,
-                emailVerified: Bool?,
-                gender: String?,
-                birthdate: String?,
-                zoneinfo: TimeZone?,
-                locale: Locale?,
-                phoneNumber: String?,
-                phoneNumberVerified: Bool?,
-                address: [String: String]?,
-                updatedAt: Date?,
-                customClaims: [String: Any]?) {
-        self.sub = sub
+}
 
-        self.name = name
-        self.givenName = givenName
-        self.familyName = familyName
-        self.middleName = middleName
-        self.nickname = nickname
-        self.preferredUsername = preferredUsername
-
-        self.profile = profile
-        self.picture = picture
-        self.website = website
-
-        self.email = email
-        self.emailVerified = emailVerified
-
-        self.gender = gender
-        self.birthdate = birthdate
-
-        self.zoneinfo = zoneinfo
-        self.locale = locale
-
-        self.phoneNumber = phoneNumber
-        self.phoneNumberVerified = phoneNumberVerified
-        self.address = address
-
-        self.updatedAt = updatedAt
-
-        self.customClaims = customClaims
-    }
+public extension UserInfo {
 
     // swiftlint:disable:next function_body_length
-    public init?(json: [String: Any]) {
+    init?(json: [String: Any]) {
         guard let sub = json["sub"] as? String else { return nil }
 
         let name = json["name"] as? String
@@ -175,4 +127,5 @@ public struct UserInfo: JSONObjectPayload {
                   updatedAt: updatedAt,
                   customClaims: customClaims)
     }
+
 }
