@@ -21,6 +21,10 @@ class RequestSpec: QuickSpec {
             }.name = "YOU SHALL NOT PASS!"
         }
 
+        afterEach {
+            HTTPStubs.removeAllStubs()
+        }
+
         describe("create and update request") {
 
             context("parameters") {

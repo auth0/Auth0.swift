@@ -33,7 +33,7 @@ public struct WebAuthError: Auth0Error {
      Description of the error
      - important: You should avoid displaying the error description to the user, it's meant for debugging only.
      */
-    public var localizedDescription: String {
+    public var debugDescription: String {
         switch self.code {
         case .noBundleIdentifier: return "Unable to retrieve the bundle identifier."
         case .malformedInvitationURL(let url): return "The invitation URL (\(url)) is missing the required query "
@@ -64,16 +64,6 @@ extension WebAuthError: Equatable {
     public static func == (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
         return lhs.code == rhs.code && lhs.localizedDescription == rhs.localizedDescription
     }
-
-}
-
-extension WebAuthError: CustomDebugStringConvertible {
-
-    /**
-     Description of the error, returns the same value as `localizedDescription`
-     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
-     */
-    public var debugDescription: String { return self.localizedDescription }
 
 }
 

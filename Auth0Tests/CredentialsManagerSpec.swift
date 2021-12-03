@@ -44,6 +44,10 @@ class CredentialsManagerSpec: QuickSpec {
             }.name = "YOU SHALL NOT PASS!"
         }
 
+        afterEach {
+            HTTPStubs.removeAllStubs()
+        }
+
         describe("storage") {
 
             afterEach {

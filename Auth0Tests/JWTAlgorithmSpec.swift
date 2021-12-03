@@ -13,10 +13,6 @@ class JWTAlgorithmSpec: QuickSpec {
             context("RS256") {
                 let alg = "RS256"
                 
-                it("should verify the signature") {
-                    expect(JWTAlgorithm.rs256.shouldVerify).to(beTrue())
-                }
-                
                 it("should return true with a correct RS256 signature") {
                     let jwt = generateJWT(alg: alg)
                     

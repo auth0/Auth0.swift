@@ -13,7 +13,17 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
     
     override func spec() {
         let domain = self.domain
-        
+
+        beforeEach {
+            stub(condition: isHost(domain)) { _
+                in HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+            }.name = "YOU SHALL NOT PASS!"
+        }
+
+        afterEach {
+            HTTPStubs.removeAllStubs()
+        }
+
         describe("signature validation") {
             let signatureValidator = IDTokenSignatureValidator(context: validatorContext)
             
@@ -39,7 +49,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -53,7 +63,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -70,7 +80,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -82,7 +92,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -94,7 +104,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
