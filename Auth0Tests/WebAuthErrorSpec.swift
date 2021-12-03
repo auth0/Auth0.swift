@@ -13,6 +13,7 @@ class WebAuthErrorSpec: QuickSpec {
             it("should initialize with type") {
                 let error = WebAuthError(code: .other)
                 expect(error.code) == WebAuthError.Code.other
+                expect(error.cause).to(beNil())
             }
 
             it("should initialize with type & cause") {
@@ -53,6 +54,20 @@ class WebAuthErrorSpec: QuickSpec {
             it("should not pattern match by code with a generic error") {
                 let error = WebAuthError(code: .other)
                 expect(error ~= (WebAuthError.unknown) as Error) == false
+            }
+
+        }
+
+        describe("debug description") {
+
+            it("should match the localized message") {
+                let error = WebAuthError(code: .other)
+                expect(error.debugDescription) == WebAuthError.other.debugDescription
+            }
+
+            it("should match the error description") {
+                let error = WebAuthError(code: .other)
+                expect(error.debugDescription) == WebAuthError.other.errorDescription
             }
 
         }
