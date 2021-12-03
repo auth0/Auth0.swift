@@ -252,7 +252,7 @@ extension WebAuth {
      ```
 
      - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
-     - parameter callback: callback called with bool outcome of the call.
+     - Parameter callback: callback called with bool outcome of the call.
      */
     public func clearSession(federated: Bool = false, callback: @escaping (Bool) -> Void) {
         self.clearSession(federated: federated, callback: callback)
