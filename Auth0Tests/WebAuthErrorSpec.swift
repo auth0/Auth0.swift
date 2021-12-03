@@ -31,7 +31,7 @@ class WebAuthErrorSpec: QuickSpec {
 
             it("should return message for no authorization code") {
                 let values: [String: String] = ["foo": "bar"]
-                let message = "No authorization code found in \(values)"
+                let message = "No authorization code found in \(values)."
                 let error = WebAuthError(code: .noAuthorizationCode(values))
                 expect(error.localizedDescription) == message
             }
