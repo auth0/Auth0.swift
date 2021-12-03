@@ -13,7 +13,7 @@ public protocol WebAuth: Trackable, Loggable {
     /**
      Specify a connection name to be used to authenticate.
 
-     By default no connection is specified, so the Universal Login  page will be displayed
+     By default no connection is specified, so the Universal Login page will be displayed
 
      - parameter connection: name of the connection to use
 
