@@ -79,13 +79,13 @@ extension WebAuthError: CustomDebugStringConvertible {
 
 // MARK: - Pattern Matching Operator
 
-extension WebAuthError {
+public extension WebAuthError {
 
-    public static func ~= (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
+    static func ~= (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
         return lhs.code == rhs.code
     }
 
-    public static func ~= (lhs: WebAuthError, rhs: Error) -> Bool {
+    static func ~= (lhs: WebAuthError, rhs: Error) -> Bool {
         guard let rhs = rhs as? WebAuthError else { return false }
         return lhs.code == rhs.code
     }

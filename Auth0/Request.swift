@@ -102,14 +102,14 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 // MARK: - Combine
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
-extension Request {
+public extension Request {
 
     /**
      Combine publisher for the request.
 
      - Returns: a type-erased publisher.
      */
-    public func publisher() -> AnyPublisher<T, E> {
+    func publisher() -> AnyPublisher<T, E> {
         return Deferred { Future(self.start) }.eraseToAnyPublisher()
     }
 

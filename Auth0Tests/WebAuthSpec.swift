@@ -410,7 +410,7 @@ class WebAuthSpec: QuickSpec {
                     expect(storage.current).toNot(beNil())
                 }
 
-                it("should hava a generated state") {
+                it("should have a generated state") {
                     let auth = newWebAuth()
                     auth.start({ _ in})
                     expect(storage.current?.state).toNot(beNil())
