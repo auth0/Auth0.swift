@@ -219,7 +219,7 @@ public protocol WebAuth: Trackable, Loggable {
          .store(in: &cancellables)
      ```
 
-     - parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
+     - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
      - Returns: a type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
