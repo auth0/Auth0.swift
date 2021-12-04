@@ -14,7 +14,7 @@ Auth0.swift no longer supports Objective-C.
 
 ## Supported platform versions
 
-The deployment targets for each platform have been raised to:
+The deployment targets for each platform were raised to:
 
 - iOS 12.0
 - macOS 10.15
@@ -42,22 +42,22 @@ The default scope value in Web Auth and all the Authentication client methods (e
 
 ### Protocols
 
-The following protocols have been removed:
+`AuthTransaction` is no longer public, and the following protocols were removed:
 
 - `AuthResumable`
 - `AuthCancelable`
 - `AuthProvider`
 - `NativeAuthTransaction`
 
-`AuthResumable` and `AuthCancelable` have been subsumed in `AuthTransaction`.
+`AuthResumable` and `AuthCancelable` were subsumed in `AuthTransaction`.
 
 ### Type aliases
 
-The iOS-only type alias `A0URLOptionsKey` has been removed, as it is no longer needed.
+The iOS-only type alias `A0URLOptionsKey` was removed, as it is no longer needed.
 
 ### Enums
 
-The custom `Result` enum has been removed, along with its shims. Auth0.swift is now using the Swift 5 `Result` type.
+The custom `Result` enum was removed, along with its shims. Auth0.swift is now using the Swift 5 `Result` type.
 
 ### Structs
 
@@ -68,7 +68,7 @@ The following structs were removed, as they were no longer being used:
 
 ### Classes
 
-The following Objective-C compatibility wrappers have been removed:
+The following Objective-C compatibility wrappers were removed:
 
 - `_ObjectiveAuthenticationAPI`
 - `_ObjectiveManagementAPI`
@@ -115,14 +115,14 @@ Auth0.webAuth()
 
 #### Other methods
 
-The following methods have been removed and have no replacement, as they rely on deprecated endpoints:
+The following methods were removed and have no replacement, as they rely on deprecated endpoints:
 
 - `loginSocial(token:connection:scope:parameters:)`
 - `delegation(withParameters:)`
 
 ### Web Auth
 
-Auth0.swift now only supports the [authorization code flow with PKCE](https://auth0.com/blog/oauth-2-best-practices-for-native-apps/), which is used by default. For this reason, the following methods have been removed from the Web Auth builder:
+Auth0.swift now only supports the [authorization code flow with PKCE](https://auth0.com/blog/oauth-2-best-practices-for-native-apps/), which is used by default. For this reason, the following methods were removed from the Web Auth builder:
 
 - `usingImplicitGrant()`
 - `responseType(_:)`
@@ -285,7 +285,7 @@ The properties are no longer marked with the `@objc` attribute. Additionally, th
 
 ### `NSError` extension
 
-These properties have been removed:
+These properties were removed:
 
 - `a0_isManagementError`
 - `a0_isAuthenticationError`
@@ -434,19 +434,3 @@ The `CredentialsManager` class no longer takes into account the ID Token expirat
 ### Thread-safety when renewing credentials with the `CredentialsManager` 
 
 The method `credentials(withScope:minTTL:parameters:callback:)` of the `CredentialsManager` class will now execute the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
-
-## Title of change
-
-Description of change
-
-### Before
-
-```swift
-// Some code
-```
-
-### After
-
-```swift
-// Some code
-```
