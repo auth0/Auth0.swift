@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-#if swift(>=5.5)
+#if compiler(>=5.5)
 let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst]
 #else
 let webAuthPlatforms: [Platform] = [.iOS, .macOS]

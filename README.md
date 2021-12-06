@@ -113,6 +113,21 @@ Auth0
 ```
 </details>
 
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .webAuth()
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
 ### Configuration
 
 In order to use Auth0 you need to provide your Auth0 **ClientId** and **Domain**.
@@ -200,8 +215,8 @@ Auth0
    .userInfo(withAccessToken: accessToken)
    .start { result in
        switch result {
-       case .success(let profile):
-           print("User Profile: \(profile)")
+       case .success(let user):
+           print("User: \(user)")
        case .failure(let error):
            print("Failed with \(error)")
        }
@@ -220,10 +235,26 @@ Auth0
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
-    }, receiveValue: { profile in
-        print("User Profile: \(profile)")
+    }, receiveValue: { user in
+        print("User: \(user)")
     })
     .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .authentication()
+        .userInfo(withAccessToken: accessToken)
+        .start()
+    print("User: \(user)")
+} catch {
+    print("Failed with \(error)")
+}
 ```
 </details>
 
@@ -261,6 +292,22 @@ Auth0
         print("Obtained new credentials: \(credentials)")
     })
     .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .renew(withRefreshToken: refreshToken)
+        .start()
+    print("Obtained new credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
 ```
 </details>
 
@@ -367,6 +414,19 @@ credentialsManager
 ```
 </details>
 
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await credentialsManager.credentials()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
 #### Clearing credentials and revoking refresh tokens
 
 Credentials can be cleared by using the `clear` function, which clears credentials from the Keychain.
@@ -400,6 +460,19 @@ credentialsManager
         print("Success")
     }, receiveValue: { _ in })
     .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    try await credentialsManager.revoke()
+    print("Success")
+} catch {
+    print("Failed with \(error)")
+}
 ```
 </details>
 
@@ -546,6 +619,47 @@ Auth0
 
 > This requires `Password` Grant or `http://auth0.com/oauth/grant-type/password-realm`.
 
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+   .authentication()
+   .login(usernameOrEmail: "support@auth0.com",
+          password: "secret-password",
+          realm: "Username-Password-Authentication",
+          scope: "openid profile")
+   .publisher()
+   .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(usernameOrEmail: "support@auth0.com",
+               password: "secret-password",
+               realm: "Username-Password-Authentication",
+               scope: "openid profile")
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
 #### Sign up with database connection
 
 ```swift
@@ -558,12 +672,53 @@ Auth0
     .start { result in
         switch result {
         case .success(let user):
-            print("User Signed up: \(user)")
+            print("User signed up: \(user)")
         case .failure(let error):
             print("Failed with \(error)")
         }
     }
 ```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+   .authentication()
+   .createUser(email: "support@auth0.com",
+               password: "secret-password",
+               connection: "Username-Password-Authentication",
+               userMetadata: ["first_name": "First", "last_name": "Last"])
+   .publisher()
+   .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { user in
+        print("User signed up: \(user)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .authentication()
+        .createUser(email: "support@auth0.com",
+                    password: "secret-password",
+                    connection: "Username-Password-Authentication",
+                    userMetadata: ["first_name": "First", "last_name": "Last"])
+        .start()
+    print("User signed up: \(user)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
 
 ### Management API (Users)
 
@@ -579,13 +734,48 @@ Auth0
     .link("user identifier", withOtherUserToken: "another user token")
     .start { result in
         switch result {
-        case .success(let userInfo):
-            print("User: \(userInfo)")
+        case .success(let user):
+            print("User: \(user)")
         case .failure(let error):
             print("Failed with \(error)")
         }
     }
 ```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+   .users(token: idToken)
+   .link("user identifier", withOtherUserToken: "another user token")
+   .publisher()
+   .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { user in
+        print("User: \(user)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .users(token: idToken)
+        .link("user identifier", withOtherUserToken: "another user token")
+        .start()
+    print("User: \(user)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
 
 ### Custom Domains
 
