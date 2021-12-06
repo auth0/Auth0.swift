@@ -85,7 +85,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = issValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -98,7 +98,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = issValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -125,7 +125,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = subValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -153,7 +153,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = audValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -166,7 +166,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = audValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -181,7 +181,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = audValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -211,7 +211,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = expValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -226,7 +226,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = expValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
                 
                 it("should return an error if exp + leeway is in the past") {
@@ -239,7 +239,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = expValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -266,7 +266,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = iatValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -294,7 +294,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = nonceValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -307,7 +307,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = nonceValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -338,7 +338,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = azpValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -351,7 +351,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = azpValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -382,7 +382,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = authTimeValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -399,7 +399,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = authTimeValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
                 
                 it("should return an error if last auth time + max age + leeway is in the future") {
@@ -412,7 +412,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = authTimeValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -440,7 +440,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = organizationValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             
@@ -453,7 +453,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let result = organizationValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
                 }
             }
             

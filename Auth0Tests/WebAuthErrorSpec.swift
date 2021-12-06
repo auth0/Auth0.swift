@@ -8,6 +8,70 @@ class WebAuthErrorSpec: QuickSpec {
 
     override func spec() {
 
+        describe("init") {
+
+            it("should initialize with type") {
+                let error = WebAuthError(code: .other)
+                expect(error.code) == WebAuthError.Code.other
+                expect(error.cause).to(beNil())
+            }
+
+            it("should initialize with type & cause") {
+                let cause = AuthenticationError(description: "")
+                let error = WebAuthError(code: .other, cause: cause)
+                expect(error.cause).to(matchError(cause))
+            }
+
+        }
+
+        describe("operators") {
+
+            it("should be equal by code") {
+                let error = WebAuthError(code: .other)
+                expect(error) == WebAuthError.other
+            }
+
+            it("should not be equal by code") {
+                let error = WebAuthError(code: .other)
+                expect(error) != WebAuthError.unknown
+            }
+
+            it("should pattern match by code") {
+                let error = WebAuthError(code: .other)
+                expect(error ~= WebAuthError.other) == true
+            }
+
+            it("should not pattern match by code") {
+                let error = WebAuthError(code: .other)
+                expect(error ~= WebAuthError.unknown) == false
+            }
+
+            it("should pattern match by code with a generic error") {
+                let error = WebAuthError(code: .other)
+                expect(error ~= (WebAuthError.other) as Error) == true
+            }
+
+            it("should not pattern match by code with a generic error") {
+                let error = WebAuthError(code: .other)
+                expect(error ~= (WebAuthError.unknown) as Error) == false
+            }
+
+        }
+
+        describe("debug description") {
+
+            it("should match the localized message") {
+                let error = WebAuthError(code: .other)
+                expect(error.debugDescription) == WebAuthError.other.debugDescription
+            }
+
+            it("should match the error description") {
+                let error = WebAuthError(code: .other)
+                expect(error.debugDescription) == WebAuthError.other.errorDescription
+            }
+
+        }
+
         describe("error message") {
 
             it("should return message for no bundle identifier") {
@@ -31,7 +95,7 @@ class WebAuthErrorSpec: QuickSpec {
 
             it("should return message for no authorization code") {
                 let values: [String: String] = ["foo": "bar"]
-                let message = "No authorization code found in \(values)"
+                let message = "No authorization code found in \(values)."
                 let error = WebAuthError(code: .noAuthorizationCode(values))
                 expect(error.localizedDescription) == message
             }
