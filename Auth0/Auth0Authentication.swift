@@ -270,20 +270,6 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func tokenExchange() -> Request<Credentials, AuthenticationError> {
-        let payload: [String: Any] = [
-            "client_id": self.clientId
-        ]
-        let token = URL(string: "oauth/token", relativeTo: self.url)!
-        return Request(session: session,
-                       url: token,
-                       method: "POST",
-                       handle: codable,
-                       parameters: payload,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
-    }
-
     func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
         return self.tokenExchange().parameters([
             "code": code,
@@ -340,6 +326,7 @@ struct Auth0Authentication: Authentication {
 // MARK: - Private Methods
 
 private extension Auth0Authentication {
+
     func login(username: String, otp: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
@@ -360,6 +347,20 @@ private extension Auth0Authentication {
                        telemetry: self.telemetry)
     }
 
+    func tokenExchange() -> Request<Credentials, AuthenticationError> {
+        let payload: [String: Any] = [
+            "client_id": self.clientId
+        ]
+        let token = URL(string: "oauth/token", relativeTo: self.url)!
+        return Request(session: session,
+                       url: token,
+                       method: "POST",
+                       handle: codable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
     func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = parameters ?? [:]
         parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
@@ -369,4 +370,5 @@ private extension Auth0Authentication {
         parameters["scope"] = scope
         return self.tokenExchange().parameters(parameters)
     }
+
 }
