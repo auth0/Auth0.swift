@@ -15,7 +15,17 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
         let validatorContext = self.validatorContext
         let mockSignatureValidator = MockSuccessfulIDTokenSignatureValidator()
         let mockClaimsValidator = MockSuccessfulIDTokenClaimsValidator()
-        
+
+        beforeEach {
+            stub(condition: isHost(domain)) { _
+                in HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+            }.name = "YOU SHALL NOT PASS!"
+        }
+
+        afterEach {
+            HTTPStubs.removeAllStubs()
+        }
+
         describe("top level validation api") {
             
             context("id token decoding") {
@@ -28,7 +38,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -41,7 +51,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -54,7 +64,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -68,7 +78,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }

@@ -45,7 +45,7 @@ public struct ManagementError: Auth0APIError {
      Description of the error
      - important: You should avoid displaying the description to the user, it's meant for debugging only.
      */
-    public var localizedDescription: String {
+    public var debugDescription: String {
         if let string = self.info["description"] as? String {
             return string
         }
@@ -61,16 +61,6 @@ extension ManagementError: Equatable {
             && lhs.statusCode == rhs.statusCode
             && lhs.localizedDescription == rhs.localizedDescription
     }
-
-}
-
-extension ManagementError: CustomDebugStringConvertible {
-
-    /**
-     Description of the error, returns the same value as `localizedDescription`
-     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
-     */
-    public var debugDescription: String { return self.localizedDescription }
 
 }
 

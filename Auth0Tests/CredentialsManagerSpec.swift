@@ -44,6 +44,10 @@ class CredentialsManagerSpec: QuickSpec {
             }.name = "YOU SHALL NOT PASS!"
         }
 
+        afterEach {
+            HTTPStubs.removeAllStubs()
+        }
+
         describe("storage") {
 
             afterEach {
@@ -766,7 +770,7 @@ class CredentialsManagerSpec: QuickSpec {
                                 .assertNoFailure()
                                 .count()
                                 .sink(receiveValue: { count in
-                                    expect(count).to(equal(1))
+                                    expect(count) == 1
                                     done()
                                 })
                                 .store(in: &cancellables)
@@ -834,7 +838,7 @@ class CredentialsManagerSpec: QuickSpec {
                                 .assertNoFailure()
                                 .count()
                                 .sink(receiveValue: { count in
-                                    expect(count).to(equal(1))
+                                    expect(count) == 1
                                     done()
                                 })
                                 .store(in: &cancellables)

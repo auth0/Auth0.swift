@@ -3,11 +3,11 @@ import Foundation
 import JWTDecode
 
 protocol JWTValidator {
-    func validate(_ jwt: JWT) -> LocalizedError?
+    func validate(_ jwt: JWT) -> Auth0Error?
 }
 
 protocol JWTAsyncValidator {
-    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void)
+    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void)
 }
 
 struct IDTokenValidator: JWTAsyncValidator {
@@ -23,7 +23,7 @@ struct IDTokenValidator: JWTAsyncValidator {
         self.context = context
     }
 
-    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
+    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             self.signatureValidator.validate(jwt) { error in
                 if let error = error { return callback(error) }
@@ -36,10 +36,10 @@ struct IDTokenValidator: JWTAsyncValidator {
     }
 }
 
-enum IDTokenDecodingError: LocalizedError {
+enum IDTokenDecodingError: Auth0Error {
     case cannotDecode
 
-    var errorDescription: String? {
+    var debugDescription: String {
         switch self {
         case .cannotDecode: return "ID token could not be decoded"
         }
@@ -50,7 +50,7 @@ func validate(idToken: String,
               with context: IDTokenValidatorContext,
               signatureValidator: JWTAsyncValidator? = nil, // for testing
               claimsValidator: JWTValidator? = nil,
-              callback: @escaping (LocalizedError?) -> Void) {
+              callback: @escaping (Auth0Error?) -> Void) {
     guard let jwt = try? decode(jwt: idToken) else { return callback(IDTokenDecodingError.cannotDecode) }
     var claimValidators: [JWTValidator] = [IDTokenIssValidator(issuer: context.issuer),
                                            IDTokenSubValidator(),

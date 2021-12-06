@@ -9,12 +9,12 @@ protocol IDTokenSignatureValidatorContext {
 }
 
 struct IDTokenSignatureValidator: JWTAsyncValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case invalidAlgorithm(actual: String, expected: String)
         case missingPublicKey(kid: String)
         case invalidSignature
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .invalidAlgorithm(let actual, let expected):
                 return "Signature algorithm of \"\(actual)\" is not supported. Expected the ID token to be signed with \"\(expected)\""
@@ -30,10 +30,9 @@ struct IDTokenSignatureValidator: JWTAsyncValidator {
         self.context = context
     }
 
-    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
+    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void) {
         if let error = validateAlg(jwt) { return callback(error) }
         let algorithm = jwt.algorithm!
-        guard algorithm.shouldVerify else { return callback(nil) }
         if let error = validateKid(jwt) { return callback(error) }
         let kid = jwt.kid!
 
@@ -51,7 +50,7 @@ struct IDTokenSignatureValidator: JWTAsyncValidator {
         }
     }
 
-    private func validateAlg(_ jwt: JWT) -> LocalizedError? {
+    private func validateAlg(_ jwt: JWT) -> Auth0Error? {
         let defaultAlgorithm = JWTAlgorithm.rs256.rawValue
         guard jwt.algorithm != nil else {
             let actualAlgorithm = jwt.header["alg"] as? String
@@ -60,7 +59,7 @@ struct IDTokenSignatureValidator: JWTAsyncValidator {
         return nil
     }
 
-    private func validateKid(_ jwt: JWT) -> LocalizedError? {
+    private func validateKid(_ jwt: JWT) -> Auth0Error? {
         let kid = jwt.kid
         guard kid != nil else { return ValidationError.missingPublicKey(kid: kid.debugDescription) }
         return nil

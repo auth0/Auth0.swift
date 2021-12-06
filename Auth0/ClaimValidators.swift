@@ -17,17 +17,17 @@ struct IDTokenClaimsValidator: JWTValidator {
         self.validators = validators
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         return validators.first { $0.validate(jwt) != nil }?.validate(jwt)
     }
 }
 
 struct IDTokenIssValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case missingIss
         case mismatchedIss(actual: String, expected: String)
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .missingIss: return "Issuer (iss) claim must be a string present in the ID token"
             case .mismatchedIss(let actual, let expected):
@@ -42,7 +42,7 @@ struct IDTokenIssValidator: JWTValidator {
         self.expectedIss = issuer
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         guard let actualIss = jwt.issuer else { return ValidationError.missingIss }
         guard actualIss == expectedIss else {
             return ValidationError.mismatchedIss(actual: actualIss, expected: expectedIss)
@@ -52,29 +52,29 @@ struct IDTokenIssValidator: JWTValidator {
 }
 
 struct IDTokenSubValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case missingSub
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .missingSub: return "Subject (sub) claim must be a string present in the ID token"
             }
         }
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         guard let sub = jwt.subject, !sub.isEmpty else { return ValidationError.missingSub }
         return nil
     }
 }
 
 struct IDTokenAudValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case missingAud
         case mismatchedAudString(actual: String, expected: String)
         case mismatchedAudArray(actual: [String], expected: String)
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .missingAud:
                 return "Audience (aud) claim must be a string or array of strings present in the ID token"
@@ -92,7 +92,7 @@ struct IDTokenAudValidator: JWTValidator {
         self.expectedAud = audience
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         guard let actualAud = jwt.audience, !actualAud.isEmpty else { return ValidationError.missingAud }
         guard actualAud.contains(expectedAud) else {
             return actualAud.count == 1 ?
@@ -104,11 +104,11 @@ struct IDTokenAudValidator: JWTValidator {
 }
 
 struct IDTokenExpValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case missingExp
         case pastExp(baseTime: Double, expirationTime: Double)
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .missingExp: return "Expiration time (exp) claim must be a number present in the ID token"
             case .pastExp(let baseTime, let expirationTime):
@@ -125,7 +125,7 @@ struct IDTokenExpValidator: JWTValidator {
         self.leeway = leeway
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         guard let exp = jwt.expiresAt else { return ValidationError.missingExp }
         let baseTimeEpoch = baseTime.timeIntervalSince1970
         let expEpoch = exp.timeIntervalSince1970 + Double(leeway)
@@ -137,28 +137,28 @@ struct IDTokenExpValidator: JWTValidator {
 }
 
 struct IDTokenIatValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case missingIat
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .missingIat: return "Issued At (iat) claim must be a number present in the ID token"
             }
         }
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         guard jwt.issuedAt != nil else { return ValidationError.missingIat }
         return nil
     }
 }
 
 struct IDTokenNonceValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case missingNonce
         case mismatchedNonce(actual: String, expected: String)
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .missingNonce: return "Nonce (nonce) claim must be a string present in the ID token"
             case .mismatchedNonce(let actual, let expected):
@@ -173,7 +173,7 @@ struct IDTokenNonceValidator: JWTValidator {
         self.expectedNonce = nonce
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         guard let actualNonce = jwt.claim(name: "nonce").string else { return ValidationError.missingNonce }
         guard actualNonce == expectedNonce else {
             return ValidationError.mismatchedNonce(actual: actualNonce, expected: expectedNonce)
@@ -183,11 +183,11 @@ struct IDTokenNonceValidator: JWTValidator {
 }
 
 struct IDTokenAzpValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case missingAzp
         case mismatchedAzp(actual: String, expected: String)
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .missingAzp:
                 return "Authorized Party (azp) claim must be a string present in the ID token when Audience (aud) claim has multiple values"
@@ -203,7 +203,7 @@ struct IDTokenAzpValidator: JWTValidator {
         self.expectedAzp = authorizedParty
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         guard let actualAzp = jwt.claim(name: "azp").string else { return ValidationError.missingAzp }
         guard actualAzp == expectedAzp else {
             return ValidationError.mismatchedAzp(actual: actualAzp, expected: expectedAzp)
@@ -213,11 +213,11 @@ struct IDTokenAzpValidator: JWTValidator {
 }
 
 struct IDTokenAuthTimeValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case missingAuthTime
         case pastLastAuth(baseTime: Double, lastAuthTime: Double)
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .missingAuthTime:
                 return "Authentication Time (auth_time) claim must be a number present in the ID token when Max Age (max_age) is specified"
@@ -237,7 +237,7 @@ struct IDTokenAuthTimeValidator: JWTValidator {
         self.maxAge = maxAge
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         guard let authTime = jwt.claim(name: "auth_time").date else { return ValidationError.missingAuthTime }
         let currentTimeEpoch = baseTime.timeIntervalSince1970
         let authTimeEpoch = authTime.timeIntervalSince1970 + Double(maxAge) + Double(leeway)
@@ -249,11 +249,11 @@ struct IDTokenAuthTimeValidator: JWTValidator {
 }
 
 struct IDTokenOrgIdValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case missingOrgId
         case mismatchedOrgId(actual: String, expected: String)
 
-        var errorDescription: String? {
+        var debugDescription: String {
             switch self {
             case .missingOrgId: return "Organization Id (org_id) claim must be a string present in the ID token"
             case .mismatchedOrgId(let actual, let expected):
@@ -268,7 +268,7 @@ struct IDTokenOrgIdValidator: JWTValidator {
         self.expectedOrganization = organization
     }
 
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         guard let actualOrganization = jwt.claim(name: "org_id").string else { return ValidationError.missingOrgId }
         guard actualOrganization == expectedOrganization else {
             return ValidationError.mismatchedOrgId(actual: actualOrganization, expected: expectedOrganization)
