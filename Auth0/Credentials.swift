@@ -1,5 +1,15 @@
 import Foundation
 
+private struct StructCredentials {
+    let accessToken: String
+    let tokenType: String
+    let idToken: String
+    let refreshToken: String?
+    let expiresIn: Date
+    let scope: String?
+    let recoveryCode: String?
+}
+
 /**
  User's credentials obtained from Auth0.
  */
@@ -20,6 +30,18 @@ public final class Credentials: NSObject {
     public let scope: String?
     /// MFA recovery code that the application must display to the end-user to be stored securely for future use
     public let recoveryCode: String?
+
+    public override var description: String {
+        let redacted = "<REDACTED>"
+        let values = StructCredentials(accessToken: redacted,
+                                       tokenType: self.tokenType,
+                                       idToken: redacted,
+                                       refreshToken: (self.refreshToken != nil) ? redacted : nil,
+                                       expiresIn: self.expiresIn,
+                                       scope: self.scope,
+                                       recoveryCode: (self.recoveryCode != nil) ? redacted : nil)
+        return String(describing: values).replacingOccurrences(of: "StructCredentials", with: "Credentials")
+    }
 
     public init(accessToken: String = "",
                 tokenType: String = "",
