@@ -6,11 +6,10 @@ Represents an ongoing Auth transaction with an Identity Provider (Auth0 or a thi
 
 The Auth will be done outside of application control, Safari or third party application.
 The only way to communicate the results back is using a url with a registered custom scheme in your application so the OS can open it on success/failure.
-When that happens the OS will call a method in your `AppDelegate` and that is where you need to handle the result.
 
 - important: Only one AuthTransaction can be active at a given time for Auth0.swift, if you start a new one before finishing the current one it will be cancelled.
 */
-public protocol AuthTransaction {
+protocol AuthTransaction {
 
     /// value of the OAuth 2.0 state parameter. It must be a cryptographically secure random string used to protect the app with request forgery.
     var state: String? { get }
