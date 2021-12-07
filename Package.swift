@@ -2,10 +2,16 @@
 
 import PackageDescription
 
-let webAuthFlag: (name: String, condition: BuildSettingCondition) = ("WEB_AUTH_PLATFORM",
-                                                                     .when(platforms: [.iOS, .macOS]))
-let cSettings: [CSetting] = [.define(webAuthFlag.name, webAuthFlag.condition)]
-let swiftSettings: [SwiftSetting] = [.define(webAuthFlag.name, webAuthFlag.condition)]
+var webAuthPlatforms: [Platform] = [.iOS, .macOS]
+
+#if swift(>=5.5)
+webAuthPlatforms.append(.macCatalyst)
+#endif
+
+let webAuthFlag = "WEB_AUTH_PLATFORM"
+let webAuthCondition: BuildSettingCondition = .when(platforms: webAuthPlatforms)
+let cSettings: [CSetting] = [.define(webAuthFlag, webAuthCondition)]
+let swiftSettings: [SwiftSetting] = [.define(webAuthFlag, webAuthCondition)]
 
 let package = Package(
     name: "Auth0",

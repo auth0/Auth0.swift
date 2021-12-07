@@ -1,5 +1,27 @@
 # Change Log
 
+## [1.38.0](https://github.com/auth0/Auth0.swift/tree/1.38.0) (2021-10-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.37.1...1.38.0)
+
+**Deprecated**
+- Deprecate the `responseType` Web Auth method [\#525](https://github.com/auth0/Auth0.swift/pull/525) ([Widcket](https://github.com/Widcket))
+
+## [1.37.1](https://github.com/auth0/Auth0.swift/tree/1.37.1) (2021-10-15)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.37.0...1.37.1)
+
+**Fixed**
+- Add `Carthage/Build` to the frameworks search path [\#521](https://github.com/auth0/Auth0.swift/pull/521) ([Widcket](https://github.com/Widcket))
+- Add `.macCatalyst` to Package.swift [\#518](https://github.com/auth0/Auth0.swift/pull/518) ([Widcket](https://github.com/Widcket))
+
+## [1.37.0](https://github.com/auth0/Auth0.swift/tree/1.37.0) (2021-10-12)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.36.0...1.37.0)
+
+**Changed**
+- Updated dependencies [\#505](https://github.com/auth0/Auth0.swift/pull/505) ([Widcket](https://github.com/Widcket))
+
+**Deprecated**
+- Deprecate `resumeAuth` and `useLegacyAuthentication` [\#514](https://github.com/auth0/Auth0.swift/pull/514) ([Widcket](https://github.com/Widcket))
+
 ## [1.36.0](https://github.com/auth0/Auth0.swift/tree/1.36.0) (2021-09-01)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.35.0...1.36.0)
 
