@@ -77,7 +77,7 @@ struct PKCE: OAuth2Grant {
                                                        nonce: self.defaults["nonce"],
                                                        organization: self.organization)
         authentication
-            .tokenExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
+            .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
             .start { result in
                 switch result {
                 case .failure(let error) where error.localizedDescription == "Unauthorized":

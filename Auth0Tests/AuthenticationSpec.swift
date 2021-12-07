@@ -1006,7 +1006,7 @@ class AuthenticationSpec: QuickSpec {
             it("should exchange code for tokens") {
                 stub(condition: isToken(Domain) && hasAtLeast(["code": code, "code_verifier": codeVerifier, "grant_type": "authorization_code", "redirect_uri": redirectURI])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Code Exchange Auth"
                 waitUntil(timeout: Timeout) { done in
-                    auth.tokenExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
+                    auth.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
                     }
@@ -1019,7 +1019,7 @@ class AuthenticationSpec: QuickSpec {
                     let description = "Invalid code"
                     let invalidCode = "return invalid code"
                     stub(condition: isToken(Domain) && hasAtLeast(["code": invalidCode])) { _ in return authFailure(code: code, description: description) }.name = "Invalid Code"
-                    auth.tokenExchange(withCode: invalidCode, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
+                    auth.codeExchange(withCode: invalidCode, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }

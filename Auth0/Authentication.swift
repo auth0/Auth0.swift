@@ -411,22 +411,6 @@ public protocol Authentication: Trackable, Loggable {
     func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError>
 
     /**
-     Perform a OAuth2 token request against Auth0.
-
-     ```
-     Auth0
-        .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .tokenExchange()
-        .parameters(["key": "value"])
-        .start { print($0) }
-     ```
-
-     - returns: a request that will yield Auth0 user's credentials
-     - seeAlso: exchangeCode(codeVerifier:, redirectURI:) for PKCE
-     */
-    func tokenExchange() -> Request<Credentials, AuthenticationError>
-
-    /**
      Performs the last step of Proof Key for Code Exchange [RFC 7636](https://tools.ietf.org/html/rfc7636).
 
      This will request User's token using the code and it's verifier after a request to `/oauth/authorize`
@@ -434,7 +418,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
         .authentication(clientId: clientId, domain: "samples.auth0.com")
-        .tokenExchange(withCode: "a code", codeVerifier: "code verifier", redirectURI: "https://samples.auth0.com/callback")
+        .codeExchange(withCode: "a code", codeVerifier: "code verifier", redirectURI: "https://samples.auth0.com/callback")
         .start { print($0) }
      ```
 
@@ -445,7 +429,7 @@ public protocol Authentication: Trackable, Loggable {
      - returns: a request that will yield Auth0 user's credentials
      - seeAlso: https://tools.ietf.org/html/rfc7636
      */
-    func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Renew user's credentials with a refresh_token grant for `/oauth/token`
