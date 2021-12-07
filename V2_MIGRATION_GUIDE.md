@@ -42,14 +42,14 @@ The default scope value in Web Auth and all the Authentication client methods (e
 
 ### Protocols
 
-`AuthTransaction` is no longer public, and the following protocols were removed:
+The following protocols were removed:
 
 - `AuthResumable`
 - `AuthCancelable`
 - `AuthProvider`
 - `NativeAuthTransaction`
 
-`AuthResumable` and `AuthCancelable` were subsumed in `AuthTransaction`.
+`AuthResumable` and `AuthCancelable` were subsumed in `AuthTransaction`, which is no longer public.
 
 ### Type aliases
 
@@ -169,21 +169,13 @@ The `a0_url(_:)` method is no longer public.
 
 #### Properties removed
 
-`info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
-
-#### Properties renamed
-
-`description` was renamed to `localizedDescription`, as `AuthenticationError` now conforms to `CustomStringConvertible`.
+`info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error, e.g. `error["code"]`.
 
 ### `ManagementError` struct
 
 #### Properties removed
 
-`info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
-
-#### Properties renamed
-
-`description` was renamed to `localizedDescription`, as `ManagementError` now conforms to `CustomStringConvertible`.
+`info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error, e.g. `error["code"]`.
 
 ### `WebAuthError` struct
 
@@ -384,7 +376,7 @@ class CustomStore: CredentialsStorage {
     }
 }
 
-let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore());
+let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore())
 ```
 
 #### `credentials(withScope:minTTL:parameters:callback)` 
@@ -414,7 +406,9 @@ credentialsManager.credentials { result in
 
 ## Behavior changes
 
-### `openid` scope enforced on Web Auth
+### Web Auth
+
+#### Enforcement of the `openid` scope
 
 If the scopes passed via the Web Auth method `.scope(_:)` do not include the `openid` scope, it will be added automatically.
 
@@ -427,10 +421,18 @@ Auth0
     }
 ```
 
-### Credentials expiration on `CredentialsManager` 
+### Credentials Manager
 
-The `CredentialsManager` class no longer takes into account the ID Token expiration to determine if the credentials are still valid. The only value being considered now is the Access Token expiration.
+#### Role of ID Token expiration in credentials validity
 
-### Thread-safety when renewing credentials with the `CredentialsManager` 
+The ID Token expiration is no longer used to determine if the credentials are still valid. Only the Access Token expiration is used now.
 
-The method `credentials(withScope:minTTL:parameters:callback:)` of the `CredentialsManager` class will now execute the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
+#### Role of Refresh Token in credentials validity
+
+`hasValid(minTTL:)` will no longer return `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) will determine the return value of `hasValid(minTTL:)`.
+
+Note that `hasValid(minTTL:)` is no longer being called in `credentials(withScope:minTTL:parameters:callback:)` _before_ the biometrics authentication. If you were relying on this behavior, you'll need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:callback:)` yourself.
+
+#### Thread-safety when renewing credentials
+
+The method `credentials(withScope:minTTL:parameters:callback:)` will now execute the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.

@@ -148,7 +148,7 @@ public struct CredentialsManager {
     public func hasValid(minTTL: Int = 0) -> Bool {
         guard let data = self.storage.getEntry(forKey: self.storeKey),
             let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data) else { return false }
-        return (!self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)) || credentials.refreshToken != nil
+        return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
     }
 
     /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired
@@ -176,7 +176,6 @@ public struct CredentialsManager {
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     #if WEB_AUTH_PLATFORM
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
-        guard self.hasValid(minTTL: minTTL) else { return callback(.failure(.noCredentials)) }
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
                 let error = CredentialsManagerError(code: .biometricsFailed,
@@ -195,7 +194,6 @@ public struct CredentialsManager {
     }
     #else
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
-        guard self.hasValid(minTTL: minTTL) else { return callback(.failure(.noCredentials)) }
         self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
     }
     #endif
