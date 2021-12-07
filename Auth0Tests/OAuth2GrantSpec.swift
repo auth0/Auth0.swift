@@ -18,6 +18,16 @@ class OAuth2GrantSpec: QuickSpec {
         let issuer = "\(domain.absoluteString)/"
         let leeway = 60 * 1000
 
+        beforeEach {
+            stub(condition: isHost(domain.host!)) { _ in
+                return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+            }.name = "YOU SHALL NOT PASS!"
+        }
+
+        afterEach {
+            HTTPStubs.removeAllStubs()
+        }
+
         describe("Authorization Code w/PKCE") {
 
             let method = "S256"
@@ -32,12 +42,6 @@ class OAuth2GrantSpec: QuickSpec {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nil)
             }
 
-            afterEach {
-                HTTPStubs.removeAllStubs()
-                stub(condition: isHost(domain.host!)) { _ in
-                    return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-                }.name = "YOU SHALL NOT PASS!"
-            }
 
             it("shoud build credentials") {
                 let token = UUID().uuidString

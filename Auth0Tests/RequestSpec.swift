@@ -155,5 +155,71 @@ class RequestSpec: QuickSpec {
             }
         }
 
+        #if compiler(>=5.5) && canImport(_Concurrency)
+        describe("async await") {
+
+            it("should return the response") {
+                stub(condition: isHost(Url.host!)) { _ in
+                    return HTTPStubsResponse(jsonObject: ["foo": "bar"], statusCode: 200, headers: nil)
+                }
+                let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
+                waitUntil(timeout: Timeout) { done in
+                    #if compiler(>=5.5.2)
+                    if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                        Task.init {
+                            let response = try await request.start()
+                            expect(response).toNot(beEmpty())
+                            done()
+                        }
+                    }
+                    #else
+                    if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                        Task.init {
+                            let response = try await request.start()
+                            expect(response).toNot(beEmpty())
+                            done()
+                        }
+                    } else {
+                        done()
+                    }
+                    #endif
+                }
+            }
+
+            it("should throw an error") {
+                stub(condition: isHost(Url.host!)) { _ in
+                    return authFailure()
+                }
+                let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
+                waitUntil(timeout: Timeout) { done in
+                    #if compiler(>=5.5.2)
+                    if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                        Task.init {
+                            do {
+                                _ = try await request.start()
+                            } catch {
+                                done()
+                            }
+                        }
+                    }
+                    #else
+                    if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                        Task.init {
+                            do {
+                                _ = try await request.start()
+                            } catch {
+                                done()
+                            }
+                        }
+                    } else {
+                        done()
+                    }
+                    #endif
+                }
+            }
+
+        }
+        #endif
+
     }
 }

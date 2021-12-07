@@ -741,7 +741,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentialsManager = CredentialsManager(authentication: authentication,
                                                             storage: storage)
                 }
-                
+
                 it("custom keychain should successfully set and clear credentials") {
                     _ = credentialsManager.store(credentials: credentials)
                     expect(storage.data(forKey: "credentials")).toNot(beNil())
@@ -898,6 +898,198 @@ class CredentialsManagerSpec: QuickSpec {
 
             }
         }
+
+        #if compiler(>=5.5) && canImport(_Concurrency)
+        describe("async await") {
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            context("credentials") {
+
+                it("should return the credentials using the default parameter values") {
+                    let credentialsManager = credentialsManager!
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: Timeout) { done in
+                        #if compiler(>=5.5.2)
+                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                            Task.init {
+                                _ = try await credentialsManager.credentials()
+                                done()
+                            }
+                        }
+                        #else
+                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                            Task.init {
+                                _ = try await credentialsManager.credentials()
+                                done()
+                            }
+                        } else {
+                            done()
+                        }
+                        #endif
+                    }
+                }
+
+                it("should return the credentials using custom parameter values") {
+                    let credentialsManager = credentialsManager!
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "foo": "bar"]) && hasHeader("foo", value: "bar")) { _ in
+                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
+                    }
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn), scope: "openid profile")
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: Timeout) { done in
+                        #if compiler(>=5.5.2)
+                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                            Task.init {
+                                _ = try await credentialsManager.credentials(withScope: "openid profile offline_access",
+                                                                             minTTL: ValidTTL,
+                                                                             parameters: ["foo": "bar"],
+                                                                             headers: ["foo": "bar"])
+                                done()
+                            }
+                        }
+                        #else
+                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                            Task.init {
+                                _ = try await credentialsManager.credentials(withScope: "openid profile offline_access",
+                                                                             minTTL: ValidTTL,
+                                                                             parameters: ["foo": "bar"],
+                                                                             headers: ["foo": "bar"])
+                                done()
+                            }
+                        } else {
+                            done()
+                        }
+                        #endif
+                    }
+                }
+
+                it("should throw an error") {
+                    let credentialsManager = credentialsManager!
+                    waitUntil(timeout: Timeout) { done in
+                        #if compiler(>=5.5.2)
+                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                            Task.init {
+                                do {
+                                    _ = try await credentialsManager.credentials()
+                                } catch {
+                                    done()
+                                }
+                            }
+                        }
+                        #else
+                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                            Task.init {
+                                do {
+                                    _ = try await credentialsManager.credentials()
+                                } catch {
+                                    done()
+                                }
+                            }
+                        } else {
+                            done()
+                        }
+                        #endif
+                    }
+                }
+
+            }
+
+            context("revoke") {
+
+                it("should revoke using the default parameter values") {
+                    let credentialsManager = credentialsManager!
+                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                        return revokeTokenResponse()
+                    }
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: Timeout) { done in
+                        #if compiler(>=5.5.2)
+                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                            Task.init {
+                                _ = try await credentialsManager.revoke()
+                                done()
+                            }
+                        }
+                        #else
+                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                            Task.init {
+                                _ = try await credentialsManager.revoke()
+                                done()
+                            }
+                        } else {
+                            done()
+                        }
+                        #endif
+                    }
+                }
+
+                it("should revoke using custom parameter values") {
+                    let credentialsManager = credentialsManager!
+                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader("foo", value: "bar")) { _ in
+                        return revokeTokenResponse()
+                    }
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: Timeout) { done in
+                        #if compiler(>=5.5.2)
+                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                            Task.init {
+                                _ = try await credentialsManager.revoke(headers: ["foo": "bar"])
+                                done()
+                            }
+                        }
+                        #else
+                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                            Task.init {
+                                _ = try await credentialsManager.revoke(headers: ["foo": "bar"])
+                                done()
+                            }
+                        } else {
+                            done()
+                        }
+                        #endif
+                    }
+                }
+
+                it("should throw an error") {
+                    let credentialsManager = credentialsManager!
+                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                        return authFailure()
+                    }
+                    _ = credentialsManager.store(credentials: credentials)
+                    waitUntil(timeout: Timeout) { done in
+                        #if compiler(>=5.5.2)
+                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                            Task.init {
+                                do {
+                                    _ = try await credentialsManager.revoke()
+                                } catch {
+                                    done()
+                                }
+                            }
+                        }
+                        #else
+                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                            Task.init {
+                                do {
+                                    _ = try await credentialsManager.revoke()
+                                } catch {
+                                    done()
+                                }
+                            }
+                        } else {
+                            done()
+                        }
+                        #endif
+                    }
+                }
+
+            }
+
+        }
+        #endif
 
     }
 }
