@@ -270,8 +270,8 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func tokenExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
-        return self.tokenExchange().parameters([
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
+        return self.token().parameters([
             "code": code,
             "code_verifier": codeVerifier,
             "redirect_uri": redirectURI,
@@ -347,7 +347,7 @@ private extension Auth0Authentication {
                        telemetry: self.telemetry)
     }
 
-    func tokenExchange() -> Request<Credentials, AuthenticationError> {
+    func token() -> Request<Credentials, AuthenticationError> {
         let payload: [String: Any] = [
             "client_id": self.clientId
         ]
@@ -368,7 +368,7 @@ private extension Auth0Authentication {
         parameters["subject_token_type"] = subjectTokenType
         parameters["audience"] = audience
         parameters["scope"] = scope
-        return self.tokenExchange().parameters(parameters)
+        return self.token().parameters(parameters)
     }
 
 }

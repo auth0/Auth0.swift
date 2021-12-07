@@ -99,12 +99,12 @@ Use `userInfo(withAccessToken:)` instead.
 
 #### `tokenExchange(withParameters:)`
 
-Use `tokenExchange(withCode:codeVerifier:redirectURI:)` instead. To pass custom parameters, use the `parameters(_:)` method from `Request`:
+Use `codeExchange(withCode:codeVerifier:redirectURI:)` instead. To pass custom parameters, use the `parameters(_:)` method from `Request`:
 
 ```swift
 Auth0
     .authentication()
-    .tokenExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI) 
+    .codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI) 
     .parameters(["key": "value"]) // 👈🏻
     .start { result in
         // ...
@@ -311,6 +311,10 @@ These properties were removed:
 #### Errors
 
 The Authentication API client methods will now only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
+
+#### Renamed `tokenExchange(withCode:codeVerifier:redirectURI:)`
+
+The method `tokenExchange(withCode:codeVerifier:redirectURI:)` was renamed to `codeExchange(withCode:codeVerifier:redirectURI:)`.
 
 #### Removed `parameters` parameter
 
