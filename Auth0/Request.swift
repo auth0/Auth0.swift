@@ -58,7 +58,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     /**
      Starts the request to the server.
 
-     - parameter callback: called when the request finishes and yield it's result.
+     - Parameter callback: called when the request finishes and yield it's result.
      */
     public func start(_ callback: @escaping Callback) {
         let handler = self.handle
@@ -114,3 +114,32 @@ public extension Request {
     }
 
 }
+
+// MARK: - Async/Await
+
+#if compiler(>=5.5) && canImport(_Concurrency)
+public extension Request {
+
+    /**
+     Starts the request to the server.
+
+     - Throws: An error that conforms to `Auth0APIError`; either an `AuthenticationError` or a `ManagementError`.
+     */
+    #if compiler(>=5.5.2)
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    func start() async throws -> T {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.start(continuation.resume)
+        }
+    }
+    #else
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func start() async throws -> T {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.start(continuation.resume)
+        }
+    }
+    #endif
+
+}
+#endif

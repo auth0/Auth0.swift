@@ -2,7 +2,8 @@
 import Foundation
 
 extension URLComponents {
-    var a0_fragmentValues: [String: String] {
+
+    var fragmentValues: [String: String] {
         var dict: [String: String] = [:]
         let items = fragment?.components(separatedBy: "&")
         items?.forEach { item in
@@ -17,10 +18,11 @@ extension URLComponents {
         return dict
     }
 
-    var a0_queryValues: [String: String] {
+    var queryValues: [String: String] {
         var dict: [String: String] = [:]
         self.queryItems?.forEach { dict[$0.name] = $0.value }
         return dict
     }
+
 }
 #endif
