@@ -11,6 +11,42 @@ Auth0.swift v2 includes many significant changes:
 
 As expected with a major release, Auth0.swift v2 contains breaking changes. Please review this guide thorougly to understand the changes required to migrate your app to v2.
 
+- [Supported languages](#supported-languages)
+    * [Swift](#swift)
+    * [Objective-C](#objective-c)
+- [Supported platform versions](#supported-platform-versions)
+- [Default values](#default-values)
+    * [Scope](#scope)
+- [Types removed](#types-removed)
+    * [Protocols](#protocols)
+    * [Type aliases](#type-aliases)
+    * [Enums](#enums)
+    * [Structs](#structs)
+    * [Classes](#classes)
+- [Methods removed](#methods-removed)
+    * [Authentication client](#authentication-client)
+    * [Web Auth](#web-auth)
+    * [Credentials Manager](#credentials-manager)
+    * [Errors](#errors)
+    * [Extensions](#extensions)
+- [Types changed](#types-changed)
+- [Type properties changed](#type-properties-changed)
+    * [`AuthenticationError` struct](#-authenticationerror--struct)
+    * [`ManagementError` struct](#-managementerror--struct)
+    * [`WebAuthError` struct](#-webautherror--struct)
+    * [`CredentialsManagerError` struct](#-credentialsmanagererror--struct)
+    * [`UserInfo` struct](#-userinfo--struct)
+    * [`Credentials` class](#-credentials--class)
+    * [`NSError` extension](#-nserror--extension)
+- [Method signatures changed](#method-signatures-changed)
+    * [Authentication client](#authentication-client-1)
+    * [Management client](#management-client)
+    * [Web Auth](#web-auth-1)
+    * [Credentials Manager](#credentials-manager-1)
+- [Behavior changes](#behavior-changes)
+    + [Web Auth](#web-auth-2)
+    + [Credentials Manager](#credentials-manager-2)
+
 ## Supported languages
 
 ### Swift
@@ -30,16 +66,6 @@ The deployment targets for each platform were raised to:
 - Mac Catalyst 13.0
 - tvOS 12.0
 - watchOS 6.2
-
-## Supported JWT signature algorithms
-
-ID Tokens signed with the HS256 algorithm are no longer allowed. 
-This is because HS256 is a symmetric algorithm, which is not suitable for public clients like mobile apps.
-The only algorithm supported now is RS256, an asymmetric algorithm.
-
-If your app is using HS256, you'll need to switch it to RS256 in the dashboard or login will fail with an error:
-
-**Your app's settings > Advanced settings > JSON Web Token (JWT) Signature Algorithm**
 
 ## Default values
 
@@ -88,7 +114,7 @@ The following classes were also removed, as they were no longer being used:
 - `Profile`
 - `Identity`
 
-## Methods Removed
+## Methods removed
 
 The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed.
 
@@ -313,7 +339,7 @@ These properties were removed:
 
 #### Errors
 
-The Authentication API client methods only yields errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
+The Authentication API client methods only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
 
 #### Renamed `tokenExchange(withCode:codeVerifier:redirectURI:)`
 
@@ -435,6 +461,16 @@ credentialsManager.credentials { result in
 ## Behavior changes
 
 ### Web Auth
+
+#### Supported JWT signature algorithms
+
+ID Tokens signed with the HS256 algorithm are no longer allowed. 
+This is because HS256 is a symmetric algorithm, which is not suitable for public clients like mobile apps.
+The only algorithm supported now is RS256, an asymmetric algorithm.
+
+If your app is using HS256, you'll need to switch it to RS256 in the dashboard or login will fail with an error:
+
+**Your app's settings > Advanced settings > JSON Web Token (JWT) Signature Algorithm**
 
 #### Enforcement of the `openid` scope
 
