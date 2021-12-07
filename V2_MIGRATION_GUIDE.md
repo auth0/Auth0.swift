@@ -1,6 +1,15 @@
 # V2 MIGRATION GUIDE
 
-Guide to migrating from `1.x` to `2.x`
+Auth0.swift v2 includes many significant changes:
+
+- Retrieving credentials from the Credentials Manager is now thread-safe.
+- The Credentials Manager is now decoupled from SimpleKeychain.
+- Usage of the Swift 5 `Result` type.
+- Support for custom headers.
+- Support for Combine and async/await.
+- Simplified error handling.
+
+As expected with a major release, Auth0.swift v2 contains breaking changes. Please review this guide thorougly to understand the changes required to migrate your app to v2.
 
 ## Supported languages
 
@@ -288,7 +297,7 @@ These properties were removed:
 
 #### Errors
 
-The Authentication API client methods will now only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
+The Authentication API client methods only yields errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
 
 #### Removed `parameters` parameter
 
@@ -337,19 +346,19 @@ The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `cha
 
 #### Errors
 
-The Management API client methods will now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError`.
+The methods of the Management API client now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError`.
 
 ### Web Auth
 
 #### Errors
 
-The Web Auth methods will now only yield errors of type `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError`.
+The Web Auth methods now only yield errors of type  `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError`.
 
 ### Credentials Manager
 
 #### Errors
 
-The Credentials Manager methods will now only yield errors of type `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError`.
+The methods of the Credentials Manager now only yield errors of type  `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError`.
 
 #### Initializer
 
@@ -429,10 +438,10 @@ The ID Token expiration is no longer used to determine if the credentials are st
 
 #### Role of Refresh Token in credentials validity
 
-`hasValid(minTTL:)` will no longer return `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) will determine the return value of `hasValid(minTTL:)`.
+`hasValid(minTTL:)` longer returns `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
 
 Note that `hasValid(minTTL:)` is no longer being called in `credentials(withScope:minTTL:parameters:callback:)` _before_ the biometrics authentication. If you were relying on this behavior, you'll need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:callback:)` yourself.
 
 #### Thread-safety when renewing credentials
 
-The method `credentials(withScope:minTTL:parameters:callback:)` will now execute the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
+The method `credentials(withScope:minTTL:parameters:callback:)` now executes the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
