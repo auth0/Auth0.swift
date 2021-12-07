@@ -3,7 +3,7 @@ import Foundation
 public typealias ManagementObject = [String: Any]
 
 /**
- *  Auth0 Management API
+ *  Auth0 Management API.
  */
 struct Management: Trackable, Loggable {
     let token: String

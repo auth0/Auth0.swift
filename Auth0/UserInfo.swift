@@ -1,7 +1,7 @@
 import Foundation
 
-/// OIDC Standard Claims user information
-/// - note: [Claims](https://auth0.com/docs/security/tokens/json-web-tokens/json-web-token-claims)
+/// OIDC Standard Claims user information.
+/// - Note: [Claims](https://auth0.com/docs/security/tokens/json-web-tokens/json-web-token-claims)
 public struct UserInfo: JSONObjectPayload {
 
     public static let publicClaims = [

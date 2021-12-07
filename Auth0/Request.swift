@@ -8,12 +8,12 @@ let parameterPropertyKey = "com.auth0.parameter"
 #endif
 
 /**
- Auth0 API request
+ Auth0 API request.
 
  ```
  let request: Request<Credentials, Authentication.Error> = //
  request.start { result in
-    //handle result
+    print(result)
  }
  ```
  */
@@ -58,7 +58,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     /**
      Starts the request to the server.
 
-     - Parameter callback: called when the request finishes and yield it's result.
+     - Parameter callback: Called when the request finishes and yield it's result.
      */
     public func start(_ callback: @escaping Callback) {
         let handler = self.handle
@@ -79,7 +79,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     /**
      Modify the parameters by creating a copy of self and adding the provided parameters to `parameters`.
 
-     - parameter extraParameters: Additional parameters for the request. The provided dictionary will be added to `parameters`.
+     - Parameter extraParameters: Additional parameters for the request. The provided dictionary will be added to `parameters`.
      */
     public func parameters(_ extraParameters: [String: Any]) -> Self {
         let parameters = extraParameters.merging(self.parameters) {(current, _) in current}
@@ -90,7 +90,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     /**
      Modify the headers by creating a copy of self and adding the provided headers to `headers`.
 
-     - parameter extraHeaders: Additional headers for the request. The provided dictionary will be added to `headers`.
+     - Parameter extraHeaders: Additional headers for the request. The provided dictionary will be added to `headers`.
      */
     public func headers(_ extraHeaders: [String: String]) -> Self {
         let headers = extraHeaders.merging(self.headers) {(current, _) in current}
@@ -107,7 +107,7 @@ public extension Request {
     /**
      Combine publisher for the request.
 
-     - Returns: a type-erased publisher.
+     - Returns: A type-erased publisher.
      */
     func publisher() -> AnyPublisher<T, E> {
         return Deferred { Future(self.start) }.eraseToAnyPublisher()

@@ -11,9 +11,9 @@ public extension Loggable {
     /**
      Turn on Auth0.swift debug logging of HTTP requests and OAuth2 flow (iOS only) with a custom logger.
 
-     - parameter logger: logger used to print log statements
-     - note: By default all logging is **disabled**
-     - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
+     - Parameter logger: logger used to print log statements
+     - Note: By default all logging is **disabled**
+     - Important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
      */
     func using(logger: Logger) -> Self {
         var loggable = self
@@ -24,9 +24,9 @@ public extension Loggable {
     /**
      Turn on/off Auth0.swift debug logging of HTTP requests and OAuth2 flow (iOS only).
 
-     - parameter enabled: optional flag to turn on/off logging
-     - note: By default all logging is **disabled**
-     - important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
+     - Parameter enabled: optional flag to turn on/off logging
+     - Note: By default all logging is **disabled**
+     - Important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
      */
     func logging(enabled: Bool) -> Self {
         var loggable = self

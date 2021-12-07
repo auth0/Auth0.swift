@@ -1,6 +1,7 @@
 import Foundation
 
 public extension String {
+
     func a0_decodeBase64URLSafe() -> Data? {
         let lengthMultiple = 4
         let paddingLength = lengthMultiple - count % lengthMultiple
@@ -11,4 +12,5 @@ public extension String {
             + padding
         return Data(base64Encoded: base64EncodedString)
     }
+
 }

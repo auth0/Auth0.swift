@@ -5,9 +5,11 @@ public struct JWKS: Codable {
 }
 
 public extension JWKS {
+
     func key(id kid: String) -> JWK? {
         return keys.first { $0.keyId == kid }
     }
+
 }
 
 public struct JWK: Codable {
