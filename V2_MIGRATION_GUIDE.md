@@ -3,7 +3,7 @@
 Auth0.swift v2 includes many significant changes:
 
 - Retrieving credentials from the Credentials Manager is now thread-safe.
-- The Credentials Manager is now decoupled from SimpleKeychain.
+- The Credentials Manager is now decoupled from [SimpleKeychain](https://github.com/auth0/SimpleKeychain).
 - Usage of the Swift 5 `Result` type.
 - Support for custom headers.
 - Support for Combine and async/await.
