@@ -37,6 +37,9 @@ class BaseTransactionSpec: QuickSpec {
                                           logger: nil,
                                           callback: callback)
             result = nil
+            stub(condition: isHost(Domain.host!)) { _
+                in HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+            }.name = "YOU SHALL NOT PASS!"
             stub(condition: isToken(Domain.host!) && hasAtLeast(["code": code,
                                                                  "code_verifier": generator.verifier,
                                                                  "grant_type": "authorization_code",
@@ -45,7 +48,7 @@ class BaseTransactionSpec: QuickSpec {
             }
             stub(condition: isJWKSPath(Domain.host!)) { _ in jwksResponse() }
         }
-        
+
         afterEach {
             HTTPStubs.removeAllStubs()
         }

@@ -264,4 +264,47 @@ extension Auth0WebAuth {
 
 }
 
+// MARK: - Async/Await
+
+#if compiler(>=5.5) && canImport(_Concurrency)
+extension Auth0WebAuth {
+
+    #if compiler(>=5.5.2)
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    func start() async throws -> Credentials {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.start(continuation.resume)
+        }
+    }
+    #else
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func start() async throws -> Credentials {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.start(continuation.resume)
+        }
+    }
+    #endif
+
+    #if compiler(>=5.5.2)
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    func clearSession(federated: Bool) async -> Bool {
+        return await withCheckedContinuation { continuation in
+            self.clearSession(federated: federated) { result in
+                continuation.resume(returning: result)
+            }
+        }
+    }
+    #else
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func clearSession(federated: Bool) async -> Bool {
+        return await withCheckedContinuation { continuation in
+            self.clearSession(federated: federated) { result in
+                continuation.resume(returning: result)
+            }
+        }
+    }
+    #endif
+
+}
+#endif
 #endif

@@ -1,3 +1,4 @@
+#if WEB_AUTH_PLATFORM
 import Foundation
 
 protocol OAuth2Grant {
@@ -95,9 +96,10 @@ struct PKCE: OAuth2Grant {
     }
 
     func values(fromComponents components: URLComponents) -> [String: String] {
-        var items = components.a0_fragmentValues
-        components.a0_queryValues.forEach { items[$0] = $1 }
+        var items = components.fragmentValues
+        components.queryValues.forEach { items[$0] = $1 }
         return items
     }
 
 }
+#endif

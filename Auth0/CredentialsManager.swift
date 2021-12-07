@@ -8,41 +8,6 @@ import LocalAuthentication
 import Combine
 #endif
 
-/// Generic storage API for storing credentials
-public protocol CredentialsStorage {
-    /// Retrieve a storage entry
-    ///
-    /// - Parameters:
-    ///   - forKey: The key to get from the store
-    /// - Returns: The stored data
-    func getEntry(forKey: String) -> Data?
-
-    /// Set a storage entry
-    ///
-    /// - Parameters:
-    ///   - _: The data to be stored
-    ///   - forKey: The key to store it to
-    /// - Returns: if credentials were stored
-    func setEntry(_: Data, forKey: String) -> Bool
-
-    /// Delete a storage entry
-    ///
-    /// - Parameters:
-    ///   - forKey: The key to delete from the store
-    /// - Returns: if credentials were deleted
-    func deleteEntry(forKey: String) -> Bool
-}
-
-extension A0SimpleKeychain: CredentialsStorage {
-    public func getEntry(forKey: String) -> Data? {
-        return data(forKey: forKey)
-    }
-
-    public func setEntry(_ data: Data, forKey: String) -> Bool {
-        return setData(data, forKey: forKey)
-    }
-}
-
 /// Credentials management utility
 public struct CredentialsManager {
 
@@ -341,3 +306,81 @@ public extension CredentialsManager {
     }
 
 }
+
+// MARK: - Async/Await
+
+#if compiler(>=5.5) && canImport(_Concurrency)
+public extension CredentialsManager {
+
+    /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// the credentials are not cleared and an error is thrown.
+    ///
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and no error is thrown.
+    ///
+    /// - Parameter headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
+    /// - Throws: An error of type `CredentialsManagerError`.
+    #if compiler(>=5.5.2)
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    func revoke(headers: [String: String] = [:]) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.revoke(headers: headers) { error in
+                if let error = error { return continuation.resume(throwing: error) }
+                continuation.resume(returning: ())
+            }
+        }
+    }
+    #else
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func revoke(headers: [String: String] = [:]) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.revoke(headers: headers) { error in
+                if let error = error { return continuation.resume(throwing: error) }
+                continuation.resume(returning: ())
+            }
+        }
+    }
+    #endif
+
+    /// Retrieve credentials from the keychain and yield new credentials using `refreshToken` if `accessToken` has expired,
+    /// otherwise return the retrieved credentials as they have not expired. Renewed credentials will
+    /// be stored in the keychain.
+    ///
+    /// ```
+    /// let credentials = try await credentialsManager.credentials()
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
+    ///   - minTTL: minimum time in seconds the access token must remain valid to avoid being renewed.
+    ///   - parameters: additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
+    ///   - headers: additional headers to add to a possible token refresh. The headers will be set via Request.headers.
+    /// - Returns: the user's credentials.
+    /// - Throws: An error of type `CredentialsManagerError`.
+    /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
+    #if compiler(>=5.5.2)
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.credentials(withScope: scope,
+                             minTTL: minTTL,
+                             parameters: parameters,
+                             headers: headers,
+                             callback: continuation.resume)
+        }
+    }
+    #else
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.credentials(withScope: scope,
+                             minTTL: minTTL,
+                             parameters: parameters,
+                             headers: headers,
+                             callback: continuation.resume)
+        }
+    }
+    #endif
+
+}
+#endif
