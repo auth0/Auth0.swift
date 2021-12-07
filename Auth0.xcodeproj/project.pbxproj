@@ -93,6 +93,12 @@
 		5C80980C275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */; };
 		5C80980D275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */; };
 		5C80980E275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */; };
+		5C809D96275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D95275F878E00F15A67 /* CredentialsManagerErrorSpec.swift */; };
+		5C809D97275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D95275F878E00F15A67 /* CredentialsManagerErrorSpec.swift */; };
+		5C809D98275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D95275F878E00F15A67 /* CredentialsManagerErrorSpec.swift */; };
+		5C809D9A275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */; };
+		5C809D9B275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */; };
+		5C809D9C275FA3F000F15A67 /* ManagementErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */; };
 		5CB41D4023D0BA2C00074024 /* IDTokenValidatorContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3C23D0BA2C00074024 /* IDTokenValidatorContext.swift */; };
 		5CB41D4423D0BA2C00074024 /* IDTokenSignatureValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3D23D0BA2C00074024 /* IDTokenSignatureValidator.swift */; };
 		5CB41D4823D0BA2C00074024 /* IDTokenValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3E23D0BA2C00074024 /* IDTokenValidator.swift */; };
@@ -466,6 +472,8 @@
 		5C4F553923C9125600C89615 /* JWTAlgorithmSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTAlgorithmSpec.swift; sourceTree = "<group>"; };
 		5C60412E27482A2600EEF515 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialsStorage.swift; sourceTree = "<group>"; };
+		5C809D95275F878E00F15A67 /* CredentialsManagerErrorSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialsManagerErrorSpec.swift; sourceTree = "<group>"; };
+		5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagementErrorSpec.swift; sourceTree = "<group>"; };
 		5CB41D3C23D0BA2C00074024 /* IDTokenValidatorContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IDTokenValidatorContext.swift; sourceTree = "<group>"; };
 		5CB41D3D23D0BA2C00074024 /* IDTokenSignatureValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IDTokenSignatureValidator.swift; sourceTree = "<group>"; };
 		5CB41D3E23D0BA2C00074024 /* IDTokenValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IDTokenValidator.swift; sourceTree = "<group>"; };
@@ -869,6 +877,7 @@
 			isa = PBXGroup;
 			children = (
 				5FADB6081CED500900D4BB50 /* ManagementSpec.swift */,
+				5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */,
 				5FADB60E1CED7E5200D4BB50 /* UserPatchAttributesSpec.swift */,
 				5FADB6021CEC0C3300D4BB50 /* UsersSpec.swift */,
 			);
@@ -900,6 +909,7 @@
 				5CB41D5023D0BA3800074024 /* Validators */,
 				5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */,
 				5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */,
+				5C809D95275F878E00F15A67 /* CredentialsManagerErrorSpec.swift */,
 				5C4F552D23C9123000C89615 /* CryptoExtensions.swift */,
 				5FBBF0371CC964BC0024D2AF /* Matchers.swift */,
 				5FBBF03A1CC96AA70024D2AF /* Responses.swift */,
@@ -1673,6 +1683,7 @@
 				5FA250541D4A85A200C544FA /* WebAuthErrorSpec.swift in Sources */,
 				5CB41D7623D0C15000074024 /* IDTokenValidatorBaseSpec.swift in Sources */,
 				5B9262C31ECF0CC200F4F6D3 /* BioAuthenticationSpec.swift in Sources */,
+				5C809D96275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */,
 				5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
 				5FE2F8A61CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
@@ -1681,6 +1692,7 @@
 				5F28B4671D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5B2860D61EEF210A00C75D54 /* UserInfoSpec.swift in Sources */,
+				5C809D9A275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */,
 				5FCAB16B1D07AC3500331C84 /* OAuth2GrantSpec.swift in Sources */,
 				5BEDE1951EC333380007300D /* CredentialsManagerSpec.swift in Sources */,
 				5CB41D6223D0BAC900074024 /* IDTokenValidatorSpec.swift in Sources */,
@@ -1711,6 +1723,7 @@
 				5CE775AD244FD66300D054A0 /* WebAuthErrorSpec.swift in Sources */,
 				5FE2F8A71CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
 				5CE775A2244FCF2000D054A0 /* Generators.swift in Sources */,
+				5C809D97275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */,
 				5CE775AF244FD66D00D054A0 /* OAuth2GrantSpec.swift in Sources */,
 				5FD255B21D14A9E000387ECB /* AuthenticationErrorSpec.swift in Sources */,
 				5C53A7E92703A23200A7C0A3 /* UserInfoSpec.swift in Sources */,
@@ -1719,6 +1732,7 @@
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5CE775B2244FD70B00D054A0 /* TransactionStoreSpec.swift in Sources */,
 				5CE775A9244FCF4900D054A0 /* ClaimValidatorsSpec.swift in Sources */,
+				5C809D9B275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */,
 				5CE775A3244FCF3600D054A0 /* CryptoExtensions.swift in Sources */,
 				5CE775B3244FD71000D054A0 /* WebAuthSpec.swift in Sources */,
 				5B7EE47220FCA00300367724 /* CredentialsManagerSpec.swift in Sources */,
@@ -1821,6 +1835,8 @@
 				5F331B0A1D4BB7F900AE4382 /* ManagementSpec.swift in Sources */,
 				5F331B091D4BB7EE00AE4382 /* AuthenticationErrorSpec.swift in Sources */,
 				5F331B101D4BB80700AE4382 /* Auth0Spec.swift in Sources */,
+				5C809D9C275FA3F000F15A67 /* ManagementErrorSpec.swift in Sources */,
+				5C809D98275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */,
 				5F331B041D4BB78C00AE4382 /* TelemetrySpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

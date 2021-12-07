@@ -50,7 +50,7 @@ public protocol Auth0APIError: Auth0Error {
 
      - returns: a newly created error
      */
-    init(info: [String: Any], statusCode: Int?)
+    init(info: [String: Any], statusCode: Int)
 
     /**
      Returns a value from the error data
@@ -65,11 +65,11 @@ public protocol Auth0APIError: Auth0Error {
 
 extension Auth0APIError {
 
-    init(info: [String: Any], statusCode: Int? = 0) {
+    init(info: [String: Any], statusCode: Int = 0) {
         self.init(info: info, statusCode: statusCode)
     }
 
-    init(cause error: Error, statusCode: Int? = 0) {
+    init(cause error: Error, statusCode: Int = 0) {
         let info: [String: Any] = [
             "code": nonJSONError,
             "description": error.localizedDescription,
@@ -78,7 +78,7 @@ extension Auth0APIError {
         self.init(info: info, statusCode: statusCode)
     }
 
-    init(description: String?, statusCode: Int? = 0) {
+    init(description: String?, statusCode: Int = 0) {
         let info: [String: Any] = [
             "code": description != nil ? nonJSONError : emptyBodyError,
             "description": description ?? "Empty response body"
@@ -87,7 +87,7 @@ extension Auth0APIError {
     }
 
     init(from response: Response<Self>) {
-        self.init(description: string(response.data), statusCode: response.response?.statusCode)
+        self.init(description: string(response.data), statusCode: response.response?.statusCode ?? 0)
     }
 
 }

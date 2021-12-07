@@ -18,6 +18,90 @@ private let OAuthErrorExample = "com.auth0.authentication.example.oauth"
 class AuthenticationErrorSpec: QuickSpec {
     override func spec() {
 
+        describe("init") {
+
+            it("should initialize with info") {
+                let info: [String: Any] = ["foo": "bar"]
+                let error = AuthenticationError(info: info)
+                expect(error.info["foo"] as? String) == "bar"
+                expect(error.info.count) == 2
+                expect(error.statusCode) == 0
+            }
+
+            it("should initialize with info & status code") {
+                let info: [String: Any] = ["foo": "bar"]
+                let statusCode = 400
+                let error = AuthenticationError(info: info, statusCode: statusCode)
+                expect(error.statusCode) == statusCode
+            }
+
+            it("should initialize with cause") {
+                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+                let error = AuthenticationError(cause: cause)
+                expect(error.cause).to(matchError(cause))
+                expect(error.statusCode) == 0
+            }
+
+            it("should initialize with cause & status code") {
+                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+                let statusCode = 400
+                let error = AuthenticationError(cause: cause, statusCode: statusCode)
+                expect(error.statusCode) == statusCode
+            }
+
+            it("should initialize with description") {
+                let description = "foo"
+                let error = AuthenticationError(description: description)
+                expect(error.localizedDescription) == description
+                expect(error.statusCode) == 0
+            }
+
+            it("should initialize with description & status code") {
+                let description = "foo"
+                let statusCode = 400
+                let error = AuthenticationError(description: description, statusCode: statusCode)
+                expect(error.statusCode) == statusCode
+            }
+
+        }
+
+        describe("operators") {
+
+            it("should be equal") {
+                let info: [String: Any] = ["code": "foo", "description": "bar"]
+                let statusCode = 400
+                let error = AuthenticationError(info: info, statusCode: statusCode)
+                expect(error) == AuthenticationError(info: info, statusCode: statusCode)
+            }
+
+            it("should not be equal to an error with a different code") {
+                let description = "foo"
+                let statusCode = 400
+                let error = AuthenticationError(info: ["code": "bar", "description": description], statusCode: statusCode)
+                expect(error) != AuthenticationError(info: ["code": "baz", "description": description], statusCode: statusCode)
+            }
+
+            it("should not be equal to an error with a different status code") {
+                let info: [String: Any] = ["code": "foo", "description": "bar"]
+                let error = AuthenticationError(info: info, statusCode: 400)
+                expect(error) != AuthenticationError(info: info, statusCode: 500)
+            }
+
+            it("should not be equal to an error with a different description") {
+                let code = "foo"
+                let statusCode = 400
+                let error = AuthenticationError(info: ["code": code, "description": "bar"], statusCode: statusCode)
+                expect(error) != AuthenticationError(info: ["code": code, "description": "baz"], statusCode: statusCode)
+            }
+
+            it("should access the internal info dictionary") {
+                let info: [String: Any] = ["foo": "bar"]
+                let error = AuthenticationError(info: info)
+                expect(error["foo"]) == "bar"
+            }
+
+        }
+
         describe("oauth spec error") {
 
             itBehavesLike(OAuthErrorExample) {
@@ -89,16 +173,16 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.cause).to(beNil())
             }
 
-            it("should detect password already used") {
+            it("should detect password not strong enough") {
                 let values: [String: Any] = [
                     "code": "invalid_password",
-                    "description": "You may not reuse any of the last 2 passwords. This password was used a day ago.",
-                    "name": "PasswordHistoryError",
-                    "message": "Password has previously been used",
-                    "statusCode": 400,
+                    "description": "Password is not strong enough",
+                    "name": "PasswordStrengthError",
+                    "message": "Password is not strong enough",
+                    "statusCode": 400
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
-                expect(error.isPasswordAlreadyUsed) == true
+                expect(error.isPasswordNotStrongEnough) == true
             }
 
             it("should detect password already used") {
@@ -107,7 +191,7 @@ class AuthenticationErrorSpec: QuickSpec {
                     "description": "You may not reuse any of the last 2 passwords. This password was used a day ago.",
                     "name": "PasswordHistoryError",
                     "message": "Password has previously been used",
-                    "statusCode": 400,
+                    "statusCode": 400
                 ]
                 let error = AuthenticationError(info: values, statusCode: 400)
                 expect(error.isPasswordAlreadyUsed) == true

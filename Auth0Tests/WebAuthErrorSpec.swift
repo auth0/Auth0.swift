@@ -31,9 +31,14 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error) == WebAuthError.other
             }
 
-            it("should not be equal by code") {
+            it("should not be equal to an error with a different code") {
                 let error = WebAuthError(code: .other)
                 expect(error) != WebAuthError.unknown
+            }
+
+            it("should not be equal to an error with a different description") {
+                let error = WebAuthError(code: .unknown("foo"))
+                expect(error) != WebAuthError(code: .unknown("bar"))
             }
 
             it("should pattern match by code") {
@@ -41,7 +46,7 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error ~= WebAuthError.other) == true
             }
 
-            it("should not pattern match by code") {
+            it("should not pattern match by code with a different error") {
                 let error = WebAuthError(code: .other)
                 expect(error ~= WebAuthError.unknown) == false
             }
@@ -51,7 +56,7 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error ~= (WebAuthError.other) as Error) == true
             }
 
-            it("should not pattern match by code with a generic error") {
+            it("should not pattern match by code with a different generic error") {
                 let error = WebAuthError(code: .other)
                 expect(error ~= (WebAuthError.unknown) as Error) == false
             }
@@ -106,7 +111,19 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
-            it("should return the default message") {
+            it("should return message for unknown") {
+                let message = "foo"
+                let error = WebAuthError(code: .unknown(message))
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return the default message for id token validation failed") {
+                let message = "Failed to perform Web Auth operation."
+                let error = WebAuthError(code: .idTokenValidationFailed)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return the default message for other") {
                 let message = "Failed to perform Web Auth operation."
                 let error = WebAuthError(code: .other)
                 expect(error.localizedDescription) == message
@@ -115,4 +132,5 @@ class WebAuthErrorSpec: QuickSpec {
         }
 
     }
+
 }
