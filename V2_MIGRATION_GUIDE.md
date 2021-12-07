@@ -106,6 +106,20 @@ Use `createUser(email:username:password:connection:userMetadata:rootAttributes:`
 
 Use `userInfo(withAccessToken:)` instead.
 
+#### `tokenExchange(withParameters:)`
+
+Use `codeExchange(withCode:codeVerifier:redirectURI:)` instead. To pass custom parameters, use the `parameters(_:)` method from `Request`:
+
+```swift
+Auth0
+    .authentication()
+    .codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI) 
+    .parameters(["key": "value"]) // 👈🏻
+    .start { result in
+        // ...
+    }
+```
+
 #### `tokenExchange(withAppleAuthorizationCode:scope:audience:fullName:)`
 
 Use `login(appleAuthorizationCode:fullName:profile:audience:scope:)` instead. 
@@ -301,6 +315,10 @@ These properties were removed:
 
 The Authentication API client methods only yields errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
 
+#### Renamed `tokenExchange(withCode:codeVerifier:redirectURI:)`
+
+The method `tokenExchange(withCode:codeVerifier:redirectURI:)` was renamed to `codeExchange(withCode:codeVerifier:redirectURI:)`.
+
 #### Removed `parameters` parameter
 
 The following methods lost the `parameters` parameter:
@@ -308,14 +326,13 @@ The following methods lost the `parameters` parameter:
 - `login(phoneNumber:code:audience:scope:)`
 - `login(usernameOrEmail:password:realm:audience:scope:)`
 - `loginDefaultDirectory(withUsername:password:audience:scope:)`
-- `tokenExchange()`
 
 To pass custom parameters to those (or any) method in the Authentication client, use the `parameters(_:)` method from `Request`:
 
 ```swift
 Auth0
     .authentication()
-    .tokenExchange() // Returns a Request
+    .renew(withRefreshToken: refreshToken) // Returns a Request
     .parameters(["key": "value"]) // 👈🏻
     .start { result in
         // ...
