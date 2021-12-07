@@ -291,12 +291,6 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.hasValid()).to(beTrue())
             }
 
-            it("should have valid credentials when token expired and refresh token present") {
-                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
-                expect(credentialsManager.hasValid()).to(beTrue())
-            }
-
             it("should not have valid credentials when token expired and no refresh token present") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
@@ -307,12 +301,6 @@ class CredentialsManagerSpec: QuickSpec {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid(minTTL: ValidTTL)).to(beTrue())
-            }
-
-            it("should have valid credentials when the ttl is greater than the token lifetime and refresh token present") {
-                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
-                expect(credentialsManager.hasValid(minTTL: InvalidTTL)).to(beTrue())
             }
 
             it("should not have valid credentials when the ttl is greater than the token lifetime and no refresh token present") {
@@ -390,14 +378,6 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should error when no credentials stored") {
                 A0SimpleKeychain().clearAll()
-                credentialsManager.credentials { result in
-                    expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
-                }
-            }
-
-            it("should error when token expired") {
-                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                _ = credentialsManager.store(credentials: credentials)
                 credentialsManager.credentials { result in
                     expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
                 }

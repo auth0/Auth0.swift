@@ -1,6 +1,15 @@
 # V2 MIGRATION GUIDE
 
-Guide to migrating from `1.x` to `2.x`
+Auth0.swift v2 includes many significant changes:
+
+- Retrieving credentials from the Credentials Manager is now thread-safe.
+- The Credentials Manager is now decoupled from SimpleKeychain.
+- Usage of the Swift 5 `Result` type.
+- Support for custom headers.
+- Support for Combine and async/await.
+- Simplified error handling.
+
+As expected with a major release, Auth0.swift v2 contains breaking changes. Please review this guide thorougly to understand the changes required to migrate your app to v2.
 
 ## Supported languages
 
@@ -42,14 +51,14 @@ The default scope value in Web Auth and all the Authentication client methods (e
 
 ### Protocols
 
-`AuthTransaction` is no longer public, and the following protocols were removed:
+The following protocols were removed:
 
 - `AuthResumable`
 - `AuthCancelable`
 - `AuthProvider`
 - `NativeAuthTransaction`
 
-`AuthResumable` and `AuthCancelable` were subsumed in `AuthTransaction`.
+`AuthResumable` and `AuthCancelable` were subsumed in `AuthTransaction`, which is no longer public.
 
 ### Type aliases
 
@@ -183,21 +192,15 @@ The `a0_url(_:)` method is no longer public.
 
 #### Properties removed
 
-`info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
-
-#### Properties renamed
-
-`description` was renamed to `localizedDescription`, as `AuthenticationError` now conforms to `CustomStringConvertible`.
+- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error, e.g. `error["code"]`.
+- `description` was removed, as `AuthenticationError` now conforms to `LocalizedError`.
 
 ### `ManagementError` struct
 
 #### Properties removed
 
-`info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error; e.g. `error["code"]`.
-
-#### Properties renamed
-
-`description` was renamed to `localizedDescription`, as `ManagementError` now conforms to `CustomStringConvertible`.
+- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error, e.g. `error["code"]`.
+- `description` was removed, as `ManagementError` now conforms to `LocalizedError`.
 
 ### `WebAuthError` struct
 
@@ -310,7 +313,7 @@ These properties were removed:
 
 #### Errors
 
-The Authentication API client methods will now only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
+The Authentication API client methods only yields errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
 
 #### Renamed `tokenExchange(withCode:codeVerifier:redirectURI:)`
 
@@ -362,19 +365,19 @@ The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `cha
 
 #### Errors
 
-The Management API client methods will now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError`.
+The methods of the Management API client now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError`.
 
 ### Web Auth
 
 #### Errors
 
-The Web Auth methods will now only yield errors of type `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError`.
+The Web Auth methods now only yield errors of type  `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError`.
 
 ### Credentials Manager
 
 #### Errors
 
-The Credentials Manager methods will now only yield errors of type `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError`.
+The methods of the Credentials Manager now only yield errors of type  `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError`.
 
 #### Initializer
 
@@ -401,7 +404,7 @@ class CustomStore: CredentialsStorage {
     }
 }
 
-let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore());
+let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore())
 ```
 
 #### `credentials(withScope:minTTL:parameters:callback)` 
@@ -431,7 +434,9 @@ credentialsManager.credentials { result in
 
 ## Behavior changes
 
-### `openid` scope enforced on Web Auth
+### Web Auth
+
+#### Enforcement of the `openid` scope
 
 If the scopes passed via the Web Auth method `.scope(_:)` do not include the `openid` scope, it will be added automatically.
 
@@ -444,10 +449,18 @@ Auth0
     }
 ```
 
-### Credentials expiration on `CredentialsManager` 
+### Credentials Manager
 
-The `CredentialsManager` class no longer takes into account the ID Token expiration to determine if the credentials are still valid. The only value being considered now is the Access Token expiration.
+#### Role of ID Token expiration in credentials validity
 
-### Thread-safety when renewing credentials with the `CredentialsManager` 
+The ID Token expiration is no longer used to determine if the credentials are still valid. Only the Access Token expiration is used now.
 
-The method `credentials(withScope:minTTL:parameters:callback:)` of the `CredentialsManager` class will now execute the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
+#### Role of Refresh Token in credentials validity
+
+`hasValid(minTTL:)` longer returns `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
+
+Note that `hasValid(minTTL:)` is no longer being called in `credentials(withScope:minTTL:parameters:callback:)` _before_ the biometrics authentication. If you were relying on this behavior, you'll need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:callback:)` yourself.
+
+#### Thread-safety when renewing credentials
+
+The method `credentials(withScope:minTTL:parameters:callback:)` now executes the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
