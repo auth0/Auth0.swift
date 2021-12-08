@@ -98,7 +98,7 @@ class AuthenticationErrorSpec: QuickSpec {
             it("should access the internal info dictionary") {
                 let info: [String: Any] = ["foo": "bar"]
                 let error = AuthenticationError(info: info)
-                expect(error["foo"]) == "bar"
+                expect(error.info["foo"] as? String) == "bar"
             }
 
         }

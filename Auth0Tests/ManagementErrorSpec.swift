@@ -87,7 +87,7 @@ class ManagementErrorSpec: QuickSpec {
             it("should access the internal info dictionary") {
                 let info: [String: Any] = ["foo": "bar"]
                 let error = ManagementError(info: info)
-                expect(error["foo"]) == "bar"
+                expect(error.info["foo"] as? String) == "bar"
             }
 
         }

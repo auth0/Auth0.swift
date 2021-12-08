@@ -37,11 +37,16 @@ public extension Auth0Error {
 }
 
 /**
-   Generic representation of Auth0 API errors.
+ Generic representation of Auth0 API errors.
 
-   - Note: It's recommended to use either `AuthenticationError` or `ManagementError` for better error handling.
+ - Note: It's recommended to use either `AuthenticationError` or `ManagementError` for better error handling.
  */
 public protocol Auth0APIError: Auth0Error {
+
+    /**
+     Additional information about the error.
+     */
+    var info: [String: Any] { get }
 
     /**
      The code of the error as a String.
@@ -63,14 +68,6 @@ public protocol Auth0APIError: Auth0Error {
      - Returns: A newly created error.
      */
     init(info: [String: Any], statusCode: Int)
-
-    /**
-     Returns a value from the error data.
-
-     - Parameter key: Key of the value to return.
-     - Returns: The value of key or nil if cannot be found or is of the wrong type.
-     */
-    subscript<T>(_ key: String) -> T? { get }
 
 }
 

@@ -5,7 +5,7 @@ import Foundation
  */
 public struct AuthenticationError: Auth0APIError {
 
-    let info: [String: Any]
+    public let info: [String: Any]
 
     public init(info: [String: Any], statusCode: Int) {
         var values = info
@@ -58,12 +58,12 @@ public struct AuthenticationError: Auth0APIError {
 
     /// When password used for SignUp does not match connection's strength requirements. More info will be available in `info`
     public var isPasswordNotStrongEnough: Bool {
-        return self.code == "invalid_password" && self["name"] == "PasswordStrengthError"
+        return self.code == "invalid_password" && self.info["name"] as? String == "PasswordStrengthError"
     }
 
     /// When password used for SignUp was already used before (Reported when password history feature is enabled). More info will be available in `info`
     public var isPasswordAlreadyUsed: Bool {
-        return self.code == "invalid_password" && self["name"] == "PasswordHistoryError"
+        return self.code == "invalid_password" && self.info["name"] as? String == "PasswordHistoryError"
     }
 
     /// When Auth0 rule returns an error. The message returned by the rule will be in `description`
@@ -102,14 +102,6 @@ extension AuthenticationError: Equatable {
         return lhs.code == rhs.code
             && lhs.statusCode == rhs.statusCode
             && lhs.localizedDescription == rhs.localizedDescription
-    }
-
-}
-
-public extension AuthenticationError {
-
-    subscript<T>(_ key: String) -> T? {
-        return self.info[key] as? T
     }
 
 }
