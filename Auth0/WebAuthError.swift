@@ -2,7 +2,7 @@
 import Foundation
 
 /**
- *  Represents an error during a Web Authentication operation
+ *  Represents an error during a Web Authentication operation.
  */
 public struct WebAuthError: Auth0Error {
 
@@ -24,15 +24,8 @@ public struct WebAuthError: Auth0Error {
         self.cause = cause
     }
 
-    /**
-     The underlying `Error`, if any
-     */
     public let cause: Error?
 
-    /**
-     Description of the error
-     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
-     */
     public var debugDescription: String {
         switch self.code {
         case .noBundleIdentifier: return "Unable to retrieve the bundle identifier."

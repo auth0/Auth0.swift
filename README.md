@@ -262,7 +262,7 @@ do {
 
 #### Renew user credentials
 
-Use a [Refresh Token](https://auth0.com/docs/tokens/refresh-tokens) to renew user credentials. It's recommended that you read and understand the refresh token process before implementing.
+Use a [Refresh Token](https://auth0.com/docs/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the refresh token process before implementing.
 
 ```swift
 Auth0

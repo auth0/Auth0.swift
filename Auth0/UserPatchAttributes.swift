@@ -1,27 +1,25 @@
 import Foundation
 
-/// Atributes of the user allowed to update using `patch()` method of `Users`
+/// Atributes of the user allowed to update using `patch()` method of `Users`.
 public class UserPatchAttributes {
 
     private(set) var dictionary: [String: Any]
 
     /**
-     Creates a new attributes
+     Creates a new attributes.
 
-     - parameter dictionary: default attribute values
-
-     - returns: new attributes
+     - Parameter dictionary: Default attribute values.
+     - Returns: New attributes.
      */
     public init(dictionary: [String: Any] = [:]) {
         self.dictionary = dictionary
     }
 
     /**
-     Mark/Unmark a user as blocked
+     Mark/Unmark a user as blocked.
 
-     - parameter blocked: if the user is blocked
-
-     - returns: itself
+     - Parameter blocked: If the user is blocked.
+     - Returns: Itself.
      */
     public func blocked(_ blocked: Bool) -> UserPatchAttributes {
         dictionary["blocked"] = blocked
@@ -29,15 +27,15 @@ public class UserPatchAttributes {
     }
 
     /**
-     Changes the email of the user
+     Changes the email of the user.
 
-     - parameter email:      new email for the user
-     - parameter verified:   if the email is verified
-     - parameter verify:     if the user should verify the email
-     - parameter connection: name of the connection
-     - parameter clientId:   Auth0 clientId
-
-     - returns: itself
+     - Parameters:
+       - email:      New email for the user.
+       - verified:   If the email is verified.
+       - verify:     If the user should verify the email.
+       - connection: Name of the connection.
+       - clientId:   Auth0 clientId.
+     - Returns: Itself.
      */
     public func email(_ email: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
         dictionary["email"] = email
@@ -49,12 +47,12 @@ public class UserPatchAttributes {
     }
 
     /**
-     Sets the verified status of the email
+     Sets the verified status of the email.
 
-     - parameter verified:   if the email is verified or not
-     - parameter connection: connection name
-
-     - returns: itself
+     - Parameters:
+       - verified:   If the email is verified or not.
+       - connection: Connection name.
+     - Returns: Itself.
      */
     public func emailVerified(_ verified: Bool, connection: String) -> UserPatchAttributes {
         dictionary["email_verified"] = verified
@@ -63,15 +61,15 @@ public class UserPatchAttributes {
     }
 
     /**
-     Changes the phone number of the user (SMS connection only)
+     Changes the phone number of the user (SMS connection only).
 
-     - parameter phoneNumber:   new phone number for the user
-     - parameter verified:      if the phone number is verified
-     - parameter verify:        if the user should verify the phone number
-     - parameter connection:    name of the connection
-     - parameter clientId:   	Auth0 clientId
-
-     - returns: itself
+     - Parameters:
+       - phoneNumber: New phone number for the user.
+       - verified:    If the phone number is verified.
+       - verify:      If the user should verify the phone number.
+       - connection:  Name of the connection.
+       - clientId:    Auth0 clientId.
+     - Returns: Itself.
      */
     public func phoneNumber(_ phoneNumber: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
         dictionary["phone_number"] = phoneNumber
@@ -83,12 +81,12 @@ public class UserPatchAttributes {
     }
 
     /**
-     Sets the verified status of the phone number
+     Sets the verified status of the phone number.
 
-     - parameter verified:   if the phone number is verified or not
-     - parameter connection: connection name
-
-     - returns: itself
+     - Parameters:
+       - verified:   If the phone number is verified or not.
+       - connection: Connection name.
+     - Returns: Itself.
      */
     public func phoneVerified(_ verified: Bool, connection: String) -> UserPatchAttributes {
         dictionary["phone_verified"] = verified
@@ -97,13 +95,13 @@ public class UserPatchAttributes {
     }
 
     /**
-     Changes the user's password
+     Changes the user's password.
 
-     - parameter password:   new password for the user
-     - parameter verify:     if the password should be verified by the user
-     - parameter connection: name of the connection
-
-     - returns: itself
+     - Parameters:
+       - password:   New password for the user.
+       - verify:     If the password should be verified by the user.
+       - connection: Name of the connection.
+     - Returns: Itself.
      */
     public func password(_ password: String, verify: Bool? = nil, connection: String) -> UserPatchAttributes {
         dictionary["password"] = password
@@ -113,12 +111,12 @@ public class UserPatchAttributes {
     }
 
     /**
-     Changes the username
+     Changes the username.
 
-     - parameter username:   new username
-     - parameter connection: name of the connection
-
-     - returns: itself
+     - Parameters:
+       - username:   New username.
+       - connection: Name of the connection.
+     - Returns: Itself.
      */
     public func username(_ username: String, connection: String) -> UserPatchAttributes {
         dictionary["username"] = username
@@ -127,11 +125,10 @@ public class UserPatchAttributes {
     }
 
     /**
-     Updates user metadata
+     Updates user metadata.
 
-     - parameter metadata: new user metadata values
-
-     - returns: itself
+     - Parameter metadata: New user metadata values.
+     - Returns: Itself.
      */
     public func userMetadata(_ metadata: [String: Any]) -> UserPatchAttributes {
         dictionary["user_metadata"] = metadata
@@ -139,11 +136,10 @@ public class UserPatchAttributes {
     }
 
     /**
-     Updates app metadata
+     Updates app metadata.
 
-     - parameter metadata: new app metadata values
-
-     - returns: itself
+     - Parameter metadata: New app metadata values.
+     - Returns: Itself.
      */
     public func appMetadata(_ metadata: [String: Any]) -> UserPatchAttributes {
         dictionary["app_metadata"] = metadata

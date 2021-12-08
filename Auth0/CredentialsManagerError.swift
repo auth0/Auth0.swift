@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- *  Represents an error during a Credentials Manager operation
+ *  Represents an error during a Credentials Manager operation.
  */
 public struct CredentialsManagerError: Auth0Error {
 
@@ -21,15 +21,8 @@ public struct CredentialsManagerError: Auth0Error {
         self.cause = cause
     }
 
-    /**
-     The underlying `Error`, if any
-     */
     public let cause: Error?
 
-    /**
-     Description of the error
-     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
-     */
     public var debugDescription: String {
         switch self.code {
         case .noCredentials: return "No valid credentials found."

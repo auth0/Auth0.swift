@@ -2,6 +2,7 @@
 import Foundation
 
 extension Array where Element == UInt8 {
+
     func derEncode(as dataType: UInt8) -> [UInt8] {
         var encodedBytes: [UInt8] = [dataType]
         var numberOfBytes = count
@@ -16,5 +17,6 @@ extension Array where Element == UInt8 {
         encodedBytes.append(contentsOf: self)
         return encodedBytes
     }
+
 }
 #endif

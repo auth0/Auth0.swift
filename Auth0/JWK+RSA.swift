@@ -2,6 +2,7 @@
 import Foundation
 
 extension JWK {
+
     var rsaPublicKey: SecKey? {
         if let usage = usage, usage != "sig" { return nil }
         guard keyType == "RSA",
@@ -29,5 +30,6 @@ extension JWK {
                                            kSecAttrIsPermanent: false]
         return SecKeyCreateWithData(derEncodedData as CFData, attributes as CFDictionary, nil)
     }
+
 }
 #endif

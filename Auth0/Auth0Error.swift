@@ -6,58 +6,69 @@ let emptyBodyError = "a0.sdk.internal_error.empty"
 
 public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
 
-    /// The underlying `Error`, if any
+    /**
+     The underlying `Error`, if any. Defaults to `nil`.
+     */
     var cause: Error? { get }
 
 }
 
 public extension Auth0Error {
 
-    /// The underlying `Error`, if any
+    /**
+     The underlying `Error`, if any. Defaults to `nil`.
+     */
     var cause: Error? { return nil }
 
     /**
-     Description of the error
-     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     Description of the error.
+
+     - Important: You should avoid displaying the error description to the user, it's meant for debugging only.
      */
     var localizedDescription: String { return self.debugDescription }
 
     /**
-     Description of the error
-     - important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     Description of the error.
+
+     - Important: You should avoid displaying the error description to the user, it's meant for debugging only.
      */
     var errorDescription: String? { return self.debugDescription }
 
 }
 
 /**
-   Generic representation of Auth0 API errors
-   - note: It's recommended to use either `AuthenticationError` or `ManagementError` for better error handling
+   Generic representation of Auth0 API errors.
+
+   - Note: It's recommended to use either `AuthenticationError` or `ManagementError` for better error handling.
  */
 public protocol Auth0APIError: Auth0Error {
 
-    /// The code of the error as a String
+    /**
+     The code of the error as a String.
+     */
     var code: String { get }
 
-    /// Http Status Code of the response
+    /**
+     HTTP Status Code of the response.
+     */
     var statusCode: Int { get }
 
     /**
-     Creates an error from a JSON response
+     Creates an error from a JSON response.
 
-     - parameter info:          JSON response from Auth0
-     - parameter statusCode:    Http Status Code of the Response
+     - Parameters:
+       - info:       JSON response from Auth0.
+       - statusCode: HTTP Status Code of the Response.
 
-     - returns: a newly created error
+     - Returns: A newly created error.
      */
     init(info: [String: Any], statusCode: Int)
 
     /**
-     Returns a value from the error data
+     Returns a value from the error data.
 
-     - parameter key: key of the value to return
-
-     - returns: the value of key or nil if cannot be found or is of the wrong type.
+     - Parameter key: Key of the value to return.
+     - Returns: The value of key or nil if cannot be found or is of the wrong type.
      */
     subscript<T>(_ key: String) -> T? { get }
 

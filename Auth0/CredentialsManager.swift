@@ -8,7 +8,7 @@ import LocalAuthentication
 import Combine
 #endif
 
-/// Credentials management utility
+/// Credentials management utility.
 public struct CredentialsManager {
 
     private let storage: CredentialsStorage
@@ -20,23 +20,24 @@ public struct CredentialsManager {
     private var bioAuth: BioAuthentication?
     #endif
 
-    /// Creates a new CredentialsManager instance
+    /// Creates a new CredentialsManager instance.
     ///
     /// - Parameters:
-    ///   - authentication: Auth0 authentication instance
-    ///   - storeKey: Key used to store user credentials in the keychain, defaults to "credentials"
-    ///   - storage: The A0SimpleKeychain instance used to manage credentials storage. Defaults to a standard A0SimpleKeychain instance
+    ///   - authentication: Auth0 authentication instance.
+    ///   - storeKey:       Key used to store user credentials in the keychain, defaults to "credentials".
+    ///   - storage:        The CredentialsStorage instance used to manage credentials storage. Defaults to a standard A0SimpleKeychain instance.
     public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = A0SimpleKeychain()) {
         self.storeKey = storeKey
         self.authentication = authentication
         self.storage = storage
     }
 
-    /// Retrieve the user profile from keychain synchronously, without checking if the credentials are expired
+    /// Retrieve the user profile from keychain synchronously, without checking if the credentials are expired.
     ///
     /// ```
     /// let user = credentialsManager.user
     /// ```
+    ///
     /// - Important: Access to this property will not be protected by Biometric Authentication.
     public var user: UserInfo? {
         guard let credentials = retrieveCredentials(),
@@ -46,22 +47,22 @@ public struct CredentialsManager {
     }
 
     #if WEB_AUTH_PLATFORM
-    /// Enable Biometric Authentication for additional security during credentials retrieval
+    /// Enable Biometric Authentication for additional security during credentials retrieval.
     ///
     /// - Parameters:
-    ///   - title: main message to display when Touch ID is used
-    ///   - cancelTitle: cancel message to display when Touch ID is used (iOS 10+)
-    ///   - fallbackTitle: fallback message to display when Touch ID is used after a failed match
-    ///   - evaluationPolicy: policy to be used for authentication policy evaluation
+    ///   - title:            Main message to display when Touch ID is used.
+    ///   - cancelTitle:      Cancel message to display when Touch ID is used (iOS 10+).
+    ///   - fallbackTitle:    Fallback message to display when Touch ID is used after a failed match.
+    ///   - evaluationPolicy: Policy to be used for authentication policy evaluation.
     public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil, evaluationPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics) {
         self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
     #endif
 
-    /// Store credentials instance in keychain
+    /// Store credentials instance in keychain.
     ///
-    /// - Parameter credentials: credentials instance to store
-    /// - Returns: if credentials were stored
+    /// - Parameter credentials: Credentials instance to store.
+    /// - Returns: If credentials were stored.
     public func store(credentials: Credentials) -> Bool {
         guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true) else {
             return false
@@ -69,9 +70,9 @@ public struct CredentialsManager {
         return self.storage.setEntry(data, forKey: storeKey)
     }
 
-    /// Clear credentials stored in keychain
+    /// Clear credentials stored in keychain.
     ///
-    /// - Returns: if credentials were removed
+    /// - Returns: If credentials were removed.
     public func clear() -> Bool {
         return self.storage.deleteEntry(forKey: storeKey)
     }
@@ -82,8 +83,8 @@ public struct CredentialsManager {
     /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
     ///
     /// - Parameters:
-    ///   - headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
-    ///   - callback: callback with an error if the refresh token could not be revoked
+    ///   - headers:  Additional headers to add to a possible token revocation. The headers will be set via Request.headers.
+    ///   - callback: Callback with an error if the refresh token could not be revoked.
     public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerError?) -> Void) {
         guard let data = self.storage.getEntry(forKey: self.storeKey),
               let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
@@ -106,10 +107,10 @@ public struct CredentialsManager {
             }
     }
 
-    /// Checks if a non-expired set of credentials are stored
+    /// Checks if a non-expired set of credentials are stored.
     ///
-    /// - Parameter minTTL: minimum lifetime in seconds the access token must have left.
-    /// - Returns: if there are valid and non-expired credentials stored.
+    /// - Parameter minTTL: Minimum lifetime in seconds the access token must have left.
+    /// - Returns: If there are valid and non-expired credentials stored.
     public func hasValid(minTTL: Int = 0) -> Bool {
         guard let data = self.storage.getEntry(forKey: self.storeKey),
             let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data) else { return false }
@@ -132,11 +133,11 @@ public struct CredentialsManager {
     /// ```
     ///
     /// - Parameters:
-    ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
-    ///   - minTTL: minimum time in seconds the access token must remain valid to avoid being renewed.
-    ///   - parameters: additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
-    ///   - headers: additional headers to add to a possible token refresh. The headers will be set via Request.headers.
-    ///   - callback: callback with the user's credentials or the cause of the error.
+    ///   - scope:      Scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed.
+    ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
+    ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
+    ///   - callback:   Callback with the user's credentials or the cause of the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     #if WEB_AUTH_PLATFORM
@@ -255,8 +256,8 @@ public extension CredentialsManager {
     /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the subscription completes
     /// without an error.
     ///
-    /// - Parameter headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
-    /// - Returns: a type-erased publisher.
+    /// - Parameter headers: Additional headers to add to a possible token revocation. The headers will be set via Request.headers.
+    /// - Returns: A type-erased publisher.
     func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {
             Future { callback in
@@ -286,11 +287,11 @@ public extension CredentialsManager {
     /// ```
     ///
     /// - Parameters:
-    ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
-    ///   - minTTL: minimum time in seconds the access token must remain valid to avoid being renewed.
-    ///   - parameters: additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
-    ///   - headers: additional headers to add to a possible token refresh. The headers will be set via Request.headers.
-    /// - Returns: a type-erased publisher.
+    ///   - scope:      Scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed.
+    ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
+    ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
+    /// - Returns: A type-erased publisher.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
@@ -317,7 +318,7 @@ public extension CredentialsManager {
     ///
     /// If no refresh token is available the endpoint is not called, the credentials are cleared, and no error is thrown.
     ///
-    /// - Parameter headers: additional headers to add to a possible token revocation. The headers will be set via Request.headers.
+    /// - Parameter headers: Additional headers to add to a possible token revocation. The headers will be set via Request.headers.
     /// - Throws: An error of type `CredentialsManagerError`.
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
@@ -350,11 +351,11 @@ public extension CredentialsManager {
     /// ```
     ///
     /// - Parameters:
-    ///   - scope: scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
-    ///   - minTTL: minimum time in seconds the access token must remain valid to avoid being renewed.
-    ///   - parameters: additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
-    ///   - headers: additional headers to add to a possible token refresh. The headers will be set via Request.headers.
-    /// - Returns: the user's credentials.
+    ///   - scope:      Scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed.
+    ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
+    ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
+    /// - Returns: The user's credentials.
     /// - Throws: An error of type `CredentialsManagerError`.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)

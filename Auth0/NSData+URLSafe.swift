@@ -1,6 +1,7 @@
 import Foundation
 
 public extension Data {
+
     func a0_encodeBase64URLSafe() -> String? {
         return self
             .base64EncodedString(options: [])
@@ -8,4 +9,5 @@ public extension Data {
             .replacingOccurrences(of: "/", with: "_")
             .trimmingCharacters(in: CharacterSet(charactersIn: "="))
     }
+
 }

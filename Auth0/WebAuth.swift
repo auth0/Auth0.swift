@@ -4,7 +4,7 @@ import Foundation
 import Combine
 #endif
 
-/// WebAuth Authentication using Auth0
+/// WebAuth Authentication using Auth0.
 public protocol WebAuth: Trackable, Loggable {
     var clientId: String { get }
     var url: URL { get }
@@ -12,112 +12,103 @@ public protocol WebAuth: Trackable, Loggable {
 
     /**
      Specify a connection name to be used to authenticate.
+     By default no connection is specified, so the Universal Login page will be displayed.
 
-     By default no connection is specified, so the Universal Login page will be displayed
-
-     - parameter connection: name of the connection to use
-
-     - returns: the same WebAuth instance to allow method chaining
+     - Parameter connection: Name of the connection to use.
+     - Returns: The same WebAuth instance to allow method chaining.
      */
     func connection(_ connection: String) -> Self
 
     /**
-     Scopes that will be requested during auth
+     Scopes that will be requested during auth.
 
-     - parameter scope: a scope value like: `openid email`
-
-     - returns: the same WebAuth instance to allow method chaining
+     - Parameter scope: A scope value like: `openid profile email offline_access`.
+     - Returns: The same WebAuth instance to allow method chaining.
      */
     func scope(_ scope: String) -> Self
 
     /**
-     Provider scopes for oauth2/social connections. e.g. Facebook, Google etc
+     Provider scopes for oauth2/social connections. e.g. Facebook, Google etc.
 
-     - parameter connectionScope: oauth2/social comma separated scope list: `user_friends,email`
-
-     - returns: the same WebAuth instance to allow method chaining
+     - Parameter connectionScope: OAuth2/social comma separated scope list: `user_friends,email`.
+     - Returns: The same WebAuth instance to allow method chaining.
      */
     func connectionScope(_ connectionScope: String) -> Self
 
     /**
      State value that will be echoed after authentication
      in order to check that the response is from your request and not other.
-
      By default a random value is used.
 
-     - parameter state: a state value to send with the auth request
-
-     - returns: the same WebAuth instance to allow method chaining
+     - Parameter state: A state value to send with the auth request.
+     - Returns: The same WebAuth instance to allow method chaining.
      */
     func state(_ state: String) -> Self
 
     /**
      Send additional parameters for authentication.
 
-     - parameter parameters: additional auth parameters
-
-     - returns: the same WebAuth instance to allow method chaining
+     - Parameter parameters: Additional auth parameters.
+     - Returns: The same WebAuth instance to allow method chaining.
      */
     func parameters(_ parameters: [String: String]) -> Self
 
-    /// Specify a custom redirect url to be used
+    /// Specify a custom redirect url to be used.
     ///
-    /// - Parameter redirectURL: custom redirect url
-    /// - Returns: the same WebAuth instance to allow method chaining
+    /// - Parameter redirectURL: Custom redirect url.
+    /// - Returns: The same WebAuth instance to allow method chaining.
     func redirectURL(_ redirectURL: URL) -> Self
 
-    /// Add `nonce` parameter for ID Token validation
+    /// Add `nonce` parameter for ID Token validation.
     ///
-    /// - Parameter nonce: nonce string
-    /// - Returns: the same WebAuth instance to allow method chaining
+    /// - Parameter nonce: A nonce string.
+    /// - Returns: The same WebAuth instance to allow method chaining.
     func nonce(_ nonce: String) -> Self
 
     ///  Audience name of the API that your application will call using the `access_token` returned after Auth.
-    ///  This value must match the one defined in Auth0 Dashboard [APIs Section](https://manage.auth0.com/#/apis)
+    ///  This value must match the one defined in Auth0 Dashboard [APIs Section](https://manage.auth0.com/#/apis).
     ///
-    /// - Parameter audience: an audience value like: `https://someapi.com/api`
-    /// - Returns: the same WebAuth instance to allow method chaining
+    /// - Parameter audience: An audience value like: `https://someapi.com/api`.
+    /// - Returns: The same WebAuth instance to allow method chaining.
     func audience(_ audience: String) -> Self
 
     /// Specify a custom issuer for ID Token validation.
     /// This value will be used instead of the Auth0 domain.
     ///
-    /// - Parameter issuer: custom issuer value like: `https://example.com/`
-    /// - Returns: the same WebAuth instance to allow method chaining
+    /// - Parameter issuer: A custom issuer value like: `https://example.com/`.
+    /// - Returns: The same WebAuth instance to allow method chaining.
     func issuer(_ issuer: String) -> Self
 
     /// Add a leeway amount for ID Token validation.
     /// This value represents the clock skew for the validation of date claims e.g. `exp`.
     ///
-    /// - Parameter leeway: number of milliseconds. Defaults to `60000` (1 minute).
-    /// - Returns: the same WebAuth instance to allow method chaining
+    /// - Parameter leeway: Number of milliseconds. Defaults to `60000` (1 minute).
+    /// - Returns: The same WebAuth instance to allow method chaining.
     func leeway(_ leeway: Int) -> Self
 
     /// Add `max_age` parameter for authentication, only when response type `.idToken` is specified.
     /// Sending this parameter will require the presence of the `auth_time` claim in the ID Token.
     ///
-    /// - Parameter maxAge: number of milliseconds
-    /// - Returns: the same WebAuth instance to allow method chaining
+    /// - Parameter maxAge: Number of milliseconds.
+    /// - Returns: The same WebAuth instance to allow method chaining.
     func maxAge(_ maxAge: Int) -> Self
 
-    /**
-     Disable Single Sign On (SSO) on iOS 13+ and macOS.
-     Has no effect on older versions of iOS.
-
-     - returns: the same WebAuth instance to allow method chaining
-     */
+    /// Disable Single Sign On (SSO) on iOS 13+ and macOS.
+    /// Has no effect on older versions of iOS.
+    ///
+    /// - Returns: The same WebAuth instance to allow method chaining.
     func useEphemeralSession() -> Self
 
     /// Specify an invitation URL to join an organization.
     ///
-    /// - Parameter invitationURL: organization invitation URL
-    /// - Returns: the same WebAuth instance to allow method chaining
+    /// - Parameter invitationURL: An organization invitation URL
+    /// - Returns: The same WebAuth instance to allow method chaining.
     func invitationURL(_ invitationURL: URL) -> Self
 
-    /// Specify an organization Id to log in to.
+    /// Specify an organization id to log in to.
     ///
-    /// - Parameter organization: organization Id
-    /// - Returns: the same WebAuth instance to allow method chaining
+    /// - Parameter organization: An organization id.
+    /// - Returns: The same WebAuth instance to allow method chaining.
     func organization(_ organization: String) -> Self
 
     /**
@@ -139,7 +130,7 @@ public protocol WebAuth: Trackable, Loggable {
      Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
      and it's corresponding callback with be called with a failure result of `WebAuthError.userCancelled`.
 
-     - Parameter callback: callback called with the result of the WebAuth flow.
+     - Parameter callback: Callback called with the result of the WebAuth flow.
      */
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
 
@@ -156,7 +147,7 @@ public protocol WebAuth: Trackable, Loggable {
      Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
      and it will throw a `WebAuthError.userCancelled` error.
 
-     - Returns: the result of the WebAuth flow.
+     - Returns: The result of the WebAuth flow.
      - Throws: An error of type `WebAuthError`.
      */
     #if compiler(>=5.5.2)
@@ -188,14 +179,14 @@ public protocol WebAuth: Trackable, Loggable {
      Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
      and the subscription will complete with a failure result of `WebAuthError.userCancelled`.
 
-     - Returns: a type-erased publisher.
+     - Returns: A type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func publisher() -> AnyPublisher<Credentials, WebAuthError>
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider session.
-     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You will need to ensure that the **Callback URL** has been added
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
@@ -214,14 +205,15 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession(federated: true) { print($0) }
      ```
 
-     - parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
-     - parameter callback: callback called with bool outcome of the call.
+     - Parameters:
+       - federated: `Bool` to remove the IdP session. Defaults to `false`.
+       - callback: Callback called with bool outcome of the call.
      */
     func clearSession(federated: Bool, callback: @escaping (Bool) -> Void)
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider session.
-     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You will need to ensure that the **Callback URL** has been added
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
@@ -245,7 +237,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
-     - Returns: a type-erased publisher.
+     - Returns: A type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) -> AnyPublisher<Bool, Never>
@@ -253,7 +245,7 @@ public protocol WebAuth: Trackable, Loggable {
     #if compiler(>=5.5) && canImport(_Concurrency)
     /**
      Removes Auth0 session and optionally remove the Identity Provider session.
-     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You will need to ensure that the **Callback URL** has been added
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
@@ -273,7 +265,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
-     - Returns: bool outcome of the call.
+     - Returns: `Bool` outcome of the call.
      */
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
@@ -289,7 +281,7 @@ public extension WebAuth {
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider session.
-     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You will need to ensure that the **Callback URL** has been added
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
@@ -308,8 +300,9 @@ public extension WebAuth {
          .clearSession(federated: true) { print($0) }
      ```
 
-     - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
-     - Parameter callback: callback called with bool outcome of the call.
+     - Parameters:
+       - federated: `Bool` to remove the IdP session. Defaults to `false`.
+       - callback: Callback called with bool outcome of the call.
      */
     func clearSession(federated: Bool = false, callback: @escaping (Bool) -> Void) {
         self.clearSession(federated: federated, callback: callback)
@@ -317,7 +310,7 @@ public extension WebAuth {
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider session.
-     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You will need to ensure that the **Callback URL** has been added
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
@@ -341,7 +334,7 @@ public extension WebAuth {
      ```
 
      - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
-     - Returns: a type-erased publisher.
+     - Returns: A type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool = false) -> AnyPublisher<Bool, Never> {
@@ -351,7 +344,7 @@ public extension WebAuth {
     #if compiler(>=5.5) && canImport(_Concurrency)
     /**
      Removes Auth0 session and optionally remove the Identity Provider session.
-     - seeAlso: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You will need to ensure that the **Callback URL** has been added
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
@@ -371,7 +364,7 @@ public extension WebAuth {
      ```
 
      - Parameter federated: `Bool` to remove the IdP session. Defaults to `false`.
-     - Returns: bool outcome of the call.
+     - Returns: `Bool` outcome of the call.
      */
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
