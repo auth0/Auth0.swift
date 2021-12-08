@@ -118,10 +118,10 @@ public extension Trackable {
     }
 
     /**
-     Send the library/framework, that has Auth0.swift as dependency, when sending telemetry information
+     Send the library/framework, that has Auth0.swift as dependency, when sending telemetry information.
      
-     - Parameter name:    name of library or framework that uses Auth0.swift
-     - Parameter version: version of library or framework
+     - Parameter name:    Name of library or framework that uses Auth0.swift.
+     - Parameter version: Version of library or framework.
      */
     mutating func using(inLibrary name: String, version: String) {
         self.telemetry.wrapped(inLibrary: name, version: version)

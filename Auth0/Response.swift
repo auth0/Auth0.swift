@@ -28,7 +28,7 @@ struct Response<E: Auth0APIError> {
             if response.statusCode == 204 {
                 return nil
             }
-            // not using the custom initializer because data could be empty
+            // Not using the custom initializer because data could be empty
             throw E(description: nil, statusCode: response.statusCode)
         }
         if let json = json(data) {

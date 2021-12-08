@@ -11,7 +11,7 @@ let parameterPropertyKey = "com.auth0.parameter"
  Auth0 API request.
 
  ```
- let request: Request<Credentials, Authentication.Error> = //
+ let request: Request<Credentials, AuthenticationError> = //
  request.start { result in
     print(result)
  }
