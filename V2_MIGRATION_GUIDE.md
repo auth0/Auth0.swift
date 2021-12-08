@@ -433,9 +433,13 @@ class CustomStore: CredentialsStorage {
 let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore())
 ```
 
-#### `credentials(withScope:minTTL:parameters:callback)` 
+#### `credentials(withScope:minTTL:parameters:callback)`
 
 This method now yields a `Result<Credentials, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Credentials>`.
+
+#### `revoke(headers:callback:)`
+
+This method now yields a `Result<Void, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Void>`.
 
 ##### Before
 
