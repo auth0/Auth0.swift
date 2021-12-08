@@ -663,6 +663,46 @@ public extension Authentication {
         return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope)
     }
 
+    /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either Push notification, SMS, or Voice).
+    ///
+    /// ```
+    /// Auth0
+    ///     .authentication(clientId: clientId, domain: "samples.auth0.com")
+    ///     .login(withOOBCode: "123456", mfaToken: "mfa token")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let credentials):
+    ///             print("Obtained credentials: \(credentials)")
+    ///         case .failure(let error):
+    ///             print("Failed with \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - oobCode:     The oob code received from the challenge request.
+    ///   - mfaToken:    Token returned when authentication fails due to MFA requirement.
+    ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message.
+    /// - Returns: Authentication request that will yield Auth0 user's credentials.
+    /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-oob`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(withOOBCode: oobCode, mfaToken: mfaToken, bindingCode: bindingCode)
+    }
+
+    /// Request a challenge for multi-factor authentication (MFA) based on the challenge types supported by the application and user.
+    /// The `type` is how the user will get the challenge and prove possession. Supported challenge types include:
+    /// * `otp`:  for one-time password (OTP)
+    /// * `oob`:  for SMS/Voice messages or out-of-band (OOB)
+    ///
+    /// - Parameters:
+    ///   - mfaToken:        Token returned when authentication fails due to MFA requirement.
+    ///   - types:           A list of the challenges types accepted by your application. Accepted challenge types are `oob` or `otp`. Excluding this parameter means that your client application accepts all supported challenge types.
+    ///   - authenticatorId: The ID of the authenticator to challenge. You can get the ID by querying the list of available authenticators for the user.
+    /// - Returns: A request that will yield a multi-factor challenge.
+    func multifactorChallenge(mfaToken: String, types: [String]? = nil, authenticatorId: String? = nil) -> Request<Challenge, AuthenticationError> {
+        return self.multifactorChallenge(mfaToken: mfaToken, types: types, authenticatorId: authenticatorId)
+    }
+
     /**
      Authenticate a user with their Sign In With Apple authorization code.
 

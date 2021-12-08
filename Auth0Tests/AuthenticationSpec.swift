@@ -102,12 +102,22 @@ class AuthenticationSpec: QuickSpec {
         describe("login MFA OOB") {
 
             beforeEach {
+                stub(condition: isToken(Domain) && hasAtLeast(["oob_code": OOB, "mfa_token": MFAToken])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
                 stub(condition: isToken(Domain) && hasAtLeast(["oob_code": OOB, "mfa_token": MFAToken, "binding_code": BindingCode])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "OpenID Auth"
                 stub(condition: isToken(Domain) && hasAtLeast(["oob_code": "bad_oob", "mfa_token": MFAToken])) { _ in return authFailure(code: "invalid_grant", description: "Invalid oob_code.") }.name = "invalid oob_code"
                 stub(condition: isToken(Domain) && hasAtLeast(["oob_code": OOB, "mfa_token": "bad_token"])) { _ in return authFailure(code: "invalid_grant", description: "Malformed mfa_token") }.name = "invalid mfa_token"
             }
 
-            it("should login with oob code and mfa tokens") {
+            it("should login with oob code and mfa tokens with default parameters") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(withOOBCode: OOB, mfaToken: MFAToken).start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should login with oob code and mfa tokens with binding code") {
                 waitUntil(timeout: Timeout) { done in
                     auth.login(withOOBCode: OOB, mfaToken: MFAToken, bindingCode: BindingCode).start { result in
                         expect(result).to(haveCredentials())
@@ -178,13 +188,54 @@ class AuthenticationSpec: QuickSpec {
             beforeEach {
                 stub(condition: isMultifactorChallenge(Domain) && hasAtLeast([
                     "mfa_token": MFAToken,
+                    "client_id": ClientId
+                ])) { _ in return multifactorChallengeResponse(challengeType: "oob") }.name = "MFA Challenge"
+                stub(condition: isMultifactorChallenge(Domain) && hasAtLeast([
+                    "mfa_token": MFAToken,
+                    "client_id": ClientId,
+                    "challenge_type": "oob otp"
+                ])) { _ in return multifactorChallengeResponse(challengeType: "oob") }.name = "MFA Challenge"
+                stub(condition: isMultifactorChallenge(Domain) && hasAtLeast([
+                    "mfa_token": MFAToken,
+                    "client_id": ClientId,
+                    "authenticator_id": AuthenticatorId
+                ])) { _ in return multifactorChallengeResponse(challengeType: "oob") }.name = "MFA Challenge"
+                stub(condition: isMultifactorChallenge(Domain) && hasAtLeast([
+                    "mfa_token": MFAToken,
                     "client_id": ClientId,
                     "challenge_type": "oob otp",
                     "authenticator_id": AuthenticatorId
-                    ])) { _ in return multifactorChallengeResponse(challengeType: "oob") }.name = "MFA Challenge"
+                ])) { _ in return multifactorChallengeResponse(challengeType: "oob") }.name = "MFA Challenge"
             }
 
-            it("should request without filters") {
+            it("should request MFA challenge with default parameters") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.multifactorChallenge(mfaToken: MFAToken).start { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should request MFA challenge with challenge types") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes).start { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should request MFA challenge with authenticator id") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.multifactorChallenge(mfaToken: MFAToken, authenticatorId: AuthenticatorId).start { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should request MFA challenge with all parameters") {
                 waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes, authenticatorId: AuthenticatorId).start { result in
                         expect(result).to(beSuccessful())
@@ -192,7 +243,6 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-
         }
 
         // MARK:- Refresh Tokens
@@ -515,7 +565,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should handle errors") {
+            it("should fail to revoke token") {
                 let code = "invalid_request"
                 let description = "missing params"
                 stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": refreshToken])) { _ in
@@ -584,7 +634,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should specify audience,scope and realm in request") {
+            it("should specify audience, scope and realm in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm" : "customconnection"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom audience, scope and realm"
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "customconnection", audience: "https://myapi.com/api", scope: "openid").start { result in
@@ -746,7 +796,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should handle errors") {
+            it("should fail to reset password") {
                 let code = "reset_failed"
                 let description = "failed reset password"
                 stub(condition: isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "reset failed"
@@ -814,7 +864,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should report failure") {
+            it("should fail to start") {
                 stub(condition: isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0).start { result in
@@ -902,7 +952,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should report failure") {
+            it("should fail to start") {
                 stub(condition: isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
                 waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone).start { result in
@@ -979,7 +1029,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should report failure to get user info") {
+            it("should fail to get user info") {
                 stub(condition: isUserInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
                 waitUntil(timeout: Timeout) { done in
                     auth.userInfo(withAccessToken: AccessToken).start { result in
