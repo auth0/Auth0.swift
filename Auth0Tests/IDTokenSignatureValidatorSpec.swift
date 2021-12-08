@@ -68,6 +68,21 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                         }
                     }
                 }
+
+                it("should fail with an incorrect signature") {
+                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse() }
+                    
+                    let jwt = generateJWT(alg: "RS256", signature: "foo")
+                    let expectedError = IDTokenSignatureValidator.ValidationError.invalidSignature
+                    
+                    waitUntil { done in
+                        signatureValidator.validate(jwt) { error in
+                            expect(error).to(matchError(expectedError))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
+                            done()
+                        }
+                    }
+                }
             }
             
             context("kid validation") {

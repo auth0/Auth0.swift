@@ -103,6 +103,10 @@ func isLinkPath(_ domain: String, identifier: String) -> HTTPStubsTestBlock {
     return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")
 }
 
+func isUnlinkPath(_ domain: String, identifier: String, provider: String, identityId: String) -> HTTPStubsTestBlock {
+    return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities/\(provider)/\(identityId)")
+}
+
 func isJWKSPath(_ domain: String) -> HTTPStubsTestBlock {
     return isHost(domain) && isPath("/.well-known/jwks.json")
 }

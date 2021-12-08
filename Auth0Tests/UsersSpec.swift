@@ -12,6 +12,7 @@ private let Domain = "samples.auth0.com"
 private let Token = UUID().uuidString
 private let NonExistentUser = "auth0|notfound"
 private let Timeout: DispatchTimeInterval = .seconds(2)
+private let Provider = "facebook"
 
 class UsersSpec: QuickSpec {
 
@@ -86,12 +87,12 @@ class UsersSpec: QuickSpec {
         describe("PATCH /users/:identifier") {
 
             it("should send attributes") {
-                stub(condition: isUsersPath(Domain, identifier: UserId) && isMethodPATCH() && hasAllOf(["username": Support, "connection": "facebook"]) && hasBearerToken(Token))
-                { _ in managementResponse(["user_id": UserId, "email": SupportAtAuth0, "username": Support, "connection": "facebook"]) }
+                stub(condition: isUsersPath(Domain, identifier: UserId) && isMethodPATCH() && hasAllOf(["username": Support, "connection": Provider]) && hasBearerToken(Token))
+                { _ in managementResponse(["user_id": UserId, "email": SupportAtAuth0, "username": Support, "connection": Provider]) }
                 .name = "User Patch"
 
                 waitUntil(timeout: Timeout) { done in
-                    let attributes = UserPatchAttributes().username(Support, connection: "facebook")
+                    let attributes = UserPatchAttributes().username(Support, connection: Provider)
                     users.patch(UserId, attributes: attributes).start { result in
                         expect(result).to(haveObjectWithAttributes(["user_id", "email", "username", "connection"]))
                         done()
@@ -127,7 +128,7 @@ class UsersSpec: QuickSpec {
 
         describe("PATCH /users/:identifier/identities") {
 
-            it("shoud link with just a token") {
+            it("should link with just a token") {
                 stub(condition: isLinkPath(Domain, identifier: UserId) && isMethodPOST() && hasAllOf(["link_with": "token"]) && hasBearerToken(Token))
                 { _ in managementResponse([["user_id": UserId, "email": SupportAtAuth0]])}.name = "user linked"
                 waitUntil(timeout: Timeout) { done in
@@ -138,22 +139,22 @@ class UsersSpec: QuickSpec {
                 }
             }
 
-            it("shoud link without a token") {
-                stub(condition: isLinkPath(Domain, identifier: UserId) && isMethodPOST() && hasAllOf(["user_id": "other_id", "provider": "facebook"]) && hasBearerToken(Token))
+            it("should link without a token") {
+                stub(condition: isLinkPath(Domain, identifier: UserId) && isMethodPOST() && hasAllOf(["user_id": "other_id", "provider": Provider]) && hasBearerToken(Token))
                 { _ in managementResponse([["user_id": UserId, "email": SupportAtAuth0]])}.name = "user linked"
                 waitUntil(timeout: Timeout) { done in
-                    users.link(UserId, withUser: "other_id", provider: "facebook").start { result in
+                    users.link(UserId, withUser: "other_id", provider: Provider).start { result in
                         expect(result).to(beSuccessful())
                         done()
                     }
                 }
             }
 
-            it("shoud link without a token specifying a connection id") {
-                stub(condition: isLinkPath(Domain, identifier: UserId) && isMethodPOST() && hasAllOf(["user_id": "other_id", "provider": "facebook", "connection_id": "conn_1"]) && hasBearerToken(Token))
+            it("should link without a token specifying a connection id") {
+                stub(condition: isLinkPath(Domain, identifier: UserId) && isMethodPOST() && hasAllOf(["user_id": "other_id", "provider": Provider, "connection_id": "conn_1"]) && hasBearerToken(Token))
                 { _ in managementResponse([["user_id": UserId, "email": SupportAtAuth0]])}.name = "user linked"
                 waitUntil(timeout: Timeout) { done in
-                    users.link(UserId, withUser: "other_id", provider: "facebook", connectionId: "conn_1").start { result in
+                    users.link(UserId, withUser: "other_id", provider: Provider, connectionId: "conn_1").start { result in
                         expect(result).to(beSuccessful())
                         done()
                     }
@@ -171,7 +172,60 @@ class UsersSpec: QuickSpec {
                 }
             }
 
+            it("should fail request from generic error") {
+                stub(condition: isLinkPath(Domain, identifier: NonExistentUser) && isMethodPOST() && hasBearerToken(Token)) { _ in
+                    return HTTPStubsResponse(jsonObject: [], statusCode: 400, headers: nil)
+                }.name = "user not found"
+                waitUntil(timeout: Timeout) { done in
+                    users.link(NonExistentUser, withOtherUserToken: "token").start { result in
+                        expect(result).to(beFailure())
+                        done()
+                    }
+                }
+            }
+
         }
+
+        describe("DELETE /users/:identifier/identities/:provider/:identityId") {
+
+            it("should unlink") {
+                stub(condition: isUnlinkPath(Domain, identifier: "other_id", provider: Provider, identityId: UserId) && isMethodDELETE() && hasBearerToken(Token)) { _ in
+                    return managementResponse([[:]])
+                }.name = "user unlinked"
+                waitUntil(timeout: Timeout) { done in
+                    users.unlink(identityId: UserId, provider: Provider, fromUserId: "other_id").start { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail request") {
+                stub(condition: isUnlinkPath(Domain, identifier: "other_id", provider: Provider, identityId: NonExistentUser) && isMethodDELETE() && hasBearerToken(Token)) { _ in
+                    return managementErrorResponse(error: "not_found", description: "not found user", code: "user_not_found", statusCode: 400)
+                }.name = "user not found"
+                waitUntil(timeout: Timeout) { done in
+                    users.unlink(identityId: NonExistentUser, provider: Provider, fromUserId: "other_id").start { result in
+                        expect(result).to(haveManagementError("not_found", description: "not found user", code: "user_not_found", statusCode: 400))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail request from generic error") {
+                stub(condition: isUnlinkPath(Domain, identifier: "other_id", provider: Provider, identityId: NonExistentUser) && isMethodDELETE() && hasBearerToken(Token)) { _ in
+                    return HTTPStubsResponse(jsonObject: [], statusCode: 400, headers: nil)
+                }.name = "user not found"
+                waitUntil(timeout: Timeout) { done in
+                    users.unlink(identityId: NonExistentUser, provider: Provider, fromUserId: "other_id").start { result in
+                        expect(result).to(beFailure())
+                        done()
+                    }
+                }
+            }
+
+        }
+
     }
 
 }
