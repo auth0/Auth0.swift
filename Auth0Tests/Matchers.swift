@@ -180,6 +180,7 @@ func haveManagementError<T>(description: String, statusCode: Int) -> Predicate<M
     }
 }
 
+#if WEB_AUTH_PLATFORM
 func haveWebAuthError<T>(_ expected: WebAuthError, withCause: Bool) -> Predicate<WebAuthResult<T>> {
     return Predicate<WebAuthResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
         return try beFailure(expression, failureMessage) { (error: WebAuthError) -> Bool in
@@ -187,6 +188,7 @@ func haveWebAuthError<T>(_ expected: WebAuthError, withCause: Bool) -> Predicate
         }
     }
 }
+#endif
 
 func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError, withCause: Bool) -> Predicate<CredentialsManagerResult<T>> {
     return Predicate<CredentialsManagerResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
