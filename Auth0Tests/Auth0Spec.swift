@@ -127,9 +127,19 @@ class Auth0Spec: QuickSpec {
                 expect(auth.logging(enabled: true).logger).toNot(beNil())
             }
 
+            it("should not enable default logger for auth") {
+                let auth = Auth0.authentication(clientId: ClientId, domain: Domain)
+                expect(auth.logging(enabled: false).logger).to(beNil())
+            }
+
             it("should enable default logger for users") {
                 let users = Auth0.users(token: "token", domain: Domain)
                 expect(users.logging(enabled: true).logger).toNot(beNil())
+            }
+
+            it("should not enable default logger for users") {
+                let users = Auth0.users(token: "token", domain: Domain)
+                expect(users.logging(enabled: false).logger).to(beNil())
             }
 
             it("should enable custom logger for auth") {

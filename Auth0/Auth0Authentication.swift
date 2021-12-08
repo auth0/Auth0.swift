@@ -361,8 +361,8 @@ private extension Auth0Authentication {
                        telemetry: self.telemetry)
     }
 
-    func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any]?) -> Request<Credentials, AuthenticationError> {
-        var parameters: [String: Any] = parameters ?? [:]
+    func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
+        var parameters: [String: Any] = parameters
         parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
         parameters["subject_token"] = subjectToken
         parameters["subject_token_type"] = subjectTokenType

@@ -49,15 +49,6 @@ class TelemetrySpec: QuickSpec {
                 return Telemetry.versionInformation(bundle: bundle)
             }
 
-            pending("should return bundle default version if nil") {
-                expect(subject["version"] as? String) == "0.0.0"
-            }
-
-            pending("should return bundle version") {
-                bundle.version = "1.0.0"
-                expect(subject["version"] as? String) == "1.0.0"
-            }
-
             it("should return lib name") {
                 expect(subject["name"] as? String) == "Auth0.swift"
             }
@@ -123,6 +114,7 @@ class TelemetrySpec: QuickSpec {
                 expect(env["unknown"]).toNot(beNil())
                 #endif
             }
+
         }
 
         describe("telemetry header") {
@@ -208,7 +200,6 @@ class TelemetrySpec: QuickSpec {
     }
 
 }
-
 
 class MockedBundle: Bundle {
 

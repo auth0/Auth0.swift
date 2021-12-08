@@ -47,8 +47,8 @@ class UserInfoSpec: QuickSpec {
                 expect(userInfo?.customClaims).to(beEmpty())
             }
 
-            it("should build with basic oidc profile") {
-                let userInfo = UserInfo(json: basicProfileOIDC())
+            it("should build with basic profile") {
+                let userInfo = UserInfo(json: basicProfile())
                 expect(userInfo?.sub) == Sub
                 expect(userInfo?.name) == Support
                 expect(userInfo?.nickname) == Nickname
@@ -57,8 +57,8 @@ class UserInfoSpec: QuickSpec {
                 expect(userInfo?.customClaims).to(beEmpty())
             }
 
-            it("should build with extended oidc profile") {
-                var info = basicProfileOIDC()
+            it("should build with extended profile") {
+                var info = basicProfile()
                 let optional: [String: Any] = [
                     "website": WebsiteURL.absoluteString,
                     "profile": ProfileURL.absoluteString,
@@ -80,8 +80,8 @@ class UserInfoSpec: QuickSpec {
                 expect(userInfo?.customClaims).to(beEmpty())
             }
 
-            it("should build with basic oidc profile with locale and zoneinfo") {
-                var info = basicProfileOIDC()
+            it("should build with basic profile with locale and zoneinfo") {
+                var info = basicProfile()
                 let optional: [String: Any] = [
                     "locale": LocaleUS,
                     "zoneinfo": ZoneEST
@@ -108,7 +108,7 @@ class UserInfoSpec: QuickSpec {
         describe("custom claims") {
 
             it("should build with basic profile and two custom claims") {
-                var info = basicProfileOIDC()
+                var info = basicProfile()
                 let optional: [String: Any] = [
                     "user_list":  "user1",
                     "user_active": true
@@ -123,3 +123,6 @@ class UserInfoSpec: QuickSpec {
     }
 }
 
+func basicProfile(_ sub: String = Sub, name: String = Support, nickname: String = Nickname, picture: String = PictureURL.absoluteString, updatedAt: String = UpdatedAtUnix) -> [String: Any] {
+    return ["sub": sub, "name": name, "nickname": nickname, "picture": picture, "updated_at": updatedAt]
+}

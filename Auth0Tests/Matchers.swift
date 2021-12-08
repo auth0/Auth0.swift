@@ -47,10 +47,6 @@ func hasNoneOf(_ names: [String]) -> HTTPStubsTestBlock {
     }
 }
 
-func hasNoneOf(_ parameters: [String: String]) -> HTTPStubsTestBlock {
-    return !hasAtLeast(parameters)
-}
-
 func hasQueryParameters(_ parameters: [String: String]) -> HTTPStubsTestBlock {
     return { request in
         guard
@@ -83,7 +79,6 @@ func isPasswordless(_ domain: String) -> HTTPStubsTestBlock {
 func isUserInfo(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodGET() && isHost(domain) && isPath("/userinfo")
 }
-
 
 func isRevokeToken(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/revoke")
@@ -177,9 +172,27 @@ func haveManagementError<T>(description: String, code: String, statusCode: Int =
     }
 }
 
-func haveCredentialsManagerError<T>(_ cause: CredentialsManagerError) -> Predicate<CredentialsManagerResult<T>> {
+func haveManagementError<T>(description: String, statusCode: Int) -> Predicate<ManagementResult<T>> {
+    return Predicate<ManagementResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
+        return try beFailure(expression, failureMessage) { (error: ManagementError) -> Bool in
+            return error.localizedDescription == description && error.statusCode == statusCode
+        }
+    }
+}
+
+func haveWebAuthError<T>(_ expected: WebAuthError, withCause: Bool) -> Predicate<WebAuthResult<T>> {
+    return Predicate<WebAuthResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
+        return try beFailure(expression, failureMessage) { (error: WebAuthError) -> Bool in
+            return (error == expected) && (!withCause || error.cause != nil)
+        }
+    }
+}
+
+func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError, withCause: Bool) -> Predicate<CredentialsManagerResult<T>> {
     return Predicate<CredentialsManagerResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
-        return try beFailure(expression, failureMessage) { (error: CredentialsManagerError) -> Bool in error == cause }
+        return try beFailure(expression, failureMessage) { (error: CredentialsManagerError) -> Bool in
+            return (error == expected) && (!withCause || error.cause != nil)
+        }
     }
 }
 

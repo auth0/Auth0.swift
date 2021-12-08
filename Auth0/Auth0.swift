@@ -23,7 +23,7 @@ public typealias WebAuthResult<T> = Result<T, WebAuthError>
 public typealias CredentialsManagerResult<T> = Result<T, CredentialsManagerError>
 
 /**
-  Default scope value used across Auth0.swift.
+ Default scope value used across Auth0.swift.
  */
 public let defaultScope = "openid profile email"
 

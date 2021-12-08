@@ -39,9 +39,7 @@ class CredentialsManagerSpec: QuickSpec {
         beforeEach {
             credentialsManager = CredentialsManager(authentication: authentication)
             credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-            stub(condition: isHost(Domain)) { _
-                in HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-            }.name = "YOU SHALL NOT PASS!"
+            stub(condition: isHost(Domain)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
         }
 
         afterEach {
@@ -379,7 +377,7 @@ class CredentialsManagerSpec: QuickSpec {
             it("should error when no credentials stored") {
                 A0SimpleKeychain().clearAll()
                 credentialsManager.credentials { result in
-                    expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                    expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials), withCause: false))
                 }
             }
 
@@ -387,7 +385,7 @@ class CredentialsManagerSpec: QuickSpec {
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
                 credentialsManager.credentials { result in
-                    expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noRefreshToken)))
+                    expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noRefreshToken), withCause: false))
                 }
             }
 
@@ -413,7 +411,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
-                            expect(result).to(haveCredentialsManagerError(error))
+                            expect(result).to(haveCredentialsManagerError(error, withCause: true))
                             done()
                         }
                     }
@@ -470,7 +468,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
-                            expect(result).to(haveCredentialsManagerError(error))
+                            expect(result).to(haveCredentialsManagerError(error, withCause: true))
                             done()
                         }
                     }
@@ -581,7 +579,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials(withScope: nil, minTTL: minTTL) { result in
-                            expect(result).to(haveCredentialsManagerError(error))
+                            expect(result).to(haveCredentialsManagerError(error, withCause: false))
                             done()
                         }
                     }
@@ -600,7 +598,6 @@ class CredentialsManagerSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
                             expect(result).to(haveCredentials())
-                            stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": NewRefreshToken])) { _ in return authFailure() }
                         }
                         credentialsManager.credentials { result in
                             expect(result).to(beSuccessful())
@@ -618,7 +615,6 @@ class CredentialsManagerSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
                             expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
-                            stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": NewRefreshToken])) { _ in return authFailure() }
                         }
                         credentialsManager.credentials { result in
                             expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
@@ -630,7 +626,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should renew the credentials after the previous renewal operation failed") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authFailure() }
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return apiFailureResponse() }
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
                             expect(result).to(beFailure())
@@ -655,9 +651,6 @@ class CredentialsManagerSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "second"])) { request in
-                        return authFailure()
-                    }
                     waitUntil(timeout: Timeout) { done in
                         DispatchQueue.global(qos: .utility).sync {
                             credentialsManager.credentials(parameters: ["request": "first"]) { result in
@@ -665,7 +658,7 @@ class CredentialsManagerSpec: QuickSpec {
                             }
                         }
                         DispatchQueue.global(qos: .background).sync {
-                            credentialsManager.credentials(parameters: ["request": "second"]) { result in
+                            credentialsManager.credentials { result in
                                 expect(result).to(beSuccessful())
                                 done()
                             }
@@ -679,9 +672,6 @@ class CredentialsManagerSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "second"])) { request in
-                        return authFailure()
-                    }
                     waitUntil(timeout: Timeout) { done in
                         DispatchQueue.global(qos: .utility).sync {
                             credentialsManager.credentials(parameters: ["request": "first"]) { result in
@@ -689,7 +679,7 @@ class CredentialsManagerSpec: QuickSpec {
                             }
                         }
                         DispatchQueue.global(qos: .background).sync {
-                            credentialsManager.credentials(parameters: ["request": "second"]) { result in
+                            credentialsManager.credentials { result in
                                 expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
                                 done()
                             }
@@ -701,7 +691,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
-                        return authFailure()
+                        return apiFailureResponse()
                     }
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "second"])) { request in
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
@@ -867,7 +857,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                     it("should complete with an error") {
                         stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                            return authFailure()
+                            return apiFailureResponse()
                         }
                         _ = credentialsManager.store(credentials: credentials)
                         waitUntil(timeout: Timeout) { done in
@@ -1044,7 +1034,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should throw an error") {
                     let credentialsManager = credentialsManager!
                     stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                        return authFailure()
+                        return apiFailureResponse()
                     }
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
