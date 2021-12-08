@@ -786,7 +786,7 @@ class AuthenticationSpec: QuickSpec {
                 let params = ["scope": "openid"]
                 stub(condition: isPasswordless(Domain) && hasAtLeast(["email": SupportAtAuth0]) && hasObjectAttribute("authParams", value: params)) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless web link with parameters"
                 waitUntil(timeout: Timeout) { done in
-                    auth.startPasswordless(email: SupportAtAuth0, type: .WebLink, parameters: params).start { result in
+                    auth.startPasswordless(email: SupportAtAuth0, type: .webLink, parameters: params).start { result in
                         expect(result).to(beSuccessful())
                         done()
                     }
@@ -797,7 +797,7 @@ class AuthenticationSpec: QuickSpec {
                 let params = ["scope": "openid"]
                 stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
                 waitUntil(timeout: Timeout) { done in
-                    auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: params).start { result in
+                    auth.startPasswordless(email: SupportAtAuth0, type: .code, parameters: params).start { result in
                         expect(result).to(beSuccessful())
                         done()
                     }
@@ -807,7 +807,7 @@ class AuthenticationSpec: QuickSpec {
             it("should not add params attr if they are empty") {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless without parameters"
                 waitUntil(timeout: Timeout) { done in
-                    auth.startPasswordless(email: SupportAtAuth0, type: .Code, parameters: [:]).start { result in
+                    auth.startPasswordless(email: SupportAtAuth0, type: .code, parameters: [:]).start { result in
                         expect(result).to(beSuccessful())
                         done()
                     }

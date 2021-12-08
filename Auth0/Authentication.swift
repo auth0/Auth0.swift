@@ -5,6 +5,21 @@ import Foundation
 public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
 
 /**
+ Types of passwordless authentication.
+
+ - code:        Simple OTP code sent by email or sms.
+ - webLink:     Regular Web HTTP link (Web only, uses redirect).
+ - iOSLink:     Universal Link.
+ - androidLink: Android App Link.
+ */
+public enum PasswordlessType: String {
+    case code = "code"
+    case webLink = "link"
+    case iOSLink = "link_ios"
+    case androidLink = "link_android"
+}
+
+/**
  Auth endpoints of Auth0.
 
  - See: [Auth0 Auth API docs](https://auth0.com/docs/api/authentication)
@@ -379,7 +394,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - email:      Email where to send the code or link.
-       - type:       Type of passwordless authentication. By default is 'code'.
+       - type:       Type of passwordless authentication. By default is `code`.
        - connection: Name of the passwordless connection. By default is 'email'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
@@ -407,7 +422,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - phoneNumber: Phone number where to send the sms with code or link.
-       - type:        Type of passwordless authentication. By default is 'code'.
+       - type:        Type of passwordless authentication. By default is `code`.
        - connection:  Name of the passwordless connection. By default is 'sms'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
@@ -518,21 +533,6 @@ public protocol Authentication: Trackable, Loggable {
      */
     func jwks() -> Request<JWKS, AuthenticationError>
 
-}
-
-/**
- Types of passwordless authentication
-
- - Code:        Simple OTP code sent by email or sms
- - WebLink:     Regular Web HTTP link (Web only, uses redirect)
- - iOSLink:     Universal Link
- - AndroidLink: Android App Link
- */
-public enum PasswordlessType: String {
-    case Code = "code"
-    case WebLink = "link"
-    case iOSLink = "link_ios"
-    case AndroidLink = "link_android"
 }
 
 public extension Authentication {
@@ -861,12 +861,12 @@ public extension Authentication {
 
      - Parameters:
        - email:      Email where to send the code or link.
-       - type:       Type of passwordless authentication. By default is 'code'.
+       - type:       Type of passwordless authentication. By default is `code`.
        - connection: Name of the passwordless connection. By default is 'email'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
      */
-    func startPasswordless(email: String, type: PasswordlessType = .Code, connection: String = "email", parameters: [String: Any] = [:]) -> Request<Void, AuthenticationError> {
+    func startPasswordless(email: String, type: PasswordlessType = .code, connection: String = "email", parameters: [String: Any] = [:]) -> Request<Void, AuthenticationError> {
         return self.startPasswordless(email: email, type: type, connection: connection, parameters: parameters)
     }
 
@@ -891,12 +891,12 @@ public extension Authentication {
 
      - Parameters:
        - phoneNumber: Phone number where to send the sms with code or link.
-       - type:        Type of passwordless authentication. By default is 'code'.
+       - type:        Type of passwordless authentication. By default is `code`.
        - connection:  Name of the passwordless connection. By default is 'sms'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
      */
-    func startPasswordless(phoneNumber: String, type: PasswordlessType = .Code, connection: String = "sms") -> Request<Void, AuthenticationError> {
+    func startPasswordless(phoneNumber: String, type: PasswordlessType = .code, connection: String = "sms") -> Request<Void, AuthenticationError> {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
     }
 
