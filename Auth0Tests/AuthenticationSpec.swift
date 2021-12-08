@@ -1029,28 +1029,24 @@ class AuthenticationSpec: QuickSpec {
         }
 
         describe("jwks") {
-            context("successful fetch") {
-                it("should fetch the jwks") {
-                    stub(condition: isJWKSPath(Domain)) { _ in jwksResponse() }
-                    
-                    waitUntil { done in
-                        auth.jwks().start {
-                            expect($0).to(haveJWKS())
-                            done()
-                        }
+            it("should fetch the jwks") {
+                stub(condition: isJWKSPath(Domain)) { _ in jwksResponse() }
+                
+                waitUntil { done in
+                    auth.jwks().start {
+                        expect($0).to(haveJWKS())
+                        done()
                     }
                 }
             }
-            
-            context("unsuccesful fetch") {
-                it("should produce an error") {
-                    stub(condition: isJWKSPath(Domain)) { _ in jwksErrorResponse() }
-                    
-                    waitUntil { done in
-                        auth.jwks().start {
-                            expect($0).to(beFailure())
-                            done()
-                        }
+
+            it("should produce an error") {
+                stub(condition: isJWKSPath(Domain)) { _ in jwksErrorResponse() }
+                
+                waitUntil { done in
+                    auth.jwks().start {
+                        expect($0).to(beFailure())
+                        done()
                     }
                 }
             }

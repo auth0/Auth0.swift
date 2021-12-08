@@ -138,6 +138,21 @@ class OAuth2GrantSpec: QuickSpec {
                 }
             }
 
+            it("should produce pkce not allowed error") {
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
+                let code = UUID().uuidString
+                let values = ["code": code, "nonce": nonce]
+                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
+                    return authFailure(error: "foo", description: "Unauthorized")
+                }.name = "Failed Code Exchange Auth"
+                waitUntil { done in
+                    pkce.credentials(from: values) {
+                        expect($0).to(beFailure(WebAuthError.pkceNotAllowed.localizedDescription))
+                        done()
+                    }
+                }
+            }
+
             it("shoud report error to get credentials") {
                 waitUntil { done in
                     pkce.credentials(from: [:]) {

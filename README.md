@@ -101,6 +101,7 @@ Auth0
 ```swift
 Auth0
     .webAuth()
+    .audience("https://YOUR_AUTH0_DOMAIN/userinfo")
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -120,6 +121,7 @@ Auth0
 do {
     let credentials = try await Auth0
         .webAuth()
+        .audience("https://YOUR_AUTH0_DOMAIN/userinfo")
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -338,6 +340,41 @@ Auth0
 
 > The `screen_hint` parameter can only be used with the **New Universal Login Experience**, not the **Classic Experience**.
 
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .webAuth()
+    .parameters(["screen_hint": "signup"])
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .webAuth()
+        .parameters(["screen_hint": "signup"])
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
 #### Disable Single Sign On Consent Alert (iOS 13+ / macOS)
 
 This SDK uses `ASWebAuthenticationSession` under the hood to perform Web Authentication on iOS 12+ and macOS. It is Apple's current API for performing web-based authentication. By default, `ASWebAuthenticationSession` will store the Web Authentication cookies in Safari's shared cookie jar. This makes [Single Sign On (SSO)](https://auth0.com/docs/sso) possible, but it also means that `ASWebAuthenticationSession` will prompt the user for consent.
@@ -362,6 +399,43 @@ Auth0
         }
     }
 ```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .webAuth()
+    .audience("https://YOUR_AUTH0_DOMAIN/userinfo")
+    .useEphemeralSession()
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .webAuth()
+        .audience("https://YOUR_AUTH0_DOMAIN/userinfo")
+        .useEphemeralSession()
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
 
 If you're using `useEphemeralSession()`, you do not need to call `clearSession()` to perform logout as there will be no cookies to remove. Just deleting the credentials will suffice. 
 
@@ -495,7 +569,7 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter pincode to Login"
 
 #### Sign in With Apple
 
-If you've added [the Sign In with Apple flow](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) to your app, you can use the string value from the `authorizationCode` property obtained after a successful Apple authentication to perform a token exchange for Auth0 tokens.
+If you've added [the Sign In with Apple flow](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) to your app, you can use the string value from the `authorizationCode` property obtained after a successful Apple authentication to perform a code exchange for Auth0 tokens.
 
 ```swift
 Auth0
@@ -511,11 +585,46 @@ Auth0
 }
 ```
 
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+   .authentication()
+   .login(appleAuthorizationCode: authCode)
+   .publisher()
+   .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(appleAuthorizationCode: authCode)
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
 Find out more about [Setting up Sign in with Apple](https://auth0.com/docs/connections/apple-siwa/set-up-apple) with Auth0.
 
 #### Facebook Login
 
-If you've added [the Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and use them to perform a token exchange for Auth0 tokens.
+If you've added [the Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and use them to perform a code exchange for Auth0 tokens.
 
 ```swift
 Auth0
@@ -530,6 +639,41 @@ Auth0
         }
 }
 ```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+   .authentication()
+   .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+   .publisher()
+   .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
 
 Find out more about [Setting up Facebook Login](https://auth0.com/docs/connections/nativesocial/facebook) with Auth0.
 
@@ -561,6 +705,41 @@ Auth0.webAuth()
         }
     }
 ```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+   .webAuth()
+   .organization(organizationId)
+   .publisher()
+   .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .webAuth()
+        .organization(organizationId)
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
 
 #### Accept user invitations
 

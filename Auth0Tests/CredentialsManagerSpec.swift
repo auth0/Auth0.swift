@@ -383,6 +383,14 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
+            it("should error when no refresh token") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                credentialsManager.credentials { result in
+                    expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noRefreshToken)))
+                }
+            }
+
             it("should return original credentials as not expired") {
                 _ = credentialsManager.store(credentials: credentials)
                 credentialsManager.credentials { result in
