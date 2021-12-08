@@ -7,11 +7,11 @@ public struct AuthenticationError: Auth0APIError {
 
     let info: [String: Any]
 
-    public init(info: [String: Any], statusCode: Int?) {
+    public init(info: [String: Any], statusCode: Int) {
         var values = info
         values["statusCode"] = statusCode
         self.info = values
-        self.statusCode = statusCode ?? 0
+        self.statusCode = statusCode
     }
 
     public let statusCode: Int

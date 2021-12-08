@@ -71,6 +71,11 @@ class BaseTransactionSpec: QuickSpec {
                     let url = URL(string: "https://samples.auth0.com/callback?code=\(code)")!
                     expect(transaction.resume(url)) == false
                 }
+
+                it("should fail to handle invalid url") {
+                    let url = URL(string: "foo")!
+                    expect(transaction.resume(url)) == false
+                }
             }
             
             context("cancel") {

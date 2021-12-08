@@ -58,59 +58,69 @@ class ManagementSpec: QuickSpec {
             context("failure") {
 
                 it("should yield invalid json response") {
-                    let data = "NOT JSON".data(using: .utf8)!
-                    let http = HTTPURLResponse(url: DomainURL, statusCode: 200, httpVersion: nil, headerFields: nil)
+                    let statusCode = 200
+                    let errorBody = "NOT JSON"
+                    let data = errorBody.data(using: .utf8)!
+                    let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(beFailure())
+                    expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
                 }
 
                 it("should yield invalid response") {
-                    let data = "[{\"key\": \"value\"}]".data(using: .utf8)!
-                    let http = HTTPURLResponse(url: DomainURL, statusCode: 200, httpVersion: nil, headerFields: nil)
+                    let statusCode = 200
+                    let errorBody = "[{\"key\": \"value\"}]"
+                    let data = errorBody.data(using: .utf8)!
+                    let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(beFailure())
+                    expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
                 }
 
                 it("should yield generic failure when error response is unknown") {
-                    let data = "[{\"key\": \"value\"}]".data(using: .utf8)!
-                    let http = HTTPURLResponse(url: DomainURL, statusCode: 400, httpVersion: nil, headerFields: nil)
+                    let statusCode = 400
+                    let errorBody = "[{\"key\": \"value\"}]"
+                    let data = errorBody.data(using: .utf8)!
+                    let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(beFailure())
+                    expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
                 }
 
                 it("should yield server error") {
-                    let error = ["error": "error", "description": "description", "code": "code", "statusCode": 400] as [String : Any]
+                    let statusCode = 400
+                    let error: [String : Any] = ["error": "error", "description": "description", "code": "code", "statusCode": statusCode]
                     let data = try? JSONSerialization.data(withJSONObject: error, options: [])
-                    let http = HTTPURLResponse(url: DomainURL, statusCode: 400, httpVersion: nil, headerFields: nil)
+                    let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveManagementError("error", description: "description", code: "code", statusCode: 400))
+                    expect(actual).toEventually(haveManagementError("error", description: "description", code: "code", statusCode: statusCode))
                 }
 
                 it("should yield generic failure when no payload") {
-                    let http = HTTPURLResponse(url: DomainURL, statusCode: 400, httpVersion: nil, headerFields: nil)
+                    let statusCode = 400
+                    let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: nil, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(beFailure())
+                    expect(actual).toEventually(haveManagementError(description: "Empty response body", code: emptyBodyError, statusCode: statusCode))
                 }
 
-                it("should yield generic failure") {
-                    let response = Response<ManagementError>(data: nil, response: nil, error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+                it("should yield error with a cause") {
+                    let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+                    let response = Response<ManagementError>(data: nil, response: nil, error: cause)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(beFailure())
+                    expect(actual).toEventually(haveManagementError(description: cause.localizedDescription, code: nonJSONError, cause: cause))
                 }
 
             }
 
         }
+
     }
 }

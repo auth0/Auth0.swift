@@ -329,6 +329,15 @@ class WebAuthSpec: QuickSpec {
 
         describe("other builder methods") {
 
+            context("nonce") {
+
+                it("should use a custom nonce value") {
+                    let nonce = "foo"
+                    expect(newWebAuth().nonce(nonce).nonce).to(equal(nonce))
+                }
+
+            }
+
             context("leeway") {
 
                 it("should use the default leeway value") {

@@ -103,6 +103,10 @@ func isLinkPath(_ domain: String, identifier: String) -> HTTPStubsTestBlock {
     return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")
 }
 
+func isUnlinkPath(_ domain: String, identifier: String, provider: String, identityId: String) -> HTTPStubsTestBlock {
+    return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities/\(provider)/\(identityId)")
+}
+
 func isJWKSPath(_ domain: String) -> HTTPStubsTestBlock {
     return isHost(domain) && isPath("/.well-known/jwks.json")
 }
@@ -133,7 +137,7 @@ func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQ
 }
 
 func haveAuthenticationError<T>(code: String, description: String) -> Predicate<AuthenticationResult<T>> {
-    return Predicate<AuthenticationResult<T>>.define("an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
+    return Predicate<AuthenticationResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         return try beFailure(expression, failureMessage) { (error: AuthenticationError) -> Bool in
             return code == error.code && description == error.localizedDescription
         }
@@ -142,7 +146,7 @@ func haveAuthenticationError<T>(code: String, description: String) -> Predicate<
 
 #if WEB_AUTH_PLATFORM
 func haveAuthenticationError<T>(code: String, description: String) -> Predicate<WebAuthResult<T>> {
-    return Predicate<WebAuthResult<T>>.define("an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
+    return Predicate<WebAuthResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         return try beFailure(expression, failureMessage) { (error: WebAuthError) -> Bool in
             guard let cause = error.cause as? AuthenticationError else { return false }
             return code == cause.code && description == cause.localizedDescription
@@ -151,25 +155,36 @@ func haveAuthenticationError<T>(code: String, description: String) -> Predicate<
 }
 #endif
 
-func haveManagementError<T>(_ cause: String, description: String, code: String, statusCode: Int) -> Predicate<ManagementResult<T>> {
-    return Predicate<ManagementResult<T>>.define("an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
+func haveManagementError<T>(_ errorString: String, description: String, code: String, statusCode: Int) -> Predicate<ManagementResult<T>> {
+    return Predicate<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         return try beFailure(expression, failureMessage) { (error: ManagementError) -> Bool in
-            return cause == (error["error"])
-                && code == (error["code"])
-                && description == (error["description"])
-                && statusCode == (error["statusCode"])
+            return errorString == (error["error"])
+                && code == error.code
+                && description == error.localizedDescription
+                && statusCode == error.statusCode
+        }
+    }
+}
+
+func haveManagementError<T>(description: String, code: String, statusCode: Int = 0, cause: Error? = nil) -> Predicate<ManagementResult<T>> {
+    return Predicate<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
+        return try beFailure(expression, failureMessage) { (error: ManagementError) -> Bool in
+            return code == error.code
+                && description == error.localizedDescription
+                && statusCode == error.statusCode
+                && (cause == nil || error.cause?.localizedDescription == cause?.localizedDescription)
         }
     }
 }
 
 func haveCredentialsManagerError<T>(_ cause: CredentialsManagerError) -> Predicate<CredentialsManagerResult<T>> {
-    return Predicate<CredentialsManagerResult<T>>.define("an error result") { expression, failureMessage -> PredicateResult in
+    return Predicate<CredentialsManagerResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
         return try beFailure(expression, failureMessage) { (error: CredentialsManagerError) -> Bool in error == cause }
     }
 }
 
 func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Predicate<AuthenticationResult<Credentials>> {
-    return Predicate<AuthenticationResult<Credentials>>.define("a successful authentication result") { expression, failureMessage -> PredicateResult in
+    return Predicate<AuthenticationResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> PredicateResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
                                    refreshToken: nil,
@@ -180,7 +195,7 @@ func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> 
 
 #if WEB_AUTH_PLATFORM
 func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Predicate<WebAuthResult<Credentials>> {
-    return Predicate<WebAuthResult<Credentials>>.define("a successful authentication result") { expression, failureMessage -> PredicateResult in
+    return Predicate<WebAuthResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> PredicateResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
                                    refreshToken: nil,
@@ -191,7 +206,7 @@ func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> 
 #endif
 
 func haveCredentials(_ accessToken: String, _ idToken: String? = nil, _ refreshToken: String? = nil) -> Predicate<CredentialsManagerResult<Credentials>> {
-    return Predicate<CredentialsManagerResult<Credentials>>.define("a successful credentials retrieval") { expression, failureMessage -> PredicateResult in
+    return Predicate<CredentialsManagerResult<Credentials>>.define("be a successful credentials retrieval") { expression, failureMessage -> PredicateResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
                                    refreshToken: refreshToken,
@@ -201,7 +216,7 @@ func haveCredentials(_ accessToken: String, _ idToken: String? = nil, _ refreshT
 }
 
 func haveCredentials() -> Predicate<CredentialsManagerResult<Credentials>> {
-    return Predicate<CredentialsManagerResult<Credentials>>.define("a successful credentials retrieval") { expression, failureMessage -> PredicateResult in
+    return Predicate<CredentialsManagerResult<Credentials>>.define("be a successful credentials retrieval") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage)
     }
 }
