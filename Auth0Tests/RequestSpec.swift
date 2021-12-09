@@ -16,9 +16,7 @@ class RequestSpec: QuickSpec {
     override func spec() {
 
         beforeEach {
-            stub(condition: isHost(Url.host!)) { _
-                in HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-            }.name = "YOU SHALL NOT PASS!"
+            stub(condition: isHost(Url.host!)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
         }
 
         afterEach {
@@ -101,7 +99,7 @@ class RequestSpec: QuickSpec {
 
                 it("should emit only one value") {
                     stub(condition: isHost(Url.host!)) { _ in
-                        return HTTPStubsResponse(jsonObject: [:], statusCode: 200, headers: nil)
+                        return apiSuccessResponse()
                     }
                     let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                     waitUntil(timeout: Timeout) { done in
@@ -119,7 +117,7 @@ class RequestSpec: QuickSpec {
 
                 it("should complete with the response") {
                     stub(condition: isHost(Url.host!)) { _ in
-                        return HTTPStubsResponse(jsonObject: ["foo": "bar"], statusCode: 200, headers: nil)
+                        return apiSuccessResponse(json: ["foo": "bar"])
                     }
                     let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                     waitUntil(timeout: Timeout) { done in
@@ -137,7 +135,7 @@ class RequestSpec: QuickSpec {
 
                 it("should complete with an error") {
                     stub(condition: isHost(Url.host!)) { _ in
-                        return authFailure()
+                        return apiFailureResponse()
                     }
                     let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                     waitUntil(timeout: Timeout) { done in
@@ -160,7 +158,7 @@ class RequestSpec: QuickSpec {
 
             it("should return the response") {
                 stub(condition: isHost(Url.host!)) { _ in
-                    return HTTPStubsResponse(jsonObject: ["foo": "bar"], statusCode: 200, headers: nil)
+                    return apiSuccessResponse(json: ["foo": "bar"])
                 }
                 let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                 waitUntil(timeout: Timeout) { done in
@@ -188,7 +186,7 @@ class RequestSpec: QuickSpec {
 
             it("should throw an error") {
                 stub(condition: isHost(Url.host!)) { _ in
-                    return authFailure()
+                    return apiFailureResponse()
                 }
                 let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                 waitUntil(timeout: Timeout) { done in

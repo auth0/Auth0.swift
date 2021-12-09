@@ -28,7 +28,7 @@ public struct Telemetry {
         if let libVersion = info[Telemetry.VersionKey] as? String {
             env[Telemetry.WrappedVersion] = libVersion
         } else {
-            env[Telemetry.WrappedVersion] =  Telemetry.NoVersion
+            env[Telemetry.WrappedVersion] = Telemetry.NoVersion
         }
         let wrapped: [String: Any] = [
             Telemetry.NameKey: name,

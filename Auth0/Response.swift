@@ -37,8 +37,7 @@ struct Response<E: Auth0APIError> {
         // This piece of code is dedicated to our friends the backend devs :)
         if response.url?.lastPathComponent == "change_password" {
             return nil
-        } else {
-            throw E(from: self)
         }
+        throw E(from: self)
     }
 }
