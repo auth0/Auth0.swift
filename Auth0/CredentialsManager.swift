@@ -78,19 +78,20 @@ public struct CredentialsManager {
     }
 
     /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
-    /// the credentials are not cleared and an error is raised through the callback.
+    /// the credentials are not cleared and a failure case is raised through the callback, with an error.
     ///
-    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked without an error.
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked with a
+    /// success case.
     ///
     /// - Parameters:
     ///   - headers:  Additional headers to add to a possible token revocation. The headers will be set via Request.headers.
-    ///   - callback: Callback with an error if the refresh token could not be revoked.
-    public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerError?) -> Void) {
+    ///   - callback: Callback with the operation success or the error.
+    public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
         guard let data = self.storage.getEntry(forKey: self.storeKey),
               let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
               let refreshToken = credentials.refreshToken else {
                   _ = self.clear()
-                  return callback(nil)
+                  return callback(.success(()))
         }
 
         self.authentication
@@ -99,10 +100,10 @@ public struct CredentialsManager {
             .start { result in
                 switch result {
                 case .failure(let error):
-                    callback(CredentialsManagerError(code: .revokeFailed, cause: error))
+                    callback(.failure(CredentialsManagerError(code: .revokeFailed, cause: error)))
                 case .success:
                     _ = self.clear()
-                    callback(nil)
+                    callback(.success(()))
                 }
             }
     }
@@ -117,9 +118,9 @@ public struct CredentialsManager {
         return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
     }
 
-    /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired
-    /// otherwise the retrieved credentials will be returned as they have not expired. Renewed credentials will be
-    /// stored in the keychain.
+    /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired.
+    /// Otherwise, the retrieved credentials will be returned in the success case as they have not yet expired. Renewed credentials
+    /// will be stored in the keychain.
     ///
     /// ```
     /// credentialsManager.credentials { result in
@@ -137,7 +138,7 @@ public struct CredentialsManager {
     ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed.
     ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
     ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
-    ///   - callback:   Callback with the user's credentials or the cause of the error.
+    ///   - callback:   Callback with the user's credentials or the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     #if WEB_AUTH_PLATFORM
@@ -261,10 +262,7 @@ public extension CredentialsManager {
     func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {
             Future { callback in
-                return self.revoke(headers: headers) { error in
-                    if let error = error { return callback(.failure(error)) }
-                    callback(.success(()))
-                }
+                return self.revoke(headers: headers, callback)
             }
         }.eraseToAnyPublisher()
     }
@@ -324,20 +322,14 @@ public extension CredentialsManager {
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func revoke(headers: [String: String] = [:]) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            self.revoke(headers: headers) { error in
-                if let error = error { return continuation.resume(throwing: error) }
-                continuation.resume(returning: ())
-            }
+            self.revoke(headers: headers, continuation.resume)
         }
     }
     #else
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
     func revoke(headers: [String: String] = [:]) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            self.revoke(headers: headers) { error in
-                if let error = error { return continuation.resume(throwing: error) }
-                continuation.resume(returning: ())
-            }
+            self.revoke(headers: headers, continuation.resume)
         }
     }
     #endif

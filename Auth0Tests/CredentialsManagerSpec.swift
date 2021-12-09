@@ -117,8 +117,8 @@ class CredentialsManagerSpec: QuickSpec {
             
             it("should clear credentials and revoke the refresh token") {
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.revoke { error in
-                        expect(error).to(beNil())
+                    credentialsManager.revoke { result in
+                        expect(result).to(beSuccessful())
                         expect(credentialsManager.hasValid()).to(beFalse())
                         done()
                     }
@@ -129,8 +129,8 @@ class CredentialsManagerSpec: QuickSpec {
                 _ = credentialsManager.clear()
                 
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.revoke { error in
-                        expect(error).to(beNil())
+                    credentialsManager.revoke { result in
+                        expect(result).to(beSuccessful())
                         expect(credentialsManager.hasValid()).to(beFalse())
                         done()
                     }
@@ -138,17 +138,15 @@ class CredentialsManagerSpec: QuickSpec {
             }
             
             it("should not return an error if there is no refresh token, and clear credentials anyway") {
-                let credentials = Credentials(
-                    accessToken: AccessToken,
-                    idToken: IdToken,
-                    expiresIn: Date(timeIntervalSinceNow: ExpiresIn)
-                    )
+                let credentials = Credentials(accessToken: AccessToken,
+                                              idToken: IdToken,
+                                              expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 
                 _ = credentialsManager.store(credentials: credentials)
                 
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.revoke { error in
-                        expect(error).to(beNil())
+                    credentialsManager.revoke { result in
+                        expect(result).to(beSuccessful())
                         expect(credentialsManager.hasValid()).to(beFalse())
                         done()
                     }
@@ -157,12 +155,13 @@ class CredentialsManagerSpec: QuickSpec {
             
             it("should return the failure if the token could not be revoked, and not clear credentials") {
                 let cause = AuthenticationError(description: "Revoke failed", statusCode: 400)
+                let expectedError = CredentialsManagerError(code: .revokeFailed, cause: cause)
                 stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
                     return authFailure(code: "400", description: "Revoke failed")
                 }
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.revoke { error in
-                        expect(error).to(matchError(CredentialsManagerError(code: .revokeFailed, cause: cause)))
+                    credentialsManager.revoke { result in
+                        expect(result).to(haveCredentialsManagerError(expectedError))
                         expect(credentialsManager.hasValid()).to(beTrue())
                         done()
                     }
@@ -172,8 +171,8 @@ class CredentialsManagerSpec: QuickSpec {
             it("should include custom headers") {
                 stub(condition: hasHeader("foo", value: "bar")) { _ in return revokeTokenResponse() }.name = "revoke success"
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.revoke(headers: ["foo": "bar"], { error in
-                        expect(error).to(beNil())
+                    credentialsManager.revoke(headers: ["foo": "bar"], { result in
+                        expect(result).to(beSuccessful())
                         done()
                     })
                 }

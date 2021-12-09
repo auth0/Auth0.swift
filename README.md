@@ -512,12 +512,13 @@ let didClear = credentialsManager.clear()
 In addition, credentials can be cleared and the refresh token revoked using a single call to `revoke`. This function will attempt to revoke the current refresh token stored by the credential manager and then clear credentials from the Keychain. If revoking the token results in an error, then the credentials are not cleared:
 
 ```swift
-credentialsManager.revoke { error in
-    guard error == nil else {
-        return print("Failed to revoke refresh token: \(error)")
+credentialsManager.revoke { result in
+    switch result {
+    case .success:
+        print("Success")
+    case .failure(let error):
+        print("Failed with \(error)") 
     }
-    
-    print("Success")
 }
 ```
 
