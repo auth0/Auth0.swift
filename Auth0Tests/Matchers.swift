@@ -47,10 +47,6 @@ func hasNoneOf(_ names: [String]) -> HTTPStubsTestBlock {
     }
 }
 
-func hasNoneOf(_ parameters: [String: String]) -> HTTPStubsTestBlock {
-    return !hasAtLeast(parameters)
-}
-
 func hasQueryParameters(_ parameters: [String: String]) -> HTTPStubsTestBlock {
     return { request in
         guard
@@ -83,7 +79,6 @@ func isPasswordless(_ domain: String) -> HTTPStubsTestBlock {
 func isUserInfo(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodGET() && isHost(domain) && isPath("/userinfo")
 }
-
 
 func isRevokeToken(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/oauth/revoke")
@@ -158,7 +153,7 @@ func haveAuthenticationError<T>(code: String, description: String) -> Predicate<
 func haveManagementError<T>(_ errorString: String, description: String, code: String, statusCode: Int) -> Predicate<ManagementResult<T>> {
     return Predicate<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         return try beFailure(expression, failureMessage) { (error: ManagementError) -> Bool in
-            return errorString == (error["error"])
+            return errorString == error.info["error"] as? String
                 && code == error.code
                 && description == error.localizedDescription
                 && statusCode == error.statusCode
@@ -177,9 +172,31 @@ func haveManagementError<T>(description: String, code: String, statusCode: Int =
     }
 }
 
-func haveCredentialsManagerError<T>(_ cause: CredentialsManagerError) -> Predicate<CredentialsManagerResult<T>> {
+func haveManagementError<T>(description: String, statusCode: Int) -> Predicate<ManagementResult<T>> {
+    return Predicate<ManagementResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
+        return try beFailure(expression, failureMessage) { (error: ManagementError) -> Bool in
+            return error.localizedDescription == description && error.statusCode == statusCode
+        }
+    }
+}
+
+#if WEB_AUTH_PLATFORM
+func haveWebAuthError<T>(_ expected: WebAuthError) -> Predicate<WebAuthResult<T>> {
+    return Predicate<WebAuthResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
+        return try beFailure(expression, failureMessage) { (error: WebAuthError) -> Bool in
+            return error == expected
+                && (expected.cause == nil || error.cause?.localizedDescription == expected.cause?.localizedDescription)
+        }
+    }
+}
+#endif
+
+func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError) -> Predicate<CredentialsManagerResult<T>> {
     return Predicate<CredentialsManagerResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
-        return try beFailure(expression, failureMessage) { (error: CredentialsManagerError) -> Bool in error == cause }
+        return try beFailure(expression, failureMessage) { (error: CredentialsManagerError) -> Bool in
+            return error == expected
+                && (expected.cause == nil || error.cause?.localizedDescription == expected.cause?.localizedDescription)
+        }
     }
 }
 

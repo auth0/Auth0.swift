@@ -20,7 +20,7 @@ public final class Credentials: NSObject {
     public let accessToken: String
     /// Type of the access token.
     public let tokenType: String
-    /// When the access_token expires.
+    /// When the access token expires.
     public let expiresIn: Date
     /// If the API allows you to request new access tokens and the scope `offline_access` was included on Auth.
     public let refreshToken: String?
