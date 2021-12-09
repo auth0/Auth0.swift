@@ -18,6 +18,9 @@ let parameterPropertyKey = "com.auth0.parameter"
  ```
  */
 public struct Request<T, E: Auth0APIError>: Requestable {
+    /**
+     The callback closure type for the request.
+     */
     public typealias Callback = (Result<T, E>) -> Void
 
     let session: URLSession
