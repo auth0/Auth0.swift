@@ -17,9 +17,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
         let mockClaimsValidator = MockSuccessfulIDTokenClaimsValidator()
 
         beforeEach {
-            stub(condition: isHost(domain)) { _
-                in HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-            }.name = "YOU SHALL NOT PASS!"
+            stub(condition: isHost(self.domain)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
         }
 
         afterEach {

@@ -25,10 +25,7 @@ struct DefaultLogger: Logger {
     }
 
     func trace(request: URLRequest, session: URLSession) {
-        guard
-            let method = request.httpMethod,
-            let url = request.url?.absoluteString
-            else { return }
+        guard let method = request.httpMethod, let url = request.url?.absoluteString else { return }
         output.log(message: "\(method) \(url) HTTP/1.1")
         session.configuration.httpAdditionalHeaders?.forEach { key, value in output.log(message: "\(key): \(value)") }
         request.allHTTPHeaderFields?.forEach { key, value in output.log(message: "\(key): \(value)") }

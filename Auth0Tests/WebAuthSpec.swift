@@ -329,6 +329,18 @@ class WebAuthSpec: QuickSpec {
 
         describe("other builder methods") {
 
+            context("ephemeral session") {
+
+                it("should not use ephemeral session by default") {
+                    expect(newWebAuth().ephemeralSession).to(beFalse())
+                }
+
+                it("should use ephemeral session") {
+                    expect(newWebAuth().useEphemeralSession().ephemeralSession).to(beTrue())
+                }
+
+            }
+
             context("nonce") {
 
                 it("should use a custom nonce value") {
@@ -391,60 +403,92 @@ class WebAuthSpec: QuickSpec {
 
         #if os(iOS)
         describe("session") {
-            
-            context("before start") {
-                
-                it("should not use ephemeral session by default") {
-                    expect(newWebAuth().ephemeralSession).to(beFalse())
-                }
 
-                it("should use ephemeral session") {
-                    expect(newWebAuth().useEphemeralSession().ephemeralSession).to(beTrue())
-                }
+            let storage = TransactionStore.shared
 
+            beforeEach {
+                if let current = storage.current {
+                    storage.cancel(current)
+                }
             }
 
-            context("after start") {
+            it("should save started session") {
+                newWebAuth().start { _ in }
+                expect(storage.current).toNot(beNil())
+            }
 
-                let storage = TransactionStore.shared
+            it("should have a generated state") {
+                let auth = newWebAuth()
+                auth.start { _ in }
+                expect(storage.current?.state).toNot(beNil())
+            }
 
-                beforeEach {
-                    if let current = storage.current {
-                        storage.cancel(current)
-                    }
-                }
+            it("should honor supplied state") {
+                let state = UUID().uuidString
+                newWebAuth().state(state).start { _ in }
+                expect(storage.current?.state) == state
+            }
 
-                it("should save started session") {
-                    newWebAuth().start({ _ in})
-                    expect(storage.current).toNot(beNil())
-                }
+            it("should honor supplied state via parameters") {
+                let state = UUID().uuidString
+                newWebAuth().parameters(["state": state]).start { _ in }
+                expect(storage.current?.state) == state
+            }
 
-                it("should have a generated state") {
-                    let auth = newWebAuth()
-                    auth.start({ _ in})
-                    expect(storage.current?.state).toNot(beNil())
-                }
+            it("should generate different state on every start") {
+                let auth = newWebAuth()
+                auth.start { _ in }
+                let state = storage.current?.state
+                auth.start { _ in }
+                expect(storage.current?.state) != state
+            }
 
-                it("should honor supplied state") {
-                    let state = UUID().uuidString
-                    newWebAuth().state(state).start({ _ in})
-                    expect(storage.current?.state) == state
-                }
+            it("should produce a no bundle identifier error") {
+                let auth = newWebAuth()
+                let expectedError = WebAuthError(code: .noBundleIdentifier)
+                var result: WebAuthResult<Credentials>?
+                auth.redirectURL = nil
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
 
-                it("should honor supplied state via parameters") {
-                    let state = UUID().uuidString
-                    newWebAuth().parameters(["state": state]).start({ _ in})
-                    expect(storage.current?.state) == state
-                }
+            it("should produce a malformed invitation URL error when organization is missing") {
+                let auth = newWebAuth()
+                let url = "https://\(Domain)?invitation=foo"
+                let expectedError = WebAuthError(code: .malformedInvitationURL(url))
+                var result: WebAuthResult<Credentials>?
+                _ = auth.invitationURL(URL(string: url)!)
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
 
-                it("should generate different state on every start") {
-                    let auth = newWebAuth()
-                    auth.start({ _ in})
-                    let state = storage.current?.state
-                    auth.start({ _ in})
-                    expect(storage.current?.state) != state
-                }
+            it("should produce a malformed invitation URL error when invitation is missing") {
+                let auth = newWebAuth()
+                let url = "https://\(Domain)?organization=foo"
+                let expectedError = WebAuthError(code: .malformedInvitationURL(url))
+                var result: WebAuthResult<Credentials>?
+                _ = auth.invitationURL(URL(string: url)!)
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
 
+            it("should produce a malformed invitation URL error when organization and invitation are missing") {
+                let auth = newWebAuth()
+                let url = "https://\(Domain)?foo=bar"
+                let expectedError = WebAuthError(code: .malformedInvitationURL(url))
+                var result: WebAuthResult<Credentials>?
+                _ = auth.invitationURL(URL(string: url)!)
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
+
+            it("should produce a malformed invitation URL error when query parameters are missing") {
+                let auth = newWebAuth()
+                let expectedError = WebAuthError(code: .malformedInvitationURL(DomainURL.absoluteString))
+                var result: WebAuthResult<Credentials>?
+                _ = auth.invitationURL(DomainURL)
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
         }
@@ -480,6 +524,13 @@ class WebAuthSpec: QuickSpec {
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(outcome).to(beTrue())
                     expect(TransactionStore.shared.current).to(beNil())
+                }
+
+                it("should fail when redirect URL is missing") {
+                    let auth = newWebAuth()
+                    auth.redirectURL = nil
+                    auth.clearSession(federated: false) { outcome = $0 }
+                    expect(outcome).to(beFalse())
                 }
 
             }
