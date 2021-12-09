@@ -229,15 +229,13 @@ The following cases were lowercased, as per the naming convention of Swift 3+:
 
 #### Properties removed
 
-- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error, e.g. `error["code"]`.
-- `description` was removed, as `AuthenticationError` now conforms to `LocalizedError`.
+The property `description` was removed in favor of `localizedDescription`, as `AuthenticationError` now conforms to `LocalizedError`.
 
 ### `ManagementError` struct
 
 #### Properties removed
 
-- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error, e.g. `error["code"]`.
-- `description` was removed, as `ManagementError` now conforms to `LocalizedError`.
+The property `description` was removed in favor of `localizedDescription`, as `ManagementError` now conforms to `LocalizedError`.
 
 ### `WebAuthError` struct
 

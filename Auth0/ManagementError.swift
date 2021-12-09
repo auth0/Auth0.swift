@@ -5,7 +5,7 @@ import Foundation
  */
 public struct ManagementError: Auth0APIError {
 
-    let info: [String: Any]
+    public let info: [String: Any]
 
     public init(info: [String: Any], statusCode: Int) {
         var values = info
@@ -39,16 +39,6 @@ extension ManagementError: Equatable {
         return lhs.code == rhs.code
             && lhs.statusCode == rhs.statusCode
             && lhs.localizedDescription == rhs.localizedDescription
-    }
-
-}
-
-// MARK: - Subscript
-
-public extension ManagementError {
-
-    subscript<T>(_ key: String) -> T? {
-        return self.info[key] as? T
     }
 
 }

@@ -153,7 +153,7 @@ func haveAuthenticationError<T>(code: String, description: String) -> Predicate<
 func haveManagementError<T>(_ errorString: String, description: String, code: String, statusCode: Int) -> Predicate<ManagementResult<T>> {
     return Predicate<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         return try beFailure(expression, failureMessage) { (error: ManagementError) -> Bool in
-            return errorString == (error["error"])
+            return errorString == error.info["error"] as? String
                 && code == error.code
                 && description == error.localizedDescription
                 && statusCode == error.statusCode
