@@ -913,8 +913,8 @@ Auth0
     .link("user identifier", withOtherUserToken: "another user token")
     .start { result in
         switch result {
-        case .success(let user):
-            print("User: \(user)")
+        case .success:
+            print("Accounts linked")
         case .failure(let error):
             print("Failed with \(error)")
         }
@@ -933,9 +933,8 @@ Auth0
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
-    }, receiveValue: { user in
-        print("User: \(user)")
-    })
+        print("Accounts linked")
+    }, receiveValue: { _ in })
     .store(in: &cancellables)
 ```
 </details>
@@ -945,11 +944,11 @@ Auth0
 
 ```swift
 do {
-    let user = try await Auth0
+    try await Auth0
         .users(token: idToken)
         .link("user identifier", withOtherUserToken: "another user token")
         .start()
-    print("User: \(user)")
+    print("Accounts linked")
 } catch {
     print("Failed with \(error)")
 }

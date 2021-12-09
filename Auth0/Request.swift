@@ -11,13 +11,16 @@ let parameterPropertyKey = "com.auth0.parameter"
  Auth0 API request.
 
  ```
- let request: Request<Credentials, Authentication.Error> = //
+ let request: Request<Credentials, AuthenticationError> = //
  request.start { result in
     print(result)
  }
  ```
  */
 public struct Request<T, E: Auth0APIError>: Requestable {
+    /**
+     The callback closure type for the request.
+     */
     public typealias Callback = (Result<T, E>) -> Void
 
     let session: URLSession
