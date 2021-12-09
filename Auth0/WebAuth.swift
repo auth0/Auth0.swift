@@ -1,3 +1,5 @@
+// swiftlint:disable file_length
+
 #if WEB_AUTH_PLATFORM
 import Foundation
 #if canImport(Combine)
@@ -139,9 +141,14 @@ public protocol WebAuth: Trackable, Loggable {
      Starts the WebAuth flow.
 
      ```
-     let credentials = try await Auth0
-         .webAuth(clientId: clientId, domain: "samples.auth0.com")
-         .start()
+     do {
+         let credentials = try await Auth0
+             .webAuth(clientId: clientId, domain: "samples.auth0.com")
+             .start()
+         print("Obtained credentials: \(credentials)")
+     } catch {
+         print("Failed with \(error)")
+     }
      ```
 
      Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
@@ -194,7 +201,13 @@ public protocol WebAuth: Trackable, Loggable {
      ```
      Auth0
          .webAuth()
-         .clearSession { print($0) }
+         .clearSession { result in
+             switch result {
+             case .success:
+                 print("Logged out")
+             case .failure(let error):
+                 print("Failed with \(error)")
+         }
      ```
 
      Remove Auth0 session and remove the IdP session:
@@ -209,7 +222,7 @@ public protocol WebAuth: Trackable, Loggable {
        - federated: `Bool` to remove the IdP session. Defaults to `false`.
        - callback: Callback called with bool outcome of the call.
      */
-    func clearSession(federated: Bool, callback: @escaping (Bool) -> Void)
+    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider session.
@@ -222,7 +235,14 @@ public protocol WebAuth: Trackable, Loggable {
      Auth0
          .webAuth()
          .clearSession()
-         .sink(receiveValue: { print($0) })
+         .sink(receiveCompletion: { completion in
+             switch completion {
+             case .failure(let error):
+                 print("Failed with \(error)")
+             case .finished:
+                 print("Logged out")
+             }
+         }, receiveValue: { _ in })
          .store(in: &cancellables)
      ```
 
@@ -240,7 +260,7 @@ public protocol WebAuth: Trackable, Loggable {
      - Returns: A type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
-    func clearSession(federated: Bool) -> AnyPublisher<Bool, Never>
+    func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError>
 
     #if compiler(>=5.5) && canImport(_Concurrency)
     /**
@@ -251,15 +271,20 @@ public protocol WebAuth: Trackable, Loggable {
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
      ```
-     let result = await Auth0
-         .webAuth(clientId: clientId, domain: "samples.auth0.com")
-         .clearSession()
+     do {
+         try await Auth0
+             .webAuth(clientId: clientId, domain: "samples.auth0.com")
+             .clearSession()
+         print("Logged out")
+     } catch {
+         print("Failed with \(error)")
+     }
      ```
 
      Remove Auth0 session and remove the IdP session:
 
      ```
-     let result = await Auth0
+     try await Auth0
          .webAuth(clientId: clientId, domain: "samples.auth0.com")
          .clearSession(federated: true)
      ```
@@ -269,10 +294,10 @@ public protocol WebAuth: Trackable, Loggable {
      */
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
-    func clearSession(federated: Bool) async -> Bool
+    func clearSession(federated: Bool) async throws
     #else
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func clearSession(federated: Bool) async -> Bool
+    func clearSession(federated: Bool) async throws
     #endif
     #endif
 }
@@ -289,7 +314,13 @@ public extension WebAuth {
      ```
      Auth0
          .webAuth()
-         .clearSession { print($0) }
+         .clearSession { result in
+             switch result {
+             case .success:
+                 print("Logged out")
+             case .failure(let error):
+                 print("Failed with \(error)")
+         }
      ```
 
      Remove Auth0 session and remove the IdP session:
@@ -304,7 +335,7 @@ public extension WebAuth {
        - federated: `Bool` to remove the IdP session. Defaults to `false`.
        - callback: Callback called with bool outcome of the call.
      */
-    func clearSession(federated: Bool = false, callback: @escaping (Bool) -> Void) {
+    func clearSession(federated: Bool = false, callback: @escaping (WebAuthResult<Void>) -> Void) {
         self.clearSession(federated: federated, callback: callback)
     }
 
@@ -319,7 +350,14 @@ public extension WebAuth {
      Auth0
          .webAuth()
          .clearSession()
-         .sink(receiveValue: { print($0) })
+         .sink(receiveCompletion: { completion in
+             switch completion {
+             case .failure(let error):
+                 print("Failed with \(error)")
+             case .finished:
+                 print("Logged out")
+             }
+         }, receiveValue: { _ in })
          .store(in: &cancellables)
      ```
 
@@ -337,7 +375,7 @@ public extension WebAuth {
      - Returns: A type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
-    func clearSession(federated: Bool = false) -> AnyPublisher<Bool, Never> {
+    func clearSession(federated: Bool = false) -> AnyPublisher<Void, WebAuthError> {
         return self.clearSession(federated: federated)
     }
 
@@ -350,15 +388,20 @@ public extension WebAuth {
      to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
      ```
-     let result = await Auth0
-         .webAuth(clientId: clientId, domain: "samples.auth0.com")
-         .clearSession()
+     do {
+         try await Auth0
+             .webAuth(clientId: clientId, domain: "samples.auth0.com")
+             .clearSession()
+         print("Logged out")
+     } catch {
+         print("Failed with \(error)")
+     }
      ```
 
      Remove Auth0 session and remove the IdP session:
 
      ```
-     let result = await Auth0
+     try await Auth0
          .webAuth(clientId: clientId, domain: "samples.auth0.com")
          .clearSession(federated: true)
      ```
@@ -368,13 +411,13 @@ public extension WebAuth {
      */
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
-    func clearSession(federated: Bool = false) async -> Bool {
-        return await self.clearSession(federated: federated)
+    func clearSession(federated: Bool = false) async throws {
+        return try await self.clearSession(federated: federated)
     }
     #else
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func clearSession(federated: Bool = false) async -> Bool {
-        return await self.clearSession(federated: federated)
+    func clearSession(federated: Bool = false) async throws {
+        return try await self.clearSession(federated: federated)
     }
     #endif
     #endif

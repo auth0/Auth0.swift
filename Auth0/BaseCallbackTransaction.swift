@@ -5,18 +5,18 @@ class BaseCallbackTransaction: NSObject, AuthTransaction {
 
     var authSession: AuthSession?
     var state: String?
-    let callback: (Bool) -> Void
+    let callback: (WebAuthResult<Void>) -> Void
 
-    init(callback: @escaping (Bool) -> Void) {
+    init(callback: @escaping (WebAuthResult<Void>) -> Void) {
         self.callback = callback
     }
 
     func cancel() {
-        self.callback(false)
+        self.callback(.failure(WebAuthError(code: .userCancelled)))
     }
 
     func resume(_ url: URL) -> Bool {
-        self.callback(true)
+        self.callback(.success(()))
         return true
     }
 

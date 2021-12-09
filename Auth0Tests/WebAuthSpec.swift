@@ -497,40 +497,46 @@ class WebAuthSpec: QuickSpec {
 
             context("ASWebAuthenticationSession") {
 
-                var outcome: Bool?
+                var result: WebAuthResult<Void>?
 
                 beforeEach {
-                    outcome = nil
+                    result = nil
                     TransactionStore.shared.clear()
                 }
 
                 it("should launch AuthenticationServicesSessionCallback") {
                     let auth = newWebAuth()
-                    auth.clearSession(federated: false) { _ in }
+                    auth.clearSession() { _ in }
+                    expect(TransactionStore.shared.current).toNot(beNil())
+                }
+
+                it("should launch AuthenticationServicesSessionCallback with federated") {
+                    let auth = newWebAuth()
+                    auth.clearSession(federated: true) { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
                 it("should cancel AuthenticationServicesSessionCallback") {
                     let auth = newWebAuth()
-                    auth.clearSession(federated: false) { outcome = $0 }
+                    auth.clearSession() { result = $0 }
                     TransactionStore.shared.cancel(TransactionStore.shared.current!)
-                    expect(outcome).to(beFalse())
+                    expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
                 it("should resume AuthenticationServicesSessionCallback") {
                     let auth = newWebAuth()
-                    auth.clearSession(federated: false) { outcome = $0 }
+                    auth.clearSession() { result = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
-                    expect(outcome).to(beTrue())
+                    expect(result).to(beSuccessful())
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
                 it("should fail when redirect URL is missing") {
                     let auth = newWebAuth()
                     auth.redirectURL = nil
-                    auth.clearSession(federated: false) { outcome = $0 }
-                    expect(outcome).to(beFalse())
+                    auth.clearSession() { result = $0 }
+                    expect(result).to(haveWebAuthError(WebAuthError(code: .noBundleIdentifier)))
                 }
 
             }

@@ -408,6 +408,10 @@ The methods of the Management API client now only yield errors of type `Manageme
 
 The Web Auth methods now only yield errors of type  `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError`.
 
+#### `clearSession(federated:)`
+
+This method now yields a `Result<Void, WebAuthError>`, which is aliased to `WebAuthResult<Void>`. This means you can now check the type of error (e.g. if the user cancelled the operation) and act accordingly.
+
 ### Credentials Manager
 
 #### Errors

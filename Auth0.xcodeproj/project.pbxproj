@@ -837,11 +837,11 @@
 		5F3965C01CF679B500CDE7C0 /* WebAuth */ = {
 			isa = PBXGroup;
 			children = (
+				5B16D8901F7141E5009476A5 /* AuthTransactions */,
 				5C41F6AF244DCC1100252548 /* Platforms */,
 				5F53F5CD1CFD157300476A46 /* AuthTransaction.swift */,
 				5B16D8921F714324009476A5 /* AuthSession.swift */,
 				5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */,
-				5B16D8901F7141E5009476A5 /* AuthTransactions */,
 				5FCAB1751D0900CF00331C84 /* TransactionStore.swift */,
 				5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */,
 				5FAE9C901D8878D400A871CE /* Auth0WebAuth.swift */,

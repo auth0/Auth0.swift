@@ -258,6 +258,14 @@ func beSuccessful<T>() -> Predicate<ManagementResult<T>> {
     }
 }
 
+#if WEB_AUTH_PLATFORM
+func beSuccessful<T>() -> Predicate<WebAuthResult<T>> {
+    return Predicate<WebAuthResult<T>>.define("be a successful result") { expression, failureMessage -> PredicateResult in
+        return try beSuccessful(expression, failureMessage)
+    }
+}
+#endif
+
 func beSuccessful<T>() -> Predicate<CredentialsManagerResult<T>> {
     return Predicate<CredentialsManagerResult<T>>.define("be a successful result") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage)
