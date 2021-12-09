@@ -35,6 +35,11 @@ class ResponseSpec: QuickSpec {
 
         describe("failed response") {
 
+            it("should fail with empty response") {
+                let response = Response<AuthenticationError>(data: nil, response: nil, error: nil)
+                expect(try? response.result()).to(beNil())
+            }
+
             it("should fail with code lesser than 200") {
                 let response = Response<AuthenticationError>(data: nil, response: http(199), error: nil)
                 expect(try? response.result()).to(beNil())

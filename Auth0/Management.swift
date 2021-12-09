@@ -1,7 +1,5 @@
 import Foundation
 
-public typealias ManagementObject = [String: Any]
-
 /**
  *  Auth0 Management API.
  */

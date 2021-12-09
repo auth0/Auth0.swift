@@ -512,12 +512,13 @@ let didClear = credentialsManager.clear()
 In addition, credentials can be cleared and the refresh token revoked using a single call to `revoke`. This function will attempt to revoke the current refresh token stored by the credential manager and then clear credentials from the Keychain. If revoking the token results in an error, then the credentials are not cleared:
 
 ```swift
-credentialsManager.revoke { error in
-    guard error == nil else {
-        return print("Failed to revoke refresh token: \(error)")
+credentialsManager.revoke { result in
+    switch result {
+    case .success:
+        print("Success")
+    case .failure(let error):
+        print("Failed with \(error)") 
     }
-    
-    print("Success")
 }
 ```
 
@@ -913,8 +914,8 @@ Auth0
     .link("user identifier", withOtherUserToken: "another user token")
     .start { result in
         switch result {
-        case .success(let user):
-            print("User: \(user)")
+        case .success:
+            print("Accounts linked")
         case .failure(let error):
             print("Failed with \(error)")
         }
@@ -933,9 +934,8 @@ Auth0
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
-    }, receiveValue: { user in
-        print("User: \(user)")
-    })
+        print("Accounts linked")
+    }, receiveValue: { _ in })
     .store(in: &cancellables)
 ```
 </details>
@@ -945,11 +945,11 @@ Auth0
 
 ```swift
 do {
-    let user = try await Auth0
+    try await Auth0
         .users(token: idToken)
         .link("user identifier", withOtherUserToken: "another user token")
         .start()
-    print("User: \(user)")
+    print("Accounts linked")
 } catch {
     print("Failed with \(error)")
 }

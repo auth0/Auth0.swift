@@ -31,6 +31,7 @@ As expected with a major release, Auth0.swift v2 contains breaking changes. Plea
     * [Extensions](#extensions)
 - [Types changed](#types-changed)
 - [Type properties changed](#type-properties-changed)
+    * [`PasswordlessType` enum](#passwordlesstype-enum)
     * [`AuthenticationError` struct](#authenticationerror-struct)
     * [`ManagementError` struct](#managementerror-struct)
     * [`WebAuthError` struct](#webautherror-struct)
@@ -214,19 +215,27 @@ The `a0_url(_:)` method is no longer public.
 
 ## Type properties changed
 
+### `PasswordlessType` enum
+
+#### Cases renamed
+
+The following cases were lowercased, as per the naming convention of Swift 3+:
+
+- `Code` -> `code`
+- `WebLink` -> `webLink`
+- `AndroidLink` -> `androidLink`
+
 ### `AuthenticationError` struct
 
 #### Properties removed
 
-- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error, e.g. `error["code"]`.
-- `description` was removed, as `AuthenticationError` now conforms to `LocalizedError`.
+The property `description` was removed in favor of `localizedDescription`, as `AuthenticationError` now conforms to `LocalizedError`.
 
 ### `ManagementError` struct
 
 #### Properties removed
 
-- `info: [String: Any]` is no longer public. Use the new subscript to access its values straight from the error, e.g. `error["code"]`.
-- `description` was removed, as `ManagementError` now conforms to `LocalizedError`.
+The property `description` was removed in favor of `localizedDescription`, as `ManagementError` now conforms to `LocalizedError`.
 
 ### `WebAuthError` struct
 
@@ -433,9 +442,13 @@ class CustomStore: CredentialsStorage {
 let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore())
 ```
 
-#### `credentials(withScope:minTTL:parameters:callback)` 
+#### `credentials(withScope:minTTL:parameters:callback)`
 
 This method now yields a `Result<Credentials, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Credentials>`.
+
+#### `revoke(headers:callback:)`
+
+This method now yields a `Result<Void, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Void>`.
 
 ##### Before
 

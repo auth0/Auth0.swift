@@ -1,6 +1,11 @@
 import Foundation
 
 /**
+ A dictionary containing a user profile.
+ */
+public typealias ManagementObject = [String: Any]
+
+/**
  Users endpoints of Auth0 Management API v2.
  - See: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users)
  */
@@ -19,8 +24,10 @@ public protocol Users: Trackable, Loggable {
          .get(userId)
          .start { result in
              switch result {
-             case .success(let user): print(user)
-             case .failure(let error): print(error)
+             case .success(let user):
+                 print("User signed up: \(user)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -54,7 +61,7 @@ public protocol Users: Trackable, Loggable {
     func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError>
 
     /**
-     Updates a user's root values (those who are allowed to be updated).
+     Updates a user's root values (those which are allowed to be updated).
      For example if you need to change `email`:
 
      ```
@@ -101,7 +108,7 @@ public protocol Users: Trackable, Loggable {
     func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError>
 
     /**
-     Updates only the user's userMetadata field.
+     Updates only the user's `user_metadata` field.
 
      ```
      Auth0
@@ -120,8 +127,8 @@ public protocol Users: Trackable, Loggable {
     func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError>
 
     /**
-     Links a user given it's identifier with a secondary user identifier it's token.
-     After this request the primary user will hold another identity in it's 'identities' attribute which will represent the secondary user.
+     Links a user given its identifier with a secondary user identifier its token.
+     After this request the primary user will hold another identity in its `identities` attribute which will represent the secondary user.
 
      ```
      Auth0
@@ -141,7 +148,7 @@ public protocol Users: Trackable, Loggable {
     func link(_ identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError>
 
     /**
-     Links a user given it's identifier with a secondary user identified by it's id, provider and connection identifier.
+     Links a user given its identifier with a secondary user identified by its id, provider and connection identifier.
 
      ```
      Auth0
@@ -163,7 +170,7 @@ public protocol Users: Trackable, Loggable {
     func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String?) -> Request<[ManagementObject], ManagementError>
 
     /**
-     Removes one identity from a user.
+     Removes an identity from a user.
 
      ```
      Auth0
@@ -197,8 +204,10 @@ public extension Users {
          .get(userId)
          .start { result in
              switch result {
-             case .success(let user): print(user)
-             case .failure(let error): print(error)
+             case .success(let user):
+                 print("User signed up: \(user)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -234,7 +243,7 @@ public extension Users {
     }
 
     /**
-     Links a user given it's identifier with a secondary user identified by it's id, provider and connection identifier.
+     Links a user given its identifier with a secondary user identified by its id, provider and connection identifier.
 
      ```
      Auth0
