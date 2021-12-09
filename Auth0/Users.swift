@@ -1,6 +1,11 @@
 import Foundation
 
 /**
+ A dictionary containing a user profile.
+ */
+public typealias ManagementObject = [String: Any]
+
+/**
  Users endpoints of Auth0 Management API v2.
  - See: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users)
  */
