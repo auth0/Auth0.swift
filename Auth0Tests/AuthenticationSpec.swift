@@ -30,9 +30,7 @@ class AuthenticationSpec: QuickSpec {
         let auth: Authentication = Auth0Authentication(clientId: ClientId, url: DomainURL)
 
         beforeEach {
-            stub(condition: isHost(Domain)) { _ in
-                return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-                }.name = "YOU SHALL NOT PASS!"
+            stub(condition: isHost(Domain)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
         }
 
         afterEach {
@@ -970,7 +968,7 @@ class AuthenticationSpec: QuickSpec {
         describe("user information") {
 
             it("should return user information") {
-                stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return userInfo(withProfile: basicProfileOIDC()) }.name = "user info"
+                stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return apiSuccessResponse(json: basicProfile()) }.name = "user info"
                 waitUntil(timeout: Timeout) { done in
                     auth.userInfo(withAccessToken: AccessToken).start { result in
                         expect(result).to(haveProfile(Sub))
@@ -1041,7 +1039,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should produce an error") {
-                stub(condition: isJWKSPath(Domain)) { _ in jwksErrorResponse() }
+                stub(condition: isJWKSPath(Domain)) { _ in apiFailureResponse() }
                 
                 waitUntil { done in
                     auth.jwks().start {

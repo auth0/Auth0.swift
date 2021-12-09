@@ -19,9 +19,7 @@ class OAuth2GrantSpec: QuickSpec {
         let leeway = 60 * 1000
 
         beforeEach {
-            stub(condition: isHost(domain.host!)) { _ in
-                return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-            }.name = "YOU SHALL NOT PASS!"
+            stub(condition: isHost(domain.host!)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
         }
 
         afterEach {
@@ -101,13 +99,6 @@ class OAuth2GrantSpec: QuickSpec {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
             }
 
-            afterEach {
-                HTTPStubs.removeAllStubs()
-                stub(condition: isHost(domain.host!)) { _ in
-                    return HTTPStubsResponse.init(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
-                    }.name = "YOU SHALL NOT PASS!"
-            }
-
             it("shoud build credentials") {
                 let token = UUID().uuidString
                 let code = UUID().uuidString
@@ -122,17 +113,18 @@ class OAuth2GrantSpec: QuickSpec {
                 }
             }
 
-            it("should fail with an invalid id_token") {
+            it("should produce id token validation failed error") {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
                 let token = UUID().uuidString
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
                 let idToken = generateJWT(iss: nil, nonce: nonce).string
+                let expectedError = WebAuthError(code: .idTokenValidationFailed, cause: IDTokenIssValidator.ValidationError.missingIss)
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
                 stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
                 waitUntil { done in
                     pkce.credentials(from: values) {
-                        expect($0).to(beFailure())
+                        expect($0).to(haveWebAuthError(expectedError))
                         done()
                     }
                 }
@@ -142,12 +134,30 @@ class OAuth2GrantSpec: QuickSpec {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
+                let expectedError = WebAuthError(code: .pkceNotAllowed)
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
                     return authFailure(error: "foo", description: "Unauthorized")
                 }.name = "Failed Code Exchange Auth"
                 waitUntil { done in
                     pkce.credentials(from: values) {
-                        expect($0).to(beFailure(WebAuthError.pkceNotAllowed.localizedDescription))
+                        expect($0).to(haveWebAuthError(expectedError))
+                        done()
+                    }
+                }
+            }
+
+            it("should produce other error") {
+                pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
+                let code = UUID().uuidString
+                let values = ["code": code, "nonce": nonce]
+                let cause = AuthenticationError(info: ["error": "foo", "error_description": "bar"])
+                let expectedError = WebAuthError(code: .other, cause: cause)
+                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
+                    return authFailure(error: "foo", description: "bar")
+                }.name = "Failed Code Exchange Auth"
+                waitUntil { done in
+                    pkce.credentials(from: values) {
+                        expect($0).to(haveWebAuthError(expectedError))
                         done()
                     }
                 }

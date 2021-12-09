@@ -23,7 +23,7 @@ public typealias WebAuthResult<T> = Result<T, WebAuthError>
 public typealias CredentialsManagerResult<T> = Result<T, CredentialsManagerError>
 
 /**
-  Default scope value used across Auth0.swift.
+ Default scope value used across Auth0.swift.
  */
 public let defaultScope = "openid profile email"
 
@@ -68,7 +68,7 @@ public func authentication(clientId: String, domain: String, session: URLSession
 
  - Parameters:
    - session: Instance of `URLSession` used for networking. By default it will use the shared `URLSession`.
-   - bundle:  Bundle used to locate the `Auth0.plist` file. By default is the main bundle.
+   - bundle:  Bundle used to locate the `Auth0.plist` file. By default it will use the main bundle.
  - Returns: Auth0 Authentication API.
  - Important: Calling this method without a valid `Auth0.plist` will crash your application.
  */
@@ -109,7 +109,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
  - Parameters:
    - token:   Token of Management API v2 with the correct allowed scopes to perform the desired action.
    - session: Instance of `URLSession` used for networking. By default it will use the shared `URLSession`.
-   - bundle:  Bundle used to locate the `Auth0.plist` file. By default is the main bundle.
+   - bundle:  Bundle used to locate the `Auth0.plist` file. By default it will use the main bundle.
  - Returns: Auth0 Management API v2.
  - Important: Calling this method without a valid `Auth0.plist` will crash your application.
  */
@@ -167,7 +167,7 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
 
  - Parameters:
    - session: Instance of `URLSession` used for networking. By default it will use the shared `URLSession`.
-   - bundle:  Bundle used to locate the `Auth0.plist` file. By default is the main bundle.
+   - bundle:  Bundle used to locate the `Auth0.plist` file. By default it will use the main bundle.
  - Returns: Auth0 WebAuth component.
  - Important: Calling this method without a valid `Auth0.plist` will crash your application.
  */

@@ -136,7 +136,7 @@ final class Auth0WebAuth: WebAuth {
             guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
                 let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
                 let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
-                    return callback(.failure(WebAuthError(code: .malformedInvitationURL(url.absoluteString))))
+                    return callback(.failure(WebAuthError(code: .malformedInvitationURL(invitationURL.absoluteString))))
             }
             organization = organizationId
             invitation = invitationId
