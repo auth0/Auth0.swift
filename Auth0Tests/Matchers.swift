@@ -181,19 +181,21 @@ func haveManagementError<T>(description: String, statusCode: Int) -> Predicate<M
 }
 
 #if WEB_AUTH_PLATFORM
-func haveWebAuthError<T>(_ expected: WebAuthError, withCause: Bool) -> Predicate<WebAuthResult<T>> {
+func haveWebAuthError<T>(_ expected: WebAuthError) -> Predicate<WebAuthResult<T>> {
     return Predicate<WebAuthResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
         return try beFailure(expression, failureMessage) { (error: WebAuthError) -> Bool in
-            return (error == expected) && (!withCause || error.cause != nil)
+            return error == expected
+                && (expected.cause == nil || error.cause?.localizedDescription == expected.cause?.localizedDescription)
         }
     }
 }
 #endif
 
-func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError, withCause: Bool) -> Predicate<CredentialsManagerResult<T>> {
+func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError) -> Predicate<CredentialsManagerResult<T>> {
     return Predicate<CredentialsManagerResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
         return try beFailure(expression, failureMessage) { (error: CredentialsManagerError) -> Bool in
-            return (error == expected) && (!withCause || error.cause != nil)
+            return error == expected
+                && (expected.cause == nil || error.cause?.localizedDescription == expected.cause?.localizedDescription)
         }
     }
 }

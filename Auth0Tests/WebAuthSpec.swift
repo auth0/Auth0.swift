@@ -445,10 +445,11 @@ class WebAuthSpec: QuickSpec {
 
             it("should produce a no bundle identifier error") {
                 let auth = newWebAuth()
+                let expectedError = WebAuthError(code: .noBundleIdentifier)
                 var result: WebAuthResult<Credentials>?
                 auth.redirectURL = nil
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(.noBundleIdentifier, withCause: false))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce a malformed invitation URL error when organization is missing") {
@@ -458,7 +459,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError, withCause: false))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce a malformed invitation URL error when invitation is missing") {
@@ -468,7 +469,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError, withCause: false))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce a malformed invitation URL error when organization and invitation are missing") {
@@ -478,7 +479,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError, withCause: false))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce a malformed invitation URL error when query parameters are missing") {
@@ -487,7 +488,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(DomainURL)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError, withCause: false))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
         }

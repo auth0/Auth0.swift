@@ -119,11 +119,12 @@ class OAuth2GrantSpec: QuickSpec {
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
                 let idToken = generateJWT(iss: nil, nonce: nonce).string
+                let expectedError = WebAuthError(code: .idTokenValidationFailed, cause: IDTokenIssValidator.ValidationError.missingIss)
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
                 stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
                 waitUntil { done in
                     pkce.credentials(from: values) {
-                        expect($0).to(haveWebAuthError(WebAuthError.idTokenValidationFailed, withCause: true))
+                        expect($0).to(haveWebAuthError(expectedError))
                         done()
                     }
                 }
@@ -133,12 +134,13 @@ class OAuth2GrantSpec: QuickSpec {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
+                let expectedError = WebAuthError(code: .pkceNotAllowed)
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
                     return authFailure(error: "foo", description: "Unauthorized")
                 }.name = "Failed Code Exchange Auth"
                 waitUntil { done in
                     pkce.credentials(from: values) {
-                        expect($0).to(haveWebAuthError(WebAuthError.pkceNotAllowed, withCause: false))
+                        expect($0).to(haveWebAuthError(expectedError))
                         done()
                     }
                 }
@@ -148,12 +150,14 @@ class OAuth2GrantSpec: QuickSpec {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
+                let cause = AuthenticationError(info: ["error": "foo", "error_description": "bar"])
+                let expectedError = WebAuthError(code: .other, cause: cause)
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
                     return authFailure(error: "foo", description: "bar")
                 }.name = "Failed Code Exchange Auth"
                 waitUntil { done in
                     pkce.credentials(from: values) {
-                        expect($0).to(haveWebAuthError(WebAuthError.other, withCause: true))
+                        expect($0).to(haveWebAuthError(expectedError))
                         done()
                     }
                 }
