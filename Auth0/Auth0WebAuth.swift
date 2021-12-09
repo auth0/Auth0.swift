@@ -158,7 +158,7 @@ final class Auth0WebAuth: WebAuth {
         self.storage.store(session)
     }
 
-    func clearSession(federated: Bool, callback: @escaping (Bool) -> Void) {
+    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
         let endpoint = federated ?
             URL(string: "v2/logout?federated", relativeTo: self.url)! :
             URL(string: "v2/logout", relativeTo: self.url)!
@@ -170,7 +170,7 @@ final class Auth0WebAuth: WebAuth {
         components?.queryItems = queryItems + [returnTo, clientId]
 
         guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
-            return callback(false)
+            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
         let session = ASCallbackTransaction(url: logoutURL,
@@ -252,11 +252,11 @@ extension Auth0WebAuth {
         return Deferred { Future(self.start) }.eraseToAnyPublisher()
     }
 
-    public func clearSession(federated: Bool) -> AnyPublisher<Bool, Never> {
+    public func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
         return Deferred {
             Future { callback in
                 self.clearSession(federated: federated) { result in
-                    callback(.success(result))
+                    callback(result)
                 }
             }
         }.eraseToAnyPublisher()
@@ -287,19 +287,19 @@ extension Auth0WebAuth {
 
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
-    func clearSession(federated: Bool) async -> Bool {
-        return await withCheckedContinuation { continuation in
+    func clearSession(federated: Bool) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
             self.clearSession(federated: federated) { result in
-                continuation.resume(returning: result)
+                continuation.resume(with: result)
             }
         }
     }
     #else
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func clearSession(federated: Bool) async -> Bool {
-        return await withCheckedContinuation { continuation in
+    func clearSession(federated: Bool) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
             self.clearSession(federated: federated) { result in
-                continuation.resume(returning: result)
+                continuation.resume(with: result)
             }
         }
     }

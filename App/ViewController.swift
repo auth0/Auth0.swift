@@ -35,8 +35,8 @@ class ViewController: UIViewController {
             .logging(enabled: true)
             .clearSession(federated: false) { result in
                 switch result {
-                    case true: print("Logged out")
-                    case false: print("Log out failed")
+                case .success: print("Logged out")
+                case .failure(let error): print(error)
                 }
             }
     }
