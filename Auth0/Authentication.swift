@@ -2,7 +2,25 @@
 
 import Foundation
 
+/**
+ A created database user (just email, username and email verified flag).
+ */
 public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
+
+/**
+ Types of passwordless authentication.
+
+ - code:        Simple OTP code sent by email or sms.
+ - webLink:     Regular Web HTTP link (Web only, uses redirect).
+ - iOSLink:     Universal Link.
+ - androidLink: Android App Link.
+ */
+public enum PasswordlessType: String {
+    case code = "code"
+    case webLink = "link"
+    case iOSLink = "link_ios"
+    case androidLink = "link_android"
+}
 
 /**
  Auth endpoints of Auth0.
@@ -22,8 +40,10 @@ public protocol Authentication: Trackable, Loggable {
          .login(email: "support@auth0.com", code: "123456")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -61,8 +81,10 @@ public protocol Authentication: Trackable, Loggable {
          .login(phoneNumber: "+4599134762367", code: "123456")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -92,41 +114,43 @@ public protocol Authentication: Trackable, Loggable {
     func login(phoneNumber username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-      Login using username and password in a realm.
+     Login using username and password in a realm.
 
-      ```
-      Auth0
-          .authentication(clientId: clientId, domain: "samples.auth0.com")
-          .login(usernameOrEmail: "support@auth0.com",
-                 password: "a secret password",
-                 realm: "mydatabase")
-          .start { result in
+     ```
+     Auth0
+         .authentication(clientId: clientId, domain: "samples.auth0.com")
+         .login(usernameOrEmail: "support@auth0.com",
+                password: "a secret password",
+                realm: "mydatabase")
+         .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
-      ```
+     ```
 
-      You can also specify audience and scope:
+     You can also specify audience and scope:
 
-      ```
-      Auth0
-          .authentication(clientId: clientId, domain: "samples.auth0.com")
-          .login(usernameOrEmail: "support@auth0.com",
-                 password: "a secret password",
-                 realm: "mydatabase",
-                 audience: "https://myapi.com/api",
-                 scope: "openid profile email offline_access")
-          .start { print($0) }
-      ```
+     ```
+     Auth0
+         .authentication(clientId: clientId, domain: "samples.auth0.com")
+         .login(usernameOrEmail: "support@auth0.com",
+                password: "a secret password",
+                realm: "mydatabase",
+                audience: "https://myapi.com/api",
+                scope: "openid profile email offline_access")
+         .start { print($0) }
+     ```
 
      - Parameters:
        - username: Username or email used of the user to authenticate.
        - password: Password of the user.
        - realm:    Domain of the realm or connection name.
        - audience: API Identifier that the client is requesting access to.
-       - scope:    sSope value requested when authenticating the user.
+       - scope:    Scope value requested when authenticating the user.
      - Important: This only works if you have the OAuth 2.0 API Authorization flag on.
      - Returns: Authentication request that will yield Auth0 user's credentials.
      - Requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
@@ -139,11 +163,13 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(withOTP: "123456", mfaToken: "mfa token value")
+         .login(withOTP: "123456", mfaToken: "mfa token")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -157,10 +183,24 @@ public protocol Authentication: Trackable, Loggable {
 
     /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either Push notification, SMS, or Voice).
     ///
+    /// ```
+    /// Auth0
+    ///     .authentication(clientId: clientId, domain: "samples.auth0.com")
+    ///     .login(withOOBCode: "123456", mfaToken: "mfa token")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let credentials):
+    ///             print("Obtained credentials: \(credentials)")
+    ///         case .failure(let error):
+    ///             print("Failed with \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
     /// - Parameters:
-    ///   - oobCode:     The oob code received from the challenge request
-    ///   - mfaToken:    Token returned when authentication fails due to MFA requirement
-    ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message
+    ///   - oobCode:     The oob code received from the challenge request.
+    ///   - mfaToken:    Token returned when authentication fails due to MFA requirement.
+    ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message.
     /// - Returns: Authentication request that will yield Auth0 user's credentials.
     /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-oob`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
@@ -168,22 +208,37 @@ public protocol Authentication: Trackable, Loggable {
     /// Verifies multi-factor authentication (MFA) using a recovery code.
     /// Some multi-factor authentication (MFA) providers (such as Guardian) support using a recovery code to login. Use this method to authenticate when the user's enrolled device is unavailable, or the user cannot receive the challenge or accept it due to connectivity issues.
     ///
+    /// ```
+    /// Auth0
+    ///     .authentication(clientId: clientId, domain: "samples.auth0.com")
+    ///     .login(withRecoveryCode: "recovery code", mfaToken: "mfa token")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let credentials):
+    ///             print("Obtained credentials: \(credentials)")
+    ///         case .failure(let error):
+    ///             print("Failed with \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
     /// - Parameters:
-    ///   - recoveryCode: Recovery code provided by the end-user
-    ///   - mfaToken:     Token returned when authentication fails due to MFA requirement
-    /// - Returns: Authentication request that will yield Auth0 user's credentials. Might include a recovery code, which the application must display to the end-user to be stored securely for future use
+    ///   - recoveryCode: Recovery code provided by the end-user.
+    ///   - mfaToken:     Token returned when authentication fails due to MFA requirement.
+    /// - Returns: Authentication request that will yield Auth0 user's credentials. Might include a recovery code, which the application must display to the end-user to be stored securely for future use.
     /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
     /// Request a challenge for multi-factor authentication (MFA) based on the challenge types supported by the application and user.
     /// The `type` is how the user will get the challenge and prove possession. Supported challenge types include:
-    /// * `otp`: for one-time password (OTP)
-    /// * `oob`: for SMS/Voice messages or out-of-band (OOB)
+    /// * `otp`:  for one-time password (OTP)
+    /// * `oob`:  for SMS/Voice messages or out-of-band (OOB)
     ///
     /// - Parameters:
-    ///   - mfaToken:        Token returned when authentication fails due to MFA requirement
-    ///   - types:           A list of the challenges types accepted by your application. Accepted challenge types are `oob` or `otp`. Excluding this parameter means that your client application accepts all supported challenge types
-    ///   - authenticatorId: The ID of the authenticator to challenge. You can get the ID by querying the list of available authenticators for the user
+    ///   - mfaToken:        Token returned when authentication fails due to MFA requirement.
+    ///   - types:           A list of the challenges types accepted by your application. Accepted challenge types are `oob` or `otp`. Excluding this parameter means that your client application accepts all supported challenge types.
+    ///   - authenticatorId: The ID of the authenticator to challenge. You can get the ID by querying the list of available authenticators for the user.
+    /// - Returns: A request that will yield a multi-factor challenge.
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
 
     /**
@@ -195,8 +250,10 @@ public protocol Authentication: Trackable, Loggable {
          .login(appleAuthorizationCode: authCode)
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -232,8 +289,10 @@ public protocol Authentication: Trackable, Loggable {
          .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -268,8 +327,10 @@ public protocol Authentication: Trackable, Loggable {
                                 password: "a secret password")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -302,11 +363,15 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+         .createUser(email: "support@auth0.com",
+                     password: "a secret password",
+                     connection: "Username-Password-Authentication")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let user):
+                 print("User signed up: \(user)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -316,7 +381,10 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
+         .createUser(email: "support@auth0.com",
+                     password: "a secret password",
+                     connection: "Username-Password-Authentication",
+                     userMetadata: ["first_name": "support"])
          .start { print($0) }
      ```
 
@@ -325,13 +393,16 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId, domain: "samples.auth0.com")
-         .createUser(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
+         .createUser(email: "support@auth0.com",
+                     username: "support",
+                     password: "a secret password",
+                     connection: "Username-Password-Authentication")
          .start { print($0) }
      ```
 
      - Parameters:
        - email:          Email of the user to create.
-       - username:       Username of the user if the connection requires username. By default is 'nil'.
+       - username:       Username of the user if the connection requires username. By default is `nil`.
        - password:       Password for the new user.
        - connection:     Name where the user will be created (Database connection).
        - userMetadata:   Additional userMetadata parameters that will be added to the newly created user.
@@ -379,7 +450,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - email:      Email where to send the code or link.
-       - type:       Type of passwordless authentication. By default is 'code'.
+       - type:       Type of passwordless authentication. By default is `code`.
        - connection: Name of the passwordless connection. By default is 'email'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
@@ -407,7 +478,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - phoneNumber: Phone number where to send the sms with code or link.
-       - type:        Type of passwordless authentication. By default is 'code'.
+       - type:        Type of passwordless authentication. By default is `code`.
        - connection:  Name of the passwordless connection. By default is 'sms'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
@@ -423,8 +494,10 @@ public protocol Authentication: Trackable, Loggable {
          .userInfo(withAccessToken: accessToken)
          .start { result in
              switch result {
-             case .success(let user): print(user)
-             case .failure(let error): print(error)
+             case .success(let user):
+                 print("User: \(user)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -441,11 +514,15 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .codeExchange(withCode: "a code", codeVerifier: "code verifier", redirectURI: "https://samples.auth0.com/callback")
+         .codeExchange(withCode: "a code",
+                       codeVerifier: "code verifier",
+                       redirectURI: "https://samples.auth0.com/callback")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -460,12 +537,19 @@ public protocol Authentication: Trackable, Loggable {
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Renew user's credentials with a `refresh_token` grant for `/oauth/token`
-     
+     Renew the user's credentials with a `refresh_token` grant for `/oauth/token`.
+
      ```
      Auth0
          .renew(withRefreshToken: refreshToken, scope: "openid profile email offline_access read:users")
-         .start { print($0) }
+         .start { result in
+             switch result {
+             case .success(let credentials):
+                 print("Obtained new credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
+             }
+         }
      ```
 
      To ask the same scopes requested when the refresh token was issued:
@@ -507,32 +591,19 @@ public protocol Authentication: Trackable, Loggable {
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .jwks()
          .start { result in
-              switch result {
-              case .success(let jwks): print(jwks)
-              case .failure(let error): print(error)
-              }
-          }
+             switch result {
+             case .success(let jwks):
+                 print("Obtained JWKS: \(jwks)")
+             case .failure(let error):
+                 print("Failed with \(error)")
+             }
+         }
      ```
     
      - Returns: A request that will yield JWKS information.
      */
     func jwks() -> Request<JWKS, AuthenticationError>
 
-}
-
-/**
- Types of passwordless authentication
-
- - Code:        Simple OTP code sent by email or sms
- - WebLink:     Regular Web HTTP link (Web only, uses redirect)
- - iOSLink:     Universal Link
- - AndroidLink: Android App Link
- */
-public enum PasswordlessType: String {
-    case Code = "code"
-    case WebLink = "link"
-    case iOSLink = "link_ios"
-    case AndroidLink = "link_android"
 }
 
 public extension Authentication {
@@ -546,8 +617,10 @@ public extension Authentication {
          .login(email: "support@auth0.com", code: "123456")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -587,8 +660,10 @@ public extension Authentication {
          .login(phoneNumber: "+4599134762367", code: "123456")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -620,41 +695,43 @@ public extension Authentication {
     }
 
     /**
-      Login using username and password in a realm.
+     Login using username and password in a realm.
 
-      ```
-      Auth0
-          .authentication(clientId: clientId, domain: "samples.auth0.com")
-          .login(usernameOrEmail: "support@auth0.com",
-                 password: "a secret password",
-                 realm: "mydatabase")
-          .start { result in
+     ```
+     Auth0
+         .authentication(clientId: clientId, domain: "samples.auth0.com")
+         .login(usernameOrEmail: "support@auth0.com",
+                password: "a secret password",
+                realm: "mydatabase")
+         .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
-      ```
+     ```
 
-      You can also specify audience and scope:
+     You can also specify audience and scope:
 
-      ```
-      Auth0
-          .authentication(clientId: clientId, domain: "samples.auth0.com")
-          .login(usernameOrEmail: "support@auth0.com",
-                 password: "a secret password",
-                 realm: "mydatabase",
-                 audience: "https://myapi.com/api",
-                 scope: "openid profile email offline_access")
-          .start { print($0) }
-      ```
+     ```
+     Auth0
+         .authentication(clientId: clientId, domain: "samples.auth0.com")
+         .login(usernameOrEmail: "support@auth0.com",
+                password: "a secret password",
+                realm: "mydatabase",
+                audience: "https://myapi.com/api",
+                scope: "openid profile email offline_access")
+         .start { print($0) }
+     ```
 
      - Parameters:
        - username: Username or email used of the user to authenticate.
        - password: Password of the user.
        - realm:    Domain of the realm or connection name.
        - audience: API Identifier that the client is requesting access to.
-       - scope:    sSope value requested when authenticating the user.
+       - scope:    Scope value requested when authenticating the user.
      - Important: This only works if you have the OAuth 2.0 API Authorization flag on.
      - Returns: Authentication request that will yield Auth0 user's credentials.
      - Requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
@@ -672,8 +749,10 @@ public extension Authentication {
          .login(appleAuthorizationCode: authCode)
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -711,8 +790,10 @@ public extension Authentication {
          .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -749,8 +830,10 @@ public extension Authentication {
                                 password: "a secret password")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -785,11 +868,15 @@ public extension Authentication {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication")
+         .createUser(email: "support@auth0.com",
+                     password: "a secret password",
+                     connection: "Username-Password-Authentication")
          .start { result in
              switch result {
-             case .success(let credentials): print(credentials)
-             case .failure(let error): print(error)
+             case .success(let user):
+                 print("User signed up: \(user)")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }
      ```
@@ -799,7 +886,10 @@ public extension Authentication {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .createUser(email: "support@auth0.com", password: "a secret password", connection: "Username-Password-Authentication", userMetadata: ["first_name": "support"])
+         .createUser(email: "support@auth0.com",
+                     password: "a secret password",
+                     connection: "Username-Password-Authentication",
+                     userMetadata: ["first_name": "support"])
          .start { print($0) }
      ```
 
@@ -808,13 +898,16 @@ public extension Authentication {
      ```
      Auth0
          .authentication(clientId, domain: "samples.auth0.com")
-         .createUser(email: "support@auth0.com", username: "support", password: "a secret password", connection: "Username-Password-Authentication")
+         .createUser(email: "support@auth0.com",
+                     username: "support",
+                     password: "a secret password",
+                     connection: "Username-Password-Authentication")
          .start { print($0) }
      ```
 
      - Parameters:
        - email:          Email of the user to create.
-       - username:       Username of the user if the connection requires username. By default is 'nil'.
+       - username:       Username of the user if the connection requires username. By default is `nil`.
        - password:       Password for the new user.
        - connection:     Name where the user will be created (Database connection).
        - userMetadata:   Additional userMetadata parameters that will be added to the newly created user.
@@ -830,7 +923,7 @@ public extension Authentication {
      
      - Parameters:
        - email:        Email of the user to create.
-       - username:     Username of the user if the connection requires username. By default is 'nil'.
+       - username:     Username of the user if the connection requires username. By default is `nil`.
        - password:     Password for the new user.
        - connection:   Name where the user will be created (Database connection).
        - userMetadata: Additional userMetadata parameters that will be added to the newly created user.
@@ -861,12 +954,12 @@ public extension Authentication {
 
      - Parameters:
        - email:      Email where to send the code or link.
-       - type:       Type of passwordless authentication. By default is 'code'.
+       - type:       Type of passwordless authentication. By default is `code`.
        - connection: Name of the passwordless connection. By default is 'email'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
      */
-    func startPasswordless(email: String, type: PasswordlessType = .Code, connection: String = "email", parameters: [String: Any] = [:]) -> Request<Void, AuthenticationError> {
+    func startPasswordless(email: String, type: PasswordlessType = .code, connection: String = "email", parameters: [String: Any] = [:]) -> Request<Void, AuthenticationError> {
         return self.startPasswordless(email: email, type: type, connection: connection, parameters: parameters)
     }
 
@@ -891,22 +984,29 @@ public extension Authentication {
 
      - Parameters:
        - phoneNumber: Phone number where to send the sms with code or link.
-       - type:        Type of passwordless authentication. By default is 'code'.
+       - type:        Type of passwordless authentication. By default is `code`.
        - connection:  Name of the passwordless connection. By default is 'sms'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
      */
-    func startPasswordless(phoneNumber: String, type: PasswordlessType = .Code, connection: String = "sms") -> Request<Void, AuthenticationError> {
+    func startPasswordless(phoneNumber: String, type: PasswordlessType = .code, connection: String = "sms") -> Request<Void, AuthenticationError> {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
     }
 
     /**
-     Renew user's credentials with a `refresh_token` grant for `/oauth/token`
-     
+     Renew the user's credentials with a `refresh_token` grant for `/oauth/token`.
+
      ```
      Auth0
          .renew(withRefreshToken: refreshToken, scope: "openid profile email offline_access read:users")
-         .start { print($0) }
+         .start { result in
+             switch result {
+             case .success(let credentials):
+                 print("Obtained new credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with \(error)")
+             }
+         }
      ```
 
      To ask the same scopes requested when the refresh token was issued:

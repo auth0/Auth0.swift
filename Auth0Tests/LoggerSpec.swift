@@ -41,6 +41,14 @@ class LoggerSpec: QuickSpec {
                 expect(output.messages).to(contain("Content-Type: application/json"))
             }
 
+            it("should log additional request header") {
+                let sessionConfig = URLSession.shared.configuration
+                sessionConfig.httpAdditionalHeaders = ["Accept": "application/json"]
+                let urlSession = URLSession(configuration: sessionConfig)
+                logger.trace(request: request, session: urlSession)
+                expect(output.messages).to(contain("Accept: application/json"))
+            }
+
             it("should log request body") {
                 let json = "{key: \"\(UUID().uuidString)\"}"
                 request.httpBody = json.data(using: .utf8)

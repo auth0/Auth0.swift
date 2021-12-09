@@ -31,6 +31,7 @@ As expected with a major release, Auth0.swift v2 contains breaking changes. Plea
     * [Extensions](#extensions)
 - [Types changed](#types-changed)
 - [Type properties changed](#type-properties-changed)
+    * [`PasswordlessType` enum](#passwordlesstype-enum)
     * [`AuthenticationError` struct](#authenticationerror-struct)
     * [`ManagementError` struct](#managementerror-struct)
     * [`WebAuthError` struct](#webautherror-struct)
@@ -213,6 +214,16 @@ The `a0_url(_:)` method is no longer public.
 - `CredentialsManagerError` was changed from enum to struct.
 
 ## Type properties changed
+
+### `PasswordlessType` enum
+
+#### Cases renamed
+
+The following cases were lowercased, as per the naming convention of Swift 3+:
+
+- `Code` -> `code`
+- `WebLink` -> `webLink`
+- `AndroidLink` -> `androidLink`
 
 ### `AuthenticationError` struct
 

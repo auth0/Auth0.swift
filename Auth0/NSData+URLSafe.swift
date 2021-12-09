@@ -7,7 +7,7 @@ public extension Data {
             .base64EncodedString(options: [])
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
-            .trimmingCharacters(in: CharacterSet(charactersIn: "="))
+            .replacingOccurrences(of: "=", with: "")
     }
 
 }

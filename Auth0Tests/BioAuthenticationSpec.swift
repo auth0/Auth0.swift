@@ -32,6 +32,21 @@ class BioAuthenticationSpec: QuickSpec {
                 _ = bioAuthentication.available
                 expect(mockContext.canEvaluatePolicyReceivedPolicy).to(equal(evaluationPolicy))
             }
+
+        }
+
+        describe("getters") {
+
+            it("should set cancel title") {
+                mockContext.localizedCancelTitle = "cancel title"
+                expect(bioAuthentication.cancelTitle) == "cancel title"
+            }
+
+            it("should set fallback title") {
+                mockContext.localizedFallbackTitle = "fallback title"
+                expect(bioAuthentication.fallbackTitle) == "fallback title"
+            }
+
         }
 
         describe("setters") {
@@ -46,6 +61,7 @@ class BioAuthenticationSpec: QuickSpec {
                 expect(mockContext.localizedFallbackTitle) == "fallback title"
             }
         }
+
         describe("touch authentication") {
 
             var error: Error?
