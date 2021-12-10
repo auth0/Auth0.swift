@@ -115,6 +115,8 @@ The following classes were also removed, as they were no longer being used:
 - `Profile`
 - `Identity`
 
+You should use `UserInfo` from `userInfo(withAccessToken:)` instead.
+
 ## Methods removed
 
 The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed.
@@ -287,12 +289,12 @@ All the following error cases were no longer being used.
 - `.malformedInvitationURL`, for when the invitation URL is missing the `organization` and/or the `invitation` query parameters.
 - `.noAuthorizationCode`, for when the callback URL is missing the `code` query parameter.
 - `.idTokenValidationFailed`, for when the ID Token validation performed after Web Auth login fails.
-- `.other`, for when a different `Error` happens. That error can be acessed via the `cause: Error?` property.
+- `.other`, for when a different `Error` happens. That error can be accessed via the `cause: Error?` property.
 
 ### `CredentialsManagerError` struct
 
 All the former enum cases are now static properties, so to switch over them you will need to add a `default` clause.
-As static properties cannot have asociated values, to access the `Error` for `.refreshFailed`, `.biometricsFailed`, and `.revokeFailed` use the new `cause: Error?` property.
+As static properties cannot have associated values, to access the `Error` for `.refreshFailed`, `.biometricsFailed`, and `.revokeFailed` use the new `cause: Error?` property.
 
 ##### Before
 
@@ -450,10 +452,6 @@ let credentialsManager = CredentialsManager(authentication: authentication, stor
 
 This method now yields a `Result<Credentials, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Credentials>`.
 
-#### `revoke(headers:callback:)`
-
-This method now yields a `Result<Void, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Void>`.
-
 ##### Before
 
 ```swift
@@ -474,6 +472,10 @@ credentialsManager.credentials { result in
     }
 }
 ```
+
+#### `revoke(headers:callback:)`
+
+This method now yields a `Result<Void, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Void>`.
 
 ## Behavior changes
 
