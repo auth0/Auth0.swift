@@ -121,7 +121,7 @@ You should use `UserInfo` from `userInfo(withAccessToken:)` instead.
 
 ## Methods removed
 
-The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed. These methods were used for iOS < 11 support. Since the library is now targeting iOS 12+, you can safely remove them from your app.
+The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed. You can safely remove them from your app.
 
 ### Authentication client
 
@@ -234,12 +234,7 @@ Auth0
     .webAuth()
     .useEphemeralSession() // no alert box, and no SSO
     .start { result in
-        switch result {
-        case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
-        case .failure(let error):
-            print("Failed with \(error)")
-        }
+        // ...
     }
 ```
 
