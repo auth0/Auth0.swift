@@ -1,4 +1,4 @@
-# V2 MIGRATION GUIDE
+# V2 Migration Guide
 
 Auth0.swift v2 includes many significant changes:
 
@@ -10,6 +10,8 @@ Auth0.swift v2 includes many significant changes:
 - Simplified error handling.
 
 As expected with a major release, Auth0.swift v2 contains breaking changes. Please review this guide thorougly to understand the changes required to migrate your app to v2.
+
+## Table of contents
 
 - [Supported languages](#supported-languages)
     * [Swift](#swift)
@@ -137,17 +139,37 @@ Use `userInfo(withAccessToken:)` instead.
 
 #### `tokenExchange(withParameters:)`
 
-Use `codeExchange(withCode:codeVerifier:redirectURI:)` instead. To pass custom parameters, use the `parameters(_:)` method from `Request`:
+Use `codeExchange(withCode:codeVerifier:redirectURI:)` instead. To pass custom parameters, use the `parameters(_:)` method from `Request`.
+
+<details>
+  <summary>Before</summary>
 
 ```swift
 Auth0
     .authentication()
-    .codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI) 
-    .parameters(["key": "value"]) // 👈🏻
+    .tokenExchange(withParameters: ["key": "value"]) 
     .start { result in
         // ...
     }
 ```
+</details>
+
+<details>
+  <summary>After</summary>
+
+```swift
+Auth0
+    .authentication()
+    .codeExchange(withCode: code, 
+                  codeVerifier: codeVerifier, 
+                  redirectURI: redirectURI) 
+    .parameters(["key": "value"])
+    .start { result in
+        // ...
+    }
+}
+```
+</details>
 
 #### `tokenExchange(withAppleAuthorizationCode:scope:audience:fullName:)`
 
@@ -155,7 +177,23 @@ Use `login(appleAuthorizationCode:fullName:profile:audience:scope:)` instead.
 
 #### `webAuth(withConnection:)`
 
-Use Web Auth with its `connection(_:)` method instead:
+Use Web Auth with its `connection(_:)` method instead.
+
+<details>
+  <summary>Before</summary>
+
+```swift
+Auth0.authentication()
+    .webAuth(withConnection: "some-connection")
+    .start { result in
+        // ...
+    }
+}
+```
+</details>
+
+<details>
+  <summary>After</summary>
 
 ```swift
 Auth0.webAuth()
@@ -163,7 +201,9 @@ Auth0.webAuth()
     .start { result in
         // ...
     }
+}
 ```
+</details>
 
 #### Other methods
 
@@ -180,6 +220,47 @@ Auth0.swift now only supports the [authorization code flow with PKCE](https://au
 - `responseType(_:)`
 
 The `useUniversalLink()` method was removed as well, as Universal Links [cannot be used](https://openradar.appspot.com/51091611) for OAuth redirections without user interaction since iOS 10.
+
+`useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were also removed, as their underlying Apple API `SFAuthenticationSession` is [deprecated](https://developer.apple.com/documentation/safariservices/sfauthenticationsession) in favor of `ASWebAuthenticationSession`. Auth0.swift uses `ASWebAuthenticationSession` by default to perform web-based authentication.
+
+#### But without `useLegacyAuthentication()` there's an alert box
+
+That alert box is displayed by `ASWebAuthenticationSession`, not by Auth0.swift, because by default this API will store the auth cookie in the shared Safari cookie jar. This makes Single Sign On (SSO) possible, and therefore requires user consent.
+
+If you don't need SSO, you can disable this behavior by adding `useEphemeralSession()` to the login call. This will configure `ASWebAuthenticationSession` to not store the auth cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
+
+```swift
+Auth0
+    .webAuth()
+    .useEphemeralSession() // no alert box, and no SSO
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
+
+Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
+
+> `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`. This option is only available on [iOS 13+ and macOS](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio), so `useEphemeralSession()` will have no effect on iOS 12. To improve the experience for iOS 12 users, check out the approach described below.
+
+#### I don't want the _logout_ alert box
+
+If you need SSO and/or are willing to tolerate the alert box on the login call, but would like to get rid of it when calling `clearSession(federated:)`, you can simply not call `clearSession(federated:)` and just clear the credentials from the app. This means that the shared cookie will not be removed, so to get the user to log in again you'll need to add the `"prompt": "login"` parameter to the _login_ call.
+
+```swift
+Auth0
+    .webAuth()
+    .parameters(["prompt": "login"]) // force the login page, having cookie or not
+    .start { result in
+        // ...
+    }
+```
+
+Otherwise, the browser modal will close right away and the user will be automatically logged in again, as the cookie will still be there.
 
 ### Credentials Manager
 
@@ -223,9 +304,9 @@ The `a0_url(_:)` method is no longer public.
 
 The following cases were lowercased, as per the naming convention of Swift 3+:
 
-- `Code` -> `code`
-- `WebLink` -> `webLink`
-- `AndroidLink` -> `androidLink`
+- `.Code` -> `.code`
+- `.WebLink` -> `.webLink`
+- `.AndroidLink` -> `.androidLink`
 
 ### `AuthenticationError` struct
 
@@ -243,24 +324,28 @@ The property `description` was removed in favor of `localizedDescription`, as `M
 
 All the former enum cases are now static properties, so to switch over them you will need to add a `default` clause.
 
-##### Before
+<details>
+  <summary>Before</summary>
 
 ```swift
 switch error {
-    case .userCancelled: handleError(error)
+    case .userCancelled: // handle WebAuthError
     // ...
 }
 ```
+</details>
 
-##### After
+<details>
+  <summary>After</summary>
 
 ```swift
 switch error {
-    case .userCancelled: handleError(error)
+    case .userCancelled: // handle WebAuthError
     // ...
     default: // handle unknown errors, e.g. errors added in future versions
 }
 ```
+</details>
 
 #### Properties removed
 
@@ -294,26 +379,30 @@ All the following error cases were no longer being used.
 ### `CredentialsManagerError` struct
 
 All the former enum cases are now static properties, so to switch over them you will need to add a `default` clause.
-As static properties cannot have associated values, to access the `Error` for `.refreshFailed`, `.biometricsFailed`, and `.revokeFailed` use the new `cause: Error?` property.
+As static properties cannot have associated values, to access the underlying `Error` for `.refreshFailed`, `.biometricsFailed`, and `.revokeFailed` use the new `cause: Error?` property.
 
-##### Before
+<details>
+  <summary>Before</summary>
 
 ```swift
 switch error {
-    case .revokeFailed(let error): handleError(error) // handle underlying error
+    case .revokeFailed(let error): handleError(error) // handle underlying Error
     // ...
 }
 ```
+</details>
 
-##### After
+<details>
+  <summary>After</summary>
 
 ```swift
 switch error {
-    case .revokeFailed: handleError(error.cause) // handle underlying error
+    case .revokeFailed: handleError(error.cause) // handle underlying Error?
     // ...
     default: // handle unknown errors, e.g. errors added in future versions
 }
 ```
+</details>
 
 #### Error cases renamed
 
@@ -350,7 +439,30 @@ These properties were removed:
 
 #### Errors
 
-The Authentication API client methods only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
+The methods of the Authentication API client now only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
+
+<details>
+  <summary>Before</summary>
+
+```swift
+switch error {
+case .success(let credentials): // ...
+case .failure(let error as AuthenticationError): // handle AuthenticationError
+case .failure(let error): // handle Error
+}
+```
+</details>
+
+<details>
+  <summary>After</summary>
+
+```swift
+switch error {
+case .success(let credentials): // ...
+case .failure(let error): // handle AuthenticationError
+}
+```
+</details>
 
 #### Renamed `tokenExchange(withCode:codeVerifier:redirectURI:)`
 
@@ -404,21 +516,118 @@ The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `cha
 
 The methods of the Management API client now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError`.
 
+<details>
+  <summary>Before</summary>
+
+```swift
+switch error {
+case .success(let user): // ...
+case .failure(let error as ManagementError): // handle ManagementError
+case .failure(let error): // handle Error
+}
+```
+</details>
+
+<details>
+  <summary>After</summary>
+
+```swift
+switch error {
+case .success(let user): // ...
+case .failure(let error): // handle ManagementError
+}
+```
+</details>
+
 ### Web Auth
 
 #### Errors
 
 The Web Auth methods now only yield errors of type  `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError`.
 
+<details>
+  <summary>Before</summary>
+
+```swift
+switch result {
+case .success(let credentials): // ...
+case .failure(let error as WebAuthError): // handle WebAuthError
+case .failure(let error): // handle Error
+}
+```
+</details>
+
+<details>
+  <summary>After</summary>
+
+```swift
+switch result {
+case .success(let credentials): // ...
+case .failure(let error): // handle WebAuthError
+}
+```
+</details>
+
 #### `clearSession(federated:)`
 
 This method now yields a `Result<Void, WebAuthError>`, which is aliased to `WebAuthResult<Void>`. This means you can now check the type of error (e.g. if the user cancelled the operation) and act accordingly.
+
+<details>
+  <summary>Before</summary>
+
+```swift
+Auth0
+    .webAuth()
+    .clearSession(federated: false) { outcome in
+        switch outcome {
+        case true: // success
+        case false: // failure
+        }
+    }
+```
+</details>
+
+<details>
+  <summary>After</summary>
+
+```swift
+Auth0
+    .webAuth()
+    .clearSession() { result in // federated is now false by default
+        switch result {
+        case .success: // ...
+        case .failure(let error): // ...
+        }
+    }
+```
+</details>
 
 ### Credentials Manager
 
 #### Errors
 
 The methods of the Credentials Manager now only yield errors of type  `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError`.
+
+<details>
+  <summary>Before</summary>
+
+```swift
+if let error = error as? CredentialsManagerError {
+    // handle CredentialsManagerError
+}
+```
+</details>
+
+<details>
+  <summary>After</summary>
+
+```swift
+switch result {
+case .success(let credentials): // ...
+case .failure(let error): // handle CredentialsManagerError
+}
+```
+</details>
 
 #### Initializer
 
@@ -445,37 +654,71 @@ class CustomStore: CredentialsStorage {
     }
 }
 
-let credentialsManager = CredentialsManager(authentication: authentication, storage: CustomStore())
+let credentialsManager = CredentialsManager(authentication: authentication, 
+                                            storage: CustomStore())
 ```
 
 #### `credentials(withScope:minTTL:parameters:callback)`
 
 This method now yields a `Result<Credentials, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Credentials>`.
 
-##### Before
+<details>
+  <summary>Before</summary>
 
 ```swift
 credentialsManager.credentials { error, credentials in
-    guard error == nil, let credentials = credentials else { 
-        return handleError(error) 
+    guard error == nil, let credentials = credentials else {
+        // ...
+        return
     }
-    // credentials retrieved
+    // ...
+}
 ```
+</details>
 
-##### After
+<details>
+  <summary>After</summary>
 
 ```swift
 credentialsManager.credentials { result in
     switch result {
-    case .success(let credentials): // credentials retrieved
-    case .failure(let error): handleError(error) 
+    case .success(let credentials): // ...
+    case .failure(let error): // ...
     }
 }
 ```
+</details>
 
 #### `revoke(headers:callback:)`
 
 This method now yields a `Result<Void, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Void>`.
+
+<details>
+  <summary>Before</summary>
+
+```swift
+credentialsManager.revoke { error in
+    guard error == nil {
+        // ...
+        return
+    }
+    // ...
+}
+```
+</details>
+
+<details>
+  <summary>After</summary>
+
+```swift
+credentialsManager.revoke { result in
+    switch result {
+    case .success: // ...
+    case .failure(let error): // ...
+    }
+}
+```
+</details>
 
 ## Behavior changes
 
@@ -512,7 +755,7 @@ The ID Token expiration is no longer used to determine if the credentials are st
 
 #### Role of Refresh Token in credentials validity
 
-`hasValid(minTTL:)` longer returns `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
+`hasValid(minTTL:)` no longer returns `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
 
 Note that `hasValid(minTTL:)` is no longer being called in `credentials(withScope:minTTL:parameters:callback:)` _before_ the biometrics authentication. If you were relying on this behavior, you'll need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:callback:)` yourself.
 
