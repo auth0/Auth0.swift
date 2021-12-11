@@ -121,25 +121,25 @@ You should use `UserInfo` from `userInfo(withAccessToken:)` instead.
 
 ## Methods removed
 
-The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed.
+The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed. These methods were used for iOS < 11 support. Since the library is now targeting iOS 12+, you can safely remove them from your app.
 
 ### Authentication client
 
 #### `login(usernameOrEmail:password:multifactorCode:connection:scope:parameters:)`
 
-Use `login(usernameOrEmail:password:realm:audience:scope:)` instead.
+You should use `login(usernameOrEmail:password:realm:audience:scope:)` instead.
 
 #### `signUp(email:username:password:connection:userMetadata:scope:parameters:)`
 
-Use `createUser(email:username:password:connection:userMetadata:rootAttributes:` and then `login(usernameOrEmail:password:realm:audience:scope:)` instead.
+You should use `createUser(email:username:password:connection:userMetadata:rootAttributes:)` and then `login(usernameOrEmail:password:realm:audience:scope:)` instead. That is, create the user and then log them in.
 
 #### `tokenInfo(token:)` and `userInfo(token:)`
 
-Use `userInfo(withAccessToken:)` instead.
+You should use `userInfo(withAccessToken:)` instead.
 
 #### `tokenExchange(withParameters:)`
 
-Use `codeExchange(withCode:codeVerifier:redirectURI:)` instead. To pass custom parameters, use the `parameters(_:)` method from `Request`.
+You should use `codeExchange(withCode:codeVerifier:redirectURI:)` instead. To pass custom parameters, use the `parameters(_:)` method from `Request`.
 
 <details>
   <summary>Before</summary>
@@ -173,11 +173,11 @@ Auth0
 
 #### `tokenExchange(withAppleAuthorizationCode:scope:audience:fullName:)`
 
-Use `login(appleAuthorizationCode:fullName:profile:audience:scope:)` instead. 
+You should use `login(appleAuthorizationCode:fullName:profile:audience:scope:)` instead. 
 
 #### `webAuth(withConnection:)`
 
-Use Web Auth with its `connection(_:)` method instead.
+You should use Web Auth with its `connection(_:)` method instead.
 
 <details>
   <summary>Before</summary>
@@ -264,7 +264,7 @@ Otherwise, the browser modal will close right away and the user will be automati
 
 ### Credentials Manager
 
-The method `enableTouchAuth(withTitle:cancelTitle:fallbackTitle:)` was removed. Use `enableBiometrics(withTitle:cancelTitle:fallbackTitle:evaluationPolicy:)` instead.
+The method `enableTouchAuth(withTitle:cancelTitle:fallbackTitle:)` was removed. You should use `enableBiometrics(withTitle:cancelTitle:fallbackTitle:evaluationPolicy:)` instead.
 
 ### Errors
 
@@ -631,7 +631,7 @@ case .failure(let error): // handle CredentialsManagerError
 
 #### Initializer
 
-`CredentialsManager` now takes a `CredentialsStorage` protocol as it's storage argument rather than an instance of `SimpleKeychain`.
+`CredentialsManager` now takes a `CredentialsStorage` protocol as its storage argument rather than an instance of `SimpleKeychain`.
 
 This means you can now provide your own storage layer to `CredentialsManager`.
 
