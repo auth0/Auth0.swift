@@ -23,7 +23,7 @@ public typealias WebAuthResult<T> = Result<T, WebAuthError>
 public typealias CredentialsManagerResult<T> = Result<T, CredentialsManagerError>
 
 /**
- Default scope value used across Auth0.swift.
+ Default scope value used across Auth0.swift. Equals to `openid profile email`.
  */
 public let defaultScope = "openid profile email"
 
@@ -36,7 +36,7 @@ public let defaultScope = "openid profile email"
 
  - Parameters:
    - clientId: ClientId of your Auth0 application.
-   - domain:   Domain of your Auth0 account. e.g.: 'samples.auth0.com'.
+   - domain:   Domain of your Auth0 account, e.g. 'samples.auth0.com'.
    - session:  Instance of `URLSession` used for networking. By default it will use the shared `URLSession`.
  - Returns: Auth0 Authentication API.
  */
@@ -134,7 +134,7 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
 
  - Parameters:
    - token:   Token of Management API v2 with the correct allowed scopes to perform the desired action.
-   - domain:  Domain of your Auth0 account. e.g.: 'samples.auth0.com'.
+   - domain:  Domain of your Auth0 account, e.g. 'samples.auth0.com'.
    - session: Instance of `URLSession` used for networking. By default it will use the shared `URLSession`.
  - Returns: Auth0 Management API v2.
  */
@@ -185,7 +185,7 @@ public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main)
 
  - Parameters:
    - clientId: ClientId of your Auth0 application.
-   - domain:   Domain of your Auth0 account. e.g.: 'samples.auth0.com'.
+   - domain:   Domain of your Auth0 account, e.g. 'samples.auth0.com'.
    - session:  Instance of `URLSession` used for networking. By default it will use the shared `URLSession`.
  - Returns: Auth0 WebAuth component.
  */

@@ -4,10 +4,14 @@ let unknownError = "a0.sdk.internal_error.unknown"
 let nonJSONError = "a0.sdk.internal_error.plain"
 let emptyBodyError = "a0.sdk.internal_error.empty"
 
+/**
+ Generic representation of Auth0 errors. ``AuthenticationError``, ``ManagementError``, ``WebAuthError``, and
+ ``CredentialsManagerError`` conform to this protocol.
+ */
 public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
 
     /**
-     The underlying `Error`, if any. Defaults to `nil`.
+     The underlying `Error`, if any.
      */
     var cause: Error? { get }
 
@@ -16,7 +20,7 @@ public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
 public extension Auth0Error {
 
     /**
-     The underlying `Error`, if any. Defaults to `nil`.
+     Defaults to `nil`.
      */
     var cause: Error? { return nil }
 
@@ -37,9 +41,7 @@ public extension Auth0Error {
 }
 
 /**
- Generic representation of Auth0 API errors.
-
- - Note: It's recommended to use either `AuthenticationError` or `ManagementError` for better error handling.
+ Generic representation of Auth0 API errors. ``AuthenticationError`` and ``ManagementError`` conform to this protocol.
  */
 public protocol Auth0APIError: Auth0Error {
 

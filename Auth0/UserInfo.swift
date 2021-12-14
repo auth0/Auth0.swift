@@ -4,6 +4,7 @@ import Foundation
 /// - Note: [Claims](https://auth0.com/docs/security/tokens/json-web-tokens/json-web-token-claims)
 public struct UserInfo: JSONObjectPayload {
 
+    /// The list of public claims.
     public static let publicClaims = [
         "sub",
         "name",
@@ -27,41 +28,66 @@ public struct UserInfo: JSONObjectPayload {
         "updated_at"
     ]
 
+    // MARK: - Claims
+
+    /// The Auth0 user ID.
     public let sub: String
 
+    /// The name of the user. Requires the `profile` scope.
     public let name: String?
+    /// The fist name of the user. Requires the `profile` scope.
     public let givenName: String?
+    /// The last name of the user. Requires the `profile` scope.
     public let familyName: String?
+    /// The middle name of the user. Requires the `profile` scope.
     public let middleName: String?
+    /// The nickname of the user. Requires the `profile` scope.
     public let nickname: String?
+    /// The preferred username of the user. Requires the `profile` scope.
     public let preferredUsername: String?
 
+    /// The URL of the user's profile page. Requires the `profile` scope.
     public let profile: URL?
+    /// The URL of the user's picture. Requires the `profile` scope.
     public let picture: URL?
+    /// The URL of the user's website. Requires the `profile` scope.
     public let website: URL?
 
+    /// The email of the user. Requires the `email` scope.
     public let email: String?
+    /// If the user's email was verified. Requires the `email` scope.
     public let emailVerified: Bool?
 
+    /// The gender of the user. Requires the `profile` scope.
     public let gender: String?
+    /// The birthdate of the user. Requires the `profile` scope.
     public let birthdate: String?
 
+    /// The time zone of the user. Requires the `profile` scope.
     public let zoneinfo: TimeZone?
+    /// The locale of the user. Requires the `profile` scope.
     public let locale: Locale?
 
+    /// The phone number of the user. Requires the `phone_number` scope.
     public let phoneNumber: String?
+    /// If the user's phone number was verified. Requires the `phone_number` scope.
     public let phoneNumberVerified: Bool?
 
+    /// The address of the user. Requires the `address` scope.
     public let address: [String: String]?
+    /// The time the user's information was last updated. Requires the `profile` scope.
     public let updatedAt: Date?
-
+    /// Any custom claims.
     public let customClaims: [String: Any]?
 
 }
 
+// MARK: - Initializer
+
 public extension UserInfo {
 
     // swiftlint:disable:next function_body_length
+    /// Creates a ``UserInfo`` from a JSON dictionary.
     init?(json: [String: Any]) {
         guard let sub = json["sub"] as? String else { return nil }
 

@@ -126,7 +126,7 @@ public extension Request {
     /**
      Starts the request to the server.
 
-     - Throws: An error that conforms to `Auth0APIError`; either an `AuthenticationError` or a `ManagementError`.
+     - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
      */
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)

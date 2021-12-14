@@ -20,7 +20,7 @@ public struct CredentialsManager {
     private var bioAuth: BioAuthentication?
     #endif
 
-    /// Creates a new CredentialsManager instance.
+    /// Create a new CredentialsManager instance.
     ///
     /// - Parameters:
     ///   - authentication: Auth0 authentication instance.
@@ -108,7 +108,7 @@ public struct CredentialsManager {
             }
     }
 
-    /// Checks if a non-expired set of credentials are stored.
+    /// Check if a non-expired set of credentials are stored.
     ///
     /// - Parameter minTTL: Minimum lifetime in seconds the access token must have left.
     /// - Returns: If there are valid and non-expired credentials stored.
@@ -118,6 +118,7 @@ public struct CredentialsManager {
         return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
     }
 
+    #if WEB_AUTH_PLATFORM
     /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired.
     /// Otherwise, the retrieved credentials will be returned in the success case as they have not yet expired. Renewed credentials
     /// will be stored in the keychain.
@@ -141,7 +142,6 @@ public struct CredentialsManager {
     ///   - callback:   Callback with the user's credentials or the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
-    #if WEB_AUTH_PLATFORM
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
@@ -251,7 +251,7 @@ public struct CredentialsManager {
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 public extension CredentialsManager {
 
-    /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// Call the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
     /// the credentials are not cleared and the subscription completes with an error.
     ///
     /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the subscription completes
@@ -311,13 +311,13 @@ public extension CredentialsManager {
 #if compiler(>=5.5) && canImport(_Concurrency)
 public extension CredentialsManager {
 
-    /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// Call the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
     /// the credentials are not cleared and an error is thrown.
     ///
     /// If no refresh token is available the endpoint is not called, the credentials are cleared, and no error is thrown.
     ///
     /// - Parameter headers: Additional headers to add to a possible token revocation. The headers will be set via Request.headers.
-    /// - Throws: An error of type `CredentialsManagerError`.
+    /// - Throws: An error of type ``CredentialsManagerError``.
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func revoke(headers: [String: String] = [:]) async throws {
@@ -348,7 +348,7 @@ public extension CredentialsManager {
     ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
     ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
     /// - Returns: The user's credentials.
-    /// - Throws: An error of type `CredentialsManagerError`.
+    /// - Throws: An error of type ``CredentialsManagerError``.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     #if compiler(>=5.5.2)

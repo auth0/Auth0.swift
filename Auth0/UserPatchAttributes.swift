@@ -1,12 +1,12 @@
 import Foundation
 
-/// Attributes of the user allowed to update using `patch()` method of `Users`.
+/// Attributes of the user allowed to update using `patch()` method of ``Users `.
 public class UserPatchAttributes {
 
     private(set) var dictionary: [String: Any]
 
     /**
-     Creates a new attributes.
+     Create a new attributes.
 
      - Parameter dictionary: Default attribute values.
      - Returns: New attributes.
@@ -16,7 +16,7 @@ public class UserPatchAttributes {
     }
 
     /**
-     Mark/Unmark a user as blocked.
+     Mark/unmark a user as blocked.
 
      - Parameter blocked: If the user is blocked.
      - Returns: Itself.
@@ -27,7 +27,7 @@ public class UserPatchAttributes {
     }
 
     /**
-     Changes the email of the user.
+     Change the email of the user.
 
      - Parameters:
        - email:      New email for the user.
@@ -47,7 +47,7 @@ public class UserPatchAttributes {
     }
 
     /**
-     Sets the verified status of the email.
+     Set the verified status of the email.
 
      - Parameters:
        - verified:   If the email is verified or not.
@@ -61,7 +61,7 @@ public class UserPatchAttributes {
     }
 
     /**
-     Changes the phone number of the user (SMS connection only).
+     Change the phone number of the user (SMS connection only).
 
      - Parameters:
        - phoneNumber: New phone number for the user.
@@ -81,7 +81,7 @@ public class UserPatchAttributes {
     }
 
     /**
-     Sets the verified status of the phone number.
+     Set the verified status of the phone number.
 
      - Parameters:
        - verified:   If the phone number is verified or not.
@@ -95,7 +95,7 @@ public class UserPatchAttributes {
     }
 
     /**
-     Changes the user's password.
+     Change the user's password.
 
      - Parameters:
        - password:   New password for the user.
@@ -111,7 +111,7 @@ public class UserPatchAttributes {
     }
 
     /**
-     Changes the username.
+     Change the username.
 
      - Parameters:
        - username:   New username.
@@ -125,7 +125,7 @@ public class UserPatchAttributes {
     }
 
     /**
-     Updates user metadata.
+     Update user metadata.
 
      - Parameter metadata: New user metadata values.
      - Returns: Itself.
@@ -136,7 +136,7 @@ public class UserPatchAttributes {
     }
 
     /**
-     Updates app metadata.
+     Update app metadata.
 
      - Parameter metadata: New app metadata values.
      - Returns: Itself.

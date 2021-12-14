@@ -16,13 +16,13 @@ private struct StructCredentials {
 @objc(A0Credentials)
 public final class Credentials: NSObject {
 
-    /// Token used that allows calling to the requested APIs (audience sent on Auth).
+    /// Token used that allows calling to the requested APIs (the `audience` value` sent on authentication).
     public let accessToken: String
     /// Type of the access token.
     public let tokenType: String
     /// When the access token expires.
     public let expiresIn: Date
-    /// If the API allows you to request new access tokens and the scope `offline_access` was included on Auth.
+    /// If the API allows you to request new access tokens and the scope `offline_access` was included on authentication.
     public let refreshToken: String?
     /// Token that details the user identity after authentication.
     public let idToken: String
@@ -31,6 +31,7 @@ public final class Credentials: NSObject {
     /// MFA recovery code that the application must display to the end-user to be stored securely for future use.
     public let recoveryCode: String?
 
+    /// Custom description that redacts the tokens with `<REDACTED>`.
     public override var description: String {
         let redacted = "<REDACTED>"
         let values = StructCredentials(accessToken: redacted,
@@ -43,6 +44,7 @@ public final class Credentials: NSObject {
         return String(describing: values).replacingOccurrences(of: "StructCredentials", with: "Credentials")
     }
 
+    /// Default initializer.
     public init(accessToken: String = "",
                 tokenType: String = "",
                 idToken: String = "",
@@ -75,6 +77,7 @@ extension Credentials: Codable {
         case recoveryCode = "recovery_code"
     }
 
+    /// `Decodable` initializer.
     public convenience init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         let accessToken = try values.decodeIfPresent(String.self, forKey: .accessToken)
@@ -108,6 +111,7 @@ extension Credentials: Codable {
 
 extension Credentials: NSSecureCoding {
 
+    /// `NSSecureCoding` decoding initializer.
     public convenience init?(coder aDecoder: NSCoder) {
         let accessToken = aDecoder.decodeObject(of: NSString.self, forKey: "accessToken")
         let tokenType = aDecoder.decodeObject(of: NSString.self, forKey: "tokenType")
@@ -126,6 +130,7 @@ extension Credentials: NSSecureCoding {
                   recoveryCode: recoveryCode as String?)
     }
 
+    /// `NSSecureCoding` encoding method.
     public func encode(with aCoder: NSCoder) {
         aCoder.encode(self.accessToken as NSString, forKey: "accessToken")
         aCoder.encode(self.tokenType as NSString, forKey: "tokenType")
@@ -136,6 +141,7 @@ extension Credentials: NSSecureCoding {
         aCoder.encode(self.recoveryCode as NSString?, forKey: "recoveryCode")
     }
 
+    /// Property that enables secure coding. Equals to `true`.
     public static var supportsSecureCoding: Bool { return true }
 
 }

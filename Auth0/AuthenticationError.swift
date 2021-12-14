@@ -5,8 +5,20 @@ import Foundation
  */
 public struct AuthenticationError: Auth0APIError {
 
+    /**
+     Additional information about the error.
+     */
     public let info: [String: Any]
 
+    /**
+     Creates an error from a JSON response.
+
+     - Parameters:
+       - info:       JSON response from Auth0.
+       - statusCode: HTTP Status Code of the Response.
+
+     - Returns: A newly created error.
+     */
     public init(info: [String: Any], statusCode: Int) {
         var values = info
         values["statusCode"] = statusCode
@@ -14,17 +26,31 @@ public struct AuthenticationError: Auth0APIError {
         self.statusCode = statusCode
     }
 
+    /**
+     HTTP Status Code of the response.
+     */
     public let statusCode: Int
 
+    /**
+     The underlying `Error`, if any. Defaults to `nil`.
+     */
     public var cause: Error? {
         return self.info["cause"] as? Error
     }
 
+    /**
+     The code of the error as a String.
+     */
     public var code: String {
         let code = self.info["error"] ?? self.info["code"]
         return code as? String ?? unknownError
     }
 
+    /**
+     Description of the error.
+
+     - Important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     */
     public var debugDescription: String {
         let description = self.info["description"] ?? self.info["error_description"]
         if let string = description as? String {
@@ -35,6 +61,8 @@ public struct AuthenticationError: Auth0APIError {
 
         return "Failed with unknown error \(self.info)"
     }
+
+    // MARK: - Error Types
 
     /// When MFA code is required to authenticate.
     public var isMultifactorRequired: Bool {
@@ -56,12 +84,12 @@ public struct AuthenticationError: Auth0APIError {
         return self.code == "expired_token" && self.localizedDescription == "mfa_token is expired" || self.code == "invalid_grant" && self.localizedDescription == "Malformed mfa_token"
     }
 
-    /// When password used for SignUp does not match connection's strength requirements. More info will be available in `info`.
+    /// When password used for sign up does not match connection's strength requirements. More info will be available in `info`.
     public var isPasswordNotStrongEnough: Bool {
         return self.code == "invalid_password" && self.info["name"] as? String == "PasswordStrengthError"
     }
 
-    /// When password used for SignUp was already used before (Reported when password history feature is enabled). More info will be available in `info`.
+    /// When password used for sign up was already used before (reported when password history feature is enabled). More info will be available in `info`.
     public var isPasswordAlreadyUsed: Bool {
         return self.code == "invalid_password" && self.info["name"] as? String == "PasswordHistoryError"
     }
@@ -96,8 +124,11 @@ public struct AuthenticationError: Auth0APIError {
 
 }
 
+// MARK: - Equatable
+
 extension AuthenticationError: Equatable {
 
+    /// Conformance to `Equatable`.
     public static func == (lhs: AuthenticationError, rhs: AuthenticationError) -> Bool {
         return lhs.code == rhs.code
             && lhs.statusCode == rhs.statusCode
