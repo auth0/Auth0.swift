@@ -21,7 +21,7 @@ public struct JWK: Codable {
     public let keyType: String
     /// The unique identifier of the key.
     public let keyId: String?
-    /// How the key was meant to be used.
+    /// How the key is meant to be used.
     public let usage: String?
     /// The algorithm of the key.
     public let algorithm: String?
