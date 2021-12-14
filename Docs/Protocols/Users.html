@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Users Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Protocol/Users" class="dashAnchor"></a>
+
+    <a title="Users Protocol Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          Auth0 2.0.0-beta Docs
+        </a>
+         (92% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/auth0/Auth0.swift">
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">Auth0 Reference</a>
+      <img class="carat" src="../img/carat.png" alt=""/>
+      Users Protocol Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/Credentials.html">Credentials</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/UserPatchAttributes.html">UserPatchAttributes</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Global%20Variables.html">Global Variables</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Global%20Variables.html#/s:5Auth012defaultScopeSSvp">defaultScope</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/PasswordlessType.html">PasswordlessType</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/A0SimpleKeychain.html">A0SimpleKeychain</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Functions.html">Functions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth014authentication8clientId6domain7sessionAA14Authentication_pSS_SSSo12NSURLSessionCtF">authentication(clientId:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth014authentication7session6bundleAA14Authentication_pSo12NSURLSessionC_So8NSBundleCtF">authentication(session:bundle:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth05users5token6domain7sessionAA5Users_pSS_SSSo12NSURLSessionCtF">users(token:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth05users5token7session6bundleAA5Users_pSS_So12NSURLSessionCSo8NSBundleCtF">users(token:session:bundle:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/webAuth(clientId:domain:session:)">webAuth(clientId:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth07webAuth8clientId6domain7sessionAA03WebC0_pSS_SSSo12NSURLSessionCtF">webAuth(clientId:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/webAuth(session:bundle:)">webAuth(session:bundle:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth07webAuth7session6bundleAA03WebC0_pSo12NSURLSessionC_So8NSBundleCtF">webAuth(session:bundle:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Auth0APIError.html">Auth0APIError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Auth0Error.html">Auth0Error</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Authentication.html">Authentication</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/CredentialsStorage.html">CredentialsStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Loggable.html">Loggable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Logger.html">Logger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Trackable.html">Trackable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Users.html">Users</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/WebAuth.html">WebAuth</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AuthenticationError.html">AuthenticationError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Challenge.html">Challenge</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Challenge/CodingKeys.html">– CodingKeys</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/CredentialsManager.html">CredentialsManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/CredentialsManagerError.html">CredentialsManagerError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/JWK.html">JWK</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/JWKS.html">JWKS</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ManagementError.html">ManagementError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Request.html">Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Telemetry.html">Telemetry</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UserInfo.html">UserInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/WebAuthError.html">WebAuthError</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth020AuthenticationResulta">AuthenticationResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth024CredentialsManagerResulta">CredentialsManagerResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth012DatabaseUsera">DatabaseUser</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth016ManagementObjecta">ManagementObject</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth016ManagementResulta">ManagementResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/WebAuthResult">WebAuthResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth013WebAuthResulta">WebAuthResult</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>Users</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Users</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/Loggable.html">Loggable</a></span><span class="p">,</span> <span class="kt"><a href="../Protocols/Trackable.html">Trackable</a></span></code></pre>
+
+                </div>
+              </div>
+            <p>Users endpoints of Auth0 Management API v2.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users">Auth0 Management API docs</a>
+
+</div>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05UsersP5tokenSSvp"></a>
+                    <a name="//apple_ref/swift/Property/token" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05UsersP5tokenSSvp">token</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The Management API token.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">token</span><span class="p">:</span> <span class="kt">String</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05UsersP3url10Foundation3URLVvp"></a>
+                    <a name="//apple_ref/swift/Property/url" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05UsersP3url10Foundation3URLVvp">url</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The Auth0 domain URL.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05UsersP3get_6fields7includeAA7RequestVySDySSypGAA15ManagementErrorVGSS_SaySSGSbtF"></a>
+                    <a name="//apple_ref/swift/Method/get(_:fields:include:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05UsersP3get_6fields7includeAA7RequestVySDySSypGAA15ManagementErrorVGSS_SaySSGSbtF">get(_:<wbr>fields:<wbr>include:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Fetch a user using its identifier.
+By default it gets all the user&rsquo;s attributes:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="n">userId</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"User signed up: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<p>You can select which attributes you want:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="s">"email"</span><span class="p">,</span> <span class="s">"user_id"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+<p>You can even exclude some attributes:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="n">token</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="s">"identities"</span><span class="p">,</span> <span class="s">"app_metadata"</span><span class="p">],</span> <span class="nv">include</span><span class="p">:</span> <span class="kc">false</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id">Auth0 Management API docs</a>.
+
+</div><div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    The token must have the scope <code>read:users</code> scope.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">get</span><span class="p">(</span><span class="n">_</span> <span class="nv">identifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">],</span> <span class="nv">include</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Typealiases.html#/s:5Auth016ManagementObjecta">ManagementObject</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/ManagementError.html">ManagementError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>identifier</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ID of the user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>fields</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>List of the user&rsquo;s field names that will be included/excluded in the response. By default all will be retrieved.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>include</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Flag that indicates that only the names in &lsquo;fields&rsquo; should be included or not in the response. By default it will include them.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request that will yield a user.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05UsersP5patch_10attributesAA7RequestVySDySSypGAA15ManagementErrorVGSS_AA19UserPatchAttributesCtF"></a>
+                    <a name="//apple_ref/swift/Method/patch(_:attributes:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05UsersP5patch_10attributesAA7RequestVySDySSypGAA15ManagementErrorVGSS_AA19UserPatchAttributesCtF">patch(_:<wbr>attributes:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Updates a user&rsquo;s root values (those which are allowed to be updated).
+For example if you need to change <code>email</code>:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">attributes</span> <span class="o">=</span> <span class="kt">UserPatchAttributes</span><span class="p">()</span><span class="o">.</span><span class="nf">email</span><span class="p">(</span><span class="s">"newmail@auth0.com"</span><span class="p">,</span> 
+                                             <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span> 
+                                             <span class="nv">clientId</span><span class="p">:</span> <span class="s">"MyClientId"</span><span class="p">)</span>
+</code></pre>
+
+<p>Or if you need to change <code>user_metadata</code>:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">attributes</span> <span class="o">=</span> <span class="kt">UserPatchAttributes</span><span class="p">()</span><span class="o">.</span><span class="nf">userMetadata</span><span class="p">([</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"John"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"Appleseed"</span><span class="p">])</span>
+</code></pre>
+
+<p>You can even chain several changes together:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">attributes</span> <span class="o">=</span> <span class="kt">UserPatchAttributes</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">email</span><span class="p">(</span><span class="s">"support@auth0.com"</span><span class="p">,</span> 
+           <span class="nv">verify</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> 
+           <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span> 
+           <span class="nv">clientId</span><span class="p">:</span> <span class="s">"MyClientId"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">userMetadata</span><span class="p">([</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"Juan"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"AuthZero"</span><span class="p">])</span>
+    <span class="o">.</span><span class="nf">appMetadata</span><span class="p">([</span><span class="s">"role"</span><span class="p">:</span> <span class="s">"admin"</span><span class="p">])</span>
+</code></pre>
+
+<p>Then just pass the <code><a href="../Classes/UserPatchAttributes.html">UserPatchAttributes</a></code> to the patch method, like:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">attributes</span><span class="p">:</span> <span class="n">attributes</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <code><a href="../Classes/UserPatchAttributes.html">UserPatchAttributes</a></code>
+
+</div><div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id">Auth0 Management API docs</a>.
+
+</div><div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    The token must have one of  the following scopes: <code>update:users</code>, <code>update:users_app_metadata</code>.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">patch</span><span class="p">(</span><span class="n">_</span> <span class="nv">identifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">attributes</span><span class="p">:</span> <span class="kt"><a href="../Classes/UserPatchAttributes.html">UserPatchAttributes</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Typealiases.html#/s:5Auth016ManagementObjecta">ManagementObject</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/ManagementError.html">ManagementError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>identifier</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ID of the user to update.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>attributes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Root attributes to be updated.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05UsersP5patch_12userMetadataAA7RequestVySDySSypGAA15ManagementErrorVGSS_AHtF"></a>
+                    <a name="//apple_ref/swift/Method/patch(_:userMetadata:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05UsersP5patch_12userMetadataAA7RequestVySDySSypGAA15ManagementErrorVGSS_AHtF">patch(_:<wbr>userMetadata:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Updates only the user&rsquo;s <code>user_metadata</code> field.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"Juan"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"AuthZero"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id">Auth0 Management API docs</a>.
+
+</div><div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    The token must have one of  the following scopes: <code>update:users</code>, <code>update:users_app_metadata</code>.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">patch</span><span class="p">(</span><span class="n">_</span> <span class="nv">identifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Typealiases.html#/s:5Auth016ManagementObjecta">ManagementObject</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/ManagementError.html">ManagementError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>identifier</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ID of the user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>userMetadata</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Metadata to update.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request to patch <code>user_metadata</code>.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05UsersP4link_18withOtherUserTokenAA7RequestVySaySDySSypGGAA15ManagementErrorVGSS_SStF"></a>
+                    <a name="//apple_ref/swift/Method/link(_:withOtherUserToken:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05UsersP4link_18withOtherUserTokenAA7RequestVySaySDySSypGGAA15ManagementErrorVGSS_SStF">link(_:<wbr>withOtherUserToken:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Links a user given its identifier with a secondary user identifier its token.
+After this request the primary user will hold another identity in its <code>identities</code> attribute which will represent the secondary user.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">link</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">withOtherUserToken</span><span class="p">:</span> <span class="n">anotherToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/post_identities">Auth0 Management API docs</a>.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/users/user-account-linking">Link Accounts Guide</a>.
+
+</div><div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    The token must have the scope <code>update:current_user_identities</code>.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">link</span><span class="p">(</span><span class="n">_</span> <span class="nv">identifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">withOtherUserToken</span> <span class="nv">token</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="p">[</span><span class="kt"><a href="../Typealiases.html#/s:5Auth016ManagementObjecta">ManagementObject</a></span><span class="p">],</span> <span class="kt"><a href="../Structs/ManagementError.html">ManagementError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>identifier</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ID of the primary user who will be linked against a secondary one.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>withOtherUserToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Token of the secondary user to link to.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request to link two users.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05UsersP4link_8withUser8provider12connectionIdAA7RequestVySaySDySSypGGAA15ManagementErrorVGSS_S3SSgtF"></a>
+                    <a name="//apple_ref/swift/Method/link(_:withUser:provider:connectionId:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05UsersP4link_8withUser8provider12connectionIdAA7RequestVySaySDySSypGGAA15ManagementErrorVGSS_S3SSgtF">link(_:<wbr>withUser:<wbr>provider:<wbr>connectionId:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Links a user given its identifier with a secondary user identified by its id, provider and connection identifier.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">link</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">userId</span><span class="p">:</span> <span class="n">anotherUserId</span><span class="p">,</span> <span class="nv">provider</span><span class="p">:</span> <span class="s">"auth0"</span><span class="p">,</span> <span class="nv">connectionId</span><span class="p">:</span> <span class="s">"AConnectionID"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/post_identities">Auth0 Management API docs</a>.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/users/user-account-linking">Link Accounts Guide</a>.
+
+</div><div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    The token must have the scope <code>update:users</code>.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">link</span><span class="p">(</span><span class="n">_</span> <span class="nv">identifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">withUser</span> <span class="nv">userId</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">provider</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">connectionId</span><span class="p">:</span> <span class="kt">String</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="p">[</span><span class="kt"><a href="../Typealiases.html#/s:5Auth016ManagementObjecta">ManagementObject</a></span><span class="p">],</span> <span class="kt"><a href="../Structs/ManagementError.html">ManagementError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>identifier</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ID of the primary user who will be linked against a secondary one.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>withUser</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ID of the secondary user who will be linked.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>provider</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Name of the provider of the secondary user, e.g. &lsquo;auth0&rsquo; for Database connections.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>connectionId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ID of the connection of the secondary user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request to link two users.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05UsersP6unlink10identityId8provider08fromUserE0AA7RequestVySaySDySSypGGAA15ManagementErrorVGSS_S2StF"></a>
+                    <a name="//apple_ref/swift/Method/unlink(identityId:provider:fromUserId:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05UsersP6unlink10identityId8provider08fromUserE0AA7RequestVySaySDySSypGGAA15ManagementErrorVGSS_S2StF">unlink(identityId:<wbr>provider:<wbr>fromUserId:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Removes an identity from a user.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">unlink</span><span class="p">(</span><span class="nv">identityId</span><span class="p">:</span> <span class="s">"an_idenitity_id"</span><span class="p">,</span> <span class="nv">provider</span><span class="p">:</span> <span class="s">"facebook"</span><span class="p">,</span> <span class="nv">fromUserId</span><span class="p">:</span> <span class="s">"a_user_identifier"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id">Auth0 Management API docs</a>.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/users/user-account-linking">Link Accounts Guide</a>.
+
+</div><div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    The token must have the scope <code>update:users</code>.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">unlink</span><span class="p">(</span><span class="nv">identityId</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">provider</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">fromUserId</span> <span class="nv">identifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="p">[</span><span class="kt"><a href="../Typealiases.html#/s:5Auth016ManagementObjecta">ManagementObject</a></span><span class="p">],</span> <span class="kt"><a href="../Structs/ManagementError.html">ManagementError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>identityId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Identifier of the identity to remove.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>provider</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Name of the provider of the identity.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>fromUserId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ID of the user who owns the identity.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request to remove an identity.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-14)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>
