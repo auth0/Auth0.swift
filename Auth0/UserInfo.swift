@@ -1,3 +1,5 @@
+// swiftlint:disable function_body_length
+
 import Foundation
 
 /// OIDC Standard Claims user information.
@@ -86,7 +88,6 @@ public struct UserInfo: JSONObjectPayload {
 
 public extension UserInfo {
 
-    // swiftlint:disable:next function_body_length
     /// Creates a ``UserInfo`` from a JSON dictionary.
     init?(json: [String: Any]) {
         guard let sub = json["sub"] as? String else { return nil }
