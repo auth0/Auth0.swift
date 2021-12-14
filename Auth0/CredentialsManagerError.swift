@@ -56,7 +56,7 @@ public struct CredentialsManagerError: Auth0Error {
     /// ``cause`` property.
     public static let revokeFailed: CredentialsManagerError = .init(code: .revokeFailed)
     /// The `minTTL` requested is greater than the lifetime of the renewed Access Token. Request a lower `minTTL` or 
-    /// increase the 'Token Expiration' setting of your Auth0 API in the dashboard. This error does not include a ``cause``.
+    /// increase the 'Token Expiration' setting of your Auth0 API in the Dashboard. This error does not include a ``cause``.
     public static let largeMinTTL: CredentialsManagerError = .init(code: .largeMinTTL(minTTL: 0, lifetime: 0))
 
 }
