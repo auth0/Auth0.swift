@@ -221,41 +221,9 @@ Auth0.swift now only supports the [authorization code flow with PKCE](https://au
 
 The `useUniversalLink()` method was removed as well, as Universal Links [cannot be used](https://openradar.appspot.com/51091611) for OAuth redirections without user interaction since iOS 10.
 
-`useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were also removed, as their underlying Apple API `SFAuthenticationSession` is [deprecated](https://developer.apple.com/documentation/safariservices/sfauthenticationsession) in favor of `ASWebAuthenticationSession`. Auth0.swift uses `ASWebAuthenticationSession` by default to perform web-based authentication.
+`useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were also removed, as their underlying Apple API `SFAuthenticationSession` is [deprecated](https://developer.apple.com/documentation/safariservices/sfauthenticationsession) in favor of `ASWebAuthenticationSession`. Auth0.swift now only uses `ASWebAuthenticationSession` to perform web-based authentication.
 
-#### But without `useLegacyAuthentication()` there's an alert box
-
-That alert box is displayed by `ASWebAuthenticationSession`, not by Auth0.swift, because by default this API will store the auth cookie in the shared Safari cookie jar. This makes Single Sign On (SSO) possible, and therefore requires user consent.
-
-If you don't need SSO, you can disable this behavior by adding `useEphemeralSession()` to the login call. This will configure `ASWebAuthenticationSession` to not store the auth cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
-
-```swift
-Auth0
-    .webAuth()
-    .useEphemeralSession() // no alert box, and no SSO
-    .start { result in
-        // ...
-    }
-```
-
-Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
-
-> `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`. This option is only available on [iOS 13+ and macOS](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio), so `useEphemeralSession()` will have no effect on iOS 12. To improve the experience for iOS 12 users, check out the approach described below.
-
-#### I don't want the _logout_ alert box
-
-If you need SSO and/or are willing to tolerate the alert box on the login call, but would like to get rid of it when calling `clearSession(federated:)`, you can simply not call `clearSession(federated:)` and just clear the credentials from the app. This means that the shared cookie will not be removed, so to get the user to log in again you'll need to add the `"prompt": "login"` parameter to the _login_ call.
-
-```swift
-Auth0
-    .webAuth()
-    .parameters(["prompt": "login"]) // force the login page, having cookie or not
-    .start { result in
-        // ...
-    }
-```
-
-Otherwise, the browser modal will close right away and the user will be automatically logged in again, as the cookie will still be there.
+**Check out the [FAQ](FAQ.md) for more information about the alert box that pops up by default when using Web Auth.**
 
 ### Credentials Manager
 
@@ -753,6 +721,8 @@ The ID Token expiration is no longer used to determine if the credentials are st
 `hasValid(minTTL:)` no longer returns `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
 
 Note that `hasValid(minTTL:)` is no longer being called in `credentials(withScope:minTTL:parameters:callback:)` _before_ the biometrics authentication. If you were relying on this behavior, you'll need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:callback:)` yourself.
+
+You'll also need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:callback:)` yourself if you're not using a Refresh Token. Otherwise, that method will now produce a `CredentialsManagerError.noRefreshToken` error when the credentials are not valid and there is no Refresh Token available.
 
 #### Thread-safety when renewing credentials
 
