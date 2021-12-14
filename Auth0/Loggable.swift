@@ -1,7 +1,9 @@
 import Foundation
 
+/// A type that can log statements for debugging purposes.
 public protocol Loggable {
 
+    /// Logger used to log statements.
     var logger: Logger? { get set }
 
 }
@@ -37,4 +39,5 @@ public extension Loggable {
         }
         return loggable
     }
+
 }

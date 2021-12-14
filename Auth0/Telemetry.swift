@@ -102,6 +102,7 @@ public struct Telemetry {
 
 public protocol Trackable {
 
+    /// The ``Telemetry`` instance.
     var telemetry: Telemetry { get set }
 
 }
