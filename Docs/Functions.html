@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Functions  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Section/Functions" class="dashAnchor"></a>
+
+    <a title="Functions  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          Auth0 2.0.0-beta Docs
+        </a>
+         (92% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/auth0/Auth0.swift">
+            <img class="header-icon" src="img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">Auth0 Reference</a>
+      <img class="carat" src="img/carat.png" alt=""/>
+      Functions  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/Credentials.html">Credentials</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/UserPatchAttributes.html">UserPatchAttributes</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Global%20Variables.html">Global Variables</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Global%20Variables.html#/s:5Auth012defaultScopeSSvp">defaultScope</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/PasswordlessType.html">PasswordlessType</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/A0SimpleKeychain.html">A0SimpleKeychain</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/Data.html">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/String.html">String</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Functions.html">Functions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:5Auth014authentication8clientId6domain7sessionAA14Authentication_pSS_SSSo12NSURLSessionCtF">authentication(clientId:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:5Auth014authentication7session6bundleAA14Authentication_pSo12NSURLSessionC_So8NSBundleCtF">authentication(session:bundle:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:5Auth05users5token6domain7sessionAA5Users_pSS_SSSo12NSURLSessionCtF">users(token:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:5Auth05users5token7session6bundleAA5Users_pSS_So12NSURLSessionCSo8NSBundleCtF">users(token:session:bundle:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/webAuth(clientId:domain:session:)">webAuth(clientId:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:5Auth07webAuth8clientId6domain7sessionAA03WebC0_pSS_SSSo12NSURLSessionCtF">webAuth(clientId:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/webAuth(session:bundle:)">webAuth(session:bundle:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:5Auth07webAuth7session6bundleAA03WebC0_pSo12NSURLSessionC_So8NSBundleCtF">webAuth(session:bundle:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Auth0APIError.html">Auth0APIError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Auth0Error.html">Auth0Error</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Authentication.html">Authentication</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/CredentialsStorage.html">CredentialsStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Loggable.html">Loggable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Logger.html">Logger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Trackable.html">Trackable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Users.html">Users</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/WebAuth.html">WebAuth</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AuthenticationError.html">AuthenticationError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Challenge.html">Challenge</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Challenge/CodingKeys.html">– CodingKeys</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/CredentialsManager.html">CredentialsManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/CredentialsManagerError.html">CredentialsManagerError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/JWK.html">JWK</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/JWKS.html">JWKS</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ManagementError.html">ManagementError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Request.html">Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Telemetry.html">Telemetry</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UserInfo.html">UserInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/WebAuthError.html">WebAuthError</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth020AuthenticationResulta">AuthenticationResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth024CredentialsManagerResulta">CredentialsManagerResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth012DatabaseUsera">DatabaseUser</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth016ManagementObjecta">ManagementObject</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth016ManagementResulta">ManagementResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/WebAuthResult">WebAuthResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth013WebAuthResulta">WebAuthResult</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>Functions</h1>
+            <p>The following functions are available globally.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014authentication8clientId6domain7sessionAA14Authentication_pSS_SSSo12NSURLSessionCtF"></a>
+                    <a name="//apple_ref/swift/Function/authentication(clientId:domain:session:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014authentication8clientId6domain7sessionAA14Authentication_pSS_SSSo12NSURLSessionCtF">authentication(clientId:<wbr>domain:<wbr>session:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Auth0 Authentication API to authenticate your user using a Database, Social, Enterprise or Passwordless connections.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span><span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">session</span><span class="p">:</span> <span class="kt">URLSession</span> <span class="o">=</span> <span class="o">.</span><span class="n">shared</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="Protocols/Authentication.html">Authentication</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>clientId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ClientId of your Auth0 application.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>domain</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Domain of your Auth0 account, e.g. &lsquo;samples.auth0.com&rsquo;.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>session</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Instance of <code>URLSession</code> used for networking. By default it will use the shared <code>URLSession</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Auth0 Authentication API.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014authentication7session6bundleAA14Authentication_pSo12NSURLSessionC_So8NSBundleCtF"></a>
+                    <a name="//apple_ref/swift/Function/authentication(session:bundle:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014authentication7session6bundleAA14Authentication_pSo12NSURLSessionC_So8NSBundleCtF">authentication(session:<wbr>bundle:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Auth0 Authentication API to authenticate your user using a Database, Social, Enterprise or Passwordless connections.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span><span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
+</code></pre>
+
+<p>Auth0 clientId &amp; domain are loaded from the file <code>Auth0.plist</code> in your main bundle with the following content:</p>
+<pre class="highlight swift"><code><span class="o">&lt;</span><span class="p">?</span><span class="n">xml</span> <span class="n">version</span><span class="o">=</span><span class="s">"1.0"</span> <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">?</span><span class="o">&gt;</span>
+<span class="o">&lt;!</span><span class="kt">DOCTYPE</span> <span class="n">plist</span> <span class="kt">PUBLIC</span> <span class="s">"-//Apple//DTD PLIST 1.0//EN"</span> <span class="s">"http://www.apple.com/DTDs/PropertyList-1.0.dtd"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">plist</span> <span class="n">version</span><span class="o">=</span><span class="s">"1.0"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">dict</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="kt">ClientId</span><span class="o">&lt;/</span><span class="n">key</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">{</span><span class="kt">YOUR_CLIENT_ID</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="kt">Domain</span><span class="o">&lt;/</span><span class="n">key</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">{</span><span class="kt">YOUR_DOMAIN</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">dict</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">plist</span><span class="o">&gt;</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    Calling this method without a valid <code>Auth0.plist</code> will crash your application.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authentication</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="kt">URLSession</span> <span class="o">=</span> <span class="o">.</span><span class="n">shared</span><span class="p">,</span> <span class="nv">bundle</span><span class="p">:</span> <span class="kt">Bundle</span> <span class="o">=</span> <span class="o">.</span><span class="n">main</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="Protocols/Authentication.html">Authentication</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>session</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Instance of <code>URLSession</code> used for networking. By default it will use the shared <code>URLSession</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>bundle</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Bundle used to locate the <code>Auth0.plist</code> file. By default it will use the main bundle.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Auth0 Authentication API.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05users5token7session6bundleAA5Users_pSS_So12NSURLSessionCSo8NSBundleCtF"></a>
+                    <a name="//apple_ref/swift/Function/users(token:session:bundle:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05users5token7session6bundleAA5Users_pSS_So12NSURLSessionCSo8NSBundleCtF">users(token:<wbr>session:<wbr>bundle:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Auth0 Management Users API v2 that allows CRUD operations with the users endpoint.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span><span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">)</span>
+</code></pre>
+
+<p>Currently you can only perform the following operations:</p>
+
+<ul>
+<li>Get an user by id</li>
+<li>Update an user, e.g. by adding <code>user_metadata</code></li>
+<li>Link users</li>
+<li>Unlink users</li>
+</ul>
+
+<p>Auth0 domain is loaded from the file <code>Auth0.plist</code> in your main bundle with the following content:</p>
+<pre class="highlight swift"><code><span class="o">&lt;</span><span class="p">?</span><span class="n">xml</span> <span class="n">version</span><span class="o">=</span><span class="s">"1.0"</span> <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">?</span><span class="o">&gt;</span>
+<span class="o">&lt;!</span><span class="kt">DOCTYPE</span> <span class="n">plist</span> <span class="kt">PUBLIC</span> <span class="s">"-//Apple//DTD PLIST 1.0//EN"</span> <span class="s">"http://www.apple.com/DTDs/PropertyList-1.0.dtd"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">plist</span> <span class="n">version</span><span class="o">=</span><span class="s">"1.0"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">dict</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="kt">ClientId</span><span class="o">&lt;/</span><span class="n">key</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">{</span><span class="kt">YOUR_CLIENT_ID</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="kt">Domain</span><span class="o">&lt;/</span><span class="n">key</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">{</span><span class="kt">YOUR_DOMAIN</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">dict</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">plist</span><span class="o">&gt;</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    Calling this method without a valid <code>Auth0.plist</code> will crash your application.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">session</span><span class="p">:</span> <span class="kt">URLSession</span> <span class="o">=</span> <span class="o">.</span><span class="n">shared</span><span class="p">,</span> <span class="nv">bundle</span><span class="p">:</span> <span class="kt">Bundle</span> <span class="o">=</span> <span class="o">.</span><span class="n">main</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="Protocols/Users.html">Users</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>token</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Token of Management API v2 with the correct allowed scopes to perform the desired action.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>session</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Instance of <code>URLSession</code> used for networking. By default it will use the shared <code>URLSession</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>bundle</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Bundle used to locate the <code>Auth0.plist</code> file. By default it will use the main bundle.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Auth0 Management API v2.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth05users5token6domain7sessionAA5Users_pSS_SSSo12NSURLSessionCtF"></a>
+                    <a name="//apple_ref/swift/Function/users(token:domain:session:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth05users5token6domain7sessionAA5Users_pSS_SSSo12NSURLSessionCtF">users(token:<wbr>domain:<wbr>session:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Auth0 Management Users API v2 that allows CRUD operations with the users endpoint.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span><span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+</code></pre>
+
+<p>Currently you can only perform the following operations:</p>
+
+<ul>
+<li>Get an user by id</li>
+<li>Update an user, e.g. by adding <code>user_metadata</code></li>
+<li>Link users</li>
+<li><p>Unlink users</p></li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">session</span><span class="p">:</span> <span class="kt">URLSession</span> <span class="o">=</span> <span class="o">.</span><span class="n">shared</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="Protocols/Users.html">Users</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>token</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Token of Management API v2 with the correct allowed scopes to perform the desired action.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>domain</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Domain of your Auth0 account, e.g. &lsquo;samples.auth0.com&rsquo;.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>session</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Instance of <code>URLSession</code> used for networking. By default it will use the shared <code>URLSession</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Auth0 Management API v2.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth07webAuth7session6bundleAA03WebC0_pSo12NSURLSessionC_So8NSBundleCtF"></a>
+                    <a name="//apple_ref/swift/Function/webAuth(session:bundle:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth07webAuth7session6bundleAA03WebC0_pSo12NSURLSessionC_So8NSBundleCtF">webAuth(session:<wbr>bundle:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Auth0 component for authenticating with web-based flow.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span><span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
+</code></pre>
+
+<p>Auth0 domain is loaded from the file <code>Auth0.plist</code> in your main bundle with the following content:</p>
+<pre class="highlight swift"><code><span class="o">&lt;</span><span class="p">?</span><span class="n">xml</span> <span class="n">version</span><span class="o">=</span><span class="s">"1.0"</span> <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">?</span><span class="o">&gt;</span>
+<span class="o">&lt;!</span><span class="kt">DOCTYPE</span> <span class="n">plist</span> <span class="kt">PUBLIC</span> <span class="s">"-//Apple//DTD PLIST 1.0//EN"</span> <span class="s">"http://www.apple.com/DTDs/PropertyList-1.0.dtd"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">plist</span> <span class="n">version</span><span class="o">=</span><span class="s">"1.0"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">dict</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="kt">ClientId</span><span class="o">&lt;/</span><span class="n">key</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">{</span><span class="kt">YOUR_CLIENT_ID</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">string</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="kt">Domain</span><span class="o">&lt;/</span><span class="n">key</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">{</span><span class="kt">YOUR_DOMAIN</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">dict</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">plist</span><span class="o">&gt;</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    Calling this method without a valid <code>Auth0.plist</code> will crash your application.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">webAuth</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="kt">URLSession</span> <span class="o">=</span> <span class="o">.</span><span class="n">shared</span><span class="p">,</span> <span class="nv">bundle</span><span class="p">:</span> <span class="kt">Bundle</span> <span class="o">=</span> <span class="kt">Bundle</span><span class="o">.</span><span class="n">main</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="Protocols/WebAuth.html">WebAuth</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>session</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Instance of <code>URLSession</code> used for networking. By default it will use the shared <code>URLSession</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>bundle</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Bundle used to locate the <code>Auth0.plist</code> file. By default it will use the main bundle.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Auth0 WebAuth component.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth07webAuth8clientId6domain7sessionAA03WebC0_pSS_SSSo12NSURLSessionCtF"></a>
+                    <a name="//apple_ref/swift/Function/webAuth(clientId:domain:session:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth07webAuth8clientId6domain7sessionAA03WebC0_pSS_SSSo12NSURLSessionCtF">webAuth(clientId:<wbr>domain:<wbr>session:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Auth0 component for authenticating with web-based flow.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span><span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">session</span><span class="p">:</span> <span class="kt">URLSession</span> <span class="o">=</span> <span class="o">.</span><span class="n">shared</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="Protocols/WebAuth.html">WebAuth</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>clientId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>ClientId of your Auth0 application.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>domain</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Domain of your Auth0 account, e.g. &lsquo;samples.auth0.com&rsquo;.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>session</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Instance of <code>URLSession</code> used for networking. By default it will use the shared <code>URLSession</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Auth0 WebAuth component.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/"></a>
+                    <a name="//apple_ref/swift/Function/webAuth(session:bundle:)" class="dashAnchor"></a>
+                    <a class="token" href="#/">webAuth(session:<wbr>bundle:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Auth0 component for authenticating with web-based flow.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span><span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
+</code></pre>
+
+<p>Auth0 domain is loaded from the file <code>Auth0.plist</code> in your main bundle with the following content:</p>
+<pre class="highlight swift"><code><span class="o">&lt;</span><span class="p">?</span><span class="n">xml</span> <span class="n">version</span><span class="o">=</span><span class="s">"1.0"</span> <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">?</span><span class="o">&gt;</span>
+<span class="o">&lt;!</span><span class="kt">DOCTYPE</span> <span class="n">plist</span> <span class="kt">PUBLIC</span> <span class="s">"-//Apple//DTD PLIST 1.0//EN"</span> <span class="s">"http://www.apple.com/DTDs/PropertyList-1.0.dtd"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">plist</span> <span class="n">version</span><span class="o">=</span><span class="s">"1.0"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">dict</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="kt">ClientId</span><span class="o">&lt;/</span><span class="n">key</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">{</span><span class="kt">YOUR_CLIENT_ID</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">string</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="kt">Domain</span><span class="o">&lt;/</span><span class="n">key</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">{</span><span class="kt">YOUR_DOMAIN</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">dict</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">plist</span><span class="o">&gt;</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    Calling this method without a valid <code>Auth0.plist</code> will crash your application.
+
+</div>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/"></a>
+                    <a name="//apple_ref/swift/Function/webAuth(clientId:domain:session:)" class="dashAnchor"></a>
+                    <a class="token" href="#/">webAuth(clientId:<wbr>domain:<wbr>session:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Auth0 component for authenticating with web-based flow.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span><span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+</code></pre>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-14)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>

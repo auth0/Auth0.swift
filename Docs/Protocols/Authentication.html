@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Authentication Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Protocol/Authentication" class="dashAnchor"></a>
+
+    <a title="Authentication Protocol Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          Auth0 2.0.0-beta Docs
+        </a>
+         (92% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/auth0/Auth0.swift">
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">Auth0 Reference</a>
+      <img class="carat" src="../img/carat.png" alt=""/>
+      Authentication Protocol Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/Credentials.html">Credentials</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/UserPatchAttributes.html">UserPatchAttributes</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Global%20Variables.html">Global Variables</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Global%20Variables.html#/s:5Auth012defaultScopeSSvp">defaultScope</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/PasswordlessType.html">PasswordlessType</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/A0SimpleKeychain.html">A0SimpleKeychain</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Functions.html">Functions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth014authentication8clientId6domain7sessionAA14Authentication_pSS_SSSo12NSURLSessionCtF">authentication(clientId:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth014authentication7session6bundleAA14Authentication_pSo12NSURLSessionC_So8NSBundleCtF">authentication(session:bundle:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth05users5token6domain7sessionAA5Users_pSS_SSSo12NSURLSessionCtF">users(token:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth05users5token7session6bundleAA5Users_pSS_So12NSURLSessionCSo8NSBundleCtF">users(token:session:bundle:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/webAuth(clientId:domain:session:)">webAuth(clientId:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth07webAuth8clientId6domain7sessionAA03WebC0_pSS_SSSo12NSURLSessionCtF">webAuth(clientId:domain:session:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/webAuth(session:bundle:)">webAuth(session:bundle:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions.html#/s:5Auth07webAuth7session6bundleAA03WebC0_pSo12NSURLSessionC_So8NSBundleCtF">webAuth(session:bundle:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Auth0APIError.html">Auth0APIError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Auth0Error.html">Auth0Error</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Authentication.html">Authentication</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/CredentialsStorage.html">CredentialsStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Loggable.html">Loggable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Logger.html">Logger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Trackable.html">Trackable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Users.html">Users</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/WebAuth.html">WebAuth</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AuthenticationError.html">AuthenticationError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Challenge.html">Challenge</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Challenge/CodingKeys.html">– CodingKeys</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/CredentialsManager.html">CredentialsManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/CredentialsManagerError.html">CredentialsManagerError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/JWK.html">JWK</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/JWKS.html">JWKS</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ManagementError.html">ManagementError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Request.html">Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Telemetry.html">Telemetry</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UserInfo.html">UserInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/WebAuthError.html">WebAuthError</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth020AuthenticationResulta">AuthenticationResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth024CredentialsManagerResulta">CredentialsManagerResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth012DatabaseUsera">DatabaseUser</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth016ManagementObjecta">ManagementObject</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth016ManagementResulta">ManagementResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/WebAuthResult">WebAuthResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth013WebAuthResulta">WebAuthResult</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>Authentication</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Authentication</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/Loggable.html">Loggable</a></span><span class="p">,</span> <span class="kt"><a href="../Protocols/Trackable.html">Trackable</a></span></code></pre>
+
+                </div>
+              </div>
+            <p>Auth endpoints of Auth0.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication">Auth0 Auth API docs</a>
+
+</div>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP8clientIdSSvp"></a>
+                    <a name="//apple_ref/swift/Property/clientId" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP8clientIdSSvp">clientId</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The Auth0 client ID.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">clientId</span><span class="p">:</span> <span class="kt">String</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP3url10Foundation3URLVvp"></a>
+                    <a name="//apple_ref/swift/Property/url" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP3url10Foundation3URLVvp">url</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The Auth0 domain URL.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP5login5email4code8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2SSgSStF"></a>
+                    <a name="//apple_ref/swift/Method/login(email:code:audience:scope:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP5login5email4code8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2SSgSStF">login(email:<wbr>code:<wbr>audience:<wbr>scope:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Logs in a user using an email and an OTP code received via email (last part of the passwordless login flow).</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span> <span class="nv">code</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<p>You can also specify audience and scope:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+           <span class="nv">code</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">,</span>
+           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">,</span>
+           <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+<p>When result is <code>.success</code>, its associated value will be a <code><a href="../Classes/Credentials.html">Credentials</a></code> object.</p>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more info and how to enable it.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="n">email</span> <span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">code</span> <span class="nv">otp</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">audience</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span> <span class="nv">scope</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>email</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Email the user used to start the passwordless login flow.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>code</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>One time password (OTP) code the user received via email.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>audience</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>API Identifier that the client is requesting access to. Default is <code>nil</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scope</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Scope value requested when authenticating the user. Default is <code>openid profile email</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Authentication request that will yield Auth0 user&rsquo;s credentials.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP5login11phoneNumber4code8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2SSgSStF"></a>
+                    <a name="//apple_ref/swift/Method/login(phoneNumber:code:audience:scope:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP5login11phoneNumber4code8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2SSgSStF">login(phoneNumber:<wbr>code:<wbr>audience:<wbr>scope:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Logs in a user using a phone number and an OTP code received via sms (last part of the passwordless login flow).</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">phoneNumber</span><span class="p">:</span> <span class="s">"+4599134762367"</span><span class="p">,</span> <span class="nv">code</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<p>You can also specify audience and scope:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">phoneNumber</span><span class="p">:</span> <span class="s">"+4599134762367"</span><span class="p">,</span>
+           <span class="nv">code</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">,</span>
+           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">,</span>
+           <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+<p>When result is <code>.success</code>, its associated value will be a <code><a href="../Classes/Credentials.html">Credentials</a></code> object.</p>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more info and how to enable it.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="n">phoneNumber</span> <span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">code</span> <span class="nv">otp</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">audience</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span> <span class="nv">scope</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>phoneNumber</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Phone number the user used to start the passwordless login flow.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>code</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>One time password (OTP) code the user received via sms.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>audience</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>API Identifier that the client is requesting access to. Default is <code>nil</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scope</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Scope value requested when authenticating the user. Default is <code>openid profile email</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Authentication request that will yield Auth0 user&rsquo;s credentials.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP5login15usernameOrEmail8password5realm8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S3SSgSStF"></a>
+                    <a name="//apple_ref/swift/Method/login(usernameOrEmail:password:realm:audience:scope:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP5login15usernameOrEmail8password5realm8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S3SSgSStF">login(usernameOrEmail:<wbr>password:<wbr>realm:<wbr>audience:<wbr>scope:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Login using username and password in a realm.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+           <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+           <span class="nv">realm</span><span class="p">:</span> <span class="s">"mydatabase"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<p>You can also specify audience and scope:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+           <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+           <span class="nv">realm</span><span class="p">:</span> <span class="s">"mydatabase"</span><span class="p">,</span>
+           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">,</span>
+           <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    This only works if you have the OAuth 2.0 API Authorization flag on.
+
+</div><div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    Grant <code>http://auth0.com/oauth/grant-type/password-realm</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more info and how to enable it.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="n">usernameOrEmail</span> <span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">realm</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">audience</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span> <span class="nv">scope</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>username</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Username or email used of the user to authenticate.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>password</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Password of the user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>realm</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Domain of the realm or connection name.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>audience</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>API Identifier that the client is requesting access to.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scope</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Scope value requested when authenticating the user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Authentication request that will yield Auth0 user&rsquo;s credentials.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP5login7withOTP8mfaTokenAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_SStF"></a>
+                    <a name="//apple_ref/swift/Method/login(withOTP:mfaToken:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP5login7withOTP8mfaTokenAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_SStF">login(withOTP:<wbr>mfaToken:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Login using One Time Password and MFA token.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">withOTP</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">,</span> <span class="nv">mfaToken</span><span class="p">:</span> <span class="s">"mfa token"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    Grant <code>http://auth0.com/oauth/grant-type/mfa-otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more info and how to enable it.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="n">withOTP</span> <span class="nv">otp</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">mfaToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>otp</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>One time password supplied by MFA Authenticator.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>mfaToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Token returned when authentication fails due to MFA requirement.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP5login11withOOBCode8mfaToken11bindingCodeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2SSgtF"></a>
+                    <a name="//apple_ref/swift/Method/login(withOOBCode:mfaToken:bindingCode:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP5login11withOOBCode8mfaToken11bindingCodeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2SSgtF">login(withOOBCode:<wbr>mfaToken:<wbr>bindingCode:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either Push notification, SMS, or Voice).</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">withOOBCode</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">,</span> <span class="nv">mfaToken</span><span class="p">:</span> <span class="s">"mfa token"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    Grant <code>http://auth0.com/oauth/grant-type/mfa-oob</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more info and how to enable it.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="n">withOOBCode</span> <span class="nv">oobCode</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">mfaToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">bindingCode</span><span class="p">:</span> <span class="kt">String</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>oobCode</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The oob code received from the challenge request.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>mfaToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Token returned when authentication fails due to MFA requirement.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>bindingCode</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Authentication request that will yield Auth0 user&rsquo;s credentials.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP5login16withRecoveryCode8mfaTokenAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_SStF"></a>
+                    <a name="//apple_ref/swift/Method/login(withRecoveryCode:mfaToken:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP5login16withRecoveryCode8mfaTokenAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_SStF">login(withRecoveryCode:<wbr>mfaToken:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Verifies multi-factor authentication (MFA) using a recovery code.
+Some multi-factor authentication (MFA) providers (such as Guardian) support using a recovery code to login. Use this method to authenticate when the user&rsquo;s enrolled device is unavailable, or the user cannot receive the challenge or accept it due to connectivity issues.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">withRecoveryCode</span><span class="p">:</span> <span class="s">"recovery code"</span><span class="p">,</span> <span class="nv">mfaToken</span><span class="p">:</span> <span class="s">"mfa token"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    Grant <code>http://auth0.com/oauth/grant-type/mfa-recovery-code</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more info and how to enable it.
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="n">withRecoveryCode</span> <span class="nv">recoveryCode</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">mfaToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>recoveryCode</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Recovery code provided by the end-user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>mfaToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Token returned when authentication fails due to MFA requirement.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Authentication request that will yield Auth0 user&rsquo;s credentials. Might include a recovery code, which the application must display to the end-user to be stored securely for future use.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP20multifactorChallenge8mfaToken5types15authenticatorIdAA7RequestVyAA0D0VAA0B5ErrorVGSS_SaySSGSgSSSgtF"></a>
+                    <a name="//apple_ref/swift/Method/multifactorChallenge(mfaToken:types:authenticatorId:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP20multifactorChallenge8mfaToken5types15authenticatorIdAA7RequestVyAA0D0VAA0B5ErrorVGSS_SaySSGSgSSSgtF">multifactorChallenge(mfaToken:<wbr>types:<wbr>authenticatorId:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Request a challenge for multi-factor authentication (MFA) based on the challenge types supported by the application and user.
+The <code>type</code> is how the user will get the challenge and prove possession. Supported challenge types include:</p>
+
+<ul>
+<li><code>otp</code>:  for one-time password (OTP)</li>
+<li><p><code>oob</code>:  for SMS/Voice messages or out-of-band (OOB)</p></li>
+</ul>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">multifactorChallenge</span><span class="p">(</span><span class="nv">mfaToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">types</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?,</span> <span class="nv">authenticatorId</span><span class="p">:</span> <span class="kt">String</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/Challenge.html">Challenge</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>mfaToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Token returned when authentication fails due to MFA requirement.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>types</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A list of the challenges types accepted by your application. Accepted challenge types are <code>oob</code> or <code>otp</code>. Excluding this parameter means that your client application accepts all supported challenge types.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>authenticatorId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The ID of the authenticator to challenge. You can get the ID by querying the list of available authenticators for the user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request that will yield a multi-factor challenge.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP5login22appleAuthorizationCode8fullName7profile8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_10Foundation06PersonH10ComponentsVSgSDySSypGSgSSSgSStF"></a>
+                    <a name="//apple_ref/swift/Method/login(appleAuthorizationCode:fullName:profile:audience:scope:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP5login22appleAuthorizationCode8fullName7profile8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_10Foundation06PersonH10ComponentsVSgSDySSypGSgSSSgSStF">login(appleAuthorizationCode:<wbr>fullName:<wbr>profile:<wbr>audience:<wbr>scope:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Authenticate a user with their Sign In With Apple authorization code.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">appleAuthorizationCode</span><span class="p">:</span> <span class="n">authCode</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<p>If you need to specify a scope:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">appleAuthorizationCode</span><span class="p">:</span> <span class="n">authCode</span><span class="p">,</span>
+           <span class="nv">fullName</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">fullName</span><span class="p">,</span>
+           <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">,</span>
+           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="n">appleAuthorizationCode</span> <span class="nv">authorizationCode</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">fullName</span><span class="p">:</span> <span class="kt">PersonNameComponents</span><span class="p">?,</span> <span class="nv">profile</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?,</span> <span class="nv">audience</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span> <span class="nv">scope</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>authCode</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Authorization Code retrieved from Apple Authorization.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>fullName</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The full name property returned with the Apple ID Credentials.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>profile</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Additional user profile data returned with the Apple ID Credentials.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scope</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Requested scope value when authenticating the user. By default is <code>openid profile email</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>audience</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>API Identifier that the client is requesting access to.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request that will yield Auth0 user&rsquo;s credentials.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP5login26facebookSessionAccessToken7profile8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_SDySSypGSSSgSStF"></a>
+                    <a name="//apple_ref/swift/Method/login(facebookSessionAccessToken:profile:audience:scope:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP5login26facebookSessionAccessToken7profile8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_SDySSypGSSSgSStF">login(facebookSessionAccessToken:<wbr>profile:<wbr>audience:<wbr>scope:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Authenticate a user with their Facebook session info access token and profile data.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="n">sessionAccessToken</span><span class="p">,</span> <span class="nv">profile</span><span class="p">:</span> <span class="n">profile</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<p>If you need to specify a scope or audience:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="n">sessionAccessToken</span><span class="p">,</span>
+           <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">,</span>
+           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">login</span><span class="p">(</span><span class="n">facebookSessionAccessToken</span> <span class="nv">sessionAccessToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">profile</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">],</span> <span class="nv">audience</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span> <span class="nv">scope</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>sessionAccessToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Session info access token retrieved from Facebook.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>profile</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The user profile returned by Facebook.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scope</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Requested scope value when authenticating the user. By default is <code>openid profile email</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>audience</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>API Identifier that the client is requesting access to.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request that will yield Auth0 user&rsquo;s credentials.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP21loginDefaultDirectory12withUsername8password8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2SSgSStF"></a>
+                    <a name="//apple_ref/swift/Method/loginDefaultDirectory(withUsername:password:audience:scope:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP21loginDefaultDirectory12withUsername8password8audience5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2SSgSStF">loginDefaultDirectory(withUsername:<wbr>password:<wbr>audience:<wbr>scope:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Login using username and password in the default directory.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">loginDefaultDirectory</span><span class="p">(</span><span class="nv">withUsername</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+                           <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<p>You can also specify audience and scope:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">loginDefaultDirectory</span><span class="p">(</span><span class="nv">withUsername</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+                           <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+                           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">,</span>
+                           <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    This only works if you have the OAuth 2.0 API Authorization flag on.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">loginDefaultDirectory</span><span class="p">(</span><span class="n">withUsername</span> <span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">audience</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span> <span class="nv">scope</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>username</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Username or email used of the user to authenticate.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>password</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Password of the user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>audience</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>API Identifier that the client is requesting access to.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scope</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Scope value requested when authenticating the user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Authentication request that will yield Auth0 user&rsquo;s credentials.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP10createUser5email8username8password10connection12userMetadata14rootAttributesAA7RequestVySSAE_SSSgAFSb8verifiedtAA0B5ErrorVGSS_AMS2SSDySSypGSgAStF"></a>
+                    <a name="//apple_ref/swift/Method/createUser(email:username:password:connection:userMetadata:rootAttributes:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP10createUser5email8username8password10connection12userMetadata14rootAttributesAA7RequestVySSAE_SSSgAFSb8verifiedtAA0B5ErrorVGSS_AMS2SSDySSypGSgAStF">createUser(email:<wbr>username:<wbr>password:<wbr>connection:<wbr>userMetadata:<wbr>rootAttributes:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Creates a user in a Database connection.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">createUser</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+                <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+                <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"User signed up: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<p>You can also add additional metadata when creating the user:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">createUser</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+                <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+                <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span>
+                <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"support"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+<p>If the database connection requires a username:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">createUser</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+                <span class="nv">username</span><span class="p">:</span> <span class="s">"support"</span><span class="p">,</span>
+                <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+                <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">createUser</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">connection</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?,</span> <span class="nv">rootAttributes</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Typealiases.html#/s:5Auth012DatabaseUsera">DatabaseUser</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>email</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Email of the user to create.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>username</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Username of the user if the connection requires username. By default is <code>nil</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>password</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Password for the new user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>connection</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Name where the user will be created (Database connection).</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>userMetadata</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Additional userMetadata parameters that will be added to the newly created user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>rootAttributes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Root attributes that will be added to the newly created user. See <a href="https://auth0.com/docs/api/authentication#signup">https://auth0.com/docs/api/authentication#signup</a> for supported attributes. Will not overwrite existing parameters.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Request that will yield a created database user (just email, username and email verified flag).</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP13resetPassword5email10connectionAA7RequestVyytAA0B5ErrorVGSS_SStF"></a>
+                    <a name="//apple_ref/swift/Method/resetPassword(email:connection:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP13resetPassword5email10connectionAA7RequestVyytAA0B5ErrorVGSS_SStF">resetPassword(email:<wbr>connection:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Resets a Database user password.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">resetPassword</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span> <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">resetPassword</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">connection</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt">Void</span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>email</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Email of the database user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>connection</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Name of the Database connection.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Request to reset password.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP17startPasswordless5email4type10connection10parametersAA7RequestVyytAA0B5ErrorVGSS_AA0D4TypeOSSSDySSypGtF"></a>
+                    <a name="//apple_ref/swift/Method/startPasswordless(email:type:connection:parameters:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP17startPasswordless5email4type10connection10parametersAA7RequestVyytAA0B5ErrorVGSS_AA0D4TypeOSSSDySSypGtF">startPasswordless(email:<wbr>type:<wbr>connection:<wbr>parameters:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Starts passwordless authentication by sending an email with a OTP code.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+<p>If you have configured iOS Universal Links:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span> <span class="nv">type</span><span class="p">:</span> <span class="o">.</span><span class="n">iOSLink</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more info and how to enable it.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/PasswordlessType.html">PasswordlessType</a></span><span class="p">,</span> <span class="nv">connection</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">parameters</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt">Void</span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>email</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Email where to send the code or link.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>type</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Type of passwordless authentication. By default is <code>code</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>connection</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Name of the passwordless connection. By default is &lsquo;email&rsquo;.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP17startPasswordless11phoneNumber4type10connectionAA7RequestVyytAA0B5ErrorVGSS_AA0D4TypeOSStF"></a>
+                    <a name="//apple_ref/swift/Method/startPasswordless(phoneNumber:type:connection:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP17startPasswordless11phoneNumber4type10connectionAA7RequestVyytAA0B5ErrorVGSS_AA0D4TypeOSStF">startPasswordless(phoneNumber:<wbr>type:<wbr>connection:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Starts passwordless authentication by sending an sms with an OTP code.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">phoneNumber</span><span class="p">:</span> <span class="s">"+12025550135"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+<p>If you have configured iOS Universal Links:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">phoneNumber</span><span class="p">:</span> <span class="s">"+12025550135"</span><span class="p">,</span> <span class="nv">type</span><span class="p">:</span> <span class="o">.</span><span class="n">iOSLink</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more info and how to enable it.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">phoneNumber</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/PasswordlessType.html">PasswordlessType</a></span><span class="p">,</span> <span class="nv">connection</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt">Void</span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>phoneNumber</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Phone number where to send the sms with code or link.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>type</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Type of passwordless authentication. By default is <code>code</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>connection</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Name of the passwordless connection. By default is &lsquo;sms&rsquo;.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP8userInfo15withAccessTokenAA7RequestVyAA04UserD0VAA0B5ErrorVGSS_tF"></a>
+                    <a name="//apple_ref/swift/Method/userInfo(withAccessToken:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP8userInfo15withAccessTokenAA7RequestVyAA04UserD0VAA0B5ErrorVGSS_tF">userInfo(withAccessToken:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns OIDC standard claims information by performing a request to the <code>/userinfo</code> endpoint.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">userInfo</span><span class="p">(</span><span class="nv">withAccessToken</span><span class="p">:</span> <span class="n">accessToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"User: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">userInfo</span><span class="p">(</span><span class="n">withAccessToken</span> <span class="nv">accessToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/UserInfo.html">UserInfo</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>accessToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>accessToken obtained by authenticating the user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request that will yield user information.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP12codeExchange8withCode0C8Verifier11redirectURIAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2StF"></a>
+                    <a name="//apple_ref/swift/Method/codeExchange(withCode:codeVerifier:redirectURI:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP12codeExchange8withCode0C8Verifier11redirectURIAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_S2StF">codeExchange(withCode:<wbr>codeVerifier:<wbr>redirectURI:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Performs the last step of Proof Key for Code Exchange <a href="https://tools.ietf.org/html/rfc7636">RFC 7636</a>.
+This will request the user&rsquo;s token using the code and it&rsquo;s verifier after a request to <code>/oauth/authorize</code>.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">codeExchange</span><span class="p">(</span><span class="nv">withCode</span><span class="p">:</span> <span class="s">"a code"</span><span class="p">,</span>
+                  <span class="nv">codeVerifier</span><span class="p">:</span> <span class="s">"code verifier"</span><span class="p">,</span>
+                  <span class="nv">redirectURI</span><span class="p">:</span> <span class="s">"https://samples.auth0.com/callback"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://tools.ietf.org/html/rfc7636">https://tools.ietf.org/html/rfc7636</a>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">codeExchange</span><span class="p">(</span><span class="n">withCode</span> <span class="nv">code</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">codeVerifier</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">redirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>code</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Code returned after an <code>/oauth/authorize</code> request.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>codeVerifier</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Verifier used to generate the challenge sent in <code>/oauth/authorize</code> request.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>redirectURI</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Redirect uri sent in <code>/oauth/authorize</code> request.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request that will yield Auth0 user&rsquo;s credentials.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP5renew16withRefreshToken5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_SSSgtF"></a>
+                    <a name="//apple_ref/swift/Method/renew(withRefreshToken:scope:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP5renew16withRefreshToken5scopeAA7RequestVyAA11CredentialsCAA0B5ErrorVGSS_SSSgtF">renew(withRefreshToken:<wbr>scope:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Renew the user&rsquo;s credentials with a <code>refresh_token</code> grant for <code>/oauth/token</code>.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">,</span> <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access read:users"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained new credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<p>To ask the same scopes requested when the refresh token was issued:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+
+</div>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">renew</span><span class="p">(</span><span class="n">withRefreshToken</span> <span class="nv">refreshToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">scope</span><span class="p">:</span> <span class="kt">String</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>refreshToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The client&rsquo;s refresh token.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scope</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Scopes to request for the new tokens. By default is <code>nil</code>, which will ask for the same ones requested during Auth.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request that will yield Auth0 user&rsquo;s credentials.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP6revoke12refreshTokenAA7RequestVyytAA0B5ErrorVGSS_tF"></a>
+                    <a name="//apple_ref/swift/Method/revoke(refreshToken:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP6revoke12refreshTokenAA7RequestVyytAA0B5ErrorVGSS_tF">revoke(refreshToken:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Revoke a user&rsquo;s <code>refresh_token</code> with a call to <code>/oauth/revoke</code>.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">revoke</span><span class="p">(</span><span class="nv">refreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">revoke</span><span class="p">(</span><span class="nv">refreshToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt">Void</span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>refreshToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the client&rsquo;s refresh token.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationP4jwksAA7RequestVyAA4JWKSVAA0B5ErrorVGyF"></a>
+                    <a name="//apple_ref/swift/Method/jwks()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationP4jwksAA7RequestVyAA4JWKSVAA0B5ErrorVGyF">jwks()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns JSON Web Key Set (JWKS) information by performing a request to the <code>/.well-known/jwks.json</code> endpoint.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">jwks</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">jwks</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained JWKS: </span><span class="se">\(</span><span class="n">jwks</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">jwks</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/JWKS.html">JWKS</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request that will yield JWKS information.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth014AuthenticationPAAE10createUser5email8username8password10connection12userMetadataAA7RequestVySSAE_SSSgAFSb8verifiedtAA0B5ErrorVGSS_ALS2SSDySSypGSgtF"></a>
+                    <a name="//apple_ref/swift/Method/createUser(email:username:password:connection:userMetadata:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth014AuthenticationPAAE10createUser5email8username8password10connection12userMetadataAA7RequestVySSAE_SSSgAFSb8verifiedtAA0B5ErrorVGSS_ALS2SSDySSypGSgtF">createUser(email:<wbr>username:<wbr>password:<wbr>connection:<wbr>userMetadata:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">createUser</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">connection</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/Request.html">Request</a></span><span class="o">&lt;</span><span class="kt"><a href="../Typealiases.html#/s:5Auth012DatabaseUsera">DatabaseUser</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/AuthenticationError.html">AuthenticationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-14)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>
