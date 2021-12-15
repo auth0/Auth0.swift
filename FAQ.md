@@ -12,9 +12,9 @@
 
 Under the hood, Auth0.swift uses `ASWebAuthenticationSession` to perform web-based authentication, which is the [API provided by Apple](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) for such purpose.
 
-That alert box is displayed and managed by `ASWebAuthenticationSession`, not by Auth0.swift, because by default this API will store the auth cookie in the shared Safari cookie jar. This makes Single Sign On (SSO) possible. According to Apple, that requires user consent.
+That alert box is displayed and managed by `ASWebAuthenticationSession`, not by Auth0.swift, because by default this API will store the session cookie in the shared Safari cookie jar. This makes Single Sign On (SSO) possible. According to Apple, that requires user consent.
 
-If you don't need SSO, you can disable this behavior by adding `useEphemeralSession()` to the login call. This will configure `ASWebAuthenticationSession` to not store the auth cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
+If you don't need SSO, you can disable this behavior by adding `useEphemeralSession()` to the login call. This will configure `ASWebAuthenticationSession` to not store the session cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
 
 ```swift
 Auth0
@@ -25,7 +25,7 @@ Auth0
     }
 ```
 
-Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
+Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
 
 > `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`. This option is only available on [iOS 13+ and macOS](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio), so `useEphemeralSession()` will have no effect on iOS 12. To improve the experience for iOS 12 users, check out the approach described below.
 
@@ -38,6 +38,7 @@ If you need SSO and/or are willing to tolerate the alert box on the login call, 
 ```swift
 Auth0
     .webAuth()
+    .useEphemeralSession()
     .parameters(["prompt": "login"]) // force the login page, having cookie or not
     .start { result in
         // ...
@@ -48,12 +49,12 @@ Otherwise, the browser modal will close right away and the user will be automati
 
 ## 3. Is there a way to get rid of the _login_ alert box without `useEphemeralSession()`?
 
-No. According to Apple, storing the auth cookie in the shared Safari cookie jar requires user consent. The only way to not have a shared cookie is to configure `ASWebAuthenticationSession` with `prefersEphemeralWebBrowserSession` set to `true`, which is what `useEphemeralSession()` does.
+No. According to Apple, storing the session cookie in the shared Safari cookie jar requires user consent. The only way to not have a shared cookie is to configure `ASWebAuthenticationSession` with `prefersEphemeralWebBrowserSession` set to `true`, which is what `useEphemeralSession()` does.
 
 ## 4. How can I change the message in the alert box?
 
-Auth0.swift has no control whatsoever over the alert box. Its contents cannot be changed. Unfortunately, that is a limitation of `ASWebAuthenticationSession`.
+Auth0.swift has no control whatsoever over the alert box. Its contents cannot be changed. Unfortunately, that's a limitation of `ASWebAuthenticationSession`.
 
 ## 5. How can I programmatically close the alert box?
 
-Auth0.swift has no control whatsoever over the alert box. It cannot be closed programmatically. Unfortunately, that is a limitation of `ASWebAuthenticationSession`. 
+Auth0.swift has no control whatsoever over the alert box. It cannot be closed programmatically. Unfortunately, that's a limitation of `ASWebAuthenticationSession`. 
