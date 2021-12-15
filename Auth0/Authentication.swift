@@ -1,4 +1,5 @@
 // swiftlint:disable file_length
+// swiftlint:disable function_parameter_count
 
 import Foundation
 
@@ -355,7 +356,6 @@ public protocol Authentication: Trackable, Loggable {
      */
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
-    // swiftlint:disable:next function_parameter_count
     /**
      Creates a user in a Database connection.
 

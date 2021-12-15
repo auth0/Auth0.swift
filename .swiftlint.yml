@@ -7,7 +7,6 @@ included: # paths to include during linting. `--path` is ignored if present.
 excluded: # paths to ignore during linting. Takes precedence over `included`.
   - Carthage
   - Pods
-
 # configurable rules can be customized from this configuration file
 # rules that have both warning and error levels, can set just the warning level
 # implicitly
@@ -21,13 +20,4 @@ type_name:
 identifier_name:
   min_length: # only min_length
     warning: 3 # only error
-  excluded: # No regex support available for this
-    - id
-    - a0_isAuthenticationError
-    - a0_isManagementError
-    - a0_fragmentValues
-    - a0_queryValues
-    - Code
-    - WebLink
-    - AndroidLink
 reporter: "xcode" # reporter type (xcode, json, csv, checkstyle, junit)
