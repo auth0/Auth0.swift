@@ -351,6 +351,59 @@ do {
 ```
 </details>
 
+#### Use Universal Login with any Auth0 connection (iOS / macOS)
+
+Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the Universal Login page itself. The connection must first be enabled for your Auth0 application in the Dashboard.
+
+```swift
+Auth0
+    .webAuth()
+    .connection("facebook")
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .webAuth()
+    .connection("facebook")
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .webAuth()
+        .connection("facebook")
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
 #### Retrieve user information (iOS / macOS / tvOS / watchOS)
 
 ```swift
@@ -372,10 +425,10 @@ Auth0
 
 ```swift
 Auth0
-   .authentication()
-   .userInfo(withAccessToken: accessToken)
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .authentication()
+    .userInfo(withAccessToken: accessToken)
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
@@ -404,7 +457,7 @@ do {
 
 #### Renew user credentials (iOS / macOS / tvOS / watchOS)
 
-Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process before implementing.
+Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
 
 ```swift
 Auth0
@@ -425,10 +478,10 @@ Auth0
 
 ```swift
 Auth0
-   .authentication()
-   .renew(withRefreshToken: refreshToken)
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .authentication()
+    .renew(withRefreshToken: refreshToken)
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
@@ -625,13 +678,13 @@ Auth0
 
 ```swift
 Auth0
-   .authentication()
-   .login(usernameOrEmail: "support@auth0.com",
-          password: "secret-password",
-          realm: "Username-Password-Authentication",
-          scope: "openid profile")
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .authentication()
+    .login(usernameOrEmail: "support@auth0.com",
+            password: "secret-password",
+            realm: "Username-Password-Authentication",
+            scope: "openid profile")
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
@@ -685,13 +738,13 @@ Auth0
 
 ```swift
 Auth0
-   .authentication()
-   .createUser(email: "support@auth0.com",
-               password: "secret-password",
-               connection: "Username-Password-Authentication",
-               userMetadata: ["first_name": "First", "last_name": "Last"])
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .authentication()
+    .createUser(email: "support@auth0.com",
+                password: "secret-password",
+                connection: "Username-Password-Authentication",
+                userMetadata: ["first_name": "First", "last_name": "Last"])
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
@@ -715,6 +768,215 @@ do {
                     userMetadata: ["first_name": "First", "last_name": "Last"])
         .start()
     print("User signed up: \(user)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
+#### Passwordless login
+
+Passwordless is a two-step authentication flow that requires the **Passwordless OTP** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+
+To start the flow, you request a code to be sent to the user's email or phone number. For email scenarios only, a link can be sent in place of the code.
+
+With an email:
+
+```swift
+Auth0
+    .authentication(clientId: clientId, domain: "samples.auth0.com")
+    .startPasswordless(email: "support@auth0.com")
+    .start { result in
+        switch result {
+        case .success:
+            print("Code sent")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .startPasswordless(email: "support@auth0.com")
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+        print("Code sent")
+    }, receiveValue: { _ in })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    try await Auth0
+        .authentication()
+        .startPasswordless(email: "support@auth0.com")
+        .start()
+    print("Code sent")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
+With a phone number:
+
+```swift
+Auth0
+    .authentication(clientId: clientId, domain: "samples.auth0.com")
+    .startPasswordless(phoneNumber: "+12025550135")
+    .start { result in
+        case .success:
+            print("Code sent")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .startPasswordless(phoneNumber: "+12025550135")
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+        print("Code sent")
+    }, receiveValue: { _ in })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    try await Auth0
+        .authentication()
+        .startPasswordless(phoneNumber: "+12025550135")
+        .start()
+    print("Code sent")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
+To complete the authentication, you must send back that received code along with the email or phone number used to start the flow.
+
+With an email:
+
+```swift
+Auth0
+    .authentication(clientId: clientId, domain: "samples.auth0.com")
+    .login(email: "support@auth0.com", code: "123456")
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .login(email: "support@auth0.com", code: "123456")
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(email: "support@auth0.com", code: "123456")
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
+With a phone number:
+
+```swift
+Auth0
+    .authentication(clientId: clientId, domain: "samples.auth0.com")
+    .login(phoneNumber: "+12025550135", code: "123456")
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .login(phoneNumber: "+12025550135", code: "123456")
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using Async/Await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(phoneNumber: "+12025550135", code: "123456")
+        .start()
+    print("Obtained credentials: \(credentials)")
 } catch {
     print("Failed with \(error)")
 }
@@ -748,10 +1010,10 @@ Auth0
 
 ```swift
 Auth0
-   .users(token: idToken)
-   .link("user identifier", withOtherUserToken: "another user token")
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .users(token: idToken)
+    .link("user identifier", withOtherUserToken: "another user token")
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
@@ -839,10 +1101,10 @@ Auth0
 
 ```swift
 Auth0
-   .authentication()
-   .login(appleAuthorizationCode: authCode)
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .authentication()
+    .login(appleAuthorizationCode: authCode)
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
@@ -894,10 +1156,10 @@ Auth0
 
 ```swift
 Auth0
-   .authentication()
-   .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .authentication()
+    .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
@@ -960,10 +1222,10 @@ Auth0.webAuth()
 
 ```swift
 Auth0
-   .webAuth()
-   .organization(organizationId)
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .webAuth()
+    .organization(organizationId)
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
