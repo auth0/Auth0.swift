@@ -38,6 +38,7 @@ If you need SSO and/or are willing to tolerate the alert box on the login call, 
 ```swift
 Auth0
     .webAuth()
+    .useEphemeralSession()
     .parameters(["prompt": "login"]) // force the login page, having cookie or not
     .start { result in
         // ...
