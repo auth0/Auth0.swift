@@ -1,0 +1,579 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Authentication.swift",
+      "line": 645,
+      "symbol": "Authentication.createUser(email:username:password:connection:userMetadata:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Authentication.swift",
+      "line": 645,
+      "symbol": "Authentication.createUser(email:username:password:connection:userMetadata:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Authentication.swift",
+      "line": 645,
+      "symbol": "Authentication.createUser(email:username:password:connection:userMetadata:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Authentication.swift",
+      "line": 645,
+      "symbol": "Authentication.createUser(email:username:password:connection:userMetadata:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 11,
+      "symbol": "Challenge.CodingKeys",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 11,
+      "symbol": "Challenge.CodingKeys",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 11,
+      "symbol": "Challenge.CodingKeys",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 11,
+      "symbol": "Challenge.CodingKeys",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 12,
+      "symbol": "Challenge.CodingKeys.challengeType",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 12,
+      "symbol": "Challenge.CodingKeys.challengeType",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 12,
+      "symbol": "Challenge.CodingKeys.challengeType",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 12,
+      "symbol": "Challenge.CodingKeys.challengeType",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 13,
+      "symbol": "Challenge.CodingKeys.oobCode",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 13,
+      "symbol": "Challenge.CodingKeys.oobCode",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 13,
+      "symbol": "Challenge.CodingKeys.oobCode",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 13,
+      "symbol": "Challenge.CodingKeys.oobCode",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 14,
+      "symbol": "Challenge.CodingKeys.bindingMethod",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 14,
+      "symbol": "Challenge.CodingKeys.bindingMethod",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 14,
+      "symbol": "Challenge.CodingKeys.bindingMethod",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Challenge.swift",
+      "line": 14,
+      "symbol": "Challenge.CodingKeys.bindingMethod",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 163,
+      "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:callback:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 163,
+      "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:callback:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 330,
+      "symbol": "CredentialsManager.revoke(headers:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 330,
+      "symbol": "CredentialsManager.revoke(headers:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 330,
+      "symbol": "CredentialsManager.revoke(headers:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 330,
+      "symbol": "CredentialsManager.revoke(headers:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 367,
+      "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 367,
+      "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 367,
+      "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
+      "line": 367,
+      "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManagerError.swift",
+      "line": 79,
+      "symbol": "CredentialsManagerError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManagerError.swift",
+      "line": 79,
+      "symbol": "CredentialsManagerError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManagerError.swift",
+      "line": 79,
+      "symbol": "CredentialsManagerError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManagerError.swift",
+      "line": 79,
+      "symbol": "CredentialsManagerError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManagerError.swift",
+      "line": 83,
+      "symbol": "CredentialsManagerError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManagerError.swift",
+      "line": 83,
+      "symbol": "CredentialsManagerError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManagerError.swift",
+      "line": 83,
+      "symbol": "CredentialsManagerError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManagerError.swift",
+      "line": 83,
+      "symbol": "CredentialsManagerError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 3,
+      "symbol": "Logger",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 3,
+      "symbol": "Logger",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 3,
+      "symbol": "Logger",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 3,
+      "symbol": "Logger",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 4,
+      "symbol": "Logger.trace(request:session:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 4,
+      "symbol": "Logger.trace(request:session:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 4,
+      "symbol": "Logger.trace(request:session:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 4,
+      "symbol": "Logger.trace(request:session:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 5,
+      "symbol": "Logger.trace(response:data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 5,
+      "symbol": "Logger.trace(response:data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 5,
+      "symbol": "Logger.trace(response:data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 5,
+      "symbol": "Logger.trace(response:data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 6,
+      "symbol": "Logger.trace(url:source:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 6,
+      "symbol": "Logger.trace(url:source:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 6,
+      "symbol": "Logger.trace(url:source:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Logger.swift",
+      "line": 6,
+      "symbol": "Logger.trace(url:source:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Request.swift",
+      "line": 140,
+      "symbol": "Request.start()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Request.swift",
+      "line": 140,
+      "symbol": "Request.start()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Request.swift",
+      "line": 140,
+      "symbol": "Request.start()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Request.swift",
+      "line": 140,
+      "symbol": "Request.start()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 3,
+      "symbol": "Telemetry",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 3,
+      "symbol": "Telemetry",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 3,
+      "symbol": "Telemetry",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 3,
+      "symbol": "Telemetry",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 21,
+      "symbol": "Telemetry.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 21,
+      "symbol": "Telemetry.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 21,
+      "symbol": "Telemetry.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 21,
+      "symbol": "Telemetry.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 103,
+      "symbol": "Trackable",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 103,
+      "symbol": "Trackable",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 103,
+      "symbol": "Trackable",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 103,
+      "symbol": "Trackable",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 110,
+      "symbol": "Trackable",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 110,
+      "symbol": "Trackable",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 110,
+      "symbol": "Trackable",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/Telemetry.swift",
+      "line": 110,
+      "symbol": "Trackable",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuth.swift",
+      "line": 169,
+      "symbol": "WebAuth.start()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuth.swift",
+      "line": 169,
+      "symbol": "WebAuth.start()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuth.swift",
+      "line": 304,
+      "symbol": "WebAuth.clearSession(federated:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuth.swift",
+      "line": 304,
+      "symbol": "WebAuth.clearSession(federated:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuthError.swift",
+      "line": 93,
+      "symbol": "WebAuthError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuthError.swift",
+      "line": 93,
+      "symbol": "WebAuthError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuthError.swift",
+      "line": 97,
+      "symbol": "WebAuthError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuthError.swift",
+      "line": 97,
+      "symbol": "WebAuthError.~=(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/rita/Code/Auth0.swift"
+}
