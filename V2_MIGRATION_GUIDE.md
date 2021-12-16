@@ -1,4 +1,4 @@
-# V2 Migration Guide
+# v2 Migration Guide
 
 Auth0.swift v2 includes many significant changes:
 

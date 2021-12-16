@@ -1,12 +1,12 @@
 # Frequently Asked Questions
 
-1. [How can I get rid of the _login_ alert box?](#1-how-can-i-get-rid-of-the-login-alert-box)
-2. [How can I get rid of the _logout_ alert box?](#2-how-can-i-get-rid-of-the-logout-alert-box)
-3. [Is there a way to get rid of the _login_ alert box without `useEphemeralSession()`?](#3-is-there-a-way-to-get-rid-of-the-login-alert-box-without-useephemeralsession)
+1. [How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box)
+2. [How can I disable the _logout_ alert box?](#2-how-can-i-disable-the-logout-alert-box)
+3. [Is there a way to disable the _login_ alert box without `useEphemeralSession()`?](#3-is-there-a-way-to-disable-the-login-alert-box-without-useephemeralsession)
 4. [How can I change the message in the alert box?](#4-how-can-i-change-the-message-in-the-alert-box)
 5. [How can I programmatically close the alert box?](#5-how-can-i-programmatically-close-the-alert-box)
 
-## 1. How can I get rid of the _login_ alert box?
+## 1. How can I disable the _login_ alert box?
 
 ![sso-alert](./sso-alert.png)
 
@@ -29,7 +29,7 @@ Note that with `useEphemeralSession()` you don't need to call `clearSession(fede
 
 > `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`. This option is only available on [iOS 13+ and macOS](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio), so `useEphemeralSession()` will have no effect on iOS 12. To improve the experience for iOS 12 users, check out the approach described below.
 
-## 2. How can I get rid of the _logout_ alert box?
+## 2. How can I disable the _logout_ alert box?
 
 ![sso-alert](./sso-alert.png)
 
@@ -47,7 +47,7 @@ Auth0
 
 Otherwise, the browser modal will close right away and the user will be automatically logged in again, as the cookie will still be there.
 
-## 3. Is there a way to get rid of the _login_ alert box without `useEphemeralSession()`?
+## 3. Is there a way to disable the _login_ alert box without `useEphemeralSession()`?
 
 No. According to Apple, storing the session cookie in the shared Safari cookie jar requires user consent. The only way to not have a shared cookie is to configure `ASWebAuthenticationSession` with `prefersEphemeralWebBrowserSession` set to `true`, which is what `useEphemeralSession()` does.
 

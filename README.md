@@ -11,7 +11,7 @@
 
 Swift SDK that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api) endpoints and enables you to seamlessly integrate the Auth0 login.
 
-Need help migrating from v1? Please check our [Migration Guide](V2_MIGRATION_GUIDE.md).
+**Migrating from v1? Check our [Migration Guide](V2_MIGRATION_GUIDE.md).**
 
 ## Table of Contents
 
@@ -33,10 +33,11 @@ Need help migrating from v1? Please check our [Migration Guide](V2_MIGRATION_GUI
   + [Management API (Users) (iOS / macOS / tvOS / watchOS)](#management-api-users-ios--macos--tvos--watchos)
   + [Logging](#logging)
 - [Other Features](#other-features)
+  + [Custom Domains](#custom-domains)
   + [Native Social Login](#native-social-login)
   + [Organizations](#organizations)
-  + [Custom Domains](#custom-domains)
   + [Bot Detection](#bot-detection)
+- [Support Policy](#support-policy)
 - [Issue Reporting](#issue-reporting)
 - [What is Auth0?](#what-is-auth0)
 - [License](#license)
@@ -46,6 +47,8 @@ Need help migrating from v1? Please check our [Migration Guide](V2_MIGRATION_GUI
 - iOS 12+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+
 - Xcode 12.x / 13.x
 - Swift 5.3+
+
+> ⚠️ Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
 
 ## Documentation
 
@@ -215,7 +218,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -265,7 +268,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -283,7 +286,7 @@ do {
 
 ![sso-alert](./sso-alert.png)
 
-Check out the [FAQ](FAQ.md) for more information about the alert box that pops up by default when using Web Auth.
+Check the [FAQ](FAQ.md) for more information about the alert box that pops up by default when using Web Auth.
 
 ## Next Steps
 
@@ -336,7 +339,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -353,12 +356,12 @@ do {
 
 #### Use Universal Login with any Auth0 connection (iOS / macOS)
 
-Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the Universal Login page itself. The connection must first be enabled for your Auth0 application in the Dashboard.
+Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the Universal Login page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
 
 ```swift
 Auth0
     .webAuth()
-    .connection("facebook")
+    .connection("facebook") // Show the Facebook login page
     .start { result in
         switch result {
         case .success(let credentials):
@@ -375,7 +378,7 @@ Auth0
 ```swift
 Auth0
     .webAuth()
-    .connection("facebook")
+    .connection("facebook") // Show the Facebook login page
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -389,13 +392,13 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
     let credentials = try await Auth0
         .webAuth()
-        .connection("facebook")
+        .connection("facebook") // Show the Facebook login page
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -440,7 +443,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -493,7 +496,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -558,7 +561,7 @@ credentialsManager
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -608,7 +611,7 @@ credentialsManager
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -632,7 +635,7 @@ let user = credentialsManager.user
 
 #### Biometric authentication
 
-You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by your device e.g. Face ID or Touch ID.
+You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by your device, e.g. Face ID or Touch ID.
 
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
@@ -650,9 +653,9 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
 ### Authentication API (iOS / macOS / tvOS / watchOS)
 
 The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
-We recommend using [Universal Login](https://auth0.com/docs/login/universal-login) but if you wish to build your own UI, you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your Auth0 Dashboard as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
+We recommend using [Universal Login](https://auth0.com/docs/login/universal-login) but if you wish to build your own UI, you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your [Auth0 Dashboard](https://manage.auth0.com/#/applications/) as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
 
-The `Password` Grant Type needs to be enabled in your application, for login with username/password using a realm (or connection name). If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `password`, otherwise the Auth0 Dashboard will take care of activating both when `Password` is enabled.
+For login or signup with username/password, the `Password` Grant Type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `password`, otherwise the Auth0 Dashboard will take care of activating both when `Password` is enabled.
 
 #### Login with database connection
 
@@ -661,7 +664,7 @@ Auth0
     .authentication()
     .login(usernameOrEmail: "support@auth0.com",
            password: "secret-password",
-           realm: "Username-Password-Authentication",
+           realm: "Username-Password-Authentication", // The connection name
            scope: "openid profile email offline_access")
      .start { result in
          switch result {
@@ -680,9 +683,9 @@ Auth0
 Auth0
     .authentication()
     .login(usernameOrEmail: "support@auth0.com",
-            password: "secret-password",
-            realm: "Username-Password-Authentication",
-            scope: "openid profile")
+           password: "secret-password",
+           realm: "Username-Password-Authentication", // The connection name
+           scope: "openid profile")
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -696,7 +699,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -704,7 +707,7 @@ do {
         .authentication()
         .login(usernameOrEmail: "support@auth0.com",
                password: "secret-password",
-               realm: "Username-Password-Authentication",
+               realm: "Username-Password-Authentication", // The connection name
                scope: "openid profile")
         .start()
     print("Obtained credentials: \(credentials)")
@@ -756,7 +759,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -776,8 +779,9 @@ do {
 
 #### Passwordless login
 
-Passwordless is a two-step authentication flow that requires the **Passwordless OTP** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+Passwordless is a two-step authentication flow that requires the **Passwordless OTP** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
 
+##### 1. Start the passwordless flow
 To start the flow, you request a code to be sent to the user's email or phone number. For email scenarios only, a link can be sent in place of the code.
 
 With an email:
@@ -815,7 +819,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -864,7 +868,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -879,6 +883,7 @@ do {
 ```
 </details>
 
+##### 2. Login with the received code
 To complete the authentication, you must send back that received code along with the email or phone number used to start the flow.
 
 With an email:
@@ -917,7 +922,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -968,7 +973,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -1024,7 +1029,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -1076,11 +1081,32 @@ Connection: keep-alive
 
 ## Other Features
 
+### Custom Domains
+
+If you are using [Custom Domains](https://auth0.com/docs/brand-and-customize/custom-domains) and need to call an Auth0 endpoint
+such as `/userinfo`, please use the Auth0 domain specified for your Application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+
+```swift
+Auth0
+    .webAuth()
+    .audience("https://YOUR_AUTH0_DOMAIN/userinfo")
+    // ...
+```
+
+Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 domain before starting the authentication. Otherwise, the ID Token validation will fail.
+
+```swift
+Auth0
+    .webAuth()
+    .issuer("https://YOUR_AUTH0_DOMAIN/")
+    // ...
+```
+
 ### Native Social Login
 
 #### Sign in With Apple
 
-If you've added [the Sign In with Apple flow](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) to your app, you can use the string value from the `authorizationCode` property obtained after a successful Apple authentication to perform a code exchange for Auth0 tokens.
+If you've added [the Sign In with Apple flow](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) to your app, after a successful Sign in With Apple authentication you can use the value of the `authorizationCode` property to perform a code exchange for Auth0 credentials.
 
 ```swift
 Auth0
@@ -1116,7 +1142,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -1135,7 +1161,7 @@ Find out more about [Setting up Sign in with Apple](https://auth0.com/docs/conne
 
 #### Facebook Login
 
-If you've added [the Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and use them both to perform a code exchange for Auth0 tokens.
+If you've added [the Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and use them both to perform a code exchange for Auth0 credentials.
 
 ```swift
 Auth0
@@ -1171,7 +1197,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -1237,7 +1263,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 ```swift
 do {
@@ -1283,27 +1309,6 @@ NotificationCenter
     .store(in: &cancellables)
 ```
 
-### Custom Domains
-
-If you are using [Custom Domains](https://auth0.com/docs/brand-and-customize/custom-domains) and need to call an Auth0 endpoint
-such as `/userinfo`, please use the Auth0 domain specified for your Application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
-
-```swift
-Auth0
-    .webAuth()
-    .audience("https://YOUR_AUTH0_DOMAIN/userinfo")
-    // ...
-```
-
-Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 domain before starting the authentication. Otherwise, the ID Token validation will fail.
-
-```swift
-Auth0
-    .webAuth()
-    .issuer("https://YOUR_AUTH0_DOMAIN/")
-    // ...
-```
-
 ### Bot Detection
 
 If you are using the [Bot Detection](https://auth0.com/docs/configure/attack-protection/bot-detection) feature and performing database login/signup via the Authentication API, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Universal Login to complete it.
@@ -1343,7 +1348,35 @@ Auth0
     // ...
 ```
 
-Check out how to set up Universal Login in the [Getting Started](#getting-started) section.
+Check how to set up Universal Login in the [Getting Started](#getting-started) section.
+
+## Support Policy
+
+This Policy defines the extent of the support for Xcode, Swift, and platform (iOS, macOS, tvOS, and watchOS) versions in Auth0.swift.
+
+### Xcode
+
+The only supported versions of Xcode are those that can be currently used to submit apps to the App Store. Dropping older, unsupported Xcode versions **will not be considered a breaking change**, and will be done in **minor** releases.
+
+### Swift
+
+The minimum supported Swift 5 minor version is the one released with the oldest-supported Xcode version. Dropping older, unsupported Swift 5 minors **will not be considered a breaking change**, and will be done in **minor** releases.
+
+### Platforms
+
+Only the last 4 major platform versions are supported, starting from:
+
+- iOS **12**
+- macOS **10.15**
+- Catalyst **13.0**
+- tvOS **12.0**
+- watchOS **6.2**
+
+Dropping older, unsupported platform versions **will not be considered a breaking change**, and will be done in **minor** releases.
+
+> E.g. iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.
+
+In the case of macOS, the yearly named releases are considered a major platform version for the purposes of this Policy, regardless of the actual version numbers.
 
 ## Issue Reporting
 
