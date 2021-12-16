@@ -709,7 +709,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should create a user with email & password") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.createUser(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
+                    auth.signup(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCreatedUser(SupportAtAuth0))
                         done()
                     }
@@ -718,7 +718,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should create a user with email, username & password") {
                 waitUntil(timeout: Timeout) { done in
-                    auth.createUser(email: SupportAtAuth0, username: Support, password: ValidPassword, connection: ConnectionName).start { result in
+                    auth.signup(email: SupportAtAuth0, username: Support, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCreatedUser(SupportAtAuth0, username: Support))
                         done()
                     }
@@ -731,7 +731,7 @@ class AuthenticationSpec: QuickSpec {
                     let description = "Invalid password"
                     let password = "return invalid password"
                     stub(condition: isSignUp(Domain) && hasAtLeast(["password": password])) { _ in return authFailure(code: code, description: description) }.name = "invalid password"
-                    auth.createUser(email: SupportAtAuth0, password: password, connection: ConnectionName).start { result in
+                    auth.signup(email: SupportAtAuth0, password: password, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
                     }
@@ -744,7 +744,7 @@ class AuthenticationSpec: QuickSpec {
                 let metadata = ["country": country]
                 stub(condition: isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: email) }.name = "User w/metadata"
                 waitUntil(timeout: Timeout) { done in
-                    auth.createUser(email: email, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
+                    auth.signup(email: email, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
                         expect(result).to(haveCreatedUser(email))
                         done()
                     }
@@ -758,7 +758,7 @@ class AuthenticationSpec: QuickSpec {
                                       "nickname" : "Johnny"]
                     stub(condition: isSignUp(Domain) && hasAtLeast(attributes)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/root attributes"
                     waitUntil(timeout: Timeout) { done in
-                        auth.createUser(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, rootAttributes: attributes).start { result in
+                        auth.signup(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, rootAttributes: attributes).start { result in
                             expect(result).to(haveCreatedUser(SupportAtAuth0))
                             done()
                         }
@@ -771,7 +771,7 @@ class AuthenticationSpec: QuickSpec {
                                       "email" : "root@email.com"]
                     stub(condition: isSignUp(Domain) && !hasAtLeast(attributes)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/root attributes"
                     waitUntil(timeout: Timeout) { done in
-                        auth.createUser(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, rootAttributes: attributes).start { result in
+                        auth.signup(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, rootAttributes: attributes).start { result in
                             expect(result).to(haveCreatedUser(SupportAtAuth0))
                             done()
                         }

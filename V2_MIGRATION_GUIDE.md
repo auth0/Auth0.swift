@@ -131,7 +131,7 @@ You should use `login(usernameOrEmail:password:realm:audience:scope:)` instead.
 
 #### `signUp(email:username:password:connection:userMetadata:scope:parameters:)`
 
-You should use `createUser(email:username:password:connection:userMetadata:rootAttributes:)` and then `login(usernameOrEmail:password:realm:audience:scope:)` instead. That is, create the user and then log them in.
+You should use `signup(email:username:password:connection:userMetadata:rootAttributes:)` and then `login(usernameOrEmail:password:realm:audience:scope:)` instead. That is, create the user and then log them in.
 
 #### `tokenInfo(token:)` and `userInfo(token:)`
 
@@ -426,6 +426,10 @@ case .failure(let error): // handle AuthenticationError
 }
 ```
 </details>
+
+#### Renamed `signup(email:username:password:connection:userMetadata:rootAttributes:)`
+
+The method `createUser(email:username:password:connection:userMetadata:rootAttributes:)` was renamed to `signup(email:username:password:connection:userMetadata:rootAttributes:)`.
 
 #### Renamed `tokenExchange(withCode:codeVerifier:redirectURI:)`
 

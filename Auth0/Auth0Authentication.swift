@@ -180,7 +180,7 @@ struct Auth0Authentication: Authentication {
                                   parameters: parameters)
     }
 
-    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+    func signup(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         var payload: [String: Any] = [
             "email": email,
             "password": password,
@@ -195,9 +195,9 @@ struct Auth0Authentication: Authentication {
             }
         }
 
-        let createUser = URL(string: "dbconnections/signup", relativeTo: self.url)!
+        let signup = URL(string: "dbconnections/signup", relativeTo: self.url)!
         return Request(session: session,
-                       url: createUser,
+                       url: signup,
                        method: "POST",
                        handle: databaseUser,
                        parameters: payload,
