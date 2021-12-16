@@ -282,13 +282,13 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.hasValid()).to(beFalse())
             }
 
-            it("should have valid credentials when token valid and no refresh token present") {
+            it("should have valid credentials when token valid") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid()).to(beTrue())
             }
 
-            it("should not have valid credentials when token expired and no refresh token present") {
+            it("should not have valid credentials when token expired") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid()).to(beFalse())
@@ -300,7 +300,7 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.hasValid(minTTL: ValidTTL)).to(beTrue())
             }
 
-            it("should not have valid credentials when the ttl is greater than the token lifetime and no refresh token present") {
+            it("should not have valid credentials when the ttl is greater than the token lifetime") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid(minTTL: InvalidTTL)).to(beFalse())
@@ -370,28 +370,40 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             afterEach {
-                A0SimpleKeychain().clearAll()
+                _ = credentialsManager.clear()
             }
 
             it("should error when no credentials stored") {
-                A0SimpleKeychain().clearAll()
-                credentialsManager.credentials { result in
-                    expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                _ = credentialsManager.clear()
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        done()
+                    }
                 }
             }
 
             it("should error when no refresh token") {
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
-                credentialsManager.credentials { result in
-                    expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noRefreshToken)))
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noRefreshToken)))
+                        done()
+                    }
                 }
             }
 
             it("should return original credentials as not expired") {
                 _ = credentialsManager.store(credentials: credentials)
-                credentialsManager.credentials { result in
-                    expect(result).to(haveCredentials())
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.credentials { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
                 }
             }
 
@@ -588,23 +600,6 @@ class CredentialsManagerSpec: QuickSpec {
 
             context("serial renew from same thread") {
 
-                it("should not renew the credentials after the previous renewal operation succeeded") {
-                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                    _ = credentialsManager.store(credentials: credentials)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials { result in
-                            expect(result).to(haveCredentials())
-                        }
-                        credentialsManager.credentials { result in
-                            expect(result).to(beSuccessful())
-                            done()
-                        }
-                    }
-                }
-
                 it("should yield the stored credentials after the previous renewal operation succeeded") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
@@ -643,27 +638,6 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             context("serial renew from different threads") {
-
-                it("should not renew the credentials after the previous renewal operation succeeded") {
-                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                    _ = credentialsManager.store(credentials: credentials)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
-                    waitUntil(timeout: Timeout) { done in
-                        DispatchQueue.global(qos: .utility).sync {
-                            credentialsManager.credentials(parameters: ["request": "first"]) { result in
-                                expect(result).to(haveCredentials())
-                            }
-                        }
-                        DispatchQueue.global(qos: .background).sync {
-                            credentialsManager.credentials { result in
-                                expect(result).to(beSuccessful())
-                                done()
-                            }
-                        }
-                    }
-                }
 
                 it("should yield the stored credentials after the previous renewal operation succeeded") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
