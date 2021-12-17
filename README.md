@@ -28,6 +28,7 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
   + [Default Alert Box](#default-alert-box)
 - [Next Steps](#next-steps)
   + [Common Tasks](#common-tasks)
+  + [Web Auth Configuration (iOS / macOS)](#web-auth-configuration-ios--macos)
   + [Credentials Manager (iOS / macOS / tvOS / watchOS)](#credentials-manager-ios--macos--tvos--watchos)
   + [Authentication API (iOS / macOS / tvOS / watchOS)](#authentication-api-ios--macos--tvos--watchos)
   + [Management API (Users) (iOS / macOS / tvOS / watchOS)](#management-api-users-ios--macos--tvos--watchos)
@@ -55,6 +56,10 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
 - [Quickstarts](https://auth0.com/docs/quickstart/native/ios-swift)
 - [Sample app](https://github.com/auth0-samples/auth0-ios-swift-sample)
 - [API Documentation](https://auth0.github.io/Auth0.swift/)
+  + [Web Auth](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)
+  + [Credentials Manager](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)
+  + [Authentication API Client](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
+  + [Management API Client](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
 - [FAQ](FAQ.md)
 
 ## Installation
@@ -144,7 +149,7 @@ Auth0
 
 #### Configure Callback URLs (iOS / macOS)
 
-Callback URLs are the URLs that Auth0 invokes after the authentication process. Auth0 routes your application back to this URL and appends additional parameters to it, including a token. Since callback URLs can be manipulated, you will need to add your callback URL to the **Allowed Callback URLs** field in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/). This will enable Auth0 to recognize these URLs as valid. If omitted, the authentication will not be successful.
+Callback URLs are the URLs that Auth0 invokes after the authentication process to redirect back to your app. Since callback URLs can be manipulated, you will need to add your callback URL to the **Allowed Callback URLs** field in the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/). This will enable Auth0 to recognize these URLs as valid. If omitted, the authentication will not be successful.
 
 In your application's `Info.plist` file, register your iOS / macOS Bundle Identifier as a custom URL scheme.
 
@@ -166,7 +171,7 @@ In your application's `Info.plist` file, register your iOS / macOS Bundle Identi
 
 > If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As / Source Code**.
 
-Finally, go to your [Auth0 Dashboard](https://manage.auth0.com/#/applications/) and make sure that your application's **Allowed Callback URLs** field contains the following entry:
+Finally, go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and make sure that the **Allowed Callback URLs** field contains the following entry:
 
 ```text
 YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
@@ -234,7 +239,13 @@ do {
 
 ### Logout with Universal Login (iOS / macOS)
 
-To clear the Universal Login session cookie, call the `clearSession()` method in the action of your **Logout** button.
+Web Auth logout involves clearing the Universal Login session cookie and then redirecting back to your app. For this redirection to happen, you must copy the **Allowed Callback URLs** value you added for authentication into the **Allowed Logout URLs** field in your [Auth0 application](https://manage.auth0.com/#/applications/) settings.
+
+```text
+YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
+```
+
+To clear the session cookie, call the `clearSession()` method in the action of your **Logout** button.
 
 ```swift
 Auth0
@@ -288,6 +299,8 @@ do {
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up by default when using Web Auth.
 
+[Go up ⤴](#table-of-contents)
+
 ## Next Steps
 
 ### Common Tasks
@@ -317,7 +330,7 @@ Auth0
     }
 ```
 
-> The `screen_hint` parameter can only be used with the **New Universal Login Experience**, not the **Classic Experience**.
+> ⚠️ The `screen_hint` parameter can only be used with the **New Universal Login Experience**, not the **Classic Experience**.
 
 <details>
   <summary>Using Combine</summary>
@@ -354,113 +367,11 @@ do {
 ```
 </details>
 
-#### Use Universal Login with any Auth0 connection (iOS / macOS)
-
-Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the Universal Login page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
-
-```swift
-Auth0
-    .webAuth()
-    .connection("facebook") // Show the Facebook login page
-    .start { result in
-        switch result {
-        case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
-        case .failure(let error):
-            print("Failed with \(error)")
-        }
-    }
-```
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .webAuth()
-    .connection("facebook") // Show the Facebook login page
-    .publisher()
-    .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print("Failed with \(error)")
-        }
-    }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
-    })
-    .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let credentials = try await Auth0
-        .webAuth()
-        .connection("facebook") // Show the Facebook login page
-        .start()
-    print("Obtained credentials: \(credentials)")
-} catch {
-    print("Failed with \(error)")
-}
-```
-</details>
-
-#### Retrieve user information (iOS / macOS / tvOS / watchOS)
-
-```swift
-Auth0
-   .authentication()
-   .userInfo(withAccessToken: accessToken)
-   .start { result in
-       switch result {
-       case .success(let user):
-           print("User: \(user)")
-       case .failure(let error):
-           print("Failed with \(error)")
-       }
-   }
-```
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .authentication()
-    .userInfo(withAccessToken: accessToken)
-    .publisher()
-    .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print("Failed with \(error)")
-        }
-    }, receiveValue: { user in
-        print("User: \(user)")
-    })
-    .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let user = try await Auth0
-        .authentication()
-        .userInfo(withAccessToken: accessToken)
-        .start()
-    print("User: \(user)")
-} catch {
-    print("Failed with \(error)")
-}
-```
-</details>
-
-#### Renew user credentials (iOS / macOS / tvOS / watchOS)
+#### Renew credentials (iOS / macOS / tvOS / watchOS)
 
 Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
+
+> You need the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) to get a Refresh Token from Auth0.
 
 ```swift
 Auth0
@@ -511,7 +422,56 @@ do {
 ```
 </details>
 
+### Web Auth Configuration (iOS / macOS)
+
+The following are some of the available Web Auth configuration options. Check the [API documentation](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html) for the complete list.
+
+#### Use any Auth0 connection
+
+Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the Universal Login page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
+
+```swift
+Auth0
+    .webAuth()
+    .connection("facebook") // Show the Facebook login page
+    // ...
+```
+
+#### Add an audience value
+
+Specify an audience to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/configure/apis).
+
+```swift
+Auth0
+    .webAuth()
+    .audience("YOUR_API_IDENTIFIER")
+    // ...
+```
+
+#### Add a scope value
+
+Specify a [scope](https://auth0.com/docs/configure/apis/scopes) to request permission to access protected resources. The default scope used is `openid profile email`. Regardless of the scope value configured, `openid` is always included.
+
+```swift
+Auth0
+    .webAuth()
+    .scope("openid profile email offline_access read:todos")
+    // ...
+```
+
+Use `connectionScope()` to configure a scope value for an Auth0 connection.
+
+```swift
+Auth0
+    .webAuth()
+    .connection("connection-name")
+    .connectionScope("openid profile email offline_access")
+    // ...
+```
+
 ### Credentials Manager (iOS / macOS / tvOS / watchOS)
+
+[API documentation ↗](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)
 
 The Credentials Manager utility provides a convenience to securely store and retrieve the user's credentials from the Keychain.
 
@@ -529,9 +489,9 @@ credentialsManager.store(credentials: credentials)
 
 #### Retrieve stored credentials 
 
-Credentials will automatically be renewed (if expired) using the Refresh Token. The scope `offline_access` is necessary to get a Refresh Token from Auth0.
+Credentials will automatically be renewed (if expired) using the [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens). **This method is thread-safe.**
 
-> This method is thread-safe.
+> You need the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) to get a Refresh Token from Auth0.
 
 ```swift
 credentialsManager.credentials { result in 
@@ -575,7 +535,7 @@ do {
 
 #### Clear credentials and revoke Refresh Tokens
 
-Credentials can be cleared from the Keychain by using the `clear()` function.
+Credentials can be cleared from the Keychain by using the `clear()` method.
 
 ```swift
 let didClear = credentialsManager.clear()
@@ -648,9 +608,11 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
                                     evaluationPolicy: .deviceOwnerAuthentication)
 ```
 
-> Note that retrieving the user profile with `credentialsManager.user` will not be protected by Biometric authentication.
+> ⚠️ Retrieving the user information with `credentialsManager.user` will not be protected by Biometric authentication.
 
 ### Authentication API (iOS / macOS / tvOS / watchOS)
+
+[API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
 
 The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
 We recommend using [Universal Login](https://auth0.com/docs/login/universal-login) but if you wish to build your own UI, you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your [Auth0 Dashboard](https://manage.auth0.com/#/applications/) as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
@@ -685,7 +647,7 @@ Auth0
     .login(usernameOrEmail: "support@auth0.com",
            password: "secret-password",
            realm: "Username-Password-Authentication", // The connection name
-           scope: "openid profile")
+           scope: "openid profile email offline_access")
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -708,7 +670,7 @@ do {
         .login(usernameOrEmail: "support@auth0.com",
                password: "secret-password",
                realm: "Username-Password-Authentication", // The connection name
-               scope: "openid profile")
+               scope: "openid profile email offline_access")
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -988,11 +950,141 @@ do {
 ```
 </details>
 
+#### Configuration
+
+##### Add custom parameters
+
+Use the `parameters()` method to add custom parameters to any request.
+
+```swift
+Auth0
+    .authentication()
+    .renew(withRefreshToken: refreshToken) // Any request
+    .parameters(["key": "value"])
+    // ...
+```
+
+##### Add custom headers
+
+Use the `headers()` method to add custom headers to any request.
+
+```swift
+Auth0
+    .authentication()
+    .renew(withRefreshToken: refreshToken) // Any request
+    .headers(["key": "value"])
+    // ...
+```
+
 ### Management API (Users) (iOS / macOS / tvOS / watchOS)
+
+[API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
 
 You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2). For security reasons native mobile applications are restricted to a subset of the Management API functionality.
 
 You can find a detailed guide in this [iOS Swift QuickStart](https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata).
+
+#### Retrieve user metadata
+
+```swift
+Auth0
+    .users(token: accessToken)
+    .get(userId, fields: ["user_metadata"])
+    .start { result in
+        switch result {
+          case .success(let user):
+              print("User with metadata: \(user)")
+          case .failure(let error):
+              print("Failed with \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .users(token: accessToken)
+    .get(userId, fields: ["user_metadata"])
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("User with metadata: \(user)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .users(token: accessToken)
+        .get(userId, fields: ["user_metadata"])
+        .start()
+    print("User with metadata: \(user)") 
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
+#### Update user metadata
+
+```swift
+Auth0
+    .users(token: accessToken)
+    .patch(userId, userMetadata: ["key": "value"])
+    .start { result in
+        switch result {
+          case .success(let user):
+              print("Updated user: \(user)")
+          case .failure(let error):
+              print("Failed with \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .users(token: accessToken)
+    .patch(userId, userMetadata: ["key": "value"])
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Updated user: \(user)") 
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .users(token: accessToken)
+        .patch(userId, userMetadata: ["key": "value"])
+        .start()
+    print("Updated user: \(user)") 
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
 
 #### Link an account
 
@@ -1044,6 +1136,32 @@ do {
 ```
 </details>
 
+#### Configuration
+
+##### Add custom parameters
+
+Use the `parameters()` method to add custom parameters to any request.
+
+```swift
+Auth0
+    .users(token: accessToken)
+    .patch(userId, userMetadata: userMetadata) // Any request
+    .parameters(["key": "value"])
+    // ...
+```
+
+##### Add custom headers
+
+Use the `headers()` method to add custom headers to any request.
+
+```swift
+Auth0
+    .users(token: accessToken)
+    .patch(userId, userMetadata: userMetadata) // Any request
+    .headers(["key": "value"])
+    // ...
+```
+
 ### Logging
 
 To enable Auth0.swift to log HTTP requests and the OAuth2 flow for debugging you can call the following method in either `WebAuth`, `Authentication` or `Users`:
@@ -1077,7 +1195,9 @@ Connection: keep-alive
 {"access_token":"...","token_type":"Bearer"}
 ```
 
-> Set this flag only when **DEBUGGING** to avoid leaking user's credentials in the device log.
+> ⚠️ Set this flag only when **DEBUGGING** to avoid leaking user's credentials in the device log.
+
+[Go up ⤴](#table-of-contents)
 
 ## Other Features
 
@@ -1398,3 +1518,5 @@ Auth0 helps you to:
 ## License
 
 This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
+
+[Go up ⤴](#table-of-contents)
