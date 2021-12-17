@@ -103,7 +103,7 @@ class CredentialsManagerErrorSpec: QuickSpec {
 
             it("should return the default message for refresh failed") {
                 let message = "Failed to perform Credentials Manager operation."
-                let error = CredentialsManagerError(code: .refreshFailed)
+                let error = CredentialsManagerError(code: .renewFailed)
                 expect(error.localizedDescription) == message
             }
 

@@ -473,7 +473,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should yield error on failed renew") {
                     let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
-                    let expectedError = CredentialsManagerError(code: .refreshFailed, cause: cause)
+                    let expectedError = CredentialsManagerError(code: .renewFailed, cause: cause)
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authFailure(code: "invalid_request", description: "missing_params") }.name = "renew failed"
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
