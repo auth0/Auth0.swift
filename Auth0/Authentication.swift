@@ -67,7 +67,7 @@ public protocol Authentication: Trackable, Loggable {
        - audience: API Identifier that the client is requesting access to. Default is `nil`.
        - scope:    Scope value requested when authenticating the user. Default is `openid profile email`.
      - Returns: Authentication request that will yield Auth0 user's credentials.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
     func login(email username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -77,7 +77,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(phoneNumber: "+4599134762367", code: "123456")
+         .login(phoneNumber: "+12025550135", code: "123456")
          .start { result in
              switch result {
              case .success(let credentials):
@@ -93,7 +93,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(phoneNumber: "+4599134762367",
+         .login(phoneNumber: "+12025550135",
                 code: "123456",
                 audience: "https://myapi.com/api",
                 scope: "openid profile email offline_access")
@@ -108,7 +108,7 @@ public protocol Authentication: Trackable, Loggable {
        - audience:    API Identifier that the client is requesting access to. Default is `nil`.
        - scope:       Scope value requested when authenticating the user. Default is `openid profile email`.
      - Returns: Authentication request that will yield Auth0 user's credentials.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
     func login(phoneNumber username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -152,7 +152,7 @@ public protocol Authentication: Trackable, Loggable {
        - scope:    Scope value requested when authenticating the user.
      - Important: This only works if you have the OAuth 2.0 API Authorization flag on.
      - Returns: Authentication request that will yield Auth0 user's credentials.
-     - Requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+     - Requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
     func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -176,7 +176,7 @@ public protocol Authentication: Trackable, Loggable {
      - Parameters:
        - otp:      One time password supplied by MFA Authenticator.
        - mfaToken: Token returned when authentication fails due to MFA requirement.
-     - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+     - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
@@ -201,7 +201,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - mfaToken:    Token returned when authentication fails due to MFA requirement.
     ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message.
     /// - Returns: Authentication request that will yield Auth0 user's credentials.
-    /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-oob`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+    /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-oob`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using a recovery code.
@@ -225,7 +225,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - recoveryCode: Recovery code provided by the end-user.
     ///   - mfaToken:     Token returned when authentication fails due to MFA requirement.
     /// - Returns: Authentication request that will yield Auth0 user's credentials. Might include a recovery code, which the application must display to the end-user to be stored securely for future use.
-    /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+    /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
     /// Request a challenge for multi-factor authentication (MFA) based on the challenge types supported by the application and user.
@@ -362,9 +362,9 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .createUser(email: "support@auth0.com",
-                     password: "a secret password",
-                     connection: "Username-Password-Authentication")
+         .signup(email: "support@auth0.com",
+                 password: "a secret password",
+                 connection: "Username-Password-Authentication")
          .start { result in
              switch result {
              case .success(let user):
@@ -380,10 +380,10 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .createUser(email: "support@auth0.com",
-                     password: "a secret password",
-                     connection: "Username-Password-Authentication",
-                     userMetadata: ["first_name": "support"])
+         .signup(email: "support@auth0.com",
+                 password: "a secret password",
+                 connection: "Username-Password-Authentication",
+                 userMetadata: ["first_name": "support"])
          .start { print($0) }
      ```
 
@@ -392,10 +392,10 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId, domain: "samples.auth0.com")
-         .createUser(email: "support@auth0.com",
-                     username: "support",
-                     password: "a secret password",
-                     connection: "Username-Password-Authentication")
+         .signup(email: "support@auth0.com",
+                 username: "support",
+                 password: "a secret password",
+                 connection: "Username-Password-Authentication")
          .start { print($0) }
      ```
 
@@ -408,7 +408,7 @@ public protocol Authentication: Trackable, Loggable {
        - rootAttributes: Root attributes that will be added to the newly created user. See https://auth0.com/docs/api/authentication#signup for supported attributes. Will not overwrite existing parameters.
      - Returns: Request that will yield a created database user (just email, username and email verified flag).
      */
-    func createUser(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
+    func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
     /**
      Resets a Database user password.
@@ -451,7 +451,7 @@ public protocol Authentication: Trackable, Loggable {
        - type:       Type of passwordless authentication. By default is `code`.
        - connection: Name of the passwordless connection. By default is 'email'.
      - Returns: A request.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
     func startPasswordless(email: String, type: PasswordlessType, connection: String, parameters: [String: Any]) -> Request<Void, AuthenticationError>
 
@@ -479,7 +479,7 @@ public protocol Authentication: Trackable, Loggable {
        - type:        Type of passwordless authentication. By default is `code`.
        - connection:  Name of the passwordless connection. By default is 'sms'.
      - Returns: A request.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more info and how to enable it.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
@@ -638,12 +638,12 @@ public extension Authentication {
         return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope)
     }
 
-    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
-        return self.createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
+    func signup(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+        return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
     }
 
-    func createUser(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
-        return self.createUser(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: nil)
+    func signup(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+        return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: nil)
     }
 
     func startPasswordless(email: String, type: PasswordlessType = .code, connection: String = "email", parameters: [String: Any] = [:]) -> Request<Void, AuthenticationError> {

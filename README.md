@@ -110,7 +110,7 @@ Then run `carthage bootstrap --use-xcframeworks`.
 
 In order to use Auth0 you need to set up Auth0.swift with your **Client ID** and **Domain**. For Web Auth, you'll also need to configure the Callback URLs in the Auth0 Dashboard.
 
-> The Auth0 Client ID & Domain can be found in your [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+> The Auth0 Client ID & Domain can be found in the [Dashboard](https://manage.auth0.com/#/applications/).
 
 #### Configure Client ID and Domain with a plist
 
@@ -684,10 +684,10 @@ do {
 ```swift
 Auth0
     .authentication()
-    .createUser(email: "support@auth0.com",
-                password: "secret-password",
-                connection: "Username-Password-Authentication",
-                userMetadata: ["first_name": "First", "last_name": "Last"])
+    .signup(email: "support@auth0.com",
+            password: "secret-password",
+            connection: "Username-Password-Authentication",
+            userMetadata: ["first_name": "First", "last_name": "Last"])
     .start { result in
         switch result {
         case .success(let user):
@@ -704,10 +704,10 @@ Auth0
 ```swift
 Auth0
     .authentication()
-    .createUser(email: "support@auth0.com",
-                password: "secret-password",
-                connection: "Username-Password-Authentication",
-                userMetadata: ["first_name": "First", "last_name": "Last"])
+    .signup(email: "support@auth0.com",
+            password: "secret-password",
+            connection: "Username-Password-Authentication",
+            userMetadata: ["first_name": "First", "last_name": "Last"])
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -727,10 +727,10 @@ Auth0
 do {
     let user = try await Auth0
         .authentication()
-        .createUser(email: "support@auth0.com",
-                    password: "secret-password",
-                    connection: "Username-Password-Authentication",
-                    userMetadata: ["first_name": "First", "last_name": "Last"])
+        .signup(email: "support@auth0.com",
+                password: "secret-password",
+                connection: "Username-Password-Authentication",
+                userMetadata: ["first_name": "First", "last_name": "Last"])
         .start()
     print("User signed up: \(user)")
 } catch {
@@ -1488,8 +1488,8 @@ Only the last 4 major platform versions are supported, starting from:
 
 - iOS **12**
 - macOS **10.15**
-- Catalyst **13.0**
-- tvOS **12.0**
+- Catalyst **13**
+- tvOS **12**
 - watchOS **6.2**
 
 Dropping older, unsupported platform versions **will not be considered a breaking change**, and will be done in **minor** releases.
