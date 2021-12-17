@@ -336,7 +336,7 @@ All the following error cases were no longer being used.
 
 #### Error cases added
 
-- `.malformedInvitationURL`, for when the invitation URL is missing the `organization` and/or the `invitation` query parameters.
+- `.invalidInvitationURL`, for when the invitation URL is missing the `organization` and/or the `invitation` query parameters.
 - `.noAuthorizationCode`, for when the callback URL is missing the `code` query parameter.
 - `.idTokenValidationFailed`, for when the ID Token validation performed after Web Auth login fails.
 - `.other`, for when a different `Error` happens. That error can be accessed via the `cause: Error?` property.
