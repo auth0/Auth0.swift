@@ -144,7 +144,7 @@ Auth0
 
 #### Configure Callback URLs (iOS / macOS)
 
-Callback URLs are the URLs that Auth0 invokes after the authentication process. Auth0 routes your application back to this URL and appends additional parameters to it, including a token. Since callback URLs can be manipulated, you will need to add your callback URL to the **Allowed Callback URLs** field in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/). This will enable Auth0 to recognize these URLs as valid. If omitted, the authentication will not be successful.
+Callback URLs are the URLs that Auth0 invokes after the authentication process. Auth0 routes your application back to this URL and appends additional parameters to it, including a token. Since callback URLs can be manipulated, you will need to add your callback URL to the **Allowed Callback URLs** field in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/). This will enable Auth0 to recognize these URLs as valid. If omitted, the authentication will not be successful.
 
 In your application's `Info.plist` file, register your iOS / macOS Bundle Identifier as a custom URL scheme.
 
