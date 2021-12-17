@@ -450,7 +450,7 @@ Auth0
 
 #### Add a scope value
 
-Specify a [scope](https://auth0.com/docs/configure/apis/scopes) to request permission to access protected resources. The default scope used is `openid profile email`. Regardless of the scope value configured, the `openid` scope is always sent.
+Specify a [scope](https://auth0.com/docs/configure/apis/scopes) to request permission to access protected resources. The default scope used is `openid profile email`. Regardless of the scope value configured, `openid` is always included.
 
 ```swift
 Auth0
