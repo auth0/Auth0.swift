@@ -80,14 +80,32 @@ class CredentialsManagerErrorSpec: QuickSpec {
         describe("error message") {
 
             it("should return message for no credentials") {
-                let message = "No valid credentials found."
+                let message = "No credentials were found in the store."
                 let error = CredentialsManagerError(code: .noCredentials)
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for no refresh token") {
-                let message = "No Refresh Token in the credentials."
+                let message = "The stored credentials instance does not contain a Refresh Token."
                 let error = CredentialsManagerError(code: .noRefreshToken)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return message for renew failed") {
+                let message = "The credentials renewal failed. The underlying 'AuthenticationError' can be accessed via the 'cause' property."
+                let error = CredentialsManagerError(code: .renewFailed)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return message for biometrics failed") {
+                let message = "The Biometric authentication failed. The underlying 'LAError' can be accessed via the 'cause' property."
+                let error = CredentialsManagerError(code: .biometricsFailed)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return message for revoke failed") {
+                let message = "The revocation of the Refresh Token failed. The underlying 'AuthenticationError' can be accessed via the 'cause' property."
+                let error = CredentialsManagerError(code: .revokeFailed)
                 expect(error.localizedDescription) == message
             }
 
@@ -96,26 +114,8 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 let lifetime = 3600
                 let message = "The minTTL requested (\(minTTL)s) is greater than the "
                 + "lifetime of the renewed Access Token (\(lifetime)s). Request a lower minTTL or increase the "
-                + "'Token Expiration' setting of your Auth0 API in the dashboard."
+                + "'Token Expiration' setting of your Auth0 API in the Dashboard."
                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: lifetime))
-                expect(error.localizedDescription) == message
-            }
-
-            it("should return the default message for refresh failed") {
-                let message = "Failed to perform Credentials Manager operation."
-                let error = CredentialsManagerError(code: .renewFailed)
-                expect(error.localizedDescription) == message
-            }
-
-            it("should return the default message for biometrics failed") {
-                let message = "Failed to perform Credentials Manager operation."
-                let error = CredentialsManagerError(code: .biometricsFailed)
-                expect(error.localizedDescription) == message
-            }
-
-            it("should return the default message for revoke failed") {
-                let message = "Failed to perform Credentials Manager operation."
-                let error = CredentialsManagerError(code: .revokeFailed)
                 expect(error.localizedDescription) == message
             }
 
