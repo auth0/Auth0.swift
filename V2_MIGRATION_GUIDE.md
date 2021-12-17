@@ -54,7 +54,7 @@ As expected with a major release, Auth0.swift v2 contains breaking changes. Plea
 
 ### Swift
 
-The minimum supported Swift version is now 5.3.
+The minimum supported Swift version is now **5.3**.
 
 ### Objective-C
 
@@ -64,11 +64,11 @@ Auth0.swift no longer supports Objective-C.
 
 The deployment targets for each platform were raised to:
 
-- iOS 12.0
-- macOS 10.15
-- Mac Catalyst 13.0
-- tvOS 12.0
-- watchOS 6.2
+- iOS **12.0**
+- macOS **10.15**
+- Mac Catalyst **13.0**
+- tvOS **12.0**
+- watchOS **6.2**
 
 ## Default values
 
@@ -183,7 +183,8 @@ You should use Web Auth with its `connection(_:)` method instead.
   <summary>Before</summary>
 
 ```swift
-Auth0.authentication()
+Auth0
+    .authentication()
     .webAuth(withConnection: "some-connection")
     .start { result in
         // ...
@@ -196,7 +197,8 @@ Auth0.authentication()
   <summary>After</summary>
 
 ```swift
-Auth0.webAuth()
+Auth0
+    .webAuth()
     .connection("some-connection")
     .start { result in
         // ...
@@ -221,7 +223,7 @@ Auth0.swift now only supports the [authorization code flow with PKCE](https://au
 
 The `useUniversalLink()` method was removed as well, as Universal Links [cannot be used](https://openradar.appspot.com/51091611) for OAuth redirections without user interaction since iOS 10.
 
-`useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were also removed, as their underlying Apple API `SFAuthenticationSession` is [deprecated](https://developer.apple.com/documentation/safariservices/sfauthenticationsession) in favor of `ASWebAuthenticationSession`. Auth0.swift now only uses `ASWebAuthenticationSession` to perform web-based authentication.
+`useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were also removed. Auth0.swift now only uses `ASWebAuthenticationSession` to perform web-based authentication.
 
 **Check out the [FAQ](FAQ.md) for more information about the alert box that pops up by default when using Web Auth.**
 
@@ -342,7 +344,7 @@ All the following error cases were no longer being used.
 ### `CredentialsManagerError` struct
 
 All the former enum cases are now static properties, so to switch over them you will need to add a `default` clause.
-As static properties cannot have associated values, to access the underlying `Error` for `.refreshFailed`, `.biometricsFailed`, and `.revokeFailed` use the new `cause: Error?` property.
+As static properties cannot have associated values, to access the underlying `Error` for `.renewFailed`, `.biometricsFailed`, and `.revokeFailed` use the new `cause: Error?` property.
 
 <details>
   <summary>Before</summary>
@@ -369,7 +371,7 @@ switch error {
 
 #### Error cases renamed
 
-- `.failedRefresh` was renamed to `.refreshFailed`.
+- `.failedRefresh` was renamed to `.renewFailed`.
 - `.touchFailed` was renamed to `.biometricsFailed`.
 
 #### Error cases added
