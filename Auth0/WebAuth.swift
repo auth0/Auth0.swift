@@ -15,8 +15,8 @@ public protocol WebAuth: Trackable, Loggable {
     var telemetry: Telemetry { get set }
 
     /**
-     Specify a connection name to be used to authenticate.
-     By default no connection is specified, so the Universal Login page will be displayed.
+     Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the Universal Login
+     page itself. By default no connection is specified, so the Universal Login page will be displayed.
 
      - Parameter connection: Name of the connection to use.
      - Returns: The same WebAuth instance to allow method chaining.
@@ -77,7 +77,7 @@ public protocol WebAuth: Trackable, Loggable {
     func audience(_ audience: String) -> Self
 
     /// Specify a custom issuer for ID Token validation.
-    /// This value will be used instead of the Auth0 domain.
+    /// This value will be used instead of the Auth0 Domain.
     ///
     /// - Parameter issuer: A custom issuer value like: `https://example.com/`.
     /// - Returns: The same WebAuth instance to allow method chaining.
@@ -90,7 +90,7 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: The same WebAuth instance to allow method chaining.
     func leeway(_ leeway: Int) -> Self
 
-    /// Add `max_age` parameter for authentication, only when response type `.idToken` is specified.
+    /// Add `max_age` parameter for authentication.
     /// Sending this parameter will require the presence of the `auth_time` claim in the ID Token.
     ///
     /// - Parameter maxAge: Number of milliseconds.
@@ -198,7 +198,8 @@ public protocol WebAuth: Trackable, Loggable {
      - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You will need to ensure that the **Callback URL** has been added
-     to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+     to the **Allowed Logout URLs** section of your application in the
+     [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
      ```
      Auth0
@@ -212,7 +213,7 @@ public protocol WebAuth: Trackable, Loggable {
          }
      ```
 
-     Remove Auth0 session and remove the identity provider (IdP) session:
+     Remove Auth0 session and remove the Identity Provider (IdP) session:
 
      ```
      Auth0
@@ -221,7 +222,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      - Parameters:
-       - federated: `Bool` to remove the identity provider (IdP) session. Defaults to `false`.
+       - federated: `Bool` to remove the Identity Provider (IdP) session. Defaults to `false`.
        - callback: Callback called with bool outcome of the call.
      */
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
@@ -231,7 +232,8 @@ public protocol WebAuth: Trackable, Loggable {
      - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You will need to ensure that the **Callback URL** has been added
-     to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+     to the **Allowed Logout URLs** section of your application in the
+     [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
 
      ```
      Auth0
@@ -248,7 +250,7 @@ public protocol WebAuth: Trackable, Loggable {
          .store(in: &cancellables)
      ```
 
-     Remove Auth0 session and remove the identity provider (IdP) session:
+     Remove Auth0 session and remove the Identity Provider (IdP) session:
 
      ```
      Auth0
@@ -258,7 +260,7 @@ public protocol WebAuth: Trackable, Loggable {
          .store(in: &cancellables)
      ```
 
-     - Parameter federated: `Bool` to remove the identity provider (IdP) session. Defaults to `false`.
+     - Parameter federated: `Bool` to remove the Identity Provider (IdP) session. Defaults to `false`.
      - Returns: A type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
@@ -283,7 +285,7 @@ public protocol WebAuth: Trackable, Loggable {
      }
      ```
 
-     Remove Auth0 session and remove the identity provider (IdP) session:
+     Remove Auth0 session and remove the Identity Provider (IdP) session:
 
      ```
      try await Auth0
@@ -291,7 +293,7 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession(federated: true)
      ```
 
-     - Parameter federated: `Bool` to remove the identity provider (IdP) session. Defaults to `false`.
+     - Parameter federated: `Bool` to remove the Identity Provider (IdP) session. Defaults to `false`.
      - Returns: `Bool` outcome of the call.
      */
     #if compiler(>=5.5.2)
