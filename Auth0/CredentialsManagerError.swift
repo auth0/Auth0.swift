@@ -8,7 +8,7 @@ public struct CredentialsManagerError: Auth0Error {
     enum Code: Equatable {
         case noCredentials
         case noRefreshToken
-        case refreshFailed
+        case renewFailed
         case biometricsFailed
         case revokeFailed
         case largeMinTTL(minTTL: Int, lifetime: Int)
@@ -49,7 +49,7 @@ public struct CredentialsManagerError: Auth0Error {
     /// The ``Credentials`` instance stored does not contain a Refresh Token. This error does not include a ``cause``.
     public static let noRefreshToken: CredentialsManagerError = .init(code: .noRefreshToken)
     /// The credentials renewal failed. The underlying ``AuthenticationError`` can be accessed via the `cause: Error?` property.
-    public static let refreshFailed: CredentialsManagerError = .init(code: .refreshFailed)
+    public static let renewFailed: CredentialsManagerError = .init(code: .renewFailed)
     /// The Biometric authentication failed. The underlying `LAError` can be accessed via the ``cause`` property.
     public static let biometricsFailed: CredentialsManagerError = .init(code: .biometricsFailed)
     /// The revocation of the Refresh Token failed. The underlying ``AuthenticationError`` can be accessed via the

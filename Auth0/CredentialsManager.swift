@@ -24,7 +24,7 @@ public struct CredentialsManager {
     ///
     /// - Parameters:
     ///   - authentication: Auth0 authentication instance.
-    ///   - storeKey:       Key used to store user credentials in the keychain, defaults to "credentials".
+    ///   - storeKey:       Key used to store user credentials in the Keychain, defaults to "credentials".
     ///   - storage:        The CredentialsStorage instance used to manage credentials storage. Defaults to a standard A0SimpleKeychain instance.
     public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = A0SimpleKeychain()) {
         self.storeKey = storeKey
@@ -32,7 +32,8 @@ public struct CredentialsManager {
         self.storage = storage
     }
 
-    /// Retrieve the user profile from keychain synchronously, without checking if the credentials are expired.
+    /// Retrieve the user information from the Keychain synchronously, without checking if the credentials are expired.
+    /// The user information is read from the stored [ID Token](https://auth0.com/docs/security/tokens/id-tokens).
     ///
     /// ```
     /// let user = credentialsManager.user
@@ -59,7 +60,7 @@ public struct CredentialsManager {
     }
     #endif
 
-    /// Store credentials instance in keychain.
+    /// Store credentials instance in the Keychain.
     ///
     /// - Parameter credentials: Credentials instance to store.
     /// - Returns: If credentials were stored.
@@ -70,7 +71,7 @@ public struct CredentialsManager {
         return self.storage.setEntry(data, forKey: storeKey)
     }
 
-    /// Clear credentials stored in keychain.
+    /// Clear credentials stored in the Keychain.
     ///
     /// - Returns: If credentials were removed.
     public func clear() -> Bool {
@@ -119,9 +120,9 @@ public struct CredentialsManager {
     }
 
     #if WEB_AUTH_PLATFORM
-    /// Retrieve credentials from keychain and yield new credentials using `refreshToken` if `accessToken` has expired.
-    /// Otherwise, the retrieved credentials will be returned in the success case as they have not yet expired. Renewed credentials
-    /// will be stored in the keychain.
+    /// Retrieve credentials from the Keychain and yield new credentials using the `refreshToken` if the `accessToken`
+    /// has expired. Otherwise, the retrieved credentials will be returned in the success case as they have not yet
+    /// expired. Renewed credentials will be stored in the Keychain.
     ///
     /// ```
     /// credentialsManager.credentials { result in
@@ -141,7 +142,8 @@ public struct CredentialsManager {
     ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
     ///   - callback:   Callback with the user's credentials or the error.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
-    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - Note: This method is thread-safe.
+    /// - See: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
@@ -216,7 +218,7 @@ public struct CredentialsManager {
                             }
                         case .failure(let error):
                             self.dispatchGroup.leave()
-                            callback(.failure(CredentialsManagerError(code: .refreshFailed, cause: error)))
+                            callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
                         }
                     }
             }
@@ -267,9 +269,9 @@ public extension CredentialsManager {
         }.eraseToAnyPublisher()
     }
 
-    /// Retrieve credentials from the keychain and yield new credentials using `refreshToken` if `accessToken` has expired,
-    /// otherwise the subscription will complete with the retrieved credentials as they have not expired. Renewed credentials will
-    /// be stored in the keychain.
+    /// Retrieve credentials from the Keychain and yield new credentials using the `refreshToken` if the `accessToken`
+    /// has expired. Otherwise, the subscription will complete with the retrieved credentials as they have not expired.
+    /// Renewed credentials will be stored in the Keychain.
     ///
     /// ```
     /// credentialsManager
@@ -291,7 +293,8 @@ public extension CredentialsManager {
     ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
     /// - Returns: A type-erased publisher.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
-    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - Note: This method is thread-safe.
+    /// - See: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
             Future { callback in
@@ -334,9 +337,9 @@ public extension CredentialsManager {
     }
     #endif
 
-    /// Retrieve credentials from the keychain and yield new credentials using `refreshToken` if `accessToken` has expired,
-    /// otherwise return the retrieved credentials as they have not expired. Renewed credentials will
-    /// be stored in the keychain.
+    /// Retrieve credentials from the Keychain and yield new credentials using the `refreshToken` if the `accessToken`
+    /// has expired. Otherwise, return the retrieved credentials as they have not expired. Renewed credentials will be
+    /// stored in the Keychain.
     ///
     /// ```
     /// let credentials = try await credentialsManager.credentials()
@@ -350,7 +353,8 @@ public extension CredentialsManager {
     /// - Returns: The user's credentials.
     /// - Throws: An error of type ``CredentialsManagerError``.
     /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
-    /// - Note: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - Note: This method is thread-safe.
+    /// - See: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {
