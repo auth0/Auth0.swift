@@ -62,7 +62,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     /**
      Starts the request to the server.
 
-     - Parameter callback: Called when the request finishes with its result.
+     - Parameter callback: Called with the result of the request when it finishes.
      */
     public func start(_ callback: @escaping Callback) {
         let handler = self.handle
