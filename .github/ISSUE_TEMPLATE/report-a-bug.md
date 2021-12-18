@@ -44,7 +44,7 @@ Detail the steps taken to reproduce this error, and whether this issue can be re
 - **Platform (iOS/macOS/tvOS/watchOS)**:
 - **Platform version**:
 - **Xcode version**:
-- **Package manager (SPM/Cococapods/Carthage/other)**:
+- **Package manager (SPM/Cocoapods/Carthage/other)**:
 
 ### ✅ Checklist
 

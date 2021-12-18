@@ -1,7 +1,7 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-/// Keeps track of current Auth Transaction.
+/// Keeps track of the current Auth Transaction.
 class TransactionStore {
 
     static let shared = TransactionStore()

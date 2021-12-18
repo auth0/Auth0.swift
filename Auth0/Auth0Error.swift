@@ -27,14 +27,14 @@ public extension Auth0Error {
     /**
      Description of the error.
 
-     - Important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
      */
     var localizedDescription: String { return self.debugDescription }
 
     /**
      Description of the error.
 
-     - Important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
      */
     var errorDescription: String? { return self.debugDescription }
 
@@ -51,7 +51,7 @@ public protocol Auth0APIError: Auth0Error {
     var info: [String: Any] { get }
 
     /**
-     The code of the error as a String.
+     The code of the error as a string.
      */
     var code: String { get }
 
@@ -65,7 +65,7 @@ public protocol Auth0APIError: Auth0Error {
 
      - Parameters:
        - info:       JSON response from Auth0.
-       - statusCode: HTTP Status Code of the Response.
+       - statusCode: HTTP Status Code of the response.
 
      - Returns: A newly created error.
      */

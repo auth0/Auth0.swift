@@ -7,13 +7,15 @@ public typealias ManagementObject = [String: Any]
 
 /**
  Users endpoints of Auth0 Management API v2.
+
+ - See: ``ManagementError``
  - See: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users)
  */
 public protocol Users: Trackable, Loggable {
 
     /// The Management API token.
     var token: String { get }
-    /// The Auth0 domain URL.
+    /// The Auth0 Domain URL.
     var url: URL { get }
 
     /**

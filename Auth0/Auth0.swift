@@ -35,7 +35,7 @@ public let defaultScope = "openid profile email"
  ```
 
  - Parameters:
-   - clientId: ClientId of your Auth0 application.
+   - clientId: Client ID of your Auth0 application.
    - domain:   Domain of your Auth0 account, e.g. 'samples.auth0.com'.
    - session:  Instance of `URLSession` used for networking. By default it will use the shared `URLSession`.
  - Returns: Auth0 Authentication API.
@@ -51,7 +51,7 @@ public func authentication(clientId: String, domain: String, session: URLSession
  Auth0.authentication()
  ```
 
- Auth0 clientId & domain are loaded from the file `Auth0.plist` in your main bundle with the following content:
+ The Auth0 Client ID & Domain are loaded from the `Auth0.plist` file in your main bundle. It should have the following content:
  
  ```
  <?xml version="1.0" encoding="UTF-8"?>
@@ -78,7 +78,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
 }
 
 /**
- Auth0 Management Users API v2 that allows CRUD operations with the users endpoint.
+ Auth0 Management API v2 that allows CRUD operations with the users endpoint.
 
  ```
  Auth0.users(token: token)
@@ -86,12 +86,12 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
 
  Currently you can only perform the following operations:
 
- * Get an user by id
+ * Get an user by its ID
  * Update an user, e.g. by adding `user_metadata`
  * Link users
  * Unlink users
 
- Auth0 domain is loaded from the file `Auth0.plist` in your main bundle with the following content:
+ The Auth0 Domain is loaded from the `Auth0.plist` file in your main bundle. It should have the following content:
 
  ```
  <?xml version="1.0" encoding="UTF-8"?>
@@ -119,7 +119,7 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
 }
 
 /**
- Auth0 Management Users API v2 that allows CRUD operations with the users endpoint.
+ Auth0 Management API v2 that allows CRUD operations with the users endpoint.
  
  ```
  Auth0.users(token: token, domain: "samples.auth0.com")
@@ -127,7 +127,7 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
 
  Currently you can only perform the following operations:
  
- * Get an user by id
+ * Get an user by its ID
  * Update an user, e.g. by adding `user_metadata`
  * Link users
  * Unlink users
@@ -150,7 +150,7 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
  Auth0.webAuth()
  ```
 
- Auth0 domain is loaded from the file `Auth0.plist` in your main bundle with the following content:
+ The Auth0 Domain is loaded from the `Auth0.plist` file in your main bundle. It should have the following content:
 
  ```
  <?xml version="1.0" encoding="UTF-8"?>
@@ -184,7 +184,7 @@ public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main)
  ```
 
  - Parameters:
-   - clientId: ClientId of your Auth0 application.
+   - clientId: Client ID of your Auth0 application.
    - domain:   Domain of your Auth0 account, e.g. 'samples.auth0.com'.
    - session:  Instance of `URLSession` used for networking. By default it will use the shared `URLSession`.
  - Returns: Auth0 WebAuth component.

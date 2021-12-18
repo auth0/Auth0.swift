@@ -3,7 +3,7 @@
 import Foundation
 
 /// OIDC Standard Claims user information.
-/// - Note: [Claims](https://auth0.com/docs/security/tokens/json-web-tokens/json-web-token-claims)
+/// - See: [Claims](https://auth0.com/docs/security/tokens/json-web-tokens/json-web-token-claims)
 public struct UserInfo: JSONObjectPayload {
 
     /// The list of public claims.

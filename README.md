@@ -273,7 +273,7 @@ Auth0
         case .finished:
             print("Logged out")
         }
-    }, receiveValue: { _ in })
+    }, receiveValue: {})
     .store(in: &cancellables)
 ```
 </details>
@@ -465,7 +465,7 @@ Use `connectionScope()` to configure a scope value for an Auth0 connection.
 Auth0
     .webAuth()
     .connection("connection-name")
-    .connectionScope("openid profile email offline_access")
+    .connectionScope("user_friends email")
     // ...
 ```
 
@@ -565,7 +565,7 @@ credentialsManager
             print("Failed with \(error)")
         }
         print("Success")
-    }, receiveValue: { _ in })
+    }, receiveValue: {})
     .store(in: &cancellables)
 ```
 </details>
@@ -775,7 +775,7 @@ Auth0
             print("Failed with \(error)")
         }
         print("Code sent")
-    }, receiveValue: { _ in })
+    }, receiveValue: {})
     .store(in: &cancellables)
 ```
 </details>
@@ -824,7 +824,7 @@ Auth0
             print("Failed with \(error)")
         }
         print("Code sent")
-    }, receiveValue: { _ in })
+    }, receiveValue: {})
     .store(in: &cancellables)
 ```
 </details>
@@ -1125,7 +1125,7 @@ Auth0
 
 ```swift
 do {
-    try await Auth0
+    _ = try await Auth0
         .users(token: idToken)
         .link("user identifier", withOtherUserToken: "another user token")
         .start()
