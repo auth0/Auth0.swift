@@ -459,7 +459,7 @@ Auth0
 
 #### Renamed `realm` parameter
 
-In `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` the `realm`parameter was renamed to `realmOrConnection`.
+In the method `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` the `realm` parameter was renamed to `realmOrConnection`.
 
 #### Reordered `scope` and `audience` parameters
 
