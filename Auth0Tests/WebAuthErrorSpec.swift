@@ -80,14 +80,16 @@ class WebAuthErrorSpec: QuickSpec {
         describe("error message") {
 
             it("should return message for no bundle identifier") {
-                let message = "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier, or it could not be used to build a valid URL."
+                let message = "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
+                + " or it could not be used to build a valid URL."
                 let error = WebAuthError(code: .noBundleIdentifier)
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for invalid invitation URL") {
                 let url = "https://samples.auth0.com"
-                let message = "The invitation URL (\(url)) is missing the 'invitation' and/or the 'organization' query parameters."
+                let message = "The invitation URL (\(url)) is missing the 'invitation' and/or"
+                + " the 'organization' query parameters."
                 let error = WebAuthError(code: .invalidInvitationURL(url))
                 expect(error.localizedDescription) == message
             }
@@ -99,20 +101,25 @@ class WebAuthErrorSpec: QuickSpec {
             }
 
             it("should return message for PKCE not allowed") {
-                let message = "Unable to complete authentication with PKCE. The correct method for Token Endpoint Authentication Method is not set (it should be 'None'). PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the 'ApplicationType' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
+                let message = "Unable to complete authentication with PKCE."
+                + " The correct method for Token Endpoint Authentication Method is not set (it should be 'None')."
+                + " PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the"
+                + " 'ApplicationType' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
                 let error = WebAuthError(code: .pkceNotAllowed)
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for no authorization code") {
                 let values: [String: String] = ["foo": "bar"]
-                let message = "The callback URL is missing the authorization code in its query parameters (\(values))."
+                let message = "The callback URL is missing the authorization code in its"
+                + " query parameters (\(values))."
                 let error = WebAuthError(code: .noAuthorizationCode(values))
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for id token validation failed") {
-                let message = "The ID Token validation performed after Web Auth login failed. The underlying error can be accessed via the 'cause' property."
+                let message = "The ID Token validation performed after Web Auth login failed."
+                + " The underlying error can be accessed via the 'cause' property."
                 let error = WebAuthError(code: .idTokenValidationFailed)
                 expect(error.localizedDescription) == message
             }
