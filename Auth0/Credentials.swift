@@ -16,19 +16,19 @@ private struct StructCredentials {
 @objc(A0Credentials)
 public final class Credentials: NSObject {
 
-    /// Token used that allows calling to the requested APIs (the `audience` value` sent on authentication).
+    /// Token that can be used to make authenticated requests to the specified API (the **audience** value used on authentication).
     public let accessToken: String
-    /// Type of the access token.
+    /// Type of the Access Token.
     public let tokenType: String
-    /// When the access token expires.
+    /// When the Access Token expires.
     public let expiresIn: Date
-    /// If the API allows you to request new access tokens and the scope `offline_access` was included on authentication.
+    /// Token that can be used to request a new Access Token. Requires the scope `offline_access` to be requested on authentication.
     public let refreshToken: String?
-    /// Token that details the user identity after authentication.
+    /// Token that contains the user information.
     public let idToken: String
-    /// Granted scopes, only populated when a requested scope or scopes was not granted.
+    /// Granted scopes. This value is only present when one or more of the requested scopes were not granted.
     public let scope: String?
-    /// MFA recovery code that the application must display to the end-user to be stored securely for future use.
+    /// MFA recovery code that the application must display to the end-user, to be stored securely for future use.
     public let recoveryCode: String?
 
     /// Custom description that redacts the tokens with `<REDACTED>`.

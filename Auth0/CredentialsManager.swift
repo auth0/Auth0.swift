@@ -9,6 +9,8 @@ import Combine
 #endif
 
 /// Credentials management utility.
+///
+/// - See: ``CredentialsManagerError``
 public struct CredentialsManager {
 
     private let storage: CredentialsStorage
@@ -24,7 +26,7 @@ public struct CredentialsManager {
     ///
     /// - Parameters:
     ///   - authentication: Auth0 authentication instance.
-    ///   - storeKey:       Key used to store user credentials in the Keychain, defaults to "credentials".
+    ///   - storeKey:       Key used to store user credentials in the Keychain, defaults to `credentials`.
     ///   - storage:        The CredentialsStorage instance used to manage credentials storage. Defaults to a standard A0SimpleKeychain instance.
     public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = A0SimpleKeychain()) {
         self.storeKey = storeKey
@@ -39,7 +41,7 @@ public struct CredentialsManager {
     /// let user = credentialsManager.user
     /// ```
     ///
-    /// - Important: Access to this property will not be protected by Biometric Authentication.
+    /// - Important: Access to this property will not be protected by Biometric authentication.
     public var user: UserInfo? {
         guard let credentials = retrieveCredentials(),
               let jwt = try? decode(jwt: credentials.idToken) else { return nil }
@@ -48,7 +50,7 @@ public struct CredentialsManager {
     }
 
     #if WEB_AUTH_PLATFORM
-    /// Enable Biometric Authentication for additional security during credentials retrieval.
+    /// Enable Biometric authentication for additional security during credentials retrieval.
     ///
     /// - Parameters:
     ///   - title:            Main message to display when Touch ID is used.
@@ -78,15 +80,15 @@ public struct CredentialsManager {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
-    /// Calls the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// Call the revoke token endpoint to revoke the Refresh Token and, if successful, the credentials are cleared. Otherwise,
     /// the credentials are not cleared and a failure case is raised through the callback, with an error.
     ///
-    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is invoked with a
+    /// If no Refresh Token is available the endpoint is not called, the credentials are cleared, and the callback is invoked with a
     /// success case.
     ///
     /// - Parameters:
-    ///   - headers:  Additional headers to add to a possible token revocation. The headers will be set via Request.headers.
-    ///   - callback: Callback with the operation success or the error.
+    ///   - headers:  Additional headers to add to a possible token revocation. The headers will be set via `Request.headers`.
+    ///   - callback: Callback with the result of the operation.
     public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
         guard let data = self.storage.getEntry(forKey: self.storeKey),
               let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
@@ -111,7 +113,7 @@ public struct CredentialsManager {
 
     /// Check if a non-expired set of credentials are stored.
     ///
-    /// - Parameter minTTL: Minimum lifetime in seconds the access token must have left.
+    /// - Parameter minTTL: Minimum lifetime in seconds the Access Token must have left.
     /// - Returns: If there are valid and non-expired credentials stored.
     public func hasValid(minTTL: Int = 0) -> Bool {
         guard let data = self.storage.getEntry(forKey: self.storeKey),
@@ -137,11 +139,11 @@ public struct CredentialsManager {
     ///
     /// - Parameters:
     ///   - scope:      Scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed.
-    ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
-    ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
+    ///   - minTTL:     Minimum time in seconds the Access Token must remain valid to avoid being renewed.
+    ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via `Request.parameters`.
+    ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via `Request.headers`.
     ///   - callback:   Callback with the user's credentials or the error.
-    /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+    /// - Important: This method only works for a Refresh Token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: This method is thread-safe.
     /// - See: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
@@ -253,13 +255,13 @@ public struct CredentialsManager {
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 public extension CredentialsManager {
 
-    /// Call the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// Call the revoke token endpoint to revoke the Refresh Token and, if successful, the credentials are cleared. Otherwise,
     /// the credentials are not cleared and the subscription completes with an error.
     ///
-    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the subscription completes
+    /// If no Refresh Token is available the endpoint is not called, the credentials are cleared, and the subscription completes
     /// without an error.
     ///
-    /// - Parameter headers: Additional headers to add to a possible token revocation. The headers will be set via Request.headers.
+    /// - Parameter headers: Additional headers to add to a possible token revocation. The headers will be set via `Request.headers`.
     /// - Returns: A type-erased publisher.
     func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {
@@ -288,11 +290,11 @@ public extension CredentialsManager {
     ///
     /// - Parameters:
     ///   - scope:      Scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed.
-    ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
-    ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
+    ///   - minTTL:     Minimum time in seconds the Access Token must remain valid to avoid being renewed.
+    ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via `Request.parameters`.
+    ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via `Request.headers`.
     /// - Returns: A type-erased publisher.
-    /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+    /// - Important: This method only works for a Refresh Token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: This method is thread-safe.
     /// - See: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
@@ -314,12 +316,12 @@ public extension CredentialsManager {
 #if compiler(>=5.5) && canImport(_Concurrency)
 public extension CredentialsManager {
 
-    /// Call the revoke token endpoint to revoke the refresh token and, if successful, the credentials are cleared. Otherwise,
+    /// Call the revoke token endpoint to revoke the Refresh Token and, if successful, the credentials are cleared. Otherwise,
     /// the credentials are not cleared and an error is thrown.
     ///
-    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and no error is thrown.
+    /// If no Refresh Token is available the endpoint is not called, the credentials are cleared, and no error is thrown.
     ///
-    /// - Parameter headers: Additional headers to add to a possible token revocation. The headers will be set via Request.headers.
+    /// - Parameter headers: Additional headers to add to a possible token revocation. The headers will be set via `Request.headers`.
     /// - Throws: An error of type ``CredentialsManagerError``.
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
@@ -347,12 +349,12 @@ public extension CredentialsManager {
     ///
     /// - Parameters:
     ///   - scope:      Scopes to request for the new tokens. By default is nil which will ask for the same ones requested during original Auth.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed.
-    ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via Request.parameters.
-    ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via Request.headers.
+    ///   - minTTL:     Minimum time in seconds the Access Token must remain valid to avoid being renewed.
+    ///   - parameters: Additional parameters to add to a possible token refresh. The parameters will be set via `Request.parameters`.
+    ///   - headers:    Additional headers to add to a possible token refresh. The headers will be set via `Request.headers`.
     /// - Returns: The user's credentials.
     /// - Throws: An error of type ``CredentialsManagerError``.
-    /// - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+    /// - Important: This method only works for a Refresh Token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: This method is thread-safe.
     /// - See: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
     #if compiler(>=5.5.2)

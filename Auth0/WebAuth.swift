@@ -4,12 +4,15 @@ import Foundation
 import Combine
 #endif
 
-/// WebAuth Authentication using Auth0.
+/// Web Authentication using Auth0.
+///
+/// - See: ``WebAuthError``
+/// - See: [Universal Login](https://auth0.com/docs/login/universal-login)
 public protocol WebAuth: Trackable, Loggable {
 
-    /// The Auth0 client ID.
+    /// The Auth0 Client ID.
     var clientId: String { get }
-    /// The Auth0 domain URL.
+    /// The Auth0 Domain URL.
     var url: URL { get }
     /// The ``Telemetry`` instance.
     var telemetry: Telemetry { get set }
@@ -34,7 +37,7 @@ public protocol WebAuth: Trackable, Loggable {
     /**
      Provider scopes for OAuth2/social connections, e.g. Facebook, Google etc.
 
-     - Parameter connectionScope: OAuth2/social comma separated scope list: `user_friends,email`.
+     - Parameter connectionScope: OAuth2/social scope list: `user_friends email`.
      - Returns: The same WebAuth instance to allow method chaining.
      */
     func connectionScope(_ connectionScope: String) -> Self
@@ -44,7 +47,7 @@ public protocol WebAuth: Trackable, Loggable {
      in order to check that the response is from your request and not other.
      By default a random value is used.
 
-     - Parameter state: A state value to send with the auth request.
+     - Parameter state: A state value to send with the authentication request.
      - Returns: The same WebAuth instance to allow method chaining.
      */
     func state(_ state: String) -> Self
@@ -52,7 +55,7 @@ public protocol WebAuth: Trackable, Loggable {
     /**
      Send additional parameters for authentication.
 
-     - Parameter parameters: Additional auth parameters.
+     - Parameter parameters: Additional authentication parameters.
      - Returns: The same WebAuth instance to allow method chaining.
      */
     func parameters(_ parameters: [String: String]) -> Self
@@ -63,18 +66,18 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: The same WebAuth instance to allow method chaining.
     func redirectURL(_ redirectURL: URL) -> Self
 
+    ///  Audience name of the API that your application will call using the `access_token` returned after authentication.
+    ///  This value must match the one defined in the APIs Section of the [Auth0 Dashboard](https://manage.auth0.com/#/apis).
+    ///
+    /// - Parameter audience: An audience value like: `https://example.com/api`.
+    /// - Returns: The same WebAuth instance to allow method chaining.
+    func audience(_ audience: String) -> Self
+
     /// Add `nonce` parameter for ID Token validation.
     ///
     /// - Parameter nonce: A nonce string.
     /// - Returns: The same WebAuth instance to allow method chaining.
     func nonce(_ nonce: String) -> Self
-
-    ///  Audience name of the API that your application will call using the `access_token` returned after Auth.
-    ///  This value must match the one defined in Auth0 Dashboard [APIs Section](https://manage.auth0.com/#/apis).
-    ///
-    /// - Parameter audience: An audience value like: `https://someapi.com/api`.
-    /// - Returns: The same WebAuth instance to allow method chaining.
-    func audience(_ audience: String) -> Self
 
     /// Specify a custom issuer for ID Token validation.
     /// This value will be used instead of the Auth0 Domain.
@@ -131,8 +134,8 @@ public protocol WebAuth: Trackable, Loggable {
      }
      ```
 
-     Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
-     and it's corresponding callback with be called with a failure result of `WebAuthError.userCancelled`.
+     Any ongoing WebAuth session will be automatically cancelled when starting a new one,
+     and its corresponding callback with be called with a failure result of `WebAuthError.userCancelled`.
 
      - Parameter callback: Callback called with the result of the WebAuth flow.
      */
@@ -153,7 +156,7 @@ public protocol WebAuth: Trackable, Loggable {
      }
      ```
 
-     Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
+     Any ongoing WebAuth session will be automatically cancelled when starting a new one,
      and it will throw a `WebAuthError.userCancelled` error.
 
      - Returns: The result of the WebAuth flow.
@@ -185,7 +188,7 @@ public protocol WebAuth: Trackable, Loggable {
          .store(in: &cancellables)
      ```
 
-     Any on going WebAuth Auth session will be automatically cancelled when starting a new one,
+     Any ongoing WebAuth session will be automatically cancelled when starting a new one,
      and the subscription will complete with a failure result of `WebAuthError.userCancelled`.
 
      - Returns: A type-erased publisher.
@@ -194,12 +197,12 @@ public protocol WebAuth: Trackable, Loggable {
     func publisher() -> AnyPublisher<Credentials, WebAuthError>
 
     /**
-     Removes Auth0 session and optionally remove the Identity Provider session.
+     Removes Auth0 session and optionally remove the Identity Provider (IdP) session.
      - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
-     You will need to ensure that the **Callback URL** has been added
-     to the **Allowed Logout URLs** section of your application in the
-     [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+     You need to make sure that the **Callback URL** has been added to the
+     **Allowed Logout URLs** field of your Auth0 application settings in the
+     [Dashboard](https://manage.auth0.com/#/applications/).
 
      ```
      Auth0
@@ -213,7 +216,7 @@ public protocol WebAuth: Trackable, Loggable {
          }
      ```
 
-     Remove Auth0 session and remove the Identity Provider (IdP) session:
+     Remove Auth0 session and the Identity Provider session:
 
      ```
      Auth0
@@ -222,18 +225,18 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      - Parameters:
-       - federated: `Bool` to remove the Identity Provider (IdP) session. Defaults to `false`.
-       - callback: Callback called with bool outcome of the call.
+       - federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
+       - callback: Callback called with the result of the call.
      */
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
 
     /**
-     Removes Auth0 session and optionally remove the Identity Provider session.
+     Removes Auth0 session and optionally remove the Identity Provider (IdP) session.
      - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
-     You will need to ensure that the **Callback URL** has been added
-     to the **Allowed Logout URLs** section of your application in the
-     [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+     You need to make sure that the **Callback URL** has been added to the
+     **Allowed Logout URLs** field of your Auth0 application settings in the
+     [Dashboard](https://manage.auth0.com/#/applications/).
 
      ```
      Auth0
@@ -241,26 +244,27 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession()
          .sink(receiveCompletion: { completion in
              switch completion {
-             case .failure(let error):
-                 print("Failed with \(error)")
              case .finished:
                  print("Logged out")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
-         }, receiveValue: { _ in })
+         }, receiveValue: {})
          .store(in: &cancellables)
      ```
 
-     Remove Auth0 session and remove the Identity Provider (IdP) session:
+     Remove Auth0 session and the Identity Provider session:
 
      ```
      Auth0
          .webAuth()
          .clearSession(federated: true)
-         .sink(receiveValue: { print($0) })
+         .sink(receiveCompletion: { print($0) },
+               receiveValue: {})
          .store(in: &cancellables)
      ```
 
-     - Parameter federated: `Bool` to remove the Identity Provider (IdP) session. Defaults to `false`.
+     - Parameter federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
      - Returns: A type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
@@ -268,11 +272,12 @@ public protocol WebAuth: Trackable, Loggable {
 
     #if compiler(>=5.5) && canImport(_Concurrency)
     /**
-     Removes Auth0 session and optionally remove the Identity Provider session.
+     Removes Auth0 session and optionally remove the Identity Provider (IdP) session.
      - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
-     You will need to ensure that the **Callback URL** has been added
-     to the **Allowed Logout URLs** section of your application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
+     You need to make sure that the **Callback URL** has been added to the
+     **Allowed Logout URLs** field of your Auth0 application settings in the
+     [Dashboard](https://manage.auth0.com/#/applications/).
 
      ```
      do {
@@ -285,7 +290,7 @@ public protocol WebAuth: Trackable, Loggable {
      }
      ```
 
-     Remove Auth0 session and remove the Identity Provider (IdP) session:
+     Remove Auth0 session and the Identity Provider session:
 
      ```
      try await Auth0
@@ -293,8 +298,7 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession(federated: true)
      ```
 
-     - Parameter federated: `Bool` to remove the Identity Provider (IdP) session. Defaults to `false`.
-     - Returns: `Bool` outcome of the call.
+     - Parameter federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
      */
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)

@@ -15,7 +15,7 @@ public struct AuthenticationError: Auth0APIError {
 
      - Parameters:
        - info:       JSON response from Auth0.
-       - statusCode: HTTP Status Code of the Response.
+       - statusCode: HTTP Status Code of the response.
 
      - Returns: A newly created error.
      */
@@ -39,7 +39,7 @@ public struct AuthenticationError: Auth0APIError {
     }
 
     /**
-     The code of the error as a String.
+     The code of the error as a string.
      */
     public var code: String {
         let code = self.info["error"] ?? self.info["code"]
@@ -49,7 +49,7 @@ public struct AuthenticationError: Auth0APIError {
     /**
      Description of the error.
 
-     - Important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
      */
     public var debugDescription: String {
         let description = self.info["description"] ?? self.info["error_description"]

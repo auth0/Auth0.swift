@@ -32,7 +32,7 @@ public struct WebAuthError: Auth0Error {
     /**
      Description of the error.
 
-     - Important: You should avoid displaying the error description to the user, it's meant for debugging only.
+     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
      */
     public var debugDescription: String {
         switch self.code {

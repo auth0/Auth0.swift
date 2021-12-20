@@ -3,19 +3,20 @@
 
 import Foundation
 
-/// A created database user (just email, username and email verified flag).
+/// A created database user (just email, username, and email verified flag).
 public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
 
 /**
  Auth endpoints of Auth0.
 
+ - See: ``AuthenticationError``
  - See: [Auth0 Auth API docs](https://auth0.com/docs/api/authentication)
  */
 public protocol Authentication: Trackable, Loggable {
 
-    /// The Auth0 client ID.
+    /// The Auth0 Client ID.
     var clientId: String { get }
-    /// The Auth0 domain URL.
+    /// The Auth0 Domain URL.
     var url: URL { get }
 
     /**
@@ -188,7 +189,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - oobCode:     The oob code received from the challenge request.
     ///   - mfaToken:    Token returned when authentication fails due to MFA requirement.
     ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message.
-    /// - Returns: Authentication request that will yield Auth0 user's credentials.
+    /// - Returns: A request that will yield Auth0 user's credentials.
     /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-oob`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
 
@@ -212,7 +213,7 @@ public protocol Authentication: Trackable, Loggable {
     /// - Parameters:
     ///   - recoveryCode: Recovery code provided by the end-user.
     ///   - mfaToken:     Token returned when authentication fails due to MFA requirement.
-    /// - Returns: Authentication request that will yield Auth0 user's credentials. Might include a recovery code, which the application must display to the end-user to be stored securely for future use.
+    /// - Returns: A request that will yield Auth0 user's credentials. Might include a recovery code, which the application must display to the end-user to be stored securely for future use.
     /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
@@ -268,7 +269,7 @@ public protocol Authentication: Trackable, Loggable {
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Authenticate a user with their Facebook session info access token and profile data.
+     Authenticate a user with their Facebook session info Access Token and profile data.
 
      ```
      Auth0
@@ -296,7 +297,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
 
      - Parameters:
-       - sessionAccessToken: Session info access token retrieved from Facebook.
+       - sessionAccessToken: Session info Access Token retrieved from Facebook.
        - profile:            The user profile returned by Facebook.
        - scope:              Requested scope value when authenticating the user. By default is `openid profile email`.
        - audience:           API Identifier that the client is requesting access to.
@@ -340,7 +341,7 @@ public protocol Authentication: Trackable, Loggable {
        - audience: API Identifier that the client is requesting access to.
        - scope:    Scope value requested when authenticating the user.
      - Important: This only works if you have the OAuth 2.0 API Authorization flag on.
-     - Returns: Authentication request that will yield Auth0 user's credentials.
+     - Returns: A request that will yield Auth0 user's credentials.
      */
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -388,18 +389,18 @@ public protocol Authentication: Trackable, Loggable {
      ```
 
      - Parameters:
-       - email:          Email of the user to create.
+       - email:          Email for the new user.
        - username:       Username of the user if the connection requires username. By default is `nil`.
        - password:       Password for the new user.
        - connection:     Name where the user will be created (Database connection).
-       - userMetadata:   Additional userMetadata parameters that will be added to the newly created user.
+       - userMetadata:   Additional user metadata parameters that will be added to the newly created user.
        - rootAttributes: Root attributes that will be added to the newly created user. See https://auth0.com/docs/api/authentication#signup for supported attributes. Will not overwrite existing parameters.
-     - Returns: Request that will yield a created database user (just email, username and email verified flag).
+     - Returns: A request that will yield a created database user (just email, username, and email verified flag).
      */
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
     /**
-     Resets a Database user password.
+     Resets a database user password.
 
      ```
      Auth0
@@ -410,8 +411,8 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - email:      Email of the database user.
-       - connection: Name of the Database connection.
-     - Returns: Request to reset password.
+       - connection: Name of the database connection.
+     - Returns: A request to reset the password.
      */
     func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError>
 
@@ -436,7 +437,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - email:      Email where to send the code or link.
-       - type:       Type of passwordless authentication. By default is `code`.
+       - type:       Type of passwordless authentication. By default is 'code'.
        - connection: Name of the passwordless connection. By default is 'email'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
@@ -464,7 +465,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - phoneNumber: Phone number where to send the sms with code or link.
-       - type:        Type of passwordless authentication. By default is `code`.
+       - type:        Type of passwordless authentication. By default is 'code'.
        - connection:  Name of the passwordless connection. By default is 'sms'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
@@ -488,7 +489,7 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     - Parameter accessToken: accessToken obtained by authenticating the user.
+     - Parameter accessToken: Access Token obtained by authenticating the user.
      - Returns: A request that will yield user information.
      */
     func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError>
@@ -516,7 +517,7 @@ public protocol Authentication: Trackable, Loggable {
      - Parameters:
        - code:         Code returned after an `/oauth/authorize` request.
        - codeVerifier: Verifier used to generate the challenge sent in `/oauth/authorize` request.
-       - redirectURI:  Redirect uri sent in `/oauth/authorize` request.
+       - redirectURI:  Redirect URI sent in `/oauth/authorize` request.
      - Returns: A request that will yield Auth0 user's credentials.
      - See: https://tools.ietf.org/html/rfc7636
      */
@@ -538,7 +539,7 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     To ask the same scopes requested when the refresh token was issued:
+     To ask the same scopes requested when the Refresh Token was issued:
 
      ```
      Auth0
@@ -547,9 +548,9 @@ public protocol Authentication: Trackable, Loggable {
      ```
 
      - Parameters:
-       - refreshToken: The client's refresh token.
+       - refreshToken: The client's Refresh Token.
        - scope:        Scopes to request for the new tokens. By default is `nil`, which will ask for the same ones requested during Auth.
-     - Important: This method only works for a refresh token obtained after auth with OAuth 2.0 API Authorization.
+     - Important: This method only works for a Refresh Token obtained after authentication with OAuth 2.0 API Authorization.
      - Returns: A request that will yield Auth0 user's credentials.
      */
     func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
@@ -564,7 +565,7 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     - Parameter refreshToken: the client's refresh token.
+     - Parameter refreshToken: The client's Refresh Token.
      - Returns: A request.
      */
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError>
