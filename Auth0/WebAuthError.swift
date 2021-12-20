@@ -8,7 +8,7 @@ public struct WebAuthError: Auth0Error {
 
     enum Code: Equatable {
         case noBundleIdentifier
-        case malformedInvitationURL(String)
+        case invalidInvitationURL(String)
         case userCancelled
         case noAuthorizationCode([String: String])
         case pkceNotAllowed
@@ -36,16 +36,21 @@ public struct WebAuthError: Auth0Error {
      */
     public var debugDescription: String {
         switch self.code {
-        case .noBundleIdentifier: return "Unable to retrieve the bundle identifier."
-        case .malformedInvitationURL(let url): return "The invitation URL (\(url)) is missing the required query "
-            + "parameters 'invitation' and 'organization'."
-        case .userCancelled: return "User cancelled Web Authentication."
-        case .noAuthorizationCode(let values): return "No authorization code found in \(values)."
-        case .pkceNotAllowed: return "Unable to complete authentication with PKCE. PKCE support can be enabled by "
-            + "setting Application Type to 'Native' and Token Endpoint Authentication Method to 'None' for this app "
-            + "in the Auth0 Dashboard."
+        case .noBundleIdentifier: return "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
+            + " or it could not be used to build a valid URL."
+        case .invalidInvitationURL(let url): return "The invitation URL (\(url)) is missing the 'invitation' and/or"
+            + " the 'organization' query parameters."
+        case .userCancelled: return "The user cancelled the Web Auth operation."
+        case .pkceNotAllowed: return "Unable to complete authentication with PKCE."
+            + " The correct method for Token Endpoint Authentication Method is not set (it should be 'None')."
+            + " PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the"
+            + " 'ApplicationType' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
+        case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
+            + " query parameters (\(values))."
+        case .idTokenValidationFailed: return "The ID Token validation performed after Web Auth login failed."
+            + " The underlying error can be accessed via the 'cause' property."
+        case .other: return "An error occurred. The 'Error' value can be accessed via the 'cause' property."
         case .unknown(let message): return message
-        default: return "Failed to perform Web Auth operation."
         }
     }
 
@@ -54,13 +59,13 @@ public struct WebAuthError: Auth0Error {
     /// The bundle identifier could not be retrieved from `Bundle.main.bundleIdentifier`, or it could not be used to
     /// build a valid URL. This error does not include a ``cause``.
     public static let noBundleIdentifier: WebAuthError = .init(code: .noBundleIdentifier)
-    /// The invitation URL is missing the `organization` and/or the `invitation` query parameters.
+    /// The invitation URL is missing the `invitation` and/or the `organization` query parameters.
     /// This error does not include a ``cause``.
-    public static let malformedInvitationURL: WebAuthError = .init(code: .malformedInvitationURL(""))
+    public static let invalidInvitationURL: WebAuthError = .init(code: .invalidInvitationURL(""))
     /// The user cancelled the Web Auth operation. This error does not include a ``cause``.
     public static let userCancelled: WebAuthError = .init(code: .userCancelled)
     /// The correct method for Token Endpoint Authentication Method is not set (it should be 'None').
-    /// You need to enable PKCE support in your Auth0 application's settings page, by setting the 'Application Type' to
+    /// PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the 'Application Type' to
     /// 'Native' and the 'Token Endpoint Authentication Method' to 'None'. This error does not include a ``cause``.
     public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
     /// The callback URL is missing the `code` query parameter. This error does not include a ``cause``.
@@ -68,9 +73,9 @@ public struct WebAuthError: Auth0Error {
     /// The ID Token validation performed after Web Auth login failed.
     /// The underlying error can be accessed via the ``cause`` property.
     public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
-    /// Another `Error` occurred. That error can be accessed via the ``cause`` property.
+    /// An error occurred. The `Error` value can be accessed via the ``cause`` property.
     public static let other: WebAuthError = .init(code: .other)
-    /// An unknown error occurred, but an `Error` value is not available. This error does not include a ``cause``.
+    /// An unknown error occurred, and an `Error` value is not available. This error does not include a ``cause``.
     public static let unknown: WebAuthError = .init(code: .unknown(""))
 
 }

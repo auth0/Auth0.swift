@@ -6,18 +6,6 @@ import Foundation
 /// A created database user (just email, username, and email verified flag).
 public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
 
-/// Types of passwordless authentication.
-public enum PasswordlessType: String {
-    /// Simple OTP code sent by email or sms.
-    case code = "code"
-    /// Regular Web HTTP link (web only, uses redirect).
-    case webLink = "link"
-    /// Universal Link.
-    case iOSLink = "link_ios"
-    /// Android App Link.
-    case androidLink = "link_android"
-}
-
 /**
  Auth endpoints of Auth0.
 
