@@ -95,7 +95,8 @@ The iOS-only type alias `A0URLOptionsKey` was removed, as it is no longer needed
 
 ### Enums
 
-The custom `Result` enum was removed, along with its shims. Auth0.swift is now using the Swift 5 `Result` type.
+- The custom `Result` enum was removed, along with its shims. Auth0.swift is now using the Swift 5 `Result` type.
+- The `Challenge.CodingKeys` enum is no longer public.
 
 ### Structs
 
