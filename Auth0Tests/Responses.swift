@@ -124,8 +124,8 @@ func jwksResponse(kid: String? = Kid) -> HTTPStubsResponse {
     jwks = ["keys": [["alg": jwk.algorithm,
                       "kty": jwk.keyType,
                       "use": jwk.usage,
-                      "n": jwk.rsaModulus,
-                      "e": jwk.rsaExponent,
+                      "n": jwk.modulus,
+                      "e": jwk.exponent,
                       "kid": kid]]]
     #endif
 

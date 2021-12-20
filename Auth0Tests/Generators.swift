@@ -186,8 +186,8 @@ func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String =
                    certUrl: nil,
                    certThumbprint: nil,
                    certChain: nil,
-                   rsaModulus: encodedModulus,
-                   rsaExponent: encodedExponent)
+                   modulus: encodedModulus,
+                   exponent: encodedExponent)
     }
     
     return publicKey.export().withUnsafeBytes { unsafeRawBufferPointer in

@@ -626,7 +626,7 @@ Auth0
     .authentication()
     .login(usernameOrEmail: "support@auth0.com",
            password: "secret-password",
-           realm: "Username-Password-Authentication", // The connection name
+           realmOrConnection: "Username-Password-Authentication",
            scope: "openid profile email offline_access")
      .start { result in
          switch result {
@@ -646,7 +646,7 @@ Auth0
     .authentication()
     .login(usernameOrEmail: "support@auth0.com",
            password: "secret-password",
-           realm: "Username-Password-Authentication", // The connection name
+           realmOrConnection: "Username-Password-Authentication",
            scope: "openid profile email offline_access")
     .publisher()
     .sink(receiveCompletion: { completion in
@@ -669,7 +669,7 @@ do {
         .authentication()
         .login(usernameOrEmail: "support@auth0.com",
                password: "secret-password",
-               realm: "Username-Password-Authentication", // The connection name
+               realmOrConnection: "Username-Password-Authentication",
                scope: "openid profile email offline_access")
         .start()
     print("Obtained credentials: \(credentials)")
@@ -1436,7 +1436,10 @@ If you are using the [Bot Detection](https://auth0.com/docs/configure/attack-pro
 ```swift
 Auth0
     .authentication()
-    .login(usernameOrEmail: email, password: password, realm: realm, scope: scope)
+    .login(usernameOrEmail: email, 
+           password: password, 
+           realmOrConnection: connection, 
+           scope: scope)
     .start { result in
         switch result {
         case .success(let credentials): // ...
@@ -1444,7 +1447,7 @@ Auth0
         DispatchQueue.main.async {
             Auth0
                 .webAuth()
-                .connection(realm)
+                .connection(connection)
                 .scope(scope)
                 .useEphemeralSession()
                 // ☝🏼 Otherwise a session cookie will remain

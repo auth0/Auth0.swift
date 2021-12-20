@@ -452,39 +452,39 @@ class WebAuthSpec: QuickSpec {
                 expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
-            it("should produce a malformed invitation URL error when organization is missing") {
+            it("should produce an invalid invitation URL error when organization is missing") {
                 let auth = newWebAuth()
                 let url = "https://\(Domain)?invitation=foo"
-                let expectedError = WebAuthError(code: .malformedInvitationURL(url))
+                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
                 expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
-            it("should produce a malformed invitation URL error when invitation is missing") {
+            it("should produce an invalid invitation URL error when invitation is missing") {
                 let auth = newWebAuth()
                 let url = "https://\(Domain)?organization=foo"
-                let expectedError = WebAuthError(code: .malformedInvitationURL(url))
+                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
                 expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
-            it("should produce a malformed invitation URL error when organization and invitation are missing") {
+            it("should produce an invalid invitation URL error when organization and invitation are missing") {
                 let auth = newWebAuth()
                 let url = "https://\(Domain)?foo=bar"
-                let expectedError = WebAuthError(code: .malformedInvitationURL(url))
+                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
                 expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
-            it("should produce a malformed invitation URL error when query parameters are missing") {
+            it("should produce an invalid invitation URL error when query parameters are missing") {
                 let auth = newWebAuth()
-                let expectedError = WebAuthError(code: .malformedInvitationURL(DomainURL.absoluteString))
+                let expectedError = WebAuthError(code: .invalidInvitationURL(DomainURL.absoluteString))
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(DomainURL)
                 auth.start { result = $0 }

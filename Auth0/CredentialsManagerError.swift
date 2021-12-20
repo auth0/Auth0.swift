@@ -33,12 +33,17 @@ public struct CredentialsManagerError: Auth0Error {
      */
     public var debugDescription: String {
         switch self.code {
-        case .noCredentials: return "No valid credentials found."
-        case .noRefreshToken: return "No Refresh Token in the credentials."
-        case .largeMinTTL(let minTTL, let lifetime): return "The minTTL requested (\(minTTL)s) is greater than the "
-            + "lifetime of the renewed Access Token (\(lifetime)s). Request a lower minTTL or increase the "
-            + "'Token Expiration' setting of your Auth0 API in the dashboard."
-        default: return "Failed to perform Credentials Manager operation."
+        case .noCredentials: return "No credentials were found in the store."
+        case .noRefreshToken: return "The stored credentials instance does not contain a Refresh Token."
+        case .renewFailed: return "The credentials renewal failed. The underlying 'AuthenticationError' can be"
+            + " accessed via the 'cause' property."
+        case .biometricsFailed: return "The Biometric authentication failed. The underlying 'LAError' can be accessed"
+            + " via the 'cause' property."
+        case .revokeFailed: return "The revocation of the Refresh Token failed. The underlying 'AuthenticationError'"
+            + " can be accessed via the 'cause' property."
+        case .largeMinTTL(let minTTL, let lifetime): return "The minTTL requested (\(minTTL)s) is greater than the"
+            + " lifetime of the renewed Access Token (\(lifetime)s). Request a lower minTTL or increase the"
+            + " 'Token Expiration' setting of your Auth0 API in the Dashboard."
         }
     }
 
@@ -46,9 +51,9 @@ public struct CredentialsManagerError: Auth0Error {
 
     /// No credentials were found in the store. This error does not include a ``cause``.
     public static let noCredentials: CredentialsManagerError = .init(code: .noCredentials)
-    /// The ``Credentials`` instance stored does not contain a Refresh Token. This error does not include a ``cause``.
+    /// The  stored``Credentials`` instance does not contain a Refresh Token. This error does not include a ``cause``.
     public static let noRefreshToken: CredentialsManagerError = .init(code: .noRefreshToken)
-    /// The credentials renewal failed. The underlying ``AuthenticationError`` can be accessed via the `cause: Error?` property.
+    /// The credentials renewal failed. The underlying ``AuthenticationError`` can be accessed via the ``cause`` property.
     public static let renewFailed: CredentialsManagerError = .init(code: .renewFailed)
     /// The Biometric authentication failed. The underlying `LAError` can be accessed via the ``cause`` property.
     public static let biometricsFailed: CredentialsManagerError = .init(code: .biometricsFailed)
