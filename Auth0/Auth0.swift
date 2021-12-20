@@ -86,7 +86,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
 
  Currently you can only perform the following operations:
 
- * Get an user by its ID
+ * Get a user by their ID
  * Update an user, e.g. by adding `user_metadata`
  * Link users
  * Unlink users
