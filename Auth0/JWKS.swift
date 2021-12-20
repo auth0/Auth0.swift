@@ -32,9 +32,9 @@ public struct JWK: Codable {
     /// The x.509 certificate chain.
     public let certChain: [String]?
     /// The modulus of the key.
-    public let rsaModulus: String?
+    public let modulus: String?
     /// The exponent of the key.
-    public let rsaExponent: String?
+    public let exponent: String?
 
     enum CodingKeys: String, CodingKey {
         case keyType = "kty"
@@ -44,7 +44,7 @@ public struct JWK: Codable {
         case certUrl = "x5u"
         case certThumbprint = "x5t"
         case certChain = "x5c"
-        case rsaModulus = "n"
-        case rsaExponent = "e"
+        case modulus = "n"
+        case exponent = "e"
     }
 }

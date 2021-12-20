@@ -21,8 +21,8 @@ class JWKSpec: QuickSpec {
                                         certUrl: nil,
                                         certThumbprint: nil,
                                         certChain: nil,
-                                        rsaModulus: "42xFiJGFLj6e8PgJ-zDQE_KhXNscWFHmJylilVhpD0KUoNKict4IUBvmLYrKMiFLggBS-ttadXeJn7XMnsu6Dz8OzE6r9ELxjZK9sljwx-KWn3ojX8XB8c4LB4NLCEzcwAmE-1zEymJSRg7GJ1g5CHQ_uPeZgxPpEKg5XbrVjZO0KmKE2vCIEVFJIxXNIIu-yC4zR0dPLLEN0lPDZLwwYVRF5y9F_WzDX8fr2nGPQQHQdebBHe_ystvlNc1RdZvyM7BjN9z0l3CXTyR18bLNhJdRDU39NvS7IzGmnqL3WLAwZGtJ6rMhYCPsj-Dla4tUJCy6Yc4V7Gr8zBGQWmLKlQ",
-                                        rsaExponent: "AQAB").rsaPublicKey
+                                        modulus: "42xFiJGFLj6e8PgJ-zDQE_KhXNscWFHmJylilVhpD0KUoNKict4IUBvmLYrKMiFLggBS-ttadXeJn7XMnsu6Dz8OzE6r9ELxjZK9sljwx-KWn3ojX8XB8c4LB4NLCEzcwAmE-1zEymJSRg7GJ1g5CHQ_uPeZgxPpEKg5XbrVjZO0KmKE2vCIEVFJIxXNIIu-yC4zR0dPLLEN0lPDZLwwYVRF5y9F_WzDX8fr2nGPQQHQdebBHe_ystvlNc1RdZvyM7BjN9z0l3CXTyR18bLNhJdRDU39NvS7IzGmnqL3WLAwZGtJ6rMhYCPsj-Dla4tUJCy6Yc4V7Gr8zBGQWmLKlQ",
+                                        exponent: "AQAB").rsaPublicKey
                     
                     expect(publicKey).notTo(beNil())
                     
@@ -41,8 +41,8 @@ class JWKSpec: QuickSpec {
                                                     certUrl: nil,
                                                     certThumbprint: nil,
                                                     certChain: nil,
-                                                    rsaModulus: jwk.rsaModulus,
-                                                    rsaExponent: jwk.rsaExponent)
+                                                    modulus: jwk.modulus,
+                                                    exponent: jwk.exponent)
                     
                     expect(jwkWithInvalidKeyType.rsaPublicKey).to(beNil())
                 }
@@ -55,8 +55,8 @@ class JWKSpec: QuickSpec {
                                                       certUrl: nil,
                                                       certThumbprint: nil,
                                                       certChain: nil,
-                                                      rsaModulus: jwk.rsaModulus,
-                                                      rsaExponent: jwk.rsaExponent)
+                                                      modulus: jwk.modulus,
+                                                      exponent: jwk.exponent)
                     
                     expect(jwkWithInvalidAlgorithm.rsaPublicKey).to(beNil())
                 }
@@ -69,8 +69,8 @@ class JWKSpec: QuickSpec {
                                                       certUrl: nil,
                                                       certThumbprint: nil,
                                                       certChain: nil,
-                                                      rsaModulus: jwk.rsaModulus,
-                                                      rsaExponent: jwk.rsaExponent)
+                                                      modulus: jwk.modulus,
+                                                      exponent: jwk.exponent)
                     
                     expect(jwkWithUnsupportedUsage.rsaPublicKey).to(beNil())
                 }
@@ -83,8 +83,8 @@ class JWKSpec: QuickSpec {
                                                     certUrl: nil,
                                                     certThumbprint: nil,
                                                     certChain: nil,
-                                                    rsaModulus: "###",
-                                                    rsaExponent: jwk.rsaExponent)
+                                                    modulus: "###",
+                                                    exponent: jwk.exponent)
                     
                     expect(jwkWithInvalidModulus.rsaPublicKey).to(beNil())
                 }
@@ -97,8 +97,8 @@ class JWKSpec: QuickSpec {
                                                      certUrl: nil,
                                                      certThumbprint: nil,
                                                      certChain: nil,
-                                                     rsaModulus: jwk.rsaModulus,
-                                                     rsaExponent: "###")
+                                                     modulus: jwk.modulus,
+                                                     exponent: "###")
                     
                     expect(jwkWithInvalidExponent.rsaPublicKey).to(beNil())
                 }
