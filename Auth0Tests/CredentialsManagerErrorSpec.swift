@@ -112,7 +112,7 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
-            it("should return message for PKCE not allowed") {
+            it("should return message when minTTL is too big") {
                 let minTTL = 7200
                 let lifetime = 3600
                 let message = "The minTTL requested (\(minTTL)s) is greater than the"
