@@ -269,7 +269,6 @@ Auth0
     .clearSession()
     .sink(receiveCompletion: { completion in
         switch completion {
-        
         case .finished:
             print("Logged out")
         case .failure(let error):
