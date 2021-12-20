@@ -113,14 +113,14 @@ public protocol Authentication: Trackable, Loggable {
     func login(phoneNumber username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Login using username and password in a realm.
+     Login using username and password with a realm or connection.
 
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .login(usernameOrEmail: "support@auth0.com",
                 password: "a secret password",
-                realm: "mydatabase")
+                realmOrConnection: "mydatabase")
          .start { result in
              switch result {
              case .success(let credentials):
@@ -138,23 +138,23 @@ public protocol Authentication: Trackable, Loggable {
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .login(usernameOrEmail: "support@auth0.com",
                 password: "a secret password",
-                realm: "mydatabase",
+                realmOrConnection: "mydatabase",
                 audience: "https://myapi.com/api",
                 scope: "openid profile email offline_access")
          .start { print($0) }
      ```
 
      - Parameters:
-       - username: Username or email used of the user to authenticate.
-       - password: Password of the user.
-       - realm:    Domain of the realm or connection name.
-       - audience: API Identifier that the client is requesting access to.
-       - scope:    Scope value requested when authenticating the user.
+       - usernameOrEmail:   Username or email used of the user to authenticate.
+       - password:          Password of the user.
+       - realmOrConnection: Domain of the realm or connection name.
+       - audience:          API Identifier that the client is requesting access to.
+       - scope:             Scope value requested when authenticating the user.
      - Important: This only works if you have the OAuth 2.0 API Authorization flag on.
      - Returns: Authentication request that will yield Auth0 user's credentials.
      - Requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Login using One Time Password and MFA token.
@@ -614,8 +614,8 @@ public extension Authentication {
         return self.login(phoneNumber: username, code: otp, audience: audience, scope: scope)
     }
 
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(usernameOrEmail: username, password: password, realm: realm, audience: audience, scope: scope)
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+        return self.login(usernameOrEmail: username, password: password, realmOrConnection: realm, audience: audience, scope: scope)
     }
 
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil) -> Request<Credentials, AuthenticationError> {
