@@ -7,8 +7,8 @@ extension JWK {
         if let usage = usage, usage != "sig" { return nil }
         guard keyType == "RSA",
             algorithm == JWTAlgorithm.rs256.rawValue,
-            let modulus = rsaModulus?.a0_decodeBase64URLSafe(),
-            let exponent = rsaExponent?.a0_decodeBase64URLSafe() else { return nil }
+            let modulus = modulus?.a0_decodeBase64URLSafe(),
+            let exponent = exponent?.a0_decodeBase64URLSafe() else { return nil }
         let encodedKey = encodeRSAPublicKey(modulus: [UInt8](modulus), exponent: [UInt8](exponent))
         return generateRSAPublicKey(from: encodedKey)
     }

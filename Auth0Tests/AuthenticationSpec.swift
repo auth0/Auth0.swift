@@ -579,13 +579,12 @@ class AuthenticationSpec: QuickSpec {
         }
 
         // MARK:- password-realm grant type
-        describe("authenticating with credentials in a realm") {
+        describe("authenticating with credentials and a realm/connection") {
 
             it("should receive token with username and password") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
-
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "myrealm").start { result in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm").start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
@@ -595,7 +594,7 @@ class AuthenticationSpec: QuickSpec {
             it("should fail to return token") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": InvalidPassword, "realm": "myrealm"])) { _ in return authFailure(error: "", description: "") }.name = "Grant Password"
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: InvalidPassword, realm: "myrealm").start { result in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: InvalidPassword, realmOrConnection: "myrealm").start { result in
                         expect(result).toNot(haveCredentials())
                         done()
                     }
@@ -605,7 +604,7 @@ class AuthenticationSpec: QuickSpec {
             it("should specify scope in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "myrealm", scope: "openid").start { result in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
@@ -615,7 +614,7 @@ class AuthenticationSpec: QuickSpec {
             it("should specify audience in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : "https://myapi.com/api", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "myrealm", audience: "https://myapi.com/api").start { result in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", audience: "https://myapi.com/api").start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
@@ -625,17 +624,17 @@ class AuthenticationSpec: QuickSpec {
             it("should specify audience and scope in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "myrealm", audience: "https://myapi.com/api", scope: "openid").start { result in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", audience: "https://myapi.com/api", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
                 }
             }
 
-            it("should specify audience, scope and realm in request") {
+            it("should specify audience, scope and realm/connection in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm" : "customconnection"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom audience, scope and realm"
                 waitUntil(timeout: Timeout) { done in
-                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realm: "customconnection", audience: "https://myapi.com/api", scope: "openid").start { result in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "customconnection", audience: "https://myapi.com/api", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
@@ -874,10 +873,8 @@ class AuthenticationSpec: QuickSpec {
             
             context("passwordless login") {
                 
-                let emailRealm = "email"
-                
                 it("should login with email code") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "otp": OTP, "realm": emailRealm, "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
+                    stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "otp": OTP, "realm": "email", "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
                     waitUntil(timeout: Timeout) { done in
