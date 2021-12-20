@@ -244,10 +244,10 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession()
          .sink(receiveCompletion: { completion in
              switch completion {
-             case .failure(let error):
-                 print("Failed with \(error)")
              case .finished:
                  print("Logged out")
+             case .failure(let error):
+                 print("Failed with \(error)")
              }
          }, receiveValue: {})
          .store(in: &cancellables)
