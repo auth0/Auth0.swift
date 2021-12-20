@@ -24,7 +24,7 @@ struct Auth0Authentication: Authentication {
         return login(username: username, otp: otp, realm: "sms", audience: audience, scope: scope)
     }
 
-    func login(usernameOrEmail username: String, password: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         let resourceOwner = URL(string: "oauth/token", relativeTo: self.url)!
         var payload: [String: Any] = [
             "username": username,

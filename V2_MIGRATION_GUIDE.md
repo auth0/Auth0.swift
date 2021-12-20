@@ -95,7 +95,8 @@ The iOS-only type alias `A0URLOptionsKey` was removed, as it is no longer needed
 
 ### Enums
 
-The custom `Result` enum was removed, along with its shims. Auth0.swift is now using the Swift 5 `Result` type.
+- The custom `Result` enum was removed, along with its shims. Auth0.swift is now using the Swift 5 `Result` type.
+- The `Challenge.CodingKeys` enum is no longer public.
 
 ### Structs
 
@@ -127,11 +128,11 @@ The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAu
 
 #### `login(usernameOrEmail:password:multifactorCode:connection:scope:parameters:)`
 
-You should use `login(usernameOrEmail:password:realm:audience:scope:)` instead.
+You should use `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` instead.
 
 #### `signUp(email:username:password:connection:userMetadata:scope:parameters:)`
 
-You should use `signup(email:username:password:connection:userMetadata:rootAttributes:)` and then `login(usernameOrEmail:password:realm:audience:scope:)` instead. That is, create the user and then log them in.
+You should use `signup(email:username:password:connection:userMetadata:rootAttributes:)` and then `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` instead. That is, create the user and then log them in.
 
 #### `tokenInfo(token:)` and `userInfo(token:)`
 
@@ -429,7 +430,7 @@ case .failure(let error): // handle AuthenticationError
 ```
 </details>
 
-#### Renamed `signup(email:username:password:connection:userMetadata:rootAttributes:)`
+#### Renamed `createUser(email:username:password:connection:userMetadata:rootAttributes:)`
 
 The method `createUser(email:username:password:connection:userMetadata:rootAttributes:)` was renamed to `signup(email:username:password:connection:userMetadata:rootAttributes:)`.
 
@@ -442,7 +443,7 @@ The method `tokenExchange(withCode:codeVerifier:redirectURI:)` was renamed to `c
 The following methods lost the `parameters` parameter:
 
 - `login(phoneNumber:code:audience:scope:)`
-- `login(usernameOrEmail:password:realm:audience:scope:)`
+- `login(usernameOrEmail:password:realmOrConnection:audience:scope:)`
 - `loginDefaultDirectory(withUsername:password:audience:scope:)`
 
 To pass custom parameters to those (or any) method in the Authentication client, use the `parameters(_:)` method from `Request`:
@@ -457,6 +458,10 @@ Auth0
     }
 ```
 
+#### Renamed `realm` parameter
+
+In the method `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` the `realm` parameter was renamed to `realmOrConnection`.
+
 #### Reordered `scope` and `audience` parameters
 
 In the following methods the `scope` and `audience` parameters switched places, for consistency with the rest of the methods in the Authentication client:
@@ -470,7 +475,7 @@ In the following methods the `scope` parameter became non-optional (with a defau
 
 - `login(email:code:audience:scope:)`
 - `login(phoneNumber:code:audience:scope:)`
-- `login(usernameOrEmail:password:realm:audience:scope:)`
+- `login(usernameOrEmail:password:realmOrConnection:audience:scope:)`
 - `loginDefaultDirectory(withUsername:password:audience:scope:)`
 - `login(appleAuthorizationCode:fullName:profile:audience:scope:)`
 - `login(facebookSessionAccessToken:profile:audience:scope:)`
