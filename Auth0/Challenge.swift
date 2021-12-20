@@ -8,7 +8,7 @@ public struct Challenge: Codable {
     /// `binding_code` and send it as part of the request. 
     public let bindingMethod: String?
 
-    public enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case challengeType = "challenge_type"
         case oobCode = "oob_code"
         case bindingMethod = "binding_method"
