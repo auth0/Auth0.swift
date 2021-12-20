@@ -256,6 +256,7 @@ Auth0
             print("Logged out")
         case .failure(let error):
             print("Failed with \(error)")
+        }
     }
 ```
 
@@ -268,10 +269,11 @@ Auth0
     .clearSession()
     .sink(receiveCompletion: { completion in
         switch completion {
-        case .failure(let error):
-            print("Failed with \(error)")
+        
         case .finished:
             print("Logged out")
+        case .failure(let error):
+            print("Failed with \(error)")
         }
     }, receiveValue: {})
     .store(in: &cancellables)
@@ -500,6 +502,7 @@ credentialsManager.credentials { result in
         print("Obtained credentials: \(credentials)")
     case .failure(let error):
         print("Failed with \(error)") 
+    }
 }
 ```
 
@@ -561,10 +564,12 @@ credentialsManager.revoke { result in
 credentialsManager
     .revoke()
     .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
+        switch completion {
+        case .finished:
+            print("Success")
+        case .failure(let error):
             print("Failed with \(error)")
         }
-        print("Success")
     }, receiveValue: {})
     .store(in: &cancellables)
 ```
@@ -628,14 +633,14 @@ Auth0
            password: "secret-password",
            realm: "Username-Password-Authentication", // The connection name
            scope: "openid profile email offline_access")
-     .start { result in
-         switch result {
-         case .success(let credentials):
+    .start { result in
+        switch result {
+        case .success(let credentials):
             print("Obtained credentials: \(credentials)")
-         case .failure(let error):
+        case .failure(let error):
             print("Failed with \(error)")
-         }
-     }
+        }
+    }
 ```
 
 <details>
@@ -771,10 +776,12 @@ Auth0
     .startPasswordless(email: "support@auth0.com")
     .publisher()
     .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
+        switch completion {
+        case .finished:
+            print("Code sent")
+        case .failure(let error):
             print("Failed with \(error)")
         }
-        print("Code sent")
     }, receiveValue: {})
     .store(in: &cancellables)
 ```
@@ -803,6 +810,7 @@ Auth0
     .authentication(clientId: clientId, domain: "samples.auth0.com")
     .startPasswordless(phoneNumber: "+12025550135")
     .start { result in
+        switch result {
         case .success:
             print("Code sent")
         case .failure(let error):
@@ -820,10 +828,12 @@ Auth0
     .startPasswordless(phoneNumber: "+12025550135")
     .publisher()
     .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
+        switch completion {
+        case .finished:
+            print("Code sent")
+        case .failure(let error):
             print("Failed with \(error)")
         }
-        print("Code sent")
     }, receiveValue: {})
     .store(in: &cancellables)
 ```
@@ -992,10 +1002,10 @@ Auth0
     .get(userId, fields: ["user_metadata"])
     .start { result in
         switch result {
-          case .success(let user):
-              print("User with metadata: \(user)")
-          case .failure(let error):
-              print("Failed with \(error)")
+        case .success(let user):
+            print("User with metadata: \(user)")
+        case .failure(let error):
+            print("Failed with \(error)")
         }
     }
 ```
@@ -1012,7 +1022,7 @@ Auth0
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
-    }, receiveValue: { credentials in
+    }, receiveValue: { user in
         print("User with metadata: \(user)")
     })
     .store(in: &cancellables)
@@ -1043,10 +1053,10 @@ Auth0
     .patch(userId, userMetadata: ["key": "value"])
     .start { result in
         switch result {
-          case .success(let user):
-              print("Updated user: \(user)")
-          case .failure(let error):
-              print("Failed with \(error)")
+        case .success(let user):
+            print("Updated user: \(user)")
+        case .failure(let error):
+            print("Failed with \(error)")
         }
     }
 ```
@@ -1063,7 +1073,7 @@ Auth0
         if case .failure(let error) = completion {
             print("Failed with \(error)")
         }
-    }, receiveValue: { credentials in
+    }, receiveValue: { user in
         print("Updated user: \(user)") 
     })
     .store(in: &cancellables)
@@ -1111,10 +1121,12 @@ Auth0
     .link("user identifier", withOtherUserToken: "another user token")
     .publisher()
     .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
+        switch completion {
+        case .finished:
+            print("Accounts linked")
+        case .failure(let error):
             print("Failed with \(error)")
         }
-        print("Accounts linked")
     }, receiveValue: { _ in })
     .store(in: &cancellables)
 ```
@@ -1239,7 +1251,7 @@ Auth0
         case .failure(let error):
             print("Failed with \(error)")
         }
-}
+    }
 ```
 
 <details>
@@ -1294,7 +1306,7 @@ Auth0
         case .failure(let error):
             print("Failed with \(error)")
         }
-}
+    }
 ```
 
 <details>
@@ -1441,19 +1453,19 @@ Auth0
         switch result {
         case .success(let credentials): // ...
         case .failure(let error) where error.isVerificationRequired:
-        DispatchQueue.main.async {
-            Auth0
-                .webAuth()
-                .connection(realm)
-                .scope(scope)
-                .useEphemeralSession()
-                // ☝🏼 Otherwise a session cookie will remain
-                .parameters(["login_hint": email])
-                // ☝🏼 So the user doesn't have to type it again
-                .start { result in
-                    // ...
-                }
-        }
+            DispatchQueue.main.async {
+                Auth0
+                    .webAuth()
+                    .connection(realm)
+                    .scope(scope)
+                    .useEphemeralSession()
+                    // ☝🏼 Otherwise a session cookie will remain
+                    .parameters(["login_hint": email])
+                    // ☝🏼 So the user doesn't have to type it again
+                    .start { result in
+                        // ...
+                    }
+            }
         case .failure(let error): // ...
         }
     }
