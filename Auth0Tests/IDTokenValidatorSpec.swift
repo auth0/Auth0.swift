@@ -238,29 +238,41 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                         }
                     }
                 }
-                
+
                 it("should validate a token with auth time") {
-                    let maxAge = 1000 // 1 second
-                    let authTime = Date().addingTimeInterval(-10000) // -10 seconds
-                    let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: maxAge, authTime: authTime)
-                    let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
-                                                          audience: aud[0],
-                                                          jwksRequest: validatorContext.jwksRequest,
-                                                          leeway: 1000, // 1 second
-                                                          maxAge: maxAge,
-                                                          nonce: nil,
-                                                          organization: nil)
-                    
+                    let oneSecond = 1_000
+                    let authTime = Date()
+
+                    let jwt = generateJWT(
+                        aud: aud,
+                        azp: nil,
+                        nonce: nil,
+                        maxAge: oneSecond,
+                        authTime: authTime
+                    )
+
+                    let context = IDTokenValidatorContext(
+                        issuer: validatorContext.issuer,
+                        audience: aud[0],
+                        jwksRequest: validatorContext.jwksRequest,
+                        leeway: oneSecond,
+                        maxAge: oneSecond,
+                        nonce: nil,
+                        organization: nil
+                    )
+
                     waitUntil { done in
-                        validate(idToken: jwt.string,
-                                 with: context,
-                                 signatureValidator: mockSignatureValidator) { error in
+                        validate(
+                            idToken: jwt.string,
+                            with: context,
+                            signatureValidator: mockSignatureValidator
+                        ) { error in
                             expect(error).to(beNil())
                             done()
                         }
                     }
                 }
-                
+
                 it("should validate a token with an organization") {
                     let organization = "abc1234"
                     let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: nil, authTime: nil, organization: organization)

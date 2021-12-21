@@ -381,24 +381,29 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
         }
         
         describe("auth time validation") {
-            
+
             var authTimeValidator: IDTokenAuthTimeValidator!
-            let leeway = 1000 // 1 second
-            let maxAge = 1000 // 1 second
-            let currentTime = Date()
-            let expectedAuthTime = currentTime.addingTimeInterval(-10000) // -10 seconds
-            
+            let leeway = 1_000 // 1 second
+            let maxAge = 1_000 // 1 second
+            var currentTime: Date!
+            var expectedAuthTime: Date!
+
             beforeEach {
+                currentTime = Date()
+                expectedAuthTime = currentTime.addingTimeInterval(-10_000) // -10 seconds
                 authTimeValidator = IDTokenAuthTimeValidator(baseTime: currentTime, leeway: leeway, maxAge: maxAge)
             }
-            
+
             context("auth time request") {
-                it("should return nil if max age is present and auth time was requested") {
-                    let jwt = generateJWT(maxAge: maxAge, authTime: expectedAuthTime)
-                    
+                it("should return nil if token's life is less than the specified max age") {
+                    let max: Int = .max
+
+                    let jwt = generateJWT(maxAge: max, authTime: expectedAuthTime)
+                    authTimeValidator = IDTokenAuthTimeValidator(baseTime: currentTime, leeway: leeway, maxAge: max)
+
                     expect(authTimeValidator.validate(jwt)).to(beNil())
                 }
-                
+
                 it("should return an error if max age is present and auth time was not requested") {
                     let jwt = generateJWT(maxAge: maxAge, authTime: nil)
                     let expectedError = IDTokenAuthTimeValidator.ValidationError.missingAuthTime
@@ -408,37 +413,51 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     expect(result?.errorDescription).to(equal(expectedError.errorDescription))
                 }
             }
-            
+
             context("incorrect auth time") {
-                it("should return an error if last auth time + max age + leeway is in the present") {
+                it("should return an error if last auth time + max age + leeway is exactly the expiration time") {
                     let expectedAuthTime = currentTime
-                        .addingTimeInterval(-Double(maxAge))
-                        .addingTimeInterval(-Double(leeway))
+
                     let jwt = generateJWT(maxAge: maxAge, authTime: expectedAuthTime)
                     let currentTimeEpoch = currentTime.timeIntervalSince1970
-                    let authTimeEpoch = expectedAuthTime.timeIntervalSince1970 + Double(leeway) + Double(maxAge)
-                    let expectedError = IDTokenAuthTimeValidator.ValidationError.pastLastAuth(baseTime: currentTimeEpoch,
-                                                                                              lastAuthTime: authTimeEpoch)
+                    let authTimeEpoch = expectedAuthTime!.timeIntervalSince1970
+
+                    let expectedError = IDTokenAuthTimeValidator
+                        .ValidationError
+                        .pastLastAuth(baseTime: currentTimeEpoch, lastAuthTime: authTimeEpoch)
+
+                    authTimeValidator = IDTokenAuthTimeValidator(baseTime: currentTime, leeway: 0, maxAge: 0)
                     let result = authTimeValidator.validate(jwt)
-                    
+
                     expect(result).to(matchError(expectedError))
                     expect(result?.errorDescription).to(equal(expectedError.errorDescription))
                 }
-                
-                it("should return an error if last auth time + max age + leeway is in the future") {
-                    let expectedAuthTime = currentTime.addingTimeInterval(10000) // 10 seconds
+
+                it("should return an error if last auth time has outlived the max age and leeway") {
+                    let expectedAuthTime = currentTime
+                    let baseTime = currentTime.addingTimeInterval(10_000)
+
                     let jwt = generateJWT(maxAge: maxAge, authTime: expectedAuthTime)
-                    let currentTimeEpoch = currentTime.timeIntervalSince1970
-                    let authTimeEpoch = expectedAuthTime.timeIntervalSince1970 + Double(leeway) + Double(maxAge)
-                    let expectedError = IDTokenAuthTimeValidator.ValidationError.pastLastAuth(baseTime: currentTimeEpoch,
-                                                                                              lastAuthTime: authTimeEpoch)
-                    let result = authTimeValidator.validate(jwt)
                     
+                    authTimeValidator = .init(
+                        baseTime: baseTime,
+                        leeway: leeway,
+                        maxAge: maxAge
+                    )
+
+                    let expectedError = IDTokenAuthTimeValidator
+                        .ValidationError
+                        .pastLastAuth(
+                            baseTime: baseTime.timeIntervalSince1970,
+                            lastAuthTime: expectedAuthTime!.timeIntervalSince1970
+                        )
+
+                    let result = authTimeValidator.validate(jwt)
+
                     expect(result).to(matchError(expectedError))
                     expect(result?.errorDescription).to(equal(expectedError.errorDescription))
                 }
             }
-            
         }
 
         describe("organization validation") {

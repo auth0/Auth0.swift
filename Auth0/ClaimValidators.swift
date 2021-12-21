@@ -261,10 +261,13 @@ struct IDTokenAuthTimeValidator: JWTValidator {
 
     func validate(_ jwt: JWT) -> LocalizedError? {
         guard let authTime = jwt.claim(name: "auth_time").date else { return ValidationError.missingAuthTime }
+
         let currentTimeEpoch = baseTime.timeIntervalSince1970
-        let authTimeEpoch = authTime.timeIntervalSince1970 + Double(maxAge) + Double(leeway)
-        guard authTimeEpoch < currentTimeEpoch else {
-            return ValidationError.pastLastAuth(baseTime: currentTimeEpoch, lastAuthTime: authTimeEpoch)
+        let authEpoch = authTime.timeIntervalSince1970
+        let authAge = currentTimeEpoch - authEpoch
+
+        guard authAge < Double(maxAge) + Double(leeway) else {
+            return ValidationError.pastLastAuth(baseTime: currentTimeEpoch, lastAuthTime: authEpoch)
         }
         return nil
     }
