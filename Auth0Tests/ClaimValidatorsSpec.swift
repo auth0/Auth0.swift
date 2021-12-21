@@ -394,8 +394,8 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                 authTimeValidator = IDTokenAuthTimeValidator(baseTime: currentTime, leeway: leeway, maxAge: maxAge)
             }
 
-            context("auth time request") {
-                it("should return nil if token's life is less than the specified max age") {
+            context("succeeds") {
+                it("if token's life is less than the specified max age") {
                     let max: Int = .max
 
                     let jwt = generateJWT(maxAge: max, authTime: expectedAuthTime)
@@ -408,37 +408,31 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     let jwt = generateJWT(maxAge: maxAge, authTime: nil)
                     let expectedError = IDTokenAuthTimeValidator.ValidationError.missingAuthTime
                     let result = authTimeValidator.validate(jwt)
-                    
+
                     expect(result).to(matchError(expectedError))
                     expect(result?.errorDescription).to(equal(expectedError.errorDescription))
                 }
-            }
 
-            context("incorrect auth time") {
-                it("should return an error if last auth time + max age + leeway is exactly the expiration time") {
+                it("if last auth time + max age + leeway is exactly the expiration time") {
                     let expectedAuthTime = currentTime
 
                     let jwt = generateJWT(maxAge: maxAge, authTime: expectedAuthTime)
-                    let currentTimeEpoch = currentTime.timeIntervalSince1970
-                    let authTimeEpoch = expectedAuthTime!.timeIntervalSince1970
-
-                    let expectedError = IDTokenAuthTimeValidator
-                        .ValidationError
-                        .pastLastAuth(baseTime: currentTimeEpoch, lastAuthTime: authTimeEpoch)
 
                     authTimeValidator = IDTokenAuthTimeValidator(baseTime: currentTime, leeway: 0, maxAge: 0)
                     let result = authTimeValidator.validate(jwt)
 
-                    expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                    expect(result).to(beNil())
                 }
+            }
 
-                it("should return an error if last auth time has outlived the max age and leeway") {
+            context("fails") {
+
+                it("if last auth time has outlived the max age and leeway") {
                     let expectedAuthTime = currentTime
                     let baseTime = currentTime.addingTimeInterval(10_000)
 
                     let jwt = generateJWT(maxAge: maxAge, authTime: expectedAuthTime)
-                    
+
                     authTimeValidator = .init(
                         baseTime: baseTime,
                         leeway: leeway,

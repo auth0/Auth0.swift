@@ -264,9 +264,11 @@ struct IDTokenAuthTimeValidator: JWTValidator {
 
         let currentTimeEpoch = baseTime.timeIntervalSince1970
         let authEpoch = authTime.timeIntervalSince1970
-        let authAge = currentTimeEpoch - authEpoch
 
-        guard authAge < Double(maxAge) + Double(leeway) else {
+        let authAge = currentTimeEpoch - authEpoch
+        let adjustedMaxAge = Double(maxAge) + Double(leeway)
+
+        guard authAge <= adjustedMaxAge else {
             return ValidationError.pastLastAuth(baseTime: currentTimeEpoch, lastAuthTime: authEpoch)
         }
         return nil
