@@ -445,6 +445,7 @@ The following methods lost the `parameters` parameter:
 - `login(phoneNumber:code:audience:scope:)`
 - `login(usernameOrEmail:password:realmOrConnection:audience:scope:)`
 - `loginDefaultDirectory(withUsername:password:audience:scope:)`
+- `startPasswordless(email:type:connection:)`
 
 To pass custom parameters to those (or any) method in the Authentication client, use the `parameters(_:)` method from `Request`:
 

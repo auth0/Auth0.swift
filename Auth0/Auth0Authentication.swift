@@ -221,16 +221,13 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func startPasswordless(email: String, type: PasswordlessType, connection: String, parameters: [String: Any]) -> Request<Void, AuthenticationError> {
-        var payload: [String: Any] = [
+    func startPasswordless(email: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError> {
+        let payload: [String: Any] = [
             "email": email,
             "connection": connection,
             "send": type.rawValue,
             "client_id": self.clientId
         ]
-        if case .webLink = type, !parameters.isEmpty {
-            payload["authParams"] = parameters
-        }
 
         let start = URL(string: "passwordless/start", relativeTo: self.url)!
         return Request(session: session,
