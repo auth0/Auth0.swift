@@ -7,49 +7,44 @@
 ![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)
 ![Swift 5.5](https://img.shields.io/badge/Swift-5.5-orange.svg?style=flat-square)
 
-> Note: This library is currently in **Beta** and has not had a complete security review. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.
+> ⚠️ This library is currently in **Beta** and has not had a complete security review. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.
 
 Swift SDK that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api) endpoints and enables you to seamlessly integrate the Auth0 login.
 
 **Migrating from v1? Check our [Migration Guide](V2_MIGRATION_GUIDE.md).**
 
+---
+
 ## Table of Contents
 
-- [Requirements](#requirements)
 - [Documentation](#documentation)
+- [Requirements](#requirements)
 - [Installation](#installation)
-  + [SPM](#spm)
+  + [Swift Package Manager](#swift-package-manager)
   + [Cocoapods](#cocoapods)
   + [Carthage](#carthage)
 - [Getting Started](#getting-started)
   + [Configuration](#configuration)
-  + [Login with Universal Login (iOS / macOS)](#login-with-universal-login-ios--macos)
-  + [Logout with Universal Login (iOS / macOS)](#logout-with-universal-login-ios--macos)
-  + [Default Alert Box](#default-alert-box)
+  + [Web Auth Configuration (iOS / macOS)](#web-auth-configuration-ios--macos)
+  + [Web Auth Login (iOS / macOS)](#web-auth-login-ios--macos)
+  + [Web Auth Logout (iOS / macOS)](#web-auth-logout-ios--macos)
+  + [SSO Alert Box (iOS / macOS)](#sso-alert-box-ios--macos)
 - [Next Steps](#next-steps)
   + [Common Tasks](#common-tasks)
-  + [Web Auth Configuration (iOS / macOS)](#web-auth-configuration-ios--macos)
+  + [Web Auth Options (iOS / macOS)](#web-auth-options-ios--macos)
   + [Credentials Manager (iOS / macOS / tvOS / watchOS)](#credentials-manager-ios--macos--tvos--watchos)
   + [Authentication API (iOS / macOS / tvOS / watchOS)](#authentication-api-ios--macos--tvos--watchos)
   + [Management API (Users) (iOS / macOS / tvOS / watchOS)](#management-api-users-ios--macos--tvos--watchos)
   + [Logging](#logging)
 - [Other Features](#other-features)
-  + [Custom Domains](#custom-domains)
   + [Native Social Login](#native-social-login)
   + [Organizations](#organizations)
   + [Bot Detection](#bot-detection)
+  + [Custom Domains](#custom-domains)
 - [Support Policy](#support-policy)
 - [Issue Reporting](#issue-reporting)
 - [What is Auth0?](#what-is-auth0)
 - [License](#license)
-
-## Requirements
-
-- iOS 12+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+
-- Xcode 12.x / 13.x
-- Swift 5.3+
-
-> ⚠️ Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
 
 ## Documentation
 
@@ -59,24 +54,32 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
   + [Web Auth](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)
   + [Authentication API Client](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
-  + [Management API Client](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
+  + [Management API Client (Users)](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
 - [FAQ](FAQ.md)
+
+## Requirements
+
+- iOS 12+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+
+- Xcode 12.x / 13.x
+- Swift 5.3+
+
+> ⚠️ Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
 
 ## Installation
 
-### SPM
+### Swift Package Manager
 
-If you are using the Swift Package Manager, open the following menu item in Xcode:
+If you are using SPM, open the following menu item in Xcode:
 
 **File > Add Packages...**
 
-In the **Search or Enter Package URL** search box enter this url: 
+In the **Search or Enter Package URL** search box enter this URL: 
 
 ```text
 https://github.com/auth0/Auth0.swift.git
 ```
 
-Then select the **Exact Version** dependency rule, input `2.0.0-beta.0` as the version number and press **Add Package**.
+Then select the **Exact Version** dependency rule, input `2.0.0-beta.0` as the version number, and press **Add Package**.
 
 > For further reference on SPM, check [its official documentation](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app).
 
@@ -108,13 +111,13 @@ Then run `carthage bootstrap --use-xcframeworks`.
 
 ### Configuration
 
-In order to use Auth0 you need to set up Auth0.swift with your **Client ID** and **Domain**. For Web Auth, you'll also need to configure the Callback URLs in the Auth0 Dashboard.
+Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. These details can be found on the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/). If you are using a [Custom Domain](https://auth0.com/docs/custom-domains), use the value of your Custom Domain instead of the value from the settings page.
 
-> The Auth0 Client ID & Domain can be found in the [Dashboard](https://manage.auth0.com/#/applications/).
+> ⚠️ Make sure that the [application type](https://auth0.com/docs/configure/applications) of the Auth0 application is **Native**. If you don’t have a Native Auth0 application, [create one](https://auth0.com/docs/get-started/create-apps/native-apps) before continuing.
 
 #### Configure Client ID and Domain with a plist
 
-In your application bundle add a `plist` file named `Auth0.plist` with the following content:
+Create a `plist` file named `Auth0.plist` in your application bundle with the following content:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -131,27 +134,45 @@ In your application bundle add a `plist` file named `Auth0.plist` with the follo
 
 #### Configure Client ID and Domain programmatically
 
-For Web Auth:
+<details>
+  <summary>For Web Auth</summary>
 
 ```swift
 Auth0
     .webAuth(clientId: "YOUR_AUTH0_CLIENT_ID", domain: "YOUR_AUTH0_DOMAIN")
     // ...
 ```
+</details>
 
-For the Authentication API client:
+<details>
+  <summary>For the Authentication API client</summary>
 
 ```swift
 Auth0
     .authentication(clientId: "YOUR_AUTH0_CLIENT_ID", domain: "YOUR_AUTH0_DOMAIN")
     // ...
 ```
+</details>
 
-#### Configure Callback URLs (iOS / macOS)
+<details>
+  <summary>For the Management API client (Users)</summary>
 
-Callback URLs are the URLs that Auth0 invokes after the authentication process to redirect back to your app. Since callback URLs can be manipulated, you will need to add your callback URL to the **Allowed Callback URLs** field in the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/). This will enable Auth0 to recognize these URLs as valid. If omitted, the authentication will not be successful.
+```swift
+Auth0
+    .users(token: "ACCESS_TOKEN", domain: "YOUR_AUTH0_DOMAIN") // You only need the Domain
+    // ...
+```
+</details>
 
-In your application's `Info.plist` file, register your iOS / macOS Bundle Identifier as a custom URL scheme.
+### Web Auth Configuration (iOS / macOS)
+
+For Web Auth, you need to set up the callback and logout URLs in the settings page of your Auth0 application.
+
+#### Configure Callback URL
+
+The callback URL is the URL that Auth0 invokes **after the authentication process** to redirect back to your application. Since callback URLs can be manipulated, you will need to add your callback URL to the **Allowed Callback URLs** field in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback URL is not set, the authentication will fail.
+
+In your application's `Info.plist` file, register your iOS / macOS bundle identifier as a custom URL scheme.
 
 ```xml
 <key>CFBundleURLTypes</key>
@@ -169,28 +190,40 @@ In your application's `Info.plist` file, register your iOS / macOS Bundle Identi
 </array>
 ```
 
-> If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As / Source Code**.
+> If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As > Source Code**.
 
-Finally, go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and make sure that the **Allowed Callback URLs** field contains the following entry:
+Finally, go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add to the **Allowed Callback URLs** field the following entry:
 
 ```text
 YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
 ```
 
-E.g. If your bundle identifier was `com.company.myapp` and your Auth0 domain was `company.auth0.com`, then this value would be:
+E.g. if your bundle identifier was `com.company.myapp` and your Auth0 domain was `company.us.auth0.com`, then this value would be:
 
 ```text
-com.company.myapp://company.auth0.com/ios/com.company.myapp/callback
+com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 ```
 
-### Login with Universal Login (iOS / macOS)
+#### Configure Logout URL
 
-1. Import **Auth0** into your project.        
+The callback URL is the URL that Auth0 invokes **after removing the session cookie** to redirect back to your application. If the logout URL is not set, the logout will fail.
+
+Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and copy the **Allowed Callback URLs** value you added for authentication into the **Allowed Logout URLs** field.
+
+```text
+YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
+```
+
+### Web Auth Login (iOS / macOS)
+
+1. Import the `Auth0` module in the file where you want to present the login page.
+
 ```swift
 import Auth0
 ```
 
-2. Present the Universal Login page in the action of your **Login** button.
+2. Present the [Universal Login](https://auth0.com/docs/login/universal-login) page in the action of your **Login** button.
+
 ```swift
 Auth0
     .webAuth()
@@ -237,13 +270,9 @@ do {
 ```
 </details>
 
-### Logout with Universal Login (iOS / macOS)
+### Web Auth Logout (iOS / macOS)
 
-Web Auth logout involves clearing the Universal Login session cookie and then redirecting back to your app. For this redirection to happen, you must copy the **Allowed Callback URLs** value you added for authentication into the **Allowed Logout URLs** field in your [Auth0 application](https://manage.auth0.com/#/applications/) settings.
-
-```text
-YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
-```
+Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your application. 
 
 To clear the session cookie, call the `clearSession()` method in the action of your **Logout** button.
 
@@ -294,11 +323,13 @@ do {
 ```
 </details>
 
-### Default Alert Box
+Once the session cookie has been cleared, delete the user's credentials from your application.
+
+### SSO Alert Box (iOS / macOS)
 
 ![sso-alert](./sso-alert.png)
 
-Check the [FAQ](FAQ.md) for more information about the alert box that pops up by default when using Web Auth.
+Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
 [Go up ⤴](#table-of-contents)
 
@@ -306,7 +337,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up by
 
 ### Common Tasks
 
-#### Signup with Universal Login (iOS / macOS)
+#### Web Auth Signup (iOS / macOS)
 
 You can make users land directly on the Signup page instead of the Login page by specifying the `"screen_hint": "signup"` parameter when performing Web Authentication. Note that this can be combined with `"prompt": "login"`, which indicates whether you want to always show the authentication page or you want to skip if there's an existing session.
 
@@ -423,7 +454,7 @@ do {
 ```
 </details>
 
-### Web Auth Configuration (iOS / macOS)
+### Web Auth Options (iOS / macOS)
 
 The following are some of the available Web Auth configuration options. Check the [API documentation](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html) for the complete list.
 
@@ -451,7 +482,7 @@ Auth0
 
 #### Add a scope value
 
-Specify a [scope](https://auth0.com/docs/configure/apis/scopes) to request permission to access protected resources. The default scope used is `openid profile email`. Regardless of the scope value configured, `openid` is always included.
+Specify a [scope](https://auth0.com/docs/configure/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email`. Regardless of the scope value configured, `openid` is always included.
 
 ```swift
 Auth0
@@ -605,7 +636,7 @@ You can enable an additional level of user authentication before retrieving cred
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
-If needed, you are able to specify specific `LAPolicy` to be used - e.g. you might want to support FaceID, but allow fallback to passcode.
+If needed, you can use a specific `LAPolicy` - e.g. you might want to support FaceID, but allow fallback to passcode.
 
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login", 
@@ -619,9 +650,9 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
 [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
 
 The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
-We recommend using [Universal Login](https://auth0.com/docs/login/universal-login) but if you wish to build your own UI, you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your [Auth0 Dashboard](https://manage.auth0.com/#/applications/) as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
+We recommend using [Universal Login](https://auth0.com/docs/login/universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your [Auth0 Dashboard](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
 
-For login or signup with username/password, the `Password` Grant Type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `password`, otherwise the Auth0 Dashboard will take care of activating both when `Password` is enabled.
+For login or signup with username/password, the `Password` Grant Type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`, otherwise the Auth0 Dashboard will take care of activating both when `Password` is enabled.
 
 #### Login with database connection
 
@@ -991,7 +1022,7 @@ Auth0
 
 You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2). For security reasons native mobile applications are restricted to a subset of the Management API functionality.
 
-You can find a detailed guide in this [iOS Swift QuickStart](https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata).
+You can find a detailed guide in this [Quickstart](https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata).
 
 #### Retrieve user metadata
 
@@ -1212,27 +1243,6 @@ Connection: keep-alive
 
 ## Other Features
 
-### Custom Domains
-
-If you are using [Custom Domains](https://auth0.com/docs/brand-and-customize/custom-domains) and need to call an Auth0 endpoint
-such as `/userinfo`, please use the Auth0 domain specified for your Application in the [Auth0 Dashboard](https://manage.auth0.com/#/applications/).
-
-```swift
-Auth0
-    .webAuth()
-    .audience("https://YOUR_AUTH0_DOMAIN/userinfo")
-    // ...
-```
-
-Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 domain before starting the authentication. Otherwise, the ID Token validation will fail.
-
-```swift
-Auth0
-    .webAuth()
-    .issuer("https://YOUR_AUTH0_DOMAIN/")
-    // ...
-```
-
 ### Native Social Login
 
 #### Sign in With Apple
@@ -1442,7 +1452,7 @@ NotificationCenter
 
 ### Bot Detection
 
-If you are using the [Bot Detection](https://auth0.com/docs/configure/attack-protection/bot-detection) feature and performing database login/signup via the Authentication API, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Universal Login to complete it.
+If you are using the [Bot Detection](https://auth0.com/docs/configure/attack-protection/bot-detection) feature and performing database login/signup via the Authentication API, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.
 
 ```swift
 Auth0
@@ -1482,7 +1492,18 @@ Auth0
     // ...
 ```
 
-Check how to set up Universal Login in the [Getting Started](#getting-started) section.
+Check how to set up Web Auth in the [Web Auth Configuratikon](#web-auth-configuration-ios--macos) section.
+
+### Custom Domains
+
+Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 domain before performing Web Auth login. Otherwise, the ID Token validation will fail.
+
+```swift
+Auth0
+    .webAuth()
+    .issuer("https://YOUR_AUTH0_DOMAIN/")
+    // ...
+```
 
 ## Support Policy
 
@@ -1514,7 +1535,9 @@ In the case of macOS, the yearly named releases are considered a major platform 
 
 ## Issue Reporting
 
-If you have found a bug or to request a feature, please [raise an issue](https://github.com/auth0/Auth0.swift/issues). Do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy) details the procedure for disclosing security issues.
+For general support or usage questions, use the [Auth0 Community](https://community.auth0.com/tags/c/sdks/5/swift) forums or raise a [support ticket](https://support.auth0.com/). Only [raise an issue](https://github.com/auth0/Auth0.swift/issues) if you have found a bug or want to request a feature.
+
+**Do not report security vulnerabilities on the public GitHub issue tracker.** The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy) details the procedure for disclosing security issues.
 
 ## What is Auth0?
 
@@ -1532,5 +1555,7 @@ Auth0 helps you to:
 ## License
 
 This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
+
+---
 
 [Go up ⤴](#table-of-contents)
