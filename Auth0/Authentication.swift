@@ -246,24 +246,24 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     If you need to specify a scope:
+     You can also specify audience and scope:
 
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .login(appleAuthorizationCode: authCode,
                 fullName: credentials.fullName,
-                scope: "openid profile email offline_access",
-                audience: "https://myapi.com/api")
+                audience: "https://myapi.com/api"
+                scope: "openid profile email offline_access")
          .start { print($0) }
      ```
 
      - Parameters:
-       - authCode: Authorization Code retrieved from Apple Authorization.
-       - fullName: The full name property returned with the Apple ID Credentials.
-       - profile:  Additional user profile data returned with the Apple ID Credentials.
-       - scope:    Requested scope value when authenticating the user. By default is `openid profile email`.
-       - audience: API Identifier that the client is requesting access to.
+       - authorizationCode: Authorization Code retrieved from Apple Authorization.
+       - fullName:          The full name property returned with the Apple ID Credentials.
+       - profile:           Additional user profile data returned with the Apple ID Credentials.
+       - audience:          API Identifier that the client is requesting access to.   
+       - scope:             Requested scope value when authenticating the user. By default is `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
      */
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
@@ -285,22 +285,22 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     If you need to specify a scope or audience:
+     You can also specify audience and scope:
 
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .login(facebookSessionAccessToken: sessionAccessToken,
-                scope: "openid profile email offline_access",
-                audience: "https://myapi.com/api")
+                audience: "https://myapi.com/api"
+                scope: "openid profile email offline_access")
          .start { print($0) }
      ```
 
      - Parameters:
        - sessionAccessToken: Session info Access Token retrieved from Facebook.
        - profile:            The user profile returned by Facebook.
-       - scope:              Requested scope value when authenticating the user. By default is `openid profile email`.
        - audience:           API Identifier that the client is requesting access to.
+       - scope:              Requested scope value when authenticating the user. By default is `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
      */
     func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
@@ -442,7 +442,7 @@ public protocol Authentication: Trackable, Loggable {
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
-    func startPasswordless(email: String, type: PasswordlessType, connection: String, parameters: [String: Any]) -> Request<Void, AuthenticationError>
+    func startPasswordless(email: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
     /**
      Starts passwordless authentication by sending an sms with an OTP code.
@@ -631,12 +631,8 @@ public extension Authentication {
         return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
     }
 
-    func signup(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
-        return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: nil)
-    }
-
-    func startPasswordless(email: String, type: PasswordlessType = .code, connection: String = "email", parameters: [String: Any] = [:]) -> Request<Void, AuthenticationError> {
-        return self.startPasswordless(email: email, type: type, connection: connection, parameters: parameters)
+    func startPasswordless(email: String, type: PasswordlessType = .code, connection: String = "email") -> Request<Void, AuthenticationError> {
+        return self.startPasswordless(email: email, type: type, connection: connection)
     }
 
     func startPasswordless(phoneNumber: String, type: PasswordlessType = .code, connection: String = "sms") -> Request<Void, AuthenticationError> {
