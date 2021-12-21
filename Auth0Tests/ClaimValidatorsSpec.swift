@@ -394,7 +394,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                 authTimeValidator = IDTokenAuthTimeValidator(baseTime: currentTime, leeway: leeway, maxAge: maxAge)
             }
 
-            context("succeeds") {
+            context("succeeds by returning nil") {
                 it("if token's life is less than the specified max age") {
                     let max: Int = .max
 
@@ -402,15 +402,6 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     authTimeValidator = IDTokenAuthTimeValidator(baseTime: currentTime, leeway: leeway, maxAge: max)
 
                     expect(authTimeValidator.validate(jwt)).to(beNil())
-                }
-
-                it("should return an error if max age is present and auth time was not requested") {
-                    let jwt = generateJWT(maxAge: maxAge, authTime: nil)
-                    let expectedError = IDTokenAuthTimeValidator.ValidationError.missingAuthTime
-                    let result = authTimeValidator.validate(jwt)
-
-                    expect(result).to(matchError(expectedError))
-                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
                 }
 
                 it("if last auth time + max age + leeway is exactly the expiration time") {
@@ -425,7 +416,15 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                 }
             }
 
-            context("fails") {
+            context("fails by returning an error") {
+                it("if max age is present and auth time was not requested") {
+                    let jwt = generateJWT(maxAge: maxAge, authTime: nil)
+                    let expectedError = IDTokenAuthTimeValidator.ValidationError.missingAuthTime
+                    let result = authTimeValidator.validate(jwt)
+
+                    expect(result).to(matchError(expectedError))
+                    expect(result?.errorDescription).to(equal(expectedError.errorDescription))
+                }
 
                 it("if last auth time has outlived the max age and leeway") {
                     let expectedAuthTime = currentTime
