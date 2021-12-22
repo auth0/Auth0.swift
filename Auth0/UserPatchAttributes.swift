@@ -1,7 +1,7 @@
 import Foundation
 
 /// Attributes of the user allowed to update using `patch()` method of ``Users``.
-public class UserPatchAttributes {
+final public class UserPatchAttributes {
 
     private(set) var dictionary: [String: Any]
 

@@ -254,9 +254,10 @@ The `a0_url(_:)` method is no longer public.
 
 ## Types changed
 
-- `UserInfo` was changed from class to struct.
-- `Credentials` is now a `final` class that conforms to `Codable` instead of `JSONObjectPayload`.
 - `Auth0Error` was renamed to `Auth0APIError`, and `Auth0Error` is now a different protocol.
+- `Credentials` is now a `final` class that conforms to `Codable` instead of `JSONObjectPayload`.
+- `UserPatchAttributes` is now a `final` class.
+- `UserInfo` was changed from class to struct.
 - `AuthenticationError` was changed from class to struct, and it no longer conforms to `CustomNSError`.
 - `ManagementError` was changed from class to struct, and it no longer conforms to `CustomNSError`.
 - `WebAuthError` was changed from enum to struct.
