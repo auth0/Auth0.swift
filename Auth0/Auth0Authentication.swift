@@ -16,12 +16,12 @@ struct Auth0Authentication: Authentication {
         self.telemetry = telemetry
     }
 
-    func login(email username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
-        return login(username: username, otp: otp, realm: "email", audience: audience, scope: scope)
+    func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+        return login(username: email, otp: code, realm: "email", audience: audience, scope: scope)
     }
 
-    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
-        return login(username: username, otp: otp, realm: "sms", audience: audience, scope: scope)
+    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+        return login(username: phoneNumber, otp: code, realm: "sms", audience: audience, scope: scope)
     }
 
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {

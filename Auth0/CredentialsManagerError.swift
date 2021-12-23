@@ -51,7 +51,7 @@ public struct CredentialsManagerError: Auth0Error {
 
     /// No credentials were found in the store. This error does not include a ``cause``.
     public static let noCredentials: CredentialsManagerError = .init(code: .noCredentials)
-    /// The  stored``Credentials`` instance does not contain a Refresh Token. This error does not include a ``cause``.
+    /// The stored ``Credentials`` instance does not contain a Refresh Token. This error does not include a ``cause``.
     public static let noRefreshToken: CredentialsManagerError = .init(code: .noRefreshToken)
     /// The credentials renewal failed. The underlying ``AuthenticationError`` can be accessed via the ``cause`` property.
     public static let renewFailed: CredentialsManagerError = .init(code: .renewFailed)
