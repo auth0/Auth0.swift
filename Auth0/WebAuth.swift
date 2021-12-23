@@ -198,7 +198,6 @@ public protocol WebAuth: Trackable, Loggable {
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider (IdP) session.
-     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You need to make sure that the **Callback URL** has been added to the
      **Allowed Logout URLs** field of your Auth0 application settings in the
@@ -227,12 +226,12 @@ public protocol WebAuth: Trackable, Loggable {
      - Parameters:
        - federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
        - callback: Callback called with the result of the call.
+     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
      */
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider (IdP) session.
-     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You need to make sure that the **Callback URL** has been added to the
      **Allowed Logout URLs** field of your Auth0 application settings in the
@@ -266,6 +265,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - Parameter federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
      - Returns: A type-erased publisher.
+     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError>
@@ -273,7 +273,6 @@ public protocol WebAuth: Trackable, Loggable {
     #if compiler(>=5.5) && canImport(_Concurrency)
     /**
      Removes Auth0 session and optionally remove the Identity Provider (IdP) session.
-     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
 
      You need to make sure that the **Callback URL** has been added to the
      **Allowed Logout URLs** field of your Auth0 application settings in the
@@ -299,6 +298,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      - Parameter federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
+     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
      */
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)

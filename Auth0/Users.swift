@@ -142,8 +142,8 @@ public protocol Users: Trackable, Loggable {
      ```
 
      - Parameters:
-       - identifier:         ID of the primary user who will be linked against a secondary one.
-       - withOtherUserToken: Token of the secondary user to link to.
+       - identifier: ID of the primary user who will be linked against a secondary one.
+       - token:      Token of the secondary user to link to.
      - Returns: A request to link two users.
      - Note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/post_identities).
      - See: [Link Accounts Guide](https://auth0.com/docs/users/user-account-linking).
@@ -163,7 +163,7 @@ public protocol Users: Trackable, Loggable {
 
      - Parameters:
        - identifier:   ID of the primary user who will be linked against a secondary one.
-       - withUser:     ID of the secondary user who will be linked.
+       - userId:       ID of the secondary user who will be linked.
        - provider:     Name of the provider of the secondary user, e.g. 'auth0' for Database connections.
        - connectionId: ID of the connection of the secondary user.
      - Returns: A request to link two users.
@@ -186,7 +186,7 @@ public protocol Users: Trackable, Loggable {
      - Parameters:
        - identityId: Identifier of the identity to remove.
        - provider:   Name of the provider of the identity.
-       - fromUserId: ID of the user who owns the identity.
+       - identifier: ID of the user who owns the identity.
      - Returns: A request to remove an identity.
      - Note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id).
      - See: [Link Accounts Guide](https://auth0.com/docs/users/user-account-linking).

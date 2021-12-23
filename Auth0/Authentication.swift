@@ -58,7 +58,7 @@ public protocol Authentication: Trackable, Loggable {
      - Returns: Authentication request that will yield Auth0 user's credentials.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
-    func login(email username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs in a user using a phone number and an OTP code received via sms (last part of the passwordless login flow).
@@ -99,7 +99,7 @@ public protocol Authentication: Trackable, Loggable {
      - Returns: Authentication request that will yield Auth0 user's credentials.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
-    func login(phoneNumber username: String, code otp: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Login using username and password with a realm or connection.
@@ -595,12 +595,12 @@ public protocol Authentication: Trackable, Loggable {
 
 public extension Authentication {
 
-    func login(email username: String, code otp: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(email: username, code: otp, audience: audience, scope: scope)
+    func login(email: String, code: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+        return self.login(email: email, code: code, audience: audience, scope: scope)
     }
 
-    func login(phoneNumber username: String, code otp: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(phoneNumber: username, code: otp, audience: audience, scope: scope)
+    func login(phoneNumber: String, code: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+        return self.login(phoneNumber: phoneNumber, code: code, audience: audience, scope: scope)
     }
 
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
