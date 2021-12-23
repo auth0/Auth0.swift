@@ -79,7 +79,7 @@ In the **Search or Enter Package URL** search box enter this URL:
 https://github.com/auth0/Auth0.swift.git
 ```
 
-Then select the **Exact Version** dependency rule, input `2.0.0-beta.0` as the version number, and press **Add Package**.
+Then, select the **Exact Version** dependency rule and input `2.0.0-beta.0` as the version number. Press **Add Package**.
 
 > For further reference on SPM, check [its official documentation](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app).
 
@@ -91,9 +91,9 @@ If you are using [Cocoapods](https://cocoapods.org), add this line to your `Podf
 pod 'Auth0', '2.0.0-beta.0'
 ```
 
-Then run `pod install`.
+Then, run `pod install`.
 
-> For more information on Cocoapods, check [their official documentation](https://guides.cocoapods.org/using/getting-started.html).
+> For further reference on Cocoapods, check [their official documentation](https://guides.cocoapods.org/using/getting-started.html).
 
 ### Carthage
 
@@ -103,9 +103,9 @@ If you are using [Carthage](https://github.com/Carthage/Carthage), add the follo
 github "auth0/Auth0.swift" "2.0.0-beta.0"
 ```
 
-Then run `carthage bootstrap --use-xcframeworks`.
+Then, run `carthage bootstrap --use-xcframeworks`.
 
-> For more information about Carthage usage, check [their official documentation](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos).
+> For further reference on Carthage, check [their official documentation](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos).
 
 ## Getting Started
 
@@ -192,13 +192,21 @@ In your application's `Info.plist` file, register your iOS / macOS bundle identi
 
 > If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As > Source Code**.
 
-Finally, go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add to the **Allowed Callback URLs** field the following entry:
+Finally, go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL for your application to the **Allowed Callback URLs** field.
+
+##### iOS
 
 ```text
 YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
 ```
 
-E.g. if your bundle identifier was `com.company.myapp` and your Auth0 domain was `company.us.auth0.com`, then this value would be:
+##### macOS
+
+```text
+YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/macos/YOUR_BUNDLE_IDENTIFIER/callback
+```
+
+E.g. if your iOS bundle identifier was `com.company.myapp` and your Auth0 Domain was `company.us.auth0.com`, then this value would be:
 
 ```text
 com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
@@ -208,11 +216,7 @@ com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 
 The callback URL is the URL that Auth0 invokes **after removing the session cookie** to redirect back to your application. If the logout URL is not set, the logout will fail.
 
-Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and copy the **Allowed Callback URLs** value you added for authentication into the **Allowed Logout URLs** field.
-
-```text
-YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
-```
+Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and copy the **Allowed Callback URLs** value you just added for authentication into the **Allowed Logout URLs** field.
 
 ### Web Auth Login (iOS / macOS)
 
@@ -399,6 +403,59 @@ do {
 ```
 </details>
 
+#### Retrieve user information (iOS / macOS / tvOS / watchOS)
+
+Fetch the latest user information from the `/userinfo` endpoint.
+
+```swift
+Auth0
+   .authentication()
+   .userInfo(withAccessToken: accessToken)
+   .start { result in
+       switch result {
+       case .success(let user):
+           print("User: \(user)")
+       case .failure(let error):
+           print("Failed with \(error)")
+       }
+   }
+```
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .userInfo(withAccessToken: accessToken)
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with \(error)")
+        }
+    }, receiveValue: { user in
+        print("User: \(user)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .authentication()
+        .userInfo(withAccessToken: accessToken)
+        .start()
+    print("User: \(user)")
+} catch {
+    print("Failed with \(error)")
+}
+```
+</details>
+
 #### Renew credentials (iOS / macOS / tvOS / watchOS)
 
 Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
@@ -513,10 +570,21 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 
 #### Store Credentials
 
-Store user credentials securely in the Keychain.
+When your users log in, store their credentials securely in the Keychain. You can then log them in automatically when they open your application again.
 
 ```swift
 credentialsManager.store(credentials: credentials)
+```
+
+### Check for valid credentials
+
+When the users open your application, check for valid credentials. If they exist, you can retrieve them and redirect the users to the app's main flow without any additional login steps.
+
+```swift
+guard credentialsManager.hasValid() else {
+    // No valid credentials exist, present the login page
+}
+// Retrieve stored credentials
 ```
 
 #### Retrieve stored credentials 
@@ -566,7 +634,17 @@ do {
 ```
 </details>
 
-#### Clear credentials and revoke Refresh Tokens
+#### Retrieve stored user information
+
+The stored [ID Token](https://auth0.com/docs/security/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.
+
+```swift
+let user = credentialsManager.user
+```
+
+> To get the latest user information, use the `userInfo(withAccessToken:)` method of the Authentication API client.
+
+#### Clear credentials and revoke the Refresh Token
 
 Credentials can be cleared from the Keychain by using the `clear()` method.
 
@@ -617,16 +695,6 @@ do {
 }
 ```
 </details>
-
-#### Retrieve the stored user information
-
-The stored [ID Token](https://auth0.com/docs/security/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials are expired.
-
-```swift
-let user = credentialsManager.user
-```
-
-> To get the latest user information, use the `userInfo(withAccessToken:)` method of the Authentication API client.
 
 #### Biometric authentication
 
@@ -1298,7 +1366,7 @@ do {
 ```
 </details>
 
-Find out more about [Setting up Sign in with Apple](https://auth0.com/docs/connections/social/apple-native) with Auth0.
+> Check the [Setting up Sign In with Apple](https://auth0.com/docs/connections/social/apple-native) guide for more information about integrating Sign In with Apple with Auth0.
 
 #### Facebook Login
 
@@ -1353,7 +1421,7 @@ do {
 ```
 </details>
 
-Find out more about [Setting up Facebook Login](https://auth0.com/docs/connections/social/facebook-native) with Auth0.
+> Check the [Setting up Facebook Login](https://auth0.com/docs/connections/social/facebook-native) guide for more information about integrating Facebook Login with Auth0.
 
 ### Organizations
 
@@ -1367,7 +1435,7 @@ Using Organizations, you can:
 - Implement role-based access control, such that users can have different roles when authenticating in the context of different organizations.
 - Build administration capabilities into your products, using Organizations APIs, so that those businesses can manage their own organizations.
 
-Note that Organizations is currently only available to customers on our Enterprise and Startup subscription plans.
+> Organizations is currently only available to customers on our Enterprise and Startup subscription plans.
 
 #### Log in to an organization
 
@@ -1492,11 +1560,11 @@ Auth0
     // ...
 ```
 
-Check how to set up Web Auth in the [Web Auth Configuratikon](#web-auth-configuration-ios--macos) section.
+Check how to set up Web Auth in the [Web Auth Configuration](#web-auth-configuration-ios--macos) section.
 
 ### Custom Domains
 
-Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 domain before performing Web Auth login. Otherwise, the ID Token validation will fail.
+Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 Domain before performing Web Auth login. Otherwise, the ID Token validation will fail.
 
 ```swift
 Auth0

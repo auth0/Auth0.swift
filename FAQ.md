@@ -19,7 +19,7 @@ If you don't need SSO, you can disable this behavior by adding `useEphemeralSess
 ```swift
 Auth0
     .webAuth()
-    .useEphemeralSession() // no alert box, and no SSO
+    .useEphemeralSession() // No alert box, and no SSO
     .start { result in
         // ...
     }
@@ -39,7 +39,7 @@ If you need SSO and/or are willing to tolerate the alert box on the login call, 
 Auth0
     .webAuth()
     .useEphemeralSession()
-    .parameters(["prompt": "login"]) // force the login page, having cookie or not
+    .parameters(["prompt": "login"]) // Force the login page, having cookie or not
     .start { result in
         // ...
     }
