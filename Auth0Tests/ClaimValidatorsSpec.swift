@@ -404,7 +404,7 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
                     expect(authTimeValidator.validate(jwt)).to(beNil())
                 }
 
-                it("if last auth time + max age + leeway is exactly the expiration time") {
+                it("if last auth time is exactly the expiration time") {
                     let expectedAuthTime = currentTime
 
                     let jwt = generateJWT(maxAge: 0, authTime: expectedAuthTime)
