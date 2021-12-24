@@ -236,7 +236,7 @@ Auth0
         case .success(let credentials):
             print("Obtained credentials: \(credentials)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -250,7 +250,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained credentials: \(credentials)")
@@ -269,7 +269,7 @@ do {
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -288,7 +288,7 @@ Auth0
         case .success:
             print("Logged out")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -305,7 +305,7 @@ Auth0
         case .finished:
             print("Logged out")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: {})
     .store(in: &cancellables)
@@ -322,7 +322,7 @@ do {
         .clearSession()
     print("Logged out")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -361,7 +361,7 @@ Auth0
         case .success(let credentials):
             print("Obtained credentials: \(credentials)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -378,7 +378,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained credentials: \(credentials)")
@@ -398,7 +398,7 @@ do {
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -418,7 +418,7 @@ Auth0
        case .success(let user):
            print("User: \(user)")
        case .failure(let error):
-           print("Failed with \(error)")
+           print("Failed with: \(error)")
        }
    }
 ```
@@ -433,7 +433,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { user in
         print("User: \(user)")
@@ -453,7 +453,7 @@ do {
         .start()
     print("User: \(user)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -473,7 +473,7 @@ Auth0
         case .success(let credentials):
             print("Obtained new credentials: \(credentials)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -488,7 +488,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained new credentials: \(credentials)")
@@ -508,7 +508,7 @@ do {
         .start()
     print("Obtained new credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -623,7 +623,7 @@ credentialsManager.credentials { result in
     case .success(let credentials):
         print("Obtained credentials: \(credentials)")
     case .failure(let error):
-        print("Failed with \(error)") 
+        print("Failed with: \(error)") 
     }
 }
 ```
@@ -636,7 +636,7 @@ credentialsManager
     .credentials()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained credentials: \(credentials)")
@@ -653,7 +653,7 @@ do {
     let credentials = try await credentialsManager.credentials()
     print("Obtained credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -684,7 +684,7 @@ credentialsManager.revoke { result in
     case .success:
         print("Success")
     case .failure(let error):
-        print("Failed with \(error)") 
+        print("Failed with: \(error)") 
     }
 }
 ```
@@ -700,7 +700,7 @@ credentialsManager
         case .finished:
             print("Success")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: {})
     .store(in: &cancellables)
@@ -715,7 +715,7 @@ do {
     try await credentialsManager.revoke()
     print("Success")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -750,7 +750,7 @@ We recommend using [Universal Login](https://auth0.com/docs/login/universal-logi
 
 For login or signup with username/password, the `Password` Grant Type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`, otherwise the Auth0 Dashboard will take care of activating both when `Password` is enabled.
 
-> 💡 If your Auth0 account has the "Bot Detection" feature enabled, your requests might be flagged for verification. Read how to handle this scenario on the [Bot Detection](#bot-detection) section.
+> 💡 If your Auth0 account has the "Bot Detection" feature enabled, your requests might be flagged for verification. Check how to handle this scenario on the [Bot Detection](#bot-detection) section.
 
 > ⚠️ The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID Tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) any ID Tokens received from the Authentication API client before using the information they contain.
 
@@ -768,7 +768,7 @@ Auth0
         case .success(let credentials):
             print("Obtained credentials: \(credentials)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -788,7 +788,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained credentials: \(credentials)")
@@ -811,7 +811,7 @@ do {
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -830,7 +830,7 @@ Auth0
         case .success(let user):
             print("User signed up: \(user)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -848,7 +848,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { user in
         print("User signed up: \(user)")
@@ -871,7 +871,7 @@ do {
         .start()
     print("User signed up: \(user)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -894,7 +894,7 @@ Auth0
         case .success:
             print("Code sent")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -912,7 +912,7 @@ Auth0
         case .finished:
             print("Code sent")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: {})
     .store(in: &cancellables)
@@ -930,7 +930,7 @@ do {
         .start()
     print("Code sent")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -946,7 +946,7 @@ Auth0
         case .success:
             print("Code sent")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -964,7 +964,7 @@ Auth0
         case .finished:
             print("Code sent")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: {})
     .store(in: &cancellables)
@@ -982,7 +982,7 @@ do {
         .start()
     print("Code sent")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -1001,7 +1001,7 @@ Auth0
         case .success(let credentials):
             print("Obtained credentials: \(credentials)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -1016,7 +1016,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained credentials: \(credentials)")
@@ -1036,7 +1036,7 @@ do {
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -1052,7 +1052,7 @@ Auth0
         case .success(let credentials):
             print("Obtained credentials: \(credentials)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -1067,7 +1067,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained credentials: \(credentials)")
@@ -1087,7 +1087,7 @@ do {
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -1151,7 +1151,7 @@ Auth0
         case .success(let user):
             print("User with metadata: \(user)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -1166,7 +1166,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { user in
         print("User with metadata: \(user)")
@@ -1186,7 +1186,7 @@ do {
         .start()
     print("User with metadata: \(user)") 
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -1202,7 +1202,7 @@ Auth0
         case .success(let user):
             print("Updated user: \(user)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -1217,7 +1217,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { user in
         print("Updated user: \(user)") 
@@ -1237,7 +1237,7 @@ do {
         .start()
     print("Updated user: \(user)") 
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -1253,7 +1253,7 @@ Auth0
         case .success:
             print("Accounts linked")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -1271,7 +1271,7 @@ Auth0
         case .finished:
             print("Accounts linked")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { _ in })
     .store(in: &cancellables)
@@ -1289,7 +1289,7 @@ do {
         .start()
     print("Accounts linked")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -1388,7 +1388,7 @@ Auth0
         case .success(let credentials):
             print("Obtained credentials: \(credentials)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -1403,7 +1403,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained credentials: \(credentials)")
@@ -1423,7 +1423,7 @@ do {
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -1443,7 +1443,7 @@ Auth0
         case .success(let credentials):
             print("Obtained credentials: \(credentials)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -1458,7 +1458,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained credentials: \(credentials)")
@@ -1478,7 +1478,7 @@ do {
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -1509,7 +1509,7 @@ Auth0.webAuth()
         case .success(let credentials):
             print("Obtained credentials: \(credentials)")
         case .failure(let error):
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }
 ```
@@ -1524,7 +1524,7 @@ Auth0
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with \(error)")
+            print("Failed with: \(error)")
         }
     }, receiveValue: { credentials in
         print("Obtained credentials: \(credentials)")
@@ -1544,7 +1544,7 @@ do {
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
-    print("Failed with \(error)")
+    print("Failed with: \(error)")
 }
 ```
 </details>
@@ -1573,7 +1573,7 @@ NotificationCenter
                 case .success(let credentials):
                     print("Obtained credentials: \(credentials)")
                 case .failure(let error):
-                    print("Failed with \(error)")
+                    print("Failed with: \(error)")
                 }
             }
     }
