@@ -31,7 +31,7 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
   + [SSO Alert Box (iOS / macOS)](#sso-alert-box-ios--macos)
 - [Next Steps](#next-steps)
   + [Common Tasks](#common-tasks)
-  + [Web Auth Options (iOS / macOS)](#web-auth-options-ios--macos)
+  + [Web Auth (iOS / macOS)](#web-auth-ios--macos)
   + [Credentials Manager (iOS / macOS / tvOS / watchOS)](#credentials-manager-ios--macos--tvos--watchos)
   + [Authentication API (iOS / macOS / tvOS / watchOS)](#authentication-api-ios--macos--tvos--watchos)
   + [Management API (Users) (iOS / macOS / tvOS / watchOS)](#management-api-users-ios--macos--tvos--watchos)
@@ -49,7 +49,7 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
 ## Documentation
 
 - [Quickstarts](https://auth0.com/docs/quickstart/native/ios-swift)
-- [Sample app](https://github.com/auth0-samples/auth0-ios-swift-sample)
+- [Sample app](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/beta/Sample-01)
 - [API Documentation](https://auth0.github.io/Auth0.swift/)
   + [Web Auth](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)
@@ -81,7 +81,7 @@ https://github.com/auth0/Auth0.swift.git
 
 Then, select the **Exact Version** dependency rule and input `2.0.0-beta.0` as the version number. Press **Add Package**.
 
-> For further reference on SPM, check [its official documentation](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app).
+> 💡 For further reference on SPM, check its [official documentation](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app).
 
 ### Cocoapods
 
@@ -93,7 +93,7 @@ pod 'Auth0', '2.0.0-beta.0'
 
 Then, run `pod install`.
 
-> For further reference on Cocoapods, check [their official documentation](https://guides.cocoapods.org/using/getting-started.html).
+> 💡 For further reference on Cocoapods, check their [official documentation](https://guides.cocoapods.org/using/getting-started.html).
 
 ### Carthage
 
@@ -105,7 +105,7 @@ github "auth0/Auth0.swift" "2.0.0-beta.0"
 
 Then, run `carthage bootstrap --use-xcframeworks`.
 
-> For further reference on Carthage, check [their official documentation](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos).
+> 💡 For further reference on Carthage, check their [official documentation](https://github.com/Carthage/Carthage#getting-started).
 
 ## Getting Started
 
@@ -190,7 +190,7 @@ In your application's `Info.plist` file, register your iOS / macOS bundle identi
 </array>
 ```
 
-> If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As > Source Code**.
+> 💡 If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As > Source Code**.
 
 Finally, go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL for your application to the **Allowed Callback URLs** field.
 
@@ -407,10 +407,12 @@ do {
 
 Fetch the latest user information from the `/userinfo` endpoint.
 
+This method will yield a `UserInfo` instance. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/UserInfo.html) to learn more about the available properties.
+
 ```swift
 Auth0
    .authentication()
-   .userInfo(withAccessToken: accessToken)
+   .userInfo(withAccessToken: credentials.accessToken)
    .start { result in
        switch result {
        case .success(let user):
@@ -427,7 +429,7 @@ Auth0
 ```swift
 Auth0
     .authentication()
-    .userInfo(withAccessToken: accessToken)
+    .userInfo(withAccessToken: credentials.accessToken)
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -447,7 +449,7 @@ Auth0
 do {
     let user = try await Auth0
         .authentication()
-        .userInfo(withAccessToken: accessToken)
+        .userInfo(withAccessToken: credentials.accessToken)
         .start()
     print("User: \(user)")
 } catch {
@@ -460,7 +462,7 @@ do {
 
 Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
 
-> You need the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) to get a Refresh Token from Auth0.
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
 
 ```swift
 Auth0
@@ -511,13 +513,15 @@ do {
 ```
 </details>
 
-### Web Auth Options (iOS / macOS)
+### Web Auth (iOS / macOS)
 
-The following are some of the available Web Auth configuration options. Check the [API documentation](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html) for the complete list.
+#### Configuration options
 
-#### Use any Auth0 connection
+The following are some of the available Web Auth configuration options. Check the [API documentation](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html) for the full list.
 
-Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the Universal Login page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
+##### Use any Auth0 connection
+
+Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the [Universal Login](https://auth0.com/docs/login/universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
 
 ```swift
 Auth0
@@ -526,7 +530,7 @@ Auth0
     // ...
 ```
 
-#### Add an audience value
+##### Add an audience value
 
 Specify an audience to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/configure/apis).
 
@@ -537,7 +541,7 @@ Auth0
     // ...
 ```
 
-#### Add a scope value
+##### Add a scope value
 
 Specify a [scope](https://auth0.com/docs/configure/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email`. Regardless of the scope value configured, `openid` is always included.
 
@@ -557,6 +561,26 @@ Auth0
     .connectionScope("user_friends email")
     // ...
 ```
+
+##### Use a custom `URLSession` instance
+
+You can specify a custom `URLSession` instance for more advanced networking configuration.
+
+```swift
+Auth0
+    .webAuth(session: CustomURLSession())
+    // ...
+```
+
+Note that this custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/login/universal-login) page.
+
+#### ID Token validation
+
+Auth0.swift automatically [validates](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) the ID Token obtained from Web Auth login, following the [Opend ID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID Token have not been tampered with and can be safely used.
+
+#### Errors
+
+Web Auth will only yield `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
 ### Credentials Manager (iOS / macOS / tvOS / watchOS)
 
@@ -591,7 +615,7 @@ guard credentialsManager.hasValid() else {
 
 Credentials will automatically be renewed (if expired) using the [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens). **This method is thread-safe.**
 
-> You need the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) to get a Refresh Token from Auth0.
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
 
 ```swift
 credentialsManager.credentials { result in 
@@ -642,7 +666,7 @@ The stored [ID Token](https://auth0.com/docs/security/tokens/id-tokens) contains
 let user = credentialsManager.user
 ```
 
-> To get the latest user information, use the `userInfo(withAccessToken:)` method of the Authentication API client.
+> 💡 To get the latest user information, use the `userInfo(withAccessToken:)` method of the Authentication API client.
 
 #### Clear credentials and revoke the Refresh Token
 
@@ -713,6 +737,10 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
 
 > ⚠️ Retrieving the user information with `credentialsManager.user` will not be protected by Biometric authentication.
 
+#### Errors
+
+The Credentials Manager will only yield `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
+
 ### Authentication API (iOS / macOS / tvOS / watchOS)
 
 [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
@@ -721,6 +749,10 @@ The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well a
 We recommend using [Universal Login](https://auth0.com/docs/login/universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your [Auth0 Dashboard](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
 
 For login or signup with username/password, the `Password` Grant Type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`, otherwise the Auth0 Dashboard will take care of activating both when `Password` is enabled.
+
+> 💡 If your Auth0 account has the "Bot Detection" feature enabled, your requests might be flagged for verification. Read how to handle this scenario on the [Bot Detection](#bot-detection) section.
+
+> ⚠️ The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID Tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) any ID Tokens received from the Authentication API client before using the information they contain.
 
 #### Login with database connection
 
@@ -740,6 +772,8 @@ Auth0
         }
     }
 ```
+
+> 💡 The default scope value is `openid profile email`. Regardless of the scope value configured, `openid` is always included.
 
 <details>
   <summary>Using Combine</summary>
@@ -1084,19 +1118,33 @@ Auth0
     // ...
 ```
 
+##### Use a custom `URLSession` instance
+
+You can specify a custom `URLSession` instance for more advanced networking configuration.
+
+```swift
+Auth0
+    .authentication(session: CustomURLSession())
+    // ...
+```
+
+#### Errors
+
+The Authentication API client will only yield `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html) to learn more about the available `AuthenticationError` properties.
+
 ### Management API (Users) (iOS / macOS / tvOS / watchOS)
 
 [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
 
 You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2). For security reasons native mobile applications are restricted to a subset of the Management API functionality.
 
-You can find a detailed guide in this [Quickstart](https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata).
+A detailed guide is available in this [Quickstart](https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata).
 
 #### Retrieve user metadata
 
 ```swift
 Auth0
-    .users(token: accessToken)
+    .users(token: credentials.accessToken)
     .get(userId, fields: ["user_metadata"])
     .start { result in
         switch result {
@@ -1113,7 +1161,7 @@ Auth0
 
 ```swift
 Auth0
-    .users(token: accessToken)
+    .users(token: credentials.accessToken)
     .get(userId, fields: ["user_metadata"])
     .publisher()
     .sink(receiveCompletion: { completion in
@@ -1133,7 +1181,7 @@ Auth0
 ```swift
 do {
     let user = try await Auth0
-        .users(token: accessToken)
+        .users(token: credentials.accessToken)
         .get(userId, fields: ["user_metadata"])
         .start()
     print("User with metadata: \(user)") 
@@ -1147,7 +1195,7 @@ do {
 
 ```swift
 Auth0
-    .users(token: accessToken)
+    .users(token: credentials.accessToken)
     .patch(userId, userMetadata: ["key": "value"])
     .start { result in
         switch result {
@@ -1164,7 +1212,7 @@ Auth0
 
 ```swift
 Auth0
-    .users(token: accessToken)
+    .users(token: credentials.accessToken)
     .patch(userId, userMetadata: ["key": "value"])
     .publisher()
     .sink(receiveCompletion: { completion in
@@ -1184,7 +1232,7 @@ Auth0
 ```swift
 do {
     let user = try await Auth0
-        .users(token: accessToken)
+        .users(token: credentials.accessToken)
         .patch(userId, userMetadata: ["key": "value"])
         .start()
     print("Updated user: \(user)") 
@@ -1198,7 +1246,7 @@ do {
 
 ```swift
 Auth0
-    .users(token: idToken)
+    .users(token: credentials.idToken)
     .link("user identifier", withOtherUserToken: "another user token")
     .start { result in
         switch result {
@@ -1215,7 +1263,7 @@ Auth0
 
 ```swift
 Auth0
-    .users(token: idToken)
+    .users(token: credentials.idToken)
     .link("user identifier", withOtherUserToken: "another user token")
     .publisher()
     .sink(receiveCompletion: { completion in
@@ -1236,7 +1284,7 @@ Auth0
 ```swift
 do {
     _ = try await Auth0
-        .users(token: idToken)
+        .users(token: credentials.idToken)
         .link("user identifier", withOtherUserToken: "another user token")
         .start()
     print("Accounts linked")
@@ -1254,7 +1302,7 @@ Use the `parameters()` method to add custom parameters to any request.
 
 ```swift
 Auth0
-    .users(token: accessToken)
+    .users(token: credentials.accessToken)
     .patch(userId, userMetadata: userMetadata) // Any request
     .parameters(["key": "value"])
     // ...
@@ -1266,11 +1314,25 @@ Use the `headers()` method to add custom headers to any request.
 
 ```swift
 Auth0
-    .users(token: accessToken)
+    .users(token: credentials.accessToken)
     .patch(userId, userMetadata: userMetadata) // Any request
     .headers(["key": "value"])
     // ...
 ```
+
+##### Use a custom `URLSession` instance
+
+You can specify a custom `URLSession` instance for more advanced networking configuration.
+
+```swift
+Auth0
+    .users(session: CustomURLSession())
+    // ...
+```
+
+#### Errors
+
+The Management API client will only yield `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/ManagementError.html) to learn more about the available `ManagementError` properties.
 
 ### Logging
 
@@ -1366,7 +1428,7 @@ do {
 ```
 </details>
 
-> Check the [Setting up Sign In with Apple](https://auth0.com/docs/connections/social/apple-native) guide for more information about integrating Sign In with Apple with Auth0.
+> 💡 Check the [Setting up Sign In with Apple](https://auth0.com/docs/connections/social/apple-native) guide for more information about integrating Sign In with Apple with Auth0.
 
 #### Facebook Login
 
@@ -1421,7 +1483,7 @@ do {
 ```
 </details>
 
-> Check the [Setting up Facebook Login](https://auth0.com/docs/connections/social/facebook-native) guide for more information about integrating Facebook Login with Auth0.
+> 💡 Check the [Setting up Facebook Login](https://auth0.com/docs/connections/social/facebook-native) guide for more information about integrating Facebook Login with Auth0.
 
 ### Organizations
 
@@ -1435,7 +1497,7 @@ Using Organizations, you can:
 - Implement role-based access control, such that users can have different roles when authenticating in the context of different organizations.
 - Build administration capabilities into your products, using Organizations APIs, so that those businesses can manage their own organizations.
 
-> Organizations is currently only available to customers on our Enterprise and Startup subscription plans.
+> 💡 Organizations is currently only available to customers on our Enterprise and Startup subscription plans.
 
 #### Log in to an organization
 
@@ -1595,9 +1657,7 @@ Only the last 4 major platform versions are supported, starting from:
 - tvOS **12**
 - watchOS **6.2**
 
-Dropping older, unsupported platform versions **will not be considered a breaking change**, and will be done in **minor** releases.
-
-> E.g. iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.
+Dropping older, unsupported platform versions **will not be considered a breaking change**, and will be done in **minor** releases. E.g. iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.
 
 In the case of macOS, the yearly named releases are considered a major platform version for the purposes of this Policy, regardless of the actual version numbers.
 
@@ -1622,7 +1682,7 @@ Auth0 helps you to:
 
 ## License
 
-This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
+This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more information.
 
 ---
 
