@@ -40,7 +40,6 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
   + [Native Social Login](#native-social-login)
   + [Organizations](#organizations)
   + [Bot Detection](#bot-detection)
-  + [Custom Domains](#custom-domains)
 - [Support Policy](#support-policy)
 - [Issue Reporting](#issue-reporting)
 - [What is Auth0?](#what-is-auth0)
@@ -577,6 +576,17 @@ Note that this custom `URLSession` instance will be used when communicating with
 #### ID Token validation
 
 Auth0.swift automatically [validates](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) the ID Token obtained from Web Auth login, following the [Opend ID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID Token have not been tampered with and can be safely used.
+
+##### Custom Domains
+
+Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 Domain when performing Web Auth login. Otherwise, the ID Token validation will fail.
+
+```swift
+Auth0
+    .webAuth()
+    .issuer("https://YOUR_AUTH0_DOMAIN/")
+    // ...
+```
 
 #### Errors
 
@@ -1623,17 +1633,6 @@ Auth0
 ```
 
 Check how to set up Web Auth in the [Web Auth Configuration](#web-auth-configuration-ios--macos) section.
-
-### Custom Domains
-
-Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 Domain before performing Web Auth login. Otherwise, the ID Token validation will fail.
-
-```swift
-Auth0
-    .webAuth()
-    .issuer("https://YOUR_AUTH0_DOMAIN/")
-    // ...
-```
 
 ## Support Policy
 
