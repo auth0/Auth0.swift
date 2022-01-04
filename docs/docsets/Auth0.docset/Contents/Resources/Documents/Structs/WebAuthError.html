@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           Auth0 2.0.0-beta Docs
         </a>
-         (92% documented)
+         (94% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -162,9 +162,6 @@
                 <a class="nav-group-task-link" href="../Structs/Challenge.html">Challenge</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Structs/Challenge/CodingKeys.html">– CodingKeys</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/CredentialsManager.html">CredentialsManager</a>
               </li>
               <li class="nav-group-task">
@@ -286,7 +283,7 @@
                         <p>Description of the error.</p>
 <div class="aside aside-important">
     <p class="aside-title">Important</p>
-    You should avoid displaying the error description to the user, it&rsquo;s meant for debugging only.
+    You should avoid displaying the error description to the user, it&rsquo;s meant for <strong>debugging</strong> only.
 
 </div>
 
@@ -346,9 +343,9 @@ build a valid URL. This error does not include a <code><a href="../Structs/WebAu
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Auth012WebAuthErrorV22malformedInvitationURLACvpZ"></a>
-                    <a name="//apple_ref/swift/Variable/malformedInvitationURL" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Auth012WebAuthErrorV22malformedInvitationURLACvpZ">malformedInvitationURL</a>
+                    <a name="/s:5Auth012WebAuthErrorV20invalidInvitationURLACvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/invalidInvitationURL" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth012WebAuthErrorV20invalidInvitationURLACvpZ">invalidInvitationURL</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -356,7 +353,7 @@ build a valid URL. This error does not include a <code><a href="../Structs/WebAu
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The invitation URL is missing the <code>organization</code> and/or the <code>invitation</code> query parameters.
+                        <p>The invitation URL is missing the <code>invitation</code> and/or the <code>organization</code> query parameters.
 This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
 
                       </div>
@@ -364,7 +361,7 @@ This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Au
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">malformedInvitationURL</span><span class="p">:</span> <span class="kt">WebAuthError</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">invalidInvitationURL</span><span class="p">:</span> <span class="kt">WebAuthError</span></code></pre>
 
                         </div>
                       </div>
@@ -412,7 +409,7 @@ This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Au
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>The correct method for Token Endpoint Authentication Method is not set (it should be &lsquo;None&rsquo;).
-You need to enable PKCE support in your Auth0 application&rsquo;s settings page, by setting the &lsquo;Application Type&rsquo; to
+PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the &lsquo;Application Type&rsquo; to
 &lsquo;Native&rsquo; and the &lsquo;Token Endpoint Authentication Method&rsquo; to &lsquo;None&rsquo;. This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
 
                       </div>
@@ -495,7 +492,7 @@ The underlying error can be accessed via the <code><a href="../Structs/WebAuthEr
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Another <code>Error</code> occurred. That error can be accessed via the <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code> property.</p>
+                        <p>An error occurred. The <code>Error</code> value can be accessed via the <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code> property.</p>
 
                       </div>
                       <div class="declaration">
@@ -522,7 +519,7 @@ The underlying error can be accessed via the <code><a href="../Structs/WebAuthEr
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>An unknown error occurred, but an <code>Error</code> value is not available. This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
+                        <p>An unknown error occurred, and an <code>Error</code> value is not available. This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -649,7 +646,7 @@ The underlying error can be accessed via the <code><a href="../Structs/WebAuthEr
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-14)</p>
+      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-23)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
