@@ -104,7 +104,7 @@ class RequestSpec: QuickSpec {
                     let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                     waitUntil(timeout: Timeout) { done in
                         request
-                            .publisher()
+                            .start()
                             .assertNoFailure()
                             .count()
                             .sink(receiveValue: { count in
@@ -122,7 +122,7 @@ class RequestSpec: QuickSpec {
                     let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                     waitUntil(timeout: Timeout) { done in
                         request
-                            .publisher()
+                            .start()
                             .sink(receiveCompletion: { completion in
                                 guard case .finished = completion else { return }
                                 done()
@@ -140,7 +140,7 @@ class RequestSpec: QuickSpec {
                     let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
                     waitUntil(timeout: Timeout) { done in
                         request
-                            .publisher()
+                            .start()
                             .ignoreOutput()
                             .sink(receiveCompletion: { completion in
                                 guard case .failure = completion else { return }

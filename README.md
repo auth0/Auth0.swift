@@ -246,7 +246,7 @@ Auth0
 ```swift
 Auth0
     .webAuth()
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -374,7 +374,7 @@ Auth0
 Auth0
     .webAuth()
     .parameters(["screen_hint": "signup"])
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -429,7 +429,7 @@ Auth0
 Auth0
     .authentication()
     .userInfo(withAccessToken: credentials.accessToken)
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -484,7 +484,7 @@ Auth0
 Auth0
     .authentication()
     .renew(withRefreshToken: refreshToken)
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -795,7 +795,7 @@ Auth0
            password: "secret-password",
            realmOrConnection: "Username-Password-Authentication",
            scope: "openid profile email offline_access")
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -855,7 +855,7 @@ Auth0
             password: "secret-password",
             connection: "Username-Password-Authentication",
             userMetadata: ["first_name": "First", "last_name": "Last"])
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -916,7 +916,7 @@ Auth0
 Auth0
     .authentication()
     .startPasswordless(email: "support@auth0.com")
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         switch completion {
         case .finished:
@@ -968,7 +968,7 @@ Auth0
 Auth0
     .authentication()
     .startPasswordless(phoneNumber: "+12025550135")
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         switch completion {
         case .finished:
@@ -1023,7 +1023,7 @@ Auth0
 Auth0
     .authentication()
     .login(email: "support@auth0.com", code: "123456")
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -1074,7 +1074,7 @@ Auth0
 Auth0
     .authentication()
     .login(phoneNumber: "+12025550135", code: "123456")
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -1173,7 +1173,7 @@ Auth0
 Auth0
     .users(token: credentials.accessToken)
     .get(userId, fields: ["user_metadata"])
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -1224,7 +1224,7 @@ Auth0
 Auth0
     .users(token: credentials.accessToken)
     .patch(userId, userMetadata: ["key": "value"])
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -1275,7 +1275,7 @@ Auth0
 Auth0
     .users(token: credentials.idToken)
     .link("user identifier", withOtherUserToken: "another user token")
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         switch completion {
         case .finished:
@@ -1410,7 +1410,7 @@ Auth0
 Auth0
     .authentication()
     .login(appleAuthorizationCode: authCode)
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -1465,7 +1465,7 @@ Auth0
 Auth0
     .authentication()
     .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
@@ -1531,7 +1531,7 @@ Auth0.webAuth()
 Auth0
     .webAuth()
     .organization(organizationId)
-    .publisher()
+    .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
