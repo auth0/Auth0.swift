@@ -27,10 +27,10 @@ A clear and concise description of what the problem is. E.g. I'm always frustrat
 A clear and concise description of what you want to happen.
 -->
 
-### 🩹 Alternatives and current work-arounds
+### 🩹 Alternatives and current workarounds
 
 <!-- 
-A clear and concise description of any alternatives you've considered or any work-arounds that are currently in place.
+A clear and concise description of any alternatives you've considered or any workarounds that are currently in place.
 -->
 
 ### 📌 Additional context
