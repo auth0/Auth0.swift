@@ -22,7 +22,7 @@
         <a class="header-link" href="index.html">
           Auth0 2.0.0-beta Docs
         </a>
-         (92% documented)
+         (94% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -161,9 +161,6 @@
                 <a class="nav-group-task-link" href="Structs/Challenge.html">Challenge</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Structs/Challenge/CodingKeys.html">– CodingKeys</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/CredentialsManager.html">CredentialsManager</a>
               </li>
               <li class="nav-group-task">
@@ -226,32 +223,81 @@
           <div class="section-content top-matter">
             
             <h1 id='auth0-swift-beta' class='heading'>Auth0.swift Beta</h1>
-<div class="aside aside-note">
-    <p class="aside-title">Note</p>
-    <p>This library is currently in <strong>Beta</strong> and has not had a complete security review. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.</p>
 
-</div>
-
-<p><a href="https://circleci.com/gh/auth0/Auth0.swift/tree/beta"><img src="https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat-square" alt="CircleCI"></a>
-<a href="https://codecov.io/github/auth0/Auth0.swift"><img src="https://img.shields.io/codecov/c/github/auth0/Auth0.swift/beta.svg?style=flat-square" alt="Coverage Status"></a>
-<a href="https://cocoadocs.org/docsets/Auth0"><img src="https://img.shields.io/cocoapods/v/Auth0.svg?style=flat-square" alt="Version"></a>
-<a href="https://cocoadocs.org/docsets/Auth0"><img src="https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square" alt="License"></a>
-<a href="https://cocoadocs.org/docsets/Auth0"><img src="https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square" alt="Platform"></a>
+<p><a href="https://circleci.com/gh/auth0/Auth0.swift/tree/master"><img src="https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat-square" alt="CircleCI"></a>
+<a href="https://codecov.io/github/auth0/Auth0.swift"><img src="https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat-square" alt="Coverage Status"></a>
+<img src="https://img.shields.io/cocoapods/v/Auth0.svg?style=flat-square" alt="Version">
+<img src="https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square" alt="License">
+<img src="https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square" alt="Platform">
 <img src="https://img.shields.io/badge/Swift-5.5-orange.svg?style=flat-square" alt="Swift 5.5"></p>
 
-<p>Swift SDK that lets you communicate efficiently with many of the <a href="https://auth0.com/docs/api">Auth0 API</a> functions and enables you to seamlessly integrate the Auth0 login.</p>
+<blockquote>
+<p>⚠️ This library is currently in <strong>Beta</strong> and has not had a complete security review. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.</p>
+</blockquote>
+
+<p>Swift SDK that lets you communicate efficiently with many of the <a href="https://auth0.com/docs/api">Auth0 API</a> endpoints and enables you to seamlessly integrate the Auth0 login.</p>
+
+<p><strong>Migrating from v1? Check our <a href="V2_MIGRATION_GUIDE.md">Migration Guide</a>.</strong></p>
+
+<hr>
 <h2 id='table-of-contents' class='heading'>Table of Contents</h2>
 
 <ul>
+<li><a href="#documentation">Documentation</a></li>
 <li><a href="#requirements">Requirements</a></li>
-<li><a href="#installation">Installation</a></li>
-<li><a href="#getting-started">Getting Started</a></li>
-<li><a href="#next-steps">Next Steps</a></li>
-<li><a href="#what-is-auth0">What is Auth0?</a></li>
-<li><a href="#create-a-free-auth0-account">Create a Free Auth0 Account</a></li>
+<li><a href="#installation">Installation</a>
+
+<ul>
+<li><a href="#swift-package-manager">Swift Package Manager</a></li>
+<li><a href="#cocoapods">Cocoapods</a></li>
+<li><a href="#carthage">Carthage</a></li>
+</ul></li>
+<li><a href="#getting-started">Getting Started</a>
+
+<ul>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#web-auth-configuration-ios--macos">Web Auth Configuration (iOS / macOS)</a></li>
+<li><a href="#web-auth-login-ios--macos">Web Auth Login (iOS / macOS)</a></li>
+<li><a href="#web-auth-logout-ios--macos">Web Auth Logout (iOS / macOS)</a></li>
+<li><a href="#sso-alert-box-ios--macos">SSO Alert Box (iOS / macOS)</a></li>
+</ul></li>
+<li><a href="#next-steps">Next Steps</a>
+
+<ul>
+<li><a href="#common-tasks">Common Tasks</a></li>
+<li><a href="#web-auth-options-ios--macos">Web Auth Options (iOS / macOS)</a></li>
+<li><a href="#credentials-manager-ios--macos--tvos--watchos">Credentials Manager (iOS / macOS / tvOS / watchOS)</a></li>
+<li><a href="#authentication-api-ios--macos--tvos--watchos">Authentication API (iOS / macOS / tvOS / watchOS)</a></li>
+<li><a href="#management-api-users-ios--macos--tvos--watchos">Management API (Users) (iOS / macOS / tvOS / watchOS)</a></li>
+<li><a href="#logging">Logging</a></li>
+</ul></li>
+<li><a href="#other-features">Other Features</a>
+
+<ul>
+<li><a href="#native-social-login">Native Social Login</a></li>
+<li><a href="#organizations">Organizations</a></li>
+<li><a href="#bot-detection">Bot Detection</a></li>
+<li><a href="#custom-domains">Custom Domains</a></li>
+</ul></li>
+<li><a href="#support-policy">Support Policy</a></li>
 <li><a href="#issue-reporting">Issue Reporting</a></li>
-<li><a href="#author">Author</a></li>
+<li><a href="#what-is-auth0">What is Auth0?</a></li>
 <li><a href="#license">License</a></li>
+</ul>
+<h2 id='documentation' class='heading'>Documentation</h2>
+
+<ul>
+<li><a href="https://auth0.com/docs/quickstart/native/ios-swift">Quickstarts</a></li>
+<li><a href="https://github.com/auth0-samples/auth0-ios-swift-sample/tree/beta/Sample-01">Sample app</a></li>
+<li><a href="https://auth0.github.io/Auth0.swift/">API Documentation</a>
+
+<ul>
+<li><a href="https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html">Web Auth</a></li>
+<li><a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html">Credentials Manager</a></li>
+<li><a href="https://auth0.github.io/Auth0.swift/Protocols/Authentication.html">Authentication API Client</a></li>
+<li><a href="https://auth0.github.io/Auth0.swift/Protocols/Users.html">Management API Client (Users)</a></li>
+</ul></li>
+<li><a href="FAQ.md">FAQ</a></li>
 </ul>
 <h2 id='requirements' class='heading'>Requirements</h2>
 
@@ -260,55 +306,59 @@
 <li>Xcode 12.x / 13.x</li>
 <li>Swift 5.3+</li>
 </ul>
-<h2 id='installation' class='heading'>Installation</h2>
-<h4 id='spm' class='heading'>SPM</h4>
 
-<p>If you are using the Swift Package Manager, open the following menu item in Xcode:</p>
+<blockquote>
+<p>⚠️ Check the <a href="#support-policy">Support Policy</a> to learn when dropping Xcode, Swift, and platform versions will not be considered a <strong>breaking change</strong>.</p>
+</blockquote>
+<h2 id='installation' class='heading'>Installation</h2>
+<h3 id='swift-package-manager' class='heading'>Swift Package Manager</h3>
+
+<p>If you are using SPM, open the following menu item in Xcode:</p>
 
 <p><strong>File &gt; Add Packages&hellip;</strong></p>
 
-<p>In the <strong>Search or Enter Package URL</strong> search box enter this url: </p>
+<p>In the <strong>Search or Enter Package URL</strong> search box enter this URL: </p>
 <pre class="highlight plaintext"><code>https://github.com/auth0/Auth0.swift.git
 </code></pre>
 
-<p>Then select the <strong>Exact Version</strong> dependency rule, input <code>2.0.0-beta.0</code> as the version number and press <strong>Add Package</strong>.</p>
+<p>Then, select the <strong>Exact Version</strong> dependency rule and input <code>2.0.0-beta.0</code> as the version number. Press <strong>Add Package</strong>.</p>
 
 <blockquote>
-<p>For further reference on SPM, check <a href="https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app">its official documentation</a>.</p>
+<p>For further reference on SPM, check its <a href="https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app">official documentation</a>.</p>
 </blockquote>
-<h4 id='cocoapods' class='heading'>Cocoapods</h4>
+<h3 id='cocoapods' class='heading'>Cocoapods</h3>
 
 <p>If you are using <a href="https://cocoapods.org">Cocoapods</a>, add this line to your <code>Podfile</code>:</p>
 <pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'2.0.0-beta.0'</span>
 </code></pre>
 
-<p>Then run <code>pod install</code>.</p>
+<p>Then, run <code>pod install</code>.</p>
 
 <blockquote>
-<p>For more information on Cocoapods, check <a href="https://guides.cocoapods.org/using/getting-started.html">their official documentation</a>.</p>
+<p>For further reference on Cocoapods, check their <a href="https://guides.cocoapods.org/using/getting-started.html">official documentation</a>.</p>
 </blockquote>
-<h4 id='carthage' class='heading'>Carthage</h4>
+<h3 id='carthage' class='heading'>Carthage</h3>
 
 <p>If you are using <a href="https://github.com/Carthage/Carthage">Carthage</a>, add the following line to your <code>Cartfile</code>:</p>
 <pre class="highlight plaintext"><code>github "auth0/Auth0.swift" "2.0.0-beta.0"
 </code></pre>
 
-<p>Then run <code>carthage bootstrap --use-xcframeworks</code>.</p>
+<p>Then, run <code>carthage bootstrap --use-xcframeworks</code>.</p>
 
 <blockquote>
-<p>For more information about Carthage usage, check <a href="https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos">their official documentation</a>.</p>
+<p>For further reference on Carthage, check their <a href="https://github.com/Carthage/Carthage#getting-started">official documentation</a>.</p>
 </blockquote>
 <h2 id='getting-started' class='heading'>Getting Started</h2>
 <h3 id='configuration' class='heading'>Configuration</h3>
 
-<p>In order to use Auth0 you need to set up Auth0.swift with your <strong>Client ID</strong> and <strong>Domain</strong>. For Web Auth, you&rsquo;ll also need to configure the Callback URLs in the Auth0 Dashboard.</p>
+<p>Auth0.swift needs the <strong>Client ID</strong> and <strong>Domain</strong> of the Auth0 application to communicate with Auth0. These details can be found on the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>. If you are using a <a href="https://auth0.com/docs/custom-domains">Custom Domain</a>, use the value of your Custom Domain instead of the value from the settings page.</p>
 
 <blockquote>
-<p>The Auth0 Client ID &amp; Domain can be found in your <a href="https://manage.auth0.com/#/applications/">Auth0 Dashboard</a>.</p>
+<p>⚠️ Make sure that the <a href="https://auth0.com/docs/configure/applications">application type</a> of the Auth0 application is <strong>Native</strong>. If you don’t have a Native Auth0 application, <a href="https://auth0.com/docs/get-started/create-apps/native-apps">create one</a> before continuing.</p>
 </blockquote>
 <h4 id='configure-client-id-and-domain-with-a-plist' class='heading'>Configure Client ID and Domain with a plist</h4>
 
-<p>In your application bundle add a <code>plist</code> file named <code>Auth0.plist</code> with the following content:</p>
+<p>Create a <code>plist</code> file named <code>Auth0.plist</code> in your application bundle with the following content:</p>
 <pre class="highlight xml"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
 <span class="cp">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span>
 <span class="nt">&lt;plist</span> <span class="na">version=</span><span class="s">"1.0"</span><span class="nt">&gt;</span>
@@ -322,22 +372,43 @@
 </code></pre>
 <h4 id='configure-client-id-and-domain-programmatically' class='heading'>Configure Client ID and Domain programmatically</h4>
 
-<p>For Web Auth:</p>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="s">"YOUR_AUTH0_CLIENT_ID"</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"YOUR_AUTH0_DOMAIN"</span><span class="p">)</span>
-    <span class="c1">// ...</span>
-</code></pre>
+<details>
+  <summary>For Web Auth</summary>
 
-<p>For the Authentication API client:</p>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="s">"YOUR_AUTH0_CLIENT_ID"</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"YOUR_AUTH0_DOMAIN"</span><span class="p">)</span>
-    <span class="c1">// ...</span>
-</code></pre>
-<h4 id='configure-callback-urls-ios-macos' class='heading'>Configure Callback URLs (iOS / macOS)</h4>
+&ldquo;`swift
+Auth0
+    .webAuth(clientId: &quot;YOUR_AUTH0_CLIENT_ID&rdquo;, domain: &ldquo;YOUR_AUTH0_DOMAIN&rdquo;)
+    // &hellip;
+&ldquo;`
+</details>
 
-<p>Callback URLs are the URLs that Auth0 invokes after the authentication process. Auth0 routes your application back to this URL and appends additional parameters to it, including a token. Since callback URLs can be manipulated, you will need to add your callback URL to the <strong>Allowed Callback URLs</strong> field in the <a href="https://manage.auth0.com/#/applications/">Auth0 Dashboard</a>. This will enable Auth0 to recognize these URLs as valid. If omitted, the authentication will not be successful.</p>
+<details>
+  <summary>For the Authentication API client</summary>
 
-<p>In your application&rsquo;s <code>Info.plist</code> file, register your iOS / macOS Bundle Identifier as a custom scheme.</p>
+&rdquo;`swift
+Auth0
+    .authentication(clientId: &ldquo;YOUR_AUTH0_CLIENT_ID&rdquo;, domain: &ldquo;YOUR_AUTH0_DOMAIN&rdquo;)
+    // &hellip;
+&ldquo;`
+</details>
+
+<details>
+  <summary>For the Management API client (Users)</summary>
+
+&rdquo;`swift
+Auth0
+    .users(token: &ldquo;ACCESS_TOKEN&rdquo;, domain: &ldquo;YOUR_AUTH0_DOMAIN&rdquo;) // You only need the Domain
+    // &hellip;
+&ldquo;`
+</details>
+<h3 id='web-auth-configuration-ios-macos' class='heading'>Web Auth Configuration (iOS / macOS)</h3>
+
+<p>For Web Auth, you need to set up the callback and logout URLs in the settings page of your Auth0 application.</p>
+<h4 id='configure-callback-url' class='heading'>Configure Callback URL</h4>
+
+<p>The callback URL is the URL that Auth0 invokes <strong>after the authentication process</strong> to redirect back to your application. Since callback URLs can be manipulated, you will need to add your callback URL to the <strong>Allowed Callback URLs</strong> field in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback URL is not set, the authentication will fail.</p>
+
+<p>In your application&rsquo;s <code>Info.plist</code> file, register your iOS / macOS bundle identifier as a custom URL scheme.</p>
 <pre class="highlight xml"><code><span class="nt">&lt;key&gt;</span>CFBundleURLTypes<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;array&gt;</span>
     <span class="nt">&lt;dict&gt;</span>
@@ -354,46 +425,58 @@
 </code></pre>
 
 <blockquote>
-<p>If your <code>Info.plist</code> is not shown in this format, you can <strong>Right Click</strong> on <code>Info.plist</code> in Xcode and then select <strong>Open As / Source Code</strong>.</p>
+<p>If your <code>Info.plist</code> is not shown in this format, you can <strong>Right Click</strong> on <code>Info.plist</code> in Xcode and then select <strong>Open As &gt; Source Code</strong>.</p>
 </blockquote>
 
-<p>Finally, go to your <a href="https://manage.auth0.com/#/applications/">Auth0 Dashboard</a> and make sure that your application&rsquo;s <strong>Allowed Callback URLs</strong> field contains the following entry:</p>
+<p>Finally, go to the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a> and add the corresponding URL for your application to the <strong>Allowed Callback URLs</strong> field.</p>
+<h5 id='ios' class='heading'>iOS</h5>
 <pre class="highlight plaintext"><code>YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
 </code></pre>
-
-<p>e.g. If your bundle identifier was <code>com.company.myapp</code> and your Auth0 domain was <code>company.auth0.com</code>, then this value would be:</p>
-<pre class="highlight plaintext"><code>com.company.myapp://company.auth0.com/ios/com.company.myapp/callback
+<h5 id='macos' class='heading'>macOS</h5>
+<pre class="highlight plaintext"><code>YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/macos/YOUR_BUNDLE_IDENTIFIER/callback
 </code></pre>
-<h3 id='login-with-universal-login-ios-macos' class='heading'>Login with Universal Login (iOS / macOS)</h3>
+
+<p>E.g. if your iOS bundle identifier was <code>com.company.myapp</code> and your Auth0 Domain was <code>company.us.auth0.com</code>, then this value would be:</p>
+<pre class="highlight plaintext"><code>com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
+</code></pre>
+<h4 id='configure-logout-url' class='heading'>Configure Logout URL</h4>
+
+<p>The callback URL is the URL that Auth0 invokes <strong>after removing the session cookie</strong> to redirect back to your application. If the logout URL is not set, the logout will fail.</p>
+
+<p>Go to the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a> and copy the <strong>Allowed Callback URLs</strong> value you just added for authentication into the <strong>Allowed Logout URLs</strong> field.</p>
+<h3 id='web-auth-login-ios-macos' class='heading'>Web Auth Login (iOS / macOS)</h3>
 
 <ol>
-<li><p>Import <strong>Auth0</strong> into your project.        </p>
-<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Auth0</span>
-</code></pre></li>
-<li><p>Present the Universal Login page in the action of your <strong>Login</strong> button.</p>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-<span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
-<span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-    <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
-    <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
-        <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-    <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-        <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></li>
+<li>Import the <code>Auth0</code> module in the file where you want to present the login page.</li>
 </ol>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Auth0</span>
+</code></pre>
+
+<ol>
+<li>Present the <a href="https://auth0.com/docs/login/universal-login">Universal Login</a> page in the action of your <strong>Login</strong> button.</li>
+</ol>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
 
 <details>
   <summary>Using Combine</summary>
 
-&ldquo;`swift
+&rdquo;`swift
 Auth0
     .webAuth()
     .publisher()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print(&quot;Failed with \(error)&rdquo;)
+            print(&ldquo;Failed with \(error)&rdquo;)
         }
     }, receiveValue: { credentials in
         print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
@@ -403,7 +486,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 &rdquo;`swift
 do {
@@ -416,9 +499,11 @@ do {
 }
 &ldquo;`
 </details>
-<h3 id='logout-with-universal-login-ios-macos' class='heading'>Logout with Universal Login (iOS / macOS)</h3>
+<h3 id='web-auth-logout-ios-macos' class='heading'>Web Auth Logout (iOS / macOS)</h3>
 
-<p>To clear the Universal Login session, call the <code>clearSession()</code> method in the action of your <strong>Logout</strong> button.</p>
+<p>Logging the user out involves clearing the Universal Login session cookie and then deleting the user&rsquo;s credentials from your application. </p>
+
+<p>To clear the session cookie, call the <code>clearSession()</code> method in the action of your <strong>Logout</strong> button.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="n">clearSession</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
@@ -427,6 +512,7 @@ do {
             <span class="nf">print</span><span class="p">(</span><span class="s">"Logged out"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
 
@@ -439,18 +525,18 @@ Auth0
     .clearSession()
     .sink(receiveCompletion: { completion in
         switch completion {
-        case .failure(let error):
-            print(&ldquo;Failed with \(error)&rdquo;)
         case .finished:
             print(&ldquo;Logged out&rdquo;)
+        case .failure(let error):
+            print(&ldquo;Failed with \(error)&rdquo;)
         }
-    }, receiveValue: { _ in })
+    }, receiveValue: {})
     .store(in: &cancellables)
 &ldquo;`
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 &rdquo;`swift
 do {
@@ -463,110 +549,18 @@ do {
 }
 &ldquo;`
 </details>
+
+<p>Once the session cookie has been cleared, delete the user&rsquo;s credentials from your application.</p>
+<h3 id='sso-alert-box-ios-macos' class='heading'>SSO Alert Box (iOS / macOS)</h3>
+
+<p><img src="./sso-alert.png" alt="sso-alert"></p>
+
+<p>Check the <a href="FAQ.md">FAQ</a> for more information about the alert box that pops up <strong>by default</strong> when using Web Auth.</p>
+
+<p><a href="#table-of-contents">Go up ⤴</a></p>
 <h2 id='next-steps' class='heading'>Next Steps</h2>
-<h3 id='learning-resources' class='heading'>Learning Resources</h3>
-
-<p>Check out the <a href="https://auth0.com/docs/quickstart/native/ios-swift">iOS Swift QuickStart Guide</a> to find out more about the Auth0.swift SDK and explore our tutorials and sample projects.</p>
 <h3 id='common-tasks' class='heading'>Common Tasks</h3>
-<h4 id='retrieve-user-information' class='heading'>Retrieve user information</h4>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-   <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
-   <span class="o">.</span><span class="nf">userInfo</span><span class="p">(</span><span class="nv">withAccessToken</span><span class="p">:</span> <span class="n">accessToken</span><span class="p">)</span>
-   <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-       <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
-       <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
-           <span class="nf">print</span><span class="p">(</span><span class="s">"User: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-       <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-           <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-       <span class="p">}</span>
-   <span class="p">}</span>
-</code></pre>
-
-<details>
-  <summary>Using Combine</summary>
-
-&rdquo;`swift
-Auth0
-   .authentication()
-   .userInfo(withAccessToken: accessToken)
-   .publisher()
-   .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print(&ldquo;Failed with \(error)&rdquo;)
-        }
-    }, receiveValue: { user in
-        print(&ldquo;User: \(user)&rdquo;)
-    })
-    .store(in: &cancellables)
-&ldquo;`
-</details>
-
-<details>
-  <summary>Using Async/Await</summary>
-
-&rdquo;`swift
-do {
-    let user = try await Auth0
-        .authentication()
-        .userInfo(withAccessToken: accessToken)
-        .start()
-    print(&ldquo;User: \(user)&rdquo;)
-} catch {
-    print(&ldquo;Failed with \(error)&rdquo;)
-}
-&ldquo;`
-</details>
-<h4 id='renew-user-credentials' class='heading'>Renew user credentials</h4>
-
-<p>Use a <a href="https://auth0.com/docs/security/tokens/refresh-tokens">Refresh Token</a> to renew the user&rsquo;s credentials. It&rsquo;s recommended that you read and understand the Refresh Token process before implementing.</p>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
-        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained new credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-</code></pre>
-
-<details>
-  <summary>Using Combine</summary>
-
-&rdquo;`swift
-Auth0
-   .authentication()
-   .renew(withRefreshToken: refreshToken)
-   .publisher()
-   .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print(&ldquo;Failed with \(error)&rdquo;)
-        }
-    }, receiveValue: { credentials in
-        print(&ldquo;Obtained new credentials: \(credentials)&rdquo;)
-    })
-    .store(in: &cancellables)
-&ldquo;`
-</details>
-
-<details>
-  <summary>Using Async/Await</summary>
-
-&rdquo;`swift
-do {
-    let credentials = try await Auth0
-        .authentication()
-        .renew(withRefreshToken: refreshToken)
-        .start()
-    print(&ldquo;Obtained new credentials: \(credentials)&rdquo;)
-} catch {
-    print(&ldquo;Failed with \(error)&rdquo;)
-}
-&ldquo;`
-</details>
-<h4 id='signup-with-universal-login' class='heading'>Signup with Universal Login</h4>
+<h4 id='web-auth-signup-ios-macos' class='heading'>Web Auth Signup (iOS / macOS)</h4>
 
 <p>You can make users land directly on the Signup page instead of the Login page by specifying the <code>&quot;screen_hint&quot;: &quot;signup&quot;</code> parameter when performing Web Authentication. Note that this can be combined with <code>&quot;prompt&quot;: &quot;login&quot;</code>, which indicates whether you want to always show the authentication page or you want to skip if there&rsquo;s an existing session.</p>
 
@@ -612,7 +606,7 @@ do {
 </code></pre>
 
 <blockquote>
-<p>The <code>screen_hint</code> parameter can only be used with the <strong>New Universal Login Experience</strong>, not the <strong>Classic Experience</strong>.</p>
+<p>⚠️ The <code>screen_hint</code> parameter can only be used with the <strong>New Universal Login Experience</strong>, not the <strong>Classic Experience</strong>.</p>
 </blockquote>
 
 <details>
@@ -635,7 +629,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 &rdquo;`swift
 do {
@@ -649,22 +643,171 @@ do {
 }
 &ldquo;`
 </details>
-<h3 id='credentials-management-utility' class='heading'>Credentials Management Utility</h3>
+<h4 id='retrieve-user-information-ios-macos-tvos-watchos' class='heading'>Retrieve user information (iOS / macOS / tvOS / watchOS)</h4>
 
-<p>The credentials manager utility provides a convenience to securely store and retrieve the user&rsquo;s credentials from the Keychain.</p>
+<p>Fetch the latest user information from the <code>/userinfo</code> endpoint.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+   <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
+   <span class="o">.</span><span class="nf">userInfo</span><span class="p">(</span><span class="nv">withAccessToken</span><span class="p">:</span> <span class="n">accessToken</span><span class="p">)</span>
+   <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+       <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+       <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
+           <span class="nf">print</span><span class="p">(</span><span class="s">"User: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+       <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+           <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+       <span class="p">}</span>
+   <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .authentication()
+    .userInfo(withAccessToken: accessToken)
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: { user in
+        print(&ldquo;User: \(user)&rdquo;)
+    })
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    let user = try await Auth0
+        .authentication()
+        .userInfo(withAccessToken: accessToken)
+        .start()
+    print(&ldquo;User: \(user)&rdquo;)
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+<h4 id='renew-credentials-ios-macos-tvos-watchos' class='heading'>Renew credentials (iOS / macOS / tvOS / watchOS)</h4>
+
+<p>Use a <a href="https://auth0.com/docs/security/tokens/refresh-tokens">Refresh Token</a> to renew the user&rsquo;s credentials. It&rsquo;s recommended that you read and understand the Refresh Token process beforehand.</p>
+
+<blockquote>
+<p>You need the <code>offline_access</code> <a href="https://auth0.com/docs/configure/apis/scopes">scope</a> to get a Refresh Token from Auth0.</p>
+</blockquote>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained new credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .authentication()
+    .renew(withRefreshToken: refreshToken)
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: { credentials in
+        print(&ldquo;Obtained new credentials: \(credentials)&rdquo;)
+    })
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .renew(withRefreshToken: refreshToken)
+        .start()
+    print(&ldquo;Obtained new credentials: \(credentials)&rdquo;)
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+<h3 id='web-auth-options-ios-macos' class='heading'>Web Auth Options (iOS / macOS)</h3>
+
+<p>The following are some of the available Web Auth configuration options. Check the <a href="https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html">API documentation</a> for the complete list.</p>
+<h4 id='use-any-auth0-connection' class='heading'>Use any Auth0 connection</h4>
+
+<p>Specify an Auth0 connection to directly show that Identity Provider&rsquo;s login page, skipping the Universal Login page itself. The connection must first be enabled for your Auth0 application in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">connection</span><span class="p">(</span><span class="s">"facebook"</span><span class="p">)</span> <span class="c1">// Show the Facebook login page</span>
+    <span class="c1">// ...</span>
+</code></pre>
+<h4 id='add-an-audience-value' class='heading'>Add an audience value</h4>
+
+<p>Specify an audience to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the <strong>API Identifier</strong> of your <a href="https://auth0.com/docs/configure/apis">Auth0 API</a>.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">audience</span><span class="p">(</span><span class="s">"YOUR_API_IDENTIFIER"</span><span class="p">)</span>
+    <span class="c1">// ...</span>
+</code></pre>
+<h4 id='add-a-scope-value' class='heading'>Add a scope value</h4>
+
+<p>Specify a <a href="https://auth0.com/docs/configure/apis/scopes">scope</a> to request permission to access protected resources, like the user profile. The default scope value is <code>openid profile email</code>. Regardless of the scope value configured, <code>openid</code> is always included.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">scope</span><span class="p">(</span><span class="s">"openid profile email offline_access read:todos"</span><span class="p">)</span>
+    <span class="c1">// ...</span>
+</code></pre>
+
+<p>Use <code>connectionScope()</code> to configure a scope value for an Auth0 connection.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">connection</span><span class="p">(</span><span class="s">"connection-name"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">connectionScope</span><span class="p">(</span><span class="s">"user_friends email"</span><span class="p">)</span>
+    <span class="c1">// ...</span>
+</code></pre>
+<h3 id='credentials-manager-ios-macos-tvos-watchos' class='heading'>Credentials Manager (iOS / macOS / tvOS / watchOS)</h3>
+
+<p><a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html">API documentation ↗</a></p>
+
+<p>The Credentials Manager utility provides a convenience to securely store and retrieve the user&rsquo;s credentials from the Keychain.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">credentialsManager</span> <span class="o">=</span> <span class="kt">CredentialsManager</span><span class="p">(</span><span class="nv">authentication</span><span class="p">:</span> <span class="kt">Auth0</span><span class="o">.</span><span class="nf">authentication</span><span class="p">())</span>
 </code></pre>
 <h4 id='store-credentials' class='heading'>Store Credentials</h4>
 
-<p>Store user credentials securely in the Keychain.</p>
+<p>When your users log in, store their credentials securely in the Keychain. You can then log them in automatically when they open your application again.</p>
 <pre class="highlight swift"><code><span class="n">credentialsManager</span><span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">credentials</span><span class="p">:</span> <span class="n">credentials</span><span class="p">)</span>
+</code></pre>
+<h3 id='check-for-valid-credentials' class='heading'>Check for valid credentials</h3>
+
+<p>When the users open your application, check for valid credentials. If they exist, you can retrieve them and redirect the users to the app&rsquo;s main flow without any additional login steps.</p>
+<pre class="highlight swift"><code><span class="k">guard</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="nf">hasValid</span><span class="p">()</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// No valid credentials exist, present the login page</span>
+<span class="p">}</span>
+<span class="c1">// Retrieve stored credentials</span>
 </code></pre>
 <h4 id='retrieve-stored-credentials' class='heading'>Retrieve stored credentials</h4>
 
-<p>Credentials will automatically be renewed (if expired) using the Refresh Token. The scope <code>offline_access</code> is required to ensure the Refresh Token is returned.</p>
+<p>Credentials will automatically be renewed (if expired) using the <a href="https://auth0.com/docs/security/tokens/refresh-tokens">Refresh Token</a>. <strong>This method is thread-safe.</strong></p>
 
 <blockquote>
-<p>This method is thread-safe.</p>
+<p>You need the <code>offline_access</code> <a href="https://auth0.com/docs/configure/apis/scopes">scope</a> to get a Refresh Token from Auth0.</p>
 </blockquote>
 <pre class="highlight swift"><code><span class="n">credentialsManager</span><span class="o">.</span><span class="n">credentials</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span> 
     <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
@@ -672,6 +815,7 @@ do {
         <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
     <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
         <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span> 
+    <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -693,7 +837,7 @@ credentialsManager
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 &rdquo;`swift
 do {
@@ -704,13 +848,22 @@ do {
 }
 &ldquo;`
 </details>
-<h4 id='clearing-credentials-and-revoking-refresh-tokens' class='heading'>Clearing credentials and revoking Refresh Tokens</h4>
+<h4 id='retrieve-stored-user-information' class='heading'>Retrieve stored user information</h4>
 
-<p>Credentials can be cleared by using the <code>clear</code> function, which clears credentials from the Keychain.</p>
+<p>The stored <a href="https://auth0.com/docs/security/tokens/id-tokens">ID Token</a> contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">user</span> <span class="o">=</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="n">user</span>
+</code></pre>
+
+<blockquote>
+<p>To get the latest user information, use the <code>userInfo(withAccessToken:)</code> method of the Authentication API client.</p>
+</blockquote>
+<h4 id='clear-credentials-and-revoke-the-refresh-token' class='heading'>Clear credentials and revoke the Refresh Token</h4>
+
+<p>Credentials can be cleared from the Keychain by using the <code>clear()</code> method.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">didClear</span> <span class="o">=</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="nf">clear</span><span class="p">()</span>
 </code></pre>
 
-<p>In addition, credentials can be cleared and the Refresh Token revoked using a single call to <code>revoke</code>. This function will attempt to revoke the current Refresh Token stored by the credential manager and then clear credentials from the Keychain. If revoking the token results in an error, then the credentials are not cleared:</p>
+<p>In addition, credentials can be cleared and the Refresh Token revoked using a single call to <code>revoke()</code>. This method will attempt to revoke the current Refresh Token stored by the Credentials Manager and then clear credentials from the Keychain. If revoking the token results in an error, the credentials will not be cleared.</p>
 <pre class="highlight swift"><code><span class="n">credentialsManager</span><span class="o">.</span><span class="n">revoke</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
     <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
     <span class="k">case</span> <span class="o">.</span><span class="nv">success</span><span class="p">:</span>
@@ -728,17 +881,19 @@ do {
 credentialsManager
     .revoke()
     .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
+        switch completion {
+        case .finished:
+            print(&ldquo;Success&rdquo;)
+        case .failure(let error):
             print(&ldquo;Failed with \(error)&rdquo;)
         }
-        print(&ldquo;Success&rdquo;)
-    }, receiveValue: { _ in })
+    }, receiveValue: {})
     .store(in: &cancellables)
 &ldquo;`
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 &rdquo;`swift
 do {
@@ -751,21 +906,33 @@ do {
 </details>
 <h4 id='biometric-authentication' class='heading'>Biometric authentication</h4>
 
-<p>You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by your device e.g. Face ID or Touch ID.</p>
+<p>You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by your device, e.g. Face ID or Touch ID.</p>
 <pre class="highlight swift"><code><span class="n">credentialsManager</span><span class="o">.</span><span class="nf">enableBiometrics</span><span class="p">(</span><span class="nv">withTitle</span><span class="p">:</span> <span class="s">"Touch to Login"</span><span class="p">)</span>
 </code></pre>
 
-<p>If needed, you are able to specify specific <code>LAPolicy</code> to be used - e.g. you might want to support FaceID, but allow fallback to passcode.</p>
+<p>If needed, you can use a specific <code>LAPolicy</code> - e.g. you might want to support FaceID, but allow fallback to passcode.</p>
 <pre class="highlight swift"><code><span class="n">credentialsManager</span><span class="o">.</span><span class="nf">enableBiometrics</span><span class="p">(</span><span class="nv">withTitle</span><span class="p">:</span> <span class="s">"Touch or enter passcode to Login"</span><span class="p">,</span> 
                                     <span class="nv">evaluationPolicy</span><span class="p">:</span> <span class="o">.</span><span class="n">deviceOwnerAuthentication</span><span class="p">)</span>
 </code></pre>
-<h3 id='native-social-login' class='heading'>Native Social Login</h3>
-<h4 id='sign-in-with-apple' class='heading'>Sign in With Apple</h4>
 
-<p>If you&rsquo;ve added <a href="https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple">the Sign In with Apple flow</a> to your app, you can use the string value from the <code>authorizationCode</code> property obtained after a successful Apple authentication to perform a code exchange for Auth0 tokens.</p>
+<blockquote>
+<p>⚠️ Retrieving the user information with <code>credentialsManager.user</code> will not be protected by Biometric authentication.</p>
+</blockquote>
+<h3 id='authentication-api-ios-macos-tvos-watchos' class='heading'>Authentication API (iOS / macOS / tvOS / watchOS)</h3>
+
+<p><a href="https://auth0.github.io/Auth0.swift/Protocols/Authentication.html">API documentation ↗</a></p>
+
+<p>The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
+We recommend using <a href="https://auth0.com/docs/login/universal-login">Universal Login</a>, but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your <a href="https://manage.auth0.com/#/applications/">Auth0 Dashboard</a>, as explained in <a href="https://auth0.com/docs/configure/applications/update-grant-types">Update Grant Types</a>.</p>
+
+<p>For login or signup with username/password, the <code>Password</code> Grant Type needs to be enabled in your application. If you set the grants via the Management API you should activate both <code>http://auth0.com/oauth/grant-type/password-realm</code> and <code>Password</code>, otherwise the Auth0 Dashboard will take care of activating both when <code>Password</code> is enabled.</p>
+<h4 id='login-with-database-connection' class='heading'>Login with database connection</h4>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">appleAuthorizationCode</span><span class="p">:</span> <span class="n">authCode</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+           <span class="nv">password</span><span class="p">:</span> <span class="s">"secret-password"</span><span class="p">,</span>
+           <span class="nv">realmOrConnection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span>
+           <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
@@ -773,7 +940,7 @@ do {
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
-<span class="p">}</span>
+    <span class="p">}</span>
 </code></pre>
 
 <details>
@@ -781,10 +948,13 @@ do {
 
 &rdquo;`swift
 Auth0
-   .authentication()
-   .login(appleAuthorizationCode: authCode)
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .authentication()
+    .login(usernameOrEmail: &ldquo;support@auth0.com&rdquo;,
+           password: &ldquo;secret-password&rdquo;,
+           realmOrConnection: &ldquo;Username-Password-Authentication&rdquo;,
+           scope: &ldquo;openid profile email offline_access&rdquo;)
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print(&ldquo;Failed with \(error)&rdquo;)
         }
@@ -796,7 +966,550 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(usernameOrEmail: &ldquo;support@auth0.com&rdquo;,
+               password: &ldquo;secret-password&rdquo;,
+               realmOrConnection: &ldquo;Username-Password-Authentication&rdquo;,
+               scope: &ldquo;openid profile email offline_access&rdquo;)
+        .start()
+    print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+<h4 id='sign-up-with-database-connection' class='heading'>Sign up with database connection</h4>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">signup</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+            <span class="nv">password</span><span class="p">:</span> <span class="s">"secret-password"</span><span class="p">,</span>
+            <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span>
+            <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"First"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"Last"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"User signed up: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .authentication()
+    .signup(email: &ldquo;support@auth0.com&rdquo;,
+            password: &ldquo;secret-password&rdquo;,
+            connection: &ldquo;Username-Password-Authentication&rdquo;,
+            userMetadata: [&ldquo;first_name&rdquo;: &ldquo;First&rdquo;, &ldquo;last_name&rdquo;: &ldquo;Last&rdquo;])
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: { user in
+        print(&ldquo;User signed up: \(user)&rdquo;)
+    })
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    let user = try await Auth0
+        .authentication()
+        .signup(email: &ldquo;support@auth0.com&rdquo;,
+                password: &ldquo;secret-password&rdquo;,
+                connection: &ldquo;Username-Password-Authentication&rdquo;,
+                userMetadata: [&ldquo;first_name&rdquo;: &ldquo;First&rdquo;, &ldquo;last_name&rdquo;: &ldquo;Last&rdquo;])
+        .start()
+    print(&ldquo;User signed up: \(user)&rdquo;)
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+<h4 id='passwordless-login' class='heading'>Passwordless login</h4>
+
+<p>Passwordless is a two-step authentication flow that requires the <strong>Passwordless OTP</strong> grant to be enabled for your Auth0 application. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information and how to enable it.</p>
+<h5 id='1-start-the-passwordless-flow' class='heading'>1. Start the passwordless flow</h5>
+
+<p>To start the flow, you request a code to be sent to the user&rsquo;s email or phone number. For email scenarios only, a link can be sent in place of the code.</p>
+
+<p>With an email:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nv">success</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Code sent"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .authentication()
+    .startPasswordless(email: &ldquo;support@auth0.com&rdquo;)
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        switch completion {
+        case .finished:
+            print(&ldquo;Code sent&rdquo;)
+        case .failure(let error):
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: {})
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    try await Auth0
+        .authentication()
+        .startPasswordless(email: &ldquo;support@auth0.com&rdquo;)
+        .start()
+    print(&ldquo;Code sent&rdquo;)
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+
+<p>With a phone number:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">phoneNumber</span><span class="p">:</span> <span class="s">"+12025550135"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nv">success</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Code sent"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .authentication()
+    .startPasswordless(phoneNumber: &ldquo;+12025550135&rdquo;)
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        switch completion {
+        case .finished:
+            print(&ldquo;Code sent&rdquo;)
+        case .failure(let error):
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: {})
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    try await Auth0
+        .authentication()
+        .startPasswordless(phoneNumber: &ldquo;+12025550135&rdquo;)
+        .start()
+    print(&ldquo;Code sent&rdquo;)
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+<h5 id='2-login-with-the-received-code' class='heading'>2. Login with the received code</h5>
+
+<p>To complete the authentication, you must send back that received code along with the email or phone number used to start the flow.</p>
+
+<p>With an email:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span> <span class="nv">code</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .authentication()
+    .login(email: &ldquo;support@auth0.com&rdquo;, code: &ldquo;123456&rdquo;)
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: { credentials in
+        print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
+    })
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(email: &ldquo;support@auth0.com&rdquo;, code: &ldquo;123456&rdquo;)
+        .start()
+    print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+
+<p>With a phone number:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">phoneNumber</span><span class="p">:</span> <span class="s">"+12025550135"</span><span class="p">,</span> <span class="nv">code</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .authentication()
+    .login(phoneNumber: &ldquo;+12025550135&rdquo;, code: &ldquo;123456&rdquo;)
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: { credentials in
+        print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
+    })
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(phoneNumber: &ldquo;+12025550135&rdquo;, code: &ldquo;123456&rdquo;)
+        .start()
+    print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+<h4 id='configuration' class='heading'>Configuration</h4>
+<h5 id='add-custom-parameters' class='heading'>Add custom parameters</h5>
+
+<p>Use the <code>parameters()</code> method to add custom parameters to any request.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">)</span> <span class="c1">// Any request</span>
+    <span class="o">.</span><span class="nf">parameters</span><span class="p">([</span><span class="s">"key"</span><span class="p">:</span> <span class="s">"value"</span><span class="p">])</span>
+    <span class="c1">// ...</span>
+</code></pre>
+<h5 id='add-custom-headers' class='heading'>Add custom headers</h5>
+
+<p>Use the <code>headers()</code> method to add custom headers to any request.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">)</span> <span class="c1">// Any request</span>
+    <span class="o">.</span><span class="nf">headers</span><span class="p">([</span><span class="s">"key"</span><span class="p">:</span> <span class="s">"value"</span><span class="p">])</span>
+    <span class="c1">// ...</span>
+</code></pre>
+<h3 id='management-api-users-ios-macos-tvos-watchos' class='heading'>Management API (Users) (iOS / macOS / tvOS / watchOS)</h3>
+
+<p><a href="https://auth0.github.io/Auth0.swift/Protocols/Users.html">API documentation ↗</a></p>
+
+<p>You can request more information about a user&rsquo;s profile and manage the user&rsquo;s metadata by accessing the Auth0 <a href="https://auth0.com/docs/api/management/v2">Management API</a>. For security reasons native mobile applications are restricted to a subset of the Management API functionality.</p>
+
+<p>You can find a detailed guide in this <a href="https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata">Quickstart</a>.</p>
+<h4 id='retrieve-user-metadata' class='heading'>Retrieve user metadata</h4>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">accessToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="s">"user_metadata"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"User with metadata: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .users(token: accessToken)
+    .get(userId, fields: [&ldquo;user_metadata&rdquo;])
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: { user in
+        print(&ldquo;User with metadata: \(user)&rdquo;)
+    })
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    let user = try await Auth0
+        .users(token: accessToken)
+        .get(userId, fields: [&ldquo;user_metadata&rdquo;])
+        .start()
+    print(&ldquo;User with metadata: \(user)&rdquo;) 
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+<h4 id='update-user-metadata' class='heading'>Update user metadata</h4>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">accessToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="s">"key"</span><span class="p">:</span> <span class="s">"value"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Updated user: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .users(token: accessToken)
+    .patch(userId, userMetadata: [&ldquo;key&rdquo;: &ldquo;value&rdquo;])
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: { user in
+        print(&ldquo;Updated user: \(user)&rdquo;) 
+    })
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    let user = try await Auth0
+        .users(token: accessToken)
+        .patch(userId, userMetadata: [&ldquo;key&rdquo;: &ldquo;value&rdquo;])
+        .start()
+    print(&ldquo;Updated user: \(user)&rdquo;) 
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+<h4 id='link-an-account' class='heading'>Link an account</h4>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">idToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">link</span><span class="p">(</span><span class="s">"user identifier"</span><span class="p">,</span> <span class="nv">withOtherUserToken</span><span class="p">:</span> <span class="s">"another user token"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nv">success</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Accounts linked"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .users(token: idToken)
+    .link(&ldquo;user identifier&rdquo;, withOtherUserToken: &ldquo;another user token&rdquo;)
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        switch completion {
+        case .finished:
+            print(&ldquo;Accounts linked&rdquo;)
+        case .failure(let error):
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: { _ in })
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
+
+&rdquo;`swift
+do {
+    _ = try await Auth0
+        .users(token: idToken)
+        .link(&ldquo;user identifier&rdquo;, withOtherUserToken: &ldquo;another user token&rdquo;)
+        .start()
+    print(&ldquo;Accounts linked&rdquo;)
+} catch {
+    print(&ldquo;Failed with \(error)&rdquo;)
+}
+&ldquo;`
+</details>
+<h4 id='configuration' class='heading'>Configuration</h4>
+<h5 id='add-custom-parameters' class='heading'>Add custom parameters</h5>
+
+<p>Use the <code>parameters()</code> method to add custom parameters to any request.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">accessToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">userMetadata</span><span class="p">:</span> <span class="n">userMetadata</span><span class="p">)</span> <span class="c1">// Any request</span>
+    <span class="o">.</span><span class="nf">parameters</span><span class="p">([</span><span class="s">"key"</span><span class="p">:</span> <span class="s">"value"</span><span class="p">])</span>
+    <span class="c1">// ...</span>
+</code></pre>
+<h5 id='add-custom-headers' class='heading'>Add custom headers</h5>
+
+<p>Use the <code>headers()</code> method to add custom headers to any request.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">accessToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">userMetadata</span><span class="p">:</span> <span class="n">userMetadata</span><span class="p">)</span> <span class="c1">// Any request</span>
+    <span class="o">.</span><span class="nf">headers</span><span class="p">([</span><span class="s">"key"</span><span class="p">:</span> <span class="s">"value"</span><span class="p">])</span>
+    <span class="c1">// ...</span>
+</code></pre>
+<h3 id='logging' class='heading'>Logging</h3>
+
+<p>To enable Auth0.swift to log HTTP requests and the OAuth2 flow for debugging you can call the following method in either <code><a href="Protocols/WebAuth.html">WebAuth</a></code>, <code><a href="Protocols/Authentication.html">Authentication</a></code> or <code><a href="Protocols/Users.html">Users</a></code>:</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">logging</span><span class="p">(</span><span class="nv">enabled</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
+    <span class="c1">// ...</span>
+</code></pre>
+
+<p>Then with a successful authentication you&rsquo;ll see something similar to the following:</p>
+<pre class="highlight plaintext"><code>Safari: https://samples.auth0.com/authorize?.....
+URL: com.auth0.myapp://samples.auth0.com/ios/com.auth0.MyApp/callback?...
+POST https://samples.auth0.com/oauth/token HTTP/1.1
+Content-Type: application/json
+
+{"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.auth0.MyApp:\/\/samples.auth0.com\/ios\/com.auth0.MyApp\/callback","code_verifier":"..."}
+
+HTTP/1.1 200
+Pragma: no-cache
+Content-Type: application/json
+Strict-Transport-Security: max-age=3600
+Date: Thu, 09 Jun 2016 19:04:39 GMT
+Content-Length: 57
+Cache-Control: no-cache
+Connection: keep-alive
+
+{"access_token":"...","token_type":"Bearer"}
+</code></pre>
+
+<blockquote>
+<p>⚠️ Set this flag only when <strong>DEBUGGING</strong> to avoid leaking user&rsquo;s credentials in the device log.</p>
+</blockquote>
+
+<p><a href="#table-of-contents">Go up ⤴</a></p>
+<h2 id='other-features' class='heading'>Other Features</h2>
+<h3 id='native-social-login' class='heading'>Native Social Login</h3>
+<h4 id='sign-in-with-apple' class='heading'>Sign in With Apple</h4>
+
+<p>If you&rsquo;ve added <a href="https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple">the Sign In with Apple flow</a> to your app, after a successful Sign in With Apple authentication you can use the value of the <code>authorizationCode</code> property to perform a code exchange for Auth0 credentials.</p>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">appleAuthorizationCode</span><span class="p">:</span> <span class="n">authCode</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+
+<details>
+  <summary>Using Combine</summary>
+
+&rdquo;`swift
+Auth0
+    .authentication()
+    .login(appleAuthorizationCode: authCode)
+    .publisher()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print(&ldquo;Failed with \(error)&rdquo;)
+        }
+    }, receiveValue: { credentials in
+        print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
+    })
+    .store(in: &cancellables)
+&ldquo;`
+</details>
+
+<details>
+  <summary>Using async/await</summary>
 
 &rdquo;`swift
 do {
@@ -811,10 +1524,12 @@ do {
 &ldquo;`
 </details>
 
-<p>Find out more about <a href="https://auth0.com/docs/connections/social/apple-native">Setting up Sign in with Apple</a> with Auth0.</p>
+<blockquote>
+<p>Check the <a href="https://auth0.com/docs/connections/social/apple-native">Setting up Sign In with Apple</a> guide for more information about integrating Sign In with Apple with Auth0.</p>
+</blockquote>
 <h4 id='facebook-login' class='heading'>Facebook Login</h4>
 
-<p>If you&rsquo;ve added <a href="https://developers.facebook.com/docs/facebook-login/ios">the Facebook Login flow</a> to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and use them both to perform a code exchange for Auth0 tokens.</p>
+<p>If you&rsquo;ve added <a href="https://developers.facebook.com/docs/facebook-login/ios">the Facebook Login flow</a> to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and use them both to perform a code exchange for Auth0 credentials.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="n">sessionAccessToken</span><span class="p">,</span> <span class="nv">profile</span><span class="p">:</span> <span class="n">profile</span><span class="p">)</span>
@@ -825,7 +1540,7 @@ do {
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
-<span class="p">}</span>
+    <span class="p">}</span>
 </code></pre>
 
 <details>
@@ -833,10 +1548,10 @@ do {
 
 &rdquo;`swift
 Auth0
-   .authentication()
-   .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .authentication()
+    .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print(&ldquo;Failed with \(error)&rdquo;)
         }
@@ -848,7 +1563,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 &rdquo;`swift
 do {
@@ -863,7 +1578,9 @@ do {
 &ldquo;`
 </details>
 
-<p>Find out more about <a href="https://auth0.com/docs/connections/social/facebook-native">Setting up Facebook Login</a> with Auth0.</p>
+<blockquote>
+<p>Check the <a href="https://auth0.com/docs/connections/social/facebook-native">Setting up Facebook Login</a> guide for more information about integrating Facebook Login with Auth0.</p>
+</blockquote>
 <h3 id='organizations' class='heading'>Organizations</h3>
 
 <p><a href="https://auth0.com/docs/organizations">Organizations</a> is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. </p>
@@ -878,7 +1595,9 @@ do {
 <li>Build administration capabilities into your products, using Organizations APIs, so that those businesses can manage their own organizations.</li>
 </ul>
 
-<p>Note that Organizations is currently only available to customers on our Enterprise and Startup subscription plans.</p>
+<blockquote>
+<p>Organizations is currently only available to customers on our Enterprise and Startup subscription plans.</p>
+</blockquote>
 <h4 id='log-in-to-an-organization' class='heading'>Log in to an organization</h4>
 <pre class="highlight swift"><code><span class="kt">Auth0</span><span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">organization</span><span class="p">(</span><span class="n">organizationId</span><span class="p">)</span>
@@ -897,10 +1616,10 @@ do {
 
 &rdquo;`swift
 Auth0
-   .webAuth()
-   .organization(organizationId)
-   .publisher()
-   .sink(receiveCompletion: { completion in
+    .webAuth()
+    .organization(organizationId)
+    .publisher()
+    .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
             print(&ldquo;Failed with \(error)&rdquo;)
         }
@@ -912,7 +1631,7 @@ Auth0
 </details>
 
 <details>
-  <summary>Using Async/Await</summary>
+  <summary>Using async/await</summary>
 
 &rdquo;`swift
 do {
@@ -954,266 +1673,86 @@ do {
     <span class="p">}</span>
     <span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">cancellables</span><span class="p">)</span>
 </code></pre>
-<h3 id='authentication-api-ios-macos-tvos-watchos' class='heading'>Authentication API (iOS / macOS / tvOS / watchOS)</h3>
-
-<p>The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
-We recommend using <a href="https://auth0.com/docs/login/universal-login">Universal Login</a> but if you wish to build your own UI, you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your Auth0 Dashboard as explained in <a href="https://auth0.com/docs/configure/applications/update-grant-types">Update Grant Types</a>.</p>
-
-<p>The <code>Password</code> Grant Type needs to be enabled in your application, for login with username/password using a realm (or connection name). If you set the grants via the Management API you should activate both <code>http://auth0.com/oauth/grant-type/password-realm</code> and <code>password</code>, otherwise the Auth0 Dashboard will take care of activating both when <code>Password</code> is enabled.</p>
-<h4 id='login-with-database-connection' class='heading'>Login with database connection</h4>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
-           <span class="nv">password</span><span class="p">:</span> <span class="s">"secret-password"</span><span class="p">,</span>
-           <span class="nv">realm</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span>
-           <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
-     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
-         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-         <span class="p">}</span>
-     <span class="p">}</span>
-</code></pre>
-
-<blockquote>
-<p>This requires <code>Password</code> Grant or <code>http://auth0.com/oauth/grant-type/password-realm</code>.</p>
-</blockquote>
-
-<details>
-  <summary>Using Combine</summary>
-
-&rdquo;`swift
-Auth0
-   .authentication()
-   .login(usernameOrEmail: &ldquo;support@auth0.com&rdquo;,
-          password: &ldquo;secret-password&rdquo;,
-          realm: &ldquo;Username-Password-Authentication&rdquo;,
-          scope: &ldquo;openid profile&rdquo;)
-   .publisher()
-   .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print(&ldquo;Failed with \(error)&rdquo;)
-        }
-    }, receiveValue: { credentials in
-        print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
-    })
-    .store(in: &cancellables)
-&ldquo;`
-</details>
-
-<details>
-  <summary>Using Async/Await</summary>
-
-&rdquo;`swift
-do {
-    let credentials = try await Auth0
-        .authentication()
-        .login(usernameOrEmail: &ldquo;support@auth0.com&rdquo;,
-               password: &ldquo;secret-password&rdquo;,
-               realm: &ldquo;Username-Password-Authentication&rdquo;,
-               scope: &ldquo;openid profile&rdquo;)
-        .start()
-    print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
-} catch {
-    print(&ldquo;Failed with \(error)&rdquo;)
-}
-&ldquo;`
-</details>
-<h4 id='sign-up-with-database-connection' class='heading'>Sign up with database connection</h4>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">createUser</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
-                <span class="nv">password</span><span class="p">:</span> <span class="s">"secret-password"</span><span class="p">,</span>
-                <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span>
-                <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"First"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"Last"</span><span class="p">])</span>
-    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
-        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"User signed up: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-</code></pre>
-
-<details>
-  <summary>Using Combine</summary>
-
-&rdquo;`swift
-Auth0
-   .authentication()
-   .createUser(email: &ldquo;support@auth0.com&rdquo;,
-               password: &ldquo;secret-password&rdquo;,
-               connection: &ldquo;Username-Password-Authentication&rdquo;,
-               userMetadata: [&ldquo;first_name&rdquo;: &ldquo;First&rdquo;, &ldquo;last_name&rdquo;: &ldquo;Last&rdquo;])
-   .publisher()
-   .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print(&ldquo;Failed with \(error)&rdquo;)
-        }
-    }, receiveValue: { user in
-        print(&ldquo;User signed up: \(user)&rdquo;)
-    })
-    .store(in: &cancellables)
-&ldquo;`
-</details>
-
-<details>
-  <summary>Using Async/Await</summary>
-
-&rdquo;`swift
-do {
-    let user = try await Auth0
-        .authentication()
-        .createUser(email: &ldquo;support@auth0.com&rdquo;,
-                    password: &ldquo;secret-password&rdquo;,
-                    connection: &ldquo;Username-Password-Authentication&rdquo;,
-                    userMetadata: [&ldquo;first_name&rdquo;: &ldquo;First&rdquo;, &ldquo;last_name&rdquo;: &ldquo;Last&rdquo;])
-        .start()
-    print(&ldquo;User signed up: \(user)&rdquo;)
-} catch {
-    print(&ldquo;Failed with \(error)&rdquo;)
-}
-&ldquo;`
-</details>
-<h3 id='management-api-users' class='heading'>Management API (Users)</h3>
-
-<p>You can request more information about a user&rsquo;s profile and manage the user&rsquo;s metadata by accessing the Auth0 <a href="https://auth0.com/docs/api/management/v2">Management API</a>. For security reasons native mobile applications are restricted to a subset of the Management API functionality.</p>
-
-<p>You can find a detailed guide in this <a href="https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata">iOS Swift QuickStart</a>.</p>
-<h4 id='link-an-account' class='heading'>Link an account</h4>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">idToken</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">link</span><span class="p">(</span><span class="s">"user identifier"</span><span class="p">,</span> <span class="nv">withOtherUserToken</span><span class="p">:</span> <span class="s">"another user token"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
-        <span class="k">case</span> <span class="o">.</span><span class="nv">success</span><span class="p">:</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Accounts linked"</span><span class="p">)</span>
-        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-</code></pre>
-
-<details>
-  <summary>Using Combine</summary>
-
-&rdquo;`swift
-Auth0
-   .users(token: idToken)
-   .link(&ldquo;user identifier&rdquo;, withOtherUserToken: &ldquo;another user token&rdquo;)
-   .publisher()
-   .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print(&ldquo;Failed with \(error)&rdquo;)
-        }
-        print(&ldquo;Accounts linked&rdquo;)
-    }, receiveValue: { _ in })
-    .store(in: &cancellables)
-&ldquo;`
-</details>
-
-<details>
-  <summary>Using Async/Await</summary>
-
-&rdquo;`swift
-do {
-    try await Auth0
-        .users(token: idToken)
-        .link(&ldquo;user identifier&rdquo;, withOtherUserToken: &ldquo;another user token&rdquo;)
-        .start()
-    print(&ldquo;Accounts linked&rdquo;)
-} catch {
-    print(&ldquo;Failed with \(error)&rdquo;)
-}
-&ldquo;`
-</details>
-<h3 id='custom-domains' class='heading'>Custom Domains</h3>
-
-<p>If you are using <a href="https://auth0.com/docs/brand-and-customize/custom-domains">Custom Domains</a> and need to call an Auth0 endpoint
-such as <code>/userinfo</code>, please use the Auth0 domain specified for your Application in the <a href="https://manage.auth0.com/#/applications/">Auth0 Dashboard</a>.</p>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">audience</span><span class="p">(</span><span class="s">"https://YOUR_AUTH0_DOMAIN/userinfo"</span><span class="p">)</span>
-    <span class="c1">// ...</span>
-</code></pre>
-
-<p>Users of Auth0 Private Cloud with Custom Domains still on the <a href="https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains">legacy behavior</a> need to specify a custom issuer to match the Auth0 domain before starting the authentication. Otherwise, the ID Token validation will fail.</p>
-<pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">issuer</span><span class="p">(</span><span class="s">"https://YOUR_AUTH0_DOMAIN/"</span><span class="p">)</span>
-    <span class="c1">// ...</span>
-</code></pre>
 <h3 id='bot-detection' class='heading'>Bot Detection</h3>
 
-<p>If you are using the <a href="https://auth0.com/docs/configure/attack-protection/bot-detection">Bot Detection</a> feature and performing database login/signup via the Authentication API, you need to handle the <code>isVerificationRequired</code> error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Universal Login to complete it.</p>
+<p>If you are using the <a href="https://auth0.com/docs/configure/attack-protection/bot-detection">Bot Detection</a> feature and performing database login/signup via the Authentication API, you need to handle the <code>isVerificationRequired</code> error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span> <span class="nv">realm</span><span class="p">:</span> <span class="n">realm</span><span class="p">,</span> <span class="nv">scope</span><span class="p">:</span> <span class="n">scope</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span> 
+           <span class="nv">password</span><span class="p">:</span> <span class="n">password</span><span class="p">,</span> 
+           <span class="nv">realmOrConnection</span><span class="p">:</span> <span class="n">connection</span><span class="p">,</span> 
+           <span class="nv">scope</span><span class="p">:</span> <span class="n">scope</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span> <span class="c1">// ...</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">)</span> <span class="k">where</span> <span class="n">error</span><span class="o">.</span><span class="nv">isVerificationRequired</span><span class="p">:</span>
-        <span class="kt">DispatchQueue</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="k">async</span> <span class="p">{</span>
-            <span class="kt">Auth0</span>
-                <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
-                <span class="o">.</span><span class="nf">connection</span><span class="p">(</span><span class="n">realm</span><span class="p">)</span>
-                <span class="o">.</span><span class="nf">scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
-                <span class="o">.</span><span class="nf">useEphemeralSession</span><span class="p">()</span>
-                <span class="c1">// ☝🏼 Otherwise a session cookie will remain</span>
-                <span class="o">.</span><span class="nf">parameters</span><span class="p">([</span><span class="s">"login_hint"</span><span class="p">:</span> <span class="n">email</span><span class="p">])</span>
-                <span class="c1">// ☝🏼 So the user doesn't have to type it again</span>
-                <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-                    <span class="c1">// ...</span>
-                <span class="p">}</span>
-        <span class="p">}</span>
+            <span class="kt">DispatchQueue</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="k">async</span> <span class="p">{</span>
+                <span class="kt">Auth0</span>
+                    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
+                    <span class="o">.</span><span class="nf">connection</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
+                    <span class="o">.</span><span class="nf">scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+                    <span class="o">.</span><span class="nf">useEphemeralSession</span><span class="p">()</span>
+                    <span class="c1">// ☝🏼 Otherwise a session cookie will remain</span>
+                    <span class="o">.</span><span class="nf">parameters</span><span class="p">([</span><span class="s">"login_hint"</span><span class="p">:</span> <span class="n">email</span><span class="p">])</span>
+                    <span class="c1">// ☝🏼 So the user doesn't have to type it again</span>
+                    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+                        <span class="c1">// ...</span>
+                    <span class="p">}</span>
+            <span class="p">}</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span> <span class="c1">// ...</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
 
-<p>In the case of signup, you can add <a href="https://auth0.com/docs/login/universal-login/new-experience#signup">an additional parameter</a> to make the user land directly on the signup page.</p>
+<p>In the case of signup, you can add <a href="#signup-with-universal-login-ios--macos">an additional parameter</a> to make the user land directly on the signup page.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">parameters</span><span class="p">([</span><span class="s">"login_hint"</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span> <span class="s">"screen_hint"</span><span class="p">:</span> <span class="s">"signup"</span><span class="p">])</span>
     <span class="c1">// ...</span>
 </code></pre>
 
-<p>Check out how to set up Universal Login in the <a href="#getting-started">Getting Started</a> section.</p>
-<h3 id='logging' class='heading'>Logging</h3>
+<p>Check how to set up Web Auth in the <a href="#web-auth-configuration-ios--macos">Web Auth Configuration</a> section.</p>
+<h3 id='custom-domains' class='heading'>Custom Domains</h3>
 
-<p>To enable Auth0.swift to log HTTP requests and OAuth2 flow for debugging you can call the following method in either <code><a href="Protocols/WebAuth.html">WebAuth</a></code>, <code><a href="Protocols/Authentication.html">Authentication</a></code> or <code><a href="Protocols/Users.html">Users</a></code>:</p>
+<p>Users of Auth0 Private Cloud with Custom Domains still on the <a href="https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains">legacy behavior</a> need to specify a custom issuer to match the Auth0 Domain before performing Web Auth login. Otherwise, the ID Token validation will fail.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">logging</span><span class="p">(</span><span class="nv">enabled</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">issuer</span><span class="p">(</span><span class="s">"https://YOUR_AUTH0_DOMAIN/"</span><span class="p">)</span>
     <span class="c1">// ...</span>
 </code></pre>
+<h2 id='support-policy' class='heading'>Support Policy</h2>
 
-<p>Then for a successful authentication you&rsquo;ll see something similar to the following:</p>
-<pre class="highlight plaintext"><code>Safari: https://samples.auth0.com/authorize?.....
-URL: com.auth0.myapp://samples.auth0.com/ios/com.auth0.MyApp/callback?...
-POST https://samples.auth0.com/oauth/token HTTP/1.1
-Content-Type: application/json
+<p>This Policy defines the extent of the support for Xcode, Swift, and platform (iOS, macOS, tvOS, and watchOS) versions in Auth0.swift.</p>
+<h3 id='xcode' class='heading'>Xcode</h3>
 
-{"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.auth0.MyApp:\/\/samples.auth0.com\/ios\/com.auth0.MyApp\/callback","code_verifier":"..."}
+<p>The only supported versions of Xcode are those that can be currently used to submit apps to the App Store. Dropping older, unsupported Xcode versions <strong>will not be considered a breaking change</strong>, and will be done in <strong>minor</strong> releases.</p>
+<h3 id='swift' class='heading'>Swift</h3>
 
-HTTP/1.1 200
-Pragma: no-cache
-Content-Type: application/json
-Strict-Transport-Security: max-age=3600
-Date: Thu, 09 Jun 2016 19:04:39 GMT
-Content-Length: 57
-Cache-Control: no-cache
-Connection: keep-alive
+<p>The minimum supported Swift 5 minor version is the one released with the oldest-supported Xcode version. Dropping older, unsupported Swift 5 minors <strong>will not be considered a breaking change</strong>, and will be done in <strong>minor</strong> releases.</p>
+<h3 id='platforms' class='heading'>Platforms</h3>
 
-{"access_token":"...","token_type":"Bearer"}
-</code></pre>
+<p>Only the last 4 major platform versions are supported, starting from:</p>
+
+<ul>
+<li>iOS <strong>12</strong></li>
+<li>macOS <strong>10.15</strong></li>
+<li>Catalyst <strong>13</strong></li>
+<li>tvOS <strong>12</strong></li>
+<li>watchOS <strong>6.2</strong></li>
+</ul>
+
+<p>Dropping older, unsupported platform versions <strong>will not be considered a breaking change</strong>, and will be done in <strong>minor</strong> releases.</p>
 
 <blockquote>
-<p>Set this flag only when <strong>DEBUGGING</strong> to avoid leaking user&rsquo;s credentials in the device log.</p>
+<p>E.g. iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.</p>
 </blockquote>
+
+<p>In the case of macOS, the yearly named releases are considered a major platform version for the purposes of this Policy, regardless of the actual version numbers.</p>
+<h2 id='issue-reporting' class='heading'>Issue Reporting</h2>
+
+<p>For general support or usage questions, use the <a href="https://community.auth0.com/tags/c/sdks/5/swift">Auth0 Community</a> forums or raise a <a href="https://support.auth0.com/">support ticket</a>. Only <a href="https://github.com/auth0/Auth0.swift/issues">raise an issue</a> if you have found a bug or want to request a feature.</p>
+
+<p><strong>Do not report security vulnerabilities on the public GitHub issue tracker.</strong> The <a href="https://auth0.com/responsible-disclosure-policy">Responsible Disclosure Program</a> details the procedure for disclosing security issues.</p>
 <h2 id='what-is-auth0' class='heading'>What is Auth0?</h2>
 
 <p>Auth0 helps you to:</p>
@@ -1226,21 +1765,15 @@ Connection: keep-alive
 <li>Analytics of how, when, and where users are logging in.</li>
 <li>Pull data from other sources and add it to the user profile through <a href="https://auth0.com/docs/actions">JavaScript actions</a>.</li>
 </ul>
-<h2 id='create-a-free-auth0-account' class='heading'>Create a Free Auth0 Account</h2>
 
-<ol>
-<li>Go to <a href="https://auth0.com">Auth0</a> and click <strong>Sign Up</strong>.</li>
-<li>Use Google, GitHub, or Microsoft Account to login.</li>
-</ol>
-<h2 id='issue-reporting' class='heading'>Issue Reporting</h2>
-
-<p>If you have found a bug or to request a feature, please <a href="https://github.com/auth0/Auth0.swift/issues">raise an issue</a>. Please do not report security vulnerabilities on the public GitHub issue tracker. The <a href="https://auth0.com/responsible-disclosure-policy">Responsible Disclosure Program</a> details the procedure for disclosing security issues.</p>
-<h2 id='author' class='heading'>Author</h2>
-
-<p><a href="https://auth0.com">Auth0</a></p>
+<p><strong>Why Auth0?</strong> Because you should save time, be happy, and focus on what really matters: building your product.</p>
 <h2 id='license' class='heading'>License</h2>
 
-<p>This project is licensed under the MIT license. See the <a href="LICENSE">LICENSE</a> file for more info.</p>
+<p>This project is licensed under the MIT license. See the <a href="LICENSE">LICENSE</a> file for more information.</p>
+
+<hr>
+
+<p><a href="#table-of-contents">Go up ⤴</a></p>
 
           </div>
         </section>
@@ -1249,7 +1782,7 @@ Connection: keep-alive
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-14)</p>
+      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-23)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
