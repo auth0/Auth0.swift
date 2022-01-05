@@ -177,7 +177,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
      Auth0
          .webAuth(clientId: clientId, domain: "samples.auth0.com")
-         .publisher()
+         .start()
          .sink(receiveCompletion: { completion in
              if case .failure(let error) = completion {
                  print("Failed with \(error)")
@@ -194,7 +194,7 @@ public protocol WebAuth: Trackable, Loggable {
      - Returns: A type-erased publisher.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
-    func publisher() -> AnyPublisher<Credentials, WebAuthError>
+    func start() -> AnyPublisher<Credentials, WebAuthError>
 
     /**
      Removes Auth0 session and optionally remove the Identity Provider (IdP) session.

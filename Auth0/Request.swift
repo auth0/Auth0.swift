@@ -113,7 +113,7 @@ public extension Request {
 
      - Returns: A type-erased publisher.
      */
-    func publisher() -> AnyPublisher<T, E> {
+    func start() -> AnyPublisher<T, E> {
         return Deferred { Future(self.start) }.eraseToAnyPublisher()
     }
 
