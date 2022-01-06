@@ -75,7 +75,7 @@ If you are using SPM, open the following menu item in Xcode:
 In the **Search or Enter Package URL** search box enter this URL: 
 
 ```text
-https://github.com/auth0/Auth0.swift.git
+https://github.com/auth0/Auth0.swift
 ```
 
 Then, select the **Exact Version** dependency rule and input `2.0.0-beta.0` as the version number. Press **Add Package**.
@@ -110,7 +110,7 @@ Then, run `carthage bootstrap --use-xcframeworks`.
 
 ### Configuration
 
-Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. These details can be found on the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/). If you are using a [Custom Domain](https://auth0.com/docs/custom-domains), use the value of your Custom Domain instead of the value from the settings page.
+Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details on the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/). If you are using a [Custom Domain](https://auth0.com/docs/brand-and-customize/custom-domains), use the value of your Custom Domain instead of the value from the settings page.
 
 > ⚠️ Make sure that the [application type](https://auth0.com/docs/configure/applications) of the Auth0 application is **Native**. If you don’t have a Native Auth0 application, [create one](https://auth0.com/docs/get-started/create-apps/native-apps) before continuing.
 
@@ -123,10 +123,10 @@ Create a `plist` file named `Auth0.plist` in your application bundle with the fo
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>ClientId</key>
-  <string>YOUR_AUTH0_CLIENT_ID</string>
-  <key>Domain</key>
-  <string>YOUR_AUTH0_DOMAIN</string>
+    <key>ClientId</key>
+    <string>YOUR_AUTH0_CLIENT_ID</string>
+    <key>Domain</key>
+    <string>YOUR_AUTH0_DOMAIN</string>
 </dict>
 </plist>
 ```
@@ -165,33 +165,13 @@ Auth0
 
 ### Web Auth Configuration (iOS / macOS)
 
-For Web Auth, you need to set up the callback and logout URLs in the settings page of your Auth0 application.
+#### Configure Callback and Logout URLs
 
-#### Configure Callback URL
+The callback and logout URLs are the URLs that Auth0 invokes to redirect back to your application. Auth0 invokes the callback URL after authenticating the user, and the logout URL after removing the session cookie.
 
-The callback URL is the URL that Auth0 invokes **after the authentication process** to redirect back to your application. Since callback URLs can be manipulated, you will need to add your callback URL to the **Allowed Callback URLs** field in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback URL is not set, the authentication will fail.
+Since callback and logout URLs can be manipulated, you will need to add your URLs to the **Allowed Callback URLs** and **Allowed Logout URLs** fields in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback and logout URLs are not set, users will be unable to log in and out of the application and will get an error.
 
-In your application's `Info.plist` file, register your iOS / macOS bundle identifier as a custom URL scheme.
-
-```xml
-<key>CFBundleURLTypes</key>
-<array>
-    <dict>
-        <key>CFBundleTypeRole</key>
-        <string>None</string>
-        <key>CFBundleURLName</key>
-        <string>auth0</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-            <string>YOUR_BUNDLE_IDENTIFIER</string>
-        </array>
-    </dict>
-</array>
-```
-
-> 💡 If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As > Source Code**.
-
-Finally, go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL for your application to the **Allowed Callback URLs** field.
+Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the following value to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your application.
 
 ##### iOS
 
@@ -211,11 +191,27 @@ E.g. if your iOS bundle identifier was `com.company.myapp` and your Auth0 Domain
 com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 ```
 
-#### Configure Logout URL
+### Configure Custom URL Scheme
 
-The callback URL is the URL that Auth0 invokes **after removing the session cookie** to redirect back to your application. If the logout URL is not set, the logout will fail.
+In your application's `Info.plist` file, register the bundle identifier as a custom URL scheme.
 
-Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and copy the **Allowed Callback URLs** value you just added for authentication into the **Allowed Logout URLs** field.
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleTypeRole</key>
+        <string>None</string>
+        <key>CFBundleURLName</key>
+        <string>auth0</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+        </array>
+    </dict>
+</array>
+```
+
+> 💡 If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As > Source Code**.
 
 ### Web Auth Login (iOS / macOS)
 
@@ -275,9 +271,7 @@ do {
 
 ### Web Auth Logout (iOS / macOS)
 
-Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your application. 
-
-To clear the session cookie, call the `clearSession()` method in the action of your **Logout** button.
+Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your application. To clear the session cookie, call the `clearSession()` method in the action of your **Logout** button.
 
 ```swift
 Auth0
@@ -575,7 +569,7 @@ Note that this custom `URLSession` instance will be used when communicating with
 
 #### ID Token validation
 
-Auth0.swift automatically [validates](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) the ID Token obtained from Web Auth login, following the [Opend ID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID Token have not been tampered with and can be safely used.
+Auth0.swift automatically [validates](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) the ID Token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID Token have not been tampered with and can be safely used.
 
 ##### Custom Domains
 
