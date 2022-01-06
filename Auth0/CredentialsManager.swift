@@ -132,7 +132,7 @@ public struct CredentialsManager {
     ///    case .success(let credentials):
     ///        print("Obtained credentials: \(credentials)")
     ///    case .failure(let error):
-    ///        print("Failed with \(error)")
+    ///        print("Failed with: \(error)")
     ///    }
     /// }
     /// ```
@@ -145,7 +145,7 @@ public struct CredentialsManager {
     ///   - callback:   Callback with the user's credentials or the error.
     /// - Important: This method only works for a Refresh Token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: This method is thread-safe.
-    /// - See: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
@@ -280,7 +280,7 @@ public extension CredentialsManager {
     ///     .credentials()
     ///     .sink(receiveCompletion: { completion in
     ///         if case .failure(let error) = completion {
-    ///             print("Failed with \(error)")
+    ///             print("Failed with: \(error)")
     ///         }
     ///     }, receiveValue: { credentials in
     ///         print("Obtained credentials: \(credentials)")
@@ -296,7 +296,7 @@ public extension CredentialsManager {
     /// - Returns: A type-erased publisher.
     /// - Important: This method only works for a Refresh Token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: This method is thread-safe.
-    /// - See: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
     func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
             Future { callback in
@@ -356,7 +356,7 @@ public extension CredentialsManager {
     /// - Throws: An error of type ``CredentialsManagerError``.
     /// - Important: This method only works for a Refresh Token obtained after auth with OAuth 2.0 API Authorization.
     /// - Note: This method is thread-safe.
-    /// - See: [Auth0 Refresh Tokens Docs](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {

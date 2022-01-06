@@ -95,10 +95,12 @@ extension WebAuthError: Equatable {
 
 public extension WebAuthError {
 
+    /// Matches `WebAuthError` values in a switch statement.
     static func ~= (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
         return lhs.code == rhs.code
     }
 
+    /// Matches `Error` values in a switch statement.
     static func ~= (lhs: WebAuthError, rhs: Error) -> Bool {
         guard let rhs = rhs as? WebAuthError else { return false }
         return lhs.code == rhs.code
