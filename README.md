@@ -569,7 +569,7 @@ Note that this custom `URLSession` instance will be used when communicating with
 
 #### ID Token validation
 
-Auth0.swift automatically [validates](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) the ID Token obtained from Web Auth login, following the [Openid ID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID Token have not been tampered with and can be safely used.
+Auth0.swift automatically [validates](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) the ID Token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID Token have not been tampered with and can be safely used.
 
 ##### Custom Domains
 
