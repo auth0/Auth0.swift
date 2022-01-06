@@ -150,7 +150,7 @@ public protocol Authentication: Trackable, Loggable {
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Login using One Time Password and MFA token.
+     Verifies multi-factor authentication (MFA) using a one-time password (OTP).
 
      ```
      Auth0
