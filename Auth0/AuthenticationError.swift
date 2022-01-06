@@ -1,7 +1,9 @@
 import Foundation
 
 /**
- *  Represents an error during a request to Auth0 Authentication API.
+ *  Represents an error during a request to the Auth0 Authentication API.
+ *
+ *  - See: [Standard Error Responses](https://auth0.com/docs/api/authentication#standard-error-responses)
  */
 public struct AuthenticationError: Auth0APIError {
 

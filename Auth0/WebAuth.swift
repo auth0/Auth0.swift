@@ -67,7 +67,7 @@ public protocol WebAuth: Trackable, Loggable {
     func redirectURL(_ redirectURL: URL) -> Self
 
     ///  Audience name of the API that your application will call using the `access_token` returned after authentication.
-    ///  This value must match the one defined in the APIs Section of the [Auth0 Dashboard](https://manage.auth0.com/#/apis).
+    ///  This value must match the one defined in the APIs section of the [Auth0 Dashboard](https://manage.auth0.com/#/apis).
     ///
     /// - Parameter audience: An audience value like: `https://example.com/api`.
     /// - Returns: The same WebAuth instance to allow method chaining.
@@ -129,13 +129,13 @@ public protocol WebAuth: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
          }
      }
      ```
 
      Any ongoing WebAuth session will be automatically cancelled when starting a new one,
-     and its corresponding callback with be called with a failure result of `WebAuthError.userCancelled`.
+     and its corresponding callback with be called with a failure result containing a ``WebAuthError/userCancelled``.
 
      - Parameter callback: Callback called with the result of the WebAuth flow.
      */
@@ -152,12 +152,12 @@ public protocol WebAuth: Trackable, Loggable {
              .start()
          print("Obtained credentials: \(credentials)")
      } catch {
-         print("Failed with \(error)")
+         print("Failed with: \(error)")
      }
      ```
 
      Any ongoing WebAuth session will be automatically cancelled when starting a new one,
-     and it will throw a `WebAuthError.userCancelled` error.
+     and it will throw a ``WebAuthError/userCancelled`` error.
 
      - Returns: The result of the WebAuth flow.
      - Throws: An error of type ``WebAuthError``.
@@ -180,7 +180,7 @@ public protocol WebAuth: Trackable, Loggable {
          .start()
          .sink(receiveCompletion: { completion in
              if case .failure(let error) = completion {
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }, receiveValue: { credentials in
              print("Obtained credentials: \(credentials)")
@@ -189,7 +189,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      Any ongoing WebAuth session will be automatically cancelled when starting a new one,
-     and the subscription will complete with a failure result of `WebAuthError.userCancelled`.
+     and the subscription will complete with a failure result containing a ``WebAuthError/userCancelled``.
 
      - Returns: A type-erased publisher.
      */
@@ -211,7 +211,7 @@ public protocol WebAuth: Trackable, Loggable {
              case .success:
                  print("Logged out")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
          }
      ```
 
@@ -226,7 +226,7 @@ public protocol WebAuth: Trackable, Loggable {
      - Parameters:
        - federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
        - callback: Callback called with the result of the call.
-     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+     - See: [Logout](https://auth0.com/docs/login/logout)
      */
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
 
@@ -246,7 +246,7 @@ public protocol WebAuth: Trackable, Loggable {
              case .finished:
                  print("Logged out")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }, receiveValue: {})
          .store(in: &cancellables)
@@ -265,7 +265,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - Parameter federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
      - Returns: A type-erased publisher.
-     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+     - See: [Logout](https://auth0.com/docs/login/logout)
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError>
@@ -285,7 +285,7 @@ public protocol WebAuth: Trackable, Loggable {
              .clearSession()
          print("Logged out")
      } catch {
-         print("Failed with \(error)")
+         print("Failed with: \(error)")
      }
      ```
 
@@ -298,7 +298,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      - Parameter federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
-     - See: [Auth0 Logout docs](https://auth0.com/docs/login/logout)
+     - See: [Logout](https://auth0.com/docs/login/logout)
      */
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)

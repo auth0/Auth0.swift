@@ -7,10 +7,10 @@ import Foundation
 public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
 
 /**
- Auth endpoints of Auth0.
+ Client for the [Auth0 Authentication API](https://auth0.com/docs/api/authentication).
 
  - See: ``AuthenticationError``
- - See: [Auth0 Auth API docs](https://auth0.com/docs/api/authentication)
+ - See: [Standard Error Responses](https://auth0.com/docs/api/authentication#standard-error-responses)
  */
 public protocol Authentication: Trackable, Loggable {
 
@@ -31,7 +31,7 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
@@ -57,6 +57,8 @@ public protocol Authentication: Trackable, Loggable {
        - scope:    Scope value requested when authenticating the user. Default is `openid profile email`.
      - Returns: Authentication request that will yield Auth0 user's credentials.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
+     - See: [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
      */
     func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -72,7 +74,7 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
@@ -98,6 +100,8 @@ public protocol Authentication: Trackable, Loggable {
        - scope:       Scope value requested when authenticating the user. Default is `openid profile email`.
      - Returns: Authentication request that will yield Auth0 user's credentials.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
+     - See: [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
      */
     func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -115,7 +119,7 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
@@ -141,12 +145,12 @@ public protocol Authentication: Trackable, Loggable {
        - scope:             Scope value requested when authenticating the user.
      - Important: This only works if you have the OAuth 2.0 API Authorization flag on.
      - Returns: Authentication request that will yield Auth0 user's credentials.
-     - Requires: Grant `http://auth0.com/oauth/grant-type/password-realm`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - Requires: The `http://auth0.com/oauth/grant-type/password-realm` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
      */
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Login using One Time Password and MFA token.
+     Verifies multi-factor authentication (MFA) using a one-time password (OTP).
 
      ```
      Auth0
@@ -157,7 +161,7 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
@@ -165,11 +169,13 @@ public protocol Authentication: Trackable, Loggable {
      - Parameters:
        - otp:      One time password supplied by MFA Authenticator.
        - mfaToken: Token returned when authentication fails due to MFA requirement.
-     - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - Requires: The `http://auth0.com/oauth/grant-type/mfa-otp` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-one-time-password-otp-)
      */
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
-    /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either Push notification, SMS, or Voice).
+    /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either Push notification, SMS,
+    /// or Voice).
     ///
     /// ```
     /// Auth0
@@ -180,7 +186,7 @@ public protocol Authentication: Trackable, Loggable {
     ///         case .success(let credentials):
     ///             print("Obtained credentials: \(credentials)")
     ///         case .failure(let error):
-    ///             print("Failed with \(error)")
+    ///             print("Failed with: \(error)")
     ///         }
     ///     }
     /// ```
@@ -190,11 +196,14 @@ public protocol Authentication: Trackable, Loggable {
     ///   - mfaToken:    Token returned when authentication fails due to MFA requirement.
     ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message.
     /// - Returns: A request that will yield Auth0 user's credentials.
-    /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-oob`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-oob` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+    /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-out-of-band-oob-)
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using a recovery code.
-    /// Some multi-factor authentication (MFA) providers (such as Guardian) support using a recovery code to login. Use this method to authenticate when the user's enrolled device is unavailable, or the user cannot receive the challenge or accept it due to connectivity issues.
+    /// Some multi-factor authentication (MFA) providers support using a recovery code to login. Use this method to
+    /// authenticate when the user's enrolled device is unavailable, or the user cannot receive the challenge or accept
+    /// it due to connectivity issues.
     ///
     /// ```
     /// Auth0
@@ -205,7 +214,7 @@ public protocol Authentication: Trackable, Loggable {
     ///         case .success(let credentials):
     ///             print("Obtained credentials: \(credentials)")
     ///         case .failure(let error):
-    ///             print("Failed with \(error)")
+    ///             print("Failed with: \(error)")
     ///         }
     ///     }
     /// ```
@@ -213,11 +222,14 @@ public protocol Authentication: Trackable, Loggable {
     /// - Parameters:
     ///   - recoveryCode: Recovery code provided by the end-user.
     ///   - mfaToken:     Token returned when authentication fails due to MFA requirement.
-    /// - Returns: A request that will yield Auth0 user's credentials. Might include a recovery code, which the application must display to the end-user to be stored securely for future use.
-    /// - Requires: Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+    /// - Returns: A request that will yield Auth0 user's credentials. Might include a recovery code, which the
+    /// application must display to the end-user to be stored securely for future use.
+    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-recovery-code` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+    /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-recovery-code)
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
-    /// Request a challenge for multi-factor authentication (MFA) based on the challenge types supported by the application and user.
+    /// Request a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
+    /// application and user.
     /// The `type` is how the user will get the challenge and prove possession. Supported challenge types include:
     /// * `otp`:  for one-time password (OTP)
     /// * `oob`:  for SMS/Voice messages or out-of-band (OOB)
@@ -227,10 +239,11 @@ public protocol Authentication: Trackable, Loggable {
     ///   - types:           A list of the challenges types accepted by your application. Accepted challenge types are `oob` or `otp`. Excluding this parameter means that your client application accepts all supported challenge types.
     ///   - authenticatorId: The ID of the authenticator to challenge. You can get the ID by querying the list of available authenticators for the user.
     /// - Returns: A request that will yield a multi-factor challenge.
+    /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#challenge-request)
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
 
     /**
-     Authenticate a user with their Sign In With Apple authorization code.
+     Authenticate a user with their Sign In with Apple authorization code.
 
      ```
      Auth0
@@ -241,7 +254,7 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
@@ -265,6 +278,7 @@ public protocol Authentication: Trackable, Loggable {
        - audience:          API Identifier that the client is requesting access to.   
        - scope:             Requested scope value when authenticating the user. By default is `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#token-exchange-for-native-social)
      */
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -280,7 +294,7 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
@@ -302,6 +316,7 @@ public protocol Authentication: Trackable, Loggable {
        - audience:           API Identifier that the client is requesting access to.
        - scope:              Requested scope value when authenticating the user. By default is `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#token-exchange-for-native-social)
      */
     func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -318,7 +333,7 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
@@ -359,7 +374,7 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let user):
                  print("User signed up: \(user)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
@@ -396,6 +411,7 @@ public protocol Authentication: Trackable, Loggable {
        - userMetadata:   Additional user metadata parameters that will be added to the newly created user.
        - rootAttributes: Root attributes that will be added to the newly created user. See https://auth0.com/docs/api/authentication#signup for supported attributes. Will not overwrite existing parameters.
      - Returns: A request that will yield a created database user (just email, username, and email verified flag).
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#signup)
      */
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
@@ -413,6 +429,7 @@ public protocol Authentication: Trackable, Loggable {
        - email:      Email of the database user.
        - connection: Name of the database connection.
      - Returns: A request to reset the password.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#change-password)
      */
     func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError>
 
@@ -441,6 +458,8 @@ public protocol Authentication: Trackable, Loggable {
        - connection: Name of the passwordless connection. By default is 'email'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
+     - See: [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
      */
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
@@ -469,6 +488,8 @@ public protocol Authentication: Trackable, Loggable {
        - connection:  Name of the passwordless connection. By default is 'sms'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
+     - See: [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
      */
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
@@ -484,18 +505,19 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let user):
                  print("User: \(user)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
 
      - Parameter accessToken: Access Token obtained by authenticating the user.
      - Returns: A request that will yield user information.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-user-info)
      */
     func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError>
 
     /**
-     Performs the last step of Proof Key for Code Exchange [RFC 7636](https://tools.ietf.org/html/rfc7636).
+     Performs the last step of Proof Key for Code Exchange (PKCE).
      This will request the user's token using the code and it's verifier after a request to `/oauth/authorize`.
 
      ```
@@ -509,7 +531,7 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
@@ -519,7 +541,8 @@ public protocol Authentication: Trackable, Loggable {
        - codeVerifier: Verifier used to generate the challenge sent in `/oauth/authorize` request.
        - redirectURI:  Redirect URI sent in `/oauth/authorize` request.
      - Returns: A request that will yield Auth0 user's credentials.
-     - See: https://tools.ietf.org/html/rfc7636
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authorization-code-flow-with-pkce45)
+     - See: [RFC 7636](https://tools.ietf.org/html/rfc7636)
      */
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
@@ -534,12 +557,12 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let credentials):
                  print("Obtained new credentials: \(credentials)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
 
-     To ask the same scopes requested when the Refresh Token was issued:
+     To request the same scopes as when the Refresh Token was issued:
 
      ```
      Auth0
@@ -552,6 +575,7 @@ public protocol Authentication: Trackable, Loggable {
        - scope:        Scopes to request for the new tokens. By default is `nil`, which will ask for the same ones requested during Auth.
      - Important: This method only works for a Refresh Token obtained after authentication with OAuth 2.0 API Authorization.
      - Returns: A request that will yield Auth0 user's credentials.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
      */
     func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
 
@@ -567,6 +591,8 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameter refreshToken: The client's Refresh Token.
      - Returns: A request.
+     - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
+     - See: [Error Responses](https://auth0.com/docs/api/authentication#post-oauth-revoke)
      */
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError>
 
@@ -582,12 +608,13 @@ public protocol Authentication: Trackable, Loggable {
              case .success(let jwks):
                  print("Obtained JWKS: \(jwks)")
              case .failure(let error):
-                 print("Failed with \(error)")
+                 print("Failed with: \(error)")
              }
          }
      ```
     
      - Returns: A request that will yield JWKS information.
+     - See: [JSON Web Key Sets](https://auth0.com/docs/security/tokens/json-web-tokens/json-web-key-sets)
      */
     func jwks() -> Request<JWKS, AuthenticationError>
 
