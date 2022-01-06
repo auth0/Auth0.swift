@@ -81,10 +81,12 @@ extension CredentialsManagerError: Equatable {
 
 public extension CredentialsManagerError {
 
+    /// Matches `CredentialsManagerError` values in a switch statement.
     static func ~= (lhs: CredentialsManagerError, rhs: CredentialsManagerError) -> Bool {
         return lhs.code == rhs.code
     }
 
+    /// Matches `Error` values in a switch statement.
     static func ~= (lhs: CredentialsManagerError, rhs: Error) -> Bool {
         guard let rhs = rhs as? CredentialsManagerError else { return false }
         return lhs.code == rhs.code

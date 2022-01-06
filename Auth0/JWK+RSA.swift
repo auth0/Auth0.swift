@@ -13,6 +13,10 @@ extension JWK {
         return generateRSAPublicKey(from: encodedKey)
     }
 
+}
+
+private extension JWK {
+
     private func encodeRSAPublicKey(modulus: [UInt8], exponent: [UInt8]) -> Data {
         var prefixedModulus: [UInt8] = [0x00] // To indicate that the number is not negative
         prefixedModulus.append(contentsOf: modulus)

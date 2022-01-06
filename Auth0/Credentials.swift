@@ -16,19 +16,34 @@ private struct StructCredentials {
 @objc(A0Credentials)
 public final class Credentials: NSObject {
 
-    /// Token that can be used to make authenticated requests to the specified API (the **audience** value used on authentication).
+    /// Token that can be used to make authenticated requests to the specified API (the **audience** value used on login).
+    ///
+    /// - See: [Access Tokens](https://auth0.com/docs/security/tokens/access-tokens)
     public let accessToken: String
     /// Type of the Access Token.
     public let tokenType: String
     /// When the Access Token expires.
     public let expiresIn: Date
-    /// Token that can be used to request a new Access Token. Requires the scope `offline_access` to be requested on authentication.
+    /// Token that can be used to request a new Access Token.
+    ///
+    /// - Requires: The scope `offline_access` to be requested on login.
+    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
     public let refreshToken: String?
     /// Token that contains the user information.
+    ///
+    /// - Important: The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their
+    /// contents have not been tampered with. **This is not the case for the ID Tokens obtained from the Authentication API
+    /// client.** You must [validate](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) any ID
+    /// Tokens received from the Authentication API client before using the information they contain.
+    /// - See: [ID Tokens](https://auth0.com/docs/security/tokens/id-tokens)
     public let idToken: String
     /// Granted scopes. This value is only present when one or more of the requested scopes were not granted.
+    ///
+    /// - See: [Scopes]{https://auth0.com/docs/configure/apis/scopes}
     public let scope: String?
     /// MFA recovery code that the application must display to the end-user, to be stored securely for future use.
+    ///
+    /// - See: [MFA Recovery Codes](https://auth0.com/docs/mfa/configure-recovery-codes-for-mfa)
     public let recoveryCode: String?
 
     /// Custom description that redacts the tokens with `<REDACTED>`.
