@@ -2,55 +2,57 @@
 
 Auth0.swift v2 includes many significant changes:
 
-- Retrieving credentials from the Credentials Manager is now thread-safe.
-- The Credentials Manager is now decoupled from [SimpleKeychain](https://github.com/auth0/SimpleKeychain).
-- Usage of the Swift 5 `Result` type.
+- Thread-safe renewal of credentials from the Credentials Manager.
+- Support for custom storage layer in the Credentials Manager.
+- Support for async/await and Combine.
 - Support for custom headers.
-- Support for Combine and async/await.
+- Adoption of the Swift 5 `Result` type.
 - Simplified error handling.
 
 As expected with a major release, Auth0.swift v2 contains breaking changes. Please review this guide thorougly to understand the changes required to migrate your app to v2.
 
-## Table of contents
+---
 
-- [Supported languages](#supported-languages)
-    * [Swift](#swift)
-    * [Objective-C](#objective-c)
-- [Supported platform versions](#supported-platform-versions)
-- [Default values](#default-values)
-    * [Scope](#scope)
-- [Types removed](#types-removed)
-    * [Protocols](#protocols)
-    * [Type aliases](#type-aliases)
-    * [Enums](#enums)
-    * [Structs](#structs)
-    * [Classes](#classes)
-- [Methods removed](#methods-removed)
-    * [Authentication client](#authentication-client)
-    * [Web Auth](#web-auth)
-    * [Credentials Manager](#credentials-manager)
-    * [Errors](#errors)
-    * [Extensions](#extensions)
-- [Types changed](#types-changed)
-- [Type properties changed](#type-properties-changed)
-    * [`PasswordlessType` enum](#passwordlesstype-enum)
-    * [`AuthenticationError` struct](#authenticationerror-struct)
-    * [`ManagementError` struct](#managementerror-struct)
-    * [`WebAuthError` struct](#webautherror-struct)
-    * [`CredentialsManagerError` struct](#credentialsmanagererror-struct)
-    * [`UserInfo` struct](#userinfo-struct)
-    * [`Credentials` class](#credentials-class)
-    * [`NSError` extension](#nserror-extension)
-- [Method signatures changed](#method-signatures-changed)
-    * [Authentication client](#authentication-client-1)
-    * [Management client](#management-client)
-    * [Web Auth](#web-auth-1)
-    * [Credentials Manager](#credentials-manager-1)
-- [Behavior changes](#behavior-changes)
-    + [Web Auth](#web-auth-2)
-    + [Credentials Manager](#credentials-manager-2)
+## Table of Contents
 
-## Supported languages
+- [Supported Languages](#supported-languages)
+  + [Swift](#swift)
+  + [Objective-C](#objective-c)
+- [Supported Platform Versions](#supported-platform-versions)
+- [Default Values](#default-values)
+  + [Scope](#scope)
+- [Types Removed](#types-removed)
+  + [Protocols](#protocols)
+  + [Type aliases](#type-aliases)
+  + [Enums](#enums)
+  + [Structs](#structs)
+  + [Classes](#classes)
+- [Methods Removed](#methods-removed)
+  + [Authentication client](#authentication-client)
+  + [Web Auth](#web-auth)
+  + [Credentials Manager](#credentials-manager)
+  + [Errors](#errors)
+  + [Extensions](#extensions)
+- [Types Changed](#types-changed)
+- [Type Properties Changed](#type-properties-changed)
+  + [`PasswordlessType` enum](#passwordlesstype-enum)
+  + [`AuthenticationError` struct](#authenticationerror-struct)
+  + [`ManagementError` struct](#managementerror-struct)
+  + [`WebAuthError` struct](#webautherror-struct)
+  + [`CredentialsManagerError` struct](#credentialsmanagererror-struct)
+  + [`UserInfo` struct](#userinfo-struct)
+  + [`Credentials` class](#credentials-class)
+  + [`NSError` extension](#nserror-extension)
+- [Method Signatures Changed](#method-signatures-changed)
+  + [Authentication client](#authentication-client-1)
+  + [Management client](#management-client)
+  + [Web Auth](#web-auth-1)
+  + [Credentials Manager](#credentials-manager-1)
+- [Behavior Changes](#behavior-changes)
+  + [Web Auth](#web-auth-2)
+  + [Credentials Manager](#credentials-manager-2)
+
+## Supported Languages
 
 ### Swift
 
@@ -60,7 +62,7 @@ The minimum supported Swift version is now **5.3**.
 
 Auth0.swift no longer supports Objective-C.
 
-## Supported platform versions
+## Supported Platform Versions
 
 The deployment targets for each platform were raised to:
 
@@ -70,13 +72,13 @@ The deployment targets for each platform were raised to:
 - tvOS **12.0**
 - watchOS **6.2**
 
-## Default values
+## Default Values
 
 ### Scope
 
 The default scope value in Web Auth and all the Authentication client methods (except `renew(withRefreshToken:scope:)`, in which `scope` keeps defaulting to `nil`) was changed from an assortment of values to `openid profile email`.
 
-## Types removed
+## Types Removed
 
 ### Protocols
 
@@ -120,7 +122,7 @@ The following classes were also removed, as they were no longer being used:
 
 You should use `UserInfo` from `userInfo(withAccessToken:)` instead.
 
-## Methods removed
+## Methods Removed
 
 The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed. You can safely remove them from your app.
 
@@ -130,17 +132,109 @@ The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAu
 
 You should use `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` instead.
 
+> 💡 To pass custom parameters, use the `parameters(_:)` method from `Request`.
+
+<details>
+  <summary>Before</summary>
+
+```swift
+Auth0
+    .authentication()
+    .login(usernameOrEmail: username, 
+           password: password, 
+           connection: connection, 
+           scope: scope, 
+           parameters: ["key": "value"])
+    .start { result in
+        // ...
+    }
+```
+</details>
+
+<details>
+  <summary>After</summary>
+
+```swift
+Auth0
+    .authentication()
+    .login(usernameOrEmail: username, 
+           password: password, 
+           realmOrConnection: connection, 
+           scope: scope)
+    .parameters(["key": "value"])
+    .start { result in
+        // ...
+    }
+}
+```
+</details>
+
+For multi-factor authentication, use `multifactorChallenge(mfaToken:types:authenticatorId:)` and then either `login(withOTP:mfaToken:)` or `login(withOOBCode:mfaToken:bindingCode:)`.
+
+> 💡 Check the [API Documentation](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html) for more details.
+
 #### `signUp(email:username:password:connection:userMetadata:scope:parameters:)`
 
-You should use `signup(email:username:password:connection:userMetadata:rootAttributes:)` and then `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` instead. That is, create the user and then log them in.
+You should use `signup(email:username:password:connection:userMetadata:rootAttributes:)` and then `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` instead. That is, first create the user and then log them in.
 
-#### `tokenInfo(token:)` and `userInfo(token:)`
+> 💡 To pass custom parameters, use the `parameters(_:)` method from `Request`.
 
-You should use `userInfo(withAccessToken:)` instead.
+<details>
+  <summary>Before</summary>
+
+```swift
+Auth0
+    .authentication()
+    .signUp(email: email, 
+            username: username, 
+            password: password, 
+            connection: connection, 
+            userMetadata: metadata, 
+            scope: scope, 
+            parameters: ["key": "value"])
+    .start { result in
+        // ...
+    }
+```
+</details>
+
+<details>
+  <summary>After</summary>
+
+```swift
+Auth0
+    .authentication()
+    .signup(email: email, 
+            username: username, 
+            password: password, 
+            connection: connection, 
+            userMetadata: metadata)
+    .start { result in
+        switch result {
+        case .success:
+            Auth0
+                .authentication()
+                .login(usernameOrEmail: username, 
+                       password: password, 
+                       realmOrConnection: connection, 
+                       scope: scope)
+                .parameters(["key": "value"])
+                .start { result in
+                    // ...
+                }
+        case .failure(let error):
+            print("Failed with: \(error)") 
+        }
+    }
+}
+```
+</details>
 
 #### `tokenExchange(withParameters:)`
 
-You should use `codeExchange(withCode:codeVerifier:redirectURI:)` instead. To pass custom parameters, use the `parameters(_:)` method from `Request`.
+You should use `codeExchange(withCode:codeVerifier:redirectURI:)` instead.
+
+> 💡 To pass custom parameters, use the `parameters(_:)` method from `Request`.
 
 <details>
   <summary>Before</summary>
@@ -174,7 +268,11 @@ Auth0
 
 #### `tokenExchange(withAppleAuthorizationCode:scope:audience:fullName:)`
 
-You should use `login(appleAuthorizationCode:fullName:profile:audience:scope:)` instead. 
+You should use `login(appleAuthorizationCode:fullName:profile:audience:scope:)` instead.
+
+#### `tokenInfo(token:)` and `userInfo(token:)`
+
+You should use `userInfo(withAccessToken:)` instead.
 
 #### `webAuth(withConnection:)`
 
@@ -186,7 +284,7 @@ You should use Web Auth with its `connection(_:)` method instead.
 ```swift
 Auth0
     .authentication()
-    .webAuth(withConnection: "some-connection")
+    .webAuth(withConnection: connection)
     .start { result in
         // ...
     }
@@ -200,7 +298,7 @@ Auth0
 ```swift
 Auth0
     .webAuth()
-    .connection("some-connection")
+    .connection(connection)
     .start { result in
         // ...
     }
@@ -226,7 +324,7 @@ The `useUniversalLink()` method was removed as well, as Universal Links [cannot 
 
 `useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were also removed. Auth0.swift now only uses `ASWebAuthenticationSession` to perform web-based authentication.
 
-**Check out the [FAQ](FAQ.md) for more information about the alert box that pops up by default when using Web Auth.**
+> 💡 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
 ### Credentials Manager
 
@@ -252,7 +350,7 @@ The `init(string: String?, statusCode: Int)` initializer was removed.
 
 The `a0_url(_:)` method is no longer public.
 
-## Types changed
+## Types Changed
 
 - `Auth0Error` was renamed to `Auth0APIError`, and `Auth0Error` is now a different protocol.
 - `Credentials` is now a `final` class that conforms to `Codable` instead of `JSONObjectPayload`.
@@ -263,7 +361,7 @@ The `a0_url(_:)` method is no longer public.
 - `WebAuthError` was changed from enum to struct.
 - `CredentialsManagerError` was changed from enum to struct.
 
-## Type properties changed
+## Type Properties Changed
 
 ### `PasswordlessType` enum
 
@@ -400,13 +498,13 @@ These properties were removed:
 - `a0_isManagementError`
 - `a0_isAuthenticationError`
 
-## Method signatures changed
+## Method Signatures Changed
 
 ### Authentication client
 
 #### Errors
 
-The methods of the Authentication API client now only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError`.
+The methods of the Authentication API client now only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError` value.
 
 <details>
   <summary>Before</summary>
@@ -473,7 +571,7 @@ In the following methods the `scope` and `audience` parameters switched places, 
 
 #### Changed `scope` parameter to be non-optional
 
-In the following methods the `scope` parameter became non-optional (with a default value of `openid profile email`):
+In the following methods the `scope` parameter became non-optional, with a default value of `openid profile email`:
 
 - `login(email:code:audience:scope:)`
 - `login(phoneNumber:code:audience:scope:)`
@@ -490,7 +588,7 @@ The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `cha
 
 #### Errors
 
-The methods of the Management API client now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError`.
+The methods of the Management API client now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError` value.
 
 <details>
   <summary>Before</summary>
@@ -519,7 +617,7 @@ case .failure(let error): // handle ManagementError
 
 #### Errors
 
-The Web Auth methods now only yield errors of type  `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError`.
+The Web Auth methods now only yield errors of type  `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError` value.
 
 <details>
   <summary>Before</summary>
@@ -546,7 +644,7 @@ case .failure(let error): // handle WebAuthError
 
 #### `clearSession(federated:)`
 
-This method now yields a `Result<Void, WebAuthError>`, which is aliased to `WebAuthResult<Void>`. This means you can now check the type of error (e.g. if the user cancelled the operation) and act accordingly.
+This method now yields a `Result<Void, WebAuthError>`, which is aliased to `WebAuthResult<Void>`. This means you can now check the type of error, e.g. if the user cancelled the operation.
 
 <details>
   <summary>Before</summary>
@@ -582,7 +680,7 @@ Auth0
 
 #### Errors
 
-The methods of the Credentials Manager now only yield errors of type  `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError`.
+The methods of the Credentials Manager now only yield errors of type  `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError` value.
 
 <details>
   <summary>Before</summary>
@@ -634,7 +732,7 @@ let credentialsManager = CredentialsManager(authentication: authentication,
                                             storage: CustomStore())
 ```
 
-#### `credentials(withScope:minTTL:parameters:callback)`
+#### `credentials(withScope:minTTL:parameters:headers:callback:)`
 
 This method now yields a `Result<Credentials, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Credentials>`.
 
@@ -696,15 +794,13 @@ credentialsManager.revoke { result in
 ```
 </details>
 
-## Behavior changes
+## Behavior Changes
 
 ### Web Auth
 
 #### Supported JWT signature algorithms
 
-ID Tokens signed with the HS256 algorithm are no longer allowed. 
-This is because HS256 is a symmetric algorithm, which is not suitable for public clients like mobile apps.
-The only algorithm supported now is RS256, an asymmetric algorithm.
+ID Tokens signed with the HS256 algorithm are no longer allowed. This is because HS256 is a symmetric algorithm, which is not suitable for public clients like mobile apps.The only algorithm supported now is RS256, an asymmetric algorithm.
 
 If your app is using HS256, you'll need to switch it to RS256 in the dashboard or login will fail with an error:
 
@@ -733,10 +829,14 @@ The ID Token expiration is no longer used to determine if the credentials are st
 
 `hasValid(minTTL:)` no longer returns `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
 
-Note that `hasValid(minTTL:)` is no longer being called in `credentials(withScope:minTTL:parameters:callback:)` _before_ the biometrics authentication. If you were relying on this behavior, you'll need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:callback:)` yourself.
+Note that `hasValid(minTTL:)` is no longer being called in `credentials(withScope:minTTL:parameters:headers:callback:)` _before_ the biometrics authentication. If you were relying on this behavior, you'll need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:headers:callback:)` yourself.
 
-You'll also need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:callback:)` yourself if you're not using a Refresh Token. Otherwise, that method will now produce a `CredentialsManagerError.noRefreshToken` error when the credentials are not valid and there is no Refresh Token available.
+You'll also need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:headers:callback:)` yourself if you're not using a Refresh Token. Otherwise, that method will now produce a `CredentialsManagerError.noRefreshToken` error when the credentials are not valid and there is no Refresh Token available.
 
 #### Thread-safety when renewing credentials
 
-The method `credentials(withScope:minTTL:parameters:callback:)` now executes the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
+The method `credentials(withScope:minTTL:parameters:headers:callback:)` now executes the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
+
+---
+
+[Go up ⤴](#table-of-contents)
