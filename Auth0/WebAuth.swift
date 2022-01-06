@@ -135,7 +135,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      Any ongoing WebAuth session will be automatically cancelled when starting a new one,
-     and its corresponding callback with be called with a failure result of `WebAuthError.userCancelled`.
+     and its corresponding callback with be called with a failure result containing a ``WebAuthError/userCancelled``.
 
      - Parameter callback: Callback called with the result of the WebAuth flow.
      */
@@ -157,7 +157,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      Any ongoing WebAuth session will be automatically cancelled when starting a new one,
-     and it will throw a `WebAuthError.userCancelled` error.
+     and it will throw a ``WebAuthError/userCancelled`` error.
 
      - Returns: The result of the WebAuth flow.
      - Throws: An error of type ``WebAuthError``.
@@ -189,7 +189,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      Any ongoing WebAuth session will be automatically cancelled when starting a new one,
-     and the subscription will complete with a failure result of `WebAuthError.userCancelled`.
+     and the subscription will complete with a failure result containing a ``WebAuthError/userCancelled``.
 
      - Returns: A type-erased publisher.
      */

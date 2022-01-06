@@ -6,10 +6,9 @@ import Foundation
 public typealias ManagementObject = [String: Any]
 
 /**
- Client for the User endpoints of the Auth0 Management API v2.
+ Client for the [User endpoints](https://auth0.com/docs/api/management/v2#!/Users) of the Auth0 Management API v2.
 
  - See: ``ManagementError``
- - See: [Auth0 Management API](https://auth0.com/docs/api/management/v2#!/Users)
  */
 public protocol Users: Trackable, Loggable {
 
@@ -59,7 +58,7 @@ public protocol Users: Trackable, Loggable {
        - fields:     List of the user's field names that will be included/excluded in the response. By default all will be retrieved.
        - include:    Flag that indicates that only the names in 'fields' should be included or not in the response. By default it will include them.
      - Returns: A request that will yield a user.
-     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id).
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id)
      - Important: The token must have the scope `read:users` scope.
      */
     func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError>
@@ -106,7 +105,7 @@ public protocol Users: Trackable, Loggable {
        - attributes: Root attributes to be updated.
      - Returns: A request.
      - See: ``UserPatchAttributes``
-     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id).
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      - Important: The token must have one of  the following scopes: `update:users`, `update:users_app_metadata`.
      */
     func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError>
@@ -125,7 +124,7 @@ public protocol Users: Trackable, Loggable {
        - identifier:   ID of the user.
        - userMetadata: Metadata to update.
      - Returns: A request to patch `user_metadata`.
-     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id).
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      - Important: The token must have one of  the following scopes: `update:users`, `update:users_app_metadata`.
      */
     func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError>
@@ -145,8 +144,8 @@ public protocol Users: Trackable, Loggable {
        - identifier: ID of the primary user who will be linked against a secondary one.
        - token:      Token of the secondary user to link to.
      - Returns: A request to link two users.
-     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities).
-     - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking).
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
+     - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking)
      - Important: The token must have the scope `update:current_user_identities`.
      */
     func link(_ identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError>
@@ -167,8 +166,8 @@ public protocol Users: Trackable, Loggable {
        - provider:     Name of the provider of the secondary user, e.g. 'auth0' for Database connections.
        - connectionId: ID of the connection of the secondary user.
      - Returns: A request to link two users.
-     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities).
-     - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking).
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
+     - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking)
      - Important: The token must have the scope `update:users`.
      */
     func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String?) -> Request<[ManagementObject], ManagementError>
@@ -188,8 +187,8 @@ public protocol Users: Trackable, Loggable {
        - provider:   Name of the provider of the identity.
        - identifier: ID of the user who owns the identity.
      - Returns: A request to remove an identity.
-     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id).
-     - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking).
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id)
+     - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking)
      - Important: The token must have the scope `update:users`.
      */
     func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError>
