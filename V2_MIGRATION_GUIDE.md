@@ -28,6 +28,7 @@ As expected with a major release, Auth0.swift v2 contains breaking changes. Plea
   + [Structs](#structs)
   + [Classes](#classes)
 - [Methods Removed](#methods-removed)
+  + [Global methods](#global-methods)
   + [Authentication client](#authentication-client)
   + [Web Auth](#web-auth)
   + [Credentials Manager](#credentials-manager)
@@ -124,6 +125,8 @@ You should use `UserInfo` from `userInfo(withAccessToken:)` instead.
 
 ## Methods Removed
 
+### Global methods
+
 The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed. You can safely remove them from your app.
 
 ### Authentication client
@@ -132,12 +135,11 @@ The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAu
 
 You should use `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` instead.
 
-> 💡 To pass custom parameters, use the `parameters(_:)` method from `Request`.
-
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 Auth0
     .authentication()
     .login(usernameOrEmail: username, 
@@ -148,13 +150,8 @@ Auth0
     .start { result in
         // ...
     }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 Auth0
     .authentication()
     .login(usernameOrEmail: username, 
@@ -171,18 +168,15 @@ Auth0
 
 For multi-factor authentication, use `multifactorChallenge(mfaToken:types:authenticatorId:)` and then either `login(withOTP:mfaToken:)` or `login(withOOBCode:mfaToken:bindingCode:)`.
 
-> 💡 Check the [API Documentation](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html) for more details.
-
 #### `signUp(email:username:password:connection:userMetadata:scope:parameters:)`
 
 You should use `signup(email:username:password:connection:userMetadata:rootAttributes:)` and then `login(usernameOrEmail:password:realmOrConnection:audience:scope:)` instead. That is, first create the user and then log them in.
 
-> 💡 To pass custom parameters, use the `parameters(_:)` method from `Request`.
-
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 Auth0
     .authentication()
     .signUp(email: email, 
@@ -195,13 +189,8 @@ Auth0
     .start { result in
         // ...
     }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 Auth0
     .authentication()
     .signup(email: email, 
@@ -222,8 +211,7 @@ Auth0
                 .start { result in
                     // ...
                 }
-        case .failure(let error):
-            print("Failed with: \(error)") 
+        case .failure(let error): // ...
         }
     }
 }
@@ -234,25 +222,19 @@ Auth0
 
 You should use `codeExchange(withCode:codeVerifier:redirectURI:)` instead.
 
-> 💡 To pass custom parameters, use the `parameters(_:)` method from `Request`.
-
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 Auth0
     .authentication()
     .tokenExchange(withParameters: ["key": "value"]) 
     .start { result in
         // ...
     }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 Auth0
     .authentication()
     .codeExchange(withCode: code, 
@@ -279,9 +261,10 @@ You should use `userInfo(withAccessToken:)` instead.
 You should use Web Auth with its `connection(_:)` method instead.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 Auth0
     .authentication()
     .webAuth(withConnection: connection)
@@ -289,13 +272,8 @@ Auth0
         // ...
     }
 }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 Auth0
     .webAuth()
     .connection(connection)
@@ -306,12 +284,13 @@ Auth0
 ```
 </details>
 
-#### Other methods
+#### `loginSocial(token:connection:scope:parameters:)`
 
-The following methods were removed and have no replacement, as they rely on deprecated endpoints:
+The method relies on a deprecated endpoint and has no direct replacement. You can use `login(appleAuthorizationCode:fullName:profile:audience:scope:)` and/or `login(facebookSessionAccessToken:profile:audience:scope:)` instead.
 
-- `loginSocial(token:connection:scope:parameters:)`
-- `delegation(withParameters:)`
+#### `delegation(withParameters:)`
+
+The method relies on a deprecated endpoint and has no replacement.
 
 ### Web Auth
 
@@ -390,20 +369,16 @@ The property `description` was removed in favor of `localizedDescription`, as `M
 All the former enum cases are now static properties, so to switch over them you will need to add a `default` clause.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 switch error {
     case .userCancelled: // handle WebAuthError
     // ...
 }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 switch error {
     case .userCancelled: // handle WebAuthError
     // ...
@@ -447,20 +422,16 @@ All the former enum cases are now static properties, so to switch over them you 
 As static properties cannot have associated values, to access the underlying `Error` for `.renewFailed`, `.biometricsFailed`, and `.revokeFailed` use the new `cause: Error?` property.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 switch error {
     case .revokeFailed(let error): handleError(error) // handle underlying Error
     // ...
 }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 switch error {
     case .revokeFailed: handleError(error.cause) // handle underlying Error?
     // ...
@@ -507,21 +478,17 @@ These properties were removed:
 The methods of the Authentication API client now only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError` value.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 switch error {
 case .success(let credentials): // ...
 case .failure(let error as AuthenticationError): // handle AuthenticationError
 case .failure(let error): // handle Error
 }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 switch error {
 case .success(let credentials): // ...
 case .failure(let error): // handle AuthenticationError
@@ -591,21 +558,17 @@ The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `cha
 The methods of the Management API client now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError` value.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 switch error {
 case .success(let user): // ...
 case .failure(let error as ManagementError): // handle ManagementError
 case .failure(let error): // handle Error
 }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 switch error {
 case .success(let user): // ...
 case .failure(let error): // handle ManagementError
@@ -620,21 +583,17 @@ case .failure(let error): // handle ManagementError
 The Web Auth methods now only yield errors of type  `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError` value.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 switch result {
 case .success(let credentials): // ...
 case .failure(let error as WebAuthError): // handle WebAuthError
 case .failure(let error): // handle Error
 }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 switch result {
 case .success(let credentials): // ...
 case .failure(let error): // handle WebAuthError
@@ -647,9 +606,10 @@ case .failure(let error): // handle WebAuthError
 This method now yields a `Result<Void, WebAuthError>`, which is aliased to `WebAuthResult<Void>`. This means you can now check the type of error, e.g. if the user cancelled the operation.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 Auth0
     .webAuth()
     .clearSession(federated: false) { outcome in
@@ -658,13 +618,8 @@ Auth0
         case false: // failure
         }
     }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 Auth0
     .webAuth()
     .clearSession() { result in // federated is now false by default
@@ -683,19 +638,15 @@ Auth0
 The methods of the Credentials Manager now only yield errors of type  `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError` value.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 if let error = error as? CredentialsManagerError {
     // handle CredentialsManagerError
 }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 switch result {
 case .success(let credentials): // ...
 case .failure(let error): // handle CredentialsManagerError
@@ -737,9 +688,10 @@ let credentialsManager = CredentialsManager(authentication: authentication,
 This method now yields a `Result<Credentials, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Credentials>`.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 credentialsManager.credentials { error, credentials in
     guard error == nil, let credentials = credentials else {
         // ...
@@ -747,13 +699,8 @@ credentialsManager.credentials { error, credentials in
     }
     // ...
 }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 credentialsManager.credentials { result in
     switch result {
     case .success(let credentials): // ...
@@ -768,9 +715,10 @@ credentialsManager.credentials { result in
 This method now yields a `Result<Void, CredentialsManagerError>`, which is aliased to `CredentialsManagerResult<Void>`.
 
 <details>
-  <summary>Before</summary>
+  <summary>Before / After</summary>
 
 ```swift
+// Before
 credentialsManager.revoke { error in
     guard error == nil {
         // ...
@@ -778,13 +726,8 @@ credentialsManager.revoke { error in
     }
     // ...
 }
-```
-</details>
 
-<details>
-  <summary>After</summary>
-
-```swift
+// After
 credentialsManager.revoke { result in
     switch result {
     case .success: // ...
@@ -827,11 +770,11 @@ The ID Token expiration is no longer used to determine if the credentials are st
 
 #### Role of Refresh Token in credentials validity
 
-`hasValid(minTTL:)` no longer returns `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
+The `hasValid(minTTL:)` method no longer returns `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
 
 Note that `hasValid(minTTL:)` is no longer being called in `credentials(withScope:minTTL:parameters:headers:callback:)` _before_ the biometrics authentication. If you were relying on this behavior, you'll need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:headers:callback:)` yourself.
 
-You'll also need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:headers:callback:)` yourself if you're not using a Refresh Token. Otherwise, that method will now produce a `CredentialsManagerError.noRefreshToken` error when the credentials are not valid and there is no Refresh Token available.
+You'll also need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:headers:callback:)` yourself if you're not using Refresh Tokens. Otherwise, that method will now produce a `CredentialsManagerError.noRefreshToken` error when the credentials are not valid and there is no Refresh Token available.
 
 #### Thread-safety when renewing credentials
 
