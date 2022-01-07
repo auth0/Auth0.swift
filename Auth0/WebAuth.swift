@@ -209,7 +209,7 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession { result in
              switch result {
              case .success:
-                 print("Logged out")
+                 print("Session cookie cleared")
              case .failure(let error):
                  print("Failed with: \(error)")
          }
@@ -244,7 +244,7 @@ public protocol WebAuth: Trackable, Loggable {
          .sink(receiveCompletion: { completion in
              switch completion {
              case .finished:
-                 print("Logged out")
+                 print("Session cookie cleared")
              case .failure(let error):
                  print("Failed with: \(error)")
              }
@@ -283,7 +283,7 @@ public protocol WebAuth: Trackable, Loggable {
          try await Auth0
              .webAuth(clientId: clientId, domain: "samples.auth0.com")
              .clearSession()
-         print("Logged out")
+         print("Session cookie cleared")
      } catch {
          print("Failed with: \(error)")
      }

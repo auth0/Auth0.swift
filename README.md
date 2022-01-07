@@ -47,7 +47,7 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
 
 ## Documentation
 
-- [Quickstarts](https://auth0.com/docs/quickstart/native/ios-swift)
+- [Quickstart](https://auth0.com/docs/quickstart/native/swift-beta)
 - [Sample app](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/beta/Sample-01)
 - [API Documentation](https://auth0.github.io/Auth0.swift/)
   + [Web Auth](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)
@@ -215,13 +215,13 @@ In your application's `Info.plist` file, register the bundle identifier as a cus
 
 ### Web Auth Login (iOS / macOS)
 
-1. Import the `Auth0` module in the file where you want to present the login page.
+Import the `Auth0` module in the file where you want to present the login page.
 
 ```swift
 import Auth0
 ```
 
-2. Present the [Universal Login](https://auth0.com/docs/login/universal-login) page in the action of your **Login** button.
+Then, present the [Universal Login](https://auth0.com/docs/login/universal-login) page in the action of your **Login** button.
 
 ```swift
 Auth0
@@ -235,6 +235,21 @@ Auth0
         }
     }
 ```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .webAuth()
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
 
 <details>
   <summary>Using Combine</summary>
@@ -254,24 +269,11 @@ Auth0
 ```
 </details>
 
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let credentials = try await Auth0
-        .webAuth()
-        .start()
-    print("Obtained credentials: \(credentials)")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
 ### Web Auth Logout (iOS / macOS)
 
-Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your application. To clear the session cookie, call the `clearSession()` method in the action of your **Logout** button.
+Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your application.
+
+Call the `clearSession()` method in the action of your **Logout** button. Once the session cookie has been cleared, delete the user's credentials from your application.
 
 ```swift
 Auth0
@@ -279,12 +281,29 @@ Auth0
     .clearSession { result in
         switch result {
         case .success:
-            print("Logged out")
+            print("Session cookie cleared")
+            // Delete credentials
         case .failure(let error):
             print("Failed with: \(error)")
         }
     }
 ```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    try await Auth0
+        .webAuth()
+        .clearSession()
+    print("Session cookie cleared")
+    // Delete credentials
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
 
 <details>
   <summary>Using Combine</summary>
@@ -296,7 +315,8 @@ Auth0
     .sink(receiveCompletion: { completion in
         switch completion {
         case .finished:
-            print("Logged out")
+            print("Session cookie cleared")
+            // Delete credentials
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -304,23 +324,6 @@ Auth0
     .store(in: &cancellables)
 ```
 </details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    try await Auth0
-        .webAuth()
-        .clearSession()
-    print("Logged out")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
-Once the session cookie has been cleared, delete the user's credentials from your application.
 
 ### SSO Alert Box (iOS / macOS)
 
@@ -333,6 +336,14 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 ## Next Steps
 
 ### Common Tasks
+
+- [Retrieve user information](#retrieve-user-information-ios--macos--tvos--watchos)
+- [Store credentials](#store-credentials)
+- [Retrieve stored credentials](#retrieve-stored-credentials)
+- [Clear stored credentials](#clear-stored-credentials)
+- [Enable debug logging](#logging)
+
+### Web Auth (iOS / macOS)
 
 #### Web Auth Signup (iOS / macOS)
 
@@ -362,6 +373,22 @@ Auth0
 > ⚠️ The `screen_hint` parameter can only be used with the **New Universal Login Experience**, not the **Classic Experience**.
 
 <details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .webAuth()
+        .parameters(["screen_hint": "signup"])
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
   <summary>Using Combine</summary>
 
 ```swift
@@ -380,135 +407,7 @@ Auth0
 ```
 </details>
 
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let credentials = try await Auth0
-        .webAuth()
-        .parameters(["screen_hint": "signup"])
-        .start()
-    print("Obtained credentials: \(credentials)")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
-#### Retrieve user information (iOS / macOS / tvOS / watchOS)
-
-Fetch the latest user information from the `/userinfo` endpoint.
-
-This method will yield a `UserInfo` instance. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/UserInfo.html) to learn more about the available properties.
-
-```swift
-Auth0
-   .authentication()
-   .userInfo(withAccessToken: credentials.accessToken)
-   .start { result in
-       switch result {
-       case .success(let user):
-           print("User: \(user)")
-       case .failure(let error):
-           print("Failed with: \(error)")
-       }
-   }
-```
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .authentication()
-    .userInfo(withAccessToken: credentials.accessToken)
-    .start()
-    .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print("Failed with: \(error)")
-        }
-    }, receiveValue: { user in
-        print("User: \(user)")
-    })
-    .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let user = try await Auth0
-        .authentication()
-        .userInfo(withAccessToken: credentials.accessToken)
-        .start()
-    print("User: \(user)")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
-#### Renew credentials (iOS / macOS / tvOS / watchOS)
-
-Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
-
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
-
-```swift
-Auth0
-    .authentication()
-    .renew(withRefreshToken: refreshToken)
-    .start { result in
-        switch result {
-        case .success(let credentials):
-            print("Obtained new credentials: \(credentials)")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }
-```
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .authentication()
-    .renew(withRefreshToken: refreshToken)
-    .start()
-    .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print("Failed with: \(error)")
-        }
-    }, receiveValue: { credentials in
-        print("Obtained new credentials: \(credentials)")
-    })
-    .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let credentials = try await Auth0
-        .authentication()
-        .renew(withRefreshToken: refreshToken)
-        .start()
-    print("Obtained new credentials: \(credentials)")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
-### Web Auth (iOS / macOS)
-
-#### Configuration options
+#### Configuration
 
 The following are some of the available Web Auth configuration options. Check the [API documentation](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html) for the full list.
 
@@ -596,7 +495,7 @@ The Credentials Manager utility provides a convenience to securely store and ret
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 ```
 
-#### Store Credentials
+#### Store credentials
 
 When your users log in, store their credentials securely in the Keychain. You can then log them in automatically when they open your application again.
 
@@ -604,7 +503,7 @@ When your users log in, store their credentials securely in the Keychain. You ca
 credentialsManager.store(credentials: credentials)
 ```
 
-### Check for valid credentials
+#### Check validity of stored credentials
 
 When the users open your application, check for valid credentials. If they exist, you can retrieve them and redirect the users to the app's main flow without any additional login steps.
 
@@ -633,6 +532,19 @@ credentialsManager.credentials { result in
 ```
 
 <details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await credentialsManager.credentials()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
   <summary>Using Combine</summary>
 
 ```swift
@@ -649,19 +561,6 @@ credentialsManager
 ```
 </details>
 
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let credentials = try await credentialsManager.credentials()
-    print("Obtained credentials: \(credentials)")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
 #### Retrieve stored user information
 
 The stored [ID Token](https://auth0.com/docs/security/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.
@@ -672,15 +571,15 @@ let user = credentialsManager.user
 
 > 💡 To get the latest user information, use the `userInfo(withAccessToken:)` method of the Authentication API client.
 
-#### Clear credentials and revoke the Refresh Token
+#### Clear stored credentials
 
-Credentials can be cleared from the Keychain by using the `clear()` method.
+The stored credentials can be removed from the Keychain by using the `clear()` method.
 
 ```swift
 let didClear = credentialsManager.clear()
 ```
 
-In addition, credentials can be cleared and the Refresh Token revoked using a single call to `revoke()`. This method will attempt to revoke the current Refresh Token stored by the Credentials Manager and then clear credentials from the Keychain. If revoking the token results in an error, the credentials will not be cleared.
+You can clear the credentials and revoke the Refresh Token with a single call to `revoke()`. This method will attempt to revoke the current Refresh Token stored by the Credentials Manager and then clear the credentials from the Keychain. If the token revocation fails, the credentials will not be cleared.
 
 ```swift
 credentialsManager.revoke { result in
@@ -692,6 +591,19 @@ credentialsManager.revoke { result in
     }
 }
 ```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    try await credentialsManager.revoke()
+    print("Success")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
 
 <details>
   <summary>Using Combine</summary>
@@ -708,19 +620,6 @@ credentialsManager
         }
     }, receiveValue: {})
     .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    try await credentialsManager.revoke()
-    print("Success")
-} catch {
-    print("Failed with: \(error)")
-}
 ```
 </details>
 
@@ -752,7 +651,7 @@ The Credentials Manager will only yield `CredentialsManagerError` error values. 
 The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
 We recommend using [Universal Login](https://auth0.com/docs/login/universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your [Auth0 Dashboard](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
 
-For login or signup with username/password, the `Password` Grant Type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`, otherwise the Auth0 Dashboard will take care of activating both when `Password` is enabled.
+For login or signup with username/password, the `Password` grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`, otherwise the Auth0 Dashboard will take care of activating both when `Password` is enabled.
 
 > 💡 If your Auth0 account has the "Bot Detection" feature enabled, your requests might be flagged for verification. Check how to handle this scenario on the [Bot Detection](#bot-detection) section.
 
@@ -780,6 +679,25 @@ Auth0
 > 💡 The default scope value is `openid profile email`. Regardless of the scope value configured, `openid` is always included.
 
 <details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(usernameOrEmail: "support@auth0.com",
+               password: "secret-password",
+               realmOrConnection: "Username-Password-Authentication",
+               scope: "openid profile email offline_access")
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
   <summary>Using Combine</summary>
 
 ```swift
@@ -798,25 +716,6 @@ Auth0
         print("Obtained credentials: \(credentials)")
     })
     .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let credentials = try await Auth0
-        .authentication()
-        .login(usernameOrEmail: "support@auth0.com",
-               password: "secret-password",
-               realmOrConnection: "Username-Password-Authentication",
-               scope: "openid profile email offline_access")
-        .start()
-    print("Obtained credentials: \(credentials)")
-} catch {
-    print("Failed with: \(error)")
-}
 ```
 </details>
 
@@ -840,6 +739,25 @@ Auth0
 ```
 
 <details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .authentication()
+        .signup(email: "support@auth0.com",
+                password: "secret-password",
+                connection: "Username-Password-Authentication",
+                userMetadata: ["first_name": "First", "last_name": "Last"])
+        .start()
+    print("User signed up: \(user)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
   <summary>Using Combine</summary>
 
 ```swift
@@ -861,33 +779,13 @@ Auth0
 ```
 </details>
 
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let user = try await Auth0
-        .authentication()
-        .signup(email: "support@auth0.com",
-                password: "secret-password",
-                connection: "Username-Password-Authentication",
-                userMetadata: ["first_name": "First", "last_name": "Last"])
-        .start()
-    print("User signed up: \(user)")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
 #### Passwordless login
 
-Passwordless is a two-step authentication flow that requires the **Passwordless OTP** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+Passwordless is a two-step authentication flow that requires the **Passwordless OTP** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
 
 ##### 1. Start the passwordless flow
-To start the flow, you request a code to be sent to the user's email or phone number. For email scenarios only, a link can be sent in place of the code.
 
-With an email:
+Request a code to be sent to the user's email or phone number. For email scenarios only, a link can be sent in place of the code.
 
 ```swift
 Auth0
@@ -902,26 +800,6 @@ Auth0
         }
     }
 ```
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .authentication()
-    .startPasswordless(email: "support@auth0.com")
-    .start()
-    .sink(receiveCompletion: { completion in
-        switch completion {
-        case .finished:
-            print("Code sent")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }, receiveValue: {})
-    .store(in: &cancellables)
-```
-</details>
 
 <details>
   <summary>Using async/await</summary>
@@ -939,29 +817,13 @@ do {
 ```
 </details>
 
-With a phone number:
-
-```swift
-Auth0
-    .authentication(clientId: clientId, domain: "samples.auth0.com")
-    .startPasswordless(phoneNumber: "+12025550135")
-    .start { result in
-        switch result {
-        case .success:
-            print("Code sent")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }
-```
-
 <details>
   <summary>Using Combine</summary>
 
 ```swift
 Auth0
     .authentication()
-    .startPasswordless(phoneNumber: "+12025550135")
+    .startPasswordless(email: "support@auth0.com")
     .start()
     .sink(receiveCompletion: { completion in
         switch completion {
@@ -975,26 +837,11 @@ Auth0
 ```
 </details>
 
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    try await Auth0
-        .authentication()
-        .startPasswordless(phoneNumber: "+12025550135")
-        .start()
-    print("Code sent")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
+> 💡 Use `startPasswordless(phoneNumber:)` to send a code to the user's phone number instead.
 
 ##### 2. Login with the received code
-To complete the authentication, you must send back that received code along with the email or phone number used to start the flow.
 
-With an email:
+To complete the authentication, you must send back that code the user received along with the email or phone number used to start the flow.
 
 ```swift
 Auth0
@@ -1009,25 +856,6 @@ Auth0
         }
     }
 ```
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-Auth0
-    .authentication()
-    .login(email: "support@auth0.com", code: "123456")
-    .start()
-    .sink(receiveCompletion: { completion in
-        if case .failure(let error) = completion {
-            print("Failed with: \(error)")
-        }
-    }, receiveValue: { credentials in
-        print("Obtained credentials: \(credentials)")
-    })
-    .store(in: &cancellables)
-```
-</details>
 
 <details>
   <summary>Using async/await</summary>
@@ -1045,29 +873,13 @@ do {
 ```
 </details>
 
-With a phone number:
-
-```swift
-Auth0
-    .authentication(clientId: clientId, domain: "samples.auth0.com")
-    .login(phoneNumber: "+12025550135", code: "123456")
-    .start { result in
-        switch result {
-        case .success(let credentials):
-            print("Obtained credentials: \(credentials)")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }
-```
-
 <details>
   <summary>Using Combine</summary>
 
 ```swift
 Auth0
     .authentication()
-    .login(phoneNumber: "+12025550135", code: "123456")
+    .login(email: "support@auth0.com", code: "123456")
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1080,6 +892,83 @@ Auth0
 ```
 </details>
 
+> 💡 Use `login(phoneNumber:code:)` if the code was sent to the user's phone number.
+
+#### Retrieve user information (iOS / macOS / tvOS / watchOS)
+
+Fetch the latest user information from the `/userinfo` endpoint.
+
+This method will yield a `UserInfo` instance. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/UserInfo.html) to learn more about its available properties.
+
+```swift
+Auth0
+   .authentication()
+   .userInfo(withAccessToken: credentials.accessToken)
+   .start { result in
+       switch result {
+       case .success(let user):
+           print("User: \(user)")
+       case .failure(let error):
+           print("Failed with: \(error)")
+       }
+   }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .authentication()
+        .userInfo(withAccessToken: credentials.accessToken)
+        .start()
+    print("User: \(user)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .userInfo(withAccessToken: credentials.accessToken)
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { user in
+        print("User: \(user)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+#### Renew credentials (iOS / macOS / tvOS / watchOS)
+
+Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
+
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
+
+```swift
+Auth0
+    .authentication()
+    .renew(withRefreshToken: refreshToken)
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained new credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
 <details>
   <summary>Using async/await</summary>
 
@@ -1087,12 +976,31 @@ Auth0
 do {
     let credentials = try await Auth0
         .authentication()
-        .login(phoneNumber: "+12025550135", code: "123456")
+        .renew(withRefreshToken: refreshToken)
         .start()
-    print("Obtained credentials: \(credentials)")
+    print("Obtained new credentials: \(credentials)")
 } catch {
     print("Failed with: \(error)")
 }
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .renew(withRefreshToken: refreshToken)
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained new credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
 ```
 </details>
 
@@ -1161,6 +1069,22 @@ Auth0
 ```
 
 <details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .users(token: credentials.accessToken)
+        .get(userId, fields: ["user_metadata"])
+        .start()
+    print("User with metadata: \(user)") 
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
   <summary>Using Combine</summary>
 
 ```swift
@@ -1176,22 +1100,6 @@ Auth0
         print("User with metadata: \(user)")
     })
     .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let user = try await Auth0
-        .users(token: credentials.accessToken)
-        .get(userId, fields: ["user_metadata"])
-        .start()
-    print("User with metadata: \(user)") 
-} catch {
-    print("Failed with: \(error)")
-}
 ```
 </details>
 
@@ -1212,6 +1120,22 @@ Auth0
 ```
 
 <details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .users(token: credentials.accessToken)
+        .patch(userId, userMetadata: ["key": "value"])
+        .start()
+    print("Updated user: \(user)") 
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
   <summary>Using Combine</summary>
 
 ```swift
@@ -1227,22 +1151,6 @@ Auth0
         print("Updated user: \(user)") 
     })
     .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let user = try await Auth0
-        .users(token: credentials.accessToken)
-        .patch(userId, userMetadata: ["key": "value"])
-        .start()
-    print("Updated user: \(user)") 
-} catch {
-    print("Failed with: \(error)")
-}
 ```
 </details>
 
@@ -1263,6 +1171,22 @@ Auth0
 ```
 
 <details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    _ = try await Auth0
+        .users(token: credentials.idToken)
+        .link("user identifier", withOtherUserToken: "another user token")
+        .start()
+    print("Accounts linked")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
   <summary>Using Combine</summary>
 
 ```swift
@@ -1279,22 +1203,6 @@ Auth0
         }
     }, receiveValue: { _ in })
     .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    _ = try await Auth0
-        .users(token: credentials.idToken)
-        .link("user identifier", withOtherUserToken: "another user token")
-        .start()
-    print("Accounts linked")
-} catch {
-    print("Failed with: \(error)")
-}
 ```
 </details>
 
@@ -1398,6 +1306,22 @@ Auth0
 ```
 
 <details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(appleAuthorizationCode: authCode)
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
   <summary>Using Combine</summary>
 
 ```swift
@@ -1413,22 +1337,6 @@ Auth0
         print("Obtained credentials: \(credentials)")
     })
     .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let credentials = try await Auth0
-        .authentication()
-        .login(appleAuthorizationCode: authCode)
-        .start()
-    print("Obtained credentials: \(credentials)")
-} catch {
-    print("Failed with: \(error)")
-}
 ```
 </details>
 
@@ -1453,6 +1361,22 @@ Auth0
 ```
 
 <details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
   <summary>Using Combine</summary>
 
 ```swift
@@ -1468,22 +1392,6 @@ Auth0
         print("Obtained credentials: \(credentials)")
     })
     .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let credentials = try await Auth0
-        .authentication()
-        .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
-        .start()
-    print("Obtained credentials: \(credentials)")
-} catch {
-    print("Failed with: \(error)")
-}
 ```
 </details>
 
@@ -1506,7 +1414,8 @@ Using Organizations, you can:
 #### Log in to an organization
 
 ```swift
-Auth0.webAuth()
+Auth0
+    .webAuth()
     .organization(organizationId)
     .start { result in
         switch result {
@@ -1517,6 +1426,22 @@ Auth0.webAuth()
         }
     }
 ```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .webAuth()
+        .organization(organizationId)
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
 
 <details>
   <summary>Using Combine</summary>
@@ -1534,22 +1459,6 @@ Auth0
         print("Obtained credentials: \(credentials)")
     })
     .store(in: &cancellables)
-```
-</details>
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    let credentials = try await Auth0
-        .webAuth()
-        .organization(organizationId)
-        .start()
-    print("Obtained credentials: \(credentials)")
-} catch {
-    print("Failed with: \(error)")
-}
 ```
 </details>
 

@@ -56,7 +56,7 @@ public protocol Authentication: Trackable, Loggable {
        - audience: API Identifier that the client is requesting access to. Default is `nil`.
        - scope:    Scope value requested when authenticating the user. Default is `openid profile email`.
      - Returns: Authentication request that will yield Auth0 user's credentials.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
      - See: [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
      */
@@ -99,7 +99,7 @@ public protocol Authentication: Trackable, Loggable {
        - audience:    API Identifier that the client is requesting access to. Default is `nil`.
        - scope:       Scope value requested when authenticating the user. Default is `openid profile email`.
      - Returns: Authentication request that will yield Auth0 user's credentials.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
      - See: [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
      */
@@ -145,7 +145,7 @@ public protocol Authentication: Trackable, Loggable {
        - scope:             Scope value requested when authenticating the user.
      - Important: This only works if you have the OAuth 2.0 API Authorization flag on.
      - Returns: Authentication request that will yield Auth0 user's credentials.
-     - Requires: The `http://auth0.com/oauth/grant-type/password-realm` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - Requires: The `http://auth0.com/oauth/grant-type/password-realm` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
      */
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -169,7 +169,7 @@ public protocol Authentication: Trackable, Loggable {
      - Parameters:
        - otp:      One time password supplied by MFA Authenticator.
        - mfaToken: Token returned when authentication fails due to MFA requirement.
-     - Requires: The `http://auth0.com/oauth/grant-type/mfa-otp` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - Requires: The `http://auth0.com/oauth/grant-type/mfa-otp` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-one-time-password-otp-)
      */
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
@@ -196,7 +196,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - mfaToken:    Token returned when authentication fails due to MFA requirement.
     ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message.
     /// - Returns: A request that will yield Auth0 user's credentials.
-    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-oob` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-oob` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-out-of-band-oob-)
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
 
@@ -224,7 +224,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - mfaToken:     Token returned when authentication fails due to MFA requirement.
     /// - Returns: A request that will yield Auth0 user's credentials. Might include a recovery code, which the
     /// application must display to the end-user to be stored securely for future use.
-    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-recovery-code` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-recovery-code` grant. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-recovery-code)
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
@@ -457,7 +457,7 @@ public protocol Authentication: Trackable, Loggable {
        - type:       Type of passwordless authentication. By default is 'code'.
        - connection: Name of the passwordless connection. By default is 'email'.
      - Returns: A request.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
      - See: [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
      */
@@ -487,7 +487,7 @@ public protocol Authentication: Trackable, Loggable {
        - type:        Type of passwordless authentication. By default is 'code'.
        - connection:  Name of the passwordless connection. By default is 'sms'.
      - Returns: A request.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information and how to enable it.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
      - See: [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
      */
