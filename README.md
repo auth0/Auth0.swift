@@ -1543,11 +1543,11 @@ This Policy defines the extent of the support for Xcode, Swift, and platform (iO
 
 ### Xcode
 
-The only supported versions of Xcode are those that can be currently used to submit apps to the App Store. Dropping older, unsupported Xcode versions **will not be considered a breaking change**, and will be done in **minor** releases.
+The only supported versions of Xcode are those that can be currently used to submit apps to the App Store. Once a Xcode version becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release.
 
 ### Swift
 
-The minimum supported Swift 5 minor version is the one released with the oldest-supported Xcode version. Dropping older, unsupported Swift 5 minors **will not be considered a breaking change**, and will be done in **minor** releases.
+The minimum supported Swift 5 minor version is the one released with the oldest-supported Xcode version. Once a Swift 5 minor becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release.
 
 ### Platforms
 
@@ -1559,7 +1559,7 @@ Only the last 4 major platform versions are supported, starting from:
 - tvOS **12**
 - watchOS **6.2**
 
-Dropping older, unsupported platform versions **will not be considered a breaking change**, and will be done in **minor** releases. E.g. iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.
+Once a platform version becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release. E.g. iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.
 
 In the case of macOS, the yearly named releases are considered a major platform version for the purposes of this Policy, regardless of the actual version numbers.
 
