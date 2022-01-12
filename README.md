@@ -1062,12 +1062,12 @@ To call the Management API, the Access Token needs to have its API Identifier as
 
 #### Retrieve user metadata
 
-To call this method, you need to request the `read:users` scope when logging in.
+To call this method, you need to request the `read:users` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
 
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .get(userId, fields: ["user_metadata"])
+    .get("user id", fields: ["user_metadata"])
     .start { result in
         switch result {
         case .success(let user):
@@ -1085,7 +1085,7 @@ Auth0
 do {
     let user = try await Auth0
         .users(token: credentials.accessToken)
-        .get(userId, fields: ["user_metadata"])
+        .get("user id", fields: ["user_metadata"])
         .start()
     print("User with metadata: \(user)") 
 } catch {
@@ -1100,7 +1100,7 @@ do {
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .get(userId, fields: ["user_metadata"])
+    .get("user id", fields: ["user_metadata"])
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1117,12 +1117,12 @@ Auth0
 
 #### Update user metadata
 
-To call this method, you need to request either the `update:users` or the `update:users_app_metadata` scope when logging in.
+To call this method, you need to request either the `update:users` or the `update:users_app_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
 
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .patch(userId, userMetadata: ["key": "value"])
+    .patch("user id", userMetadata: ["key": "value"])
     .start { result in
         switch result {
         case .success(let user):
@@ -1140,7 +1140,7 @@ Auth0
 do {
     let user = try await Auth0
         .users(token: credentials.accessToken)
-        .patch(userId, userMetadata: ["key": "value"])
+        .patch("user id", userMetadata: ["key": "value"])
         .start()
     print("Updated user: \(user)") 
 } catch {
@@ -1155,7 +1155,7 @@ do {
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .patch(userId, userMetadata: ["key": "value"])
+    .patch("user id", userMetadata: ["key": "value"])
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1171,6 +1171,8 @@ Auth0
 #### Link an account
 
 Your users may want to link their other accounts to the account they are logged in to. To achieve this, you need the user ID for the primary account and the idToken for the secondary account. You also need to request the `update:current_user_identities` scope when logging in.
+
+You can get the primary user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the primary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
 
 ```swift
 Auth0

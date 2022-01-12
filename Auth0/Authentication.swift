@@ -452,8 +452,8 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - email:      Email where to send the code or link.
-       - type:       Type of passwordless authentication. By default is 'code'.
-       - connection: Name of the passwordless connection. By default is 'email'.
+       - type:       Type of passwordless authentication. Defaults to 'code'.
+       - connection: Name of the passwordless connection. Defaults to 'email'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
@@ -482,8 +482,8 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - phoneNumber: Phone number where to send the sms with code or link.
-       - type:        Type of passwordless authentication. By default is 'code'.
-       - connection:  Name of the passwordless connection. By default is 'sms'.
+       - type:        Type of passwordless authentication. Defaults to 'code'.
+       - connection:  Name of the passwordless connection. Defaults to 'sms'.
      - Returns: A request.
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)

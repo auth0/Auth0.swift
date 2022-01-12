@@ -25,7 +25,7 @@ public protocol Users: Trackable, Loggable {
      ```
      Auth0
          .users(token: credentials.accessToken, domain: "samples.auth0.com")
-         .get(userId)
+         .get("user id")
          .start { result in
              switch result {
              case .success(let user):
@@ -41,7 +41,7 @@ public protocol Users: Trackable, Loggable {
      ```
      Auth0
          .users(token: credentials.accessToken, domain: "samples.auth0.com")
-         .get(userId, fields: ["email", "user_id"])
+         .get("user id", fields: ["email", "user_id"])
          .start { print($0) }
      ```
 
@@ -50,7 +50,7 @@ public protocol Users: Trackable, Loggable {
      ```
      Auth0
          .users(token: credentials.accessToken, domain: "samples.auth0.com")
-         .get(userId, fields: ["identities", "app_metadata"], include: false)
+         .get("user id", fields: ["identities", "app_metadata"], include: false)
          .start { print($0) }
      ```
 
@@ -98,7 +98,7 @@ public protocol Users: Trackable, Loggable {
      ```
      Auth0
          .users(token: credentials.accessToken, domain: "samples.auth0.com")
-         .patch(userId, attributes: attributes)
+         .patch("user id", attributes: attributes)
          .start { print($0) }
      ```
 
@@ -118,7 +118,7 @@ public protocol Users: Trackable, Loggable {
      ```
      Auth0
          .users(token: credentials.accessToken, domain: "samples.auth0.com")
-         .patch(userId, userMetadata: ["first_name": "John", "last_name": "Appleseed"])
+         .patch("user id", userMetadata: ["first_name": "John", "last_name": "Appleseed"])
          .start { print($0) }
      ```
 
@@ -180,7 +180,7 @@ public protocol Users: Trackable, Loggable {
      ```
      Auth0
          .users(token: credentials.accessToken, domain: "samples.auth0.com")
-         .unlink(identityId: "identity id", provider: "facebook", fromUserId: userId)
+         .unlink(identityId: "identity id", provider: "facebook", fromUserId: "user id")
          .start { print($0) }
      ```
 
