@@ -25,9 +25,9 @@ public struct JWK: Codable {
     public let usage: String?
     /// The algorithm of the key.
     public let algorithm: String?
-    /// The URL of the x.509 cert.
+    /// The URL of the x.509 certificate.
     public let certUrl: String?
-    /// The thumbprint of the x.509 cert (SHA-1 thumbprint).
+    /// The thumbprint of the x.509 certificate (SHA-1 thumbprint).
     public let certThumbprint: String?
     /// The x.509 certificate chain.
     public let certChain: [String]?

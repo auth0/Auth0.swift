@@ -20,7 +20,7 @@ public protocol Authentication: Trackable, Loggable {
     var url: URL { get }
 
     /**
-     Logs in a user using an email and an OTP code received via email (last part of the passwordless login flow).
+     Logs in a user using an email and an OTP code received via email. This is the last part of the passwordless login flow.
 
      ```
      Auth0
@@ -48,8 +48,6 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     When result is `.success`, its associated value will be a ``Credentials`` object.
-
      - Parameters:
        - email:    Email the user used to start the passwordless login flow.
        - code:     One time password (OTP) code the user received via email.
@@ -63,7 +61,7 @@ public protocol Authentication: Trackable, Loggable {
     func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Logs in a user using a phone number and an OTP code received via sms (last part of the passwordless login flow).
+     Logs in a user using a phone number and an OTP code received via sms. This is the last part of the passwordless login flow.
 
      ```
      Auth0
@@ -91,8 +89,6 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     When result is `.success`, its associated value will be a ``Credentials`` object.
-
      - Parameters:
        - phoneNumber: Phone number the user used to start the passwordless login flow.
        - code:        One time password (OTP) code the user received via sms.
@@ -106,13 +102,13 @@ public protocol Authentication: Trackable, Loggable {
     func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Login using username and password with a realm or connection.
+     Logs in a user using username and password with a realm or connection.
 
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .login(usernameOrEmail: "support@auth0.com",
-                password: "a secret password",
+                password: "secret password",
                 realmOrConnection: "mydatabase")
          .start { result in
              switch result {
@@ -130,7 +126,7 @@ public protocol Authentication: Trackable, Loggable {
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .login(usernameOrEmail: "support@auth0.com",
-                password: "a secret password",
+                password: "secret password",
                 realmOrConnection: "mydatabase",
                 audience: "https://myapi.com/api",
                 scope: "openid profile email offline_access")
@@ -174,8 +170,8 @@ public protocol Authentication: Trackable, Loggable {
      */
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
-    /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either Push notification, SMS,
-    /// or Voice).
+    /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either push notification, SMS
+    /// or voice).
     ///
     /// ```
     /// Auth0
@@ -228,11 +224,11 @@ public protocol Authentication: Trackable, Loggable {
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-recovery-code)
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
-    /// Request a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
+    /// Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
     /// application and user.
     /// The `type` is how the user will get the challenge and prove possession. Supported challenge types include:
     /// * `otp`:  for one-time password (OTP)
-    /// * `oob`:  for SMS/Voice messages or out-of-band (OOB)
+    /// * `oob`:  for SMS/voice messages or out-of-band (OOB)
     ///
     /// - Parameters:
     ///   - mfaToken:        Token returned when authentication fails due to MFA requirement.
@@ -243,12 +239,12 @@ public protocol Authentication: Trackable, Loggable {
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
 
     /**
-     Authenticate a user with their Sign In with Apple authorization code.
+     Authenticates a user with their Sign In with Apple authorization code.
 
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(appleAuthorizationCode: authCode)
+         .login(appleAuthorizationCode: "auth code")
          .start { result in
              switch result {
              case .success(let credentials):
@@ -264,9 +260,9 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(appleAuthorizationCode: authCode,
+         .login(appleAuthorizationCode: "auth code",
                 fullName: credentials.fullName,
-                audience: "https://myapi.com/api"
+                audience: "https://myapi.com/api",
                 scope: "openid profile email offline_access")
          .start { print($0) }
      ```
@@ -283,12 +279,12 @@ public protocol Authentication: Trackable, Loggable {
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Authenticate a user with their Facebook session info Access Token and profile data.
+     Authenticates a user with their Facebook Session info Access Token and profile data.
 
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+         .login(facebookSessionAccessToken: "session access token", profile: ["key": "value"])
          .start { result in
              switch result {
              case .success(let credentials):
@@ -304,15 +300,16 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(facebookSessionAccessToken: sessionAccessToken,
-                audience: "https://myapi.com/api"
+         .login(facebookSessionAccessToken: "session access token",
+                profile: ["key": "value"],
+                audience: "https://myapi.com/api",
                 scope: "openid profile email offline_access")
          .start { print($0) }
      ```
 
      - Parameters:
        - sessionAccessToken: Session info Access Token retrieved from Facebook.
-       - profile:            The user profile returned by Facebook.
+       - profile:            The user profile dictionary returned by Facebook.
        - audience:           API Identifier that the client is requesting access to.
        - scope:              Requested scope value when authenticating the user. By default is `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
@@ -321,13 +318,13 @@ public protocol Authentication: Trackable, Loggable {
     func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Login using username and password in the default directory.
+     Logs in a user using username and password in the default directory.
 
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .loginDefaultDirectory(withUsername: "support@auth0.com",
-                                password: "a secret password")
+                                password: "secret password")
          .start { result in
              switch result {
              case .success(let credentials):
@@ -344,7 +341,7 @@ public protocol Authentication: Trackable, Loggable {
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .loginDefaultDirectory(withUsername: "support@auth0.com",
-                                password: "a secret password",
+                                password: "secret password",
                                 audience: "https://myapi.com/api",
                                 scope: "openid profile email offline_access")
          .start { print($0) }
@@ -367,7 +364,7 @@ public protocol Authentication: Trackable, Loggable {
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .signup(email: "support@auth0.com",
-                 password: "a secret password",
+                 password: "secret password",
                  connection: "Username-Password-Authentication")
          .start { result in
              switch result {
@@ -385,7 +382,7 @@ public protocol Authentication: Trackable, Loggable {
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
          .signup(email: "support@auth0.com",
-                 password: "a secret password",
+                 password: "secret password",
                  connection: "Username-Password-Authentication",
                  userMetadata: ["first_name": "support"])
          .start { print($0) }
@@ -398,7 +395,7 @@ public protocol Authentication: Trackable, Loggable {
          .authentication(clientId, domain: "samples.auth0.com")
          .signup(email: "support@auth0.com",
                  username: "support",
-                 password: "a secret password",
+                 password: "secret password",
                  connection: "Username-Password-Authentication")
          .start { print($0) }
      ```
@@ -409,14 +406,14 @@ public protocol Authentication: Trackable, Loggable {
        - password:       Password for the new user.
        - connection:     Name where the user will be created (Database connection).
        - userMetadata:   Additional user metadata parameters that will be added to the newly created user.
-       - rootAttributes: Root attributes that will be added to the newly created user. See https://auth0.com/docs/api/authentication#signup for supported attributes. Will not overwrite existing parameters.
+       - rootAttributes: Root attributes that will be added to the newly created user; will not overwrite existing parameters. See https://auth0.com/docs/api/authentication#signup for the full list of supported attributes.
      - Returns: A request that will yield a created database user (just email, username, and email verified flag).
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#signup)
      */
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
     /**
-     Resets a database user password.
+     Resets the password of a database user.
 
      ```
      Auth0
@@ -434,7 +431,7 @@ public protocol Authentication: Trackable, Loggable {
     func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError>
 
     /**
-     Starts passwordless authentication by sending an email with a OTP code.
+     Starts passwordless authentication by sending an email with a OTP code. This is the first part of the passwordless login flow.
 
      ```
      Auth0
@@ -464,7 +461,7 @@ public protocol Authentication: Trackable, Loggable {
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
     /**
-     Starts passwordless authentication by sending an sms with an OTP code.
+     Starts passwordless authentication by sending a SMS with an OTP code. This is the first part of the passwordless login flow.
 
      ```
      Auth0
@@ -499,7 +496,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId, domain: "samples.auth0.com")
-         .userInfo(withAccessToken: accessToken)
+         .userInfo(withAccessToken: credentials.accessToken)
          .start { result in
              switch result {
              case .success(let user):
@@ -523,7 +520,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .codeExchange(withCode: "a code",
+         .codeExchange(withCode: "code",
                        codeVerifier: "code verifier",
                        redirectURI: "https://samples.auth0.com/callback")
          .start { result in
@@ -538,8 +535,8 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - code:         Code returned after an `/oauth/authorize` request.
-       - codeVerifier: Verifier used to generate the challenge sent in `/oauth/authorize` request.
-       - redirectURI:  Redirect URI sent in `/oauth/authorize` request.
+       - codeVerifier: Verifier used to generate the challenge sent in the `/oauth/authorize` request.
+       - redirectURI:  Redirect URI sent in the `/oauth/authorize` request.
      - Returns: A request that will yield Auth0 user's credentials.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authorization-code-flow-with-pkce45)
      - See: [RFC 7636](https://tools.ietf.org/html/rfc7636)
@@ -547,11 +544,12 @@ public protocol Authentication: Trackable, Loggable {
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Renew the user's credentials with a `refresh_token` grant for `/oauth/token`.
+     Renews the user's credentials using a Refresh Token.
 
      ```
      Auth0
-         .renew(withRefreshToken: refreshToken, scope: "openid profile email offline_access read:users")
+         .renew(withRefreshToken: credentials.refreshToken,
+                scope: "openid profile email offline_access read:users")
          .start { result in
              switch result {
              case .success(let credentials):
@@ -566,26 +564,25 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-         .renew(withRefreshToken: refreshToken)
+         .renew(withRefreshToken: credentials.refreshToken)
          .start { print($0) }
      ```
 
      - Parameters:
        - refreshToken: The client's Refresh Token.
-       - scope:        Scopes to request for the new tokens. By default is `nil`, which will ask for the same ones requested during Auth.
-     - Important: This method only works for a Refresh Token obtained after authentication with OAuth 2.0 API Authorization.
+       - scope:        Scopes to request for the new tokens. Defaults to `nil`, which will ask for the same scopes that were requested on login.
      - Returns: A request that will yield Auth0 user's credentials.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
      */
     func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
-     Revoke a user's `refresh_token` with a call to `/oauth/revoke`.
+     Revokes a user's Refresh Token with a call to `/oauth/revoke`.
 
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .revoke(refreshToken: refreshToken)
+         .revoke(refreshToken: credentials.refreshToken)
          .start { print($0) }
      ```
 
@@ -597,7 +594,7 @@ public protocol Authentication: Trackable, Loggable {
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError>
 
     /**
-     Returns JSON Web Key Set (JWKS) information by performing a request to the `/.well-known/jwks.json` endpoint.
+     Returns JSON Web Key Set (JWKS) information from the `/.well-known/jwks.json` endpoint.
 
      ```
      Auth0

@@ -137,7 +137,7 @@ public protocol WebAuth: Trackable, Loggable {
      Any ongoing WebAuth session will be automatically cancelled when starting a new one,
      and its corresponding callback with be called with a failure result containing a ``WebAuthError/userCancelled``.
 
-     - Parameter callback: Callback called with the result of the WebAuth flow.
+     - Parameter callback: Callback that receives a `Result` containing either the user's credentials or an error.
      */
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
 
@@ -225,7 +225,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - Parameters:
        - federated: `Bool` to remove the Identity Provider session. Defaults to `false`.
-       - callback: Callback called with the result of the call.
+       - callback: Callback that receives a `Result` containing either an empty success case or an error.
      - See: [Logout](https://auth0.com/docs/login/logout)
      */
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)

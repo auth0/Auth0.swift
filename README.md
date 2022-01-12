@@ -273,7 +273,7 @@ Auth0
 
 Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your application.
 
-Call the `clearSession()` method in the action of your **Logout** button. Once the session cookie has been cleared, delete the user's credentials from your application.
+Call the `clearSession()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](#clear-stored-credentials).
 
 ```swift
 Auth0
@@ -337,11 +337,16 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 ### Common Tasks
 
-- [Retrieve user information](#retrieve-user-information-ios--macos--tvos--watchos)
-- [Store credentials](#store-credentials)
-- [Retrieve stored credentials](#retrieve-stored-credentials)
-- [Clear stored credentials](#clear-stored-credentials)
-- [Enable debug logging](#logging)
+- [**Retrieve user information**](#retrieve-user-information-ios--macos--tvos--watchos)
+  <br>Fetch the latest user information from the `/userinfo` endpoint.
+- [**Store credentials**](#store-credentials)
+  <br>Store the user's credentials securely in the Keychain.
+- [**Retrieve stored credentials**](#retrieve-stored-credentials)
+  <br>Fetch the user's credentials from the Keychain, automatically renewing them if they have expired.
+- [**Clear stored credentials**](#clear-stored-credentials)
+  <br>Delete the user's credentials to complete the logout process.
+- [**Enable debug logging**](#logging)
+  <br>Print HTTP requests and responses for debugging.
 
 ### Web Auth (iOS / macOS)
 
@@ -424,7 +429,7 @@ Auth0
 
 ##### Add an audience value
 
-Specify an audience to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/configure/apis).
+Specify an [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/configure/apis).
 
 ```swift
 Auth0
@@ -435,7 +440,7 @@ Auth0
 
 ##### Add a scope value
 
-Specify a [scope](https://auth0.com/docs/configure/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email`. Regardless of the scope value configured, `openid` is always included.
+Specify a [scope](https://auth0.com/docs/configure/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
 
 ```swift
 Auth0
@@ -483,13 +488,13 @@ Auth0
 
 #### Errors
 
-Web Auth will only yield `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
+Web Auth will only produce `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
 ### Credentials Manager (iOS / macOS / tvOS / watchOS)
 
 [API documentation ↗](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)
 
-The Credentials Manager utility provides a convenience to securely store and retrieve the user's credentials from the Keychain.
+The Credentials Manager utility allows you to securely store and retrieve the user's credentials from the Keychain.
 
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
@@ -497,15 +502,15 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 
 #### Store credentials
 
-When your users log in, store their credentials securely in the Keychain. You can then log them in automatically when they open your application again.
+When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your application again.
 
 ```swift
-credentialsManager.store(credentials: credentials)
+let didStore = credentialsManager.store(credentials: credentials)
 ```
 
 #### Check validity of stored credentials
 
-When the users open your application, check for valid credentials. If they exist, you can retrieve them and redirect the users to the app's main flow without any additional login steps.
+When the users open your application, check for valid credentials. If they exist, you can retrieve them and redirect the users to the application's main flow without any additional login steps.
 
 ```swift
 guard credentialsManager.hasValid() else {
@@ -516,9 +521,7 @@ guard credentialsManager.hasValid() else {
 
 #### Retrieve stored credentials 
 
-Credentials will automatically be renewed (if expired) using the [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens). **This method is thread-safe.**
-
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
+The credentials will be automatically renewed (if expired) using the [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens). **This method is thread-safe.**
 
 ```swift
 credentialsManager.credentials { result in 
@@ -560,6 +563,8 @@ credentialsManager
     .store(in: &cancellables)
 ```
 </details>
+
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
 
 #### Retrieve stored user information
 
@@ -625,13 +630,13 @@ credentialsManager
 
 #### Biometric authentication
 
-You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by your device, e.g. Face ID or Touch ID.
+You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, e.g. Face ID or Touch ID.
 
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
-If needed, you can use a specific `LAPolicy` - e.g. you might want to support FaceID, but allow fallback to passcode.
+If needed, you can use a specific `LAPolicy` - e.g. you might want to support Face ID, but allow fallback to passcode.
 
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login", 
@@ -642,7 +647,7 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
 
 #### Errors
 
-The Credentials Manager will only yield `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
+The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
 ### Authentication API (iOS / macOS / tvOS / watchOS)
 
@@ -675,8 +680,6 @@ Auth0
         }
     }
 ```
-
-> 💡 The default scope value is `openid profile email`. Regardless of the scope value configured, `openid` is always included.
 
 <details>
   <summary>Using async/await</summary>
@@ -718,6 +721,8 @@ Auth0
     .store(in: &cancellables)
 ```
 </details>
+
+> 💡 The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
 
 #### Sign up with database connection
 
@@ -953,8 +958,6 @@ Auth0
 
 Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
 
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
-
 ```swift
 Auth0
     .authentication()
@@ -1004,6 +1007,8 @@ Auth0
 ```
 </details>
 
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
+
 #### Configuration
 
 ##### Add custom parameters
@@ -1042,17 +1047,21 @@ Auth0
 
 #### Errors
 
-The Authentication API client will only yield `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html) to learn more about the available `AuthenticationError` properties.
+The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html) to learn more about the available `AuthenticationError` properties.
 
 ### Management API (Users) (iOS / macOS / tvOS / watchOS)
 
 [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
 
-You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2). For security reasons native mobile applications are restricted to a subset of the Management API functionality.
+You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2). **For security reasons, native mobile applications are restricted to a subset of the Management API functionality.**
 
-A detailed guide is available in this [Quickstart](https://auth0.com/docs/quickstart/native/ios-swift/03-user-sessions#managing-metadata).
+To call the Management API, the Access Token needs to have its API Identifier as a target [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) value. To achieve this, specify `https://YOUR_AUTH0_DOMAIN/api/v2/` as the audience when logging in. 
+
+> ⚠️ Auth0 Access Tokens do not support multiple custom audience values. If you need to specify your own API Identifier as the audience to call your backend API, you cannot use the resulting Access Token to call the Management API. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your application.
 
 #### Retrieve user metadata
+
+To call this method, you need to request the `read:users` scope when logging in.
 
 ```swift
 Auth0
@@ -1103,7 +1112,11 @@ Auth0
 ```
 </details>
 
+> 💡 An alternative is to use a [post-login Action](https://auth0.com/docs/customize/actions/triggers/post-login/api-object) to add the metadata to the ID Token as a custom claim.
+
 #### Update user metadata
+
+To call this method, you need to request either the `update:users` or the `update:users_app_metadata` scope when logging in.
 
 ```swift
 Auth0
@@ -1156,10 +1169,12 @@ Auth0
 
 #### Link an account
 
+Your users may want to link their other accounts to the account they are logged in to. To achieve this, you need the user ID for the primary account and the idToken for the secondary account. You also need to request the `update:current_user_identities` scope when logging in.
+
 ```swift
 Auth0
-    .users(token: credentials.idToken)
-    .link("user identifier", withOtherUserToken: "another user token")
+    .users(token: credentials.accessToken)
+    .link("primary user id", withOtherUserToken: "secondary id token")
     .start { result in
         switch result {
         case .success:
@@ -1176,8 +1191,8 @@ Auth0
 ```swift
 do {
     _ = try await Auth0
-        .users(token: credentials.idToken)
-        .link("user identifier", withOtherUserToken: "another user token")
+        .users(token: credentials.accessToken)
+        .link("primary user id", withOtherUserToken: "secondary id token")
         .start()
     print("Accounts linked")
 } catch {
@@ -1191,8 +1206,8 @@ do {
 
 ```swift
 Auth0
-    .users(token: credentials.idToken)
-    .link("user identifier", withOtherUserToken: "another user token")
+    .users(token: credentials.accessToken)
+    .link("primary user id", withOtherUserToken: "secondary id token")
     .start()
     .sink(receiveCompletion: { completion in
         switch completion {
@@ -1244,11 +1259,11 @@ Auth0
 
 #### Errors
 
-The Management API client will only yield `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/ManagementError.html) to learn more about the available `ManagementError` properties.
+The Management API client will only produce `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/ManagementError.html) to learn more about the available `ManagementError` properties.
 
 ### Logging
 
-To enable Auth0.swift to log HTTP requests and the OAuth2 flow for debugging you can call the following method in either `WebAuth`, `Authentication` or `Users`:
+To enable Auth0.swift to print HTTP requests and responses for debugging, you can call the following method in either `WebAuth`, `Authentication` or `Users`:
 
 ```swift
 Auth0
@@ -1257,7 +1272,7 @@ Auth0
     // ...
 ```
 
-Then with a successful authentication you'll see something similar to the following:
+Then, with a successful authentication you'll see something similar to the following:
 
 ```text
 Safari: https://samples.auth0.com/authorize?.....
@@ -1289,7 +1304,7 @@ Connection: keep-alive
 
 #### Sign in With Apple
 
-If you've added [the Sign In with Apple flow](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) to your app, after a successful Sign in With Apple authentication you can use the value of the `authorizationCode` property to perform a code exchange for Auth0 credentials.
+If you've added the [Sign In with Apple flow](https://developer.apple.com/documentation/authenticationservices/implementing_user_authentication_with_sign_in_with_apple) to your app, after a successful Sign in With Apple authentication you can use the value of the `authorizationCode` property to perform a code exchange for Auth0 credentials.
 
 ```swift
 Auth0
@@ -1344,7 +1359,7 @@ Auth0
 
 #### Facebook Login
 
-If you've added [the Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and use them both to perform a code exchange for Auth0 credentials.
+If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and then use them both to perform a code exchange for Auth0 credentials.
 
 ```swift
 Auth0
@@ -1464,14 +1479,14 @@ Auth0
 
 #### Accept user invitations
 
-To accept organization invitations your app needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app). Tapping on the invitation link should open your app (invitations links are `https` only).
+To accept organization invitations your application needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app). Tapping on the invitation link should open your application (invitations links are `https` only).
 
-When your app gets opened by an invitation link, grab the invitation URL and pass it to `.invitationURL()`:
+When your application gets opened by an invitation link, grab the invitation URL and pass it to `.invitationURL()`.
 
 ```swift
 guard let url = URLContexts.first?.url else { return }
 
-// You need to wait for the app to enter the foreground before launching Web Auth
+// You need to wait for the application to enter the foreground before launching Web Auth
 NotificationCenter
     .default
     .publisher(for: UIApplication.didBecomeActiveNotification)
@@ -1526,7 +1541,7 @@ Auth0
     }
 ```
 
-In the case of signup, you can add [an additional parameter](#signup-with-universal-login-ios--macos) to make the user land directly on the signup page.
+In the case of signup, you can add an [additional parameter](#signup-with-universal-login-ios--macos) to make the user land directly on the signup page.
 
 ```swift
 Auth0
