@@ -19,6 +19,7 @@ public final class Credentials: NSObject {
     /// Token that can be used to make authenticated requests to the specified API (the **audience** value used on login).
     ///
     /// - See: [Access Tokens](https://auth0.com/docs/security/tokens/access-tokens)
+    /// - See: [Audience(https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)]
     public let accessToken: String
     /// Type of the Access Token.
     public let tokenType: String

@@ -19,6 +19,7 @@ public protocol Users: Trackable, Loggable {
 
     /**
      Fetches a user using its identifier.
+
      By default it gets all the user's attributes:
 
      ```
@@ -65,6 +66,7 @@ public protocol Users: Trackable, Loggable {
 
     /**
      Updates a user's root values (those which are allowed to be updated).
+
      For example if you need to change `email`:
 
      ```

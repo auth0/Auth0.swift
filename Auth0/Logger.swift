@@ -1,5 +1,6 @@
 import Foundation
 
+/// Logger for debugging purposes.
 public protocol Logger {
     func trace(request: URLRequest, session: URLSession)
     func trace(response: URLResponse, data: Data?)

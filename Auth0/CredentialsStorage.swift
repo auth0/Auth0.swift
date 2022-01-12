@@ -3,13 +3,13 @@ import SimpleKeychain
 /// Generic storage API for storing credentials.
 public protocol CredentialsStorage {
 
-    /// Retrieve a storage entry.
+    /// Retrieves a storage entry.
     ///
     /// - Parameter forKey: The key to get from the store.
     /// - Returns: The stored data.
     func getEntry(forKey: String) -> Data?
 
-    /// Set a storage entry.
+    /// Sets a storage entry.
     ///
     /// - Parameters:
     ///   - data: The data to be stored.
@@ -17,7 +17,7 @@ public protocol CredentialsStorage {
     /// - Returns: If the data was stored.
     func setEntry(_ data: Data, forKey: String) -> Bool
 
-    /// Delete a storage entry.
+    /// Deletes a storage entry.
     ///
     /// - Parameter forKey: The key to delete from the store.
     /// - Returns: If the entry was deleted.
@@ -27,7 +27,7 @@ public protocol CredentialsStorage {
 
 extension A0SimpleKeychain: CredentialsStorage {
 
-    /// Retrieve a storage entry.
+    /// Retrieves a storage entry.
     ///
     /// - Parameter forKey: The key to get from the Keychain.
     /// - Returns: The stored data.
@@ -35,7 +35,7 @@ extension A0SimpleKeychain: CredentialsStorage {
         return data(forKey: forKey)
     }
 
-    /// Delete a storage entry.
+    /// Deletes a storage entry.
     ///
     /// - Parameter forKey: The key to delete from the Keychain.
     /// - Returns: If the data was stored.

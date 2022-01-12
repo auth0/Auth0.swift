@@ -226,6 +226,7 @@ public protocol Authentication: Trackable, Loggable {
 
     /// Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
     /// application and user.
+    ///
     /// The `type` is how the user will get the challenge and prove possession. Supported challenge types include:
     /// * `otp`:  for one-time password (OTP)
     /// * `oob`:  for SMS/voice messages or out-of-band (OOB)
@@ -358,7 +359,7 @@ public protocol Authentication: Trackable, Loggable {
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Creates a user in a Database connection.
+     Creates a user in a database connection.
 
      ```
      Auth0
@@ -404,7 +405,7 @@ public protocol Authentication: Trackable, Loggable {
        - email:          Email for the new user.
        - username:       Username of the user if the connection requires username. By default is `nil`.
        - password:       Password for the new user.
-       - connection:     Name where the user will be created (Database connection).
+       - connection:     Name where the user will be created (database connection).
        - userMetadata:   Additional user metadata parameters that will be added to the newly created user.
        - rootAttributes: Root attributes that will be added to the newly created user; will not overwrite existing parameters. See https://auth0.com/docs/api/authentication#signup for the full list of supported attributes.
      - Returns: A request that will yield a created database user (just email, username, and email verified flag).

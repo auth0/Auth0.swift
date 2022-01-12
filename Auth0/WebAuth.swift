@@ -197,7 +197,7 @@ public protocol WebAuth: Trackable, Loggable {
     func start() -> AnyPublisher<Credentials, WebAuthError>
 
     /**
-     Removes Auth0 session and optionally remove the Identity Provider (IdP) session.
+     Removes the Auth0 session and optionally remove the Identity Provider (IdP) session.
 
      You need to make sure that the **Callback URL** has been added to the
      **Allowed Logout URLs** field of your Auth0 application settings in the
@@ -231,7 +231,7 @@ public protocol WebAuth: Trackable, Loggable {
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
 
     /**
-     Removes Auth0 session and optionally remove the Identity Provider (IdP) session.
+     Removes the Auth0 session and optionally remove the Identity Provider (IdP) session.
 
      You need to make sure that the **Callback URL** has been added to the
      **Allowed Logout URLs** field of your Auth0 application settings in the
@@ -272,7 +272,7 @@ public protocol WebAuth: Trackable, Loggable {
 
     #if compiler(>=5.5) && canImport(_Concurrency)
     /**
-     Removes Auth0 session and optionally remove the Identity Provider (IdP) session.
+     Removes the Auth0 session and optionally remove the Identity Provider (IdP) session.
 
      You need to make sure that the **Callback URL** has been added to the
      **Allowed Logout URLs** field of your Auth0 application settings in the
