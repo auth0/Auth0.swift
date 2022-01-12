@@ -1053,11 +1053,12 @@ The Authentication API client will only produce `AuthenticationError` error valu
 
 [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
 
-You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2). **For security reasons, native mobile applications are restricted to a subset of the Management API functionality.**
-
+You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2).
 To call the Management API, the Access Token needs to have its API Identifier as a target [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) value. To achieve this, specify `https://YOUR_AUTH0_DOMAIN/api/v2/` as the audience when logging in. 
 
-> ⚠️ Auth0 Access Tokens do not support multiple custom audience values. If you need to specify your own API Identifier as the audience to call your backend API, you cannot use the resulting Access Token to call the Management API. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your application.
+> 💡 Auth0 Access Tokens do not support multiple custom audience values. If you need to specify your own API Identifier as the audience to call your backend API, you cannot use the resulting Access Token to call the Management API. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your application.
+
+> ⚠️ For security reasons, native mobile applications are restricted to a subset of the Management API functionality.
 
 #### Retrieve user metadata
 
