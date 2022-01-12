@@ -240,8 +240,9 @@ struct IDTokenAuthTimeValidator: JWTValidator {
     func validate(_ jwt: JWT) -> Auth0Error? {
         guard let authTime = jwt.claim(name: "auth_time").date else { return ValidationError.missingAuthTime }
         let currentTimeEpoch = baseTime.timeIntervalSince1970
-        let authTimeEpoch = authTime.timeIntervalSince1970 + Double(maxAge) + Double(leeway)
-        guard authTimeEpoch < currentTimeEpoch else {
+        let adjustedMaxAge = Double(maxAge) + Double(leeway)
+        let authTimeEpoch = authTime.timeIntervalSince1970 + adjustedMaxAge
+        guard currentTimeEpoch <= authTimeEpoch else {
             return ValidationError.pastLastAuth(baseTime: currentTimeEpoch, lastAuthTime: authTimeEpoch)
         }
         return nil
