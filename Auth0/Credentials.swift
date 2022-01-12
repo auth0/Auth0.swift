@@ -19,6 +19,7 @@ public final class Credentials: NSObject {
     /// Token that can be used to make authenticated requests to the specified API (the **audience** value used on login).
     ///
     /// - See: [Access Tokens](https://auth0.com/docs/security/tokens/access-tokens)
+    /// - See: [Audience(https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)]
     public let accessToken: String
     /// Type of the Access Token.
     public let tokenType: String
@@ -26,7 +27,7 @@ public final class Credentials: NSObject {
     public let expiresIn: Date
     /// Token that can be used to request a new Access Token.
     ///
-    /// - Requires: The scope `offline_access` to be requested on login.
+    /// - Requires: The scope `offline_access` to have been requested on login.
     /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
     public let refreshToken: String?
     /// Token that contains the user information.

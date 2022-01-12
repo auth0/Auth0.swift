@@ -127,7 +127,7 @@ public struct UserInfo: JSONObjectPayload {
 
 public extension UserInfo {
 
-    /// Creates a ``UserInfo`` from a JSON dictionary.
+    /// Creates a ``UserInfo`` instance from a JSON dictionary.
     init?(json: [String: Any]) {
         guard let sub = json["sub"] as? String else { return nil }
 

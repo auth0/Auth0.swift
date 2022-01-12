@@ -17,7 +17,7 @@ extension JWK {
 
 private extension JWK {
 
-    private func encodeRSAPublicKey(modulus: [UInt8], exponent: [UInt8]) -> Data {
+    func encodeRSAPublicKey(modulus: [UInt8], exponent: [UInt8]) -> Data {
         var prefixedModulus: [UInt8] = [0x00] // To indicate that the number is not negative
         prefixedModulus.append(contentsOf: modulus)
         let encodedModulus = prefixedModulus.derEncode(as: 2) // Integer
@@ -26,7 +26,7 @@ private extension JWK {
         return Data(encodedSequence)
     }
 
-    private func generateRSAPublicKey(from derEncodedData: Data) -> SecKey? {
+    func generateRSAPublicKey(from derEncodedData: Data) -> SecKey? {
         let sizeInBits = derEncodedData.count * MemoryLayout<UInt8>.size
         let attributes: [CFString: Any] = [kSecAttrKeyType: kSecAttrKeyTypeRSA,
                                            kSecAttrKeyClass: kSecAttrKeyClassPublic,

@@ -6,7 +6,7 @@ final public class UserPatchAttributes {
     private(set) var dictionary: [String: Any]
 
     /**
-     Create a new attributes.
+     Creates a new UserPatchAttributes instance.
 
      - Parameter dictionary: Default attribute values.
      - Returns: New attributes.
