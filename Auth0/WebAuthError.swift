@@ -41,15 +41,14 @@ public struct WebAuthError: Auth0Error {
         case .invalidInvitationURL(let url): return "The invitation URL (\(url)) is missing the 'invitation' and/or"
             + " the 'organization' query parameters."
         case .userCancelled: return "The user cancelled the Web Auth operation."
-        case .pkceNotAllowed: return "Unable to complete authentication with PKCE."
-            + " The correct method for Token Endpoint Authentication Method is not set (it should be 'None')."
-            + " PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the"
-            + " 'ApplicationType' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
+        case .pkceNotAllowed: return "Unable to perform authentication with PKCE."
+            + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
+            + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
         case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
             + " query parameters (\(values))."
         case .idTokenValidationFailed: return "The ID Token validation performed after Web Auth login failed."
-            + " The underlying error can be accessed via the 'cause' property."
-        case .other: return "An error occurred. The 'Error' value can be accessed via the 'cause' property."
+            + " See the underlying 'Error' value available in the 'cause' property."
+        case .other: return "An unexpected error occurred. See the underlying 'Error' value available in the 'cause' property."
         case .unknown(let message): return message
         }
     }
@@ -57,25 +56,31 @@ public struct WebAuthError: Auth0Error {
     // MARK: - Error Cases
 
     /// The bundle identifier could not be retrieved from `Bundle.main.bundleIdentifier`, or it could not be used to
-    /// build a valid URL. This error does not include a ``cause``.
+    /// build a valid URL.
+    /// This error does not include a ``cause``.
     public static let noBundleIdentifier: WebAuthError = .init(code: .noBundleIdentifier)
     /// The invitation URL is missing the `invitation` and/or the `organization` query parameters.
     /// This error does not include a ``cause``.
     public static let invalidInvitationURL: WebAuthError = .init(code: .invalidInvitationURL(""))
-    /// The user cancelled the Web Auth operation. This error does not include a ``cause``.
+    /// The user cancelled the Web Auth operation.
+    /// This error does not include a ``cause``.
     public static let userCancelled: WebAuthError = .init(code: .userCancelled)
-    /// The correct method for Token Endpoint Authentication Method is not set (it should be 'None').
+    /// The Auth0 application does not support authentication with PKCE.
     /// PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the 'Application Type' to
-    /// 'Native' and the 'Token Endpoint Authentication Method' to 'None'. This error does not include a ``cause``.
+    /// 'Native' and the 'Token Endpoint Authentication Method' to 'None'.
+    /// This error does not include a ``cause``.
     public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
-    /// The callback URL is missing the `code` query parameter. This error does not include a ``cause``.
+    /// The callback URL is missing the `code` query parameter.
+    /// This error does not include a ``cause``.
     public static let noAuthorizationCode: WebAuthError = .init(code: .noAuthorizationCode([:]))
     /// The ID Token validation performed after Web Auth login failed.
-    /// The underlying error can be accessed via the ``cause`` property.
+    /// The underlying 'Error' value can be accessed via the ``cause`` property.
     public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
-    /// An error occurred. The `Error` value can be accessed via the ``cause`` property.
+    /// An unexpected error occurred, and an `Error` value is available.
+    /// The underlying 'Error' value can be accessed via the ``cause`` property.
     public static let other: WebAuthError = .init(code: .other)
-    /// An unknown error occurred, and an `Error` value is not available. This error does not include a ``cause``.
+    /// An unexpected error occurred, but an `Error` value is not available.
+    /// This error does not include a ``cause``.
     public static let unknown: WebAuthError = .init(code: .unknown(""))
 
 }
