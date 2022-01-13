@@ -101,10 +101,9 @@ class WebAuthErrorSpec: QuickSpec {
             }
 
             it("should return message for PKCE not allowed") {
-                let message = "Unable to complete authentication with PKCE."
-                + " The correct method for Token Endpoint Authentication Method is not set (it should be 'None')."
-                + " PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the"
-                + " 'ApplicationType' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
+                let message = "Unable to perform authentication with PKCE."
+                + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
+                + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
                 let error = WebAuthError(code: .pkceNotAllowed)
                 expect(error.localizedDescription) == message
             }
@@ -119,13 +118,13 @@ class WebAuthErrorSpec: QuickSpec {
 
             it("should return message for id token validation failed") {
                 let message = "The ID Token validation performed after Web Auth login failed."
-                + " The underlying error can be accessed via the 'cause' property."
+                + " See the underlying 'Error' value available in the 'cause' property."
                 let error = WebAuthError(code: .idTokenValidationFailed)
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for other") {
-                let message = "An error occurred. The 'Error' value can be accessed via the 'cause' property."
+                let message = "An unexpected error occurred. See the underlying 'Error' value available in the 'cause' property."
                 let error = WebAuthError(code: .other)
                 expect(error.localizedDescription) == message
             }
