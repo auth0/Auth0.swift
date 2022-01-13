@@ -19,7 +19,7 @@ public final class Credentials: NSObject {
     /// Token that can be used to make authenticated requests to the specified API (the **audience** value used on login).
     ///
     /// - See: [Access Tokens](https://auth0.com/docs/security/tokens/access-tokens)
-    /// - See: [Audience(https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)]
+    /// - See: [Audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)]
     public let accessToken: String
     /// Type of the Access Token.
     public let tokenType: String
@@ -40,7 +40,7 @@ public final class Credentials: NSObject {
     public let idToken: String
     /// Granted scopes. This value is only present when one or more of the requested scopes were not granted.
     ///
-    /// - See: [Scopes]{https://auth0.com/docs/configure/apis/scopes}
+    /// - See: [Scopes](https://auth0.com/docs/configure/apis/scopes)
     public let scope: String?
     /// MFA recovery code that the application must display to the end-user, to be stored securely for future use.
     ///

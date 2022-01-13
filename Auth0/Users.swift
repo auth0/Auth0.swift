@@ -29,7 +29,7 @@ public protocol Users: Trackable, Loggable {
          .start { result in
              switch result {
              case .success(let user):
-                 print("User: \(user)")
+                 print("Obtained user: \(user)")
              case .failure(let error):
                  print("Failed with: \(error)")
              }

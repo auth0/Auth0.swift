@@ -584,50 +584,6 @@ The stored credentials can be removed from the Keychain by using the `clear()` m
 let didClear = credentialsManager.clear()
 ```
 
-You can clear the credentials and revoke the Refresh Token with a single call to `revoke()`. This method will attempt to revoke the current Refresh Token stored by the Credentials Manager and then clear the credentials from the Keychain. If the token revocation fails, the credentials will not be cleared.
-
-```swift
-credentialsManager.revoke { result in
-    switch result {
-    case .success:
-        print("Success")
-    case .failure(let error):
-        print("Failed with: \(error)") 
-    }
-}
-```
-
-<details>
-  <summary>Using async/await</summary>
-
-```swift
-do {
-    try await credentialsManager.revoke()
-    print("Success")
-} catch {
-    print("Failed with: \(error)")
-}
-```
-</details>
-
-<details>
-  <summary>Using Combine</summary>
-
-```swift
-credentialsManager
-    .revoke()
-    .sink(receiveCompletion: { completion in
-        switch completion {
-        case .finished:
-            print("Success")
-        case .failure(let error):
-            print("Failed with: \(error)")
-        }
-    }, receiveValue: {})
-    .store(in: &cancellables)
-```
-</details>
-
 #### Biometric authentication
 
 You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, e.g. Face ID or Touch ID.
@@ -912,7 +868,7 @@ Auth0
    .start { result in
        switch result {
        case .success(let user):
-           print("User: \(user)")
+           print("Obtained user: \(user)")
        case .failure(let error):
            print("Failed with: \(error)")
        }
@@ -928,7 +884,7 @@ do {
         .authentication()
         .userInfo(withAccessToken: credentials.accessToken)
         .start()
-    print("User: \(user)")
+    print("Obtained user: \(user)")
 } catch {
     print("Failed with: \(error)")
 }
@@ -948,7 +904,7 @@ Auth0
             print("Failed with: \(error)")
         }
     }, receiveValue: { user in
-        print("User: \(user)")
+        print("Obtained user: \(user)")
     })
     .store(in: &cancellables)
 ```
@@ -1053,10 +1009,20 @@ The Authentication API client will only produce `AuthenticationError` error valu
 
 [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
 
-You can request more information about a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2).
-To call the Management API, the Access Token needs to have its API Identifier as a target [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) value. To achieve this, specify `https://YOUR_AUTH0_DOMAIN/api/v2/` as the audience when logging in. 
+You can request more information from a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2).
 
-> 💡 Auth0 Access Tokens do not support multiple custom audience values. If you need to specify your own API Identifier as the audience to call your backend API, you cannot use the resulting Access Token to call the Management API. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your application.
+To call the Management API, you need an Access Token that has the API Identifier of the Management API as a target [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) value. Specify `https://YOUR_AUTH0_DOMAIN/api/v2/` as the audience when logging in to achieve this. 
+
+E.g. if you're using Web Auth:
+
+```swift
+Auth0
+    .webAuth()
+    .audience("https://YOUR_AUTH0_DOMAIN/api/v2/")
+    // ...
+```
+
+> 💡 Auth0 Access Tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your application.
 
 > ⚠️ For security reasons, native mobile applications are restricted to a subset of the Management API functionality.
 
@@ -1071,7 +1037,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let user):
-            print("User with metadata: \(user)")
+            print("Obtained user with metadata: \(user)")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -1087,7 +1053,7 @@ do {
         .users(token: credentials.accessToken)
         .get("user id", fields: ["user_metadata"])
         .start()
-    print("User with metadata: \(user)") 
+    print("Obtained user with metadata: \(user)") 
 } catch {
     print("Failed with: \(error)")
 }
@@ -1107,7 +1073,7 @@ Auth0
             print("Failed with: \(error)")
         }
     }, receiveValue: { user in
-        print("User with metadata: \(user)")
+        print("Obtained user with metadata: \(user)")
     })
     .store(in: &cancellables)
 ```
@@ -1358,7 +1324,7 @@ Auth0
 ```
 </details>
 
-> 💡 Check the [Setting up Sign In with Apple](https://auth0.com/docs/connections/social/apple-native) guide for more information about integrating Sign In with Apple with Auth0.
+> 💡 See the [Setting up Sign In with Apple](https://auth0.com/docs/connections/social/apple-native) guide for more information about integrating Sign In with Apple with Auth0.
 
 #### Facebook Login
 
@@ -1413,7 +1379,7 @@ Auth0
 ```
 </details>
 
-> 💡 Check the [Setting up Facebook Login](https://auth0.com/docs/connections/social/facebook-native) guide for more information about integrating Facebook Login with Auth0.
+> 💡 See the [Setting up Facebook Login](https://auth0.com/docs/connections/social/facebook-native) guide for more information about integrating Facebook Login with Auth0.
 
 ### Organizations
 
