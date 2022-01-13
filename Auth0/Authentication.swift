@@ -231,6 +231,20 @@ public protocol Authentication: Trackable, Loggable {
     /// * `otp`:  for one-time password (OTP)
     /// * `oob`:  for SMS/voice messages or out-of-band (OOB)
     ///
+    /// ```
+    /// Auth0
+    ///     .authentication(clientId: clientId, domain: "samples.auth0.com")
+    ///     .multifactorChallenge(mfaToken: "mfa token", types: ["otp"])
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let challenge):
+    ///             print("Obtained challenge: \(challenge)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
     /// - Parameters:
     ///   - mfaToken:        Token returned when authentication fails due to MFA requirement.
     ///   - types:           A list of the challenges types accepted by your application. Accepted challenge types are `oob` or `otp`. Excluding this parameter means that your client application accepts all supported challenge types.
@@ -285,7 +299,8 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(facebookSessionAccessToken: "session access token", profile: ["key": "value"])
+         .login(facebookSessionAccessToken: "session info access token",
+                profile: ["key": "value"])
          .start { result in
              switch result {
              case .success(let credentials):
@@ -301,7 +316,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .login(facebookSessionAccessToken: "session access token",
+         .login(facebookSessionAccessToken: "session info access token",
                 profile: ["key": "value"],
                 audience: "https://myapi.com/api",
                 scope: "openid profile email offline_access")
@@ -419,7 +434,8 @@ public protocol Authentication: Trackable, Loggable {
      ```
      Auth0
          .authentication(clientId: clientId, domain: "samples.auth0.com")
-         .resetPassword(email: "support@auth0.com", connection: "Username-Password-Authentication")
+         .resetPassword(email: "support@auth0.com",
+                        connection: "Username-Password-Authentication")
          .start { print($0) }
      ```
 
@@ -501,7 +517,7 @@ public protocol Authentication: Trackable, Loggable {
          .start { result in
              switch result {
              case .success(let user):
-                 print("User: \(user)")
+                 print("Obtained user: \(user)")
              case .failure(let error):
                  print("Failed with: \(error)")
              }
@@ -549,8 +565,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ```
      Auth0
-         .renew(withRefreshToken: credentials.refreshToken,
-                scope: "openid profile email offline_access read:users")
+         .renew(withRefreshToken: credentials.refreshToken)
          .start { result in
              switch result {
              case .success(let credentials):
@@ -561,17 +576,18 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     To request the same scopes as when the Refresh Token was issued:
+     You can get a downscoped Access Token by requesting fewer scopes than were requested on login:
 
      ```
      Auth0
-         .renew(withRefreshToken: credentials.refreshToken)
+         .renew(withRefreshToken: credentials.refreshToken,
+                scope: "openid offline_access")
          .start { print($0) }
      ```
 
      - Parameters:
-       - refreshToken: The client's Refresh Token.
-       - scope:        Scopes to request for the new tokens. Defaults to `nil`, which will ask for the same scopes that were requested on login.
+       - refreshToken: The Refresh Token.
+       - scope:        Scopes to request. Defaults to `nil`, which will ask for the same scopes that were requested on login.
      - Returns: A request that will yield Auth0 user's credentials.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
      */
