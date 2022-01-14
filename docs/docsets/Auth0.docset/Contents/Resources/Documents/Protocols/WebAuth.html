@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           Auth0 2.0.0-beta Docs
         </a>
-         (94% documented)
+         (97% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -230,7 +230,7 @@
 
                 </div>
               </div>
-            <p>Web Authentication using Auth0.</p>
+            <p>Web-based authentication using Auth0.</p>
 <div class="aside aside-see">
     <p class="aside-title">See</p>
     <code><a href="../Structs/WebAuthError.html">WebAuthError</a></code>
@@ -329,6 +329,19 @@
                     </section>
                   </div>
                 </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Builder"></a>
+                <a name="//apple_ref/swift/Section/Builder" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Builder"></a>
+                  <h3 class="section-name"><span>Builder</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
                 <li class="item">
                   <div>
                     <code>
@@ -366,7 +379,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                               </td>
                               <td>
                                 <div>
-                                  <p>Name of the connection to use.</p>
+                                  <p>Name of the connection.</p>
                                 </div>
                               </td>
                             </tr>
@@ -375,7 +388,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -393,7 +406,12 @@ page itself. By default no connection is specified, so the Universal Login page 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Scopes that will be requested during authentication.</p>
+                        <p>Specify the scopes that will be requested during authentication.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/configure/apis/scopes">Scopes</a>
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -416,7 +434,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                               </td>
                               <td>
                                 <div>
-                                  <p>A scope value like: <code>openid profile email offline_access</code>.</p>
+                                  <p>Space-separated list of requested scope values. E.g. <code>openid profile email offline_access</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -425,7 +443,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -443,7 +461,12 @@ page itself. By default no connection is specified, so the Universal Login page 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Provider scopes for OAuth2/social connections, e.g. Facebook, Google etc.</p>
+                        <p>Specify provider scopes for OAuth2/social connections, e.g. Facebook, Google, etc.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/authenticate/identity-providers/adding-scopes-for-an-external-idp">Connection Scopes</a>
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -466,7 +489,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                               </td>
                               <td>
                                 <div>
-                                  <p>OAuth2/social scope list: <code>user_friends email</code>.</p>
+                                  <p>Space-separated list of requested OAuth2/social scope values. E.g. <code>user_friends email</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -475,7 +498,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -493,8 +516,8 @@ page itself. By default no connection is specified, so the Universal Login page 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>State value that will be echoed after authentication
-in order to check that the response is from your request and not other.
+                        <p>Specify a <code>state</code> parameter that will be sent back after authentication to verify that the response
+corresponds to your request.
 By default a random value is used.</p>
 
                       </div>
@@ -518,7 +541,7 @@ By default a random value is used.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>A state value to send with the authentication request.</p>
+                                  <p>State value.</p>
                                 </div>
                               </td>
                             </tr>
@@ -527,7 +550,7 @@ By default a random value is used.</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -545,7 +568,7 @@ By default a random value is used.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Send additional parameters for authentication.</p>
+                        <p>Specify additional parameters for authentication.</p>
 
                       </div>
                       <div class="declaration">
@@ -577,7 +600,7 @@ By default a random value is used.</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -627,7 +650,7 @@ By default a random value is used.</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -645,8 +668,14 @@ By default a random value is used.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Audience name of the API that your application will call using the <code>access_token</code> returned after authentication.
- This value must match the one defined in the APIs Section of the <a href="https://manage.auth0.com/#/apis">Auth0 Dashboard</a>.</p>
+                        <p>Specify an audience name for the API that your application will call using the Access Token returned after
+ authentication.
+ This value must match the <strong>API Identifier</strong> defined in the APIs section of the <a href="https://manage.auth0.com/#/apis">Auth0 Dashboard</a>.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience">Audience</a>]
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -669,7 +698,7 @@ By default a random value is used.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>An audience value like: <code>https://example.com/api</code>.</p>
+                                  <p>Audience value. E.g. <code>https://example.com/api</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -678,7 +707,7 @@ By default a random value is used.</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -696,7 +725,7 @@ By default a random value is used.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Add <code>nonce</code> parameter for ID Token validation.</p>
+                        <p>Specify a <code>nonce</code> parameter for ID Token validation.</p>
 
                       </div>
                       <div class="declaration">
@@ -719,7 +748,7 @@ By default a random value is used.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>A nonce string.</p>
+                                  <p>Nonce value.</p>
                                 </div>
                               </td>
                             </tr>
@@ -728,7 +757,7 @@ By default a random value is used.</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -770,7 +799,7 @@ This value will be used instead of the Auth0 Domain.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>A custom issuer value like: <code>https://example.com/</code>.</p>
+                                  <p>Custom issuer value. E.g. <code>https://example.com/</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -779,7 +808,7 @@ This value will be used instead of the Auth0 Domain.</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -797,7 +826,7 @@ This value will be used instead of the Auth0 Domain.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Add a leeway amount for ID Token validation.
+                        <p>Specify a leeway amount for ID Token validation.
 This value represents the clock skew for the validation of date claims, e.g. <code>exp</code>.</p>
 
                       </div>
@@ -821,7 +850,7 @@ This value represents the clock skew for the validation of date claims, e.g. <co
                               </td>
                               <td>
                                 <div>
-                                  <p>Number of milliseconds. Defaults to <code>60000</code> (1 minute).</p>
+                                  <p>Number of milliseconds. Defaults to <code>60_000</code> (1 minute).</p>
                                 </div>
                               </td>
                             </tr>
@@ -830,7 +859,7 @@ This value represents the clock skew for the validation of date claims, e.g. <co
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -848,7 +877,7 @@ This value represents the clock skew for the validation of date claims, e.g. <co
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Add <code>max_age</code> parameter for authentication.
+                        <p>Specify a <code>max_age</code> parameter for authentication.
 Sending this parameter will require the presence of the <code>auth_time</code> claim in the ID Token.</p>
 
                       </div>
@@ -881,7 +910,7 @@ Sending this parameter will require the presence of the <code>auth_time</code> c
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -899,8 +928,20 @@ Sending this parameter will require the presence of the <code>auth_time</code> c
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Disable Single Sign On (SSO) on iOS 13+ and macOS.
-Has no effect on iOS 12.</p>
+                        <p>Use a private browser session to avoid storing the session cookie in the shared cookie jar.</p>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    iOS 13+ or macOS. Has no effect on iOS 12.
+
+</div><div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    This method will disable Single Sign On (SSO).
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio">prefersEphemeralWebBrowserSession</a>
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -913,7 +954,7 @@ Has no effect on iOS 12.</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -954,7 +995,7 @@ Has no effect on iOS 12.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>An organization invitation URL</p>
+                                  <p>Invitation URL for the organization.</p>
                                 </div>
                               </td>
                             </tr>
@@ -963,7 +1004,7 @@ Has no effect on iOS 12.</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
@@ -981,7 +1022,7 @@ Has no effect on iOS 12.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Specify an organization ID to log in to.</p>
+                        <p>Specify an organization identifier to log in to.</p>
 
                       </div>
                       <div class="declaration">
@@ -1004,7 +1045,7 @@ Has no effect on iOS 12.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>An organization ID.</p>
+                                  <p>ID of the organization.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1013,11 +1054,24 @@ Has no effect on iOS 12.</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The same WebAuth instance to allow method chaining.</p>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
                       </div>
                     </section>
                   </div>
                 </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Methods"></a>
+                <a name="//apple_ref/swift/Section/Methods" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Methods"></a>
+                  <h3 class="section-name"><span>Methods</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
                 <li class="item">
                   <div>
                     <code>
@@ -1031,7 +1085,7 @@ Has no effect on iOS 12.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Starts the WebAuth flow.</p>
+                        <p>Starts the Web Auth flow.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
@@ -1039,13 +1093,18 @@ Has no effect on iOS 12.</p>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
-<p>Any ongoing WebAuth session will be automatically cancelled when starting a new one,
-and its corresponding callback with be called with a failure result of <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV13userCancelledACvpZ">WebAuthError.userCancelled</a></code>.</p>
+<p>Any ongoing Web Auth session will be automatically cancelled when starting a new one,
+and its corresponding callback with be called with a failure result containing a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV13userCancelledACvpZ">userCancelled</a></code> error.</p>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    The <strong>Callback URL</strong> to have been added to the <strong>Allowed Callback URLs</strong> field of your Auth0 application settings in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -1068,7 +1127,7 @@ and its corresponding callback with be called with a failure result of <code><a 
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback called with the result of the WebAuth flow.</p>
+                                  <p>Callback that receives a <code>Result</code> containing either the user&rsquo;s credentials or an error.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1110,9 +1169,9 @@ and its corresponding callback with be called with a failure result of <code><a 
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Auth07WebAuthP9publisher7Combine12AnyPublisherVyAA11CredentialsCAA0bC5ErrorVGyF"></a>
-                    <a name="//apple_ref/swift/Method/publisher()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Auth07WebAuthP9publisher7Combine12AnyPublisherVyAA11CredentialsCAA0bC5ErrorVGyF">publisher()</a>
+                    <a name="/s:5Auth07WebAuthP5start7Combine12AnyPublisherVyAA11CredentialsCAA0bC5ErrorVGyF"></a>
+                    <a name="//apple_ref/swift/Method/start()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth07WebAuthP5start7Combine12AnyPublisherVyAA11CredentialsCAA0bC5ErrorVGyF">start()</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1120,13 +1179,13 @@ and its corresponding callback with be called with a failure result of <code><a 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Starts the WebAuth flow.</p>
+                        <p>Starts the Web Auth flow.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">publisher</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">start</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">sink</span><span class="p">(</span><span class="nv">receiveCompletion</span><span class="p">:</span> <span class="p">{</span> <span class="n">completion</span> <span class="k">in</span>
         <span class="k">if</span> <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">)</span> <span class="o">=</span> <span class="n">completion</span> <span class="p">{</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">},</span> <span class="nv">receiveValue</span><span class="p">:</span> <span class="p">{</span> <span class="n">credentials</span> <span class="k">in</span>
         <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
@@ -1134,8 +1193,13 @@ and its corresponding callback with be called with a failure result of <code><a 
     <span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">cancellables</span><span class="p">)</span>
 </code></pre>
 
-<p>Any ongoing WebAuth session will be automatically cancelled when starting a new one,
-and the subscription will complete with a failure result of <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV13userCancelledACvpZ">WebAuthError.userCancelled</a></code>.</p>
+<p>Any ongoing Web Auth session will be automatically cancelled when starting a new one,
+and the subscription will complete with a failure result containing a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV13userCancelledACvpZ">userCancelled</a></code> error.</p>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    The <strong>Callback URL</strong> to have been added to the <strong>Allowed Callback URLs</strong> field of your Auth0 application settings in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -1143,7 +1207,7 @@ and the subscription will complete with a failure result of <code><a href="../St
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)</span>
-<span class="kd">func</span> <span class="nf">publisher</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">AnyPublisher</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/WebAuthError.html">WebAuthError</a></span><span class="o">&gt;</span></code></pre>
+<span class="kd">func</span> <span class="nf">start</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">AnyPublisher</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/Credentials.html">Credentials</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/WebAuthError.html">WebAuthError</a></span><span class="o">&gt;</span></code></pre>
 
                         </div>
                       </div>
@@ -1170,30 +1234,34 @@ and the subscription will complete with a failure result of <code><a href="../St
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Removes Auth0 session and optionally remove the Identity Provider (IdP) session.</p>
-
-<p>You need to make sure that the <strong>Callback URL</strong> has been added to the
-<strong>Allowed Logout URLs</strong> field of your Auth0 application settings in the
-<a href="https://manage.auth0.com/#/applications/">Dashboard</a>.</p>
+                        <p>Removes the Auth0 session and optionally removes the Identity Provider (IdP) session.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="n">clearSession</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nv">success</span><span class="p">:</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Logged out"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Session cookie cleared"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
     <span class="p">}</span>
 </code></pre>
 
-<p>Remove Auth0 session and the Identity Provider session:</p>
+<p>Remove both the Auth0 session and the Identity Provider session:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">clearSession</span><span class="p">(</span><span class="nv">federated</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-see">
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    The <strong>Callback URL</strong> to have been added to the <strong>Allowed Logout URLs</strong> field of your Auth0 application settings in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.
+
+</div><div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    You don&rsquo;t need to call this method if you are using <code><a href="../Protocols/WebAuth.html#/s:5Auth07WebAuthP19useEphemeralSessionxyF">useEphemeralSession()</a></code> on login, because there will be no shared cookie to remove.
+
+</div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/login/logout">Auth0 Logout docs</a>
+    <a href="https://auth0.com/docs/login/logout">Logout</a>
 
 </div>
 
@@ -1222,7 +1290,7 @@ and the subscription will complete with a failure result of <code><a href="../St
                               </td>
                               <td>
                                 <div>
-                                  <p><code>Bool</code> to remove the Identity Provider session. Defaults to <code>false</code>.</p>
+                                  <p>If the Identity Provider session should be removed. Defaults to <code>false</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1234,7 +1302,7 @@ and the subscription will complete with a failure result of <code><a href="../St
                               </td>
                               <td>
                                 <div>
-                                  <p>Callback called with the result of the call.</p>
+                                  <p>Callback that receives a <code>Result</code> containing either an empty success case or an error.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1260,26 +1328,22 @@ and the subscription will complete with a failure result of <code><a href="../St
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Removes Auth0 session and optionally remove the Identity Provider (IdP) session.</p>
-
-<p>You need to make sure that the <strong>Callback URL</strong> has been added to the
-<strong>Allowed Logout URLs</strong> field of your Auth0 application settings in the
-<a href="https://manage.auth0.com/#/applications/">Dashboard</a>.</p>
+                        <p>Removes the Auth0 session and optionally removes the Identity Provider (IdP) session.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">clearSession</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">sink</span><span class="p">(</span><span class="nv">receiveCompletion</span><span class="p">:</span> <span class="p">{</span> <span class="n">completion</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">completion</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nv">finished</span><span class="p">:</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Logged out"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Session cookie cleared"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">},</span> <span class="nv">receiveValue</span><span class="p">:</span> <span class="p">{})</span>
     <span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">cancellables</span><span class="p">)</span>
 </code></pre>
 
-<p>Remove Auth0 session and the Identity Provider session:</p>
+<p>Remove both the Auth0 session and the Identity Provider session:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">clearSession</span><span class="p">(</span><span class="nv">federated</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
@@ -1287,9 +1351,17 @@ and the subscription will complete with a failure result of <code><a href="../St
           <span class="nv">receiveValue</span><span class="p">:</span> <span class="p">{})</span>
     <span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">cancellables</span><span class="p">)</span>
 </code></pre>
-<div class="aside aside-see">
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    The <strong>Callback URL</strong> to have been added to the <strong>Allowed Logout URLs</strong> field of your Auth0 application settings in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.
+
+</div><div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    You don&rsquo;t need to call this method if you are using <code><a href="../Protocols/WebAuth.html#/s:5Auth07WebAuthP19useEphemeralSessionxyF">useEphemeralSession()</a></code> on login, because there will be no shared cookie to remove.
+
+</div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/login/logout">Auth0 Logout docs</a>
+    <a href="https://auth0.com/docs/login/logout">Logout</a>
 
 </div>
 
@@ -1319,7 +1391,7 @@ and the subscription will complete with a failure result of <code><a href="../St
                               </td>
                               <td>
                                 <div>
-                                  <p><code>Bool</code> to remove the Identity Provider session. Defaults to <code>false</code>.</p>
+                                  <p>If the Identity Provider session should be removed. Defaults to <code>false</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1374,7 +1446,7 @@ and the subscription will complete with a failure result of <code><a href="../St
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-23)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-01-14)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

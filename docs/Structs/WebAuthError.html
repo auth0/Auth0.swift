@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           Auth0 2.0.0-beta Docs
         </a>
-         (94% documented)
+         (97% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -231,7 +231,7 @@
 
                 </div>
               </div>
-            <p>Represents an error during a Web Authentication operation.</p>
+            <p>Represents an error during a Web Auth operation.</p>
 
           </div>
         </section>
@@ -253,7 +253,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The underlying <code>Error</code>, if any. Defaults to <code>nil</code>.</p>
+                        <p>The underlying <code>Error</code> value, if any. Defaults to <code>nil</code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -326,7 +326,8 @@
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>The bundle identifier could not be retrieved from <code>Bundle.main.bundleIdentifier</code>, or it could not be used to
-build a valid URL. This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
+build a valid URL.
+This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -381,7 +382,8 @@ This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Au
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The user cancelled the Web Auth operation. This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
+                        <p>The user cancelled the Web Auth operation.
+This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -408,9 +410,10 @@ This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Au
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The correct method for Token Endpoint Authentication Method is not set (it should be &lsquo;None&rsquo;).
-PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the &lsquo;Application Type&rsquo; to
-&lsquo;Native&rsquo; and the &lsquo;Token Endpoint Authentication Method&rsquo; to &lsquo;None&rsquo;. This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
+                        <p>The Auth0 application does not support authentication with Proof Key for Code Exchange (PKCE).
+PKCE support needs to be enabled in the settings page of the <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>,
+by setting the <strong>Application Type</strong> to &lsquo;Native&rsquo; and the <strong>Token Endpoint Authentication Method</strong> to &lsquo;None&rsquo;.
+This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -437,7 +440,8 @@ PKCE support needs to be enabled in the settings page of the Auth0 application, 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The callback URL is missing the <code>code</code> query parameter. This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
+                        <p>The callback URL is missing the <code>code</code> query parameter.
+This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -464,8 +468,8 @@ PKCE support needs to be enabled in the settings page of the Auth0 application, 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The ID Token validation performed after Web Auth login failed.
-The underlying error can be accessed via the <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code> property.</p>
+                        <p>The ID Token validation performed after authentication failed.
+The underlying <code>Error</code> value can be accessed via the <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code> property.</p>
 
                       </div>
                       <div class="declaration">
@@ -492,7 +496,8 @@ The underlying error can be accessed via the <code><a href="../Structs/WebAuthEr
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>An error occurred. The <code>Error</code> value can be accessed via the <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code> property.</p>
+                        <p>An unexpected error occurred, and an <code>Error</code> value is available.
+The underlying <code>Error</code> value can be accessed via the <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code> property.</p>
 
                       </div>
                       <div class="declaration">
@@ -519,7 +524,8 @@ The underlying error can be accessed via the <code><a href="../Structs/WebAuthEr
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>An unknown error occurred, and an <code>Error</code> value is not available. This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
+                        <p>An unexpected error occurred, but an <code>Error</code> value is not available.
+This error does not include a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV5causes0D0_pSgvp">cause</a></code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -599,7 +605,8 @@ The underlying error can be accessed via the <code><a href="../Structs/WebAuthEr
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        
+                        <p>Matches <code>WebAuthError</code> values in a switch statement.</p>
+
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -625,7 +632,8 @@ The underlying error can be accessed via the <code><a href="../Structs/WebAuthEr
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        
+                        <p>Matches <code>Error</code> values in a switch statement.</p>
+
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -646,7 +654,7 @@ The underlying error can be accessed via the <code><a href="../Structs/WebAuthEr
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-23)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-01-14)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

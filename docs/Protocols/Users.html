@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           Auth0 2.0.0-beta Docs
         </a>
-         (94% documented)
+         (97% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -230,14 +230,10 @@
 
                 </div>
               </div>
-            <p>Users endpoints of Auth0 Management API v2.</p>
+            <p>Client for the Users endpoints of the Auth0 <a href="https://auth0.com/docs/api/management/v2">Management API v2</a>.</p>
 <div class="aside aside-see">
     <p class="aside-title">See</p>
     <code><a href="../Structs/ManagementError.html">ManagementError</a></code>
-
-</div><div class="aside aside-see">
-    <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/api/management/v2#!/Users">Auth0 Management API docs</a>
 
 </div>
 
@@ -302,6 +298,19 @@
                     </section>
                   </div>
                 </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Methods"></a>
+                <a name="//apple_ref/swift/Section/Methods" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Methods"></a>
+                  <h3 class="section-name"><span>Methods</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
                 <li class="item">
                   <div>
                     <code>
@@ -318,41 +327,42 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Fetch a user using its identifier.
-By default it gets all the user&rsquo;s attributes:</p>
+                        <p>Fetches a user using its identifier.</p>
+
+<p>By default it gets all the user&rsquo;s attributes:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="n">userId</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="s">"user id"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"User signed up: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained user: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
 
 <p>You can select which attributes you want:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="s">"email"</span><span class="p">,</span> <span class="s">"user_id"</span><span class="p">])</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="s">"user id"</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="s">"email"</span><span class="p">,</span> <span class="s">"user_id"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
 
 <p>You can even exclude some attributes:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="n">token</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="s">"identities"</span><span class="p">,</span> <span class="s">"app_metadata"</span><span class="p">],</span> <span class="nv">include</span><span class="p">:</span> <span class="kc">false</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="s">"user id"</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="s">"identities"</span><span class="p">,</span> <span class="s">"app_metadata"</span><span class="p">],</span> <span class="nv">include</span><span class="p">:</span> <span class="kc">false</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-note">
-    <p class="aside-title">Note</p>
-    <a href="https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id">Auth0 Management API docs</a>.
-
-</div><div class="aside aside-important">
-    <p class="aside-title">Important</p>
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
     The token must have the scope <code>read:users</code> scope.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id">Management API Endpoint</a>
 
 </div>
 
@@ -381,7 +391,7 @@ By default it gets all the user&rsquo;s attributes:</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>ID of the user.</p>
+                                  <p>ID of the user. You can get this value from the <code>sub</code> claim of the user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="../Structs/UserInfo.html">UserInfo</a></code> instance.</p>
                                 </div>
                               </td>
                             </tr>
@@ -405,7 +415,7 @@ By default it gets all the user&rsquo;s attributes:</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Flag that indicates that only the names in &lsquo;fields&rsquo; should be included or not in the response. By default it will include them.</p>
+                                  <p>Flag that indicates that only the names in &lsquo;fields&rsquo; should be included/excluded in the response. By default it will include them.</p>
                                 </div>
                               </td>
                             </tr>
@@ -432,11 +442,12 @@ By default it gets all the user&rsquo;s attributes:</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Updates a user&rsquo;s root values (those which are allowed to be updated).
-For example if you need to change <code>email</code>:</p>
-<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">attributes</span> <span class="o">=</span> <span class="kt">UserPatchAttributes</span><span class="p">()</span><span class="o">.</span><span class="nf">email</span><span class="p">(</span><span class="s">"newmail@auth0.com"</span><span class="p">,</span> 
-                                             <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span> 
-                                             <span class="nv">clientId</span><span class="p">:</span> <span class="s">"MyClientId"</span><span class="p">)</span>
+                        <p>Updates a user&rsquo;s root values (those which are allowed to be updated).</p>
+
+<p>For example if you need to change <code>email</code>:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">attributes</span> <span class="o">=</span> <span class="kt">UserPatchAttributes</span><span class="p">()</span><span class="o">.</span><span class="nf">email</span><span class="p">(</span><span class="s">"newemail@auth0.com"</span><span class="p">,</span>
+                                             <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span>
+                                             <span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">)</span>
 </code></pre>
 
 <p>Or if you need to change <code>user_metadata</code>:</p>
@@ -445,31 +456,31 @@ For example if you need to change <code>email</code>:</p>
 
 <p>You can even chain several changes together:</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">attributes</span> <span class="o">=</span> <span class="kt">UserPatchAttributes</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">email</span><span class="p">(</span><span class="s">"support@auth0.com"</span><span class="p">,</span> 
+    <span class="o">.</span><span class="nf">email</span><span class="p">(</span><span class="s">"newemail@auth0.com"</span><span class="p">,</span>
            <span class="nv">verify</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> 
            <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span> 
-           <span class="nv">clientId</span><span class="p">:</span> <span class="s">"MyClientId"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">userMetadata</span><span class="p">([</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"Juan"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"AuthZero"</span><span class="p">])</span>
+           <span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">userMetadata</span><span class="p">([</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"John"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"Appleseed"</span><span class="p">])</span>
     <span class="o">.</span><span class="nf">appMetadata</span><span class="p">([</span><span class="s">"role"</span><span class="p">:</span> <span class="s">"admin"</span><span class="p">])</span>
 </code></pre>
 
-<p>Then just pass the <code><a href="../Classes/UserPatchAttributes.html">UserPatchAttributes</a></code> to the patch method, like:</p>
+<p>Then, just pass the <code><a href="../Classes/UserPatchAttributes.html">UserPatchAttributes</a></code> to the patch method:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">attributes</span><span class="p">:</span> <span class="n">attributes</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="s">"user id"</span><span class="p">,</span> <span class="nv">attributes</span><span class="p">:</span> <span class="n">attributes</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-see">
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    The token must have one of the following scopes: <code>update:users</code>, <code>update:users_app_metadata</code>.
+
+</div><div class="aside aside-see">
     <p class="aside-title">See</p>
     <code><a href="../Classes/UserPatchAttributes.html">UserPatchAttributes</a></code>
 
-</div><div class="aside aside-note">
-    <p class="aside-title">Note</p>
-    <a href="https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id">Auth0 Management API docs</a>.
-
-</div><div class="aside aside-important">
-    <p class="aside-title">Important</p>
-    The token must have one of  the following scopes: <code>update:users</code>, <code>update:users_app_metadata</code>.
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id">Management API Endpoint</a>
 
 </div>
 
@@ -494,7 +505,7 @@ For example if you need to change <code>email</code>:</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>ID of the user to update.</p>
+                                  <p>ID of the user to update. You can get this value from the <code>sub</code> claim of the user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="../Structs/UserInfo.html">UserInfo</a></code> instance.</p>
                                 </div>
                               </td>
                             </tr>
@@ -515,7 +526,7 @@ For example if you need to change <code>email</code>:</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A request.</p>
+                        <p>A request that will yield the updated user.</p>
                       </div>
                     </section>
                   </div>
@@ -535,17 +546,17 @@ For example if you need to change <code>email</code>:</p>
                       <div class="abstract">
                         <p>Updates only the user&rsquo;s <code>user_metadata</code> field.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"Juan"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"AuthZero"</span><span class="p">])</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="s">"user id"</span><span class="p">,</span> <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"John"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"Appleseed"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-note">
-    <p class="aside-title">Note</p>
-    <a href="https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id">Auth0 Management API docs</a>.
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    The token must have one of the following scopes: <code>update:users</code>, <code>update:users_app_metadata</code>.
 
-</div><div class="aside aside-important">
-    <p class="aside-title">Important</p>
-    The token must have one of  the following scopes: <code>update:users</code>, <code>update:users_app_metadata</code>.
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id">Management API Endpoint</a>
 
 </div>
 
@@ -570,7 +581,7 @@ For example if you need to change <code>email</code>:</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>ID of the user.</p>
+                                  <p>ID of the user to update. You can get this value from the <code>sub</code> claim of the user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="../Structs/UserInfo.html">UserInfo</a></code> instance.</p>
                                 </div>
                               </td>
                             </tr>
@@ -591,7 +602,7 @@ For example if you need to change <code>email</code>:</p>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A request to patch <code>user_metadata</code>.</p>
+                        <p>A request that will yield the updated user.</p>
                       </div>
                     </section>
                   </div>
@@ -609,24 +620,24 @@ For example if you need to change <code>email</code>:</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Links a user given its identifier with a secondary user identifier its token.
-After this request the primary user will hold another identity in its <code>identities</code> attribute which will represent the secondary user.</p>
+                        <p>Links a user given its identifier with a secondary user given its ID Token.
+After this request the primary user will hold another identity in its <code>identities</code> attribute, which will represent the secondary user.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">link</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">withOtherUserToken</span><span class="p">:</span> <span class="n">anotherToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">link</span><span class="p">(</span><span class="s">"primary user id"</span><span class="p">,</span> <span class="nv">withOtherUserToken</span><span class="p">:</span> <span class="s">"secondary id token"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-note">
-    <p class="aside-title">Note</p>
-    <a href="https://auth0.com/docs/api/management/v2#!/Users/post_identities">Auth0 Management API docs</a>.
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    The token must have the scope <code>update:current_user_identities</code>.
 
 </div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/users/user-account-linking">Link Accounts Guide</a>.
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/post_identities">Management API Endpoint</a>
 
-</div><div class="aside aside-important">
-    <p class="aside-title">Important</p>
-    The token must have the scope <code>update:current_user_identities</code>.
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/users/user-account-linking">User Account Linking</a>
 
 </div>
 
@@ -651,7 +662,7 @@ After this request the primary user will hold another identity in its <code>iden
                               </td>
                               <td>
                                 <div>
-                                  <p>ID of the primary user who will be linked against a secondary one.</p>
+                                  <p>ID of the primary user who will be linked against a secondary one. You can get this value from the <code>sub</code> claim of the primary user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="../Structs/UserInfo.html">UserInfo</a></code> instance.</p>
                                 </div>
                               </td>
                             </tr>
@@ -663,7 +674,7 @@ After this request the primary user will hold another identity in its <code>iden
                               </td>
                               <td>
                                 <div>
-                                  <p>Token of the secondary user to link to.</p>
+                                  <p>ID Token of the secondary user.</p>
                                 </div>
                               </td>
                             </tr>
@@ -693,23 +704,23 @@ After this request the primary user will hold another identity in its <code>iden
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Links a user given its identifier with a secondary user identified by its id, provider and connection identifier.</p>
+                        <p>Links a user given its identifier with a secondary user given its identifier, provider and connection identifier.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">link</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span> <span class="nv">userId</span><span class="p">:</span> <span class="n">anotherUserId</span><span class="p">,</span> <span class="nv">provider</span><span class="p">:</span> <span class="s">"auth0"</span><span class="p">,</span> <span class="nv">connectionId</span><span class="p">:</span> <span class="s">"AConnectionID"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">link</span><span class="p">(</span><span class="s">"primary user id"</span><span class="p">,</span> <span class="nv">userId</span><span class="p">:</span> <span class="s">"secondary user id"</span><span class="p">,</span> <span class="nv">provider</span><span class="p">:</span> <span class="s">"auth0"</span><span class="p">,</span> <span class="nv">connectionId</span><span class="p">:</span> <span class="s">"connection id"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-note">
-    <p class="aside-title">Note</p>
-    <a href="https://auth0.com/docs/api/management/v2#!/Users/post_identities">Auth0 Management API docs</a>.
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    The token must have the scope <code>update:users</code>.
 
 </div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/users/user-account-linking">Link Accounts Guide</a>.
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/post_identities">Management API Endpoint</a>
 
-</div><div class="aside aside-important">
-    <p class="aside-title">Important</p>
-    The token must have the scope <code>update:users</code>.
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/users/user-account-linking">User Account Linking</a>
 
 </div>
 
@@ -738,7 +749,7 @@ After this request the primary user will hold another identity in its <code>iden
                               </td>
                               <td>
                                 <div>
-                                  <p>ID of the primary user who will be linked against a secondary one.</p>
+                                  <p>ID of the primary user who will be linked against a secondary one. You can get this value from the <code>sub</code> claim of the primary user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="../Structs/UserInfo.html">UserInfo</a></code> instance.</p>
                                 </div>
                               </td>
                             </tr>
@@ -750,7 +761,7 @@ After this request the primary user will hold another identity in its <code>iden
                               </td>
                               <td>
                                 <div>
-                                  <p>ID of the secondary user who will be linked.</p>
+                                  <p>ID of the secondary user. You can get this value from the <code>sub</code> claim of the secondary user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="../Structs/UserInfo.html">UserInfo</a></code> instance.</p>
                                 </div>
                               </td>
                             </tr>
@@ -762,7 +773,7 @@ After this request the primary user will hold another identity in its <code>iden
                               </td>
                               <td>
                                 <div>
-                                  <p>Name of the provider of the secondary user, e.g. &lsquo;auth0&rsquo; for Database connections.</p>
+                                  <p>Name of the provider for the secondary user, e.g. &lsquo;auth0&rsquo; for database connections.</p>
                                 </div>
                               </td>
                             </tr>
@@ -774,7 +785,7 @@ After this request the primary user will hold another identity in its <code>iden
                               </td>
                               <td>
                                 <div>
-                                  <p>ID of the connection of the secondary user.</p>
+                                  <p>ID of the connection for the secondary user.</p>
                                 </div>
                               </td>
                             </tr>
@@ -803,21 +814,21 @@ After this request the primary user will hold another identity in its <code>iden
                       <div class="abstract">
                         <p>Removes an identity from a user.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">unlink</span><span class="p">(</span><span class="nv">identityId</span><span class="p">:</span> <span class="s">"an_idenitity_id"</span><span class="p">,</span> <span class="nv">provider</span><span class="p">:</span> <span class="s">"facebook"</span><span class="p">,</span> <span class="nv">fromUserId</span><span class="p">:</span> <span class="s">"a_user_identifier"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">unlink</span><span class="p">(</span><span class="nv">identityId</span><span class="p">:</span> <span class="s">"identity id"</span><span class="p">,</span> <span class="nv">provider</span><span class="p">:</span> <span class="s">"facebook"</span><span class="p">,</span> <span class="nv">fromUserId</span><span class="p">:</span> <span class="s">"user id"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-note">
-    <p class="aside-title">Note</p>
-    <a href="https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id">Auth0 Management API docs</a>.
+<div class="aside aside-requires">
+    <p class="aside-title">Requires</p>
+    The token must have the scope <code>update:users</code>.
 
 </div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/users/user-account-linking">Link Accounts Guide</a>.
+    <a href="https://auth0.com/docs/api/management/v2#!/Users/delete_user_identity_by_user_id">Management API Endpoint</a>
 
-</div><div class="aside aside-important">
-    <p class="aside-title">Important</p>
-    The token must have the scope <code>update:users</code>.
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/users/user-account-linking">User Account Linking</a>
 
 </div>
 
@@ -842,7 +853,7 @@ After this request the primary user will hold another identity in its <code>iden
                               </td>
                               <td>
                                 <div>
-                                  <p>Identifier of the identity to remove.</p>
+                                  <p>ID of the identity to remove.</p>
                                 </div>
                               </td>
                             </tr>
@@ -854,7 +865,7 @@ After this request the primary user will hold another identity in its <code>iden
                               </td>
                               <td>
                                 <div>
-                                  <p>Name of the provider of the identity.</p>
+                                  <p>Name of the identity provider.</p>
                                 </div>
                               </td>
                             </tr>
@@ -866,7 +877,7 @@ After this request the primary user will hold another identity in its <code>iden
                               </td>
                               <td>
                                 <div>
-                                  <p>ID of the user who owns the identity.</p>
+                                  <p>ID of the user who owns the identity. You can get this value from the <code>sub</code> claim of the user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="../Structs/UserInfo.html">UserInfo</a></code> instance.</p>
                                 </div>
                               </td>
                             </tr>
@@ -888,7 +899,7 @@ After this request the primary user will hold another identity in its <code>iden
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-23)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-01-14)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
