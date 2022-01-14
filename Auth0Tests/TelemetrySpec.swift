@@ -39,14 +39,8 @@ class TelemetrySpec: QuickSpec {
 
         describe("versionInformation") {
 
-            let bundle = MockedBundle()
-
-            beforeEach {
-                bundle.version = nil
-            }
-
             var subject: [String: Any] {
-                return Telemetry.versionInformation(bundle: bundle)
+                return Telemetry.versionInformation()
             }
 
             it("should return lib name") {
@@ -199,18 +193,4 @@ class TelemetrySpec: QuickSpec {
 
     }
 
-}
-
-class MockedBundle: Bundle {
-
-    var version: String? = nil
-
-    override var infoDictionary: [String : Any]? {
-        if let version = self.version {
-            return [
-                "CFBundleShortVersionString": version
-            ]
-        }
-        return nil
-    }
 }
