@@ -49,7 +49,7 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
 
 - [Quickstart](https://auth0.com/docs/quickstart/native/swift-beta)
 - [Sample app](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/beta/Sample-01)
-- [API Documentation](https://auth0.github.io/Auth0.swift/)
+- [API documentation](https://auth0.github.io/Auth0.swift/)
   + [Web Auth](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)
   + [Authentication API Client](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
@@ -193,25 +193,7 @@ com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 
 ### Configure Custom URL Scheme
 
-In your application's `Info.plist` file, register the bundle identifier as a custom URL scheme.
-
-```xml
-<key>CFBundleURLTypes</key>
-<array>
-    <dict>
-        <key>CFBundleTypeRole</key>
-        <string>None</string>
-        <key>CFBundleURLName</key>
-        <string>auth0</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-            <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-        </array>
-    </dict>
-</array>
-```
-
-> 💡 If your `Info.plist` is not shown in this format, you can **Right Click** on `Info.plist` in Xcode and then select **Open As > Source Code**.
+Back in Xcode, go the **Info** tab of your application target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
 
 ### Web Auth Login (iOS / macOS)
 
@@ -488,7 +470,7 @@ Auth0
 
 #### Errors
 
-Web Auth will only produce `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
+Web Auth will only produce `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
 ### Credentials Manager (iOS / macOS / tvOS / watchOS)
 
@@ -603,7 +585,7 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
 
 #### Errors
 
-The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
+The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
 ### Authentication API (iOS / macOS / tvOS / watchOS)
 
@@ -859,7 +841,7 @@ Auth0
 
 Fetch the latest user information from the `/userinfo` endpoint.
 
-This method will yield a `UserInfo` instance. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/UserInfo.html) to learn more about its available properties.
+This method will yield a `UserInfo` instance. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/UserInfo.html) to learn more about its available properties.
 
 ```swift
 Auth0
@@ -1003,7 +985,7 @@ Auth0
 
 #### Errors
 
-The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html) to learn more about the available `AuthenticationError` properties.
+The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html) to learn more about the available `AuthenticationError` properties.
 
 ### Management API (Users) (iOS / macOS / tvOS / watchOS)
 
@@ -1231,7 +1213,7 @@ Auth0
 
 #### Errors
 
-The Management API client will only produce `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API Documentation](https://auth0.github.io/Auth0.swift/Structs/ManagementError.html) to learn more about the available `ManagementError` properties.
+The Management API client will only produce `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/ManagementError.html) to learn more about the available `ManagementError` properties.
 
 ### Logging
 
