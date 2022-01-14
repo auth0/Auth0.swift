@@ -56,7 +56,6 @@ public struct Telemetry {
     }
 
     static func versionInformation(bundle: Bundle = Bundle(for: Credentials.self)) -> [String: Any] {
-        let version = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? Telemetry.NoVersion
         let dict: [String: Any] = [
             Telemetry.NameKey: Telemetry.LibraryName,
             Telemetry.VersionKey: version,

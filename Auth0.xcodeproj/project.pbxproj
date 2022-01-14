@@ -93,6 +93,10 @@
 		5C4F553A23C9125600C89615 /* JWTAlgorithmSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F553923C9125600C89615 /* JWTAlgorithmSpec.swift */; };
 		5C53A7E92703A23200A7C0A3 /* UserInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */; };
 		5C53A7EA2703A23300A7C0A3 /* UserInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */; };
+		5C6513A72791CDDE004EBC22 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6513A62791CDDE004EBC22 /* Version.swift */; };
+		5C6513A82791CDDE004EBC22 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6513A62791CDDE004EBC22 /* Version.swift */; };
+		5C6513A92791CDDE004EBC22 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6513A62791CDDE004EBC22 /* Version.swift */; };
+		5C6513AA2791CDDE004EBC22 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6513A62791CDDE004EBC22 /* Version.swift */; };
 		5C80980B275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */; };
 		5C80980C275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */; };
 		5C80980D275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */; };
@@ -476,6 +480,7 @@
 		5C4F553423C9124200C89615 /* JWKSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWKSpec.swift; sourceTree = "<group>"; };
 		5C4F553923C9125600C89615 /* JWTAlgorithmSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTAlgorithmSpec.swift; sourceTree = "<group>"; };
 		5C60412E27482A2600EEF515 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		5C6513A62791CDDE004EBC22 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialsStorage.swift; sourceTree = "<group>"; };
 		5C809D95275F878E00F15A67 /* CredentialsManagerErrorSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialsManagerErrorSpec.swift; sourceTree = "<group>"; };
 		5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagementErrorSpec.swift; sourceTree = "<group>"; };
@@ -797,6 +802,7 @@
 				5F3965C01CF679B500CDE7C0 /* WebAuth */,
 				5F06DDC81CC66B710011842B /* Auth0.swift */,
 				5FD255B61D14F00900387ECB /* Auth0Error.swift */,
+				5C6513A62791CDDE004EBC22 /* Version.swift */,
 			);
 			path = Auth0;
 			sourceTree = "<group>";
@@ -1585,6 +1591,7 @@
 				5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */,
 				5B2860CE1EEAC30500C75D54 /* UserInfo.swift in Sources */,
 				5C4F552323C8FBA100C89615 /* JWKS.swift in Sources */,
+				5C6513A72791CDDE004EBC22 /* Version.swift in Sources */,
 				5C4F550923C8FADF00C89615 /* JWTAlgorithm.swift in Sources */,
 				5FD255B71D14F00900387ECB /* Auth0Error.swift in Sources */,
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
@@ -1645,6 +1652,7 @@
 				5C41F6D2244F972B00252548 /* JWTAlgorithm.swift in Sources */,
 				5C41F6D7244F975A00252548 /* TransactionStore.swift in Sources */,
 				5FE1182B1D8A4A2B00A374BF /* Telemetry.swift in Sources */,
+				5C6513A82791CDDE004EBC22 /* Version.swift in Sources */,
 				5FDE875E1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				5FDE876E1D8A424700EA27DC /* Handlers.swift in Sources */,
 				5C41F6CE244F970500252548 /* IDTokenValidator.swift in Sources */,
@@ -1784,6 +1792,7 @@
 				5F23E6E61D4ACD8500C3F2D9 /* Requestable.swift in Sources */,
 				5C354C07276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5FDE875F1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
+				5C6513AA2791CDDE004EBC22 /* Version.swift in Sources */,
 				5B1748761EF2D3A70060E653 /* Date.swift in Sources */,
 				5F23E6E31D4ACD7F00C3F2D9 /* ManagementError.swift in Sources */,
 				5C80980E275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
@@ -1821,6 +1830,7 @@
 				5F23E70F1D4B88FC00C3F2D9 /* Requestable.swift in Sources */,
 				5C354C06276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5FDE87601D8A424700EA27DC /* AuthenticationError.swift in Sources */,
+				5C6513A92791CDDE004EBC22 /* Version.swift in Sources */,
 				5B1748771EF2D3A90060E653 /* Date.swift in Sources */,
 				5F23E70C1D4B88F600C3F2D9 /* ManagementError.swift in Sources */,
 				5C80980D275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
