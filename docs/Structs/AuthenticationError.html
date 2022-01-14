@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           Auth0 2.0.0-beta Docs
         </a>
-         (94% documented)
+         (97% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -231,7 +231,12 @@
 
                 </div>
               </div>
-            <p>Represents an error during a request to Auth0 Authentication API.</p>
+            <p>Represents an error during a request to the Auth0 Authentication API.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#standard-error-responses">Standard Error Responses</a>
+
+</div>
 
           </div>
         </section>
@@ -315,7 +320,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>HTTP Status Code of the response.</p>
+                                  <p>HTTP status code of the response.</p>
                                 </div>
                               </td>
                             </tr>
@@ -324,7 +329,7 @@
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A newly created error.</p>
+                        <p>A new <code>AuthenticationError</code>.</p>
                       </div>
                     </section>
                   </div>
@@ -342,7 +347,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>HTTP Status Code of the response.</p>
+                        <p>HTTP status code of the response.</p>
 
                       </div>
                       <div class="declaration">
@@ -369,7 +374,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The underlying <code>Error</code>, if any. Defaults to <code>nil</code>.</p>
+                        <p>The underlying <code>Error</code> value, if any. Defaults to <code>nil</code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -468,7 +473,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>When MFA code is required to authenticate.</p>
+                        <p>When MFA is required to authenticate.</p>
 
                       </div>
                       <div class="declaration">
@@ -522,7 +527,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>When MFA code sent is invalid or expired.</p>
+                        <p>When the MFA code sent is invalid or expired.</p>
 
                       </div>
                       <div class="declaration">
@@ -549,7 +554,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>When MFA code sent is invalid or expired.</p>
+                        <p>When the MFA token is invalid or expired.</p>
 
                       </div>
                       <div class="declaration">
@@ -576,7 +581,8 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>When password used for sign up does not match connection&rsquo;s strength requirements. More info will be available in <code><a href="../Structs/AuthenticationError.html#/s:5Auth019AuthenticationErrorV4infoSDySSypGvp">info</a></code>.</p>
+                        <p>When the password used for signup does not match the strength requirements of the connection.
+Additional information is available in the <code><a href="../Structs/AuthenticationError.html#/s:5Auth019AuthenticationErrorV4infoSDySSypGvp">info</a></code> dictionary.</p>
 
                       </div>
                       <div class="declaration">
@@ -603,7 +609,9 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>When password used for sign up was already used before (reported when password history feature is enabled). More info will be available in <code><a href="../Structs/AuthenticationError.html#/s:5Auth019AuthenticationErrorV4infoSDySSypGvp">info</a></code>.</p>
+                        <p>When the password used for signup was already used before. This is reported when the Password History feature
+is enabled.
+Additional information is available in the <code><a href="../Structs/AuthenticationError.html#/s:5Auth019AuthenticationErrorV4infoSDySSypGvp">info</a></code> dictionary.</p>
 
                       </div>
                       <div class="declaration">
@@ -630,7 +638,8 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>When Auth0 rule returns an error. The message returned by the rule will be in <code>localizedDescription</code>.</p>
+                        <p>When an Auth0 rule returns an error.
+The message returned by the rule is available in <code>localizedDescription</code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -657,7 +666,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>When username and/or password used for authentication are invalid.</p>
+                        <p>When the username and/or password used for authentication are invalid.</p>
 
                       </div>
                       <div class="declaration">
@@ -684,7 +693,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>When authenticating with web-based authentication and the resource server denied access per OAuth2 spec.</p>
+                        <p>When performing web-based authentication, the resource server denies access per OAuth2 specifications.</p>
 
                       </div>
                       <div class="declaration">
@@ -711,7 +720,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>When you reached the maximum amount of request for the API.</p>
+                        <p>When the user is blocked due to too many attempts to log in.</p>
 
                       </div>
                       <div class="declaration">
@@ -800,7 +809,7 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-23)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-01-14)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

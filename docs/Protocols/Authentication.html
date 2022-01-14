@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           Auth0 2.0.0-beta Docs
         </a>
-         (94% documented)
+         (97% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -230,14 +230,14 @@
 
                 </div>
               </div>
-            <p>Auth endpoints of Auth0.</p>
+            <p>Client for the <a href="https://auth0.com/docs/api/authentication">Auth0 Authentication API</a>.</p>
 <div class="aside aside-see">
     <p class="aside-title">See</p>
     <code><a href="../Structs/AuthenticationError.html">AuthenticationError</a></code>
 
 </div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/api/authentication">Auth0 Auth API docs</a>
+    <a href="https://auth0.com/docs/api/authentication#standard-error-responses">Standard Error Responses</a>
 
 </div>
 
@@ -302,6 +302,19 @@
                     </section>
                   </div>
                 </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Methods"></a>
+                <a name="//apple_ref/swift/Section/Methods" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Methods"></a>
+                  <h3 class="section-name"><span>Methods</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
                 <li class="item">
                   <div>
                     <code>
@@ -318,7 +331,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Logs in a user using an email and an OTP code received via email (last part of the passwordless login flow).</p>
+                        <p>Logs in a user using an email and an OTP code received via email. This is the last part of the passwordless login flow.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span> <span class="nv">code</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">)</span>
@@ -327,7 +340,7 @@
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
@@ -341,11 +354,17 @@
            <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-
-<p>When result is <code>.success</code>, its associated value will be a <code><a href="../Classes/Credentials.html">Credentials</a></code> object.</p>
 <div class="aside aside-requires">
     <p class="aside-title">Requires</p>
-    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information and how to enable it.
+    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#authenticate-user">Authentication API Endpoint</a>
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#post-passwordless-verify">Error Responses</a>
 
 </div>
 
@@ -386,7 +405,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>One time password (OTP) code the user received via email.</p>
+                                  <p>One-time password (OTP) code the user received via email.</p>
                                 </div>
                               </td>
                             </tr>
@@ -398,7 +417,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>API Identifier that the client is requesting access to. Default is <code>nil</code>.</p>
+                                  <p>API Identifier that your application is requesting access to. Defaults to <code>nil</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -410,7 +429,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>Scope value requested when authenticating the user. Default is <code>openid profile email</code>.</p>
+                                  <p>Space-separated list of requested scope values. Defaults to <code>openid profile email</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -419,7 +438,7 @@
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>Authentication request that will yield Auth0 user&rsquo;s credentials.</p>
+                        <p>Request that will yield Auth0 user&rsquo;s credentials.</p>
                       </div>
                     </section>
                   </div>
@@ -440,7 +459,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Logs in a user using a phone number and an OTP code received via sms (last part of the passwordless login flow).</p>
+                        <p>Logs in a user using a phone number and an OTP code received via SMS. This is the last part of the passwordless login flow.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">phoneNumber</span><span class="p">:</span> <span class="s">"+12025550135"</span><span class="p">,</span> <span class="nv">code</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">)</span>
@@ -449,7 +468,7 @@
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
@@ -463,11 +482,17 @@
            <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-
-<p>When result is <code>.success</code>, its associated value will be a <code><a href="../Classes/Credentials.html">Credentials</a></code> object.</p>
 <div class="aside aside-requires">
     <p class="aside-title">Requires</p>
-    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information and how to enable it.
+    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#authenticate-user">Authentication API Endpoint</a>
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#post-passwordless-verify">Error Responses</a>
 
 </div>
 
@@ -508,7 +533,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>One time password (OTP) code the user received via sms.</p>
+                                  <p>One-time password (OTP) code the user received via SMS.</p>
                                 </div>
                               </td>
                             </tr>
@@ -520,7 +545,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>API Identifier that the client is requesting access to. Default is <code>nil</code>.</p>
+                                  <p>API Identifier that your application is requesting access to. Defaults to <code>nil</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -532,7 +557,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>Scope value requested when authenticating the user. Default is <code>openid profile email</code>.</p>
+                                  <p>Space-separated list of requested scope values. Defaults to <code>openid profile email</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -541,7 +566,7 @@
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>Authentication request that will yield Auth0 user&rsquo;s credentials.</p>
+                        <p>Request that will yield Auth0 user&rsquo;s credentials.</p>
                       </div>
                     </section>
                   </div>
@@ -562,18 +587,18 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Login using username and password with a realm or connection.</p>
+                        <p>Logs in a user using a username and password with a realm or connection.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
-           <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+           <span class="nv">password</span><span class="p">:</span> <span class="s">"secret password"</span><span class="p">,</span>
            <span class="nv">realmOrConnection</span><span class="p">:</span> <span class="s">"mydatabase"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
@@ -582,19 +607,15 @@
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
-           <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+           <span class="nv">password</span><span class="p">:</span> <span class="s">"secret password"</span><span class="p">,</span>
            <span class="nv">realmOrConnection</span><span class="p">:</span> <span class="s">"mydatabase"</span><span class="p">,</span>
            <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">,</span>
            <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-important">
-    <p class="aside-title">Important</p>
-    This only works if you have the OAuth 2.0 API Authorization flag on.
-
-</div><div class="aside aside-requires">
+<div class="aside aside-requires">
     <p class="aside-title">Requires</p>
-    Grant <code>http://auth0.com/oauth/grant-type/password-realm</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information and how to enable it.
+    The <code>http://auth0.com/oauth/grant-type/password-realm</code> grant. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.
 
 </div>
 
@@ -623,7 +644,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>Username or email used of the user to authenticate.</p>
+                                  <p>Username or email of the user.</p>
                                 </div>
                               </td>
                             </tr>
@@ -659,7 +680,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>API Identifier that the client is requesting access to.</p>
+                                  <p>API Identifier that your application is requesting access to.</p>
                                 </div>
                               </td>
                             </tr>
@@ -671,7 +692,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>Scope value requested when authenticating the user.</p>
+                                  <p>Space-separated list of requested scope values.</p>
                                 </div>
                               </td>
                             </tr>
@@ -680,7 +701,7 @@
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>Authentication request that will yield Auth0 user&rsquo;s credentials.</p>
+                        <p>Request that will yield Auth0 user&rsquo;s credentials.</p>
                       </div>
                     </section>
                   </div>
@@ -698,7 +719,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Login using One Time Password and MFA token.</p>
+                        <p>Verifies multi-factor authentication (MFA) using a one-time password (OTP).</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">withOTP</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">,</span> <span class="nv">mfaToken</span><span class="p">:</span> <span class="s">"mfa token"</span><span class="p">)</span>
@@ -707,13 +728,17 @@
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
 <div class="aside aside-requires">
     <p class="aside-title">Requires</p>
-    Grant <code>http://auth0.com/oauth/grant-type/mfa-otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information and how to enable it.
+    The <code>http://auth0.com/oauth/grant-type/mfa-otp</code> grant. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#verify-with-one-time-password-otp-">Authentication API Endpoint</a>
 
 </div>
 
@@ -738,7 +763,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>One time password supplied by MFA Authenticator.</p>
+                                  <p>One-time password supplied by a MFA authenticator.</p>
                                 </div>
                               </td>
                             </tr>
@@ -750,12 +775,16 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>Token returned when authentication fails due to MFA requirement.</p>
+                                  <p>Token returned when authentication fails with an <code><a href="../Structs/AuthenticationError.html#/s:5Auth019AuthenticationErrorV21isMultifactorRequiredSbvp">isMultifactorRequired</a></code> error due to MFA requirement.</p>
                                 </div>
                               </td>
                             </tr>
                           </tbody>
                         </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A request that will yield Auth0 user&rsquo;s credentials.</p>
                       </div>
                     </section>
                   </div>
@@ -776,7 +805,8 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either Push notification, SMS, or Voice).</p>
+                        <p>Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either push notification, SMS
+or voice).</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">withOOBCode</span><span class="p">:</span> <span class="s">"123456"</span><span class="p">,</span> <span class="nv">mfaToken</span><span class="p">:</span> <span class="s">"mfa token"</span><span class="p">)</span>
@@ -785,13 +815,17 @@
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
 <div class="aside aside-requires">
     <p class="aside-title">Requires</p>
-    Grant <code>http://auth0.com/oauth/grant-type/mfa-oob</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information and how to enable it.
+    The <code>http://auth0.com/oauth/grant-type/mfa-oob</code> grant. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#verify-with-out-of-band-oob-">Authentication API Endpoint</a>
 
 </div>
 
@@ -820,7 +854,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>The oob code received from the challenge request.</p>
+                                  <p>The OOB code received from the challenge request.</p>
                                 </div>
                               </td>
                             </tr>
@@ -832,7 +866,7 @@
                               </td>
                               <td>
                                 <div>
-                                  <p>Token returned when authentication fails due to MFA requirement.</p>
+                                  <p>Token returned when authentication fails with an <code><a href="../Structs/AuthenticationError.html#/s:5Auth019AuthenticationErrorV21isMultifactorRequiredSbvp">isMultifactorRequired</a></code> error due to MFA requirement.</p>
                                 </div>
                               </td>
                             </tr>
@@ -872,7 +906,9 @@
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>Verifies multi-factor authentication (MFA) using a recovery code.
-Some multi-factor authentication (MFA) providers (such as Guardian) support using a recovery code to login. Use this method to authenticate when the user&rsquo;s enrolled device is unavailable, or the user cannot receive the challenge or accept it due to connectivity issues.</p>
+Some multi-factor authentication (MFA) providers support using a recovery code to login. Use this method to
+authenticate when the user&rsquo;s enrolled device is unavailable, or the user cannot receive the challenge or accept
+it due to connectivity issues.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">withRecoveryCode</span><span class="p">:</span> <span class="s">"recovery code"</span><span class="p">,</span> <span class="nv">mfaToken</span><span class="p">:</span> <span class="s">"mfa token"</span><span class="p">)</span>
@@ -881,13 +917,21 @@ Some multi-factor authentication (MFA) providers (such as Guardian) support usin
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
 <div class="aside aside-requires">
     <p class="aside-title">Requires</p>
-    Grant <code>http://auth0.com/oauth/grant-type/mfa-recovery-code</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information and how to enable it.
+    The <code>http://auth0.com/oauth/grant-type/mfa-recovery-code</code> grant. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <code><a href="../Classes/Credentials.html#/s:5Auth011CredentialsC12recoveryCodeSSSgvp">recoveryCode</a></code>
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#verify-with-recovery-code">Authentication API Endpoint</a>
 
 </div>
 
@@ -912,7 +956,7 @@ Some multi-factor authentication (MFA) providers (such as Guardian) support usin
                               </td>
                               <td>
                                 <div>
-                                  <p>Recovery code provided by the end-user.</p>
+                                  <p>Recovery code provided by the user.</p>
                                 </div>
                               </td>
                             </tr>
@@ -924,7 +968,7 @@ Some multi-factor authentication (MFA) providers (such as Guardian) support usin
                               </td>
                               <td>
                                 <div>
-                                  <p>Token returned when authentication fails due to MFA requirement.</p>
+                                  <p>Token returned when authentication fails with an <code><a href="../Structs/AuthenticationError.html#/s:5Auth019AuthenticationErrorV21isMultifactorRequiredSbvp">isMultifactorRequired</a></code> error due to MFA requirement.</p>
                                 </div>
                               </td>
                             </tr>
@@ -933,7 +977,8 @@ Some multi-factor authentication (MFA) providers (such as Guardian) support usin
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A request that will yield Auth0 user&rsquo;s credentials. Might include a recovery code, which the application must display to the end-user to be stored securely for future use.</p>
+                        <p>A request that will yield Auth0 user&rsquo;s credentials. Might include a <strong>recovery code</strong>, which the
+application must display to the user to be stored securely for future use.</p>
                       </div>
                     </section>
                   </div>
@@ -954,13 +999,32 @@ Some multi-factor authentication (MFA) providers (such as Guardian) support usin
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Request a challenge for multi-factor authentication (MFA) based on the challenge types supported by the application and user.
-The <code>type</code> is how the user will get the challenge and prove possession. Supported challenge types include:</p>
+                        <p>Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
+application and user.</p>
+
+<p>The <code>type</code> is how the user will get the challenge and prove possession. Supported challenge types include:</p>
 
 <ul>
 <li><code>otp</code>:  for one-time password (OTP)</li>
-<li><p><code>oob</code>:  for SMS/Voice messages or out-of-band (OOB)</p></li>
+<li><code>oob</code>:  for SMS/voice messages or out-of-band (OOB)</li>
 </ul>
+<pre class="highlight swift"><code><span class="kt">Auth0</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">multifactorChallenge</span><span class="p">(</span><span class="nv">mfaToken</span><span class="p">:</span> <span class="s">"mfa token"</span><span class="p">,</span> <span class="nv">types</span><span class="p">:</span> <span class="p">[</span><span class="s">"otp"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+        <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">challenge</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained challenge: </span><span class="se">\(</span><span class="n">challenge</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#challenge-request">Authentication API Endpoint</a>
+
+</div>
 
                       </div>
                       <h4>Default Implementation</h4>
@@ -987,7 +1051,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Token returned when authentication fails due to MFA requirement.</p>
+                                  <p>Token returned when authentication fails with an <code><a href="../Structs/AuthenticationError.html#/s:5Auth019AuthenticationErrorV21isMultifactorRequiredSbvp">isMultifactorRequired</a></code> error due to MFA requirement.</p>
                                 </div>
                               </td>
                             </tr>
@@ -999,7 +1063,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>A list of the challenges types accepted by your application. Accepted challenge types are <code>oob</code> or <code>otp</code>. Excluding this parameter means that your client application accepts all supported challenge types.</p>
+                                  <p>A list of the challenges types accepted by your application. Accepted challenge types are <code>oob</code> or <code>otp</code>. Excluding this parameter means that your application accepts all supported challenge types.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1041,16 +1105,16 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Authenticate a user with their Sign In With Apple authorization code.</p>
+                        <p>Authenticates a user with their Sign In with Apple authorization code.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">appleAuthorizationCode</span><span class="p">:</span> <span class="n">authCode</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">appleAuthorizationCode</span><span class="p">:</span> <span class="s">"auth code"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
@@ -1058,12 +1122,17 @@ The <code>type</code> is how the user will get the challenge and prove possessio
 <p>You can also specify audience and scope:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">appleAuthorizationCode</span><span class="p">:</span> <span class="n">authCode</span><span class="p">,</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">appleAuthorizationCode</span><span class="p">:</span> <span class="s">"auth code"</span><span class="p">,</span>
            <span class="nv">fullName</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">fullName</span><span class="p">,</span>
-           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span>
+           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">,</span>
            <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#token-exchange-for-native-social">Authentication API Endpoint</a>
+
+</div>
 
                       </div>
                       <h4>Default Implementation</h4>
@@ -1126,7 +1195,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>API Identifier that the client is requesting access to.<br></p>
+                                  <p>API Identifier that your application is requesting access to.<br></p>
                                 </div>
                               </td>
                             </tr>
@@ -1138,7 +1207,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Requested scope value when authenticating the user. By default is <code>openid profile email</code>.</p>
+                                  <p>Space-separated list of requested scope values. Defaults to <code>openid profile email</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1168,16 +1237,17 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Authenticate a user with their Facebook session info Access Token and profile data.</p>
+                        <p>Authenticates a user with their Facebook <a href="https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/">Session Info Access Token</a> and profile data.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="n">sessionAccessToken</span><span class="p">,</span> <span class="nv">profile</span><span class="p">:</span> <span class="n">profile</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="s">"session info access token"</span><span class="p">,</span>
+           <span class="nv">profile</span><span class="p">:</span> <span class="p">[</span><span class="s">"key"</span><span class="p">:</span> <span class="s">"value"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
@@ -1185,11 +1255,17 @@ The <code>type</code> is how the user will get the challenge and prove possessio
 <p>You can also specify audience and scope:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="n">sessionAccessToken</span><span class="p">,</span>
-           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span>
+    <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="s">"session info access token"</span><span class="p">,</span>
+           <span class="nv">profile</span><span class="p">:</span> <span class="p">[</span><span class="s">"key"</span><span class="p">:</span> <span class="s">"value"</span><span class="p">],</span>
+           <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">,</span>
            <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#token-exchange-for-native-social">Authentication API Endpoint</a>
+
+</div>
 
                       </div>
                       <h4>Default Implementation</h4>
@@ -1216,7 +1292,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Session info Access Token retrieved from Facebook.</p>
+                                  <p>Session Info Access Token retrieved from Facebook.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1228,7 +1304,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>The user profile returned by Facebook.</p>
+                                  <p>The user profile data retrieved from Facebook.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1240,7 +1316,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>API Identifier that the client is requesting access to.</p>
+                                  <p>API Identifier that your application is requesting access to.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1252,7 +1328,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Requested scope value when authenticating the user. By default is <code>openid profile email</code>.</p>
+                                  <p>Space-separated list of requested scope values. Defaults to <code>openid profile email</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1282,17 +1358,17 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Login using username and password in the default directory.</p>
+                        <p>Logs in a user using a username and password in the default directory.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">loginDefaultDirectory</span><span class="p">(</span><span class="nv">withUsername</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
-                           <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">)</span>
+                           <span class="nv">password</span><span class="p">:</span> <span class="s">"secret password"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
@@ -1301,16 +1377,11 @@ The <code>type</code> is how the user will get the challenge and prove possessio
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">loginDefaultDirectory</span><span class="p">(</span><span class="nv">withUsername</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
-                           <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+                           <span class="nv">password</span><span class="p">:</span> <span class="s">"secret password"</span><span class="p">,</span>
                            <span class="nv">audience</span><span class="p">:</span> <span class="s">"https://myapi.com/api"</span><span class="p">,</span>
                            <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-important">
-    <p class="aside-title">Important</p>
-    This only works if you have the OAuth 2.0 API Authorization flag on.
-
-</div>
 
                       </div>
                       <h4>Default Implementation</h4>
@@ -1337,7 +1408,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Username or email used of the user to authenticate.</p>
+                                  <p>Username or email of the user.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1361,7 +1432,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>API Identifier that the client is requesting access to.</p>
+                                  <p>API Identifier that your application is requesting access to.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1373,7 +1444,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Scope value requested when authenticating the user.</p>
+                                  <p>Space-separated list of requested scope values.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1403,18 +1474,18 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Creates a user in a Database connection.</p>
+                        <p>Creates a user in a database connection.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">signup</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
-            <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+            <span class="nv">password</span><span class="p">:</span> <span class="s">"secret password"</span><span class="p">,</span>
             <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"User signed up: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
@@ -1423,9 +1494,9 @@ The <code>type</code> is how the user will get the challenge and prove possessio
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">signup</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
-            <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+            <span class="nv">password</span><span class="p">:</span> <span class="s">"secret password"</span><span class="p">,</span>
             <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">,</span>
-            <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"support"</span><span class="p">])</span>
+            <span class="nv">userMetadata</span><span class="p">:</span> <span class="p">[</span><span class="s">"first_name"</span><span class="p">:</span> <span class="s">"John"</span><span class="p">,</span> <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"Appleseed"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
 
@@ -1434,10 +1505,15 @@ The <code>type</code> is how the user will get the challenge and prove possessio
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">signup</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
             <span class="nv">username</span><span class="p">:</span> <span class="s">"support"</span><span class="p">,</span>
-            <span class="nv">password</span><span class="p">:</span> <span class="s">"a secret password"</span><span class="p">,</span>
+            <span class="nv">password</span><span class="p">:</span> <span class="s">"secret password"</span><span class="p">,</span>
             <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#signup">Authentication API Endpoint</a>
+
+</div>
 
                       </div>
                       <h4>Default Implementation</h4>
@@ -1476,7 +1552,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Username of the user if the connection requires username. By default is <code>nil</code>.</p>
+                                  <p>Username for the new user (if the connection requires a username). Defaults to <code>nil</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1500,7 +1576,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Name where the user will be created (Database connection).</p>
+                                  <p>Name of the connection where the user will be created (database connection).</p>
                                 </div>
                               </td>
                             </tr>
@@ -1524,7 +1600,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Root attributes that will be added to the newly created user. See <a href="https://auth0.com/docs/api/authentication#signup">https://auth0.com/docs/api/authentication#signup</a> for supported attributes. Will not overwrite existing parameters.</p>
+                                  <p>Root attributes that will be added to the newly created user. These will not overwrite existing parameters. See <a href="https://auth0.com/docs/api/authentication#signup">https://auth0.com/docs/api/authentication#signup</a> for the full list of supported attributes.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1533,7 +1609,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A request that will yield a created database user (just email, username, and email verified flag).</p>
+                        <p>A request that will yield a newly created database user (just the email, username, and email verified flag).</p>
                       </div>
                     </section>
                   </div>
@@ -1551,12 +1627,18 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Resets a database user password.</p>
+                        <p>Resets the password of a database user.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">resetPassword</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span> <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">resetPassword</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">,</span>
+                   <span class="nv">connection</span><span class="p">:</span> <span class="s">"Username-Password-Authentication"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#change-password">Authentication API Endpoint</a>
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -1600,7 +1682,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A request to reset the password.</p>
+                        <p>A request for resetting the password.</p>
                       </div>
                     </section>
                   </div>
@@ -1621,7 +1703,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Starts passwordless authentication by sending an email with a OTP code.</p>
+                        <p>Starts passwordless authentication by sending an email with an OTP code. This is the first part of the passwordless login flow.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">)</span>
@@ -1636,7 +1718,15 @@ The <code>type</code> is how the user will get the challenge and prove possessio
 </code></pre>
 <div class="aside aside-requires">
     <p class="aside-title">Requires</p>
-    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information and how to enable it.
+    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#get-code-or-link">Authentication API Endpoint</a>
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#post-passwordless-start">Error Responses</a>
 
 </div>
 
@@ -1677,7 +1767,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Type of passwordless authentication. By default is &lsquo;code&rsquo;.</p>
+                                  <p>Type of passwordless authentication. Defaults to &lsquo;code&rsquo;.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1689,7 +1779,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Name of the passwordless connection. By default is &lsquo;email&rsquo;.</p>
+                                  <p>Name of the passwordless connection. Defaults to &lsquo;email&rsquo;.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1698,7 +1788,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A request.</p>
+                        <p>A request for starting the passwordless flow.</p>
                       </div>
                     </section>
                   </div>
@@ -1719,7 +1809,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Starts passwordless authentication by sending an sms with an OTP code.</p>
+                        <p>Starts passwordless authentication by sending an SMS with an OTP code. This is the first part of the passwordless login flow.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">phoneNumber</span><span class="p">:</span> <span class="s">"+12025550135"</span><span class="p">)</span>
@@ -1734,7 +1824,15 @@ The <code>type</code> is how the user will get the challenge and prove possessio
 </code></pre>
 <div class="aside aside-requires">
     <p class="aside-title">Requires</p>
-    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information and how to enable it.
+    Passwordless OTP Grant <code>http://auth0.com/oauth/grant-type/passwordless/otp</code>. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#get-code-or-link">Authentication API Endpoint</a>
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#post-passwordless-start">Error Responses</a>
 
 </div>
 
@@ -1763,7 +1861,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Phone number where to send the sms with code or link.</p>
+                                  <p>Phone number where to send the SMS with the code or link.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1775,7 +1873,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Type of passwordless authentication. By default is &lsquo;code&rsquo;.</p>
+                                  <p>Type of passwordless authentication. Defaults to &lsquo;code&rsquo;.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1787,7 +1885,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                               </td>
                               <td>
                                 <div>
-                                  <p>Name of the passwordless connection. By default is &lsquo;sms&rsquo;.</p>
+                                  <p>Name of the passwordless connection. Defaults to &lsquo;sms&rsquo;.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1796,7 +1894,7 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A request.</p>
+                        <p>A request for starting the passwordless flow.</p>
                       </div>
                     </section>
                   </div>
@@ -1817,16 +1915,21 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                         <p>Returns OIDC standard claims information by performing a request to the <code>/userinfo</code> endpoint.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">userInfo</span><span class="p">(</span><span class="nv">withAccessToken</span><span class="p">:</span> <span class="n">accessToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">userInfo</span><span class="p">(</span><span class="nv">withAccessToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">user</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"User: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained user: </span><span class="se">\(</span><span class="n">user</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#get-user-info">Authentication API Endpoint</a>
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -1876,11 +1979,11 @@ The <code>type</code> is how the user will get the challenge and prove possessio
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Performs the last step of Proof Key for Code Exchange <a href="https://tools.ietf.org/html/rfc7636">RFC 7636</a>.
-This will request the user&rsquo;s token using the code and it&rsquo;s verifier after a request to <code>/oauth/authorize</code>.</p>
+                        <p>Performs the last step of Proof Key for Code Exchange (PKCE).
+This will request the user&rsquo;s token using the code and its verifier after a request to <code>/oauth/authorize</code>.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">codeExchange</span><span class="p">(</span><span class="nv">withCode</span><span class="p">:</span> <span class="s">"a code"</span><span class="p">,</span>
+    <span class="o">.</span><span class="nf">codeExchange</span><span class="p">(</span><span class="nv">withCode</span><span class="p">:</span> <span class="s">"code"</span><span class="p">,</span>
                   <span class="nv">codeVerifier</span><span class="p">:</span> <span class="s">"code verifier"</span><span class="p">,</span>
                   <span class="nv">redirectURI</span><span class="p">:</span> <span class="s">"https://samples.auth0.com/callback"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
@@ -1888,13 +1991,17 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
 <div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://tools.ietf.org/html/rfc7636">https://tools.ietf.org/html/rfc7636</a>
+    <a href="https://auth0.com/docs/api/authentication#authorization-code-flow-with-pkce45">Authentication API Endpoint</a>
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://tools.ietf.org/html/rfc7636">RFC 7636</a>
 
 </div>
 
@@ -1919,7 +2026,7 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                               </td>
                               <td>
                                 <div>
-                                  <p>Code returned after an <code>/oauth/authorize</code> request.</p>
+                                  <p>Code returned after a request to <code>/oauth/authorize</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1931,7 +2038,7 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                               </td>
                               <td>
                                 <div>
-                                  <p>Verifier used to generate the challenge sent in <code>/oauth/authorize</code> request.</p>
+                                  <p>Verifier used to generate the challenge sent in the request to <code>/oauth/authorize</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1943,7 +2050,7 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                               </td>
                               <td>
                                 <div>
-                                  <p>Redirect URI sent in <code>/oauth/authorize</code> request.</p>
+                                  <p>Redirect URI sent in the request to <code>/oauth/authorize</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1973,27 +2080,28 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Renew the user&rsquo;s credentials with a <code>refresh_token</code> grant for <code>/oauth/token</code>.</p>
+                        <p>Renews the user&rsquo;s credentials using a Refresh Token.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">,</span> <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid profile email offline_access read:users"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">refreshToken</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained new credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
 
-<p>To ask the same scopes requested when the Refresh Token was issued:</p>
+<p>You can get a downscoped Access Token by requesting fewer scopes than were requested on login:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">refreshToken</span><span class="p">,</span>
+           <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid offline_access"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
-<div class="aside aside-important">
-    <p class="aside-title">Important</p>
-    This method only works for a Refresh Token obtained after authentication with OAuth 2.0 API Authorization.
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#refresh-token">Authentication API Endpoint</a>
 
 </div>
 
@@ -2022,7 +2130,7 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                               </td>
                               <td>
                                 <div>
-                                  <p>The client&rsquo;s Refresh Token.</p>
+                                  <p>The Refresh Token.</p>
                                 </div>
                               </td>
                             </tr>
@@ -2034,7 +2142,7 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                               </td>
                               <td>
                                 <div>
-                                  <p>Scopes to request for the new tokens. By default is <code>nil</code>, which will ask for the same ones requested during Auth.</p>
+                                  <p>Space-separated list of scope values to request. Defaults to <code>nil</code>, which will ask for the same scopes that were requested on login.</p>
                                 </div>
                               </td>
                             </tr>
@@ -2061,12 +2169,21 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Revoke a user&rsquo;s <code>refresh_token</code> with a call to <code>/oauth/revoke</code>.</p>
+                        <p>Revokes a user&rsquo;s Refresh Token by performing a request to the <code>/oauth/revoke</code> endpoint.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
-    <span class="o">.</span><span class="nf">revoke</span><span class="p">(</span><span class="nv">refreshToken</span><span class="p">:</span> <span class="n">refreshToken</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">revoke</span><span class="p">(</span><span class="nv">refreshToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">refreshToken</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#revoke-refresh-token">Authentication API Endpoint</a>
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/api/authentication#post-oauth-revoke">Error Responses</a>
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -2089,7 +2206,7 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                               </td>
                               <td>
                                 <div>
-                                  <p>The client&rsquo;s Refresh Token.</p>
+                                  <p>The Refresh Token to revoke.</p>
                                 </div>
                               </td>
                             </tr>
@@ -2098,7 +2215,7 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A request.</p>
+                        <p>A request for revoking the Refresh Token.</p>
                       </div>
                     </section>
                   </div>
@@ -2116,7 +2233,7 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Returns JSON Web Key Set (JWKS) information by performing a request to the <code>/.well-known/jwks.json</code> endpoint.</p>
+                        <p>Returns JSON Web Key Set (JWKS) information from the <code>/.well-known/jwks.json</code> endpoint.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">jwks</span><span class="p">()</span>
@@ -2125,10 +2242,15 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">jwks</span><span class="p">):</span>
             <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained JWKS: </span><span class="se">\(</span><span class="n">jwks</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </code></pre>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://auth0.com/docs/security/tokens/json-web-tokens/json-web-key-sets">JSON Web Key Sets</a>
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -2154,7 +2276,7 @@ This will request the user&rsquo;s token using the code and it&rsquo;s verifier 
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2021 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2021-12-23)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-01-14)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
