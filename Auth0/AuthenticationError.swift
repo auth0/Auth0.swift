@@ -17,9 +17,9 @@ public struct AuthenticationError: Auth0APIError {
 
      - Parameters:
        - info:       JSON response from Auth0.
-       - statusCode: HTTP Status Code of the response.
+       - statusCode: HTTP status code of the response.
 
-     - Returns: A newly created error.
+     - Returns: A new `AuthenticationError`.
      */
     public init(info: [String: Any], statusCode: Int) {
         var values = info
@@ -29,12 +29,12 @@ public struct AuthenticationError: Auth0APIError {
     }
 
     /**
-     HTTP Status Code of the response.
+     HTTP status code of the response.
      */
     public let statusCode: Int
 
     /**
-     The underlying `Error`, if any. Defaults to `nil`.
+     The underlying `Error` value, if any. Defaults to `nil`.
      */
     public var cause: Error? {
         return self.info["cause"] as? Error
@@ -66,7 +66,7 @@ public struct AuthenticationError: Auth0APIError {
 
     // MARK: - Error Types
 
-    /// When MFA code is required to authenticate.
+    /// When MFA is required to authenticate.
     public var isMultifactorRequired: Bool {
         return self.code == "a0.mfa_required" || self.code == "mfa_required"
     }
@@ -76,32 +76,36 @@ public struct AuthenticationError: Auth0APIError {
         return self.code == "a0.mfa_registration_required" || self.code == "unsupported_challenge_type"
     }
 
-    /// When MFA code sent is invalid or expired.
+    /// When the MFA code sent is invalid or expired.
     public var isMultifactorCodeInvalid: Bool {
         return self.code == "a0.mfa_invalid_code" || self.code == "invalid_grant" && self.localizedDescription == "Invalid otp_code."
     }
 
-    /// When MFA code sent is invalid or expired.
+    /// When the MFA token is invalid or expired.
     public var isMultifactorTokenInvalid: Bool {
         return self.code == "expired_token" && self.localizedDescription == "mfa_token is expired" || self.code == "invalid_grant" && self.localizedDescription == "Malformed mfa_token"
     }
 
-    /// When password used for sign up does not match connection's strength requirements. More info will be available in `info`.
+    /// When the password used for signup does not match the strength requirements of the connection.
+    /// Additional information is available in the ``info`` dictionary.
     public var isPasswordNotStrongEnough: Bool {
         return self.code == "invalid_password" && self.info["name"] as? String == "PasswordStrengthError"
     }
 
-    /// When password used for sign up was already used before (reported when password history feature is enabled). More info will be available in `info`.
+    /// When the password used for signup was already used before. This is reported when the Password History feature
+    /// is enabled.
+    /// Additional information is available in the ``info`` dictionary.
     public var isPasswordAlreadyUsed: Bool {
         return self.code == "invalid_password" && self.info["name"] as? String == "PasswordHistoryError"
     }
 
-    /// When Auth0 rule returns an error. The message returned by the rule will be in `localizedDescription`.
+    /// When an Auth0 rule returns an error.
+    /// The message returned by the rule is available in ``localizedDescription``.
     public var isRuleError: Bool {
         return self.code == "unauthorized"
     }
 
-    /// When username and/or password used for authentication are invalid.
+    /// When the username and/or password used for authentication are invalid.
     public var isInvalidCredentials: Bool {
         return self.code == "invalid_user_password"
             || self.code == "invalid_grant" && self.localizedDescription == "Wrong email or password."
@@ -109,12 +113,12 @@ public struct AuthenticationError: Auth0APIError {
             || self.code == "invalid_grant" && self.localizedDescription == "Wrong phone number or verification code."
     }
 
-    /// When authenticating with web-based authentication and the resource server denied access per OAuth2 spec.
+    /// When performing web-based authentication, the resource server denies access per OAuth2 specifications.
     public var isAccessDenied: Bool {
         return self.code == "access_denied"
     }
 
-    /// When you reached the maximum amount of request for the API.
+    /// When the user is blocked due to too many attempts to log in.
     public var isTooManyAttempts: Bool {
         return self.code == "too_many_attempts"
     }

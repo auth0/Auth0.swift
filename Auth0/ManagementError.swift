@@ -15,9 +15,9 @@ public struct ManagementError: Auth0APIError {
 
      - Parameters:
        - info:       JSON response from Auth0.
-       - statusCode: HTTP Status Code of the response.
+       - statusCode: HTTP status code of the response.
 
-     - Returns: A newly created error.
+     - Returns: A new `ManagementError`.
      */
     public init(info: [String: Any], statusCode: Int) {
         var values = info
@@ -27,12 +27,12 @@ public struct ManagementError: Auth0APIError {
     }
 
     /**
-     HTTP Status Code of the response.
+     HTTP status code of the response.
      */
     public let statusCode: Int
 
     /**
-     The underlying `Error`, if any. Defaults to `nil`.
+     The underlying `Error` value, if any. Defaults to `nil`.
      */
     public var cause: Error? {
         return self.info["cause"] as? Error

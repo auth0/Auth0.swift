@@ -19,7 +19,7 @@ public final class Credentials: NSObject {
     /// Token that can be used to make authenticated requests to the specified API (the **audience** value used on login).
     ///
     /// - See: [Access Tokens](https://auth0.com/docs/security/tokens/access-tokens)
-    /// - See: [Audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)]
+    /// - See: [Audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)
     public let accessToken: String
     /// Type of the Access Token.
     public let tokenType: String
@@ -42,7 +42,7 @@ public final class Credentials: NSObject {
     ///
     /// - See: [Scopes](https://auth0.com/docs/configure/apis/scopes)
     public let scope: String?
-    /// MFA recovery code that the application must display to the end-user, to be stored securely for future use.
+    /// MFA recovery code that the application must display to the user, to be stored securely for future use.
     ///
     /// - See: [MFA Recovery Codes](https://auth0.com/docs/mfa/configure-recovery-codes-for-mfa)
     public let recoveryCode: String?
@@ -59,6 +59,8 @@ public final class Credentials: NSObject {
                                        recoveryCode: (self.recoveryCode != nil) ? redacted : nil)
         return String(describing: values).replacingOccurrences(of: "StructCredentials", with: "Credentials")
     }
+
+    // MARK: - Initializer
 
     /// Default initializer.
     public init(accessToken: String = "",

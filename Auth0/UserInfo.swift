@@ -32,14 +32,14 @@ public struct UserInfo: JSONObjectPayload {
 
     // MARK: - Claims
 
-    /// The Auth0 user ID.
+    /// The Auth0 user identifier.
     public let sub: String
 
     /// The name of the user.
     ///
     /// - Requires: The `profile` scope.
     public let name: String?
-    /// The fist name of the user.
+    /// The first name of the user.
     ///
     /// - Requires: The `profile` scope.
     public let givenName: String?
@@ -77,7 +77,7 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `email` scope.
     public let email: String?
-    /// If the user's email was verified.
+    /// If the user's email is verified.
     ///
     /// - Requires: The `email` scope.
     public let emailVerified: Bool?
@@ -104,7 +104,7 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `phone_number` scope.
     public let phoneNumber: String?
-    /// If the user's phone number was verified.
+    /// If the user's phone number is verified.
     ///
     /// - Requires: The `phone_number` scope.
     public let phoneNumberVerified: Bool?
@@ -113,7 +113,7 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `address` scope.
     public let address: [String: String]?
-    /// The time the user's information was last updated.
+    /// The date and time the user's information was last updated.
     ///
     /// - Requires: The `profile` scope.
     public let updatedAt: Date?
@@ -127,7 +127,7 @@ public struct UserInfo: JSONObjectPayload {
 
 public extension UserInfo {
 
-    /// Creates a ``UserInfo`` instance from a JSON dictionary.
+    /// Creates a new `UserInfo` from a JSON dictionary.
     init?(json: [String: Any]) {
         guard let sub = json["sub"] as? String else { return nil }
 

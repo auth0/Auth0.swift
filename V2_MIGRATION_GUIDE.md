@@ -9,7 +9,7 @@ Auth0.swift v2 includes many significant changes:
 - Adoption of the Swift 5 `Result` type.
 - Simplified error handling.
 
-As expected with a major release, Auth0.swift v2 contains breaking changes. Please review this guide thorougly to understand the changes required to migrate your app to v2.
+As expected with a major release, Auth0.swift v2 contains breaking changes. Please review this guide thorougly to understand the changes required to migrate your application to v2.
 
 ---
 
@@ -127,7 +127,7 @@ You should use `UserInfo` from `userInfo(withAccessToken:)` instead.
 
 ### Global methods
 
-The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed. You can safely remove them from your app.
+The iOS-only method `resumeAuth(_:options:)` and the macOS-only method `resumeAuth(_:)` were removed from the library, as they are no longer needed. You can safely remove them from your application.
 
 ### Authentication client
 
@@ -475,7 +475,7 @@ These properties were removed:
 
 #### Errors
 
-The methods of the Authentication API client now only yield errors of type `AuthenticationError`. The underlying error (if any) is available via the `cause: Error?` property of the `AuthenticationError` value.
+The methods of the Authentication API client now only yield errors of type `AuthenticationError`. The underlying error value (if any) is available via the `cause: Error?` property of the `AuthenticationError` value.
 
 <details>
   <summary>Before / After</summary>
@@ -518,7 +518,7 @@ To pass custom parameters to those (or any) method in the Authentication client,
 ```swift
 Auth0
     .authentication()
-    .renew(withRefreshToken: refreshToken) // Returns a Request
+    .renew(withRefreshToken: credentials.refreshToken) // Returns a Request
     .parameters(["key": "value"]) // 👈🏻
     .start { result in
         // ...
@@ -555,7 +555,7 @@ The `multifactorChallenge(mfaToken:types:authenticatorId:)` method lost its `cha
 
 #### Errors
 
-The methods of the Management API client now only yield errors of type `ManagementError`. The underlying error (if any) is available via the `cause: Error?` property of the `ManagementError` value.
+The methods of the Management API client now only yield errors of type `ManagementError`. The underlying error value (if any) is available via the `cause: Error?` property of the `ManagementError` value.
 
 <details>
   <summary>Before / After</summary>
@@ -580,7 +580,7 @@ case .failure(let error): // handle ManagementError
 
 #### Errors
 
-The Web Auth methods now only yield errors of type  `WebAuthError`. The underlying error (if any) is available via the `cause: Error?` property of the `WebAuthError` value.
+The Web Auth methods now only yield errors of type  `WebAuthError`. The underlying error value (if any) is available via the `cause: Error?` property of the `WebAuthError` value.
 
 <details>
   <summary>Before / After</summary>
@@ -635,7 +635,7 @@ Auth0
 
 #### Errors
 
-The methods of the Credentials Manager now only yield errors of type  `CredentialsManagerError`. The underlying error (if any) is available via the `cause: Error?` property of the `CredentialsManagerError` value.
+The methods of the Credentials Manager now only yield errors of type  `CredentialsManagerError`. The underlying error value (if any) is available via the `cause: Error?` property of the `CredentialsManagerError` value.
 
 <details>
   <summary>Before / After</summary>
@@ -664,17 +664,17 @@ This means you can now provide your own storage layer to `CredentialsManager`.
 class CustomStore: CredentialsStorage {
     var store: [String : Data] = [:]
 
-    func getEntry(forKey: String) -> Data? {
-        return store[forKey]
+    func getEntry(forKey key: String) -> Data? {
+        return store[key]
     }
 
-    func setEntry(_ data: Data, forKey: String) -> Bool {
-        store[forKey] = data
+    func setEntry(_ data: Data, forKey key: String) -> Bool {
+        store[key] = data
         return true
     }
 
-    func deleteEntry(forKey: String) -> Bool {
-        store[forKey] = nil
+    func deleteEntry(forKey key: String) -> Bool {
+        store[key] = nil
         return true
     }
 }
@@ -743,11 +743,11 @@ credentialsManager.revoke { result in
 
 #### Supported JWT signature algorithms
 
-ID Tokens signed with the HS256 algorithm are no longer allowed. This is because HS256 is a symmetric algorithm, which is not suitable for public clients like mobile apps.The only algorithm supported now is RS256, an asymmetric algorithm.
+ID Tokens signed with the HS256 algorithm are no longer allowed. This is because HS256 is a _symmetric_ algorithm, which is [not suitable](https://auth0.com/docs/get-started/applications/confidential-and-public-applications#public-applications) for public clients like mobile applications. The only algorithm supported now is RS256, an _asymmetric_ algorithm.
 
-If your app is using HS256, you'll need to switch it to RS256 in the dashboard or login will fail with an error:
+If your application is using HS256, you'll need to switch it to RS256 in the Dashboard or login will fail with an error:
 
-**Your app's settings > Advanced settings > JSON Web Token (JWT) Signature Algorithm**
+**Your Auth0 application settings > Advanced settings > JSON Web Token (JWT) Signature Algorithm**
 
 #### Enforcement of the `openid` scope
 
@@ -778,7 +778,7 @@ You'll also need to call `hasValid(minTTL:)` before `credentials(withScope:minTT
 
 #### Thread-safety when renewing credentials
 
-The method `credentials(withScope:minTTL:parameters:headers:callback:)` now executes the credentials renewal serially, to prevent race conditions when Refresh Token Rotation is enabled.
+The method `credentials(withScope:minTTL:parameters:headers:callback:)` now executes the credentials renewal serially, to prevent race conditions when [Refresh Token Rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation) is enabled.
 
 ---
 

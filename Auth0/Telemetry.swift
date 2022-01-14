@@ -18,6 +18,7 @@ public struct Telemetry {
         return self.enabled ? self.info : nil
     }
 
+    /// Initializer that generates a base64url-encoded value and stores it in ``info``.
     public init() {
         self.info = Telemetry.generateValue()
     }
@@ -109,8 +110,8 @@ public protocol Trackable {
 
 public extension Trackable {
     /**
-     Avoids Auth0.swift sending its version on every request to Auth0 API.
-     By default we collect our libraries and SDKs versions to help us during support and evaluate usage.
+     Avoids Auth0.swift sending its version on every request to Auth0.
+     By default we collect our libraries and SDKs versions to help us evaluate usage.
      
      - Parameter enabled: If Auth0.swift should send its version on every request.
      */
@@ -119,7 +120,7 @@ public extension Trackable {
     }
 
     /**
-     Sends the library/framework, that has Auth0.swift as dependency when sending telemetry information.
+     Sends the library/framework which has Auth0.swift as dependency when sending telemetry information.
      
      - Parameter name:    Name of library or framework that uses Auth0.swift.
      - Parameter version: Version of library or framework.

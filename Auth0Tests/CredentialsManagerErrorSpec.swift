@@ -92,22 +92,22 @@ class CredentialsManagerErrorSpec: QuickSpec {
             }
 
             it("should return message for renew failed") {
-                let message = "The credentials renewal failed. The underlying 'AuthenticationError' can be"
-                + " accessed via the 'cause' property."
+                let message = "The credentials renewal failed. See the underlying 'AuthenticationError' value"
+                + " available in the 'cause' property."
                 let error = CredentialsManagerError(code: .renewFailed)
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for biometrics failed") {
-                let message = "The Biometric authentication failed. The underlying 'LAError' can be accessed"
-                + " via the 'cause' property."
+                let message = "The Biometric authentication failed. See the underlying 'LAError' value"
+                + " available in the 'cause' property."
                 let error = CredentialsManagerError(code: .biometricsFailed)
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for revoke failed") {
-                let message = "The revocation of the Refresh Token failed. The underlying 'AuthenticationError'"
-                + " can be accessed via the 'cause' property."
+                let message = "The revocation of the Refresh Token failed. See the underlying 'AuthenticationError'"
+                + " value available in the 'cause' property."
                 let error = CredentialsManagerError(code: .revokeFailed)
                 expect(error.localizedDescription) == message
             }

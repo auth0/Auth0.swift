@@ -117,7 +117,7 @@ class WebAuthErrorSpec: QuickSpec {
             }
 
             it("should return message for id token validation failed") {
-                let message = "The ID Token validation performed after Web Auth login failed."
+                let message = "The ID Token validation performed after authentication failed."
                 + " See the underlying 'Error' value available in the 'cause' property."
                 let error = WebAuthError(code: .idTokenValidationFailed)
                 expect(error.localizedDescription) == message

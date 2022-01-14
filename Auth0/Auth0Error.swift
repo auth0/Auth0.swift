@@ -11,7 +11,7 @@ let emptyBodyError = "a0.sdk.internal_error.empty"
 public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
 
     /**
-     The underlying `Error`, if any.
+     The underlying `Error` value, if any.
      */
     var cause: Error? { get }
 
@@ -56,7 +56,7 @@ public protocol Auth0APIError: Auth0Error {
     var code: String { get }
 
     /**
-     HTTP Status Code of the response.
+     HTTP status code of the response.
      */
     var statusCode: Int { get }
 
@@ -65,9 +65,9 @@ public protocol Auth0APIError: Auth0Error {
 
      - Parameters:
        - info:       JSON response from Auth0.
-       - statusCode: HTTP Status Code of the response.
+       - statusCode: HTTP status code of the response.
 
-     - Returns: A newly created error.
+     - Returns: A new `Auth0APIError`.
      */
     init(info: [String: Any], statusCode: Int)
 
