@@ -288,7 +288,7 @@
 <ul>
 <li><a href="https://auth0.com/docs/quickstart/native/swift-beta">Quickstart</a></li>
 <li><a href="https://github.com/auth0-samples/auth0-ios-swift-sample/tree/beta/Sample-01">Sample app</a></li>
-<li><a href="https://auth0.github.io/Auth0.swift/">API Documentation</a>
+<li><a href="https://auth0.github.io/Auth0.swift/">API documentation</a>
 
 <ul>
 <li><a href="https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html">Web Auth</a></li>
@@ -420,25 +420,7 @@ Auth0
 </code></pre>
 <h3 id='configure-custom-url-scheme' class='heading'>Configure Custom URL Scheme</h3>
 
-<p>In your application&rsquo;s <code>Info.plist</code> file, register the bundle identifier as a custom URL scheme.</p>
-<pre class="highlight xml"><code><span class="nt">&lt;key&gt;</span>CFBundleURLTypes<span class="nt">&lt;/key&gt;</span>
-<span class="nt">&lt;array&gt;</span>
-    <span class="nt">&lt;dict&gt;</span>
-        <span class="nt">&lt;key&gt;</span>CFBundleTypeRole<span class="nt">&lt;/key&gt;</span>
-        <span class="nt">&lt;string&gt;</span>None<span class="nt">&lt;/string&gt;</span>
-        <span class="nt">&lt;key&gt;</span>CFBundleURLName<span class="nt">&lt;/key&gt;</span>
-        <span class="nt">&lt;string&gt;</span>auth0<span class="nt">&lt;/string&gt;</span>
-        <span class="nt">&lt;key&gt;</span>CFBundleURLSchemes<span class="nt">&lt;/key&gt;</span>
-        <span class="nt">&lt;array&gt;</span>
-            <span class="nt">&lt;string&gt;</span>$(PRODUCT_BUNDLE_IDENTIFIER)<span class="nt">&lt;/string&gt;</span>
-        <span class="nt">&lt;/array&gt;</span>
-    <span class="nt">&lt;/dict&gt;</span>
-<span class="nt">&lt;/array&gt;</span>
-</code></pre>
-
-<blockquote>
-<p>💡 If your <code>Info.plist</code> is not shown in this format, you can <strong>Right Click</strong> on <code>Info.plist</code> in Xcode and then select <strong>Open As &gt; Source Code</strong>.</p>
-</blockquote>
+<p>Back in Xcode, go to the <strong>Info</strong> tab of your application target settings. In the <strong>URL Types</strong> section, click the <strong>＋</strong> button to add a new entry. There, enter <code>auth0</code> into the <strong>Identifier</strong> field and <code>$(PRODUCT_BUNDLE_IDENTIFIER)</code> into the <strong>URL Schemes</strong> field.</p>
 <h3 id='web-auth-login-ios-macos' class='heading'>Web Auth Login (iOS / macOS)</h3>
 
 <p>Import the <code>Auth0</code> module in the file where you want to present the login page.</p>
@@ -706,7 +688,7 @@ Auth0
 </code></pre>
 <h4 id='errors' class='heading'>Errors</h4>
 
-<p>Web Auth will only produce <code><a href="Structs/WebAuthError.html">WebAuthError</a></code> error values. You can find the underlying error (if any) in the <code>cause: Error?</code> property of the <code><a href="Structs/WebAuthError.html">WebAuthError</a></code>. Not all error cases will have an underlying <code>cause</code>. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html">API Documentation</a> to learn more about the error cases you need to handle, and which ones include a <code>cause</code> value.</p>
+<p>Web Auth will only produce <code><a href="Structs/WebAuthError.html">WebAuthError</a></code> error values. You can find the underlying error (if any) in the <code>cause: Error?</code> property of the <code><a href="Structs/WebAuthError.html">WebAuthError</a></code>. Not all error cases will have an underlying <code>cause</code>. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html">API documentation</a> to learn more about the error cases you need to handle, and which ones include a <code>cause</code> value.</p>
 <h3 id='credentials-manager-ios-macos-tvos-watchos' class='heading'>Credentials Manager (iOS / macOS / tvOS / watchOS)</h3>
 
 <p><a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html">API documentation ↗</a></p>
@@ -803,7 +785,7 @@ credentialsManager
 </blockquote>
 <h4 id='errors' class='heading'>Errors</h4>
 
-<p>The Credentials Manager will only produce <code><a href="Structs/CredentialsManagerError.html">CredentialsManagerError</a></code> error values. You can find the underlying error (if any) in the <code>cause: Error?</code> property of the <code><a href="Structs/CredentialsManagerError.html">CredentialsManagerError</a></code>. Not all error cases will have an underlying <code>cause</code>. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html">API Documentation</a> to learn more about the error cases you need to handle, and which ones include a <code>cause</code> value.</p>
+<p>The Credentials Manager will only produce <code><a href="Structs/CredentialsManagerError.html">CredentialsManagerError</a></code> error values. You can find the underlying error (if any) in the <code>cause: Error?</code> property of the <code><a href="Structs/CredentialsManagerError.html">CredentialsManagerError</a></code>. Not all error cases will have an underlying <code>cause</code>. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html">API documentation</a> to learn more about the error cases you need to handle, and which ones include a <code>cause</code> value.</p>
 <h3 id='authentication-api-ios-macos-tvos-watchos' class='heading'>Authentication API (iOS / macOS / tvOS / watchOS)</h3>
 
 <p><a href="https://auth0.github.io/Auth0.swift/Protocols/Authentication.html">API documentation ↗</a></p>
@@ -1052,7 +1034,7 @@ Auth0
 
 <p>Fetch the latest user information from the <code>/userinfo</code> endpoint.</p>
 
-<p>This method will yield a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/UserInfo.html">API Documentation</a> to learn more about its available properties.</p>
+<p>This method will yield a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/UserInfo.html">API documentation</a> to learn more about its available properties.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
    <span class="o">.</span><span class="nf">userInfo</span><span class="p">(</span><span class="nv">withAccessToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">)</span>
@@ -1182,7 +1164,7 @@ Auth0
 </code></pre>
 <h4 id='errors' class='heading'>Errors</h4>
 
-<p>The Authentication API client will only produce <code><a href="Structs/AuthenticationError.html">AuthenticationError</a></code> error values. You can find the error information in the <code>info</code> dictionary of the error value. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html">API Documentation</a> to learn more about the available <code><a href="Structs/AuthenticationError.html">AuthenticationError</a></code> properties.</p>
+<p>The Authentication API client will only produce <code><a href="Structs/AuthenticationError.html">AuthenticationError</a></code> error values. You can find the error information in the <code>info</code> dictionary of the error value. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html">API documentation</a> to learn more about the available <code><a href="Structs/AuthenticationError.html">AuthenticationError</a></code> properties.</p>
 <h3 id='management-api-users-ios-macos-tvos-watchos' class='heading'>Management API (Users) (iOS / macOS / tvOS / watchOS)</h3>
 
 <p><a href="https://auth0.github.io/Auth0.swift/Protocols/Users.html">API documentation ↗</a></p>
@@ -1391,7 +1373,7 @@ Auth0
 </code></pre>
 <h4 id='errors' class='heading'>Errors</h4>
 
-<p>The Management API client will only produce <code><a href="Structs/ManagementError.html">ManagementError</a></code> error values. You can find the error information in the <code>info</code> dictionary of the error value. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/ManagementError.html">API Documentation</a> to learn more about the available <code><a href="Structs/ManagementError.html">ManagementError</a></code> properties.</p>
+<p>The Management API client will only produce <code><a href="Structs/ManagementError.html">ManagementError</a></code> error values. You can find the error information in the <code>info</code> dictionary of the error value. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/ManagementError.html">API documentation</a> to learn more about the available <code><a href="Structs/ManagementError.html">ManagementError</a></code> properties.</p>
 <h3 id='logging' class='heading'>Logging</h3>
 
 <p>To enable Auth0.swift to print HTTP requests and responses for debugging, you can call the following method in either <code><a href="Protocols/WebAuth.html">WebAuth</a></code>, <code><a href="Protocols/Authentication.html">Authentication</a></code> or <code><a href="Protocols/Users.html">Users</a></code>:</p>
