@@ -1,15 +1,14 @@
 import Foundation
 
-/// Attributes of the user allowed to update using `patch()` method of ``Users``.
+/// User attributes that can be updated using the ``patch()`` method of ``Users``.
 final public class UserPatchAttributes {
 
     private(set) var dictionary: [String: Any]
 
     /**
-     Creates a new UserPatchAttributes instance.
+     Creates a new `UserPatchAttributes` instance.
 
      - Parameter dictionary: Default attribute values.
-     - Returns: New attributes.
      */
     public init(dictionary: [String: Any] = [:]) {
         self.dictionary = dictionary
@@ -19,7 +18,7 @@ final public class UserPatchAttributes {
      Mark/unmark a user as blocked.
 
      - Parameter blocked: If the user is blocked.
-     - Returns: Itself.
+     - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
     public func blocked(_ blocked: Bool) -> UserPatchAttributes {
         dictionary["blocked"] = blocked
@@ -34,8 +33,8 @@ final public class UserPatchAttributes {
        - verified:   If the email is verified.
        - verify:     If the user should verify the email.
        - connection: Name of the connection.
-       - clientId:   Auth0 clientId.
-     - Returns: Itself.
+       - clientId:   Auth0 Client ID.
+     - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
     public func email(_ email: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
         dictionary["email"] = email
@@ -50,9 +49,9 @@ final public class UserPatchAttributes {
      Set the verified status of the email.
 
      - Parameters:
-       - verified:   If the email is verified or not.
-       - connection: Connection name.
-     - Returns: Itself.
+       - verified:   If the email is verified.
+       - connection: Name of the connection.
+     - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
     public func emailVerified(_ verified: Bool, connection: String) -> UserPatchAttributes {
         dictionary["email_verified"] = verified
@@ -68,8 +67,8 @@ final public class UserPatchAttributes {
        - verified:    If the phone number is verified.
        - verify:      If the user should verify the phone number.
        - connection:  Name of the connection.
-       - clientId:    Auth0 clientId.
-     - Returns: Itself.
+       - clientId:    Auth0 Client ID.
+     - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
     public func phoneNumber(_ phoneNumber: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
         dictionary["phone_number"] = phoneNumber
@@ -85,8 +84,8 @@ final public class UserPatchAttributes {
 
      - Parameters:
        - verified:   If the phone number is verified or not.
-       - connection: Connection name.
-     - Returns: Itself.
+       - connection: Name of the connection.
+     - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
     public func phoneVerified(_ verified: Bool, connection: String) -> UserPatchAttributes {
         dictionary["phone_verified"] = verified
@@ -101,7 +100,7 @@ final public class UserPatchAttributes {
        - password:   New password for the user.
        - verify:     If the password should be verified by the user.
        - connection: Name of the connection.
-     - Returns: Itself.
+     - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
     public func password(_ password: String, verify: Bool? = nil, connection: String) -> UserPatchAttributes {
         dictionary["password"] = password
@@ -114,9 +113,9 @@ final public class UserPatchAttributes {
      Change the username.
 
      - Parameters:
-       - username:   New username.
+       - username:   New username for the user.
        - connection: Name of the connection.
-     - Returns: Itself.
+     - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
     public func username(_ username: String, connection: String) -> UserPatchAttributes {
         dictionary["username"] = username
@@ -128,7 +127,7 @@ final public class UserPatchAttributes {
      Update user metadata.
 
      - Parameter metadata: New user metadata values.
-     - Returns: Itself.
+     - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
     public func userMetadata(_ metadata: [String: Any]) -> UserPatchAttributes {
         dictionary["user_metadata"] = metadata
@@ -139,7 +138,7 @@ final public class UserPatchAttributes {
      Update app metadata.
 
      - Parameter metadata: New app metadata values.
-     - Returns: Itself.
+     - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
     public func appMetadata(_ metadata: [String: Any]) -> UserPatchAttributes {
         dictionary["app_metadata"] = metadata

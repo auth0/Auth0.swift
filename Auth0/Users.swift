@@ -6,7 +6,7 @@ import Foundation
 public typealias ManagementObject = [String: Any]
 
 /**
- Client for the [User endpoints](https://auth0.com/docs/api/management/v2#!/Users) of the Auth0 Management API v2.
+ Client for the Users endpoints of the Auth0 [Management API v2](https://auth0.com/docs/api/management/v2).
 
  - See: ``ManagementError``
  */
@@ -16,6 +16,8 @@ public protocol Users: Trackable, Loggable {
     var token: String { get }
     /// The Auth0 Domain URL.
     var url: URL { get }
+
+    // MARK: - Methods
 
     /**
      Fetches a user using its identifier.
@@ -57,9 +59,9 @@ public protocol Users: Trackable, Loggable {
      - Parameters:
        - identifier: ID of the user. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
        - fields:     List of the user's field names that will be included/excluded in the response. By default all will be retrieved.
-       - include:    Flag that indicates that only the names in 'fields' should be included or not in the response. By default it will include them.
+       - include:    Flag that indicates that only the names in 'fields' should be included/excluded in the response. By default it will include them.
      - Returns: A request that will yield a user.
-     - Required: The token must have the scope `read:users` scope.
+     - Requires: The token must have the scope `read:users` scope.
      - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id)
      */
     func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError>
@@ -106,7 +108,7 @@ public protocol Users: Trackable, Loggable {
        - identifier: ID of the user to update. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
        - attributes: Root attributes to be updated.
      - Returns: A request that will yield the updated user.
-     - Required: The token must have one of the following scopes: `update:users`, `update:users_app_metadata`.
+     - Requires: The token must have one of the following scopes: `update:users`, `update:users_app_metadata`.
      - See: ``UserPatchAttributes``
      - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      */
@@ -126,7 +128,7 @@ public protocol Users: Trackable, Loggable {
        - identifier:   ID of the user to update. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
        - userMetadata: Metadata to update.
      - Returns: A request that will yield the updated user.
-     - Required: The token must have one of the following scopes: `update:users`, `update:users_app_metadata`.
+     - Requires: The token must have one of the following scopes: `update:users`, `update:users_app_metadata`.
      - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      */
     func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError>
@@ -146,7 +148,7 @@ public protocol Users: Trackable, Loggable {
        - identifier: ID of the primary user who will be linked against a secondary one. You can get this value from the `sub` claim of the primary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
        - token:      ID Token of the secondary user.
      - Returns: A request to link two users.
-     - Required: The token must have the scope `update:current_user_identities`.
+     - Requires: The token must have the scope `update:current_user_identities`.
      - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
      - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking)
      */
@@ -164,11 +166,11 @@ public protocol Users: Trackable, Loggable {
 
      - Parameters:
        - identifier:   ID of the primary user who will be linked against a secondary one. You can get this value from the `sub` claim of the primary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
-       - userId:       ID of the secondary user who will be linked. You can get this value from the `sub` claim of the secondary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - userId:       ID of the secondary user. You can get this value from the `sub` claim of the secondary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
        - provider:     Name of the provider for the secondary user, e.g. 'auth0' for database connections.
        - connectionId: ID of the connection for the secondary user.
      - Returns: A request to link two users.
-     - Required: The token must have the scope `update:users`.
+     - Requires: The token must have the scope `update:users`.
      - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
      - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking)
      */
@@ -185,11 +187,11 @@ public protocol Users: Trackable, Loggable {
      ```
 
      - Parameters:
-       - identityId: Identifier of the identity to remove.
-       - provider:   Name of the provider of the identity.
+       - identityId: ID of the identity to remove.
+       - provider:   Name of the identity provider.
        - identifier: ID of the user who owns the identity. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
      - Returns: A request to remove an identity.
-     - Required: The token must have the scope `update:users`.
+     - Requires: The token must have the scope `update:users`.
      - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/delete_user_identity_by_user_id)
      - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking)
      */

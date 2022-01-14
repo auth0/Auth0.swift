@@ -158,7 +158,7 @@ Auth0
 
 ```swift
 Auth0
-    .users(token: "ACCESS_TOKEN", domain: "YOUR_AUTH0_DOMAIN") // You only need the Domain
+    .users(token: credentials.accessToken, domain: "YOUR_AUTH0_DOMAIN") // You only need the Domain
     // ...
 ```
 </details>
@@ -352,7 +352,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 #### Web Auth Signup (iOS / macOS)
 
-You can make users land directly on the Signup page instead of the Login page by specifying the `"screen_hint": "signup"` parameter when performing Web Authentication. Note that this can be combined with `"prompt": "login"`, which indicates whether you want to always show the authentication page or you want to skip if there's an existing session.
+You can make users land directly on the Signup page instead of the Login page by specifying the `"screen_hint": "signup"` parameter. Note that this can be combined with `"prompt": "login"`, which indicates whether you want to always show the authentication page or you want to skip if there's an existing session.
 
 | Parameters                                     | No existing session   | Existing session              |
 |:-----------------------------------------------|:----------------------|:------------------------------|
@@ -429,12 +429,12 @@ Auth0
 
 ##### Add an audience value
 
-Specify an [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/configure/apis).
+Specify an [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/configure/apis), e.g. `https://example.com/api`.
 
 ```swift
 Auth0
     .webAuth()
-    .audience("YOUR_API_IDENTIFIER")
+    .audience("YOUR_AUTH0_API_IDENTIFIER")
     // ...
 ```
 
@@ -592,7 +592,7 @@ You can enable an additional level of user authentication before retrieving cred
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
-If needed, you can use a specific `LAPolicy` - e.g. you might want to support Face ID, but allow fallback to passcode.
+If needed, you can specify a particular `LAPolicy` to be used. E.g. you might want to support Face ID or Touch ID, but also allow fallback to passcode.
 
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login", 
@@ -688,7 +688,7 @@ Auth0
     .signup(email: "support@auth0.com",
             password: "secret-password",
             connection: "Username-Password-Authentication",
-            userMetadata: ["first_name": "First", "last_name": "Last"])
+            userMetadata: ["first_name": "John", "last_name": "Appleseed"])
     .start { result in
         switch result {
         case .success(let user):
@@ -709,7 +709,7 @@ do {
         .signup(email: "support@auth0.com",
                 password: "secret-password",
                 connection: "Username-Password-Authentication",
-                userMetadata: ["first_name": "First", "last_name": "Last"])
+                userMetadata: ["first_name": "John", "last_name": "Appleseed"])
         .start()
     print("User signed up: \(user)")
 } catch {
@@ -727,7 +727,7 @@ Auth0
     .signup(email: "support@auth0.com",
             password: "secret-password",
             connection: "Username-Password-Authentication",
-            userMetadata: ["first_name": "First", "last_name": "Last"])
+            userMetadata: ["first_name": "John", "last_name": "Appleseed"])
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -917,7 +917,7 @@ Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to 
 ```swift
 Auth0
     .authentication()
-    .renew(withRefreshToken: refreshToken)
+    .renew(withRefreshToken: credentials.refreshToken)
     .start { result in
         switch result {
         case .success(let credentials):
@@ -935,7 +935,7 @@ Auth0
 do {
     let credentials = try await Auth0
         .authentication()
-        .renew(withRefreshToken: refreshToken)
+        .renew(withRefreshToken: credentials.refreshToken)
         .start()
     print("Obtained new credentials: \(credentials)")
 } catch {
@@ -950,7 +950,7 @@ do {
 ```swift
 Auth0
     .authentication()
-    .renew(withRefreshToken: refreshToken)
+    .renew(withRefreshToken: credentials.refreshToken)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -974,7 +974,7 @@ Use the `parameters()` method to add custom parameters to any request.
 ```swift
 Auth0
     .authentication()
-    .renew(withRefreshToken: refreshToken) // Any request
+    .renew(withRefreshToken: credentials.refreshToken) // Any request
     .parameters(["key": "value"])
     // ...
 ```
@@ -986,7 +986,7 @@ Use the `headers()` method to add custom headers to any request.
 ```swift
 Auth0
     .authentication()
-    .renew(withRefreshToken: refreshToken) // Any request
+    .renew(withRefreshToken: credentials.refreshToken) // Any request
     .headers(["key": "value"])
     // ...
 ```
@@ -1088,7 +1088,8 @@ To call this method, you need to request either the `update:users` or the `updat
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .patch("user id", userMetadata: ["key": "value"])
+    .patch("user id", 
+           userMetadata: ["first_name": "John", "last_name": "Appleseed"])
     .start { result in
         switch result {
         case .success(let user):
@@ -1106,7 +1107,8 @@ Auth0
 do {
     let user = try await Auth0
         .users(token: credentials.accessToken)
-        .patch("user id", userMetadata: ["key": "value"])
+        .patch("user id", 
+               userMetadata: ["first_name": "John", "last_name": "Appleseed"])
         .start()
     print("Updated user: \(user)") 
 } catch {
@@ -1121,7 +1123,8 @@ do {
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .patch("user id", userMetadata: ["key": "value"])
+    .patch("user id", 
+           userMetadata: ["first_name": "John", "last_name": "Appleseed"])
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1278,7 +1281,7 @@ If you've added the [Sign In with Apple flow](https://developer.apple.com/docume
 ```swift
 Auth0
     .authentication()
-    .login(appleAuthorizationCode: authCode)
+    .login(appleAuthorizationCode: "auth code")
     .start { result in
         switch result {
         case .success(let credentials):
@@ -1296,7 +1299,7 @@ Auth0
 do {
     let credentials = try await Auth0
         .authentication()
-        .login(appleAuthorizationCode: authCode)
+        .login(appleAuthorizationCode: "auth code")
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -1311,7 +1314,7 @@ do {
 ```swift
 Auth0
     .authentication()
-    .login(appleAuthorizationCode: authCode)
+    .login(appleAuthorizationCode: "auth code")
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1328,12 +1331,13 @@ Auth0
 
 #### Facebook Login
 
-If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a Session Access Token and the Facebook user profile, and then use them both to perform a code exchange for Auth0 credentials.
+If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a [Session Info Access Token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and the Facebook user profile, and then use them both to perform a code exchange for Auth0 credentials.
 
 ```swift
 Auth0
     .authentication()
-    .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+    .login(facebookSessionAccessToken: "session info access token",
+           profile: ["key": "value"])
     .start { result in
         switch result {
         case .success(let credentials):
@@ -1351,7 +1355,8 @@ Auth0
 do {
     let credentials = try await Auth0
         .authentication()
-        .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+        .login(facebookSessionAccessToken: "session info access token",
+               profile: ["key": "value"])
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -1366,7 +1371,8 @@ do {
 ```swift
 Auth0
     .authentication()
-    .login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+    .login(facebookSessionAccessToken: "session info access token",
+           profile: ["key": "value"])
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1400,7 +1406,7 @@ Using Organizations, you can:
 ```swift
 Auth0
     .webAuth()
-    .organization(organizationId)
+    .organization("organization id")
     .start { result in
         switch result {
         case .success(let credentials):
@@ -1418,7 +1424,7 @@ Auth0
 do {
     let credentials = try await Auth0
         .webAuth()
-        .organization(organizationId)
+        .organization("organization id")
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -1433,7 +1439,7 @@ do {
 ```swift
 Auth0
     .webAuth()
-    .organization(organizationId)
+    .organization("organization id")
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {

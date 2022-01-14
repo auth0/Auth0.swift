@@ -222,7 +222,7 @@ struct IDTokenAuthTimeValidator: JWTValidator {
             case .missingAuthTime:
                 return "Authentication Time (auth_time) claim must be a number present in the ID token when Max Age (max_age) is specified"
             case .pastLastAuth(let baseTime, let lastAuthTime):
-                return "Authentication Time (auth_time) claim in the ID token indicates that too much time has passed since the last end-user authentication. Current time (\(baseTime)) is after last auth time (\(lastAuthTime))"
+                return "Authentication Time (auth_time) claim in the ID token indicates that too much time has passed since the last user authentication. Current time (\(baseTime)) is after last auth time (\(lastAuthTime))"
             }
         }
     }

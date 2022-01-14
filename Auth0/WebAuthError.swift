@@ -2,7 +2,7 @@
 import Foundation
 
 /**
- *  Represents an error during a Web Authentication operation.
+ *  Represents an error during a Web Auth operation.
  */
 public struct WebAuthError: Auth0Error {
 
@@ -25,7 +25,7 @@ public struct WebAuthError: Auth0Error {
     }
 
     /**
-     The underlying `Error`, if any. Defaults to `nil`.
+     The underlying `Error` value, if any. Defaults to `nil`.
      */
     public let cause: Error?
 
@@ -46,7 +46,7 @@ public struct WebAuthError: Auth0Error {
             + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
         case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
             + " query parameters (\(values))."
-        case .idTokenValidationFailed: return "The ID Token validation performed after Web Auth login failed."
+        case .idTokenValidationFailed: return "The ID Token validation performed after authentication failed."
             + " See the underlying 'Error' value available in the 'cause' property."
         case .other: return "An unexpected error occurred. See the underlying 'Error' value available in the 'cause' property."
         case .unknown(let message): return message
@@ -65,19 +65,19 @@ public struct WebAuthError: Auth0Error {
     /// The user cancelled the Web Auth operation.
     /// This error does not include a ``cause``.
     public static let userCancelled: WebAuthError = .init(code: .userCancelled)
-    /// The Auth0 application does not support authentication with PKCE.
-    /// PKCE support needs to be enabled in the settings page of the Auth0 application, by setting the 'Application Type' to
-    /// 'Native' and the 'Token Endpoint Authentication Method' to 'None'.
+    /// The Auth0 application does not support authentication with Proof Key for Code Exchange (PKCE).
+    /// PKCE support needs to be enabled in the settings page of the [Auth0 application](https://manage.auth0.com/#/applications/),
+    /// by setting the **Application Type** to 'Native' and the **Token Endpoint Authentication Method** to 'None'.
     /// This error does not include a ``cause``.
     public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
     /// The callback URL is missing the `code` query parameter.
     /// This error does not include a ``cause``.
     public static let noAuthorizationCode: WebAuthError = .init(code: .noAuthorizationCode([:]))
-    /// The ID Token validation performed after Web Auth login failed.
-    /// The underlying 'Error' value can be accessed via the ``cause`` property.
+    /// The ID Token validation performed after authentication failed.
+    /// The underlying `Error` value can be accessed via the ``cause`` property.
     public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
     /// An unexpected error occurred, and an `Error` value is available.
-    /// The underlying 'Error' value can be accessed via the ``cause`` property.
+    /// The underlying `Error` value can be accessed via the ``cause`` property.
     public static let other: WebAuthError = .init(code: .other)
     /// An unexpected error occurred, but an `Error` value is not available.
     /// This error does not include a ``cause``.

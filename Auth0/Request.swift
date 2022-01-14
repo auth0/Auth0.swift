@@ -60,9 +60,9 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     }
 
     /**
-     Starts the request to the server.
+     Performs the request.
 
-     - Parameter callback: Called with the result of the request when it finishes.
+     - Parameter callback: Callback that receives the result of the request when it completes.
      */
     public func start(_ callback: @escaping Callback) {
         let handler = self.handle
@@ -81,9 +81,9 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     }
 
     /**
-     Modify the parameters by creating a copy of self and adding the provided parameters to `parameters`.
+     Modifies the parameters by creating a copy of the request and adding the provided parameters to ``parameters``.
 
-     - Parameter extraParameters: Additional parameters for the request. The provided dictionary will be added to `parameters`.
+     - Parameter extraParameters: Additional parameters for the request.
      */
     public func parameters(_ extraParameters: [String: Any]) -> Self {
         let parameters = extraParameters.merging(self.parameters) {(current, _) in current}
@@ -92,9 +92,9 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     }
 
     /**
-     Modify the headers by creating a copy of self and adding the provided headers to `headers`.
+     Modifies the headers by creating a copy of the request and adding the provided headers to ``headers``.
 
-     - Parameter extraHeaders: Additional headers for the request. The provided dictionary will be added to `headers`.
+     - Parameter extraHeaders: Additional headers for the request.
      */
     public func headers(_ extraHeaders: [String: String]) -> Self {
         let headers = extraHeaders.merging(self.headers) {(current, _) in current}
@@ -125,7 +125,7 @@ public extension Request {
 public extension Request {
 
     /**
-     Starts the request to the server.
+     Performs the request.
 
      - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
      */
