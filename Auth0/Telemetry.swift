@@ -18,7 +18,7 @@ public struct Telemetry {
         return self.enabled ? self.info : nil
     }
 
-    /// Initializer that generates a base64url-encoded value and stores it in ``info``.
+    /// Initializer that generates a base64url-encoded value with telemetry data.
     public init() {
         self.info = Telemetry.generateValue()
     }
