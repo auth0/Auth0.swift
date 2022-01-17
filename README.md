@@ -11,7 +11,7 @@ Swift toolkit that lets you communicate efficiently with many of the [Auth0 API]
 
 > ❗ **Auth0.swift 2.0.0 beta is out**
 <br>It includes support for async/await and Combine, thread-safe credentials renewal from the Credentials Manager, simplified error handling, and more. The GA release is planned for the third week of February.
-<br>See #637 for more information.
+<br>See [#637](https://github.com/auth0/Auth0.swift/issues/637) for more information.
 
 ## Table of Contents
 
