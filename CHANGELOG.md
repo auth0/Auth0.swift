@@ -1,5 +1,63 @@
 # Change Log
 
+## [2.0.0-beta.0](https://github.com/auth0/Auth0.swift/tree/2.0.0-beta.0) (2022-01-17)
+
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.38.0...2.0.0-beta.0)
+
+[Migration Guide](V2_MIGRATION_GUIDE.md)
+
+⚠️ **BREAKING CHANGES**
+
+- Make `UserPatchAttributes` class final (#611) ([Widcket](https://github.com/Widcket))
+- Remove remaining `parameters` parameter (#607) ([Widcket](https://github.com/Widcket))
+- Rename `realm` parameter to `realmOrConnection` (#602) ([Widcket](https://github.com/Widcket))
+- Make the `Challenge.CodingKeys` enum internal (#601) ([Widcket](https://github.com/Widcket))
+- Rename `createUser` to `signup` (#597) ([Widcket](https://github.com/Widcket))
+- Have `clearSession()` yield a `Result` (#584) ([Widcket](https://github.com/Widcket))
+- Have the `revoke()` method yield a `Result` (#582) ([Widcket](https://github.com/Widcket))
+- Lowercase the `PasswordlessType` enum cases (#580) ([Widcket](https://github.com/Widcket))
+- Do not check for Refresh Token presence in `hasValid(minTTL:)` (#574) ([Widcket](https://github.com/Widcket))
+- Remove parameterless `tokenExchange()` method (#573) ([Widcket](https://github.com/Widcket))
+- Make AuthTransaction internal (#570) ([Widcket](https://github.com/Widcket))
+- Remove Web Auth method embedded in Authentication API client (#560) ([Widcket](https://github.com/Widcket))
+- Use strictly-typed result and error types [SDK-2977] (#558) ([Widcket](https://github.com/Widcket))
+- Migrate all errors to structs [SDK-2968] (#552) ([Widcket](https://github.com/Widcket))
+- Decouple Credentials Manager storage from SimpleKeychain [SDK-2936] (#551) ([adamjmcgrath](https://github.com/adamjmcgrath))
+- Replace `JSONObjectPayload` with `Codable` on `Credentials` [SDK-2958] (#549) ([Widcket](https://github.com/Widcket))
+- Make credentials renewal thread-safe [SDK-2903] (#548) ([Widcket](https://github.com/Widcket))
+- Remove deprecated metods (#543) ([Widcket](https://github.com/Widcket))
+- Remove custom `Result` type [SDK-2901] (#542) ([Widcket](https://github.com/Widcket))
+- Use `openid profile email` as the default scope value [SDK-2926] (#540) ([Widcket](https://github.com/Widcket))
+- Drop support for Objective-C [SDK-2894] (#539) ([Widcket](https://github.com/Widcket))
+- Use only `code` response type and drop implicit grant [SDK-2899] (#538) ([Widcket](https://github.com/Widcket))
+- Remove the `channel` parameter from MFA challenge method [SDK-2904] (#536) ([Widcket](https://github.com/Widcket))
+- Enforce `openid` scope on Web Auth [SDK-2924] (#535) ([Widcket](https://github.com/Widcket))
+- Make some `Credentials` properties non-optional [SDK-2900] (#533) ([Widcket](https://github.com/Widcket))
+- Drop support for HS256 (#532) ([Widcket](https://github.com/Widcket))
+- Drop older Swift versions (#531) ([Widcket](https://github.com/Widcket))
+- Remove `parameters` from Authentication API client methods [SDK-2902] (#530) ([Widcket](https://github.com/Widcket))
+- Drop platform versions [SDK-2895] (#527) ([Widcket](https://github.com/Widcket))
+
+**Added**
+
+- Add wrappers with default values for MFA methods (#583) ([Widcket](https://github.com/Widcket))
+- Add support for async/await (#572) ([Widcket](https://github.com/Widcket))
+- Add custom description to `Credentials` (#571) ([Widcket](https://github.com/Widcket))
+- Add support for Combine [SDK-2907] (#566) ([Widcket](https://github.com/Widcket))
+- Add a way to pass custom headers directly to the request [SDK-2908] (#562) ([adamjmcgrath](https://github.com/adamjmcgrath))
+- Add support for subpaths in Auth0 domain [SDK-2963] (#557) ([Widcket](https://github.com/Widcket))
+- Add support for custom URL sessions to Web Auth (#556) ([Widcket](https://github.com/Widcket))
+
+**Changed**
+
+- Use `Auth0Error` for ID Token validation errors (#569) ([Widcket](https://github.com/Widcket))
+- Migrate existing Objective-C code to Swift [SDK-2905] (#547) ([adamjmcgrath](https://github.com/adamjmcgrath))
+
+**Fixed**
+
+- Fix version number reported by telemetry when using SPM (#633) ([Widcket](https://github.com/Widcket))
+- Fix auth time validation (#626) ([Widcket](https://github.com/Widcket))
+
 ## [1.38.0](https://github.com/auth0/Auth0.swift/tree/1.38.0) (2021-10-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.37.1...1.38.0)
 
