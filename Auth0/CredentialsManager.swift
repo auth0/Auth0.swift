@@ -28,7 +28,7 @@ public struct CredentialsManager {
     ///
     /// - Parameters:
     ///   - authentication: Auth0 Authentication API client.
-    ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to `credentials`.
+    ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to 'credentials'.
     ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `A0SimpleKeychain` instance.
     public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = A0SimpleKeychain()) {
         self.storeKey = storeKey
@@ -71,6 +71,7 @@ public struct CredentialsManager {
     ///   - cancelTitle:      Cancel message to display when Face ID or Touch ID is used.
     ///   - fallbackTitle:    Fallback message to display when Face ID or Touch ID is used after a failed match.
     ///   - evaluationPolicy: Policy to be used for authentication policy evaluation.
+    /// - Important: Access to the ``user`` property will not be protected by Biometric authentication.
     public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil, evaluationPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics) {
         self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
@@ -153,7 +154,8 @@ public struct CredentialsManager {
             }
     }
 
-    /// Checks that there are credentials stored, and that the Access Token has not expired and will not expire within the specified TTL.
+    /// Checks that there are credentials stored, and that the Access Token has not expired and will not expire within
+    /// the specified TTL.
     ///
     /// ```
     /// guard credentialsManager.hasValid() else {
