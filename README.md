@@ -7,11 +7,11 @@
 ![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)
 ![Swift 5.5](https://img.shields.io/badge/Swift-5.5-orange.svg?style=flat-square)
 
-> ⚠️ This library is currently in **Beta** and has not had a complete security review. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.
+> ⚠️ This library is currently in **Beta**. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.
 
 Swift SDK that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api) endpoints and enables you to seamlessly integrate the Auth0 login.
 
-**Migrating from v1? Check our [Migration Guide](V2_MIGRATION_GUIDE.md).**
+**Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).**
 
 ---
 
@@ -592,9 +592,9 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
 
 The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
-We recommend using [Universal Login](https://auth0.com/docs/login/universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your [Auth0 Dashboard](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
+We recommend using [Universal Login](https://auth0.com/docs/login/universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
 
-For login or signup with username/password, the `Password` grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`, otherwise the Auth0 Dashboard will take care of activating both when `Password` is enabled.
+For login or signup with username/password, the `Password` grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`. Otherwise, the Auth0 Dashboard will take care of activating both when enabling `Password`.
 
 > 💡 If your Auth0 account has the "Bot Detection" feature enabled, your requests might be flagged for verification. Check how to handle this scenario on the [Bot Detection](#bot-detection) section.
 
@@ -728,7 +728,7 @@ Passwordless is a two-step authentication flow that requires the **Passwordless 
 
 ##### 1. Start the passwordless flow
 
-Request a code to be sent to the user's email or phone number. For email scenarios only, a link can be sent in place of the code.
+Request a code to be sent to the user's email or phone number. For email scenarios, a link can be sent in place of the code.
 
 ```swift
 Auth0
@@ -1467,7 +1467,7 @@ NotificationCenter
 
 ### Bot Detection
 
-If you are using the [Bot Detection](https://auth0.com/docs/configure/attack-protection/bot-detection) feature and performing database login/signup via the Authentication API, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.
+If you are performing database login/signup via the Authentication API and you’d like to use the [Bot Detection](https://auth0.com/docs/configure/attack-protection/bot-detection) feature, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.
 
 ```swift
 Auth0
@@ -1519,7 +1519,7 @@ The only supported versions of Xcode are those that can be currently used to sub
 
 ### Swift
 
-The minimum supported Swift 5 minor version is the one released with the oldest-supported Xcode version. Once a Swift 5 minor becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release.
+The minimum supported Swift minor version is the one released with the oldest-supported Xcode version. Once a Swift minor becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release.
 
 ### Platforms
 
