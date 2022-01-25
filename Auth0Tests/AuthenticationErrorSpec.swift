@@ -323,6 +323,15 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isInvalidCredentials) == true
             }
 
+            it("should detect invalid refresh token") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "The refresh_token was generated for a user who doesn't exist anymore."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                expect(error.isRefreshTokenDeleted) == true
+            }
+
             it("should detect invalid mfa token") {
                 let values = [
                     "error": "expired_token",
@@ -391,6 +400,7 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")
                 expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match pwd history")
                 expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid creds")
+                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
             }
 
         }
@@ -452,8 +462,9 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
                 expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")
                 expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match pwd history")
-                expect(error.isAccessDenied).to(beFalse(), description: "should not match acces denied")
+                expect(error.isAccessDenied).to(beFalse(), description: "should not match access denied")
                 expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid creds")
+                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
             }
         }
 
