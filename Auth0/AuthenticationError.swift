@@ -113,6 +113,13 @@ public struct AuthenticationError: Auth0APIError {
             || self.code == "invalid_grant" && self.localizedDescription == "Wrong phone number or verification code."
     }
 
+    /// When the credentials renewal fails because the user was deleted.
+    public var isRefreshTokenDeleted: Bool {
+        return self.code == "invalid_grant"
+            && self.localizedDescription == "The refresh_token was generated for a user who doesn't exist anymore."
+
+    }
+
     /// When performing web-based authentication, the resource server denies access per OAuth2 specifications.
     public var isAccessDenied: Bool {
         return self.code == "access_denied"
