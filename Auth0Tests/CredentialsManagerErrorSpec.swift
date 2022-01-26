@@ -117,7 +117,7 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 let lifetime = 3600
                 let message = "The minTTL requested (\(minTTL)s) is greater than the"
                 + " lifetime of the renewed Access Token (\(lifetime)s). Request a lower minTTL or increase the"
-                + " 'Token Expiration' setting of your Auth0 API in the Dashboard."
+                + " 'Token Expiration' value in the settings page of your Auth0 API."
                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: lifetime))
                 expect(error.localizedDescription) == message
             }
