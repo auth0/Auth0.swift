@@ -1,5 +1,15 @@
 # Change Log
 
+## [2.0.0-beta.1](https://github.com/auth0/Auth0.swift/tree/2.0.0-beta.1) (2022-01-26)
+
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.0.0-beta.0...2.0.0-beta.1)
+
+[Migration Guide](V2_MIGRATION_GUIDE.md)
+
+**Added**
+
+- Add `isRefreshTokenDeleted` error [SDK-3079] [\#641](https://github.com/auth0/Auth0.swift/pull/641) ([Widcket](https://github.com/Widcket))
+
 ## [2.0.0-beta.0](https://github.com/auth0/Auth0.swift/tree/2.0.0-beta.0) (2022-01-17)
 
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.38.0...2.0.0-beta.0)

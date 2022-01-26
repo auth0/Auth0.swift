@@ -20,7 +20,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Auth0 2.0.0-beta.0 Docs
+          Auth0 2.0.0-beta.1 Docs
         </a>
          (97% documented)
       </p>
@@ -232,12 +232,12 @@
 <img src="https://img.shields.io/badge/Swift-5.5-orange.svg?style=flat-square" alt="Swift 5.5"></p>
 
 <blockquote>
-<p>⚠️ This library is currently in <strong>Beta</strong> and has not had a complete security review. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.</p>
+<p>⚠️ This library is currently in <strong>Beta</strong>. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.</p>
 </blockquote>
 
 <p>Swift SDK that lets you communicate efficiently with many of the <a href="https://auth0.com/docs/api">Auth0 API</a> endpoints and enables you to seamlessly integrate the Auth0 login.</p>
 
-<p><strong>Migrating from v1? Check our <a href="V2_MIGRATION_GUIDE.md">Migration Guide</a>.</strong></p>
+<p><strong>Migrating from v1? Check the <a href="V2_MIGRATION_GUIDE.md">Migration Guide</a>.</strong></p>
 
 <hr>
 <h2 id='table-of-contents' class='heading'>Table of Contents</h2>
@@ -312,7 +312,7 @@
 <h2 id='installation' class='heading'>Installation</h2>
 <h3 id='swift-package-manager' class='heading'>Swift Package Manager</h3>
 
-<p>If you are using SPM, open the following menu item in Xcode:</p>
+<p>Open the following menu item in Xcode:</p>
 
 <p><strong>File &gt; Add Packages&hellip;</strong></p>
 
@@ -320,15 +320,15 @@
 <pre class="highlight plaintext"><code>https://github.com/auth0/Auth0.swift
 </code></pre>
 
-<p>Then, select the <strong>Exact Version</strong> dependency rule and input <code>2.0.0-beta.0</code> as the version number. Press <strong>Add Package</strong>.</p>
+<p>Then, select the <strong>Exact Version</strong> dependency rule and input <code>2.0.0-beta.1</code> as the version number. Press <strong>Add Package</strong>.</p>
 
 <blockquote>
 <p>💡 For further reference on SPM, check its <a href="https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app">official documentation</a>.</p>
 </blockquote>
 <h3 id='cocoapods' class='heading'>Cocoapods</h3>
 
-<p>If you are using <a href="https://cocoapods.org">Cocoapods</a>, add this line to your <code>Podfile</code>:</p>
-<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'2.0.0-beta.0'</span>
+<p>Add the following line to your <code>Podfile</code>:</p>
+<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'2.0.0-beta.1'</span>
 </code></pre>
 
 <p>Then, run <code>pod install</code>.</p>
@@ -338,8 +338,8 @@
 </blockquote>
 <h3 id='carthage' class='heading'>Carthage</h3>
 
-<p>If you are using <a href="https://github.com/Carthage/Carthage">Carthage</a>, add the following line to your <code>Cartfile</code>:</p>
-<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" "2.0.0-beta.0"
+<p>Add the following line to your <code>Cartfile</code>:</p>
+<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" "2.0.0-beta.1"
 </code></pre>
 
 <p>Then, run <code>carthage bootstrap --use-xcframeworks</code>.</p>
@@ -530,6 +530,10 @@ Auth0
 <p><img src="./sso-alert.png" alt="sso-alert"></p>
 
 <p>Check the <a href="FAQ.md">FAQ</a> for more information about the alert box that pops up <strong>by default</strong> when using Web Auth.</p>
+
+<blockquote>
+<p>💡 See also <a href="https://developer.okta.com/blog/2022/01/13/mobile-sso">this blog post</a> for a detailed review of Single Sign-On (SSO) in iOS.</p>
+</blockquote>
 
 <p><a href="#table-of-contents">Go up ⤴</a></p>
 <h2 id='next-steps' class='heading'>Next Steps</h2>
@@ -791,9 +795,9 @@ credentialsManager
 <p><a href="https://auth0.github.io/Auth0.swift/Protocols/Authentication.html">API documentation ↗</a></p>
 
 <p>The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
-We recommend using <a href="https://auth0.com/docs/login/universal-login">Universal Login</a>, but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them via your <a href="https://manage.auth0.com/#/applications/">Auth0 Dashboard</a>, as explained in <a href="https://auth0.com/docs/configure/applications/update-grant-types">Update Grant Types</a>.</p>
+We recommend using <a href="https://auth0.com/docs/login/universal-login">Universal Login</a>, but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>, as explained in <a href="https://auth0.com/docs/configure/applications/update-grant-types">Update Grant Types</a>.</p>
 
-<p>For login or signup with username/password, the <code>Password</code> grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both <code>http://auth0.com/oauth/grant-type/password-realm</code> and <code>Password</code>, otherwise the Auth0 Dashboard will take care of activating both when <code>Password</code> is enabled.</p>
+<p>For login or signup with username/password, the <code>Password</code> grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both <code>http://auth0.com/oauth/grant-type/password-realm</code> and <code>Password</code>. Otherwise, the Auth0 Dashboard will take care of activating both when enabling <code>Password</code>.</p>
 
 <blockquote>
 <p>💡 If your Auth0 account has the &quot;Bot Detection&rdquo; feature enabled, your requests might be flagged for verification. Check how to handle this scenario on the <a href="#bot-detection">Bot Detection</a> section.</p>
@@ -923,7 +927,7 @@ Auth0
 <p>Passwordless is a two-step authentication flow that requires the <strong>Passwordless OTP</strong> grant to be enabled for your Auth0 application. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.</p>
 <h5 id='1-start-the-passwordless-flow' class='heading'>1. Start the passwordless flow</h5>
 
-<p>Request a code to be sent to the user&rsquo;s email or phone number. For email scenarios only, a link can be sent in place of the code.</p>
+<p>Request a code to be sent to the user&rsquo;s email or phone number. For email scenarios, a link can be sent in place of the code.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">startPasswordless</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="s">"support@auth0.com"</span><span class="p">)</span>
@@ -1594,29 +1598,29 @@ Auth0
 <pre class="highlight swift"><code><span class="k">guard</span> <span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">URLContexts</span><span class="o">.</span><span class="n">first</span><span class="p">?</span><span class="o">.</span><span class="n">url</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
 
 <span class="c1">// You need to wait for the application to enter the foreground before launching Web Auth</span>
-<span class="kt">NotificationCenter</span>
-    <span class="o">.</span><span class="k">default</span>
+<span class="kt">NotificationCenter</span><span class="o">.</span><span class="k">default</span>
     <span class="o">.</span><span class="nf">publisher</span><span class="p">(</span><span class="nv">for</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="o">.</span><span class="n">didBecomeActiveNotification</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">subscribe</span><span class="p">(</span><span class="nv">on</span><span class="p">:</span> <span class="kt">DispatchQueue</span><span class="o">.</span><span class="n">main</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">prefix</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">sink</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
+    <span class="o">.</span><span class="nf">setFailureType</span><span class="p">(</span><span class="nv">to</span><span class="p">:</span> <span class="kt">WebAuthError</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="c1">// Necessary for iOS 13</span>
+    <span class="o">.</span><span class="n">flatMap</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
         <span class="kt">Auth0</span>
             <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
             <span class="o">.</span><span class="nf">invitationURL</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
-                <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
-                <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
-                    <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-                <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-                    <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
+            <span class="o">.</span><span class="nf">start</span><span class="p">()</span>
     <span class="p">}</span>
+    <span class="o">.</span><span class="nf">sink</span><span class="p">(</span><span class="nv">receiveCompletion</span><span class="p">:</span> <span class="p">{</span> <span class="n">completion</span> <span class="k">in</span>
+        <span class="k">if</span> <span class="k">case</span> <span class="o">.</span><span class="nf">failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">)</span> <span class="o">=</span> <span class="n">completion</span> <span class="p">{</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed with: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">},</span> <span class="nv">receiveValue</span><span class="p">:</span> <span class="p">{</span> <span class="n">credentials</span> <span class="k">in</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"Obtained credentials: </span><span class="se">\(</span><span class="n">credentials</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="p">})</span>
     <span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">cancellables</span><span class="p">)</span>
 </code></pre>
 <h3 id='bot-detection' class='heading'>Bot Detection</h3>
 
-<p>If you are using the <a href="https://auth0.com/docs/configure/attack-protection/bot-detection">Bot Detection</a> feature and performing database login/signup via the Authentication API, you need to handle the <code>isVerificationRequired</code> error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.</p>
+<p>If you are performing database login/signup via the Authentication API and you’d like to use the <a href="https://auth0.com/docs/configure/attack-protection/bot-detection">Bot Detection</a> feature, you need to handle the <code>isVerificationRequired</code> error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span> 
@@ -1661,7 +1665,7 @@ Auth0
 <p>The only supported versions of Xcode are those that can be currently used to submit apps to the App Store. Once a Xcode version becomes unsupported, dropping it from Auth0.swift <strong>will not be considered a breaking change</strong>, and will be done in a <strong>minor</strong> release.</p>
 <h3 id='swift' class='heading'>Swift</h3>
 
-<p>The minimum supported Swift 5 minor version is the one released with the oldest-supported Xcode version. Once a Swift 5 minor becomes unsupported, dropping it from Auth0.swift <strong>will not be considered a breaking change</strong>, and will be done in a <strong>minor</strong> release.</p>
+<p>The minimum supported Swift minor version is the one released with the oldest-supported Xcode version. Once a Swift minor becomes unsupported, dropping it from Auth0.swift <strong>will not be considered a breaking change</strong>, and will be done in a <strong>minor</strong> release.</p>
 <h3 id='platforms' class='heading'>Platforms</h3>
 
 <p>Only the last 4 major platform versions are supported, starting from:</p>
@@ -1711,7 +1715,7 @@ Auth0
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-01-14)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-01-26)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
