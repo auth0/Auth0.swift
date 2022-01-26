@@ -313,6 +313,8 @@ Auth0
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
+> 💡 See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed review of Single Sign-On (SSO) in iOS.
+
 [Go up ⤴](#table-of-contents)
 
 ## Next Steps
