@@ -68,7 +68,7 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
 
 ### Swift Package Manager
 
-If you are using SPM, open the following menu item in Xcode:
+Open the following menu item in Xcode:
 
 **File > Add Packages...**
 
@@ -84,7 +84,7 @@ Then, select the **Exact Version** dependency rule and input `2.0.0-beta.0` as t
 
 ### Cocoapods
 
-If you are using [Cocoapods](https://cocoapods.org), add this line to your `Podfile`:
+Add the following line to your `Podfile`:
 
 ```ruby
 pod 'Auth0', '2.0.0-beta.0'
@@ -96,7 +96,7 @@ Then, run `pod install`.
 
 ### Carthage
 
-If you are using [Carthage](https://github.com/Carthage/Carthage), add the following line to your `Cartfile`:
+Add the following line to your `Cartfile`:
 
 ```text
 github "auth0/Auth0.swift" "2.0.0-beta.0"
@@ -1444,24 +1444,24 @@ When your application gets opened by an invitation link, grab the invitation URL
 guard let url = URLContexts.first?.url else { return }
 
 // You need to wait for the application to enter the foreground before launching Web Auth
-NotificationCenter
-    .default
+NotificationCenter.default
     .publisher(for: UIApplication.didBecomeActiveNotification)
     .subscribe(on: DispatchQueue.main)
     .prefix(1)
-    .sink { _ in
+    .setFailureType(to: WebAuthError.self) // Necessary for iOS 13
+    .flatMap { _ in
         Auth0
             .webAuth()
             .invitationURL(url)
-            .start { result in
-                switch result {
-                case .success(let credentials):
-                    print("Obtained credentials: \(credentials)")
-                case .failure(let error):
-                    print("Failed with: \(error)")
-                }
-            }
+            .start()
     }
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
     .store(in: &cancellables)
 ```
 
