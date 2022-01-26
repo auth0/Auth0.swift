@@ -78,7 +78,7 @@ In the **Search or Enter Package URL** search box enter this URL:
 https://github.com/auth0/Auth0.swift
 ```
 
-Then, select the **Exact Version** dependency rule and input `2.0.0-beta.0` as the version number. Press **Add Package**.
+Then, select the **Exact Version** dependency rule and input `2.0.0-beta.1` as the version number. Press **Add Package**.
 
 > 💡 For further reference on SPM, check its [official documentation](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app).
 
@@ -87,7 +87,7 @@ Then, select the **Exact Version** dependency rule and input `2.0.0-beta.0` as t
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '2.0.0-beta.0'
+pod 'Auth0', '2.0.0-beta.1'
 ```
 
 Then, run `pod install`.
@@ -99,7 +99,7 @@ Then, run `pod install`.
 Add the following line to your `Cartfile`:
 
 ```text
-github "auth0/Auth0.swift" "2.0.0-beta.0"
+github "auth0/Auth0.swift" "2.0.0-beta.1"
 ```
 
 Then, run `carthage bootstrap --use-xcframeworks`.
