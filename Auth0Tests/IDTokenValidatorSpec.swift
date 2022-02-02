@@ -240,13 +240,13 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should validate a token with auth time") {
-                    let maxAge = 1000 // 1 second
-                    let authTime = Date().addingTimeInterval(-10000) // -10 seconds
+                    let maxAge = 5_000 // 5 seconds
+                    let authTime = Date().addingTimeInterval(-5_000) // -5 seconds
                     let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: maxAge, authTime: authTime)
                     let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
                                                           audience: aud[0],
                                                           jwksRequest: validatorContext.jwksRequest,
-                                                          leeway: 1000, // 1 second
+                                                          leeway: 1_000, // 1 second
                                                           maxAge: maxAge,
                                                           nonce: nil,
                                                           organization: nil)
