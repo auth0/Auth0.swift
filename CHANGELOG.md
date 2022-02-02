@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.38.1](https://github.com/auth0/Auth0.swift/tree/1.38.1) (2022-02-02)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.38.0...1.38.1)
+
+**Fixed**
+- Fix `auth_time` validation [\#652](https://github.com/auth0/Auth0.swift/pull/652) ([Widcket](https://github.com/Widcket))
+- Fix version number reported by telemetry when using SPM [\#651](https://github.com/auth0/Auth0.swift/pull/651) ([Widcket](https://github.com/Widcket))
+
 ## [1.38.0](https://github.com/auth0/Auth0.swift/tree/1.38.0) (2021-10-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.37.1...1.38.0)
 
