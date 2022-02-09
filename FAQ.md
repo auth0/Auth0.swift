@@ -14,7 +14,7 @@ Under the hood, Auth0.swift uses `ASWebAuthenticationSession` to perform web-bas
 
 That alert box is displayed and managed by `ASWebAuthenticationSession`, not by Auth0.swift, because by default this API will store the session cookie in the shared Safari cookie jar. This makes Single Sign-On (SSO) possible. According to Apple, that requires user consent.
 
-> 💡 See [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed review of SSO in iOS.
+> 💡 See [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of SSO in iOS.
 
 If you don't need SSO, you can disable this behavior by adding `useEphemeralSession()` to the login call. This will configure `ASWebAuthenticationSession` to not store the session cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
 

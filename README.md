@@ -47,14 +47,18 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
 
 ## Documentation
 
-- [Quickstart](https://auth0.com/docs/quickstart/native/swift-beta)
-- [Sample app](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/beta/Sample-01)
-- [API documentation](https://auth0.github.io/Auth0.swift/)
+- [**Quickstart**](https://auth0.com/docs/quickstart/native/swift-beta)
+  <br>Shows how to integrate Auth0.swift into an iOS / macOS app from scratch.
+- [**Sample app**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/beta/Sample-01)
+  <br>A complete, running iOS / macOS application you can try.
+- [**API documentation**](https://auth0.github.io/Auth0.swift/)
+  <br>Documentation auto-generated from the code comments that explains all the available features.
   + [Web Auth](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)
   + [Authentication API Client](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
   + [Management API Client (Users)](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
-- [FAQ](FAQ.md)
+- [**FAQ**](FAQ.md)
+  <br> Answers some common questions about Auth0.swift.
 
 ## Requirements
 
@@ -313,7 +317,7 @@ Auth0
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
-> 💡 See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed review of Single Sign-On (SSO) in iOS.
+> 💡 See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of Single Sign-On (SSO) in iOS.
 
 [Go up ⤴](#table-of-contents)
 
@@ -333,6 +337,8 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
   <br>Print HTTP requests and responses for debugging.
 
 ### Web Auth (iOS / macOS)
+
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)**
 
 #### Web Auth Signup (iOS / macOS)
 
@@ -360,6 +366,7 @@ Auth0
 ```
 
 > ⚠️ The `screen_hint` parameter can only be used with the **New Universal Login Experience**, not the **Classic Experience**.
+    <br>If you are using the **Classic Universal Login Experience** you can use any custom parameter, e.g. `parameters(["action": "signup"])`. Then, customize the [login template](https://manage.auth0.com/#/login_page) to look for this parameter and set the `initialScreen` [option](https://github.com/auth0/lock#database-options) of the `Auth0Lock` constructor.
 
 <details>
   <summary>Using async/await</summary>
@@ -476,7 +483,7 @@ Web Auth will only produce `WebAuthError` error values. You can find the underly
 
 ### Credentials Manager (iOS / macOS / tvOS / watchOS)
 
-[API documentation ↗](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)**
 
 The Credentials Manager utility allows you to securely store and retrieve the user's credentials from the Keychain.
 
@@ -591,7 +598,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 
 ### Authentication API (iOS / macOS / tvOS / watchOS)
 
-[API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)**
 
 The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
 We recommend using [Universal Login](https://auth0.com/docs/login/universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
@@ -991,7 +998,7 @@ The Authentication API client will only produce `AuthenticationError` error valu
 
 ### Management API (Users) (iOS / macOS / tvOS / watchOS)
 
-[API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Users.html)**
 
 You can request more information from a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2).
 
@@ -1315,7 +1322,7 @@ Auth0
 
 #### Facebook Login
 
-If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a [Session Info Access Token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and the Facebook user profile, and then use them both to perform a code exchange for Auth0 credentials.
+If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a [Session Info Access Token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.
 
 ```swift
 Auth0
@@ -1440,7 +1447,7 @@ Auth0
 
 To accept organization invitations your application needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app). Tapping on the invitation link should open your application (invitations links are `https` only).
 
-When your application gets opened by an invitation link, grab the invitation URL and pass it to `.invitationURL()`.
+When your application gets opened by an invitation link, grab the invitation URL and pass it to `invitationURL()`.
 
 ```swift
 guard let url = URLContexts.first?.url else { return }
@@ -1454,7 +1461,7 @@ NotificationCenter.default
     .flatMap { _ in
         Auth0
             .webAuth()
-            .invitationURL(url)
+            .invitationURL(url) // 👈🏻
             .start()
     }
     .sink(receiveCompletion: { completion in
@@ -1469,7 +1476,7 @@ NotificationCenter.default
 
 ### Bot Detection
 
-If you are performing database login/signup via the Authentication API and you’d like to use the [Bot Detection](https://auth0.com/docs/configure/attack-protection/bot-detection) feature, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.
+If you are performing database login/signup via the Authentication API and would like to use the [Bot Detection](https://auth0.com/docs/configure/attack-protection/bot-detection) feature, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.
 
 ```swift
 Auth0
