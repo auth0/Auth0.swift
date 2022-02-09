@@ -20,7 +20,6 @@ final class Auth0WebAuth: WebAuth {
     private let platform = "ios"
     #endif
     private let responseType = "code"
-    private let requiredScope = "openid"
 
     private(set) var parameters: [String: String] = [:]
     private(set) var ephemeralSession = false
@@ -204,10 +203,7 @@ final class Auth0WebAuth: WebAuth {
 
         self.parameters.forEach { entries[$0] = $1 }
 
-        if let scope = entries["scope"]?.split(separator: " ").map(String.init), !scope.contains(requiredScope) {
-            entries["scope"] = "\(requiredScope) \(entries["scope"]!)"
-        }
-
+        entries["scope"] = addRequiredScope(to: entries["scope"])
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
         components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
         components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
