@@ -731,6 +731,8 @@ Auth0
 ```
 </details>
 
+> 💡 You might want to log the user in after signup. See [Login with database connection](#login-with-database-connection) above for an example.
+
 #### Passwordless login
 
 Passwordless is a two-step authentication flow that requires the **Passwordless OTP** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
