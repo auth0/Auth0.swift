@@ -38,7 +38,7 @@ public final class Credentials: NSObject {
     /// Tokens received from the Authentication API client before using the information they contain.
     /// - See: [ID Tokens](https://auth0.com/docs/security/tokens/id-tokens)
     public let idToken: String
-    /// Granted scopes. This value is only present when one or more of the requested scopes were not granted.
+    /// Granted scopes.
     ///
     /// - See: [Scopes](https://auth0.com/docs/configure/apis/scopes)
     public let scope: String?
