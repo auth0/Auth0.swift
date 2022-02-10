@@ -203,7 +203,7 @@ final class Auth0WebAuth: WebAuth {
 
         self.parameters.forEach { entries[$0] = $1 }
 
-        entries["scope"] = addRequiredScope(to: entries["scope"])
+        entries["scope"] = includeRequiredScope(in: entries["scope"])
         entries.forEach { items.append(URLQueryItem(name: $0, value: $1)) }
         components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
         components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
