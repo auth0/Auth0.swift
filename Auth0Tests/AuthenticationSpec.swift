@@ -262,9 +262,22 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should receive access token sending also scope") {
+            it("should receive access token sending scope") {
+                HTTPStubs.removeAllStubs()
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": refreshToken, "scope": "openid email"])) { _ in return authResponse(accessToken: AccessToken) }
                 waitUntil(timeout: Timeout) { done in
-                    auth.renew(withRefreshToken: refreshToken, scope: "openid").start { result in
+                    auth.renew(withRefreshToken: refreshToken, scope: "openid email").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should receive access token sending scope without enforcing openid scope") {
+                HTTPStubs.removeAllStubs()
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": refreshToken, "scope": "email phone"])) { _ in return authResponse(accessToken: AccessToken) }
+                waitUntil(timeout: Timeout) { done in
+                    auth.renew(withRefreshToken: refreshToken, scope: "email phone").start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
@@ -287,7 +300,6 @@ class AuthenticationSpec: QuickSpec {
             }
 
         }
-
 
         // MARK:- Token Exchange
 
@@ -316,6 +328,13 @@ class AuthenticationSpec: QuickSpec {
                         "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
                         "scope": "openid email"
                     ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope"
+                    
+                    stub(condition: isToken(Domain) && hasAtLeast([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": validCode,
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
+                        "scope": "openid email phone"
+                    ])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Token Exchange Apple Success with custom scope enforcing openid scope"
                     
                     stub(condition: isToken(Domain) && hasAtLeast([
                         "grant_type": TokenExchangeGrantType,
@@ -387,6 +406,17 @@ class AuthenticationSpec: QuickSpec {
                 it("should exchange apple auth code for credentials with custom scope") {
                     waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: validCode, scope: "openid email")
+                            .start { result in
+                                expect(result).to(haveCredentials())
+                                done()
+                        }
+                    }
+
+                }
+                
+                it("should exchange apple auth code for credentials with custom scope enforcing openid scope") {
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(appleAuthorizationCode: validCode, scope: "email phone")
                             .start { result in
                                 expect(result).to(haveCredentials())
                                 done()
@@ -504,7 +534,39 @@ class AuthenticationSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         auth.login(facebookSessionAccessToken: sessionAccessToken,
-                                           profile: ["name": "John Smith", "email": "john@smith.com"])
+                                   profile: ["name": "John Smith", "email": "john@smith.com"])
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                        }
+                    }
+                }
+
+                it("should include custom scope") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email"])) { _ in
+                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(facebookSessionAccessToken: sessionAccessToken,
+                                   profile: profile,
+                                   scope: "openid email")
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                        }
+                    }
+                }
+
+                it("should include custom scope enforcing openid scope") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email phone"])) { _ in
+                        return authResponse(accessToken: AccessToken, idToken: IdToken)
+                    }
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(facebookSessionAccessToken: sessionAccessToken,
+                                   profile: profile,
+                                   scope: "email phone")
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
                                 done()
@@ -519,31 +581,14 @@ class AuthenticationSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         auth.login(facebookSessionAccessToken: sessionAccessToken,
-                                           profile: profile,
-                                           audience: "https://myapi.com/api")
+                                   profile: profile,
+                                   audience: "https://myapi.com/api")
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
                                 done()
                         }
                     }
                 }
-
-                it("should not include audience if it is nil") {
-                    stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
-                        return authResponse(accessToken: AccessToken, idToken: IdToken)
-                    }
-
-                    waitUntil(timeout: Timeout) { done in
-                        auth.login(facebookSessionAccessToken: sessionAccessToken,
-                                           profile: profile,
-                                           audience: nil)
-                            .start { result in
-                                expect(result).to(haveCredentials(AccessToken, IdToken))
-                                done()
-                        }
-                    }
-                }
-
             }
 
         }
@@ -579,6 +624,7 @@ class AuthenticationSpec: QuickSpec {
         }
 
         // MARK:- password-realm grant type
+
         describe("authenticating with credentials and a realm/connection") {
 
             it("should receive token with username and password") {
@@ -605,6 +651,16 @@ class AuthenticationSpec: QuickSpec {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", scope: "openid").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+
+            it("should specify scope in request enforcing openid scope") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid email phone", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
+                waitUntil(timeout: Timeout) { done in
+                    auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", scope: "email phone").start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
@@ -644,6 +700,7 @@ class AuthenticationSpec: QuickSpec {
         }
         
         // MARK:- password grant type
+
         describe("authenticating with credentials in a default directory") {
             
             it("should receive token with username and password") {
@@ -671,6 +728,16 @@ class AuthenticationSpec: QuickSpec {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword,  scope: "openid").start { result in
+                        expect(result).to(haveCredentials())
+                        done()
+                    }
+                }
+            }
+            
+            it("should specify scope in request enforcing openid scope") {
+                stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid email phone"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
+                waitUntil(timeout: Timeout) { done in
+                    auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword,  scope: "email phone").start { result in
                         expect(result).to(haveCredentials())
                         done()
                     }
@@ -853,6 +920,30 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
                 
+                it("should include custom scope") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, scope: "openid email").start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should include custom scope enforcing openid scope") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email phone"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(email: SupportAtAuth0, code: OTP, scope: "email phone").start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
                 it("should include audience if it is not nil") {
                     stub(condition: isToken(Domain) && hasAtLeast(["audience": "https://myapi.com/api"])) { _ in
                         return authResponse(accessToken: AccessToken)
@@ -936,6 +1027,30 @@ class AuthenticationSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP).start { result in
                             expect(result).to(haveCredentials(AccessToken))
+                            done()
+                        }
+                    }
+                }
+                
+                it("should include custom scope") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, scope: "openid email").start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should include custom scope enforcing openid scope") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email phone"])) { _ in
+                        return authResponse(accessToken: AccessToken)
+                    }
+                    waitUntil(timeout: Timeout) { done in
+                        auth.login(phoneNumber: Phone, code: OTP, scope: "email phone").start { result in
+                            expect(result).to(beSuccessful())
                             done()
                         }
                     }

@@ -10,3 +10,8 @@ func date(from string: String) -> Date? {
     }
     return Date(timeIntervalSince1970: interval)
 }
+
+func includeRequiredScope(in scope: String?) -> String? {
+    guard let scope = scope, !scope.split(separator: " ").map(String.init).contains("openid") else { return scope }
+    return "openid \(scope)"
+}

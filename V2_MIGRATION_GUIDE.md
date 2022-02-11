@@ -739,6 +739,22 @@ credentialsManager.revoke { result in
 
 ## Behavior Changes
 
+### Authentication client
+
+#### Enforcement of the `openid` scope
+
+If you use the `parameters(_:)` method of `Request` to pass scopes and do not include the `openid` scope, it will be added automatically.
+
+```swift
+Auth0
+    .authentication()
+    // ...
+    .parameters(["scope": "profile email"]) // "openid profile email" will be used
+    .start { result in
+        // ...
+    }
+```
+
 ### Web Auth
 
 #### Supported JWT signature algorithms

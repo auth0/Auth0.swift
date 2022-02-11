@@ -54,6 +54,10 @@ class RequestSpec: QuickSpec {
                     expect(request.parameters["foo"] as? String) == "bar"
                 }
 
+                it("should enforce the openid scope when adding extra parameters") {
+                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, parameters: [:], logger: nil, telemetry: Telemetry())
+                    expect(request.parameters(["scope": "email phone"]).parameters["scope"] as? String) == "openid email phone"
+                }
             }
 
             context("headers") {

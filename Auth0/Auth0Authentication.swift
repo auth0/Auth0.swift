@@ -34,7 +34,7 @@ struct Auth0Authentication: Authentication {
             "realm": realm
         ]
         payload["audience"] = audience
-        payload["scope"] = scope
+        payload["scope"] = includeRequiredScope(in: scope)
         return Request(session: session,
                        url: url,
                        method: "POST",
@@ -53,7 +53,7 @@ struct Auth0Authentication: Authentication {
             "client_id": self.clientId
         ]
         payload["audience"] = audience
-        payload["scope"] = scope
+        payload["scope"] = includeRequiredScope(in: scope)
         return Request(session: session,
                        url: url,
                        method: "POST",
@@ -288,7 +288,7 @@ struct Auth0Authentication: Authentication {
                        url: oauthToken,
                        method: "POST",
                        handle: codable,
-                       parameters: payload,
+                       parameters: payload, // Initializer does not enforce 'openid' scope
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
@@ -334,7 +334,7 @@ private extension Auth0Authentication {
             "client_id": self.clientId
         ]
         payload["audience"] = audience
-        payload["scope"] = scope
+        payload["scope"] = includeRequiredScope(in: scope)
         return Request(session: session,
                        url: url,
                        method: "POST",
@@ -365,7 +365,7 @@ private extension Auth0Authentication {
         parameters["subject_token_type"] = subjectTokenType
         parameters["audience"] = audience
         parameters["scope"] = scope
-        return self.token().parameters(parameters)
+        return self.token().parameters(parameters) // parameters() enforces 'openid' scope
     }
 
 }
