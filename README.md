@@ -36,7 +36,7 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
   + [Authentication API (iOS / macOS / tvOS / watchOS)](#authentication-api-ios--macos--tvos--watchos)
   + [Management API (Users) (iOS / macOS / tvOS / watchOS)](#management-api-users-ios--macos--tvos--watchos)
   + [Logging](#logging)
-- [Other Features](#other-features)
+- [Advanced Features](#advanced-features)
   + [Native Social Login](#native-social-login)
   + [Organizations](#organizations)
   + [Bot Detection](#bot-detection)
@@ -1260,7 +1260,7 @@ Connection: keep-alive
 
 [Go up ⤴](#table-of-contents)
 
-## Other Features
+## Advanced Features
 
 ### Native Social Login
 
