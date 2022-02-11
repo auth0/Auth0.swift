@@ -325,7 +325,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 ### Common Tasks
 
-- [**Retrieve user information**](#retrieve-user-information-ios--macos--tvos--watchos)
+- [**Retrieve user information**](#retrieve-user-information)
   <br>Fetch the latest user information from the `/userinfo` endpoint.
 - [**Store credentials**](#store-credentials)
   <br>Store the user's credentials securely in the Keychain.
@@ -845,7 +845,7 @@ Auth0
 
 > 💡 Use `login(phoneNumber:code:)` if the code was sent to the user's phone number.
 
-#### Retrieve user information (iOS / macOS / tvOS / watchOS)
+#### Retrieve user information
 
 Fetch the latest user information from the `/userinfo` endpoint.
 
@@ -900,7 +900,7 @@ Auth0
 ```
 </details>
 
-#### Renew credentials (iOS / macOS / tvOS / watchOS)
+#### Renew credentials
 
 Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
 
