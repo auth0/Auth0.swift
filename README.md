@@ -340,7 +340,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)**
 
-#### Web Auth Signup (iOS / macOS)
+#### Web Auth Signup
 
 You can make users land directly on the Signup page instead of the Login page by specifying the `"screen_hint": "signup"` parameter. Note that this can be combined with `"prompt": "login"`, which indicates whether you want to always show the authentication page or you want to skip if there's an existing session.
 
@@ -365,8 +365,7 @@ Auth0
     }
 ```
 
-> ⚠️ The `screen_hint` parameter can only be used with the **New Universal Login Experience**, not the **Classic Experience**.
-    <br>If you are using the **Classic Universal Login Experience** you can use any custom parameter, e.g. `parameters(["action": "signup"])`. Then, customize the [login template](https://manage.auth0.com/#/login_page) to look for this parameter and set the `initialScreen` [option](https://github.com/auth0/lock#database-options) of the `Auth0Lock` constructor.
+> ⚠️ The `screen_hint` parameter can only be used with the **New Universal Login Experience**, not the **Classic Experience**. If you are using the **Classic Universal Login Experience** you can use any custom parameter, e.g. `parameters(["action": "signup"])`. Then, customize the [login template](https://manage.auth0.com/#/login_page) to look for this parameter and set the `initialScreen` [option](https://github.com/auth0/lock#database-options) of the `Auth0Lock` constructor.
 
 <details>
   <summary>Using async/await</summary>
@@ -499,7 +498,7 @@ When your users log in, store their credentials securely in the Keychain. You ca
 let didStore = credentialsManager.store(credentials: credentials)
 ```
 
-#### Check validity of stored credentials
+#### Check the validity of stored credentials
 
 When the users open your application, check for valid credentials. If they exist, you can retrieve them and redirect the users to the application's main flow without any additional login steps.
 
@@ -605,7 +604,7 @@ We recommend using [Universal Login](https://auth0.com/docs/login/universal-logi
 
 For login or signup with username/password, the `Password` grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`. Otherwise, the Auth0 Dashboard will take care of activating both when enabling `Password`.
 
-> 💡 If your Auth0 account has the "Bot Detection" feature enabled, your requests might be flagged for verification. Check how to handle this scenario on the [Bot Detection](#bot-detection) section.
+> 💡 If your Auth0 account has the "Bot Detection" feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the [Bot Detection](#bot-detection) section.
 
 > ⚠️ The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID Tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) any ID Tokens received from the Authentication API client before using the information they contain.
 
