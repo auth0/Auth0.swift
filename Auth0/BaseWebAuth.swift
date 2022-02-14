@@ -241,6 +241,7 @@ class BaseWebAuth: WebAuthenticatable {
         if #available(iOS 12.0, macOS 10.15, *) {
             return AuthenticationServicesSessionCallback(url: logoutURL,
                                                          schemeURL: redirectURL,
+                                                         ephemeralSession: self.ephemeralSession,
                                                          callback: callback)
         }
         #endif
