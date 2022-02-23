@@ -229,6 +229,7 @@ class BaseWebAuth: WebAuthenticatable {
                                        redirectURL: redirectURL,
                                        federated: federated,
                                        callback: callback) {
+            logger?.trace(url: logoutURL, source: String(describing: session.self))
             self.storage.store(session)
         }
     }
