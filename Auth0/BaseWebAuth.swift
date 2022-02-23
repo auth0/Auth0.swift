@@ -218,7 +218,7 @@ class BaseWebAuth: WebAuthenticatable {
         let clientId = URLQueryItem(name: "client_id", value: self.clientId)
         var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: true)
         let queryItems = components?.queryItems ?? []
-        components?.queryItems = queryItems + [returnTo, clientId]
+        components?.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: queryItems + [returnTo, clientId])
 
         guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
             return callback(false)

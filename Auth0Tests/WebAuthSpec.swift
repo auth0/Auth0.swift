@@ -276,21 +276,41 @@ class WebAuthSpec: QuickSpec {
             #if os(iOS)
             context("telemetry") {
                 
+                func getTelemetryInfoFromUrl(url: URL) -> [String: Any] {
+                    let telemetry = (url.a0_components?.queryItems!.first(where: {$0.name == "auth0Client"})!.value)!!
+                    let value = telemetry
+                        .replacingOccurrences(of: "-", with: "+")
+                        .replacingOccurrences(of: "_", with: "/")
+                    let paddedLength: Int
+                    let padding = value.count % 4
+                    if padding > 0 {
+                        paddedLength = value.count + (4 - padding)
+                    } else {
+                        paddedLength = value.count
+                    }
+                    let padded = value.padding(toLength: paddedLength, withPad: "=", startingAt: 0)
+
+                    let data = Data(base64Encoded: padded, options: [NSData.Base64DecodingOptions.ignoreUnknownCharacters])
+                    let info = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String: Any]
+                    return info
+                }
+
                 it("should include default telemetry"){
-                    var telemetry = Telemetry()
                     let url = newWebAuth()
                             .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
-                    telemetry.addView(view: MobileWebAuth.ViewASWebAuthenticationSession)
-                    expect(url.absoluteString.contains(telemetry.info!)).to(beTrue())
+
+                    let info = getTelemetryInfoFromUrl(url: url)
+                    let env = info["env"] as! [String : String]
+                    expect(env["view"]) == MobileWebAuth.ViewASWebAuthenticationSession
                 }
 
                 it("should include telemetry for legacy auth"){
-                    var telemetry = Telemetry()
                     let url = newWebAuth()
                             .useLegacyAuthentication()
                             .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
-                    telemetry.addView(view: MobileWebAuth.ViewSFSafariViewController)
-                    expect(url.absoluteString.contains(telemetry.info!)).to(beTrue())
+                    let info = getTelemetryInfoFromUrl(url: url)
+                    let env = info["env"] as! [String : String]
+                    expect(env["view"]) == MobileWebAuth.ViewSFSafariViewController
                 }
             }
             #endif
