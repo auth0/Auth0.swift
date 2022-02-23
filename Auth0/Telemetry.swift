@@ -28,6 +28,7 @@ public struct Telemetry {
     static let VersionKey = "version"
     static let WrappedVersion = "core"
     static let EnvironmentKey = "env"
+    static let ViewKey = "view"
 
     static let NoVersion = "0.0.0"
     static let LibraryName = "Auth0.swift"
@@ -54,6 +55,17 @@ public struct Telemetry {
         }
         let wrapped: [String: Any] = [
             Telemetry.NameKey: name,
+            Telemetry.VersionKey: version,
+            Telemetry.EnvironmentKey: env
+        ]
+        self.info = Telemetry.generateValue(fromInfo: wrapped)
+    }
+
+    mutating func addView(view: String) {
+        var env = Telemetry.generateEnviroment()
+        env[Telemetry.ViewKey] = view
+        let wrapped: [String: Any] = [
+            Telemetry.NameKey: Telemetry.LibraryName,
             Telemetry.VersionKey: version,
             Telemetry.EnvironmentKey: env
         ]

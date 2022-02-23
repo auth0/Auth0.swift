@@ -85,12 +85,26 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
     private var safariPresentationStyle = UIModalPresentationStyle.fullScreen
     private var authenticationSession = true
 
+    static let ViewASWebAuthenticationSession = "aswas"
+    static let ViewSFAuthenticationSession = "sfas"
+    static let ViewSFSafariViewController = "sfsvc"
+
     init(clientId: String,
          url: URL,
          presenter: ControllerModalPresenter = ControllerModalPresenter(),
          storage: TransactionStore = TransactionStore.shared,
          telemetry: Telemetry = Telemetry()) {
         self.presenter = presenter
+
+        var telemetry = telemetry
+        if #available(iOS 12.0, *) {
+            telemetry.addView(view: MobileWebAuth.ViewASWebAuthenticationSession)
+        } else if #available(iOS 11.0, *) {
+            telemetry.addView(view: MobileWebAuth.ViewSFAuthenticationSession)
+        } else {
+            telemetry.addView(view: MobileWebAuth.ViewSFSafariViewController)
+        }
+
         super.init(platform: "ios",
                    clientId: clientId,
                    url: url,
@@ -101,6 +115,7 @@ final class MobileWebAuth: BaseWebAuth, WebAuth {
     func useLegacyAuthentication(withStyle style: UIModalPresentationStyle = .fullScreen) -> Self {
         self.authenticationSession = false
         self.safariPresentationStyle = style
+        self.telemetry.addView(view: MobileWebAuth.ViewSFSafariViewController)
         return self
     }
 

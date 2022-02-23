@@ -131,6 +131,35 @@ class TelemetrySpec: QuickSpec {
                 #endif
             }
         }
+        
+        describe("adding view") {
+
+            var telemetry = Telemetry()
+            let view = "foo"
+
+            beforeEach {
+                telemetry.addView(view: view)
+            }
+            
+            it("should have correct info") {
+                let value = telemetry.value!
+                    .replacingOccurrences(of: "-", with: "+")
+                    .replacingOccurrences(of: "_", with: "/")
+                let paddedLength: Int
+                let padding = value.count % 4
+                if padding > 0 {
+                    paddedLength = value.count + (4 - padding)
+                } else {
+                    paddedLength = value.count
+                }
+                let padded = value.padding(toLength: paddedLength, withPad: "=", startingAt: 0)
+
+                let data = Data(base64Encoded: padded, options: [NSData.Base64DecodingOptions.ignoreUnknownCharacters])
+                let info = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String: Any]
+                let env = info["env"] as! [String : String]
+                expect(env["view"]) == view
+            }
+        }
 
         describe("telemetry header") {
 

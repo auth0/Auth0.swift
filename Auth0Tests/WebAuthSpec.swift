@@ -272,7 +272,28 @@ class WebAuthSpec: QuickSpec {
                 }
                 
             }
+            
+            #if os(iOS)
+            context("telemetry") {
+                
+                it("should include default telemetry"){
+                    var telemetry = Telemetry()
+                    let url = newWebAuth()
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
+                    telemetry.addView(view: MobileWebAuth.ViewASWebAuthenticationSession)
+                    expect(url.absoluteString.contains(telemetry.info!)).to(beTrue())
+                }
 
+                it("should include telemetry for legacy auth"){
+                    var telemetry = Telemetry()
+                    let url = newWebAuth()
+                            .useLegacyAuthentication()
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
+                    telemetry.addView(view: MobileWebAuth.ViewSFSafariViewController)
+                    expect(url.absoluteString.contains(telemetry.info!)).to(beTrue())
+                }
+            }
+            #endif
         }
 
         describe("redirect uri") {
