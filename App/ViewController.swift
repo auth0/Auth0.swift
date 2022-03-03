@@ -2,7 +2,7 @@ import UIKit
 import Auth0
 import SafariServices
 
-class SFUserAgent: NSObject, WebAuthUserAgent {
+class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     var controller: SFSafariViewController
     weak var presenter: UIViewController?
@@ -37,9 +37,10 @@ class SFUserAgent: NSObject, WebAuthUserAgent {
         }
         return finish
     }
+
 }
 
-extension SFUserAgent: SFSafariViewControllerDelegate {
+extension SafariUserAgent: SFSafariViewControllerDelegate {
 
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         Auth0.cancel()
@@ -47,17 +48,17 @@ extension SFUserAgent: SFSafariViewControllerDelegate {
 
 }
 
-struct SFProvider {
+struct SafariProvider {
 
     private init() {}
 
-    static func make(with presenter: UIViewController?) -> WebAuthProvider {
+    static func with(_ presenter: UIViewController?) -> WebAuthProvider {
         let provider: WebAuthProvider = { url, callback in
             
             let safari = SFSafariViewController(url: url)
             safari.dismissButtonStyle = .cancel
 
-            return SFUserAgent(controller: safari, presenter: presenter)
+            return SafariUserAgent(controller: safari, presenter: presenter)
         }
         return provider
     }
@@ -94,7 +95,7 @@ class ViewController: UIViewController {
     @IBAction func login(_ sender: Any) {
         Auth0
             .webAuth()
-            .provider(SFProvider.make(with: self))
+            .provider(SafariProvider.with(self))
             .logging(enabled: true)
             .start(onAuth)
     }
@@ -102,7 +103,7 @@ class ViewController: UIViewController {
     @IBAction func logout(_ sender: Any) {
         Auth0
             .webAuth()
-            .provider(SFProvider.make(with: self))
+            .provider(SafariProvider.with(self))
             .logging(enabled: true)
             .clearSession(federated: false) { result in
                 switch result {
