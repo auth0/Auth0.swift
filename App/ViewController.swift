@@ -48,17 +48,18 @@ extension SFUserAgent: SFSafariViewControllerDelegate {
 }
 
 struct SFProvider {
-    weak var presenter: UIViewController?
 
-    init(presenter: UIViewController?) {
-        self.presenter = presenter
-    }
+    private init() {}
 
-    func userAgent(url: URL, callback: (WebAuthResult<Void>) -> Void) -> WebAuthUserAgent {
-        let safari = SFSafariViewController(url: url)
-        safari.dismissButtonStyle = .cancel
+    static func make(with presenter: UIViewController?) -> WebAuthProvider {
+        let provider: WebAuthProvider = { url, callback in
+            
+            let safari = SFSafariViewController(url: url)
+            safari.dismissButtonStyle = .cancel
 
-        return SFUserAgent(controller: safari, presenter: self.presenter)
+            return SFUserAgent(controller: safari, presenter: presenter)
+        }
+        return provider
     }
 
     var description: String {
@@ -91,21 +92,17 @@ class ViewController: UIViewController {
     }
     
     @IBAction func login(_ sender: Any) {
-        let provider = SFProvider(presenter: self)
-        
         Auth0
             .webAuth()
-            .provider(provider.userAgent)
+            .provider(SFProvider.make(with: self))
             .logging(enabled: true)
             .start(onAuth)
     }
     
     @IBAction func logout(_ sender: Any) {
-        let provider = SFProvider(presenter: self)
-        
         Auth0
             .webAuth()
-            .provider(provider.userAgent)
+            .provider(SFProvider.make(with: self))
             .logging(enabled: true)
             .clearSession(federated: false) { result in
                 switch result {
