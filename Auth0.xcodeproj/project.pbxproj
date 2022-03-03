@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
-		5B16D88E1F7141A0009476A5 /* ASTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* ASTransaction.swift */; };
-		5B16D8931F714324009476A5 /* AuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D8921F714324009476A5 /* AuthSession.swift */; };
+		5B16D88E1F7141A0009476A5 /* ASProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* ASProvider.swift */; };
+		5B16D8931F714324009476A5 /* WebAuthUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D8921F714324009476A5 /* WebAuthUserAgent.swift */; };
 		5B1748741EF2D3A40060E653 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1748731EF2D3A40060E653 /* Helpers.swift */; };
 		5B1748751EF2D3A70060E653 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1748731EF2D3A40060E653 /* Helpers.swift */; };
 		5B1748761EF2D3A70060E653 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1748731EF2D3A40060E653 /* Helpers.swift */; };
@@ -42,7 +42,6 @@
 		5BE65DCA1F7270DE00CADD3B /* Auth0.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5BEDE1951EC333380007300D /* CredentialsManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */; };
-		5BFB98A51F7D1232001FE50D /* ASCallbackTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFB98A41F7D1232001FE50D /* ASCallbackTransaction.swift */; };
 		5C29743223FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3F23D0BA2C00074024 /* Optional+DebugDescription.swift */; };
 		5C29743323FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3F23D0BA2C00074024 /* Optional+DebugDescription.swift */; };
 		5C29743423FDBD5500BC18FA /* Optional+DebugDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3F23D0BA2C00074024 /* Optional+DebugDescription.swift */; };
@@ -50,16 +49,15 @@
 		5C354C05276CE1A500ADBC86 /* PasswordlessType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C354C03276CE1A500ADBC86 /* PasswordlessType.swift */; };
 		5C354C06276CE1A500ADBC86 /* PasswordlessType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C354C03276CE1A500ADBC86 /* PasswordlessType.swift */; };
 		5C354C07276CE1A500ADBC86 /* PasswordlessType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C354C03276CE1A500ADBC86 /* PasswordlessType.swift */; };
-		5C41F6A4244DC94E00252548 /* BaseTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* BaseTransaction.swift */; };
-		5C41F6AA244DCAFB00252548 /* BaseCallbackTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* BaseCallbackTransaction.swift */; };
+		5C41F6A4244DC94E00252548 /* LoginTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* LoginTransaction.swift */; };
+		5C41F6AA244DCAFB00252548 /* ClearSessionTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */; };
 		5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */; };
 		5C41F6B6244DCF2F00252548 /* BaseTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B4244DCEED00252548 /* BaseTransactionSpec.swift */; };
 		5C41F6C3244F965E00252548 /* Array+Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F551923C8FB8E00C89615 /* Array+Encode.swift */; };
-		5C41F6C6244F968100252548 /* AuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D8921F714324009476A5 /* AuthSession.swift */; };
+		5C41F6C6244F968100252548 /* WebAuthUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D8921F714324009476A5 /* WebAuthUserAgent.swift */; };
 		5C41F6C7244F968B00252548 /* AuthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F53F5CD1CFD157300476A46 /* AuthTransaction.swift */; };
-		5C41F6C8244F969600252548 /* ASTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* ASTransaction.swift */; };
-		5C41F6C9244F969F00252548 /* ASCallbackTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFB98A41F7D1232001FE50D /* ASCallbackTransaction.swift */; };
-		5C41F6CA244F96AE00252548 /* BaseTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* BaseTransaction.swift */; };
+		5C41F6C8244F969600252548 /* ASProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* ASProvider.swift */; };
+		5C41F6CA244F96AE00252548 /* LoginTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* LoginTransaction.swift */; };
 		5C41F6CB244F96E300252548 /* BioAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */; };
 		5C41F6CC244F96F200252548 /* ClaimValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimValidators.swift */; };
 		5C41F6CD244F96FD00252548 /* IDTokenSignatureValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3D23D0BA2C00074024 /* IDTokenSignatureValidator.swift */; };
@@ -69,7 +67,7 @@
 		5C41F6D1244F972000252548 /* JWT+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D6B23D0BBA500074024 /* JWT+Header.swift */; };
 		5C41F6D2244F972B00252548 /* JWTAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F550423C8FADE00C89615 /* JWTAlgorithm.swift */; };
 		5C41F6D4244F974100252548 /* OAuth2Grant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */; };
-		5C41F6D5244F974B00252548 /* BaseCallbackTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* BaseCallbackTransaction.swift */; };
+		5C41F6D5244F974B00252548 /* ClearSessionTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */; };
 		5C41F6D7244F975A00252548 /* TransactionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCAB1751D0900CF00331C84 /* TransactionStore.swift */; };
 		5C41F6D8244F976200252548 /* WebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */; };
 		5C41F6D9244F977900252548 /* WebAuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B91D14F70B00387ECB /* WebAuthError.swift */; };
@@ -438,8 +436,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5B16D88C1F7141A0009476A5 /* ASTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ASTransaction.swift; path = Auth0/ASTransaction.swift; sourceTree = SOURCE_ROOT; };
-		5B16D8921F714324009476A5 /* AuthSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthSession.swift; sourceTree = "<group>"; };
+		5B16D88C1F7141A0009476A5 /* ASProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASProvider.swift; sourceTree = "<group>"; };
+		5B16D8921F714324009476A5 /* WebAuthUserAgent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebAuthUserAgent.swift; path = Auth0/WebAuthUserAgent.swift; sourceTree = SOURCE_ROOT; };
 		5B1748731EF2D3A40060E653 /* Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		5B2860CD1EEAC30500C75D54 /* UserInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserInfoSpec.swift; path = Auth0Tests/UserInfoSpec.swift; sourceTree = SOURCE_ROOT; };
@@ -462,10 +460,9 @@
 		5BA58D33209081A700782DD1 /* Cartfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
 		5BEDE1891EC21B040007300D /* CredentialsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManager.swift; sourceTree = "<group>"; };
 		5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = CredentialsManagerSpec.swift; path = Auth0Tests/CredentialsManagerSpec.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		5BFB98A41F7D1232001FE50D /* ASCallbackTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASCallbackTransaction.swift; sourceTree = "<group>"; };
 		5C354C03276CE1A500ADBC86 /* PasswordlessType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordlessType.swift; sourceTree = "<group>"; };
-		5C41F6A3244DC94E00252548 /* BaseTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTransaction.swift; sourceTree = "<group>"; };
-		5C41F6A9244DCAFB00252548 /* BaseCallbackTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseCallbackTransaction.swift; sourceTree = "<group>"; };
+		5C41F6A3244DC94E00252548 /* LoginTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTransaction.swift; sourceTree = "<group>"; };
+		5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearSessionTransaction.swift; sourceTree = "<group>"; };
 		5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileWebAuth.swift; sourceTree = "<group>"; };
 		5C41F6B4244DCEED00252548 /* BaseTransactionSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTransactionSpec.swift; sourceTree = "<group>"; };
 		5C41F6DC244F982700252548 /* DesktopWebAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopWebAuth.swift; sourceTree = "<group>"; };
@@ -667,15 +664,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5B16D8901F7141E5009476A5 /* AuthTransactions */ = {
+		5B16D8901F7141E5009476A5 /* Transactions */ = {
 			isa = PBXGroup;
 			children = (
-				5C41F6A3244DC94E00252548 /* BaseTransaction.swift */,
-				5C41F6A9244DCAFB00252548 /* BaseCallbackTransaction.swift */,
-				5B16D88C1F7141A0009476A5 /* ASTransaction.swift */,
-				5BFB98A41F7D1232001FE50D /* ASCallbackTransaction.swift */,
+				5C41F6A3244DC94E00252548 /* LoginTransaction.swift */,
+				5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */,
 			);
-			name = AuthTransactions;
+			name = Transactions;
 			sourceTree = "<group>";
 		};
 		5B7EE45920FC9F3200367724 /* OAuth2TV */ = {
@@ -847,10 +842,11 @@
 		5F3965C01CF679B500CDE7C0 /* WebAuth */ = {
 			isa = PBXGroup;
 			children = (
-				5B16D8901F7141E5009476A5 /* AuthTransactions */,
+				5B16D8901F7141E5009476A5 /* Transactions */,
 				5C41F6AF244DCC1100252548 /* Platforms */,
 				5F53F5CD1CFD157300476A46 /* AuthTransaction.swift */,
-				5B16D8921F714324009476A5 /* AuthSession.swift */,
+				5B16D88C1F7141A0009476A5 /* ASProvider.swift */,
+				5B16D8921F714324009476A5 /* WebAuthUserAgent.swift */,
 				5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */,
 				5FCAB1751D0900CF00331C84 /* TransactionStore.swift */,
 				5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */,
@@ -1573,7 +1569,7 @@
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				970BC36B25C27095007A7745 /* Challenge.swift in Sources */,
 				5FDE87591D8A424700EA27DC /* Authentication.swift in Sources */,
-				5B16D8931F714324009476A5 /* AuthSession.swift in Sources */,
+				5B16D8931F714324009476A5 /* WebAuthUserAgent.swift in Sources */,
 				5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */,
 				5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */,
 				5F28B4611D8216180000EB23 /* Loggable.swift in Sources */,
@@ -1585,7 +1581,7 @@
 				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
 				5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */,
 				5FCAB1731D09009600331C84 /* NSData+URLSafe.swift in Sources */,
-				5B16D88E1F7141A0009476A5 /* ASTransaction.swift in Sources */,
+				5B16D88E1F7141A0009476A5 /* ASProvider.swift in Sources */,
 				5C80980B275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
 				5FD255BA1D14F70B00387ECB /* WebAuthError.swift in Sources */,
 				5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */,
@@ -1606,16 +1602,15 @@
 				5F74CB401CEFD5E600226823 /* JSONObjectPayload.swift in Sources */,
 				5FD255B41D14DD2600387ECB /* ManagementError.swift in Sources */,
 				5FE2F8B81CD0E910003628F4 /* Request.swift in Sources */,
-				5C41F6A4244DC94E00252548 /* BaseTransaction.swift in Sources */,
+				5C41F6A4244DC94E00252548 /* LoginTransaction.swift in Sources */,
 				5F3965C21CF67CF000CDE7C0 /* WebAuth.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* TransactionStore.swift in Sources */,
 				5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */,
 				5FAE9C911D8878D400A871CE /* Auth0WebAuth.swift in Sources */,
 				5B5E93F91EC45C22002A37F9 /* CredentialsManagerError.swift in Sources */,
-				5C41F6AA244DCAFB00252548 /* BaseCallbackTransaction.swift in Sources */,
+				5C41F6AA244DCAFB00252548 /* ClearSessionTransaction.swift in Sources */,
 				5FDE875D1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				5FADB6061CED27FB00D4BB50 /* Users.swift in Sources */,
-				5BFB98A51F7D1232001FE50D /* ASCallbackTransaction.swift in Sources */,
 				5CB41D4023D0BA2C00074024 /* IDTokenValidatorContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1631,9 +1626,9 @@
 				5C354C05276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5F28B4621D8216180000EB23 /* Loggable.swift in Sources */,
 				5C41F6D4244F974100252548 /* OAuth2Grant.swift in Sources */,
-				5C41F6D5244F974B00252548 /* BaseCallbackTransaction.swift in Sources */,
+				5C41F6D5244F974B00252548 /* ClearSessionTransaction.swift in Sources */,
 				5C29743423FDBD5500BC18FA /* Optional+DebugDescription.swift in Sources */,
-				5C41F6C6244F968100252548 /* AuthSession.swift in Sources */,
+				5C41F6C6244F968100252548 /* WebAuthUserAgent.swift in Sources */,
 				5B1748751EF2D3A70060E653 /* Helpers.swift in Sources */,
 				5F6FAC641D09E98000D5B4EA /* Logger.swift in Sources */,
 				D5E9E318273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */,
@@ -1648,7 +1643,6 @@
 				5B2860CF1EEAC30900C75D54 /* UserInfo.swift in Sources */,
 				5C4F552423C8FBA100C89615 /* JWKS.swift in Sources */,
 				5C80980C275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
-				5C41F6C9244F969F00252548 /* ASCallbackTransaction.swift in Sources */,
 				5C41F6D2244F972B00252548 /* JWTAlgorithm.swift in Sources */,
 				5C41F6D7244F975A00252548 /* TransactionStore.swift in Sources */,
 				5FE1182B1D8A4A2B00A374BF /* Telemetry.swift in Sources */,
@@ -1656,13 +1650,13 @@
 				5FDE875E1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				5FDE876E1D8A424700EA27DC /* Handlers.swift in Sources */,
 				5C41F6CE244F970500252548 /* IDTokenValidator.swift in Sources */,
-				5C41F6CA244F96AE00252548 /* BaseTransaction.swift in Sources */,
+				5C41F6CA244F96AE00252548 /* LoginTransaction.swift in Sources */,
 				5FADB60D1CED7E0800D4BB50 /* UserPatchAttributes.swift in Sources */,
 				5C41F6CF244F970E00252548 /* IDTokenValidatorContext.swift in Sources */,
 				5C41F6DB244F97AB00252548 /* Auth0WebAuth.swift in Sources */,
 				5F74CB411CEFD5E600226823 /* JSONObjectPayload.swift in Sources */,
 				5C41F6CB244F96E300252548 /* BioAuthentication.swift in Sources */,
-				5C41F6C8244F969600252548 /* ASTransaction.swift in Sources */,
+				5C41F6C8244F969600252548 /* ASProvider.swift in Sources */,
 				5C41F6DF244FA1EE00252548 /* NSURLComponents+OAuth2.swift in Sources */,
 				5FE2F8B91CD0E910003628F4 /* Request.swift in Sources */,
 				5B7EE47320FCA00700367724 /* CredentialsManager.swift in Sources */,

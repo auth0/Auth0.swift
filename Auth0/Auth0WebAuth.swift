@@ -4,6 +4,17 @@ import Foundation
 import Combine
 #endif
 
+public typealias WebAuthProvider = (_ url: URL, _ callback: (WebAuthResult<Void>) -> Void) -> WebAuthUserAgent
+
+@discardableResult
+public func resume(_ url: URL) -> Bool {
+    return TransactionStore.shared.resume(url)
+}
+
+public func cancel() {
+    TransactionStore.shared.cancel()
+}
+
 final class Auth0WebAuth: WebAuth {
 
     let clientId: String
@@ -29,6 +40,7 @@ final class Auth0WebAuth: WebAuth {
     private(set) var maxAge: Int?
     private(set) var organization: String?
     private(set) var invitationURL: URL?
+    private(set) var provider: WebAuthProvider?
 
     lazy var redirectURL: URL? = {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
@@ -123,6 +135,11 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
+    func provider(_ provider: @escaping WebAuthProvider) -> Self {
+        self.provider = provider
+        return self
+    }
+
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         guard let redirectURL = self.redirectURL else {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
@@ -146,15 +163,23 @@ final class Auth0WebAuth: WebAuth {
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
-        let session = ASTransaction(authorizeURL: authorizeURL,
-                                    redirectURL: redirectURL,
-                                    state: state,
-                                    handler: handler,
-                                    logger: self.logger,
-                                    ephemeralSession: self.ephemeralSession,
-                                    callback: callback)
+
+        let provider = self.provider ?? ASProvider(ephemeralSession: self.ephemeralSession,
+                                                   redirectURL: redirectURL).login
+        let userAgent = provider(authorizeURL) { result in
+            if case let .failure(error) = result {
+                callback(.failure(error))
+            }
+        }
+        let transaction = LoginTransaction(redirectURL: redirectURL,
+                                           state: state,
+                                           userAgent: userAgent,
+                                           handler: handler,
+                                           logger: self.logger,
+                                           callback: callback)
+        userAgent.start()
         logger?.trace(url: authorizeURL, source: String(describing: session.self))
-        self.storage.store(session)
+        self.storage.store(transaction)
     }
 
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
@@ -172,10 +197,12 @@ final class Auth0WebAuth: WebAuth {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
-        let session = ASCallbackTransaction(url: logoutURL,
-                                            schemeURL: redirectURL,
-                                            callback: callback)
-        self.storage.store(session)
+        let provider = self.provider ?? ASProvider(ephemeralSession: self.ephemeralSession,
+                                                   redirectURL: redirectURL).clearSession
+        let userAgent = provider(logoutURL, callback)
+        let transaction = ClearSessionTransaction(userAgent: userAgent, callback: callback)
+        userAgent.start()
+        self.storage.store(transaction)
     }
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,

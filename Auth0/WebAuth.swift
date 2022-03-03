@@ -126,6 +126,8 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     func organization(_ organization: String) -> Self
 
+    func provider(_ provider: @escaping WebAuthProvider) -> Self
+
     // MARK: - Methods
 
     /**

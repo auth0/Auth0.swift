@@ -1,41 +1,43 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-class BaseTransaction: NSObject, AuthTransaction {
+class LoginTransaction: NSObject, AuthTransaction {
 
     typealias FinishTransaction = (WebAuthResult<Credentials>) -> Void
 
-    var authSession: AuthSession?
-    let state: String?
+    private(set) var userAgent: WebAuthUserAgent?
     let redirectURL: URL
+    let state: String?
     let handler: OAuth2Grant
     let logger: Logger?
     let callback: FinishTransaction
 
     init(redirectURL: URL,
          state: String? = nil,
+         userAgent: WebAuthUserAgent,
          handler: OAuth2Grant,
          logger: Logger?,
          callback: @escaping FinishTransaction) {
         self.redirectURL = redirectURL
         self.state = state
+        self.userAgent = userAgent
         self.handler = handler
         self.logger = logger
-        self.callback = callback
+        self.callback = userAgent.wrap(callback: callback)
         super.init()
     }
 
     func cancel() {
         self.callback(.failure(WebAuthError(code: .userCancelled)))
-        authSession?.cancel()
-        authSession = nil
+        self.userAgent?.cancel()
+        self.userAgent = nil
     }
 
     func resume(_ url: URL) -> Bool {
         self.logger?.trace(url: url, source: "Callback URL")
         if self.handleURL(url) {
-            authSession?.cancel()
-            authSession = nil
+            self.userAgent?.cancel()
+            self.userAgent = nil
             return true
         }
         return false

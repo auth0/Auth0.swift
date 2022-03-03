@@ -16,7 +16,7 @@ private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 class BaseTransactionSpec: QuickSpec {
 
     override func spec() {
-        var transaction: BaseTransaction!
+        var transaction: LoginTransaction!
         var result: WebAuthResult<Credentials>? = nil
         let callback: (WebAuthResult<Credentials>) -> () = { result = $0 }
         let authentication = Auth0Authentication(clientId: ClientId, url: Domain)
@@ -31,7 +31,7 @@ class BaseTransactionSpec: QuickSpec {
         let code = "123456"
 
         beforeEach {
-            transaction = BaseTransaction(redirectURL: RedirectURL,
+            transaction = LoginTransaction(redirectURL: RedirectURL,
                                           state: "state",
                                           handler: handler,
                                           logger: nil,

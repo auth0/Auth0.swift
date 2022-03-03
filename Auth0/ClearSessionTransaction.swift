@@ -1,14 +1,14 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-class BaseCallbackTransaction: NSObject, AuthTransaction {
+class ClearSessionTransaction: NSObject, AuthTransaction {
 
-    var authSession: AuthSession?
-    var state: String?
+    private(set) var userAgent: WebAuthUserAgent?
     let callback: (WebAuthResult<Void>) -> Void
 
-    init(callback: @escaping (WebAuthResult<Void>) -> Void) {
-        self.callback = callback
+    init(userAgent: WebAuthUserAgent, callback: @escaping (WebAuthResult<Void>) -> Void) {
+        self.userAgent = userAgent
+        self.callback = userAgent.wrap(callback: callback)
     }
 
     func cancel() {

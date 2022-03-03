@@ -11,7 +11,7 @@ class TransactionStore {
     func resume(_ url: URL) -> Bool {
         let resumed = self.current?.resume(url) ?? false
         if resumed {
-            self.current = nil
+            self.clear()
         }
         return resumed
     }
@@ -21,11 +21,9 @@ class TransactionStore {
         self.current = transaction
     }
 
-    func cancel(_ transaction: AuthTransaction) {
-        transaction.cancel()
-        if self.current?.state == transaction.state {
-            self.current = nil
-        }
+    func cancel() {
+        self.current?.cancel()
+        self.clear()
     }
 
     func clear() {
