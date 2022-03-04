@@ -6,6 +6,7 @@ class LoginTransaction: NSObject, AuthTransaction {
     typealias FinishTransaction = (WebAuthResult<Credentials>) -> Void
 
     private(set) var userAgent: WebAuthUserAgent?
+    private(set) var userAgentCallback: ((WebAuthResult<Void>) -> Void)?
     let redirectURL: URL
     let state: String?
     let handler: OAuth2Grant
@@ -23,41 +24,48 @@ class LoginTransaction: NSObject, AuthTransaction {
         self.userAgent = userAgent
         self.handler = handler
         self.logger = logger
-        self.callback = userAgent.wrap(callback: callback)
+        self.callback = callback
         super.init()
+        self.userAgentCallback = userAgent.finish { result in
+            if case let .failure(error) = result {
+                callback(.failure(error))
+            }
+        }
     }
 
     func cancel() {
-        self.callback(.failure(WebAuthError(code: .userCancelled)))
-        self.userAgent?.cancel()
-        self.userAgent = nil
+        self.finishUserAgent(.failure(WebAuthError(code: .userCancelled)))
     }
 
     func resume(_ url: URL) -> Bool {
         self.logger?.trace(url: url, source: "Callback URL")
-        if self.handleURL(url) {
-            self.userAgent?.cancel()
-            self.userAgent = nil
-            return true
-        }
-        return false
+        return self.handleURL(url)
     }
 
     private func handleURL(_ url: URL) -> Bool {
-        guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()) else { return false }
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-            let error = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
-            self.callback(.failure(error))
-            return false
+        guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()),
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+              case let items = self.handler.values(fromComponents: components),
+              has(state: self.state, inItems: items) else {
+                  let error = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
+                  self.finishUserAgent(.failure(error))
+                  return false
         }
-        let items = self.handler.values(fromComponents: components)
-        guard has(state: self.state, inItems: items) else { return false }
+
         if items["error"] != nil {
-            self.callback(.failure(WebAuthError(code: .other, cause: AuthenticationError(info: items))))
+            let error = WebAuthError(code: .other, cause: AuthenticationError(info: items))
+            self.finishUserAgent(.failure(error))
         } else {
+            self.finishUserAgent(.success(()))
             self.handler.credentials(from: items, callback: self.callback)
         }
         return true
+    }
+
+    private func finishUserAgent(_ result: WebAuthResult<Void>) {
+        self.userAgentCallback?(result)
+        self.userAgent = nil
+        self.userAgentCallback = nil
     }
 
     private func has(state: String?, inItems items: [String: String]) -> Bool {

@@ -19,8 +19,8 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
         self.presenter?.present(controller, animated: true)
     }
 
-    func wrap<T>(callback: @escaping (WebAuthResult<T>) -> Void) -> (WebAuthResult<T>) -> Void {
-        let finish: (WebAuthResult<T>) -> Void = { [weak controller] (result: WebAuthResult<T>) -> Void in
+    func finish(_ callback: @escaping (WebAuthResult<Void>) -> Void) -> (WebAuthResult<Void>) -> Void {
+        let closure: (WebAuthResult<Void>) -> Void = { [weak controller] result -> Void in
             if case .failure(let cause) = result, case .userCancelled = cause {
                 DispatchQueue.main.async {
                     callback(result)
@@ -36,7 +36,8 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
                 }
             }
         }
-        return finish
+
+        return closure
     }
 
     override var description: String {
@@ -57,11 +58,12 @@ struct SafariProvider {
 
     private init() {}
 
-    static func with(_ presenter: UIViewController) -> WebAuthProvider {
+    static func with(_ presenter: UIViewController, style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
         let provider: WebAuthProvider = { url, callback in
-            
+
             let safari = SFSafariViewController(url: url)
             safari.dismissButtonStyle = .cancel
+            safari.modalPresentationStyle = style
 
             return SafariUserAgent(controller: safari, presenter: presenter)
         }

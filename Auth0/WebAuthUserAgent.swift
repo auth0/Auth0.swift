@@ -2,17 +2,14 @@
 public protocol WebAuthUserAgent {
 
     func start()
-    func cancel()
-    func wrap<T>(callback: @escaping (WebAuthResult<T>) -> Void) -> (WebAuthResult<T>) -> Void
+    func finish(_ callback: @escaping (WebAuthResult<Void>) -> Void) -> (WebAuthResult<Void>) -> Void
 
 }
 
 public extension WebAuthUserAgent {
 
-    func cancel() {}
-
-    func wrap<T>(callback: @escaping (WebAuthResult<T>) -> Void) -> (WebAuthResult<T>) -> Void {
-        return callback
+    func finish(_ callback: @escaping (WebAuthResult<Void>) -> Void) -> (WebAuthResult<Void>) -> Void {
+        return { result in callback(result) }
     }
 
 }
