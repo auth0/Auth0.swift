@@ -38,6 +38,10 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
         return finish
     }
 
+    override var description: String {
+        return String(describing: SFSafariViewController.self)
+    }
+
 }
 
 extension SafariUserAgent: SFSafariViewControllerDelegate {
@@ -61,10 +65,6 @@ struct SafariProvider {
             return SafariUserAgent(controller: safari, presenter: presenter)
         }
         return provider
-    }
-
-    var description: String {
-        return String(describing: SFSafariViewController.self)
     }
 
 }

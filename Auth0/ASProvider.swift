@@ -55,16 +55,16 @@ class ASProvider: NSObject {
         return userAgent
     }
 
-    override var description: String {
-        return String(describing: ASWebAuthenticationSession.self)
-    }
-
 }
 
 extension ASWebAuthenticationSession: WebAuthUserAgent {
 
     public func start() {
         let _: Bool = self.start()
+    }
+
+    public override var description: String {
+        return String(describing: ASWebAuthenticationSession.self)
     }
 
 }

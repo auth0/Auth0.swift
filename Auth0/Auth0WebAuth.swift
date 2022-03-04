@@ -178,7 +178,7 @@ final class Auth0WebAuth: WebAuth {
                                            logger: self.logger,
                                            callback: callback)
         userAgent.start()
-        logger?.trace(url: authorizeURL, source: String(describing: session.self))
+        logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
         self.storage.store(transaction)
     }
 
