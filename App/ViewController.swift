@@ -2,6 +2,7 @@ import UIKit
 import Auth0
 import SafariServices
 
+/// This implementation is a direct port of the one in Auth0.swift v1
 class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     var controller: SFSafariViewController
