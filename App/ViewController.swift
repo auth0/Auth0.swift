@@ -7,7 +7,7 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
     var controller: SFSafariViewController
     weak var presenter: UIViewController?
 
-    init(controller: SFSafariViewController, presenter: UIViewController?) {
+    init(controller: SFSafariViewController, presenter: UIViewController) {
         self.controller = controller
         self.presenter = presenter
         super.init()
@@ -56,7 +56,7 @@ struct SafariProvider {
 
     private init() {}
 
-    static func with(_ presenter: UIViewController?) -> WebAuthProvider {
+    static func with(_ presenter: UIViewController) -> WebAuthProvider {
         let provider: WebAuthProvider = { url, callback in
             
             let safari = SFSafariViewController(url: url)
