@@ -278,19 +278,7 @@ class WebAuthSpec: QuickSpec {
                 
                 func getTelemetryInfoFromUrl(url: URL) -> [String: Any] {
                     let telemetry = (url.a0_components?.queryItems!.first(where: {$0.name == "auth0Client"})!.value)!!
-                    let value = telemetry
-                        .replacingOccurrences(of: "-", with: "+")
-                        .replacingOccurrences(of: "_", with: "/")
-                    let paddedLength: Int
-                    let padding = value.count % 4
-                    if padding > 0 {
-                        paddedLength = value.count + (4 - padding)
-                    } else {
-                        paddedLength = value.count
-                    }
-                    let padded = value.padding(toLength: paddedLength, withPad: "=", startingAt: 0)
-
-                    let data = Data(base64Encoded: padded, options: [NSData.Base64DecodingOptions.ignoreUnknownCharacters])
+                    let data = telemetry.a0_decodeBase64URLSafe()
                     let info = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String: Any]
                     return info
                 }
