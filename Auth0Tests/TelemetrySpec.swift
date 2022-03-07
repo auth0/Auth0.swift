@@ -131,6 +131,23 @@ class TelemetrySpec: QuickSpec {
                 #endif
             }
         }
+        
+        describe("adding view") {
+
+            var telemetry = Telemetry()
+            let view = "foo"
+
+            beforeEach {
+                telemetry.addView(view: view)
+            }
+            
+            it("should have correct info") {
+                let data = telemetry.value!.a0_decodeBase64URLSafe()
+                let info = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String: Any]
+                let env = info["env"] as! [String : String]
+                expect(env["view"]) == view
+            }
+        }
 
         describe("telemetry header") {
 

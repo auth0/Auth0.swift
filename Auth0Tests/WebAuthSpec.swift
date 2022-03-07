@@ -272,7 +272,36 @@ class WebAuthSpec: QuickSpec {
                 }
                 
             }
+            
+            #if os(iOS)
+            context("telemetry") {
+                
+                func getTelemetryInfoFromUrl(url: URL) -> [String: Any] {
+                    let telemetry = (url.a0_components?.queryItems!.first(where: {$0.name == "auth0Client"})!.value)!!
+                    let data = telemetry.a0_decodeBase64URLSafe()
+                    let info = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String: Any]
+                    return info
+                }
 
+                it("should include default telemetry"){
+                    let url = newWebAuth()
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
+
+                    let info = getTelemetryInfoFromUrl(url: url)
+                    let env = info["env"] as! [String : String]
+                    expect(env["view"]) == MobileWebAuth.ViewASWebAuthenticationSession
+                }
+
+                it("should include telemetry for legacy auth"){
+                    let url = newWebAuth()
+                            .useLegacyAuthentication()
+                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
+                    let info = getTelemetryInfoFromUrl(url: url)
+                    let env = info["env"] as! [String : String]
+                    expect(env["view"]) == MobileWebAuth.ViewSFSafariViewController
+                }
+            }
+            #endif
         }
 
         describe("redirect uri") {
