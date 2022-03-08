@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.39.0](https://github.com/auth0/Auth0.swift/tree/1.39.0) (2022-03-07)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.38.1...1.39.0)
+
+**Added**
+- [SDK-3145] Add `Auth0Client` parameter to logout and add `view` to `telemetry.env` for iOS [\#659](https://github.com/auth0/Auth0.swift/pull/659) ([adamjmcgrath](https://github.com/adamjmcgrath))
+
 ## [1.38.1](https://github.com/auth0/Auth0.swift/tree/1.38.1) (2022-02-02)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.38.0...1.38.1)
 
