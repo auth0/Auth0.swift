@@ -169,7 +169,7 @@ Auth0
 
 ### Web Auth Configuration (iOS / macOS)
 
-#### Configure Callback and Logout URLs
+#### Configure callback and logout URLs
 
 The callback and logout URLs are the URLs that Auth0 invokes to redirect back to your application. Auth0 invokes the callback URL after authenticating the user, and the logout URL after removing the session cookie.
 
@@ -195,7 +195,7 @@ E.g. if your iOS bundle identifier was `com.company.myapp` and your Auth0 Domain
 com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 ```
 
-#### Configure Custom URL Scheme
+#### Configure custom URL scheme
 
 Back in Xcode, go to the **Info** tab of your application target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
 
