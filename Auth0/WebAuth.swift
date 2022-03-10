@@ -111,6 +111,8 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     /// - Requires: iOS 13+ or macOS. Has no effect on iOS 12.
     /// - Important: This method will disable Single Sign On (SSO).
+    /// - Important: You don't need to call ``clearSession(federated:)`` if you are using this method on login, because there will be no shared cookie to remove.
+    /// - See: [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md)
     /// - See: [prefersEphemeralWebBrowserSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio)
     func useEphemeralSession() -> Self
 
