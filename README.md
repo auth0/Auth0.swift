@@ -169,7 +169,7 @@ Auth0
 
 ### Web Auth Configuration (iOS / macOS)
 
-#### Configure Callback and Logout URLs
+#### Configure callback and logout URLs
 
 The callback and logout URLs are the URLs that Auth0 invokes to redirect back to your application. Auth0 invokes the callback URL after authenticating the user, and the logout URL after removing the session cookie.
 
@@ -195,7 +195,7 @@ E.g. if your iOS bundle identifier was `com.company.myapp` and your Auth0 Domain
 com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 ```
 
-### Configure Custom URL Scheme
+#### Configure custom URL scheme
 
 Back in Xcode, go to the **Info** tab of your application target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
 
@@ -340,7 +340,12 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)**
 
-#### Web Auth Signup
+- [Web Auth signup](#web-auth-signup)
+- [Web Auth configuration](#web-auth-configuration)
+- [ID Token validation](#id-token-validation)
+- [Web Auth errors](#web-auth-errors)
+
+#### Web Auth signup
 
 You can make users land directly on the Signup page instead of the Login page by specifying the `"screen_hint": "signup"` parameter. Note that this can be combined with `"prompt": "login"`, which indicates whether you want to always show the authentication page or you want to skip if there's an existing session.
 
@@ -402,7 +407,7 @@ Auth0
 ```
 </details>
 
-#### Configuration
+#### Web Auth configuration
 
 The following are some of the available Web Auth configuration options. Check the [API documentation](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html) for the full list.
 
@@ -476,13 +481,21 @@ Auth0
     // ...
 ```
 
-#### Errors
+#### Web Auth errors
 
 Web Auth will only produce `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
 ### Credentials Manager (iOS / macOS / tvOS / watchOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)**
+
+- [Store credentials](#store-credentials)
+- [Check the validity of stored credentials](#check-the-validity-of-stored-credentials)
+- [Retrieve stored credentials](#retrieve-stored-credentials)
+- [Retrieve stored user information](#retrieve-stored-user-information)
+- [Clear stored credentials](#clear-stored-credentials)
+- [Biometric authentication](#biometric-authentication)
+- [Credentials Manager errors](#credentials-manager-errors)
 
 The Credentials Manager utility allows you to securely store and retrieve the user's credentials from the Keychain.
 
@@ -591,13 +604,21 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
 
 > ⚠️ Retrieving the user information with `credentialsManager.user` will not be protected by Biometric authentication.
 
-#### Errors
+#### Credentials Manager errors
 
 The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
 ### Authentication API (iOS / macOS / tvOS / watchOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)**
+
+- [Login with database connection](#login-with-database-connection)
+- [Sign up with database connection](#sign-up-with-database-connection)
+- [Passwordless login](#passwordless-login)
+- [Retrieve user information](#retrieve-user-information)
+- [Renew credentials](#renew-credentials)
+- [Authentication API client configuration](#authentication-api-client-configuration)
+- [Authentication API client errors](#authentication-api-client-errors)
 
 The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
 We recommend using [Universal Login](https://auth0.com/docs/login/universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
@@ -957,7 +978,7 @@ Auth0
 
 > 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
 
-#### Configuration
+#### Authentication API client configuration
 
 ##### Add custom parameters
 
@@ -993,13 +1014,19 @@ Auth0
     // ...
 ```
 
-#### Errors
+#### Authentication API client errors
 
 The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html) to learn more about the available `AuthenticationError` properties.
 
 ### Management API (Users) (iOS / macOS / tvOS / watchOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Users.html)**
+
+- [Retrieve user metadata](#retrieve-user-metadata)
+- [Update user metadata](#update-user-metadata)
+- [Link an account](#link-an-account)
+- [Management API client configuration](#management-api-client-configuration)
+- [Management API client errors](#management-api-client-errors)
 
 You can request more information from a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2).
 
@@ -1185,7 +1212,7 @@ Auth0
 ```
 </details>
 
-#### Configuration
+#### Management API client configuration
 
 ##### Add custom parameters
 
@@ -1221,7 +1248,7 @@ Auth0
     // ...
 ```
 
-#### Errors
+#### Management API client errors
 
 The Management API client will only produce `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/ManagementError.html) to learn more about the available `ManagementError` properties.
 
