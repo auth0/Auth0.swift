@@ -1,4 +1,4 @@
-# Auth0.swift Beta
+# Auth0.swift
 
 [![CircleCI](https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat-square)](https://circleci.com/gh/auth0/Auth0.swift/tree/master)
 [![Coverage Status](https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat-square)](https://codecov.io/github/auth0/Auth0.swift)
@@ -6,8 +6,6 @@
 ![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)
 ![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)
 ![Swift 5.5](https://img.shields.io/badge/Swift-5.5-orange.svg?style=flat-square)
-
-> ⚠️ This library is currently in **Beta**. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.
 
 Swift SDK that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api) endpoints and enables you to seamlessly integrate the Auth0 login.
 
@@ -47,9 +45,9 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
 
 ## Documentation
 
-- [**Quickstart**](https://auth0.com/docs/quickstart/native/swift-beta)
+- [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift)
   <br>Shows how to integrate Auth0.swift into an iOS / macOS application from scratch.
-- [**Sample app**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/beta/Sample-01)
+- [**Sample app**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01)
   <br>A complete, running iOS / macOS application you can try.
 - [**API documentation**](https://auth0.github.io/Auth0.swift/)
   <br>Documentation auto-generated from the code comments that explains all the available features.
@@ -82,7 +80,7 @@ In the **Search or Enter Package URL** search box enter this URL:
 https://github.com/auth0/Auth0.swift
 ```
 
-Then, select the **Exact Version** dependency rule and input `2.0.0-beta.1` as the version number. Press **Add Package**.
+Then, select the dependency rule and press **Add Package**.
 
 > 💡 For further reference on SPM, check its [official documentation](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app).
 
@@ -91,7 +89,7 @@ Then, select the **Exact Version** dependency rule and input `2.0.0-beta.1` as t
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '2.0.0-beta.1'
+pod 'Auth0', '~> 2.0'
 ```
 
 Then, run `pod install`.
@@ -103,7 +101,7 @@ Then, run `pod install`.
 Add the following line to your `Cartfile`:
 
 ```text
-github "auth0/Auth0.swift" "2.0.0-beta.1"
+github "auth0/Auth0.swift" ~> 2.0
 ```
 
 Then, run `carthage bootstrap --use-xcframeworks`.
