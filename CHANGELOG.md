@@ -68,6 +68,19 @@
 - Fix version number reported by telemetry when using SPM [\#633](https://github.com/auth0/Auth0.swift/pull/633) ([Widcket](https://github.com/Widcket))
 - Fix auth time validation [\#626](https://github.com/auth0/Auth0.swift/pull/626) ([Widcket](https://github.com/Widcket))
 
+## [1.39.0](https://github.com/auth0/Auth0.swift/tree/1.39.0) (2022-03-07)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.38.1...1.39.0)
+
+**Added**
+- [SDK-3145] Add `Auth0Client` parameter to logout and add `view` to `telemetry.env` for iOS [\#659](https://github.com/auth0/Auth0.swift/pull/659) ([adamjmcgrath](https://github.com/adamjmcgrath))
+
+## [1.38.1](https://github.com/auth0/Auth0.swift/tree/1.38.1) (2022-02-02)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.38.0...1.38.1)
+
+**Fixed**
+- Fix `auth_time` validation [\#652](https://github.com/auth0/Auth0.swift/pull/652) ([Widcket](https://github.com/Widcket))
+- Fix version number reported by telemetry when using SPM [\#651](https://github.com/auth0/Auth0.swift/pull/651) ([Widcket](https://github.com/Widcket))
+
 ## [1.38.0](https://github.com/auth0/Auth0.swift/tree/1.38.0) (2021-10-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.37.1...1.38.0)
 
