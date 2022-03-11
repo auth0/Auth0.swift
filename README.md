@@ -47,7 +47,7 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
 
 - [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift)
   <br>Shows how to integrate Auth0.swift into an iOS / macOS application from scratch.
-- [**Sample app**](https://github.com/auth0-samples/auth0-ios-swift-sample)
+- [**Sample app**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01)
   <br>A complete, running iOS / macOS application you can try.
 - [**API documentation**](https://auth0.github.io/Auth0.swift/)
   <br>Documentation auto-generated from the code comments that explains all the available features.
