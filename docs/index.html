@@ -222,7 +222,7 @@
         <section class="section">
           <div class="section-content top-matter">
             
-            <h1 id='auth0-swift-beta' class='heading'>Auth0.swift Beta</h1>
+            <h1 id='auth0-swift' class='heading'>Auth0.swift</h1>
 
 <p><a href="https://circleci.com/gh/auth0/Auth0.swift/tree/master"><img src="https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat-square" alt="CircleCI"></a>
 <a href="https://codecov.io/github/auth0/Auth0.swift"><img src="https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat-square" alt="Coverage Status"></a>
@@ -230,10 +230,6 @@
 <img src="https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square" alt="License">
 <img src="https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square" alt="Platform">
 <img src="https://img.shields.io/badge/Swift-5.5-orange.svg?style=flat-square" alt="Swift 5.5"></p>
-
-<blockquote>
-<p>⚠️ This library is currently in <strong>Beta</strong>. We do not recommend using this library in production yet. As we move towards general availability, please be aware that releases may contain breaking changes.</p>
-</blockquote>
 
 <p>Swift SDK that lets you communicate efficiently with many of the <a href="https://auth0.com/docs/api">Auth0 API</a> endpoints and enables you to seamlessly integrate the Auth0 login.</p>
 
@@ -243,16 +239,16 @@
 <h2 id='table-of-contents' class='heading'>Table of Contents</h2>
 
 <ul>
-<li><a href="#documentation">Documentation</a></li>
-<li><a href="#requirements">Requirements</a></li>
-<li><a href="#installation">Installation</a>
+<li><a href="#documentation"><strong>Documentation</strong></a></li>
+<li><a href="#requirements"><strong>Requirements</strong></a></li>
+<li><a href="#installation"><strong>Installation</strong></a>
 
 <ul>
 <li><a href="#swift-package-manager">Swift Package Manager</a></li>
 <li><a href="#cocoapods">Cocoapods</a></li>
 <li><a href="#carthage">Carthage</a></li>
 </ul></li>
-<li><a href="#getting-started">Getting Started</a>
+<li><a href="#getting-started"><strong>Getting Started</strong></a>
 
 <ul>
 <li><a href="#configuration">Configuration</a></li>
@@ -261,7 +257,7 @@
 <li><a href="#web-auth-logout-ios--macos">Web Auth Logout (iOS / macOS)</a></li>
 <li><a href="#sso-alert-box-ios--macos">SSO Alert Box (iOS / macOS)</a></li>
 </ul></li>
-<li><a href="#next-steps">Next Steps</a>
+<li><a href="#next-steps"><strong>Next Steps</strong></a>
 
 <ul>
 <li><a href="#common-tasks">Common Tasks</a></li>
@@ -271,24 +267,27 @@
 <li><a href="#management-api-users-ios--macos--tvos--watchos">Management API (Users) (iOS / macOS / tvOS / watchOS)</a></li>
 <li><a href="#logging">Logging</a></li>
 </ul></li>
-<li><a href="#other-features">Other Features</a>
+<li><a href="#advanced-features"><strong>Advanced Features</strong></a>
 
 <ul>
 <li><a href="#native-social-login">Native Social Login</a></li>
 <li><a href="#organizations">Organizations</a></li>
 <li><a href="#bot-detection">Bot Detection</a></li>
 </ul></li>
-<li><a href="#support-policy">Support Policy</a></li>
-<li><a href="#issue-reporting">Issue Reporting</a></li>
-<li><a href="#what-is-auth0">What is Auth0?</a></li>
-<li><a href="#license">License</a></li>
+<li><a href="#support-policy"><strong>Support Policy</strong></a></li>
+<li><a href="#issue-reporting"><strong>Issue Reporting</strong></a></li>
+<li><a href="#what-is-auth0"><strong>What is Auth0?</strong></a></li>
+<li><a href="#license"><strong>License</strong></a></li>
 </ul>
 <h2 id='documentation' class='heading'>Documentation</h2>
 
 <ul>
-<li><a href="https://auth0.com/docs/quickstart/native/swift-beta">Quickstart</a></li>
-<li><a href="https://github.com/auth0-samples/auth0-ios-swift-sample/tree/beta/Sample-01">Sample app</a></li>
-<li><a href="https://auth0.github.io/Auth0.swift/">API documentation</a>
+<li><a href="https://auth0.com/docs/quickstart/native/ios-swift"><strong>Quickstart</strong></a>
+<br>Shows how to integrate Auth0.swift into an iOS / macOS application from scratch.</li>
+<li><a href="https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01"><strong>Sample app</strong></a>
+<br>A complete, running iOS / macOS application you can try.</li>
+<li><a href="https://auth0.github.io/Auth0.swift/"><strong>API documentation</strong></a>
+<br>Documentation auto-generated from the code comments that explains all the available features.
 
 <ul>
 <li><a href="https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html">Web Auth</a></li>
@@ -296,7 +295,8 @@
 <li><a href="https://auth0.github.io/Auth0.swift/Protocols/Authentication.html">Authentication API Client</a></li>
 <li><a href="https://auth0.github.io/Auth0.swift/Protocols/Users.html">Management API Client (Users)</a></li>
 </ul></li>
-<li><a href="FAQ.md">FAQ</a></li>
+<li><a href="FAQ.md"><strong>FAQ</strong></a>
+<br> Answers some common questions about Auth0.swift.</li>
 </ul>
 <h2 id='requirements' class='heading'>Requirements</h2>
 
@@ -320,7 +320,7 @@
 <pre class="highlight plaintext"><code>https://github.com/auth0/Auth0.swift
 </code></pre>
 
-<p>Then, select the <strong>Exact Version</strong> dependency rule and input <code>2.0.0-beta.1</code> as the version number. Press <strong>Add Package</strong>.</p>
+<p>Then, select the dependency rule and press <strong>Add Package</strong>.</p>
 
 <blockquote>
 <p>💡 For further reference on SPM, check its <a href="https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app">official documentation</a>.</p>
@@ -328,7 +328,7 @@
 <h3 id='cocoapods' class='heading'>Cocoapods</h3>
 
 <p>Add the following line to your <code>Podfile</code>:</p>
-<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'2.0.0-beta.1'</span>
+<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'~&gt; 2.0'</span>
 </code></pre>
 
 <p>Then, run <code>pod install</code>.</p>
@@ -339,7 +339,7 @@
 <h3 id='carthage' class='heading'>Carthage</h3>
 
 <p>Add the following line to your <code>Cartfile</code>:</p>
-<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" "2.0.0-beta.1"
+<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" ~&gt; 2.0
 </code></pre>
 
 <p>Then, run <code>carthage bootstrap --use-xcframeworks</code>.</p>
@@ -401,7 +401,7 @@ Auth0
 &ldquo;`
 </details>
 <h3 id='web-auth-configuration-ios-macos' class='heading'>Web Auth Configuration (iOS / macOS)</h3>
-<h4 id='configure-callback-and-logout-urls' class='heading'>Configure Callback and Logout URLs</h4>
+<h4 id='configure-callback-and-logout-urls' class='heading'>Configure callback and logout URLs</h4>
 
 <p>The callback and logout URLs are the URLs that Auth0 invokes to redirect back to your application. Auth0 invokes the callback URL after authenticating the user, and the logout URL after removing the session cookie.</p>
 
@@ -418,7 +418,7 @@ Auth0
 <p>E.g. if your iOS bundle identifier was <code>com.company.myapp</code> and your Auth0 Domain was <code>company.us.auth0.com</code>, then this value would be:</p>
 <pre class="highlight plaintext"><code>com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 </code></pre>
-<h3 id='configure-custom-url-scheme' class='heading'>Configure Custom URL Scheme</h3>
+<h4 id='configure-custom-url-scheme' class='heading'>Configure custom URL scheme</h4>
 
 <p>Back in Xcode, go to the <strong>Info</strong> tab of your application target settings. In the <strong>URL Types</strong> section, click the <strong>＋</strong> button to add a new entry. There, enter <code>auth0</code> into the <strong>Identifier</strong> field and <code>$(PRODUCT_BUNDLE_IDENTIFIER)</code> into the <strong>URL Schemes</strong> field.</p>
 <h3 id='web-auth-login-ios-macos' class='heading'>Web Auth Login (iOS / macOS)</h3>
@@ -532,7 +532,7 @@ Auth0
 <p>Check the <a href="FAQ.md">FAQ</a> for more information about the alert box that pops up <strong>by default</strong> when using Web Auth.</p>
 
 <blockquote>
-<p>💡 See also <a href="https://developer.okta.com/blog/2022/01/13/mobile-sso">this blog post</a> for a detailed review of Single Sign-On (SSO) in iOS.</p>
+<p>💡 See also <a href="https://developer.okta.com/blog/2022/01/13/mobile-sso">this blog post</a> for a detailed overview of Single Sign-On (SSO) in iOS.</p>
 </blockquote>
 
 <p><a href="#table-of-contents">Go up ⤴</a></p>
@@ -540,7 +540,7 @@ Auth0
 <h3 id='common-tasks' class='heading'>Common Tasks</h3>
 
 <ul>
-<li><a href="#retrieve-user-information-ios--macos--tvos--watchos"><strong>Retrieve user information</strong></a>
+<li><a href="#retrieve-user-information"><strong>Retrieve user information</strong></a>
 <br>Fetch the latest user information from the <code>/userinfo</code> endpoint.</li>
 <li><a href="#store-credentials"><strong>Store credentials</strong></a>
 <br>Store the user&rsquo;s credentials securely in the Keychain.</li>
@@ -552,7 +552,16 @@ Auth0
 <br>Print HTTP requests and responses for debugging.</li>
 </ul>
 <h3 id='web-auth-ios-macos' class='heading'>Web Auth (iOS / macOS)</h3>
-<h4 id='web-auth-signup-ios-macos' class='heading'>Web Auth Signup (iOS / macOS)</h4>
+
+<p><strong>See all the available features in the <a href="https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html">API documentation ↗</a></strong></p>
+
+<ul>
+<li><a href="#web-auth-signup">Web Auth signup</a></li>
+<li><a href="#web-auth-configuration">Web Auth configuration</a></li>
+<li><a href="#id-token-validation">ID Token validation</a></li>
+<li><a href="#web-auth-errors">Web Auth errors</a></li>
+</ul>
+<h4 id='web-auth-signup' class='heading'>Web Auth signup</h4>
 
 <p>You can make users land directly on the Signup page instead of the Login page by specifying the <code>&quot;screen_hint&quot;: &quot;signup&quot;</code> parameter. Note that this can be combined with <code>&quot;prompt&quot;: &quot;login&quot;</code>, which indicates whether you want to always show the authentication page or you want to skip if there&rsquo;s an existing session.</p>
 
@@ -598,7 +607,7 @@ Auth0
 </code></pre>
 
 <blockquote>
-<p>⚠️ The <code>screen_hint</code> parameter can only be used with the <strong>New Universal Login Experience</strong>, not the <strong>Classic Experience</strong>.</p>
+<p>⚠️ The <code>screen_hint</code> parameter can only be used with the <strong>New Universal Login Experience</strong>, not the <strong>Classic Experience</strong>. If you are using the <strong>Classic Universal Login Experience</strong> you can use any custom parameter, e.g. <code>parameters([&quot;action&quot;: &quot;signup&quot;])</code>. Then, customize the <a href="https://manage.auth0.com/#/login_page">login template</a> to look for this parameter and set the <code>initialScreen</code> <a href="https://github.com/auth0/lock#database-options">option</a> of the <code>Auth0Lock</code> constructor.</p>
 </blockquote>
 
 <details>
@@ -635,7 +644,7 @@ Auth0
     .store(in: &cancellables)
 &ldquo;`
 </details>
-<h4 id='configuration' class='heading'>Configuration</h4>
+<h4 id='web-auth-configuration' class='heading'>Web Auth configuration</h4>
 
 <p>The following are some of the available Web Auth configuration options. Check the <a href="https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html">API documentation</a> for the full list.</p>
 <h5 id='use-any-auth0-connection' class='heading'>Use any Auth0 connection</h5>
@@ -690,12 +699,22 @@ Auth0
     <span class="o">.</span><span class="nf">issuer</span><span class="p">(</span><span class="s">"https://YOUR_AUTH0_DOMAIN/"</span><span class="p">)</span>
     <span class="c1">// ...</span>
 </code></pre>
-<h4 id='errors' class='heading'>Errors</h4>
+<h4 id='web-auth-errors' class='heading'>Web Auth errors</h4>
 
 <p>Web Auth will only produce <code><a href="Structs/WebAuthError.html">WebAuthError</a></code> error values. You can find the underlying error (if any) in the <code>cause: Error?</code> property of the <code><a href="Structs/WebAuthError.html">WebAuthError</a></code>. Not all error cases will have an underlying <code>cause</code>. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html">API documentation</a> to learn more about the error cases you need to handle, and which ones include a <code>cause</code> value.</p>
 <h3 id='credentials-manager-ios-macos-tvos-watchos' class='heading'>Credentials Manager (iOS / macOS / tvOS / watchOS)</h3>
 
-<p><a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html">API documentation ↗</a></p>
+<p><strong>See all the available features in the <a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html">API documentation ↗</a></strong></p>
+
+<ul>
+<li><a href="#store-credentials">Store credentials</a></li>
+<li><a href="#check-the-validity-of-stored-credentials">Check the validity of stored credentials</a></li>
+<li><a href="#retrieve-stored-credentials">Retrieve stored credentials</a></li>
+<li><a href="#retrieve-stored-user-information">Retrieve stored user information</a></li>
+<li><a href="#clear-stored-credentials">Clear stored credentials</a></li>
+<li><a href="#biometric-authentication">Biometric authentication</a></li>
+<li><a href="#credentials-manager-errors">Credentials Manager errors</a></li>
+</ul>
 
 <p>The Credentials Manager utility allows you to securely store and retrieve the user&rsquo;s credentials from the Keychain.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">credentialsManager</span> <span class="o">=</span> <span class="kt">CredentialsManager</span><span class="p">(</span><span class="nv">authentication</span><span class="p">:</span> <span class="kt">Auth0</span><span class="o">.</span><span class="nf">authentication</span><span class="p">())</span>
@@ -705,7 +724,7 @@ Auth0
 <p>When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your application again.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">didStore</span> <span class="o">=</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">credentials</span><span class="p">:</span> <span class="n">credentials</span><span class="p">)</span>
 </code></pre>
-<h4 id='check-validity-of-stored-credentials' class='heading'>Check validity of stored credentials</h4>
+<h4 id='check-the-validity-of-stored-credentials' class='heading'>Check the validity of stored credentials</h4>
 
 <p>When the users open your application, check for valid credentials. If they exist, you can retrieve them and redirect the users to the application&rsquo;s main flow without any additional login steps.</p>
 <pre class="highlight swift"><code><span class="k">guard</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="nf">hasValid</span><span class="p">()</span> <span class="k">else</span> <span class="p">{</span>
@@ -787,12 +806,22 @@ credentialsManager
 <blockquote>
 <p>⚠️ Retrieving the user information with <code>credentialsManager.user</code> will not be protected by Biometric authentication.</p>
 </blockquote>
-<h4 id='errors' class='heading'>Errors</h4>
+<h4 id='credentials-manager-errors' class='heading'>Credentials Manager errors</h4>
 
 <p>The Credentials Manager will only produce <code><a href="Structs/CredentialsManagerError.html">CredentialsManagerError</a></code> error values. You can find the underlying error (if any) in the <code>cause: Error?</code> property of the <code><a href="Structs/CredentialsManagerError.html">CredentialsManagerError</a></code>. Not all error cases will have an underlying <code>cause</code>. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html">API documentation</a> to learn more about the error cases you need to handle, and which ones include a <code>cause</code> value.</p>
 <h3 id='authentication-api-ios-macos-tvos-watchos' class='heading'>Authentication API (iOS / macOS / tvOS / watchOS)</h3>
 
-<p><a href="https://auth0.github.io/Auth0.swift/Protocols/Authentication.html">API documentation ↗</a></p>
+<p><strong>See all the available features in the <a href="https://auth0.github.io/Auth0.swift/Protocols/Authentication.html">API documentation ↗</a></strong></p>
+
+<ul>
+<li><a href="#login-with-database-connection">Login with database connection</a></li>
+<li><a href="#sign-up-with-database-connection">Sign up with database connection</a></li>
+<li><a href="#passwordless-login">Passwordless login</a></li>
+<li><a href="#retrieve-user-information">Retrieve user information</a></li>
+<li><a href="#renew-credentials">Renew credentials</a></li>
+<li><a href="#authentication-api-client-configuration">Authentication API client configuration</a></li>
+<li><a href="#authentication-api-client-errors">Authentication API client errors</a></li>
+</ul>
 
 <p>The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
 We recommend using <a href="https://auth0.com/docs/login/universal-login">Universal Login</a>, but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>, as explained in <a href="https://auth0.com/docs/configure/applications/update-grant-types">Update Grant Types</a>.</p>
@@ -800,7 +829,7 @@ We recommend using <a href="https://auth0.com/docs/login/universal-login">Univer
 <p>For login or signup with username/password, the <code>Password</code> grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both <code>http://auth0.com/oauth/grant-type/password-realm</code> and <code>Password</code>. Otherwise, the Auth0 Dashboard will take care of activating both when enabling <code>Password</code>.</p>
 
 <blockquote>
-<p>💡 If your Auth0 account has the &quot;Bot Detection&rdquo; feature enabled, your requests might be flagged for verification. Check how to handle this scenario on the <a href="#bot-detection">Bot Detection</a> section.</p>
+<p>💡 If your Auth0 account has the &quot;Bot Detection&rdquo; feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the <a href="#bot-detection">Bot Detection</a> section.</p>
 
 <p>⚠️ The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. <strong>This is not the case for the ID Tokens obtained from the Authentication API client.</strong> You must <a href="https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens">validate</a> any ID Tokens received from the Authentication API client before using the information they contain.</p>
 </blockquote>
@@ -922,6 +951,10 @@ Auth0
     .store(in: &cancellables)
 &ldquo;`
 </details>
+
+<blockquote>
+<p>💡 You might want to log the user in after signup. See <a href="#login-with-database-connection">Login with database connection</a> above for an example.</p>
+</blockquote>
 <h4 id='passwordless-login' class='heading'>Passwordless login</h4>
 
 <p>Passwordless is a two-step authentication flow that requires the <strong>Passwordless OTP</strong> grant to be enabled for your Auth0 application. Check <a href="https://auth0.com/docs/configure/applications/application-grant-types">our documentation</a> for more information.</p>
@@ -1034,7 +1067,7 @@ Auth0
 <blockquote>
 <p>💡 Use <code>login(phoneNumber:code:)</code> if the code was sent to the user&rsquo;s phone number.</p>
 </blockquote>
-<h4 id='retrieve-user-information-ios-macos-tvos-watchos' class='heading'>Retrieve user information (iOS / macOS / tvOS / watchOS)</h4>
+<h4 id='retrieve-user-information' class='heading'>Retrieve user information</h4>
 
 <p>Fetch the latest user information from the <code>/userinfo</code> endpoint.</p>
 
@@ -1086,7 +1119,7 @@ Auth0
     .store(in: &cancellables)
 &ldquo;`
 </details>
-<h4 id='renew-credentials-ios-macos-tvos-watchos' class='heading'>Renew credentials (iOS / macOS / tvOS / watchOS)</h4>
+<h4 id='renew-credentials' class='heading'>Renew credentials</h4>
 
 <p>Use a <a href="https://auth0.com/docs/security/tokens/refresh-tokens">Refresh Token</a> to renew the user&rsquo;s credentials. It&rsquo;s recommended that you read and understand the Refresh Token process beforehand.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
@@ -1140,7 +1173,7 @@ Auth0
 <blockquote>
 <p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/configure/apis/scopes">scope</a> when logging in to get a Refresh Token from Auth0.</p>
 </blockquote>
-<h4 id='configuration' class='heading'>Configuration</h4>
+<h4 id='authentication-api-client-configuration' class='heading'>Authentication API client configuration</h4>
 <h5 id='add-custom-parameters' class='heading'>Add custom parameters</h5>
 
 <p>Use the <code>parameters()</code> method to add custom parameters to any request.</p>
@@ -1166,12 +1199,20 @@ Auth0
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="kt">CustomURLSession</span><span class="p">())</span>
     <span class="c1">// ...</span>
 </code></pre>
-<h4 id='errors' class='heading'>Errors</h4>
+<h4 id='authentication-api-client-errors' class='heading'>Authentication API client errors</h4>
 
 <p>The Authentication API client will only produce <code><a href="Structs/AuthenticationError.html">AuthenticationError</a></code> error values. You can find the error information in the <code>info</code> dictionary of the error value. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html">API documentation</a> to learn more about the available <code><a href="Structs/AuthenticationError.html">AuthenticationError</a></code> properties.</p>
 <h3 id='management-api-users-ios-macos-tvos-watchos' class='heading'>Management API (Users) (iOS / macOS / tvOS / watchOS)</h3>
 
-<p><a href="https://auth0.github.io/Auth0.swift/Protocols/Users.html">API documentation ↗</a></p>
+<p><strong>See all the available features in the <a href="https://auth0.github.io/Auth0.swift/Protocols/Users.html">API documentation ↗</a></strong></p>
+
+<ul>
+<li><a href="#retrieve-user-metadata">Retrieve user metadata</a></li>
+<li><a href="#update-user-metadata">Update user metadata</a></li>
+<li><a href="#link-an-account">Link an account</a></li>
+<li><a href="#management-api-client-configuration">Management API client configuration</a></li>
+<li><a href="#management-api-client-errors">Management API client errors</a></li>
+</ul>
 
 <p>You can request more information from a user&rsquo;s profile and manage the user&rsquo;s metadata by accessing the Auth0 <a href="https://auth0.com/docs/api/management/v2">Management API</a>.</p>
 
@@ -1349,7 +1390,7 @@ Auth0
     .store(in: &cancellables)
 &ldquo;`
 </details>
-<h4 id='configuration' class='heading'>Configuration</h4>
+<h4 id='management-api-client-configuration' class='heading'>Management API client configuration</h4>
 <h5 id='add-custom-parameters' class='heading'>Add custom parameters</h5>
 
 <p>Use the <code>parameters()</code> method to add custom parameters to any request.</p>
@@ -1375,7 +1416,7 @@ Auth0
     <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="kt">CustomURLSession</span><span class="p">())</span>
     <span class="c1">// ...</span>
 </code></pre>
-<h4 id='errors' class='heading'>Errors</h4>
+<h4 id='management-api-client-errors' class='heading'>Management API client errors</h4>
 
 <p>The Management API client will only produce <code><a href="Structs/ManagementError.html">ManagementError</a></code> error values. You can find the error information in the <code>info</code> dictionary of the error value. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/ManagementError.html">API documentation</a> to learn more about the available <code><a href="Structs/ManagementError.html">ManagementError</a></code> properties.</p>
 <h3 id='logging' class='heading'>Logging</h3>
@@ -1412,7 +1453,7 @@ Connection: keep-alive
 </blockquote>
 
 <p><a href="#table-of-contents">Go up ⤴</a></p>
-<h2 id='other-features' class='heading'>Other Features</h2>
+<h2 id='advanced-features' class='heading'>Advanced Features</h2>
 <h3 id='native-social-login' class='heading'>Native Social Login</h3>
 <h4 id='sign-in-with-apple' class='heading'>Sign in With Apple</h4>
 
@@ -1470,7 +1511,7 @@ Auth0
 </blockquote>
 <h4 id='facebook-login' class='heading'>Facebook Login</h4>
 
-<p>If you&rsquo;ve added the <a href="https://developers.facebook.com/docs/facebook-login/ios">Facebook Login flow</a> to your app, after a successful Faceboook authentication you can request a <a href="https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/">Session Info Access Token</a> and the Facebook user profile, and then use them both to perform a code exchange for Auth0 credentials.</p>
+<p>If you&rsquo;ve added the <a href="https://developers.facebook.com/docs/facebook-login/ios">Facebook Login flow</a> to your app, after a successful Faceboook authentication you can request a <a href="https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/">Session Info Access Token</a> and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="s">"session info access token"</span><span class="p">,</span>
@@ -1594,7 +1635,7 @@ Auth0
 
 <p>To accept organization invitations your application needs to support <a href="https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app">Universal Links</a>. Tapping on the invitation link should open your application (invitations links are <code>https</code> only).</p>
 
-<p>When your application gets opened by an invitation link, grab the invitation URL and pass it to <code>.invitationURL()</code>.</p>
+<p>When your application gets opened by an invitation link, grab the invitation URL and pass it to <code>invitationURL()</code>.</p>
 <pre class="highlight swift"><code><span class="k">guard</span> <span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">URLContexts</span><span class="o">.</span><span class="n">first</span><span class="p">?</span><span class="o">.</span><span class="n">url</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
 
 <span class="c1">// You need to wait for the application to enter the foreground before launching Web Auth</span>
@@ -1606,7 +1647,7 @@ Auth0
     <span class="o">.</span><span class="n">flatMap</span> <span class="p">{</span> <span class="n">_</span> <span class="k">in</span>
         <span class="kt">Auth0</span>
             <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
-            <span class="o">.</span><span class="nf">invitationURL</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="o">.</span><span class="nf">invitationURL</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="c1">// 👈🏻</span>
             <span class="o">.</span><span class="nf">start</span><span class="p">()</span>
     <span class="p">}</span>
     <span class="o">.</span><span class="nf">sink</span><span class="p">(</span><span class="nv">receiveCompletion</span><span class="p">:</span> <span class="p">{</span> <span class="n">completion</span> <span class="k">in</span>
@@ -1620,7 +1661,7 @@ Auth0
 </code></pre>
 <h3 id='bot-detection' class='heading'>Bot Detection</h3>
 
-<p>If you are performing database login/signup via the Authentication API and you’d like to use the <a href="https://auth0.com/docs/configure/attack-protection/bot-detection">Bot Detection</a> feature, you need to handle the <code>isVerificationRequired</code> error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.</p>
+<p>If you are performing database login/signup via the Authentication API and would like to use the <a href="https://auth0.com/docs/configure/attack-protection/bot-detection">Bot Detection</a> feature, you need to handle the <code>isVerificationRequired</code> error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span> 
@@ -1715,7 +1756,7 @@ Auth0
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-01-26)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-03-14)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

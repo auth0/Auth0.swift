@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.0.0](https://github.com/auth0/Auth0.swift/tree/2.0.0) (2022-03-14)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.39.0...2.0.0)
+
+[Migration Guide](V2_MIGRATION_GUIDE.md)
+
 ## [2.0.0-beta.1](https://github.com/auth0/Auth0.swift/tree/2.0.0-beta.1) (2022-01-26)
 
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.0.0-beta.0...2.0.0-beta.1)
