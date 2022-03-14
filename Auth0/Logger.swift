@@ -1,30 +1,12 @@
-// Logger.swift
-//
-// Copyright (c) 2016 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Foundation
 
+/// Logger for debugging purposes.
 public protocol Logger {
+    /// Log an HTTP request.
     func trace(request: URLRequest, session: URLSession)
+    /// Log an HTTP response.
     func trace(response: URLResponse, data: Data?)
+    /// Log a URL.
     func trace(url: URL, source: String?)
 }
 
@@ -47,10 +29,7 @@ struct DefaultLogger: Logger {
     }
 
     func trace(request: URLRequest, session: URLSession) {
-        guard
-            let method = request.httpMethod,
-            let url = request.url?.absoluteString
-            else { return }
+        guard let method = request.httpMethod, let url = request.url?.absoluteString else { return }
         output.log(message: "\(method) \(url) HTTP/1.1")
         session.configuration.httpAdditionalHeaders?.forEach { key, value in output.log(message: "\(key): \(value)") }
         request.allHTTPHeaderFields?.forEach { key, value in output.log(message: "\(key): \(value)") }

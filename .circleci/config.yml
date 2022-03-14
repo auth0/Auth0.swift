@@ -60,24 +60,7 @@ commands:
     steps:
       - run:
           name: Run iOS tests
-          command: |
-            if [ $(xcodebuild -version | awk '/Xcode/ { print $2 }' | cut -d . -f 1) -ge 13 ]; then
-              SIMULATOR='platform=iOS Simulator,name=iPhone 13'
-
-              xcodebuild test \
-              -scheme Auth0.iOS \
-              -destination "$SIMULATOR" \
-              -configuration Debug \
-              -only-testing:Auth0Tests.iOS/ControllerModalPresenterSpec | xcpretty
-
-              xcodebuild test \
-              -scheme Auth0.iOS \
-              -destination "$SIMULATOR" \
-              -configuration Debug \
-              -skip-testing:Auth0Tests.iOS/ControllerModalPresenterSpec | xcpretty
-            else
-                bundle exec fastlane ios ci
-            fi
+          command: bundle exec fastlane ios ci
       - run:
           name: Upload coverage report
           command: bash <(curl -s https://codecov.io/bash) -J '<< parameters.scheme >>'

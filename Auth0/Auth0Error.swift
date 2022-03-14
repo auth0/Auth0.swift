@@ -1,25 +1,3 @@
-// Auth0Error.swift
-//
-// Copyright (c) 2016 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Foundation
 
 let unknownError = "a0.sdk.internal_error.unknown"
@@ -27,14 +5,99 @@ let nonJSONError = "a0.sdk.internal_error.plain"
 let emptyBodyError = "a0.sdk.internal_error.empty"
 
 /**
-   Generic representation of Auth0 API errors
-   - note: It's recommended to use either `AuthenticationError` or `ManagementError` for better error handling
+ Generic representation of Auth0 errors. ``AuthenticationError``, ``ManagementError``, ``WebAuthError``, and
+ ``CredentialsManagerError`` conform to this protocol.
  */
-public protocol Auth0Error: Error {
+public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
 
-    init(string: String?, statusCode: Int)
+    /**
+     The underlying `Error` value, if any.
+     */
+    var cause: Error? { get }
+
+}
+
+public extension Auth0Error {
+
+    /**
+     Defaults to `nil`.
+     */
+    var cause: Error? { return nil }
+
+    /**
+     Description of the error.
+
+     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
+     */
+    var localizedDescription: String { return self.debugDescription }
+
+    /**
+     Description of the error.
+
+     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
+     */
+    var errorDescription: String? { return self.debugDescription }
+
+}
+
+/**
+ Generic representation of Auth0 API errors. ``AuthenticationError`` and ``ManagementError`` conform to this protocol.
+ */
+public protocol Auth0APIError: Auth0Error {
+
+    /**
+     Additional information about the error.
+     */
+    var info: [String: Any] { get }
+
+    /**
+     The code of the error as a string.
+     */
+    var code: String { get }
+
+    /**
+     HTTP status code of the response.
+     */
+    var statusCode: Int { get }
+
+    /**
+     Creates an error from a JSON response.
+
+     - Parameters:
+       - info:       JSON response from Auth0.
+       - statusCode: HTTP status code of the response.
+
+     - Returns: A new `Auth0APIError`.
+     */
     init(info: [String: Any], statusCode: Int)
 
-    /// The code of the error as a String
-    var code: String { get }
+}
+
+extension Auth0APIError {
+
+    init(info: [String: Any], statusCode: Int = 0) {
+        self.init(info: info, statusCode: statusCode)
+    }
+
+    init(cause error: Error, statusCode: Int = 0) {
+        let info: [String: Any] = [
+            "code": nonJSONError,
+            "description": error.localizedDescription,
+            "cause": error
+        ]
+        self.init(info: info, statusCode: statusCode)
+    }
+
+    init(description: String?, statusCode: Int = 0) {
+        let info: [String: Any] = [
+            "code": description != nil ? nonJSONError : emptyBodyError,
+            "description": description ?? "Empty response body"
+        ]
+        self.init(info: info, statusCode: statusCode)
+    }
+
+    init(from response: Response<Self>) {
+        self.init(description: string(response.data), statusCode: response.response?.statusCode ?? 0)
+    }
+
 }

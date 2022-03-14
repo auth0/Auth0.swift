@@ -1,25 +1,3 @@
-// WebAuthSpec.swift
-//
-// Copyright (c) 2016 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Quick
 import Nimble
 import SafariServices
@@ -28,7 +6,7 @@ import SafariServices
 
 private let ClientId = "ClientId"
 private let Domain = "samples.auth0.com"
-private let DomainURL = URL.a0_url(Domain)
+private let DomainURL = URL.httpsURL(from: Domain)
 private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 private let State = "state"
 
@@ -50,8 +28,8 @@ class WebAuthSharedExamplesConfiguration: QuickConfiguration {
 
             it("should use domain \(domain)") {
                 expect(components?.scheme) == "https"
-                expect(components?.host) == domain
-                expect(components?.path) == "/authorize"
+                expect(components?.host) == String(domain.split(separator: "/").first!)
+                expect(components?.path).to(endWith("/authorize"))
             }
 
             it("should have state parameter") {
@@ -76,8 +54,8 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
         "client_id": ClientId,
         "response_type": "code",
         "redirect_uri": RedirectURL.absoluteString,
-        "scope": "openid",
-        ]
+        "scope": defaultScope,
+    ]
     parameters.forEach { query[$0] = $1 }
     return query
 }
@@ -88,6 +66,36 @@ class WebAuthSpec: QuickSpec {
 
     override func spec() {
 
+        describe("init") {
+
+            it("should init with client id & url") {
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL)
+                expect(webAuth.clientId) == ClientId
+                expect(webAuth.url) == DomainURL
+            }
+
+            it("should init with client id, url & session") {
+                let session = URLSession(configuration: URLSession.shared.configuration)
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, session: session)
+                expect(webAuth.session).to(be(session))
+            }
+
+            it("should init with client id, url & storage") {
+                let storage = TransactionStore()
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, storage: storage)
+                expect(webAuth.storage).to(be(storage))
+            }
+
+            it("should init with client id, url & telemetry") {
+                let telemetryInfo = "info"
+                var telemetry = Telemetry()
+                telemetry.info = telemetryInfo
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, telemetry: telemetry)
+                expect(webAuth.telemetry.info) == telemetryInfo
+            }
+
+        }
+
         describe("authorize URL") {
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -96,7 +104,43 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(),
-                    ]
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": "\(Domain)/foo",
+                    "query": defaultQuery()
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": "\(Domain)/foo/",
+                    "query": defaultQuery()
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": "\(Domain)/foo/bar",
+                    "query": defaultQuery()
+                ]
+            }
+
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": "\(Domain)/foo/bar/",
+                    "query": defaultQuery()
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -106,7 +150,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection": "facebook"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -116,7 +160,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["scope": "openid email"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -130,63 +174,34 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            it("should override default values") {
-                let url = newWebAuth()
-                    .parameters(["scope": "openid email phone"])
-                    .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
-                expect(url.a0_components?.queryItems).toNot(containItem(withName: "scope", value: "openid"))
-            }
-
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newWebAuth()
-                        .responseType([.idToken])
+                        .parameters(["scope": "openid email phone"])
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
-                    "query": defaultQuery(withParameters: ["response_type": "id_token"]),
-                    ]
+                    "query": defaultQuery(withParameters: ["scope": "openid email phone"]),
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newWebAuth()
-                        .responseType([.token])
+                        .parameters(["scope": "email phone"])
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
-                    "query": defaultQuery(withParameters: ["response_type": "token"]),
-                    ]
+                    "query": defaultQuery(withParameters: ["scope": "openid email phone"]),
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
                 return [
                     "url": newWebAuth()
-                        .responseType([.idToken, .token])
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
-                    "domain": Domain,
-                    "query": defaultQuery(withParameters: ["response_type": "id_token token"]),
-                    ]
-            }
-
-            itBehavesLike(ValidAuthorizeURLExample) {
-                return [
-                    "url": newWebAuth()
-                        .responseType([.idToken])
-                        .nonce("abc1234")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
-                    "domain": Domain,
-                    "query": defaultQuery(withParameters: ["nonce": "abc1234", "response_type" : "id_token"]),
-                    ]
-            }
-
-            itBehavesLike(ValidAuthorizeURLExample) {
-                return [
-                    "url": newWebAuth()
-                        .responseType([.idToken])
                         .maxAge(10000) // 1 second
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
-                    "query": defaultQuery(withParameters: ["max_age": "10000", "response_type" : "id_token"]),
-                    ]
+                    "query": defaultQuery(withParameters: ["max_age": "10000"]),
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -195,7 +210,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: "abc1234", invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["organization": "abc1234"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -204,7 +219,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: "abc1234", invitation: "xyz6789"),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["organization": "abc1234", "invitation": "xyz6789"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -215,7 +230,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: newDefaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["audience": "https://wwww.google.com"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -247,7 +262,7 @@ class WebAuthSpec: QuickSpec {
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["connection_scope": "user_friends,email"]),
-                    ]
+                ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
@@ -272,36 +287,7 @@ class WebAuthSpec: QuickSpec {
                 }
                 
             }
-            
-            #if os(iOS)
-            context("telemetry") {
-                
-                func getTelemetryInfoFromUrl(url: URL) -> [String: Any] {
-                    let telemetry = (url.a0_components?.queryItems!.first(where: {$0.name == "auth0Client"})!.value)!!
-                    let data = telemetry.a0_decodeBase64URLSafe()
-                    let info = try! JSONSerialization.jsonObject(with: data!, options: []) as! [String: Any]
-                    return info
-                }
 
-                it("should include default telemetry"){
-                    let url = newWebAuth()
-                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
-
-                    let info = getTelemetryInfoFromUrl(url: url)
-                    let env = info["env"] as! [String : String]
-                    expect(env["view"]) == MobileWebAuth.ViewASWebAuthenticationSession
-                }
-
-                it("should include telemetry for legacy auth"){
-                    let url = newWebAuth()
-                            .useLegacyAuthentication()
-                            .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil)
-                    let info = getTelemetryInfoFromUrl(url: url)
-                    let env = info["env"] as! [String : String]
-                    expect(env["view"]) == MobileWebAuth.ViewSFSafariViewController
-                }
-            }
-            #endif
         }
 
         describe("redirect uri") {
@@ -311,14 +297,28 @@ class WebAuthSpec: QuickSpec {
             let platform = "macos"
             #endif
 
-            it("should build with custom scheme") {
-                let bundleId = Bundle.main.bundleIdentifier!
-                expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/\(platform)/\(bundleId)/callback"
-            }
+            context("custom scheme") {
 
-            it("should build with universal link") {
                 let bundleId = Bundle.main.bundleIdentifier!
-                expect(newWebAuth().useUniversalLink().redirectURL?.absoluteString) == "https://\(Domain)/\(platform)/\(bundleId)/callback"
+
+                it("should build with the domain") {
+                    expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/\(platform)/\(bundleId)/callback"
+                }
+
+                it("should build with the domain and a subpath") {
+                    let subpath = "foo"
+                    let uri = "\(bundleId)://\(Domain)/\(subpath)/\(platform)/\(bundleId)/callback"
+                    let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpath))
+                    expect(webAuth.redirectURL?.absoluteString) == uri
+                }
+
+                it("should build with the domain and subpaths") {
+                    let subpaths = "foo/bar"
+                    let uri = "\(bundleId)://\(Domain)/\(subpaths)/\(platform)/\(bundleId)/callback"
+                    let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpaths))
+                    expect(webAuth.redirectURL?.absoluteString) == uri
+                }
+
             }
 
             it("should build with a custom url") {
@@ -328,6 +328,27 @@ class WebAuthSpec: QuickSpec {
         }
 
         describe("other builder methods") {
+
+            context("ephemeral session") {
+
+                it("should not use ephemeral session by default") {
+                    expect(newWebAuth().ephemeralSession).to(beFalse())
+                }
+
+                it("should use ephemeral session") {
+                    expect(newWebAuth().useEphemeralSession().ephemeralSession).to(beTrue())
+                }
+
+            }
+
+            context("nonce") {
+
+                it("should use a custom nonce value") {
+                    let nonce = "foo"
+                    expect(newWebAuth().nonce(nonce).nonce).to(equal(nonce))
+                }
+
+            }
 
             context("leeway") {
 
@@ -344,7 +365,7 @@ class WebAuthSpec: QuickSpec {
             context("issuer") {
 
                 it("should use the default issuer value") {
-                    expect(newWebAuth().issuer).to(equal("\(DomainURL.absoluteString)/"))
+                    expect(newWebAuth().issuer).to(equal(DomainURL.absoluteString))
                 }
 
                 it("should use a custom issuer value") {
@@ -382,159 +403,144 @@ class WebAuthSpec: QuickSpec {
 
         #if os(iOS)
         describe("session") {
-            
-            #if swift(>=5.1)
-            context("before start") {
-                
-                it("should not use ephemeral session by default") {
-                    expect(newWebAuth().ephemeralSession).to(beFalse())
-                }
 
-                it("should use ephemeral session") {
-                    expect(newWebAuth().useEphemeralSession().ephemeralSession).to(beTrue())
-                }
+            let storage = TransactionStore.shared
 
-            }
-            #endif
-
-            context("after start") {
-
-                let storage = TransactionStore.shared
-
-                beforeEach {
-                    if let current = storage.current {
-                        storage.cancel(current)
-                    }
-                }
-
-                it("should save started session") {
-                    newWebAuth().start({ _ in})
-                    expect(storage.current).toNot(beNil())
-                }
-
-                it("should hava a generated state") {
-                    let auth = newWebAuth()
-                    auth.start({ _ in})
-                    expect(storage.current?.state).toNot(beNil())
-                }
-
-                it("should honor supplied state") {
-                    let state = UUID().uuidString
-                    newWebAuth().state(state).start({ _ in})
-                    expect(storage.current?.state) == state
-                }
-
-                it("should honor supplied state via parameters") {
-                    let state = UUID().uuidString
-                    newWebAuth().parameters(["state": state]).start({ _ in})
-                    expect(storage.current?.state) == state
-                }
-
-                it("should generate different state on every start") {
-                    let auth = newWebAuth()
-                    auth.start({ _ in})
-                    let state = storage.current?.state
-                    auth.start({ _ in})
-                    expect(storage.current?.state) != state
-                }
-
-            }
-
-        }
-
-        describe("safari") {
-
-            var result: Result<Credentials>?
-
-            beforeEach { result = nil }
-
-            it("should build new controller") {
-                expect(newWebAuth().newSafari(DomainURL, callback: {_ in}).0).toNot(beNil())
-            }
-
-            it("should fail if controller is not presented") {
-                let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
-                callback(.success(Credentials(json: ["access_token": "at", "token_type": "bearer"])))
-                expect(result).toEventually(beFailure())
-            }
-
-            it("should fail if user dismissed safari viewcontroller") {
-                let callback = newWebAuth().newSafari(DomainURL, callback: { result = $0 }).1
-                callback(.failure(WebAuthError.userCancelled))
-                expect(result).toEventually(beFailure())
-            }
-            
-            it("should present a default presentation style") {
-                let auth = newWebAuth().useLegacyAuthentication()
-                let controller = auth.newSafari(DomainURL, callback: { _ in }).0
-                expect(controller.modalPresentationStyle) == .fullScreen
-            }
-            
-            it("should present user overridden presentation style") {
-                let auth = newWebAuth().useLegacyAuthentication(withStyle: .overFullScreen)
-                let controller = auth.newSafari(DomainURL, callback: { _ in }).0
-                expect(controller.modalPresentationStyle) == .overFullScreen
-            }
-            
-            if #available(iOS 11.0, *) {
-                it("should present user with the .cancel dismiss button style") {
-                    let auth = newWebAuth()
-                        .useLegacyAuthentication(withStyle: .overFullScreen)
-                    let controller = auth.newSafari(DomainURL, callback: { _ in }).0
-                    
-                    expect(controller.dismissButtonStyle) == .cancel
+            beforeEach {
+                if let current = storage.current {
+                    storage.cancel(current)
                 }
             }
+
+            it("should save started session") {
+                newWebAuth().start { _ in }
+                expect(storage.current).toNot(beNil())
+            }
+
+            it("should have a generated state") {
+                let auth = newWebAuth()
+                auth.start { _ in }
+                expect(storage.current?.state).toNot(beNil())
+            }
+
+            it("should honor supplied state") {
+                let state = UUID().uuidString
+                newWebAuth().state(state).start { _ in }
+                expect(storage.current?.state) == state
+            }
+
+            it("should honor supplied state via parameters") {
+                let state = UUID().uuidString
+                newWebAuth().parameters(["state": state]).start { _ in }
+                expect(storage.current?.state) == state
+            }
+
+            it("should generate different state on every start") {
+                let auth = newWebAuth()
+                auth.start { _ in }
+                let state = storage.current?.state
+                auth.start { _ in }
+                expect(storage.current?.state) != state
+            }
+
+            it("should produce a no bundle identifier error") {
+                let auth = newWebAuth()
+                let expectedError = WebAuthError(code: .noBundleIdentifier)
+                var result: WebAuthResult<Credentials>?
+                auth.redirectURL = nil
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
+
+            it("should produce an invalid invitation URL error when organization is missing") {
+                let auth = newWebAuth()
+                let url = "https://\(Domain)?invitation=foo"
+                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
+                var result: WebAuthResult<Credentials>?
+                _ = auth.invitationURL(URL(string: url)!)
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
+
+            it("should produce an invalid invitation URL error when invitation is missing") {
+                let auth = newWebAuth()
+                let url = "https://\(Domain)?organization=foo"
+                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
+                var result: WebAuthResult<Credentials>?
+                _ = auth.invitationURL(URL(string: url)!)
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
+
+            it("should produce an invalid invitation URL error when organization and invitation are missing") {
+                let auth = newWebAuth()
+                let url = "https://\(Domain)?foo=bar"
+                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
+                var result: WebAuthResult<Credentials>?
+                _ = auth.invitationURL(URL(string: url)!)
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
+
+            it("should produce an invalid invitation URL error when query parameters are missing") {
+                let auth = newWebAuth()
+                let expectedError = WebAuthError(code: .invalidInvitationURL(DomainURL.absoluteString))
+                var result: WebAuthResult<Credentials>?
+                _ = auth.invitationURL(DomainURL)
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
+
         }
 
         describe("logout") {
 
             context("ASWebAuthenticationSession") {
 
-                var outcome: Bool?
+                var result: WebAuthResult<Void>?
 
                 beforeEach {
-                    outcome = nil
+                    result = nil
                     TransactionStore.shared.clear()
                 }
 
                 it("should launch AuthenticationServicesSessionCallback") {
-                    guard #available(iOS 12.0, *) else { return }
                     let auth = newWebAuth()
-                    auth.clearSession(federated: false) { _ in }
+                    auth.clearSession() { _ in }
+                    expect(TransactionStore.shared.current).toNot(beNil())
+                }
+
+                it("should launch AuthenticationServicesSessionCallback with federated") {
+                    let auth = newWebAuth()
+                    auth.clearSession(federated: true) { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
                 it("should cancel AuthenticationServicesSessionCallback") {
-                    guard #available(iOS 12.0, *) else { return }
                     let auth = newWebAuth()
-                    auth.clearSession(federated: false) { outcome = $0 }
+                    auth.clearSession() { result = $0 }
                     TransactionStore.shared.cancel(TransactionStore.shared.current!)
-                    expect(outcome).to(beFalse())
+                    expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
                 it("should resume AuthenticationServicesSessionCallback") {
-                    guard #available(iOS 12.0, *) else { return }
                     let auth = newWebAuth()
-                    auth.clearSession(federated: false) { outcome = $0 }
+                    auth.clearSession() { result = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
-                    expect(outcome).to(beTrue())
+                    expect(result).to(beSuccessful())
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
-            }
-
-            context("SFSafariViewController") {
-
-                it("should launch silent safari viewcontroller") {
+                it("should fail when redirect URL is missing") {
                     let auth = newWebAuth()
-                    _ = auth.useLegacyAuthentication()
-                    auth.clearSession(federated: false) { _ in }
-                    expect(auth.presenter.topViewController is SilentSafariViewController).toNot(beNil())
+                    auth.redirectURL = nil
+                    auth.clearSession() { result = $0 }
+                    expect(result).to(haveWebAuthError(WebAuthError(code: .noBundleIdentifier)))
                 }
 
             }
+
         }
         #endif
 

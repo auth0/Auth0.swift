@@ -1,25 +1,3 @@
-// WebAuthErrorSpec.swift
-//
-// Copyright (c) 2016 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Foundation
 import Quick
 import Nimble
@@ -30,45 +8,135 @@ class WebAuthErrorSpec: QuickSpec {
 
     override func spec() {
 
-        describe("foundation error") {
+        describe("init") {
 
-            it("should build generic NSError") {
-                let error = WebAuthError.noBundleIdentifierFound as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
+            it("should initialize with type") {
+                let error = WebAuthError(code: .other)
+                expect(error.code) == WebAuthError.Code.other
+                expect(error.cause).to(beNil())
             }
 
-            it("should build error for PKCE not allowed") {
-                let message = "Not Allowed"
-                let error = WebAuthError.pkceNotAllowed(message) as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
+            it("should initialize with type & cause") {
+                let cause = AuthenticationError(description: "")
+                let error = WebAuthError(code: .other, cause: cause)
+                expect(error.cause).to(matchError(cause))
+            }
+
+        }
+
+        describe("operators") {
+
+            it("should be equal by code") {
+                let error = WebAuthError(code: .other)
+                expect(error) == WebAuthError.other
+            }
+
+            it("should not be equal to an error with a different code") {
+                let error = WebAuthError(code: .other)
+                expect(error) != WebAuthError.unknown
+            }
+
+            it("should not be equal to an error with a different description") {
+                let error = WebAuthError(code: .unknown("foo"))
+                expect(error) != WebAuthError(code: .unknown("bar"))
+            }
+
+            it("should pattern match by code") {
+                let error = WebAuthError(code: .other)
+                expect(error ~= WebAuthError.other) == true
+            }
+
+            it("should not pattern match by code with a different error") {
+                let error = WebAuthError(code: .other)
+                expect(error ~= WebAuthError.unknown) == false
+            }
+
+            it("should pattern match by code with a generic error") {
+                let error = WebAuthError(code: .other)
+                expect(error ~= (WebAuthError.other) as Error) == true
+            }
+
+            it("should not pattern match by code with a different generic error") {
+                let error = WebAuthError(code: .other)
+                expect(error ~= (WebAuthError.unknown) as Error) == false
+            }
+
+        }
+
+        describe("debug description") {
+
+            it("should match the localized message") {
+                let error = WebAuthError(code: .other)
+                expect(error.debugDescription) == WebAuthError.other.debugDescription
+            }
+
+            it("should match the error description") {
+                let error = WebAuthError(code: .other)
+                expect(error.debugDescription) == WebAuthError.other.errorDescription
+            }
+
+        }
+
+        describe("error message") {
+
+            it("should return message for no bundle identifier") {
+                let message = "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
+                + " or it could not be used to build a valid URL."
+                let error = WebAuthError(code: .noBundleIdentifier)
                 expect(error.localizedDescription) == message
             }
 
-            it("should build error for user cancelled") {
-                let error = WebAuthError.userCancelled as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 0
+            it("should return message for invalid invitation URL") {
+                let url = "https://samples.auth0.com"
+                let message = "The invitation URL (\(url)) is missing the 'invitation' and/or"
+                + " the 'organization' query parameters."
+                let error = WebAuthError(code: .invalidInvitationURL(url))
+                expect(error.localizedDescription) == message
             }
 
-            it("should build error for no nonce supplied") {
-                let error = WebAuthError.noNonceProvided as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
+            it("should return message for user cancelled") {
+                let message = "The user cancelled the Web Auth operation."
+                let error = WebAuthError(code: .userCancelled)
+                expect(error.localizedDescription) == message
             }
 
-            it("should build error for no idToken nonce match") {
-                let error = WebAuthError.invalidIdTokenNonce as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
+            it("should return message for PKCE not allowed") {
+                let message = "Unable to perform authentication with PKCE."
+                + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
+                + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
+                let error = WebAuthError(code: .pkceNotAllowed)
+                expect(error.localizedDescription) == message
             }
 
-            it("should build error for missing access_token") {
-                let error = WebAuthError.missingAccessToken as NSError
-                expect(error.domain) == "com.auth0.webauth"
-                expect(error.code) == 1
+            it("should return message for no authorization code") {
+                let values: [String: String] = ["foo": "bar"]
+                let message = "The callback URL is missing the authorization code in its"
+                + " query parameters (\(values))."
+                let error = WebAuthError(code: .noAuthorizationCode(values))
+                expect(error.localizedDescription) == message
             }
+
+            it("should return message for id token validation failed") {
+                let message = "The ID Token validation performed after authentication failed."
+                + " See the underlying 'Error' value available in the 'cause' property."
+                let error = WebAuthError(code: .idTokenValidationFailed)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return message for other") {
+                let message = "An unexpected error occurred. See the underlying 'Error' value available in the 'cause' property."
+                let error = WebAuthError(code: .other)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should return message for unknown") {
+                let message = "foo"
+                let error = WebAuthError(code: .unknown(message))
+                expect(error.localizedDescription) == message
+            }
+
         }
+
     }
+
 }

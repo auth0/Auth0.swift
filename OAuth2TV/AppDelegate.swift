@@ -1,18 +1,6 @@
-//
-//  AppDelegate.swift
-//  OAuth2TV
-//
-//  Created by Martin on 16/07/2018.
-//  Copyright © 2018 Auth0. All rights reserved.
-//
-
 import UIKit
 
-#if swift(>=4.2)
 typealias A0ApplicationLaunchOptionsKey = UIApplication.LaunchOptionsKey
-#else
-typealias A0ApplicationLaunchOptionsKey = UIApplicationLaunchOptionsKey
-#endif
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

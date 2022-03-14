@@ -1,25 +1,3 @@
-// Generators.swift
-//
-// Copyright (c) 2019 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Foundation
 import JWTDecode
 
@@ -27,7 +5,6 @@ import JWTDecode
 
 // MARK: - Keys
 
-@available(iOS 10.0, macOS 10.12, *)
 enum TestKeys {
     static let rsaPrivate: SecKey = {
         let query: [String: Any] = [String(kSecAttrKeyType): kSecAttrKeyTypeRSA,
@@ -114,7 +91,6 @@ private func generateJWTPayload(iss: String?,
     return encodeJWTPart(from: bodyDict)
 }
 
-@available(iOS 10.0, macOS 10.12, *)
 func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  kid: String? = Kid,
                  iss: String? = "https://tokens-test.auth0.com/",
@@ -145,10 +121,13 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
     
     if let signature = signature {
         signaturePart = signature
+    } else {
+        let data = SecKeyCreateSignature(
+            TestKeys.rsaPrivate, .rsaSignatureMessagePKCS1v15SHA256, signableParts.data(using: .utf8)! as CFData, nil
+        )
+        signaturePart = (data! as Data).a0_encodeBase64URLSafe()!
     }
-    else if let algorithm = JWTAlgorithm(rawValue: alg) {
-        signaturePart = algorithm.sign(value: signableParts.data(using: .utf8)!).a0_encodeBase64URLSafe()!
-    }
+
     
     return try! decode(jwt: "\(signableParts).\(signaturePart)")
 }
@@ -181,7 +160,6 @@ private func extractData(from bytes: UnsafePointer<UInt8>) -> (UnsafePointer<UIn
     return (pointer, data)
 }
 
-@available(iOS 10.0, macOS 10.12, *)
 func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String = Kid) -> JWK {
     let asn = { (bytes: UnsafePointer<UInt8>) -> JWK? in
         guard bytes.pointee == 0x30 else { return nil } // Checks that this is a SEQUENCE triplet
@@ -208,8 +186,8 @@ func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String =
                    certUrl: nil,
                    certThumbprint: nil,
                    certChain: nil,
-                   rsaModulus: encodedModulus,
-                   rsaExponent: encodedExponent)
+                   modulus: encodedModulus,
+                   exponent: encodedExponent)
     }
     
     return publicKey.export().withUnsafeBytes { unsafeRawBufferPointer in

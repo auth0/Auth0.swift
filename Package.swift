@@ -1,21 +1,17 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.3
 
 import PackageDescription
 
-var webAuthPlatforms: [Platform] = [.iOS, .macOS]
-
-#if swift(>=5.5)
-webAuthPlatforms.append(.macCatalyst)
+#if compiler(>=5.5)
+let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst]
+#else
+let webAuthPlatforms: [Platform] = [.iOS, .macOS]
 #endif
-
-let webAuthFlag = "WEB_AUTH_PLATFORM"
-let webAuthCondition: BuildSettingCondition = .when(platforms: webAuthPlatforms)
-let cSettings: [CSetting] = [.define(webAuthFlag, webAuthCondition)]
-let swiftSettings: [SwiftSetting] = [.define(webAuthFlag, webAuthCondition)]
+let swiftSettings: [SwiftSetting] = [.define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms))]
 
 let package = Package(
     name: "Auth0",
-    platforms: [.iOS(.v9), .macOS(.v10_11), .tvOS(.v9), .watchOS(.v2)],
+    platforms: [.iOS(.v12), .macOS(.v10_15), .tvOS(.v12), .watchOS("6.2")],
     products: [.library(name: "Auth0", targets: ["Auth0"])],
     dependencies: [
         .package(name: "SimpleKeychain", url: "https://github.com/auth0/SimpleKeychain.git", .upToNextMajor(from: "0.12.0")),
@@ -27,12 +23,10 @@ let package = Package(
     targets: [
         .target(
             name: "Auth0", 
-            dependencies: ["SimpleKeychain", "JWTDecode", "Auth0ObjectiveC"], 
+            dependencies: ["SimpleKeychain", "JWTDecode"], 
             path: "Auth0",
-            exclude: ["ObjectiveC"],
-            cSettings: cSettings,
+            exclude: ["Info.plist"],
             swiftSettings: swiftSettings),
-        .target(name: "Auth0ObjectiveC", path: "Auth0/ObjectiveC", cSettings: cSettings),
         .testTarget(
             name: "Auth0Tests",
             dependencies: [
@@ -42,8 +36,7 @@ let package = Package(
                 .product(name: "OHHTTPStubsSwift", package: "OHHTTPStubs")
             ],
             path: "Auth0Tests",
-            exclude: ["ObjectiveC"],
-            cSettings: cSettings,
+            exclude: ["Info.plist", "Auth0.plist"],
             swiftSettings: swiftSettings)
     ]
 )

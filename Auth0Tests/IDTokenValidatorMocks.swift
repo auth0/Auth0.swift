@@ -1,25 +1,3 @@
-// IDTokenValidatorMocks.swift
-//
-// Copyright (c) 2019 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Foundation
 import JWTDecode
 
@@ -28,19 +6,19 @@ import JWTDecode
 // MARK: - Signature Validator Mocks
 
 struct MockSuccessfulIDTokenSignatureValidator: JWTAsyncValidator {
-    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
+    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void) {
         callback(nil)
     }
 }
 
 struct MockUnsuccessfulIDTokenSignatureValidator: JWTAsyncValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case errorCase
         
-        var errorDescription: String? { return "Error message" }
+        var debugDescription: String { return "Error message" }
     }
         
-    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
+    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void) {
         callback(ValidationError.errorCase)
     }
 }
@@ -48,7 +26,7 @@ struct MockUnsuccessfulIDTokenSignatureValidator: JWTAsyncValidator {
 class SpyThreadingIDTokenSignatureValidator: JWTAsyncValidator {
     var didExecuteInWorkerThread: Bool = false
     
-    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
+    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void) {
         didExecuteInWorkerThread = !Thread.isMainThread
         
         callback(nil)
@@ -58,7 +36,7 @@ class SpyThreadingIDTokenSignatureValidator: JWTAsyncValidator {
 // MARK: - Claims Validator Mocks
 
 struct MockSuccessfulIDTokenClaimsValidator: JWTValidator {
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         return nil
     }
 }
@@ -66,7 +44,7 @@ struct MockSuccessfulIDTokenClaimsValidator: JWTValidator {
 class SpyThreadingIDTokenClaimsValidator: JWTValidator {
     var didExecuteInWorkerThread: Bool = false
     
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         didExecuteInWorkerThread = !Thread.isMainThread
         
         return nil
@@ -74,17 +52,17 @@ class SpyThreadingIDTokenClaimsValidator: JWTValidator {
 }
 
 struct MockSuccessfulIDTokenClaimValidator: JWTValidator {
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         return nil
     }
 }
 
 class MockUnsuccessfulIDTokenClaimValidator: JWTValidator {
-    enum ValidationError: LocalizedError {
+    enum ValidationError: Auth0Error {
         case errorCase1
         case errorCase2
         
-        var errorDescription: String? { return "Error message" }
+        var debugDescription: String { return "Error message" }
     }
     
     let errorCase: ValidationError
@@ -93,7 +71,7 @@ class MockUnsuccessfulIDTokenClaimValidator: JWTValidator {
         self.errorCase = errorCase
     }
     
-    func validate(_ jwt: JWT) -> LocalizedError? {
+    func validate(_ jwt: JWT) -> Auth0Error? {
         return errorCase
     }
 }
@@ -101,7 +79,7 @@ class MockUnsuccessfulIDTokenClaimValidator: JWTValidator {
 class SpyUnsuccessfulIDTokenClaimValidator: MockUnsuccessfulIDTokenClaimValidator {
     var didExecuteValidation: Bool = false
     
-    override func validate(_ jwt: JWT) -> LocalizedError? {
+    override func validate(_ jwt: JWT) -> Auth0Error? {
         didExecuteValidation = true
         
         return super.validate(jwt)

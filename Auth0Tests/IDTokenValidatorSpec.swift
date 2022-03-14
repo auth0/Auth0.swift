@@ -1,25 +1,3 @@
-// IDTokenValidatorSpec.swift
-//
-// Copyright (c) 2019 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Foundation
 import Quick
 import Nimble
@@ -30,7 +8,6 @@ import OHHTTPStubsSwift
 
 @testable import Auth0
 
-@available(iOS 10.0, macOS 10.12, *)
 class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
 
     override func spec() {
@@ -38,25 +15,16 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
         let validatorContext = self.validatorContext
         let mockSignatureValidator = MockSuccessfulIDTokenSignatureValidator()
         let mockClaimsValidator = MockSuccessfulIDTokenClaimsValidator()
-        
+
+        beforeEach {
+            stub(condition: isHost(self.domain)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
+        }
+
+        afterEach {
+            HTTPStubs.removeAllStubs()
+        }
+
         describe("top level validation api") {
-            
-            context("sanity checks") {
-                it("should fail to validate a nil id token") {
-                    let expectedError = IDTokenDecodingError.missingToken
-                    
-                    waitUntil { done in
-                        validate(idToken: nil,
-                                 with: validatorContext,
-                                 signatureValidator: mockSignatureValidator,
-                                 claimsValidator: mockClaimsValidator) { error in
-                            expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
-                            done()
-                        }
-                    }
-                }
-            }
             
             context("id token decoding") {
                 let expectedError = IDTokenDecodingError.cannotDecode
@@ -68,7 +36,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -81,7 +49,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -94,7 +62,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -108,7 +76,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                  signatureValidator: mockSignatureValidator,
                                  claimsValidator: mockClaimsValidator) { error in
                             expect(error).to(matchError(expectedError))
-                            expect(error?.errorDescription).to(equal(expectedError.errorDescription))
+                            expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
                             done()
                         }
                     }
@@ -133,21 +101,8 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     }
                 }
                 
-                it("should validate a token signed with HS256") {
-                    let jwt = generateJWT(alg: "HS256")
-                    
-                    waitUntil { done in
-                        validate(idToken: jwt.string,
-                                 with: validatorContext,
-                                 claimsValidator: mockClaimsValidator) { error in
-                            expect(error).to(beNil())
-                            done()
-                        }
-                    }
-                }
-                
                 it("should not validate a token signed with an unsupported algorithm") {
-                    let jwt = generateJWT(alg: "ES256")
+                    let jwt = generateJWT(alg: "HS256")
                     
                     waitUntil { done in
                         validate(idToken: jwt.string,

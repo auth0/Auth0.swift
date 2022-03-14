@@ -1,98 +1,115 @@
-// WebAuthError.swift
-//
-// Copyright (c) 2016 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 #if WEB_AUTH_PLATFORM
 import Foundation
 
 /**
- List of possible web-based authentication errors
-
- - NoBundleIdentifierFound:        Cannot get the App's Bundle Identifier to use for redirect_uri.
- - CannotDismissWebAuthController: When trying to dismiss WebAuth controller, no presenter controller could be found.
- - UserCancelled:                  User cancelled the web-based authentication, e.g. tapped the "Done" button in SFSafariViewController
- - PKCENotAllowed:                 PKCE for the supplied Auth0 ClientId was not allowed. You need to set the `Token Endpoint Authentication Method` to `None` in your Auth0 Dashboard
- - noNonceProvided:                A nonce value must be provided to use the response option of id_token
- - invalidIdTokenNonce:            Failed to match token nonce with request nonce
- - missingAccessToken:             access_token missing in response
+ *  Represents an error during a Web Auth operation.
  */
-public enum WebAuthError: CustomNSError {
-    case noBundleIdentifierFound
-    case cannotDismissWebAuthController
-    case userCancelled
-    case pkceNotAllowed(String)
-    case noNonceProvided
-    case missingResponseParam(String)
-    case invalidIdTokenNonce // TODO: Remove on the next major
-    case missingAccessToken
-    case unknownError
+public struct WebAuthError: Auth0Error {
 
-    static let genericFoundationCode = 1
-    static let cancelledFoundationCode = 0
+    enum Code: Equatable {
+        case noBundleIdentifier
+        case invalidInvitationURL(String)
+        case userCancelled
+        case noAuthorizationCode([String: String])
+        case pkceNotAllowed
+        case idTokenValidationFailed
+        case other
+        case unknown(String)
+    }
 
-    public static let infoKey = "com.auth0.webauth.error.info"
-    public static let errorDomain: String = "com.auth0.webauth"
+    let code: Code
 
-    public var errorCode: Int {
-        switch self {
-        case .userCancelled:
-            return WebAuthError.cancelledFoundationCode
-        default:
-            return WebAuthError.genericFoundationCode
+    init(code: Code, cause: Error? = nil) {
+        self.code = code
+        self.cause = cause
+    }
+
+    /**
+     The underlying `Error` value, if any. Defaults to `nil`.
+     */
+    public let cause: Error?
+
+    /**
+     Description of the error.
+
+     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
+     */
+    public var debugDescription: String {
+        switch self.code {
+        case .noBundleIdentifier: return "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
+            + " or it could not be used to build a valid URL."
+        case .invalidInvitationURL(let url): return "The invitation URL (\(url)) is missing the 'invitation' and/or"
+            + " the 'organization' query parameters."
+        case .userCancelled: return "The user cancelled the Web Auth operation."
+        case .pkceNotAllowed: return "Unable to perform authentication with PKCE."
+            + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
+            + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
+        case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
+            + " query parameters (\(values))."
+        case .idTokenValidationFailed: return "The ID Token validation performed after authentication failed."
+            + " See the underlying 'Error' value available in the 'cause' property."
+        case .other: return "An unexpected error occurred. See the underlying 'Error' value available in the 'cause' property."
+        case .unknown(let message): return message
         }
     }
 
-    public var errorUserInfo: [String: Any] {
-        switch self {
-        case .userCancelled:
-            return [
-                NSLocalizedDescriptionKey: "User Cancelled Web Authentication",
-                WebAuthError.infoKey: self
-            ]
-        case .pkceNotAllowed(let message):
-            return [
-                NSLocalizedDescriptionKey: message,
-                WebAuthError.infoKey: self
-            ]
-        case .noNonceProvided:
-            return [
-                NSLocalizedDescriptionKey: "A nonce value must be supplied when response_type includes id_token in order to prevent replay attacks",
-                WebAuthError.infoKey: self
-            ]
-        case .invalidIdTokenNonce:
-            return [
-                NSLocalizedDescriptionKey: "Could not validate the id_token",
-                WebAuthError.infoKey: self
-            ]
-        case .missingAccessToken:
-            return [
-                NSLocalizedDescriptionKey: "Could not validate the token",
-                WebAuthError.infoKey: self
-            ]
-        default:
-            return [
-                NSLocalizedDescriptionKey: "Failed to perform webAuth",
-                WebAuthError.infoKey: self
-            ]
-        }
+    // MARK: - Error Cases
+
+    /// The bundle identifier could not be retrieved from `Bundle.main.bundleIdentifier`, or it could not be used to
+    /// build a valid URL.
+    /// This error does not include a ``cause``.
+    public static let noBundleIdentifier: WebAuthError = .init(code: .noBundleIdentifier)
+    /// The invitation URL is missing the `invitation` and/or the `organization` query parameters.
+    /// This error does not include a ``cause``.
+    public static let invalidInvitationURL: WebAuthError = .init(code: .invalidInvitationURL(""))
+    /// The user cancelled the Web Auth operation.
+    /// This error does not include a ``cause``.
+    public static let userCancelled: WebAuthError = .init(code: .userCancelled)
+    /// The Auth0 application does not support authentication with Proof Key for Code Exchange (PKCE).
+    /// PKCE support needs to be enabled in the settings page of the [Auth0 application](https://manage.auth0.com/#/applications/),
+    /// by setting the **Application Type** to 'Native' and the **Token Endpoint Authentication Method** to 'None'.
+    /// This error does not include a ``cause``.
+    public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
+    /// The callback URL is missing the `code` query parameter.
+    /// This error does not include a ``cause``.
+    public static let noAuthorizationCode: WebAuthError = .init(code: .noAuthorizationCode([:]))
+    /// The ID Token validation performed after authentication failed.
+    /// The underlying `Error` value can be accessed via the ``cause`` property.
+    public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
+    /// An unexpected error occurred, and an `Error` value is available.
+    /// The underlying `Error` value can be accessed via the ``cause`` property.
+    public static let other: WebAuthError = .init(code: .other)
+    /// An unexpected error occurred, but an `Error` value is not available.
+    /// This error does not include a ``cause``.
+    public static let unknown: WebAuthError = .init(code: .unknown(""))
+
+}
+
+// MARK: - Equatable
+
+extension WebAuthError: Equatable {
+
+    /// Conformance to `Equatable`.
+    public static func == (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
+        return lhs.code == rhs.code && lhs.localizedDescription == rhs.localizedDescription
     }
+
+}
+
+// MARK: - Pattern Matching Operator
+
+public extension WebAuthError {
+
+    /// Matches `WebAuthError` values in a switch statement.
+    static func ~= (lhs: WebAuthError, rhs: WebAuthError) -> Bool {
+        return lhs.code == rhs.code
+    }
+
+    /// Matches `Error` values in a switch statement.
+    static func ~= (lhs: WebAuthError, rhs: Error) -> Bool {
+        guard let rhs = rhs as? WebAuthError else { return false }
+        return lhs.code == rhs.code
+    }
+
 }
 #endif

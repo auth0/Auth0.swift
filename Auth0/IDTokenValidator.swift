@@ -1,35 +1,13 @@
-// IDTokenValidator.swift
-//
-// Copyright (c) 2019 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 #if WEB_AUTH_PLATFORM
 import Foundation
 import JWTDecode
 
 protocol JWTValidator {
-    func validate(_ jwt: JWT) -> LocalizedError?
+    func validate(_ jwt: JWT) -> Auth0Error?
 }
 
 protocol JWTAsyncValidator {
-    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void)
+    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void)
 }
 
 struct IDTokenValidator: JWTAsyncValidator {
@@ -45,7 +23,7 @@ struct IDTokenValidator: JWTAsyncValidator {
         self.context = context
     }
 
-    func validate(_ jwt: JWT, callback: @escaping (LocalizedError?) -> Void) {
+    func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             self.signatureValidator.validate(jwt) { error in
                 if let error = error { return callback(error) }
@@ -58,24 +36,21 @@ struct IDTokenValidator: JWTAsyncValidator {
     }
 }
 
-enum IDTokenDecodingError: LocalizedError {
-    case missingToken
+enum IDTokenDecodingError: Auth0Error {
     case cannotDecode
 
-    var errorDescription: String? {
+    var debugDescription: String {
         switch self {
-        case .missingToken: return "ID token is required but missing"
         case .cannotDecode: return "ID token could not be decoded"
         }
     }
 }
 
-func validate(idToken: String?,
+func validate(idToken: String,
               with context: IDTokenValidatorContext,
               signatureValidator: JWTAsyncValidator? = nil, // for testing
               claimsValidator: JWTValidator? = nil,
-              callback: @escaping (LocalizedError?) -> Void) {
-    guard let idToken = idToken else { return callback(IDTokenDecodingError.missingToken) }
+              callback: @escaping (Auth0Error?) -> Void) {
     guard let jwt = try? decode(jwt: idToken) else { return callback(IDTokenDecodingError.cannotDecode) }
     var claimValidators: [JWTValidator] = [IDTokenIssValidator(issuer: context.issuer),
                                            IDTokenSubValidator(),

@@ -1,280 +1,220 @@
-// Users.swift
-//
-// Copyright (c) 2016 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Foundation
 
 /**
- Users endpoints of Auth0 Management API v2
- - seeAlso: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users)
+ A dictionary containing a user profile.
+ */
+public typealias ManagementObject = [String: Any]
+
+/**
+ Client for the Users endpoints of the Auth0 [Management API v2](https://auth0.com/docs/api/management/v2).
+
+ - See: ``ManagementError``
  */
 public protocol Users: Trackable, Loggable {
 
+    /// The Management API token.
     var token: String { get }
+    /// The Auth0 Domain URL.
     var url: URL { get }
 
+    // MARK: - Methods
+
     /**
-     Fetch a user using the it's identifier.
+     Fetches a user using its identifier.
 
-     By default it gets all user's attributes:
-
-     ```
-     Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .get(userId)
-     .start { print($0) }
-     ```
-
-     but you can select which attributes you want:
+     By default it gets all the user's attributes:
 
      ```
      Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .get(userId, fields: ["email", "user_id"])
-     .start { print($0) }
+         .users(token: credentials.accessToken, domain: "samples.auth0.com")
+         .get("user id")
+         .start { result in
+             switch result {
+             case .success(let user):
+                 print("Obtained user: \(user)")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
      ```
 
-     or even exclude some attributes:
+     You can select which attributes you want:
 
      ```
      Auth0
-     .users(token token, domain: "samples.auth0.com")
-     .get(userId, fields: ["identities", "app_metadata"], include: false)
-     .start { print($0) }
+         .users(token: credentials.accessToken, domain: "samples.auth0.com")
+         .get("user id", fields: ["email", "user_id"])
+         .start { print($0) }
      ```
 
-     - parameter identifier: id of the user
-     - parameter fields:     list of user's field names that will be included/excluded in the response. By default all will be retrieved
-     - parameter include:    flag that indicates that only the names in 'fields' should be included or excluded in the response. By default it will include them
+     You can even exclude some attributes:
 
-     - returns: a request that will yield a user
-     - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id)
-     - important: The token must have the scope `read:users` scope
+     ```
+     Auth0
+         .users(token: credentials.accessToken, domain: "samples.auth0.com")
+         .get("user id", fields: ["identities", "app_metadata"], include: false)
+         .start { print($0) }
+     ```
+
+     - Parameters:
+       - identifier: ID of the user. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - fields:     List of the user's field names that will be included/excluded in the response. By default all will be retrieved.
+       - include:    Flag that indicates that only the names in 'fields' should be included/excluded in the response. By default it will include them.
+     - Returns: A request that will yield a user.
+     - Requires: The token must have the scope `read:users` scope.
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id)
      */
     func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError>
 
     /**
-     Updates a user's root values (those who are allowed to be updated).
+     Updates a user's root values (those which are allowed to be updated).
 
      For example if you need to change `email`:
 
      ```
+     let attributes = UserPatchAttributes().email("newemail@auth0.com",
+                                                  connection: "Username-Password-Authentication",
+                                                  clientId: clientId)
+     ```
+
+     Or if you need to change `user_metadata`:
+
+     ```
+     let attributes = UserPatchAttributes().userMetadata(["first_name": "John", "last_name": "Appleseed"])
+     ```
+
+     You can even chain several changes together:
+
+     ```
      let attributes = UserPatchAttributes()
-     .email("newmail@auth0.com", connection: "Username-Password-Authentication", clientId: "MyClientId")
+         .email("newemail@auth0.com",
+                verify: true, 
+                connection: "Username-Password-Authentication", 
+                clientId: clientId)
+         .userMetadata(["first_name": "John", "last_name": "Appleseed"])
+         .appMetadata(["role": "admin"])
      ```
 
-     or `user_metadata`:
-
-     ```
-     let attributes = UserPatchAttributes()
-     .userMetadata(["first_name": "John", "last_name": "Appleseed"])
-
-     ```
-
-     and you can even chain several changes together:
-
-     ```
-     let attributes = UserPatchAttributes()
-     .email("support@auth0.com", verify: true, connection: "Username-Password-Authentication", clientId: "MyClientId")
-     .userMetadata(["first_name": "Juan", "last_name": "AuthZero"])
-     .appMetadata(["role": "admin"])
-     ```
-
-     then just pass the `UserPatchAttributes` to the patch method like:
+     Then, just pass the ``UserPatchAttributes`` to the patch method:
 
      ```
      Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .patch(userId, attributes: attributes)
-     .start { print($0) }
+         .users(token: credentials.accessToken, domain: "samples.auth0.com")
+         .patch("user id", attributes: attributes)
+         .start { print($0) }
      ```
 
-     - parameter identifier: id of the user to update
-     - parameter attributes: root attributes to be updated
-
-     - returns: a request
-     - seeAlso: UserPatchAttributes
-     - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
-     - important: The token must have one of  the following scopes: `update:users`, `update:users_app_metadata`
+     - Parameters:
+       - identifier: ID of the user to update. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - attributes: Root attributes to be updated.
+     - Returns: A request that will yield the updated user.
+     - Requires: The token must have one of the following scopes: `update:users`, `update:users_app_metadata`.
+     - See: ``UserPatchAttributes``
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      */
     func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError>
 
     /**
-     Updates only the user's userMetadata field
-
+     Updates only the user's `user_metadata` field.
 
      ```
      Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .patch(userId, userMetadata: ["first_name": "Juan", "last_name": "AuthZero"])
-     .start { print($0) }
+         .users(token: credentials.accessToken, domain: "samples.auth0.com")
+         .patch("user id", userMetadata: ["first_name": "John", "last_name": "Appleseed"])
+         .start { print($0) }
      ```
 
-     - parameter identifier:   id of the user
-     - parameter userMetadata: metadata to update
-
-     - returns: a request to patch user_metadata
-     - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
-     - important: The token must have one of  the following scopes: `update:users`, `update:users_app_metadata`
+     - Parameters:
+       - identifier:   ID of the user to update. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - userMetadata: Metadata to update.
+     - Returns: A request that will yield the updated user.
+     - Requires: The token must have one of the following scopes: `update:users`, `update:users_app_metadata`.
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      */
     func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError>
 
     /**
-     Links a user given it's identifier with a secondary user identifier it's token.
-     After this request the primary user will hold another identity in it's 'identities' attribute which will represent the secondary user.
+     Links a user given its identifier with a secondary user given its ID Token.
+     After this request the primary user will hold another identity in its `identities` attribute, which will represent the secondary user.
 
      ```
      Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .link(userId, withOtherUserToken: anotherToken)
-     .start { print($0) }
+         .users(token: credentials.accessToken, domain: "samples.auth0.com")
+         .link("primary user id", withOtherUserToken: "secondary id token")
+         .start { print($0) }
      ```
 
-     - parameter identifier: id of the primary user who will be linked against a secondary one
-     - parameter token:      token of the secondary user to link to
-
-     - returns: a request to link two users
-     - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
-     - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
-     - important: The token must have the following scope `update:current_user_identities`
+     - Parameters:
+       - identifier: ID of the primary user who will be linked against a secondary one. You can get this value from the `sub` claim of the primary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - token:      ID Token of the secondary user.
+     - Returns: A request to link two users.
+     - Requires: The token must have the scope `update:current_user_identities`.
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
+     - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking)
      */
     func link(_ identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError>
 
     /**
-     Links a user given it's identifier with a secondary user identified by it's id, provider and connection identifier.
+     Links a user given its identifier with a secondary user given its identifier, provider and connection identifier.
 
      ```
      Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .link(userId, userId: anotherUserId, provider: "auth0", connectionId: "AConnectionID")
-     .start { print($0) }
+         .users(token: credentials.accessToken, domain: "samples.auth0.com")
+         .link("primary user id", userId: "secondary user id", provider: "auth0", connectionId: "connection id")
+         .start { print($0) }
      ```
 
-     - parameter identifier:   id of the primary user who will be linked against a secondary one
-     - parameter userId:       id of the secondary user who will be linked
-     - parameter provider:     name of the provider of the secondary user. e.g. 'auth0' for Database connections
-     - parameter connectionId: id of the connection of the secondary user.
-
-     - returns: a request to link two users
-     - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
-     - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
-     - important: The token must have the following scope `update:users`
+     - Parameters:
+       - identifier:   ID of the primary user who will be linked against a secondary one. You can get this value from the `sub` claim of the primary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - userId:       ID of the secondary user. You can get this value from the `sub` claim of the secondary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - provider:     Name of the provider for the secondary user, e.g. 'auth0' for database connections.
+       - connectionId: ID of the connection for the secondary user.
+     - Returns: A request to link two users.
+     - Requires: The token must have the scope `update:users`.
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
+     - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking)
      */
     func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String?) -> Request<[ManagementObject], ManagementError>
 
     /**
-     Removes one identity from a user.
+     Removes an identity from a user.
 
      ```
      Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .unlink(identityId: "an_idenitity_id", provider: "facebook", fromUserId: "a_user_identifier")
-     .start { print($0) }
+         .users(token: credentials.accessToken, domain: "samples.auth0.com")
+         .unlink(identityId: "identity id", provider: "facebook", fromUserId: "user id")
+         .start { print($0) }
      ```
 
-     - parameter identityId: identifier of the identity to remove
-     - parameter provider:   name of the provider of the identity
-     - parameter identifier: id of the user who owns the identity
-
-     - returns: a request to remove an identity
-     - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id)
-     - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
-     - important: The token must have the following scope `update:users`
+     - Parameters:
+       - identityId: ID of the identity to remove.
+       - provider:   Name of the identity provider.
+       - identifier: ID of the user who owns the identity. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+     - Returns: A request to remove an identity.
+     - Requires: The token must have the scope `update:users`.
+     - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/delete_user_identity_by_user_id)
+     - See: [User Account Linking](https://auth0.com/docs/users/user-account-linking)
      */
     func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError>
+
 }
 
-extension Users {
+public extension Users {
 
-    /**
-     Fetch a user using the it's identifier.
-
-     By default it gets all user's attributes:
-
-     ```
-     Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .get(userId)
-     .start { print($0) }
-     ```
-
-     but you can select which attributes you want:
-
-     ```
-     Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .get(userId, fields: ["email", "user_id"])
-     .start { print($0) }
-     ```
-
-     or even exclude some attributes:
-
-     ```
-     Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .get(userId, fields: ["identities", "app_metadata"], include: false)
-     .start { print($0) }
-     ```
-
-     - parameter identifier: id of the user
-     - parameter fields:     list of user's field names that will be included/excluded in the response. By default all will be retrieved
-     - parameter include:    flag that indicates that only the names in 'fields' should be included or excluded in the response. By default it will include them
-
-     - returns: a request that will yield a user
-     - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id)
-     - important: The token must have the scope `read:users` scope
-     */
-    public func get(_ identifier: String, fields: [String] = [], include: Bool = true) -> Request<ManagementObject, ManagementError> {
+    func get(_ identifier: String, fields: [String] = [], include: Bool = true) -> Request<ManagementObject, ManagementError> {
         return self.get(identifier, fields: fields, include: include)
     }
 
-    /**
-     Links a user given it's identifier with a secondary user identified by it's id, provider and connection identifier.
-
-     ```
-     Auth0
-     .users(token: token, domain: "samples.auth0.com")
-     .link(userId, userId: anotherUserId, provider: "auth0", connectionId: "AConnectionID")
-     .start { print($0) }
-     ```
-
-     - parameter identifier:   id of the primary user who will be linked against a secondary one
-     - parameter userId:       id of the secondary user who will be linked
-     - parameter provider:     name of the provider of the secondary user. e.g. 'auth0' for Database connections
-     - parameter connectionId: id of the connection of the secondary user.
-
-     - returns: a request to link two users
-     - note: [Auth0 Management API docs](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
-     - seeAlso: [Link Accounts Guide](https://auth0.com/docs/link-accounts)
-     - important: The token must have the following scope `update:users`
-     */
-    public func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
+    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
         return self.link(identifier, withUser: userId, provider: provider, connectionId: connectionId)
     }
+
 }
 
 extension Management: Users {
 
     func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError> {
-        let userPath = "/api/v2/users/\(identifier)"
+        let userPath = "api/v2/users/\(identifier)"
         var component = components(baseURL: self.url as URL, path: userPath)
         let value = fields.joined(separator: ",")
         if !value.isEmpty {
@@ -288,10 +228,10 @@ extension Management: Users {
     }
 
     func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError> {
-        let userPath = "/api/v2/users/\(identifier)"
+        let userPath = "api/v2/users/\(identifier)"
         let component = components(baseURL: self.url as URL, path: userPath)
 
-        return Request(session: self.session, url: component.url!, method: "PATCH", handle: self.managementObject, payload: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session, url: component.url!, method: "PATCH", handle: self.managementObject, parameters: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError> {
@@ -300,7 +240,7 @@ extension Management: Users {
     }
 
     func link(_ identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError> {
-        return link(identifier, payload: ["link_with": token])
+        return link(identifier, parameters: ["link_with": token])
     }
 
     func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
@@ -309,17 +249,17 @@ extension Management: Users {
             "provider": provider
         ]
         payload["connection_id"] = connectionId
-        return link(identifier, payload: payload)
+        return link(identifier, parameters: payload)
     }
 
-    private func link(_ identifier: String, payload: [String: Any]) -> Request<[ManagementObject], ManagementError> {
-        let identitiesPath = "/api/v2/users/\(identifier)/identities"
+    private func link(_ identifier: String, parameters: [String: Any]) -> Request<[ManagementObject], ManagementError> {
+        let identitiesPath = "api/v2/users/\(identifier)/identities"
         let url = components(baseURL: self.url as URL, path: identitiesPath).url!
-        return Request(session: self.session, url: url, method: "POST", handle: self.managementObjects, payload: payload, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session, url: url, method: "POST", handle: self.managementObjects, parameters: parameters, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError> {
-        let identityPath = "/api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
+        let identityPath = "api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
         let url = components(baseURL: self.url as URL, path: identityPath).url!
         return Request(session: self.session, url: url, method: "DELETE", handle: self.managementObjects, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }

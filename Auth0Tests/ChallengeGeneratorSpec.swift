@@ -1,35 +1,8 @@
-// ChallengeGeneratorSpec.swift
-//
-// Copyright (c) 2016 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
+import Foundation
 import Quick
 import Nimble
 
-#if SWIFT_PACKAGE
-import Auth0
-
-@testable import Auth0ObjectiveC
-#else
 @testable import Auth0
-#endif
 
 class ChallengeGeneratorSpec: QuickSpec {
 
@@ -39,9 +12,10 @@ class ChallengeGeneratorSpec: QuickSpec {
             let seed: [UInt8] = [116, 24, 223, 180, 151, 153, 224, 37, 79, 250, 96, 125, 216, 173,
                                  187, 186, 22, 212, 37, 77, 105, 214, 191, 240, 91, 88, 5, 88, 83,
                                  132, 141, 121]
-            let verifier = Data(bytes: seed, count: seed.count * MemoryLayout<UInt8>.size)
-
-            let generator = A0SHA256ChallengeGenerator(verifier: verifier)
+            let data = Data(bytes: seed, count: seed.count * MemoryLayout<UInt8>.size)
+            let verifier = data.a0_encodeBase64URLSafe();
+            
+            let generator = ChallengeGenerator(verifier: verifier)
 
             it("should convert verifier to base 64 url-safe") {
                 expect(generator.verifier) == "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
@@ -52,10 +26,10 @@ class ChallengeGeneratorSpec: QuickSpec {
             }
         }
 
-        var generator: A0SHA256ChallengeGenerator!
+        var generator: ChallengeGenerator!
 
         beforeEach {
-            generator = A0SHA256ChallengeGenerator()
+            generator = ChallengeGenerator()
         }
 
         it("should always return SHA 256 method") {
@@ -68,6 +42,7 @@ class ChallengeGeneratorSpec: QuickSpec {
         }
 
         it("should return verifier as base64 url-safe") {
+            expect(generator.verifier.count) == 43
             expect(generator.verifier).to(beURLSafeBase64())
         }
 
@@ -75,5 +50,14 @@ class ChallengeGeneratorSpec: QuickSpec {
             expect(generator.challenge).to(beURLSafeBase64())
         }
 
+        it("should return a different verifier for a different generator") {
+            let anotherGenerator = ChallengeGenerator()
+            expect(generator.verifier).toNot(equal(anotherGenerator.verifier))
+        }
+
+        it("should return a different challenge for different generator") {
+            let anotherGenerator = ChallengeGenerator()
+            expect(generator.challenge).toNot(equal(anotherGenerator.challenge))
+        }
     }
 }

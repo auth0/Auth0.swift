@@ -1,59 +1,44 @@
-// Request.swift
-//
-// Copyright (c) 2016 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Foundation
+#if canImport(Combine)
+import Combine
+#endif
 
 #if DEBUG
-    let parameterPropertyKey = "com.auth0.parameter"
+let parameterPropertyKey = "com.auth0.parameter"
 #endif
 
 /**
- Auth0 API request
+ Auth0 API request.
 
  ```
- let request: Request<Credentials, Authentication.Error> = //
+ let request: Request<Credentials, AuthenticationError> = // ...
+ 
  request.start { result in
-    //handle result
+    print(result)
  }
  ```
  */
-public struct Request<T, E: Auth0Error>: Requestable {
-    public typealias Callback = (Result<T>) -> Void
+public struct Request<T, E: Auth0APIError>: Requestable {
+    /**
+     The callback closure type for the request.
+     */
+    public typealias Callback = (Result<T, E>) -> Void
 
     let session: URLSession
     let url: URL
     let method: String
     let handle: (Response<E>, Callback) -> Void
-    let payload: [String: Any]
+    let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
 
-    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, payload: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
+    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, parameters: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
         self.session = session
         self.url = url
         self.method = method
         self.handle = handle
-        self.payload = payload
+        self.parameters = parameters
         self.headers = headers
         self.logger = logger
         self.telemetry = telemetry
@@ -62,10 +47,10 @@ public struct Request<T, E: Auth0Error>: Requestable {
     var request: URLRequest {
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = method
-        if !payload.isEmpty, let httpBody = try? JSONSerialization.data(withJSONObject: payload, options: []) {
+        if !parameters.isEmpty, let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) {
             request.httpBody = httpBody
             #if DEBUG
-            URLProtocol.setProperty(payload, forKey: parameterPropertyKey, in: request)
+            URLProtocol.setProperty(parameters, forKey: parameterPropertyKey, in: request)
             #endif
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -75,9 +60,9 @@ public struct Request<T, E: Auth0Error>: Requestable {
     }
 
     /**
-     Starts the request to the server
+     Performs the request.
 
-     - parameter callback: called when the request finishes and yield it's result
+     - Parameter callback: Callback that receives the result of the request when it completes.
      */
     public func start(_ callback: @escaping Callback) {
         let handler = self.handle
@@ -90,47 +75,76 @@ public struct Request<T, E: Auth0Error>: Requestable {
             if error == nil, let response = response {
                 logger?.trace(response: response, data: data)
             }
-            handler(Response(data: data, response: response, error: error), callback)
+            handler(Response(data: data, response: response as? HTTPURLResponse, error: error), callback)
         })
         task.resume()
     }
 
     /**
-     Modify the parameters by creating a copy of self and adding the provided parameters to `payload`.
+     Modifies the parameters by creating a copy of the request and adding the provided parameters to ``parameters``.
 
-     - parameter payload: Additional parameters for the request. The provided map will be added to `payload`.
+     - Parameter extraParameters: Additional parameters for the request.
      */
-    public func parameters(_ payload: [String: Any]) -> Self {
-        var parameter = self.payload
-        payload.forEach { parameter[$0] = $1 }
+    public func parameters(_ extraParameters: [String: Any]) -> Self {
+        var parameters = extraParameters.merging(self.parameters) {(current, _) in current}
+        parameters["scope"] = includeRequiredScope(in: parameters["scope"] as? String)
 
-        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, payload: parameter, headers: self.headers, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, parameters: parameters, headers: self.headers, logger: self.logger, telemetry: self.telemetry)
     }
-}
-
-/**
- *  A concatenated request, if the first one fails it will yield it's error, otherwise it will return the last request outcome
- */
-public struct ConcatRequest<F, S, E: Auth0Error>: Requestable {
-    let first: Request<F, E>
-    let second: Request<S, E>
-
-    public typealias ResultType = S
 
     /**
-     Starts the request to the server
+     Modifies the headers by creating a copy of the request and adding the provided headers to ``headers``.
 
-     - parameter callback: called when the request finishes and yield it's result
+     - Parameter extraHeaders: Additional headers for the request.
      */
-    public func start(_ callback: @escaping (Result<ResultType>) -> Void) {
-        let second = self.second
-        first.start { result in
-            switch result {
-            case .failure(let cause):
-                callback(.failure(cause))
-            case .success:
-                second.start(callback)
-            }
-        }
+    public func headers(_ extraHeaders: [String: String]) -> Self {
+        let headers = extraHeaders.merging(self.headers) {(current, _) in current}
+
+        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, parameters: self.parameters, headers: headers, logger: self.logger, telemetry: self.telemetry)
     }
 }
+
+// MARK: - Combine
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+public extension Request {
+
+    /**
+     Combine publisher for the request.
+
+     - Returns: A type-erased publisher.
+     */
+    func start() -> AnyPublisher<T, E> {
+        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+    }
+
+}
+
+// MARK: - Async/Await
+
+#if compiler(>=5.5) && canImport(_Concurrency)
+public extension Request {
+
+    /**
+     Performs the request.
+
+     - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
+     */
+    #if compiler(>=5.5.2)
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    func start() async throws -> T {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.start(continuation.resume)
+        }
+    }
+    #else
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func start() async throws -> T {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.start(continuation.resume)
+        }
+    }
+    #endif
+
+}
+#endif

@@ -1,11 +1,3 @@
-//
-//  ViewController.swift
-//  OAuth2Mac
-//
-//  Created by Martin on 16/07/2018.
-//  Copyright © 2018 Auth0. All rights reserved.
-//
-
 import Cocoa
 import Auth0
 
@@ -19,15 +11,18 @@ class ViewController: NSViewController {
                 case .success(let credentials): print(credentials)
                 case .failure(let error): print(error)
                 }
-        }
+            }
     }
     
     @IBAction func logout(_ sender: Any) {
         Auth0.webAuth()
             .logging(enabled: true)
             .clearSession(federated: false) { result in
-                result ? print("Logged out") : print("Failed to log out")
-        }
+                switch result {
+                case .success: print("Logged out")
+                case .failure(let error): print(error)
+                }
+            }
     }
 
 }

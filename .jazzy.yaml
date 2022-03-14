@@ -1,0 +1,9 @@
+author: Auth0
+author_url: https://auth0.com
+github_url: https://github.com/auth0/Auth0.swift
+podspec: Auth0.podspec
+output: docs
+clean: true
+theme: fullwidth
+sdk: iphoneos
+undocumented_text: ""

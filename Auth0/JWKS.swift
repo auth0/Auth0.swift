@@ -1,47 +1,44 @@
-// JWKS.swift
-//
-// Copyright (c) 2019 Auth0 (http://auth0.com)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 import Foundation
 
+/// The JSON Web Key Set (JWKS) of your Auth0 tenant.
+///
+/// - See: [JSON Web Key Sets](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-key-sets)
 public struct JWKS: Codable {
-    let keys: [JWK]
+    /// The keys in the key set.
+    public let keys: [JWK]
 }
 
 public extension JWKS {
+
+    /// Gets a key from the key set by its identifier (`kid`).
     func key(id kid: String) -> JWK? {
         return keys.first { $0.keyId == kid }
     }
+
 }
 
+/// Cryptographic public key of your Auth0 tenant.
+///
+/// - See: ``JWKS``
 public struct JWK: Codable {
-    let keyType: String
-    let keyId: String?
-    let usage: String?
-    let algorithm: String?
-    let certUrl: String?
-    let certThumbprint: String?
-    let certChain: [String]?
-    let rsaModulus: String?
-    let rsaExponent: String?
+    /// The type of key.
+    public let keyType: String
+    /// The unique identifier of the key.
+    public let keyId: String?
+    /// How the key is meant to be used.
+    public let usage: String?
+    /// The algorithm of the key.
+    public let algorithm: String?
+    /// The URL of the x.509 certificate.
+    public let certUrl: String?
+    /// The thumbprint of the x.509 certificate (SHA-1 thumbprint).
+    public let certThumbprint: String?
+    /// The x.509 certificate chain.
+    public let certChain: [String]?
+    /// The modulus of the key.
+    public let modulus: String?
+    /// The exponent of the key.
+    public let exponent: String?
 
     enum CodingKeys: String, CodingKey {
         case keyType = "kty"
@@ -51,7 +48,7 @@ public struct JWK: Codable {
         case certUrl = "x5u"
         case certThumbprint = "x5t"
         case certChain = "x5c"
-        case rsaModulus = "n"
-        case rsaExponent = "e"
+        case modulus = "n"
+        case exponent = "e"
     }
 }
