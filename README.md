@@ -173,7 +173,7 @@ The callback and logout URLs are the URLs that Auth0 invokes to redirect back to
 
 Since callback and logout URLs can be manipulated, you will need to add your URLs to the **Allowed Callback URLs** and **Allowed Logout URLs** fields in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback and logout URLs are not set, users will be unable to log in and out of the application and will get an error.
 
-Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the following value to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your application.
+Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your application. If you are using a [Custom Domain](https://auth0.com/docs/brand-and-customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with the value of your Custom Domain instead of the value from the settings page.
 
 ##### iOS
 
