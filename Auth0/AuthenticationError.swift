@@ -120,7 +120,7 @@ public struct AuthenticationError: Auth0APIError {
 
     }
 
-    /// When performing web-based authentication, the resource server denies access per OAuth2 specifications.
+    /// When Auth0 denies access due to some misconfiguration or an error in an Action or Rule.
     public var isAccessDenied: Bool {
         return self.code == "access_denied"
     }
