@@ -1238,11 +1238,11 @@ Auth0
 
 ##### Use a custom `URLSession` instance
 
-You can specify a custom `URLSession` instance for more advanced networking configuration.
+You can specify a custom `URLSession` instance for more advanced networking configuration, e.g. customizing timeout values.
 
 ```swift
 Auth0
-    .users(session: CustomURLSession())
+    .users(session: customURLSession())
     // ...
 ```
 
