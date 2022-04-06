@@ -458,7 +458,7 @@ You can specify a custom `URLSession` instance for more advanced networking conf
 
 ```swift
 Auth0
-    .webAuth(session: customURLSession())
+    .webAuth(session: customURLSession)
     // ...
 ```
 
@@ -1008,7 +1008,7 @@ You can specify a custom `URLSession` instance for more advanced networking conf
 
 ```swift
 Auth0
-    .authentication(session: customURLSession())
+    .authentication(session: customURLSession)
     // ...
 ```
 
@@ -1242,7 +1242,7 @@ You can specify a custom `URLSession` instance for more advanced networking conf
 
 ```swift
 Auth0
-    .users(session: customURLSession())
+    .users(session: customURLSession)
     // ...
 ```
 
