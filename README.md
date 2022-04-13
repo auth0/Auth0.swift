@@ -313,7 +313,7 @@ Auth0
 
 ### SSO Alert Box (iOS / macOS)
 
-![ios-sso-alert](assets/ios-sso-alert.png)
+![sso-alert](assets/sso-alert.png)
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
