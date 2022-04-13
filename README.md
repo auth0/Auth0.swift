@@ -197,6 +197,8 @@ com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 
 Back in Xcode, go to the **Info** tab of your application target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
 
+This registers your Bundle Identifer as a custom scheme, so the callback URL can reach your application.
+
 ### Web Auth Login (iOS / macOS)
 
 Import the `Auth0` module in the file where you want to present the login page.
@@ -205,7 +207,7 @@ Import the `Auth0` module in the file where you want to present the login page.
 import Auth0
 ```
 
-Then, present the [Universal Login](https://auth0.com/docs/login/universal-login) page in the action of your **Login** button.
+Then, present the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page in the action of your **Login** button.
 
 ```swift
 Auth0
@@ -311,11 +313,11 @@ Auth0
 
 ### SSO Alert Box (iOS / macOS)
 
-![sso-alert](./sso-alert.png)
+![ios-sso-alert](assets/ios-sso-alert.png)
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
-> 💡 See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of Single Sign-On (SSO) in iOS.
+> 💡 See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of Single Sign-On (SSO) on iOS.
 
 [Go up ⤴](#table-of-contents)
 
@@ -368,7 +370,7 @@ Auth0
     }
 ```
 
-> ⚠️ The `screen_hint` parameter can only be used with the **New Universal Login Experience**, not the **Classic Experience**. If you are using the **Classic Universal Login Experience** you can use any custom parameter, e.g. `parameters(["action": "signup"])`. Then, customize the [login template](https://manage.auth0.com/#/login_page) to look for this parameter and set the `initialScreen` [option](https://github.com/auth0/lock#database-options) of the `Auth0Lock` constructor.
+> ⚠️ The `screen_hint` parameter will work with the **New Universal Login Experience** without any further configuration. If you are using the **Classic Universal Login Experience**, you need to customize the [login template](https://manage.auth0.com/#/login_page) to look for this parameter and set the `initialScreen` [option](https://github.com/auth0/lock#database-options) of the `Auth0Lock` constructor.
 
 <details>
   <summary>Using async/await</summary>
@@ -411,7 +413,7 @@ The following are some of the available Web Auth configuration options. Check th
 
 ##### Use any Auth0 connection
 
-Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the [Universal Login](https://auth0.com/docs/login/universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
+Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
 
 ```swift
 Auth0
@@ -422,7 +424,7 @@ Auth0
 
 ##### Add an audience value
 
-Specify an [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/configure/apis), e.g. `https://example.com/api`.
+Specify an [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/get-started/apis), e.g. `https://example.com/api`.
 
 ```swift
 Auth0
@@ -433,7 +435,7 @@ Auth0
 
 ##### Add a scope value
 
-Specify a [scope](https://auth0.com/docs/configure/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
+Specify a [scope](https://auth0.com/docs/get-started/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
 
 ```swift
 Auth0
@@ -462,7 +464,7 @@ Auth0
     // ...
 ```
 
-Note that this custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/login/universal-login) page.
+Note that this custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
 
 #### ID Token validation
 
@@ -522,7 +524,7 @@ guard credentialsManager.hasValid() else {
 
 #### Retrieve stored credentials 
 
-The credentials will be automatically renewed (if expired) using the [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens). **This method is thread-safe.**
+The credentials will be automatically renewed (if expired) using the [Refresh Token](https://auth0.com/docs/secure/tokens/refresh-tokens). **This method is thread-safe.**
 
 ```swift
 credentialsManager.credentials { result in 
@@ -565,7 +567,7 @@ credentialsManager
 ```
 </details>
 
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a Refresh Token from Auth0.
 
 #### Retrieve stored user information
 
@@ -619,11 +621,11 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 - [Authentication API client errors](#authentication-api-client-errors)
 
 The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
-We recommend using [Universal Login](https://auth0.com/docs/login/universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/configure/applications/update-grant-types).
+We recommend using [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/get-started/applications/update-grant-types).
 
 For login or signup with username/password, the `Password` grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`. Otherwise, the Auth0 Dashboard will take care of activating both when enabling `Password`.
 
-> 💡 If your Auth0 account has the "Bot Detection" feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the [Bot Detection](#bot-detection) section.
+> 💡 If your Auth0 account has the **Bot Detection** feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the [Bot Detection](#bot-detection) section.
 
 > ⚠️ The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID Tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) any ID Tokens received from the Authentication API client before using the information they contain.
 
@@ -923,7 +925,7 @@ Auth0
 
 #### Renew credentials
 
-Use a [Refresh Token](https://auth0.com/docs/security/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
+Use a [Refresh Token](https://auth0.com/docs/secure/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
 
 ```swift
 Auth0
@@ -974,7 +976,7 @@ Auth0
 ```
 </details>
 
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/configure/apis/scopes) when logging in to get a Refresh Token from Auth0.
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a Refresh Token from Auth0.
 
 #### Authentication API client configuration
 
@@ -1406,7 +1408,7 @@ Auth0
 
 ### Organizations
 
-[Organizations](https://auth0.com/docs/organizations) is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. 
+[Organizations](https://auth0.com/docs/manage-users/organizations) is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. 
 
 Using Organizations, you can:
 
@@ -1502,7 +1504,7 @@ NotificationCenter.default
 
 ### Bot Detection
 
-If you are performing database login/signup via the Authentication API and would like to use the [Bot Detection](https://auth0.com/docs/configure/attack-protection/bot-detection) feature, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.
+If you are performing database login/signup via the Authentication API and would like to use the [Bot Detection](https://auth0.com/docs/secure/attack-protection/bot-detection) feature, you need to handle the `isVerificationRequired` error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.
 
 ```swift
 Auth0
@@ -1580,12 +1582,12 @@ For general support or usage questions, use the [Auth0 Community](https://commun
 
 Auth0 helps you to:
 
-* Add authentication with [multiple sources](https://auth0.com/docs/connections), either social identity providers such as **Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce** (amongst others), or enterprise identity systems like **Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML Identity Provider**.
-* Add authentication through more traditional **[username/password databases](https://auth0.com/docs/connections/database/custom-db)**.
-* Add support for **[linking different user accounts](https://auth0.com/docs/users/user-account-linking)** with the same user.
-* Support for generating signed [JSON Web Tokens](https://auth0.com/docs/security/tokens/json-web-tokens) to call your APIs and **flow the user identity** securely.
+* Add authentication with [multiple sources](https://auth0.com/docs/authenticate/identity-providers), either social identity providers such as **Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce** (amongst others), or enterprise identity systems like **Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML Identity Provider**.
+* Add authentication through more traditional **[username/password databases](https://auth0.com/docs/authenticate/database-connections/custom-db)**.
+* Add support for **[linking different user accounts](hhttps://auth0.com/docs/manage-users/user-accounts/user-account-linking)** with the same user.
+* Support for generating signed [JSON Web Tokens](https://auth0.com/docs/secure/tokens/json-web-tokens) to call your APIs and **flow the user identity** securely.
 * Analytics of how, when, and where users are logging in.
-* Pull data from other sources and add it to the user profile through [JavaScript actions](https://auth0.com/docs/actions).
+* Pull data from other sources and add it to the user profile through [JavaScript Actions](https://auth0.com/docs/customize/actions).
 
 **Why Auth0?** Because you should save time, be happy, and focus on what really matters: building your product.
 

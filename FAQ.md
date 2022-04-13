@@ -8,13 +8,13 @@
 
 ## 1. How can I disable the _login_ alert box?
 
-![sso-alert](./sso-alert.png)
+![ios-sso-alert](assets/ios-sso-alert.png)
 
 Under the hood, Auth0.swift uses `ASWebAuthenticationSession` to perform web-based authentication, which is the [API provided by Apple](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) for such purpose.
 
 That alert box is displayed and managed by `ASWebAuthenticationSession`, not by Auth0.swift, because by default this API will store the session cookie in the shared Safari cookie jar. This makes Single Sign-On (SSO) possible. According to Apple, that requires user consent.
 
-> 💡 See [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of SSO in iOS.
+> 💡 See [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of SSO on iOS.
 
 If you don't need SSO, you can disable this behavior by adding `useEphemeralSession()` to the login call. This will configure `ASWebAuthenticationSession` to not store the session cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
 
@@ -27,15 +27,15 @@ Auth0
     }
 ```
 
-Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
+Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the application will suffice. What `clearSession(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
 
 > ⚠️ `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`. This option is only available on [iOS 13+ and macOS](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio), so `useEphemeralSession()` will have no effect on iOS 12. To improve the experience for iOS 12 users, see the approach described below.
 
 ## 2. How can I disable the _logout_ alert box?
 
-![sso-alert](./sso-alert.png)
+![ios-sso-alert](assets/ios-sso-alert.png)
 
-If you need SSO and/or are willing to tolerate the alert box on the login call, but would prefer to get rid of it when calling `clearSession(federated:)`, you can simply not call `clearSession(federated:)` and just clear the credentials from the app. This means that the shared session cookie will not be removed, so to get the user to log in again you'll need to add the `"prompt": "login"` parameter to the _login_ call.
+If you need SSO and/or are willing to tolerate the alert box on the login call, but would prefer to get rid of it when calling `clearSession(federated:)`, you can simply not call `clearSession(federated:)` and just clear the credentials from the application. This means that the shared session cookie will not be removed, so to get the user to log in again you need to add the `"prompt": "login"` parameter to the _login_ call.
 
 ```swift
 Auth0
@@ -49,7 +49,7 @@ Auth0
 
 Otherwise, the browser modal will close right away and the user will be automatically logged in again, as the cookie will still be there.
 
-> ⚠️ Keeping the shared session cookie may not be an option if you have strong privacy and/or security requirements, e.g. for a banking app.
+> ⚠️ Keeping the shared session cookie may not be an option if you have strong privacy and/or security requirements, e.g. for a banking application.
 
 ## 3. Is there a way to disable the _login_ alert box without `useEphemeralSession()`?
 
