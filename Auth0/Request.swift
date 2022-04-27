@@ -47,11 +47,20 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     var request: URLRequest {
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = method
-        if !parameters.isEmpty, let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) {
-            request.httpBody = httpBody
-            #if DEBUG
-            URLProtocol.setProperty(parameters, forKey: parameterPropertyKey, in: request)
-            #endif
+        if !parameters.isEmpty {
+            if method.caseInsensitiveCompare("GET") == .orderedSame {
+                var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
+                var queryItems = urlComponents?.queryItems ?? []
+                let newQueryItems = parameters.map { URLQueryItem(name: $0.key, value: String(describing: $0.value)) }
+                queryItems.append(contentsOf: newQueryItems)
+                urlComponents?.queryItems = queryItems
+                request.url = urlComponents?.url ?? url
+            } else if let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) {
+                request.httpBody = httpBody
+                #if DEBUG
+                URLProtocol.setProperty(parameters, forKey: parameterPropertyKey, in: request)
+                #endif
+            }
         }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }

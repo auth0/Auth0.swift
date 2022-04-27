@@ -58,6 +58,22 @@ class RequestSpec: QuickSpec {
                     let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, parameters: [:], logger: nil, telemetry: Telemetry())
                     expect(request.parameters(["scope": "email phone"]).parameters["scope"] as? String) == "openid email phone"
                 }
+
+                it("should add the parameters as query parameters") {
+                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, parameters: ["foo": "bar"], logger: nil, telemetry: Telemetry())
+                    expect(request.request.url?.query) == "foo=bar"
+                }
+
+                it("should append the parameters to the existing query parameters") {
+                    let request = Request(session: URLSession.shared, url: URL(string: "\(Url.absoluteString)?foo=bar")!, method: "GET", handle: plainJson, parameters: ["baz": "qux"], logger: nil, telemetry: Telemetry())
+                    expect(request.request.url?.query) == "foo=bar&baz=qux"
+                }
+
+                it("should add the parameters to the request body") {
+                    let request = Request(session: URLSession.shared, url: Url, method: "POST", handle: plainJson, parameters: ["foo": "bar"], logger: nil, telemetry: Telemetry())
+                    let body = try! JSONSerialization.jsonObject(with: request.request.httpBody!, options: []) as! [String: Any]
+                    expect(body["foo"] as? String) == "bar"
+                }
             }
 
             context("headers") {
