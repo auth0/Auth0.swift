@@ -65,7 +65,7 @@ class RequestSpec: QuickSpec {
                 }
 
                 it("should append the parameters to the existing query parameters") {
-                    let request = Request(session: URLSession.shared, url: URL(string: "https://samples.auth0.com?foo=bar")!, method: "GET", handle: plainJson, parameters: ["baz": "qux"], logger: nil, telemetry: Telemetry())
+                    let request = Request(session: URLSession.shared, url: URL(string: "\(Url.absoluteString)?foo=bar")!, method: "GET", handle: plainJson, parameters: ["baz": "qux"], logger: nil, telemetry: Telemetry())
                     expect(request.request.url?.query) == "foo=bar&baz=qux"
                 }
 
