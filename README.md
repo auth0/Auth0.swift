@@ -1473,7 +1473,7 @@ Auth0
 
 #### Accept user invitations
 
-To accept organization invitations your application needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app). Tapping on the invitation link should open your application (invitations links are HTTPS only).
+To accept organization invitations your application needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app). Tapping on the invitation link should open your application (invitation links are HTTPS only).
 
 When your application gets opened by an invitation link, grab the invitation URL and pass it to `invitationURL()`.
 
