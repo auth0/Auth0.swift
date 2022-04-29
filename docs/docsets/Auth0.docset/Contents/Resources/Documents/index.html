@@ -20,7 +20,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Auth0 2.0.0 Docs
+          Auth0 2.0.1 Docs
         </a>
          (97% documented)
       </p>
@@ -353,7 +353,7 @@
 <p>Auth0.swift needs the <strong>Client ID</strong> and <strong>Domain</strong> of the Auth0 application to communicate with Auth0. You can find these details on the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>. If you are using a <a href="https://auth0.com/docs/brand-and-customize/custom-domains">Custom Domain</a>, use the value of your Custom Domain instead of the value from the settings page.</p>
 
 <blockquote>
-<p>⚠️ Make sure that the <a href="https://auth0.com/docs/configure/applications">application type</a> of the Auth0 application is <strong>Native</strong>. If you don’t have a Native Auth0 application, <a href="https://auth0.com/docs/get-started/create-apps/native-apps">create one</a> before continuing.</p>
+<p>⚠️ Make sure that the <a href="https://auth0.com/docs/configure/applications">application type</a> of the Auth0 application is <strong>Native</strong>. If you don’t have a Native Auth0 application already, <a href="https://auth0.com/docs/get-started/create-apps/native-apps">create one</a> before continuing.</p>
 </blockquote>
 <h4 id='configure-client-id-and-domain-with-a-plist' class='heading'>Configure Client ID and Domain with a plist</h4>
 
@@ -421,13 +421,15 @@ Auth0
 <h4 id='configure-custom-url-scheme' class='heading'>Configure custom URL scheme</h4>
 
 <p>Back in Xcode, go to the <strong>Info</strong> tab of your application target settings. In the <strong>URL Types</strong> section, click the <strong>＋</strong> button to add a new entry. There, enter <code>auth0</code> into the <strong>Identifier</strong> field and <code>$(PRODUCT_BUNDLE_IDENTIFIER)</code> into the <strong>URL Schemes</strong> field.</p>
+
+<p>This registers your Bundle Identifer as a custom URL scheme, so the callback and logout URLs can reach your application.</p>
 <h3 id='web-auth-login-ios-macos' class='heading'>Web Auth Login (iOS / macOS)</h3>
 
 <p>Import the <code>Auth0</code> module in the file where you want to present the login page.</p>
 <pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Auth0</span>
 </code></pre>
 
-<p>Then, present the <a href="https://auth0.com/docs/login/universal-login">Universal Login</a> page in the action of your <strong>Login</strong> button.</p>
+<p>Then, present the <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a> page in the action of your <strong>Login</strong> button.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
@@ -527,12 +529,12 @@ Auth0
 </details>
 <h3 id='sso-alert-box-ios-macos' class='heading'>SSO Alert Box (iOS / macOS)</h3>
 
-<p><img src="./sso-alert.png" alt="sso-alert"></p>
+<p><img src="assets/sso-alert.png" alt="sso-alert"></p>
 
 <p>Check the <a href="FAQ.md">FAQ</a> for more information about the alert box that pops up <strong>by default</strong> when using Web Auth.</p>
 
 <blockquote>
-<p>💡 See also <a href="https://developer.okta.com/blog/2022/01/13/mobile-sso">this blog post</a> for a detailed overview of Single Sign-On (SSO) in iOS.</p>
+<p>💡 See also <a href="https://developer.okta.com/blog/2022/01/13/mobile-sso">this blog post</a> for a detailed overview of Single Sign-On (SSO) on iOS.</p>
 </blockquote>
 
 <p><a href="#table-of-contents">Go up ⤴</a></p>
@@ -607,7 +609,7 @@ Auth0
 </code></pre>
 
 <blockquote>
-<p>⚠️ The <code>screen_hint</code> parameter can only be used with the <strong>New Universal Login Experience</strong>, not the <strong>Classic Experience</strong>. If you are using the <strong>Classic Universal Login Experience</strong> you can use any custom parameter, e.g. <code>parameters([&quot;action&quot;: &quot;signup&quot;])</code>. Then, customize the <a href="https://manage.auth0.com/#/login_page">login template</a> to look for this parameter and set the <code>initialScreen</code> <a href="https://github.com/auth0/lock#database-options">option</a> of the <code>Auth0Lock</code> constructor.</p>
+<p>⚠️ The <code>screen_hint</code> parameter will work with the <strong>New Universal Login Experience</strong> without any further configuration. If you are using the <strong>Classic Universal Login Experience</strong>, you need to customize the <a href="https://manage.auth0.com/#/login_page">login template</a> to look for this parameter and set the <code>initialScreen</code> <a href="https://github.com/auth0/lock#database-options">option</a> of the <code>Auth0Lock</code> constructor.</p>
 </blockquote>
 
 <details>
@@ -649,7 +651,7 @@ Auth0
 <p>The following are some of the available Web Auth configuration options. Check the <a href="https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html">API documentation</a> for the full list.</p>
 <h5 id='use-any-auth0-connection' class='heading'>Use any Auth0 connection</h5>
 
-<p>Specify an Auth0 connection to directly show that Identity Provider&rsquo;s login page, skipping the <a href="https://auth0.com/docs/login/universal-login">Universal Login</a> page itself. The connection must first be enabled for your Auth0 application in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.</p>
+<p>Specify an Auth0 connection to directly show that Identity Provider&rsquo;s login page, skipping the <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a> page itself. The connection must first be enabled for your Auth0 application in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">connection</span><span class="p">(</span><span class="s">"facebook"</span><span class="p">)</span> <span class="c1">// Show the Facebook login page</span>
@@ -657,7 +659,7 @@ Auth0
 </code></pre>
 <h5 id='add-an-audience-value' class='heading'>Add an audience value</h5>
 
-<p>Specify an <a href="https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience">audience</a> to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the <strong>API Identifier</strong> of your <a href="https://auth0.com/docs/configure/apis">Auth0 API</a>, e.g. <code>https://example.com/api</code>.</p>
+<p>Specify an <a href="https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience">audience</a> to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the <strong>API Identifier</strong> of your <a href="https://auth0.com/docs/get-started/apis">Auth0 API</a>, e.g. <code>https://example.com/api</code>.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">audience</span><span class="p">(</span><span class="s">"YOUR_AUTH0_API_IDENTIFIER"</span><span class="p">)</span>
@@ -665,7 +667,7 @@ Auth0
 </code></pre>
 <h5 id='add-a-scope-value' class='heading'>Add a scope value</h5>
 
-<p>Specify a <a href="https://auth0.com/docs/configure/apis/scopes">scope</a> to request permission to access protected resources, like the user profile. The default scope value is <code>openid profile email</code>. Regardless of the scope value specified, <code>openid</code> is always included.</p>
+<p>Specify a <a href="https://auth0.com/docs/get-started/apis/scopes">scope</a> to request permission to access protected resources, like the user profile. The default scope value is <code>openid profile email</code>. Regardless of the scope value specified, <code>openid</code> is always included.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">scope</span><span class="p">(</span><span class="s">"openid profile email offline_access read:todos"</span><span class="p">)</span>
@@ -681,13 +683,13 @@ Auth0
 </code></pre>
 <h5 id='use-a-custom-code-urlsession-code-instance' class='heading'>Use a custom <code>URLSession</code> instance</h5>
 
-<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration.</p>
+<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration, e.g. customizing timeout values.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="kt">CustomURLSession</span><span class="p">())</span>
+    <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="n">customURLSession</span><span class="p">)</span>
     <span class="c1">// ...</span>
 </code></pre>
 
-<p>Note that this custom <code>URLSession</code> instance will be used when communicating with the Auth0 Authentication API, not when opening the <a href="https://auth0.com/docs/login/universal-login">Universal Login</a> page.</p>
+<p>Note that this custom <code>URLSession</code> instance will be used when communicating with the Auth0 Authentication API, not when opening the <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a> page.</p>
 <h4 id='id-token-validation' class='heading'>ID Token validation</h4>
 
 <p>Auth0.swift automatically <a href="https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens">validates</a> the ID Token obtained from Web Auth login, following the <a href="https://openid.net/specs/openid-connect-core-1_0.html">OpenID Connect specification</a>. This ensures the contents of the ID Token have not been tampered with and can be safely used.</p>
@@ -734,7 +736,7 @@ Auth0
 </code></pre>
 <h4 id='retrieve-stored-credentials' class='heading'>Retrieve stored credentials</h4>
 
-<p>The credentials will be automatically renewed (if expired) using the <a href="https://auth0.com/docs/security/tokens/refresh-tokens">Refresh Token</a>. <strong>This method is thread-safe.</strong></p>
+<p>The credentials will be automatically renewed (if expired) using the <a href="https://auth0.com/docs/secure/tokens/refresh-tokens">Refresh Token</a>. <strong>This method is thread-safe.</strong></p>
 <pre class="highlight swift"><code><span class="n">credentialsManager</span><span class="o">.</span><span class="n">credentials</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span> 
     <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
     <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
@@ -776,7 +778,7 @@ credentialsManager
 </details>
 
 <blockquote>
-<p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/configure/apis/scopes">scope</a> when logging in to get a Refresh Token from Auth0.</p>
+<p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/get-started/apis/scopes">scope</a> when logging in to get a Refresh Token from Auth0.</p>
 </blockquote>
 <h4 id='retrieve-stored-user-information' class='heading'>Retrieve stored user information</h4>
 
@@ -824,12 +826,12 @@ credentialsManager
 </ul>
 
 <p>The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
-We recommend using <a href="https://auth0.com/docs/login/universal-login">Universal Login</a>, but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>, as explained in <a href="https://auth0.com/docs/configure/applications/update-grant-types">Update Grant Types</a>.</p>
+We recommend using <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a>, but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>, as explained in <a href="https://auth0.com/docs/get-started/applications/update-grant-types">Update Grant Types</a>.</p>
 
 <p>For login or signup with username/password, the <code>Password</code> grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both <code>http://auth0.com/oauth/grant-type/password-realm</code> and <code>Password</code>. Otherwise, the Auth0 Dashboard will take care of activating both when enabling <code>Password</code>.</p>
 
 <blockquote>
-<p>💡 If your Auth0 account has the &quot;Bot Detection&rdquo; feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the <a href="#bot-detection">Bot Detection</a> section.</p>
+<p>💡 If your Auth0 account has the <strong>Bot Detection</strong> feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the <a href="#bot-detection">Bot Detection</a> section.</p>
 
 <p>⚠️ The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. <strong>This is not the case for the ID Tokens obtained from the Authentication API client.</strong> You must <a href="https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens">validate</a> any ID Tokens received from the Authentication API client before using the information they contain.</p>
 </blockquote>
@@ -853,11 +855,11 @@ We recommend using <a href="https://auth0.com/docs/login/universal-login">Univer
 <details>
   <summary>Using async/await</summary>
 
-&ldquo;`swift
+&rdquo;`swift
 do {
     let credentials = try await Auth0
         .authentication()
-        .login(usernameOrEmail: &quot;support@auth0.com&rdquo;,
+        .login(usernameOrEmail: &ldquo;support@auth0.com&rdquo;,
                password: &ldquo;secret-password&rdquo;,
                realmOrConnection: &ldquo;Username-Password-Authentication&rdquo;,
                scope: &ldquo;openid profile email offline_access&rdquo;)
@@ -1121,7 +1123,7 @@ Auth0
 </details>
 <h4 id='renew-credentials' class='heading'>Renew credentials</h4>
 
-<p>Use a <a href="https://auth0.com/docs/security/tokens/refresh-tokens">Refresh Token</a> to renew the user&rsquo;s credentials. It&rsquo;s recommended that you read and understand the Refresh Token process beforehand.</p>
+<p>Use a <a href="https://auth0.com/docs/secure/tokens/refresh-tokens">Refresh Token</a> to renew the user&rsquo;s credentials. It&rsquo;s recommended that you read and understand the Refresh Token process beforehand.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">refreshToken</span><span class="p">)</span>
@@ -1171,7 +1173,7 @@ Auth0
 </details>
 
 <blockquote>
-<p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/configure/apis/scopes">scope</a> when logging in to get a Refresh Token from Auth0.</p>
+<p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/get-started/apis/scopes">scope</a> when logging in to get a Refresh Token from Auth0.</p>
 </blockquote>
 <h4 id='authentication-api-client-configuration' class='heading'>Authentication API client configuration</h4>
 <h5 id='add-custom-parameters' class='heading'>Add custom parameters</h5>
@@ -1194,9 +1196,9 @@ Auth0
 </code></pre>
 <h5 id='use-a-custom-code-urlsession-code-instance' class='heading'>Use a custom <code>URLSession</code> instance</h5>
 
-<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration.</p>
+<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration, e.g. customizing timeout values.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="kt">CustomURLSession</span><span class="p">())</span>
+    <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="n">customURLSession</span><span class="p">)</span>
     <span class="c1">// ...</span>
 </code></pre>
 <h4 id='authentication-api-client-errors' class='heading'>Authentication API client errors</h4>
@@ -1411,9 +1413,9 @@ Auth0
 </code></pre>
 <h5 id='use-a-custom-code-urlsession-code-instance' class='heading'>Use a custom <code>URLSession</code> instance</h5>
 
-<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration.</p>
+<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration, e.g. customizing timeout values.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="kt">CustomURLSession</span><span class="p">())</span>
+    <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="n">customURLSession</span><span class="p">)</span>
     <span class="c1">// ...</span>
 </code></pre>
 <h4 id='management-api-client-errors' class='heading'>Management API client errors</h4>
@@ -1568,7 +1570,7 @@ Auth0
 </blockquote>
 <h3 id='organizations' class='heading'>Organizations</h3>
 
-<p><a href="https://auth0.com/docs/organizations">Organizations</a> is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. </p>
+<p><a href="https://auth0.com/docs/manage-users/organizations">Organizations</a> is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. </p>
 
 <p>Using Organizations, you can:</p>
 
@@ -1586,7 +1588,7 @@ Auth0
 <h4 id='log-in-to-an-organization' class='heading'>Log in to an organization</h4>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
-    <span class="o">.</span><span class="nf">organization</span><span class="p">(</span><span class="s">"organization id"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">organization</span><span class="p">(</span><span class="s">"YOUR_AUTH0_ORGANIZATION_ID"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
         <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
         <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
@@ -1604,7 +1606,7 @@ Auth0
 do {
     let credentials = try await Auth0
         .webAuth()
-        .organization(&ldquo;organization id&rdquo;)
+        .organization(&ldquo;YOUR_AUTH0_ORGANIZATION_ID&rdquo;)
         .start()
     print(&ldquo;Obtained credentials: \(credentials)&rdquo;)
 } catch {
@@ -1619,7 +1621,7 @@ do {
 &rdquo;`swift
 Auth0
     .webAuth()
-    .organization(&ldquo;organization id&rdquo;)
+    .organization(&ldquo;YOUR_AUTH0_ORGANIZATION_ID&rdquo;)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1633,7 +1635,7 @@ Auth0
 </details>
 <h4 id='accept-user-invitations' class='heading'>Accept user invitations</h4>
 
-<p>To accept organization invitations your application needs to support <a href="https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app">Universal Links</a>. Tapping on the invitation link should open your application (invitations links are <code>https</code> only).</p>
+<p>To accept organization invitations your application needs to support <a href="https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app">Universal Links</a>, as invitation links are HTTPS-only. Tapping on the invitation link should open your application.</p>
 
 <p>When your application gets opened by an invitation link, grab the invitation URL and pass it to <code>invitationURL()</code>.</p>
 <pre class="highlight swift"><code><span class="k">guard</span> <span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">URLContexts</span><span class="o">.</span><span class="n">first</span><span class="p">?</span><span class="o">.</span><span class="n">url</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
@@ -1661,7 +1663,7 @@ Auth0
 </code></pre>
 <h3 id='bot-detection' class='heading'>Bot Detection</h3>
 
-<p>If you are performing database login/signup via the Authentication API and would like to use the <a href="https://auth0.com/docs/configure/attack-protection/bot-detection">Bot Detection</a> feature, you need to handle the <code>isVerificationRequired</code> error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.</p>
+<p>If you are performing database login/signup via the Authentication API and would like to use the <a href="https://auth0.com/docs/secure/attack-protection/bot-detection">Bot Detection</a> feature, you need to handle the <code>isVerificationRequired</code> error. It indicates that the request was flagged as suspicious and an additional verification step is necessary to log the user in. That verification step is web-based, so you need to use Web Auth to complete it.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">usernameOrEmail</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span> 
@@ -1732,12 +1734,12 @@ Auth0
 <p>Auth0 helps you to:</p>
 
 <ul>
-<li>Add authentication with <a href="https://auth0.com/docs/connections">multiple sources</a>, either social identity providers such as <strong>Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce</strong> (amongst others), or enterprise identity systems like <strong>Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML Identity Provider</strong>.</li>
-<li>Add authentication through more traditional <strong><a href="https://auth0.com/docs/connections/database/custom-db">username/password databases</a></strong>.</li>
-<li>Add support for <strong><a href="https://auth0.com/docs/users/user-account-linking">linking different user accounts</a></strong> with the same user.</li>
-<li>Support for generating signed <a href="https://auth0.com/docs/security/tokens/json-web-tokens">JSON Web Tokens</a> to call your APIs and <strong>flow the user identity</strong> securely.</li>
+<li>Add authentication with <a href="https://auth0.com/docs/authenticate/identity-providers">multiple sources</a>, either social identity providers such as <strong>Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce</strong> (amongst others), or enterprise identity systems like <strong>Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML Identity Provider</strong>.</li>
+<li>Add authentication through more traditional <strong><a href="https://auth0.com/docs/authenticate/database-connections/custom-db">username/password databases</a></strong>.</li>
+<li>Add support for <strong><a href="https://auth0.com/docs/manage-users/user-accounts/user-account-linking">linking different user accounts</a></strong> with the same user.</li>
+<li>Support for generating signed <a href="https://auth0.com/docs/secure/tokens/json-web-tokens">JSON Web Tokens</a> to call your APIs and <strong>flow the user identity</strong> securely.</li>
 <li>Analytics of how, when, and where users are logging in.</li>
-<li>Pull data from other sources and add it to the user profile through <a href="https://auth0.com/docs/actions">JavaScript actions</a>.</li>
+<li>Pull data from other sources and add it to the user profile through <a href="https://auth0.com/docs/customize/actions">JavaScript Actions</a>.</li>
 </ul>
 
 <p><strong>Why Auth0?</strong> Because you should save time, be happy, and focus on what really matters: building your product.</p>
@@ -1756,7 +1758,7 @@ Auth0
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-04-02)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-04-29)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
