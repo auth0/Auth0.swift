@@ -114,7 +114,7 @@ Then, run `carthage bootstrap --use-xcframeworks`.
 
 Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details on the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/). If you are using a [Custom Domain](https://auth0.com/docs/brand-and-customize/custom-domains), use the value of your Custom Domain instead of the value from the settings page.
 
-> ⚠️ Make sure that the [application type](https://auth0.com/docs/configure/applications) of the Auth0 application is **Native**. If you don’t have a Native Auth0 application, [create one](https://auth0.com/docs/get-started/create-apps/native-apps) before continuing.
+> ⚠️ Make sure that the [application type](https://auth0.com/docs/configure/applications) of the Auth0 application is **Native**. If you don’t have a Native Auth0 application already, [create one](https://auth0.com/docs/get-started/create-apps/native-apps) before continuing.
 
 #### Configure Client ID and Domain with a plist
 
@@ -1047,7 +1047,7 @@ Auth0
 
 #### Retrieve user metadata
 
-To call this method, you need to request the `read:users` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+To call this method, you need to request the `read:users` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID Token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1102,7 +1102,7 @@ Auth0
 
 #### Update user metadata
 
-To call this method, you need to request either the `update:users` or the `update:users_app_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+To call this method, you need to request either the `update:users` or the `update:users_app_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID Token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1160,7 +1160,7 @@ Auth0
 
 Your users may want to link their other accounts to the account they are logged in to. To achieve this, you need the user ID for the primary account and the idToken for the secondary account. You also need to request the `update:current_user_identities` scope when logging in.
 
-You can get the primary user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the primary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+You can get the primary user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the primary user's ID Token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1425,7 +1425,7 @@ Using Organizations, you can:
 ```swift
 Auth0
     .webAuth()
-    .organization("organization id")
+    .organization("YOUR_AUTH0_ORGANIZATION_ID")
     .start { result in
         switch result {
         case .success(let credentials):
@@ -1443,7 +1443,7 @@ Auth0
 do {
     let credentials = try await Auth0
         .webAuth()
-        .organization("organization id")
+        .organization("YOUR_AUTH0_ORGANIZATION_ID")
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -1458,7 +1458,7 @@ do {
 ```swift
 Auth0
     .webAuth()
-    .organization("organization id")
+    .organization("YOUR_AUTH0_ORGANIZATION_ID")
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1473,7 +1473,7 @@ Auth0
 
 #### Accept user invitations
 
-To accept organization invitations your application needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app). Tapping on the invitation link should open your application (invitations links are `https` only).
+To accept organization invitations your application needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app), as invitation links are HTTPS-only. Tapping on the invitation link should open your application.
 
 When your application gets opened by an invitation link, grab the invitation URL and pass it to `invitationURL()`.
 
