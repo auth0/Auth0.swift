@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.0.1](https://github.com/auth0/Auth0.swift/tree/2.0.1) (2022-04-29)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.0.0...2.0.1)
+
+**Fixed**
+- Send GET request parameters as query params [SDK-3324] [\#678](https://github.com/auth0/Auth0.swift/pull/678) ([Widcket](https://github.com/Widcket))
+
 ## [2.0.0](https://github.com/auth0/Auth0.swift/tree/2.0.0) (2022-03-14)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.39.0...2.0.0)
 
