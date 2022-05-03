@@ -1586,8 +1586,8 @@ For general support or usage questions, use the [Auth0 Community](https://commun
 
 We appreciate feedback and contribution to Auth0.swift! Before you get started, please read the following:
 
-- [Auth0 General Contribution Guidelines](https://github.com/auth0/open-source-template/blob/master/GENERAL-CONTRIBUTING.md)
-- [Auth0 Code of Conduct](https://github.com/auth0/open-source-template/blob/master/CODE-OF-CONDUCT.md)
+- [Auth0's general contribution guidelines](https://github.com/auth0/open-source-template/blob/master/GENERAL-CONTRIBUTING.md)
+- [Auth0's code of conduct](https://github.com/auth0/open-source-template/blob/master/CODE-OF-CONDUCT.md)
 
 We use [Carthage](https://github.com/Carthage/Carthage) to manage Auth0.swift's dependencies. After cloning this repository, run `carthage bootstrap --use-xcframeworks` to fetch and build them.
 
