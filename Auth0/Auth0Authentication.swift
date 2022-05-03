@@ -239,7 +239,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError> {
+    func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<[String: Any], AuthenticationError> {
         let payload: [String: Any] = [
             "phone_number": phoneNumber,
             "connection": connection,
@@ -250,7 +250,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: start,
                        method: "POST",
-                       handle: noBody,
+                       handle: plainJson,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
