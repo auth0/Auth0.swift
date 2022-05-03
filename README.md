@@ -40,6 +40,7 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
   + [Bot Detection](#bot-detection)
 - [**Support Policy**](#support-policy)
 - [**Issue Reporting**](#issue-reporting)
+- [**Contributing**](#contributing)
 - [**What is Auth0?**](#what-is-auth0)
 - [**License**](#license)
 
@@ -1254,22 +1255,25 @@ The Management API client will only produce `ManagementError` error values. You 
 
 ### Logging
 
-To enable Auth0.swift to print HTTP requests and responses for debugging, you can call the following method in either `WebAuth`, `Authentication` or `Users`:
+Auth0.swift can print HTTP requests and responses for debugging purposes. Enable it by calling the following method in either `WebAuth`, `Authentication` or `Users`:
 
 ```swift
 Auth0
-    .authentication()
+    .webAuth()
     .logging(enabled: true)
     // ...
 ```
 
-Then, with a successful authentication you'll see something similar to the following:
+> ⚠️ Set this flag only when **DEBUGGING** to avoid leaking user's credentials in the device log.
+
+With a successful authentication you'll see something similar to the following:
 
 ```text
-Safari: https://samples.auth0.com/authorize?.....
-URL: com.auth0.myapp://samples.auth0.com/ios/com.auth0.MyApp/callback?...
+ASWebAuthenticationSession: https://samples.auth0.com/authorize?.....
+Callback URL: com.auth0.myapp://samples.auth0.com/ios/com.auth0.MyApp/callback?...
 POST https://samples.auth0.com/oauth/token HTTP/1.1
 Content-Type: application/json
+Auth0-Client: eyJ2ZXJzaW9uI...
 
 {"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.auth0.MyApp:\/\/samples.auth0.com\/ios\/com.auth0.MyApp\/callback","code_verifier":"..."}
 
@@ -1277,7 +1281,7 @@ HTTP/1.1 200
 Pragma: no-cache
 Content-Type: application/json
 Strict-Transport-Security: max-age=3600
-Date: Thu, 09 Jun 2016 19:04:39 GMT
+Date: Wed, 27 Apr 2022 19:04:39 GMT
 Content-Length: 57
 Cache-Control: no-cache
 Connection: keep-alive
@@ -1285,7 +1289,7 @@ Connection: keep-alive
 {"access_token":"...","token_type":"Bearer"}
 ```
 
-> ⚠️ Set this flag only when **DEBUGGING** to avoid leaking user's credentials in the device log.
+> 💡 When troubleshooting, you can also check the logs in the [Auth0 Dashboard](https://manage.auth0.com/#/logs) for more information.
 
 [Go up ⤴](#table-of-contents)
 
@@ -1577,6 +1581,20 @@ In the case of macOS, the yearly named releases are considered a major platform 
 For general support or usage questions, use the [Auth0 Community](https://community.auth0.com/tags/c/sdks/5/swift) forums or raise a [support ticket](https://support.auth0.com/). Only [raise an issue](https://github.com/auth0/Auth0.swift/issues) if you have found a bug or want to request a feature.
 
 **Do not report security vulnerabilities on the public GitHub issue tracker.** The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy) details the procedure for disclosing security issues.
+
+## Contributing
+
+We appreciate feedback and contribution to Auth0.swift! Before you get started, please read the following:
+
+- [Auth0 General Contribution Guidelines](https://github.com/auth0/open-source-template/blob/master/GENERAL-CONTRIBUTING.md)
+- [Auth0 Code of Conduct](https://github.com/auth0/open-source-template/blob/master/CODE-OF-CONDUCT.md)
+
+We use [Carthage](https://github.com/Carthage/Carthage) to manage Auth0.swift's dependencies. After cloning this repository, run `carthage bootstrap --use-xcframeworks` to fetch and build them.
+
+Then, open `Auth0.xcodeproj` in Xcode.
+
+> ⚠️ Tests must be added for all new functionality. Existing tests must be updated for all changed/fixed functionality, where applicable. All tests must complete without errors.
+<br>All new functionality must be documented as well.
 
 ## What is Auth0?
 
