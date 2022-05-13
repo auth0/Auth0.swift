@@ -72,28 +72,28 @@
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/Request.swift",
-      "line": 134,
+      "line": 144,
       "symbol": "Request.start()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/Request.swift",
-      "line": 134,
+      "line": 144,
       "symbol": "Request.start()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/Request.swift",
-      "line": 134,
+      "line": 144,
       "symbol": "Request.start()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/Request.swift",
-      "line": 134,
+      "line": 144,
       "symbol": "Request.start()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
@@ -184,28 +184,28 @@
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuth.swift",
-      "line": 179,
+      "line": 181,
       "symbol": "WebAuth.start()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuth.swift",
-      "line": 179,
+      "line": 181,
       "symbol": "WebAuth.start()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuth.swift",
-      "line": 312,
+      "line": 314,
       "symbol": "WebAuth.clearSession(federated:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/WebAuth.swift",
-      "line": 312,
+      "line": 314,
       "symbol": "WebAuth.clearSession(federated:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
