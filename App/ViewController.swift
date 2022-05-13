@@ -20,7 +20,7 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func finish(_ callback: @escaping (WebAuthResult<Void>) -> Void) -> (WebAuthResult<Void>) -> Void {
-        let closure: (WebAuthResult<Void>) -> Void = { [weak controller] result -> Void in
+        return { [weak controller] result -> Void in
             if case .failure(let cause) = result, case .userCancelled = cause {
                 DispatchQueue.main.async {
                     callback(result)
@@ -36,8 +36,6 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
                 }
             }
         }
-
-        return closure
     }
 
     override var description: String {
@@ -59,15 +57,13 @@ struct SafariProvider {
     private init() {}
 
     static func with(_ presenter: UIViewController, style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
-        let provider: WebAuthProvider = { url, callback in
-
+        return { url, callback in
             let safari = SFSafariViewController(url: url)
             safari.dismissButtonStyle = .cancel
             safari.modalPresentationStyle = style
 
             return SafariUserAgent(controller: safari, presenter: presenter)
         }
-        return provider
     }
 
 }
