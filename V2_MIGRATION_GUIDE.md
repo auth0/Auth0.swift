@@ -383,7 +383,7 @@ switch error {
 switch error {
     case .userCancelled: // handle WebAuthError
     // ...
-    default: // handle unknown errors, e.g. errors added in future versions
+    default: // handle unknown errors, for example errors added in future versions
 }
 ```
 </details>
@@ -414,7 +414,7 @@ All the following error cases were no longer being used.
 
 - `.invalidInvitationURL`, for when the invitation URL is missing the `organization` and/or the `invitation` query parameters.
 - `.noAuthorizationCode`, for when the callback URL is missing the `code` query parameter.
-- `.idTokenValidationFailed`, for when the ID Token validation performed after Web Auth login fails.
+- `.idTokenValidationFailed`, for when the ID token validation performed after Web Auth login fails.
 - `.other`, for when a different `Error` happens. That error can be accessed via the `cause: Error?` property.
 
 ### `CredentialsManagerError` struct
@@ -436,7 +436,7 @@ switch error {
 switch error {
     case .revokeFailed: handleError(error.cause) // handle underlying Error?
     // ...
-    default: // handle unknown errors, e.g. errors added in future versions
+    default: // handle unknown errors, for example errors added in future versions
 }
 ```
 </details>
@@ -448,7 +448,7 @@ switch error {
 
 #### Error cases added
 
-`.largeMinTTL`, for when the requested `minTTL` is greater than the lifetime of the renewed Access Token.
+`.largeMinTTL`, for when the requested `minTTL` is greater than the lifetime of the renewed access token.
 
 ### `UserInfo` struct
 
@@ -604,7 +604,7 @@ case .failure(let error): // handle WebAuthError
 
 #### `clearSession(federated:)`
 
-This method now yields a `Result<Void, WebAuthError>`, which is aliased to `WebAuthResult<Void>`. This means you can now check the type of error, e.g. if the user cancelled the operation.
+This method now yields a `Result<Void, WebAuthError>`, which is aliased to `WebAuthResult<Void>`. This means you can now check the type of error, for example if the user cancelled the operation.
 
 <details>
   <summary>Before / After</summary>
@@ -760,7 +760,7 @@ Auth0
 
 #### Supported JWT signature algorithms
 
-ID Tokens signed with the HS256 algorithm are no longer allowed. This is because HS256 is a _symmetric_ algorithm, which is [not suitable](https://auth0.com/docs/get-started/applications/confidential-and-public-applications#public-applications) for public clients like mobile applications. The only algorithm supported now is RS256, an _asymmetric_ algorithm.
+ID tokens signed with the HS256 algorithm are no longer allowed. This is because HS256 is a _symmetric_ algorithm, which is [not suitable](https://auth0.com/docs/get-started/applications/confidential-and-public-applications#public-applications) for public clients like mobile applications. The only algorithm supported now is RS256, an _asymmetric_ algorithm.
 
 If your application is using HS256, you'll need to switch it to RS256 in the Dashboard or login will fail with an error:
 
@@ -781,21 +781,21 @@ Auth0
 
 ### Credentials Manager
 
-#### Role of ID Token expiration in credentials validity
+#### Role of ID token expiration in credentials validity
 
-The ID Token expiration is no longer used to determine if the credentials are still valid. Only the Access Token expiration is used now.
+The ID token expiration is no longer used to determine if the credentials are still valid. Only the access token expiration is used now.
 
-#### Role of Refresh Token in credentials validity
+#### Role of refresh token in credentials validity
 
-The `hasValid(minTTL:)` method no longer returns `true` if a Refresh Token is present. Now, only the Access Token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
+The `hasValid(minTTL:)` method no longer returns `true` if a refresh token is present. Now, only the access token expiration (along with the `minTTL` value) determines the return value of `hasValid(minTTL:)`.
 
 Note that `hasValid(minTTL:)` is no longer being called in `credentials(withScope:minTTL:parameters:headers:callback:)` _before_ the biometrics authentication. If you were relying on this behavior, you'll need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:headers:callback:)` yourself.
 
-You'll also need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:headers:callback:)` yourself if you're not using Refresh Tokens. Otherwise, that method will now produce a `CredentialsManagerError.noRefreshToken` error when the credentials are not valid and there is no Refresh Token available.
+You'll also need to call `hasValid(minTTL:)` before `credentials(withScope:minTTL:parameters:headers:callback:)` yourself if you're not using refresh tokens. Otherwise, that method will now produce a `CredentialsManagerError.noRefreshToken` error when the credentials are not valid and there is no refresh token available.
 
 #### Thread-safety when renewing credentials
 
-The method `credentials(withScope:minTTL:parameters:headers:callback:)` now executes the credentials renewal serially, to prevent race conditions when [Refresh Token Rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation) is enabled.
+The method `credentials(withScope:minTTL:parameters:headers:callback:)` now executes the credentials renewal serially, to prevent race conditions when [refresh token rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation) is enabled.
 
 ---
 

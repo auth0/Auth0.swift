@@ -18,7 +18,7 @@ By submitting an issue to this repository, you agree to the terms within the Aut
 ### ✏️ Describe the problem you'd like to have solved
 
 <!-- 
-A clear and concise description of what the problem is. E.g. I'm always frustrated when...
+A clear and concise description of what the problem is. For example, I'm always frustrated when...
 -->
 
 ### ✏️ Describe the ideal solution

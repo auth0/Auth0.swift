@@ -19,12 +19,12 @@ Please describe both what is changing and why this is important. Include:
 ### 📎 References
 
 <!-- 
-Please include relevant links supporting this change such as a:
+Please include relevant links supporting this change such as:
 
 - GitHub issue/PR number addressed or fixed
 - Auth0 Community post
 - StackOverflow answer
-- Related pull requests/issues from other repos
+- Related pull requests/issues from other repositories
 
 If there are no references, simply delete this section.
 -->
@@ -32,7 +32,7 @@ If there are no references, simply delete this section.
 ### 🎯 Testing
 
 <!-- 
-Describe how this can be tested by reviewers. Be specific about anything not tested and why. Tests must be added for all new functionality. Existing tests must be updated for all changed/fixed functionality, where applicable. All the tests must complete without errors.
+Describe how this can be tested by reviewers. Be specific about anything not tested and why. Tests must be added for all new functionality. Existing tests must be updated for all changed/fixed functionality, where applicable. All tests must complete without errors.
 
 Please include any manual steps for testing end-to-end, or for testing functionality not covered by unit tests.
 -->

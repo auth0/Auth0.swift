@@ -86,7 +86,7 @@ class CredentialsManagerErrorSpec: QuickSpec {
             }
 
             it("should return message for no refresh token") {
-                let message = "The stored credentials instance does not contain a Refresh Token."
+                let message = "The stored credentials instance does not contain a refresh token."
                 let error = CredentialsManagerError(code: .noRefreshToken)
                 expect(error.localizedDescription) == message
             }
@@ -106,7 +106,7 @@ class CredentialsManagerErrorSpec: QuickSpec {
             }
 
             it("should return message for revoke failed") {
-                let message = "The revocation of the Refresh Token failed. See the underlying 'AuthenticationError'"
+                let message = "The revocation of the refresh token failed. See the underlying 'AuthenticationError'"
                 + " value available in the 'cause' property."
                 let error = CredentialsManagerError(code: .revokeFailed)
                 expect(error.localizedDescription) == message
@@ -116,7 +116,7 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 let minTTL = 7200
                 let lifetime = 3600
                 let message = "The minTTL requested (\(minTTL)s) is greater than the"
-                + " lifetime of the renewed Access Token (\(lifetime)s). Request a lower minTTL or increase the"
+                + " lifetime of the renewed access token (\(lifetime)s). Request a lower minTTL or increase the"
                 + " 'Token Expiration' value in the settings page of your Auth0 API."
                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: lifetime))
                 expect(error.localizedDescription) == message

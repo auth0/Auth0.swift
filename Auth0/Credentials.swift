@@ -18,29 +18,29 @@ public final class Credentials: NSObject {
 
     /// Token that can be used to make authenticated requests to the specified API (the **audience** value used on login).
     ///
-    /// - See: [Access Tokens](https://auth0.com/docs/security/tokens/access-tokens)
+    /// - See: [Access tokens](https://auth0.com/docs/security/tokens/access-tokens)
     /// - See: [Audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)
     public let accessToken: String
-    /// Type of the Access Token.
+    /// Type of access token.
     public let tokenType: String
-    /// When the Access Token expires.
+    /// When the access token expires.
     public let expiresIn: Date
-    /// Token that can be used to request a new Access Token.
+    /// Token that can be used to request a new access token.
     ///
     /// - Requires: The scope `offline_access` to have been requested on login.
-    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     public let refreshToken: String?
     /// Token that contains the user information.
     ///
-    /// - Important: The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their
-    /// contents have not been tampered with. **This is not the case for the ID Tokens obtained from the Authentication API
+    /// - Important: The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their
+    /// contents have not been tampered with. **This is not the case for the ID tokens obtained from the Authentication API
     /// client.** You must [validate](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) any ID
     /// Tokens received from the Authentication API client before using the information they contain.
-    /// - See: [ID Tokens](https://auth0.com/docs/security/tokens/id-tokens)
+    /// - See: [ID tokens](https://auth0.com/docs/security/tokens/id-tokens)
     public let idToken: String
     /// Granted scopes.
     ///
-    /// - See: [Scopes](https://auth0.com/docs/configure/apis/scopes)
+    /// - See: [Scopes](https://auth0.com/docs/get-started/apis/scopes)
     public let scope: String?
     /// MFA recovery code that the application must display to the user, to be stored securely for future use.
     ///

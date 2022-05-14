@@ -113,7 +113,7 @@ Then, run `carthage bootstrap --use-xcframeworks`.
 
 ### Configuration
 
-Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details on the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/). If you are using a [Custom Domain](https://auth0.com/docs/brand-and-customize/custom-domains), use the value of your Custom Domain instead of the value from the settings page.
+Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details in the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/). If you are using a [custom domain](https://auth0.com/docs/brand-and-customize/custom-domains), use the value of your custom domain instead of the value from the settings page.
 
 > ⚠️ Make sure that the [application type](https://auth0.com/docs/configure/applications) of the Auth0 application is **Native**. If you don’t have a Native Auth0 application already, [create one](https://auth0.com/docs/get-started/create-apps/native-apps) before continuing.
 
@@ -174,7 +174,7 @@ The callback and logout URLs are the URLs that Auth0 invokes to redirect back to
 
 Since callback and logout URLs can be manipulated, you will need to add your URLs to the **Allowed Callback URLs** and **Allowed Logout URLs** fields in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback and logout URLs are not set, users will be unable to log in and out of the application and will get an error.
 
-Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your application. If you are using a [Custom Domain](https://auth0.com/docs/brand-and-customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with the value of your Custom Domain instead of the value from the settings page.
+Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your application. If you are using a [custom domain](https://auth0.com/docs/brand-and-customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with the value of your custom domain instead of the value from the settings page.
 
 ##### iOS
 
@@ -188,7 +188,7 @@ YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
 YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/macos/YOUR_BUNDLE_IDENTIFIER/callback
 ```
 
-E.g. if your iOS bundle identifier was `com.company.myapp` and your Auth0 Domain was `company.us.auth0.com`, then this value would be:
+For example, if your iOS bundle identifier was `com.company.myapp` and your Auth0 Domain was `company.us.auth0.com`, then this value would be:
 
 ```text
 com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
@@ -198,7 +198,7 @@ com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 
 Back in Xcode, go to the **Info** tab of your application target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
 
-This registers your Bundle Identifer as a custom URL scheme, so the callback and logout URLs can reach your application.
+This registers your bundle identifer as a custom URL scheme, so the callback and logout URLs can reach your application.
 
 ### Web Auth Login (iOS / macOS)
 
@@ -318,7 +318,7 @@ Auth0
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
-> 💡 See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of Single Sign-On (SSO) on iOS.
+> 💡 See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of single sign-on (SSO) on iOS.
 
 [Go up ⤴](#table-of-contents)
 
@@ -343,7 +343,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 - [Web Auth signup](#web-auth-signup)
 - [Web Auth configuration](#web-auth-configuration)
-- [ID Token validation](#id-token-validation)
+- [ID token validation](#id-token-validation)
 - [Web Auth errors](#web-auth-errors)
 
 #### Web Auth signup
@@ -414,7 +414,7 @@ The following are some of the available Web Auth configuration options. Check th
 
 ##### Use any Auth0 connection
 
-Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
+Specify an Auth0 connection to directly show that identity provider's login page, skipping the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
 
 ```swift
 Auth0
@@ -425,7 +425,7 @@ Auth0
 
 ##### Add an audience value
 
-Specify an [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/get-started/apis), e.g. `https://example.com/api`.
+Specify an [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) to obtain an access token that can be used to make authenticated requests to a backend. The audience value is the **API Identifier** of your [Auth0 API](https://auth0.com/docs/get-started/apis), for example `https://example.com/api`.
 
 ```swift
 Auth0
@@ -457,7 +457,7 @@ Auth0
 
 ##### Use a custom `URLSession` instance
 
-You can specify a custom `URLSession` instance for more advanced networking configuration, e.g. customizing timeout values.
+You can specify a custom `URLSession` instance for more advanced networking configuration, such as customizing timeout values.
 
 ```swift
 Auth0
@@ -467,13 +467,13 @@ Auth0
 
 Note that this custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
 
-#### ID Token validation
+#### ID token validation
 
-Auth0.swift automatically [validates](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) the ID Token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID Token have not been tampered with and can be safely used.
+Auth0.swift automatically [validates](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) the ID token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID token have not been tampered with and can be safely used.
 
 ##### Custom Domains
 
-Users of Auth0 Private Cloud with Custom Domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 Domain when performing Web Auth login. Otherwise, the ID Token validation will fail.
+Users of Auth0 Private Cloud with custom domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 Domain when performing Web Auth login. Otherwise, the ID token validation will fail.
 
 ```swift
 Auth0
@@ -525,7 +525,7 @@ guard credentialsManager.hasValid() else {
 
 #### Retrieve stored credentials 
 
-The credentials will be automatically renewed (if expired) using the [Refresh Token](https://auth0.com/docs/secure/tokens/refresh-tokens). **This method is thread-safe.**
+The credentials will be automatically renewed (if expired) using the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens). **This method is thread-safe.**
 
 ```swift
 credentialsManager.credentials { result in 
@@ -568,11 +568,11 @@ credentialsManager
 ```
 </details>
 
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a Refresh Token from Auth0.
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0.
 
 #### Retrieve stored user information
 
-The stored [ID Token](https://auth0.com/docs/security/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.
+The stored [ID token](https://auth0.com/docs/security/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.
 
 ```swift
 let user = credentialsManager.user
@@ -590,13 +590,13 @@ let didClear = credentialsManager.clear()
 
 #### Biometric authentication
 
-You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, e.g. Face ID or Touch ID.
+You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, for example Face ID or Touch ID.
 
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
-If needed, you can specify a particular `LAPolicy` to be used. E.g. you might want to support Face ID or Touch ID, but also allow fallback to passcode.
+If needed, you can specify a particular `LAPolicy` to be used. For example, you might want to support Face ID or Touch ID, but also allow fallback to passcode.
 
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login", 
@@ -628,7 +628,7 @@ For login or signup with username/password, the `Password` grant type needs to b
 
 > 💡 If your Auth0 account has the **Bot Detection** feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the [Bot Detection](#bot-detection) section.
 
-> ⚠️ The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID Tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) any ID Tokens received from the Authentication API client before using the information they contain.
+> ⚠️ The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) any ID tokens received from the Authentication API client before using the information they contain.
 
 #### Login with database connection
 
@@ -926,7 +926,7 @@ Auth0
 
 #### Renew credentials
 
-Use a [Refresh Token](https://auth0.com/docs/secure/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the Refresh Token process beforehand.
+Use a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the refresh token process beforehand.
 
 ```swift
 Auth0
@@ -977,7 +977,7 @@ Auth0
 ```
 </details>
 
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a Refresh Token from Auth0.
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0.
 
 #### Authentication API client configuration
 
@@ -1007,7 +1007,7 @@ Auth0
 
 ##### Use a custom `URLSession` instance
 
-You can specify a custom `URLSession` instance for more advanced networking configuration, e.g. customizing timeout values.
+You can specify a custom `URLSession` instance for more advanced networking configuration, such as customizing timeout values.
 
 ```swift
 Auth0
@@ -1031,9 +1031,9 @@ The Authentication API client will only produce `AuthenticationError` error valu
 
 You can request more information from a user's profile and manage the user's metadata by accessing the Auth0 [Management API](https://auth0.com/docs/api/management/v2).
 
-To call the Management API, you need an Access Token that has the API Identifier of the Management API as a target [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) value. Specify `https://YOUR_AUTH0_DOMAIN/api/v2/` as the audience when logging in to achieve this. 
+To call the Management API, you need an access token that has the API Identifier of the Management API as a target [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) value. Specify `https://YOUR_AUTH0_DOMAIN/api/v2/` as the audience when logging in to achieve this. 
 
-E.g. if you're using Web Auth:
+For example, if you're using Web Auth:
 
 ```swift
 Auth0
@@ -1042,13 +1042,13 @@ Auth0
     // ...
 ```
 
-> 💡 Auth0 Access Tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your application.
+> 💡 Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your application.
 
 > ⚠️ For security reasons, native mobile applications are restricted to a subset of the Management API functionality.
 
 #### Retrieve user metadata
 
-To call this method, you need to request the `read:users` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID Token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you need to request the `read:users` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1099,11 +1099,11 @@ Auth0
 ```
 </details>
 
-> 💡 An alternative is to use a [post-login Action](https://auth0.com/docs/customize/actions/triggers/post-login/api-object) to add the metadata to the ID Token as a custom claim.
+> 💡 An alternative is to use a [post-login Action](https://auth0.com/docs/customize/actions/triggers/post-login/api-object) to add the metadata to the ID token as a custom claim.
 
 #### Update user metadata
 
-To call this method, you need to request either the `update:users` or the `update:users_app_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID Token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you need to request either the `update:users` or the `update:users_app_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1161,7 +1161,7 @@ Auth0
 
 Your users may want to link their other accounts to the account they are logged in to. To achieve this, you need the user ID for the primary account and the idToken for the secondary account. You also need to request the `update:current_user_identities` scope when logging in.
 
-You can get the primary user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the primary user's ID Token, or from the `sub` property of a `UserInfo` instance.
+You can get the primary user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the primary user's ID token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1241,7 +1241,7 @@ Auth0
 
 ##### Use a custom `URLSession` instance
 
-You can specify a custom `URLSession` instance for more advanced networking configuration, e.g. customizing timeout values.
+You can specify a custom `URLSession` instance for more advanced networking configuration, such as customizing timeout values.
 
 ```swift
 Auth0
@@ -1354,7 +1354,7 @@ Auth0
 
 #### Facebook Login
 
-If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a [Session Info Access Token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.
+If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a [session info access token](https://developers.facebook.com/docs/facebook-login/guides/%20access-tokens/get-session-info) and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.
 
 ```swift
 Auth0
@@ -1572,7 +1572,7 @@ Only the last 4 major platform versions are supported, starting from:
 - tvOS **12**
 - watchOS **6.2**
 
-Once a platform version becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release. E.g. iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.
+Once a platform version becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release. For example, iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.
 
 In the case of macOS, the yearly named releases are considered a major platform version for the purposes of this Policy, regardless of the actual version numbers.
 
@@ -1589,7 +1589,7 @@ We appreciate feedback and contribution to Auth0.swift! Before you get started, 
 - [Auth0's general contribution guidelines](https://github.com/auth0/open-source-template/blob/master/GENERAL-CONTRIBUTING.md)
 - [Auth0's code of conduct](https://github.com/auth0/open-source-template/blob/master/CODE-OF-CONDUCT.md)
 
-We use [Carthage](https://github.com/Carthage/Carthage) to manage Auth0.swift's dependencies. After cloning this repository, run `carthage bootstrap --use-xcframeworks` to fetch and build them.
+We use [Carthage](https://github.com/Carthage/Carthage) to manage Auth0.swift's dependencies. Run `carthage bootstrap --use-xcframeworks` after cloning this repository to fetch and build them.
 
 Then, open `Auth0.xcodeproj` in Xcode.
 
@@ -1600,7 +1600,7 @@ Then, open `Auth0.xcodeproj` in Xcode.
 
 Auth0 helps you to:
 
-* Add authentication with [multiple sources](https://auth0.com/docs/authenticate/identity-providers), either social identity providers such as **Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce** (amongst others), or enterprise identity systems like **Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML Identity Provider**.
+* Add authentication with [multiple sources](https://auth0.com/docs/authenticate/identity-providers), either social identity providers such as **Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce** (amongst others), or enterprise identity systems like **Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML identity provider**.
 * Add authentication through more traditional **[username/password databases](https://auth0.com/docs/authenticate/database-connections/custom-db)**.
 * Add support for **[linking different user accounts](https://auth0.com/docs/manage-users/user-accounts/user-account-linking)** with the same user.
 * Support for generating signed [JSON Web Tokens](https://auth0.com/docs/secure/tokens/json-web-tokens) to call your APIs and **flow the user identity** securely.
