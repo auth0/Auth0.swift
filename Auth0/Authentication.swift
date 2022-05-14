@@ -297,7 +297,7 @@ public protocol Authentication: Trackable, Loggable {
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Authenticates a user with their Facebook [Session Info Access Token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and profile data.
+     Authenticates a user with their Facebook [session info access token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and profile data.
 
      ```
      Auth0
@@ -327,7 +327,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
 
      - Parameters:
-       - sessionAccessToken: Session Info Access Token retrieved from Facebook.
+       - sessionAccessToken: Session info access token retrieved from Facebook.
        - profile:            The user profile data retrieved from Facebook.
        - audience:           API Identifier that your application is requesting access to.
        - scope:              Space-separated list of requested scope values. Defaults to `openid profile email`.
@@ -526,7 +526,7 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     - Parameter accessToken: Access Token obtained by authenticating the user.
+     - Parameter accessToken: Access token obtained by authenticating the user.
      - Returns: A request that will yield user information.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-user-info)
      */
@@ -563,7 +563,7 @@ public protocol Authentication: Trackable, Loggable {
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Renews the user's credentials using a Refresh Token.
+     Renews the user's credentials using a refresh token.
 
      ```
      Auth0
@@ -578,7 +578,7 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     You can get a downscoped Access Token by requesting fewer scopes than were requested on login:
+     You can get a downscoped access token by requesting fewer scopes than were requested on login:
 
      ```
      Auth0
@@ -588,7 +588,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
 
      - Parameters:
-       - refreshToken: The Refresh Token.
+       - refreshToken: The refresh token.
        - scope:        Space-separated list of scope values to request. Defaults to `nil`, which will ask for the same scopes that were requested on login.
      - Returns: A request that will yield Auth0 user's credentials.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
@@ -596,7 +596,7 @@ public protocol Authentication: Trackable, Loggable {
     func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
-     Revokes a user's Refresh Token by performing a request to the `/oauth/revoke` endpoint.
+     Revokes a user's refresh token by performing a request to the `/oauth/revoke` endpoint.
 
      ```
      Auth0
@@ -605,8 +605,8 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     - Parameter refreshToken: The Refresh Token to revoke.
-     - Returns: A request for revoking the Refresh Token.
+     - Parameter refreshToken: The refresh token to revoke.
+     - Returns: A request for revoking the refresh token.
      - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
      - See: [Error Responses](https://auth0.com/docs/api/authentication#post-oauth-revoke)
      */

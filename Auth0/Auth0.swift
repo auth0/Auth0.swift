@@ -36,7 +36,7 @@ public let defaultScope = "openid profile email"
 
  - Parameters:
    - clientId: Client ID of your Auth0 application.
-   - domain:   Domain of your Auth0 account, e.g. 'samples.auth0.com'.
+   - domain:   Domain of your Auth0 account, for example 'samples.auth0.com'.
    - session:  `URLSession` instance used for networking. Defaults to `URLSession.shared`.
  - Returns: Auth0 Authentication API client.
  */
@@ -88,7 +88,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
  Currently you can only perform the following operations:
 
  * Get a user by ID
- * Update an user, e.g. by adding `user_metadata`
+ * Update an user, for example by adding `user_metadata`
  * Link users
  * Unlink users
 
@@ -130,13 +130,13 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
  Currently you can only perform the following operations:
  
  * Get a user by ID
- * Update an user, e.g. by adding `user_metadata`
+ * Update an user, for example by adding `user_metadata`
  * Link users
  * Unlink users
 
  - Parameters:
    - token:   Management API token with the correct allowed scopes to perform the desired action.
-   - domain:  Domain of your Auth0 account, e.g. 'samples.auth0.com'.
+   - domain:  Domain of your Auth0 account, for example 'samples.auth0.com'.
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
  - Returns: Auth0 Management API v2 client.
  */
@@ -187,7 +187,7 @@ public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main)
 
  - Parameters:
    - clientId: Client ID of your Auth0 application.
-   - domain:   Domain of your Auth0 account, e.g. 'samples.auth0.com'.
+   - domain:   Domain of your Auth0 account, for example 'samples.auth0.com'.
    - session:  `URLSession` instance used for networking. Defaults to `URLSession.shared`.
  - Returns: Auth0 Web Auth client.
  */

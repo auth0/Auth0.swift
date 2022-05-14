@@ -46,7 +46,7 @@ public struct WebAuthError: Auth0Error {
             + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
         case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
             + " query parameters (\(values))."
-        case .idTokenValidationFailed: return "The ID Token validation performed after authentication failed."
+        case .idTokenValidationFailed: return "The ID token validation performed after authentication failed."
             + " See the underlying 'Error' value available in the 'cause' property."
         case .other: return "An unexpected error occurred. See the underlying 'Error' value available in the 'cause' property."
         case .unknown(let message): return message
@@ -73,7 +73,7 @@ public struct WebAuthError: Auth0Error {
     /// The callback URL is missing the `code` query parameter.
     /// This error does not include a ``cause``.
     public static let noAuthorizationCode: WebAuthError = .init(code: .noAuthorizationCode([:]))
-    /// The ID Token validation performed after authentication failed.
+    /// The ID token validation performed after authentication failed.
     /// The underlying `Error` value can be accessed via the ``cause`` property.
     public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
     /// An unexpected error occurred, and an `Error` value is available.

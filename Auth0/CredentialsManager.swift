@@ -37,7 +37,7 @@ public struct CredentialsManager {
     }
 
     /// Retrieves the user information from the Keychain synchronously, without checking if the credentials are expired.
-    /// The user information is read from the stored [ID Token](https://auth0.com/docs/security/tokens/id-tokens).
+    /// The user information is read from the stored [ID token](https://auth0.com/docs/security/tokens/id-tokens).
     ///
     /// ```
     /// let user = credentialsManager.user
@@ -58,7 +58,7 @@ public struct CredentialsManager {
     /// credentialsManager.enableBiometrics(withTitle: "Touch to Login")
     /// ```
     ///
-    /// If needed, you can specify a particular `LAPolicy` to be used. E.g. you might want to support Face ID or
+    /// If needed, you can specify a particular `LAPolicy` to be used. For example, you might want to support Face ID or
     /// Touch ID, but also allow fallback to passcode.
     ///
     /// ```
@@ -103,7 +103,7 @@ public struct CredentialsManager {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
-    /// Calls the `/oauth/revoke` endpoint to revoke the Refresh Token and then clears the credentials if the request
+    /// Calls the `/oauth/revoke` endpoint to revoke the refresh token and then clears the credentials if the request
     /// was successful. Otherwise, the credentials will not be cleared and the callback will be called with a failure
     /// result containing a ``CredentialsManagerError/revokeFailed`` error.
     /// 
@@ -111,26 +111,26 @@ public struct CredentialsManager {
     /// credentialsManager.revoke { result in
     ///    switch result {
     ///    case .success:
-    ///        print("Revoked Refresh Token and cleared credentials")
+    ///        print("Revoked refresh token and cleared credentials")
     ///    case .failure(let error):
     ///        print("Failed with: \(error)")
     ///    }
     /// }
     /// ```
     ///
-    /// If you need to specify custom headers for the Refresh Token revocation:
+    /// If you need to specify custom headers for the refresh token revocation:
     ///
     /// ```
     /// credentialsManager.revoke(headers: ["key": "value"]) { print($0) }
     /// ```
     ///
-    /// If no Refresh Token is available the endpoint is not called, the credentials are cleared, and the callback is
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the callback is
     /// invoked with a success case.
     ///
     /// - Parameters:
-    ///   - headers:  Additional headers to use when revoking the Refresh Token.
+    ///   - headers:  Additional headers to use when revoking the refresh token.
     ///   - callback: Callback that receives a `Result` containing either an empty success case or an error.
-    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
     public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
         guard let data = self.storage.getEntry(forKey: self.storeKey),
@@ -154,7 +154,7 @@ public struct CredentialsManager {
             }
     }
 
-    /// Checks that there are credentials stored, and that the Access Token has not expired and will not expire within
+    /// Checks that there are credentials stored, and that the access token has not expired and will not expire within
     /// the specified TTL.
     ///
     /// ```
@@ -164,8 +164,8 @@ public struct CredentialsManager {
     /// // Retrieve stored credentials
     /// ```
     ///
-    /// - Parameter minTTL: Minimum lifetime in seconds the Access Token must have left. Defaults to `0`.
-    /// - Returns: If there are credentials stored containing an Access Token that is neither expired or about to expire.
+    /// - Parameter minTTL: Minimum lifetime in seconds the access token must have left. Defaults to `0`.
+    /// - Returns: If there are credentials stored containing an access token that is neither expired or about to expire.
     /// - See: ``Credentials/expiresIn``
     public func hasValid(minTTL: Int = 0) -> Bool {
         guard let data = self.storage.getEntry(forKey: self.storeKey),
@@ -174,7 +174,7 @@ public struct CredentialsManager {
     }
 
     #if WEB_AUTH_PLATFORM
-    /// Retrieves credentials from the Keychain and yields new credentials using the Refresh Token if the Access Token
+    /// Retrieves credentials from the Keychain and yields new credentials using the refresh token if the access token
     /// is expired. Otherwise, the retrieved credentials will be returned via the success case as they are not expired.
     /// Renewed credentials will be stored in the Keychain.
     ///
@@ -189,7 +189,7 @@ public struct CredentialsManager {
     /// }
     /// ```
     ///
-    /// To avoid retrieving Access Tokens with too little time left, you can enforce a minimum TTL:
+    /// To avoid retrieving access tokens with too little time left, you can enforce a minimum TTL:
     ///
     /// ```
     /// credentialsManager.credentials(minTTL: 60) { print($0) }
@@ -202,7 +202,7 @@ public struct CredentialsManager {
     ///                                headers: ["key": "value"]) { print($0) }
     /// ```
     ///
-    /// When renewing credentials you can get a downscoped Access Token by requesting fewer scopes than were requested
+    /// When renewing credentials you can get a downscoped access token by requesting fewer scopes than were requested
     /// on login. If you specify fewer scopes, the credentials will be renewed immediately, regardless of whether they
     /// are expired or not.
     ///
@@ -212,13 +212,13 @@ public struct CredentialsManager {
     ///
     /// - Parameters:
     ///   - scope:      Space-separated list of scope values to request when renewing credentials. Defaults to `nil`, which will ask for the same scopes that were requested on login.
-    ///   - minTTL:     Minimum time in seconds the Access Token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
     ///   - callback:   Callback that receives a `Result` containing either the user's credentials or an error.
-    /// - Requires: The scope `offline_access` to have been requested on login to get a Refresh Token from Auth0. If the credentials are expired and there is no Refresh Token, the callback will be called with a failure case containing a ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If the credentials are expired and there is no refresh token, the callback will be called with a failure case containing a ``CredentialsManagerError/noRefreshToken`` error.
     /// - Note: This method is thread-safe.
-    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         if let bioAuth = self.bioAuth {
@@ -329,7 +329,7 @@ public struct CredentialsManager {
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 public extension CredentialsManager {
 
-    /// Calls the `/oauth/revoke` endpoint to revoke the Refresh Token and then clears the credentials if the request
+    /// Calls the `/oauth/revoke` endpoint to revoke the refresh token and then clears the credentials if the request
     /// was successful. Otherwise, the credentials are not cleared and the subscription completes with an error.
     ///
     /// ```
@@ -338,7 +338,7 @@ public extension CredentialsManager {
     ///     .sink(receiveCompletion: { completion in
     ///         switch completion {
     ///         case .finished:
-    ///             print("Revoked Refresh Token and cleared credentials")
+    ///             print("Revoked refresh token and cleared credentials")
     ///         case .failure(let error):
     ///             print("Failed with: \(error)")
     ///         }
@@ -346,7 +346,7 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// If you need to specify custom headers for the Refresh Token revocation:
+    /// If you need to specify custom headers for the refresh token revocation:
     ///
     /// ```
     /// credentialsManager
@@ -356,12 +356,12 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// If no Refresh Token is available the endpoint is not called, the credentials are cleared, and the subscription
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and the subscription
     /// completes without an error.
     ///
-    /// - Parameter headers: Additional headers to use when revoking the Refresh Token.
+    /// - Parameter headers: Additional headers to use when revoking the refresh token.
     /// - Returns: A type-erased publisher.
-    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
     func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {
@@ -371,7 +371,7 @@ public extension CredentialsManager {
         }.eraseToAnyPublisher()
     }
 
-    /// Retrieves credentials from the Keychain and yields new credentials using the Refresh Token if the Access Token
+    /// Retrieves credentials from the Keychain and yields new credentials using the refresh token if the access token
     /// is expired. Otherwise, the subscription will complete with the retrieved credentials as they are not expired.
     /// Renewed credentials will be stored in the Keychain.
     ///
@@ -388,7 +388,7 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// To avoid retrieving Access Tokens with too little time left, you can enforce a minimum TTL:
+    /// To avoid retrieving access tokens with too little time left, you can enforce a minimum TTL:
     ///
     /// ```
     /// credentialsManager
@@ -409,7 +409,7 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// When renewing credentials you can get a downscoped Access Token by requesting fewer scopes than were requested
+    /// When renewing credentials you can get a downscoped access token by requesting fewer scopes than were requested
     /// on login. If you specify fewer scopes, the credentials will be renewed immediately, regardless of whether they
     /// are expired or not.
     ///
@@ -423,13 +423,13 @@ public extension CredentialsManager {
     ///
     /// - Parameters:
     ///   - scope:      Space-separated list of scope values to request when renewing credentials. Defaults to `nil`, which will ask for the same scopes that were requested on login.
-    ///   - minTTL:     Minimum time in seconds the Access Token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
     /// - Returns: A type-erased publisher.
-    /// - Requires: The scope `offline_access` to have been requested on login to get a Refresh Token from Auth0. If the credentials are expired and there is no Refresh Token, the subscription will complete with a ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If the credentials are expired and there is no refresh token, the subscription will complete with a ``CredentialsManagerError/noRefreshToken`` error.
     /// - Note: This method is thread-safe.
-    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
@@ -450,29 +450,29 @@ public extension CredentialsManager {
 #if compiler(>=5.5) && canImport(_Concurrency)
 public extension CredentialsManager {
 
-    /// Calls the `/oauth/revoke` endpoint to revoke the Refresh Token and then clears the credentials if the request
+    /// Calls the `/oauth/revoke` endpoint to revoke the refresh token and then clears the credentials if the request
     /// was successful. Otherwise, the credentials are not cleared and an error is thrown.
     ///
     /// ```
     /// do {
     ///     try await credentialsManager.revoke()
-    ///     print("Revoked Refresh Token and cleared credentials")
+    ///     print("Revoked refresh token and cleared credentials")
     /// } catch {
     ///     print("Failed with: \(error)")
     /// }
     /// ```
     ///
-    /// If you need to specify custom headers for the Refresh Token revocation:
+    /// If you need to specify custom headers for the refresh token revocation:
     ///
     /// ```
     /// try await credentialsManager.revoke(headers: ["key": "value"])
     /// ```
     ///
-    /// If no Refresh Token is available the endpoint is not called, the credentials are cleared, and no error is thrown.
+    /// If no refresh token is available the endpoint is not called, the credentials are cleared, and no error is thrown.
     ///
-    /// - Parameter headers: Additional headers to use when revoking the Refresh Token.
+    /// - Parameter headers: Additional headers to use when revoking the refresh token.
     /// - Throws: An error of type ``CredentialsManagerError``.
-    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
@@ -490,7 +490,7 @@ public extension CredentialsManager {
     }
     #endif
 
-    /// Retrieves credentials from the Keychain and yields new credentials using the Refresh Token if the Access Token
+    /// Retrieves credentials from the Keychain and yields new credentials using the refresh token if the access token
     /// is expired. Otherwise, return the retrieved credentials as they are not expired. Renewed credentials will be
     /// stored in the Keychain.
     ///
@@ -503,7 +503,7 @@ public extension CredentialsManager {
     /// }
     /// ```
     ///
-    /// To avoid retrieving Access Tokens with too little time left, you can enforce a minimum TTL:
+    /// To avoid retrieving access tokens with too little time left, you can enforce a minimum TTL:
     ///
     /// ```
     /// let credentials = try await credentialsManager.credentials(minTTL: 60)
@@ -516,7 +516,7 @@ public extension CredentialsManager {
     ///                                                            headers: ["key": "value"])
     /// ```
     ///
-    /// When renewing credentials you can get a downscoped Access Token by requesting fewer scopes than were requested
+    /// When renewing credentials you can get a downscoped access token by requesting fewer scopes than were requested
     /// on login. If you specify fewer scopes, the credentials will be renewed immediately, regardless of whether they
     /// are expired or not.
     ///
@@ -526,14 +526,14 @@ public extension CredentialsManager {
     ///
     /// - Parameters:
     ///   - scope:      Space-separated list of scope values to request when renewing credentials. Defaults to `nil`, which will ask for the same scopes that were requested on login.
-    ///   - minTTL:     Minimum time in seconds the Access Token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
     /// - Returns: The user's credentials.
     /// - Throws: An error of type ``CredentialsManagerError``.
-    /// - Requires: The scope `offline_access` to have been requested on login to get a Refresh Token from Auth0. If the credentials are expired and there is no Refresh Token, the error ``CredentialsManagerError/noRefreshToken`` will be thrown.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If the credentials are expired and there is no refresh token, the error ``CredentialsManagerError/noRefreshToken`` will be thrown.
     /// - Note: This method is thread-safe.
-    /// - See: [Refresh Tokens](https://auth0.com/docs/security/tokens/refresh-tokens)
+    /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)

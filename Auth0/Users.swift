@@ -57,7 +57,7 @@ public protocol Users: Trackable, Loggable {
      ```
 
      - Parameters:
-       - identifier: ID of the user. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - identifier: ID of the user. You can get this value from the `sub` claim of the user's ID token, or from the `sub` property of a ``UserInfo`` instance.
        - fields:     List of the user's field names that will be included/excluded in the response. By default all will be retrieved.
        - include:    Flag that indicates that only the names in 'fields' should be included/excluded in the response. By default it will include them.
      - Returns: A request that will yield a user.
@@ -105,7 +105,7 @@ public protocol Users: Trackable, Loggable {
      ```
 
      - Parameters:
-       - identifier: ID of the user to update. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - identifier: ID of the user to update. You can get this value from the `sub` claim of the user's ID token, or from the `sub` property of a ``UserInfo`` instance.
        - attributes: Root attributes to be updated.
      - Returns: A request that will yield the updated user.
      - Requires: The token must have one of the following scopes: `update:users`, `update:users_app_metadata`.
@@ -125,7 +125,7 @@ public protocol Users: Trackable, Loggable {
      ```
 
      - Parameters:
-       - identifier:   ID of the user to update. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - identifier:   ID of the user to update. You can get this value from the `sub` claim of the user's ID token, or from the `sub` property of a ``UserInfo`` instance.
        - userMetadata: Metadata to update.
      - Returns: A request that will yield the updated user.
      - Requires: The token must have one of the following scopes: `update:users`, `update:users_app_metadata`.
@@ -134,7 +134,7 @@ public protocol Users: Trackable, Loggable {
     func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError>
 
     /**
-     Links a user given its identifier with a secondary user given its ID Token.
+     Links a user given its identifier with a secondary user given its ID token.
      After this request the primary user will hold another identity in its `identities` attribute, which will represent the secondary user.
 
      ```
@@ -145,8 +145,8 @@ public protocol Users: Trackable, Loggable {
      ```
 
      - Parameters:
-       - identifier: ID of the primary user who will be linked against a secondary one. You can get this value from the `sub` claim of the primary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
-       - token:      ID Token of the secondary user.
+       - identifier: ID of the primary user who will be linked against a secondary one. You can get this value from the `sub` claim of the primary user's ID token, or from the `sub` property of a ``UserInfo`` instance.
+       - token:      ID token of the secondary user.
      - Returns: A request to link two users.
      - Requires: The token must have the scope `update:current_user_identities`.
      - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
@@ -165,9 +165,9 @@ public protocol Users: Trackable, Loggable {
      ```
 
      - Parameters:
-       - identifier:   ID of the primary user who will be linked against a secondary one. You can get this value from the `sub` claim of the primary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
-       - userId:       ID of the secondary user. You can get this value from the `sub` claim of the secondary user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
-       - provider:     Name of the provider for the secondary user, e.g. 'auth0' for database connections.
+       - identifier:   ID of the primary user who will be linked against a secondary one. You can get this value from the `sub` claim of the primary user's ID token, or from the `sub` property of a ``UserInfo`` instance.
+       - userId:       ID of the secondary user. You can get this value from the `sub` claim of the secondary user's ID token, or from the `sub` property of a ``UserInfo`` instance.
+       - provider:     Name of the provider for the secondary user, for example 'auth0' for database connections.
        - connectionId: ID of the connection for the secondary user.
      - Returns: A request to link two users.
      - Requires: The token must have the scope `update:users`.
@@ -189,7 +189,7 @@ public protocol Users: Trackable, Loggable {
      - Parameters:
        - identityId: ID of the identity to remove.
        - provider:   Name of the identity provider.
-       - identifier: ID of the user who owns the identity. You can get this value from the `sub` claim of the user's ID Token, or from the `sub` property of a ``UserInfo`` instance.
+       - identifier: ID of the user who owns the identity. You can get this value from the `sub` claim of the user's ID token, or from the `sub` property of a ``UserInfo`` instance.
      - Returns: A request to remove an identity.
      - Requires: The token must have the scope `update:users`.
      - See: [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/delete_user_identity_by_user_id)

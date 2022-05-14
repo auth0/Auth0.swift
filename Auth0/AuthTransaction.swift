@@ -2,7 +2,7 @@
 import Foundation
 
 /**
-Represents an ongoing Auth transaction with an Identity Provider (Auth0 or a third party).
+Represents an ongoing Auth transaction with an identity provider (Auth0 or a third party).
 
 The Auth will be done outside of application control, Safari or third party application.
 The only way to communicate the results back is using a url with a registered custom scheme in your application so the OS can open it on success/failure.

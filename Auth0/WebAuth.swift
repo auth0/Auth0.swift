@@ -7,7 +7,7 @@ import Combine
 /// Web-based authentication using Auth0.
 ///
 /// - See: ``WebAuthError``
-/// - See: [Universal Login](https://auth0.com/docs/login/universal-login)
+/// - See: [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login)
 public protocol WebAuth: Trackable, Loggable {
 
     /// The Auth0 Client ID.
@@ -20,7 +20,7 @@ public protocol WebAuth: Trackable, Loggable {
     // MARK: - Builder
 
     /**
-     Specify an Auth0 connection to directly show that Identity Provider's login page, skipping the Universal Login
+     Specify an Auth0 connection to directly show that identity provider's login page, skipping the Universal Login
      page itself. By default no connection is specified, so the Universal Login page will be displayed.
 
      - Parameter connection: Name of the connection.
@@ -31,16 +31,16 @@ public protocol WebAuth: Trackable, Loggable {
     /**
      Specify the scopes that will be requested during authentication.
 
-     - Parameter scope: Space-separated list of requested scope values. E.g. `openid profile email offline_access`.
+     - Parameter scope: Space-separated list of requested scope values. For example, `openid profile email offline_access`.
      - Returns: The same `WebAuth` instance to allow method chaining.
-     - See: [Scopes](https://auth0.com/docs/configure/apis/scopes)
+     - See: [Scopes](https://auth0.com/docs/get-started/apis/scopes)
      */
     func scope(_ scope: String) -> Self
 
     /**
-     Specify provider scopes for OAuth2/social connections, e.g. Facebook, Google, etc.
+     Specify provider scopes for OAuth2/social connections, such as Facebook and Google.
 
-     - Parameter connectionScope: Space-separated list of requested OAuth2/social scope values. E.g. `user_friends email`.
+     - Parameter connectionScope: Space-separated list of requested OAuth2/social scope values. For example, `user_friends email`.
      - Returns: The same `WebAuth` instance to allow method chaining.
      - See: [Connection Scopes](https://auth0.com/docs/authenticate/identity-providers/adding-scopes-for-an-external-idp)
      */
@@ -70,37 +70,37 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     func redirectURL(_ redirectURL: URL) -> Self
 
-    ///  Specify an audience name for the API that your application will call using the Access Token returned after
+    ///  Specify an audience name for the API that your application will call using the access token returned after
     ///  authentication.
     ///  This value must match the **API Identifier** defined in the APIs section of the [Auth0 Dashboard](https://manage.auth0.com/#/apis).
     ///
-    /// - Parameter audience: Audience value. E.g. `https://example.com/api`.
+    /// - Parameter audience: Audience value. For example, `https://example.com/api`.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     /// - See: [Audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)]
     func audience(_ audience: String) -> Self
 
-    /// Specify a `nonce` parameter for ID Token validation.
+    /// Specify a `nonce` parameter for ID token validation.
     ///
     /// - Parameter nonce: Nonce value.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     func nonce(_ nonce: String) -> Self
 
-    /// Specify a custom issuer for ID Token validation.
+    /// Specify a custom issuer for ID token validation.
     /// This value will be used instead of the Auth0 Domain.
     ///
-    /// - Parameter issuer: Custom issuer value. E.g. `https://example.com/`.
+    /// - Parameter issuer: Custom issuer value. For example, `https://example.com/`.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     func issuer(_ issuer: String) -> Self
 
-    /// Specify a leeway amount for ID Token validation.
-    /// This value represents the clock skew for the validation of date claims, e.g. `exp`.
+    /// Specify a leeway amount for ID token validation.
+    /// This value represents the clock skew for the validation of date claims, for example `exp`.
     ///
     /// - Parameter leeway: Number of milliseconds. Defaults to `60_000` (1 minute).
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     func leeway(_ leeway: Int) -> Self
 
     /// Specify a `max_age` parameter for authentication.
-    /// Sending this parameter will require the presence of the `auth_time` claim in the ID Token.
+    /// Sending this parameter will require the presence of the `auth_time` claim in the ID token.
     ///
     /// - Parameter maxAge: Number of milliseconds.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
@@ -110,7 +110,7 @@ public protocol WebAuth: Trackable, Loggable {
     ///
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     /// - Requires: iOS 13+ or macOS. Has no effect on iOS 12.
-    /// - Important: This method will disable Single Sign On (SSO).
+    /// - Important: This method will disable single sign-on (SSO).
     /// - Important: You don't need to call ``clearSession(federated:)`` if you are using this method on login, because there will be no shared cookie to remove.
     /// - See: [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md)
     /// - See: [prefersEphemeralWebBrowserSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio)
@@ -212,7 +212,7 @@ public protocol WebAuth: Trackable, Loggable {
     func start() -> AnyPublisher<Credentials, WebAuthError>
 
     /**
-     Removes the Auth0 session and optionally removes the Identity Provider (IdP) session.
+     Removes the Auth0 session and optionally removes the identity provider (IdP) session.
 
      ```
      Auth0
@@ -226,7 +226,7 @@ public protocol WebAuth: Trackable, Loggable {
          }
      ```
 
-     Remove both the Auth0 session and the Identity Provider session:
+     Remove both the Auth0 session and the identity provider session:
 
      ```
      Auth0
@@ -235,7 +235,7 @@ public protocol WebAuth: Trackable, Loggable {
      ```
 
      - Parameters:
-       - federated: If the Identity Provider session should be removed. Defaults to `false`.
+       - federated: If the identity provider session should be removed. Defaults to `false`.
        - callback: Callback that receives a `Result` containing either an empty success case or an error.
      - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will be no shared cookie to remove.
@@ -244,7 +244,7 @@ public protocol WebAuth: Trackable, Loggable {
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
 
     /**
-     Removes the Auth0 session and optionally removes the Identity Provider (IdP) session.
+     Removes the Auth0 session and optionally removes the identity provider (IdP) session.
 
      ```
      Auth0
@@ -261,7 +261,7 @@ public protocol WebAuth: Trackable, Loggable {
          .store(in: &cancellables)
      ```
 
-     Remove both the Auth0 session and the Identity Provider session:
+     Remove both the Auth0 session and the identity provider session:
 
      ```
      Auth0
@@ -272,7 +272,7 @@ public protocol WebAuth: Trackable, Loggable {
          .store(in: &cancellables)
      ```
 
-     - Parameter federated: If the Identity Provider session should be removed. Defaults to `false`.
+     - Parameter federated: If the identity provider session should be removed. Defaults to `false`.
      - Returns: A type-erased publisher.
      - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will be no shared cookie to remove.
@@ -283,7 +283,7 @@ public protocol WebAuth: Trackable, Loggable {
 
     #if compiler(>=5.5) && canImport(_Concurrency)
     /**
-     Removes the Auth0 session and optionally removes the Identity Provider (IdP) session.
+     Removes the Auth0 session and optionally removes the identity provider (IdP) session.
 
      ```
      do {
@@ -296,7 +296,7 @@ public protocol WebAuth: Trackable, Loggable {
      }
      ```
 
-     Remove both the Auth0 session and the Identity Provider session:
+     Remove both the Auth0 session and the identity provider session:
 
      ```
      try await Auth0
@@ -304,7 +304,7 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession(federated: true)
      ```
 
-     - Parameter federated: If the Identity Provider session should be removed. Defaults to `false`.
+     - Parameter federated: If the identity provider session should be removed. Defaults to `false`.
      - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will be no shared cookie to remove.
      - See: [Logout](https://auth0.com/docs/login/logout)
