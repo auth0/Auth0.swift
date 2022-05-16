@@ -5,8 +5,7 @@ We appreciate feedback and contribution to Auth0.swift! Before you get started, 
 - [Auth0's general contribution guidelines](https://github.com/auth0/open-source-template/blob/master/GENERAL-CONTRIBUTING.md)
 - [Auth0's code of conduct](https://github.com/auth0/open-source-template/blob/master/CODE-OF-CONDUCT.md)
 
-> ⚠️ Tests must be added for all new functionality. Existing tests must be updated for all changed/fixed functionality, where applicable. All tests must complete without errors.
-<br>All new functionality must be documented as well.
+> ⚠️ Tests must be added for all new functionality. Existing tests must be updated for all changed/fixed functionality, where applicable. All tests must complete without errors. All new functionality must be documented as well.
 
 ## Environment setup
 
