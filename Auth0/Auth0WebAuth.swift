@@ -6,15 +6,6 @@ import Combine
 
 public typealias WebAuthProvider = (_ url: URL, _ callback: (WebAuthResult<Void>) -> Void) -> WebAuthUserAgent
 
-@discardableResult
-public func resume(_ url: URL) -> Bool {
-    return TransactionStore.shared.resume(url)
-}
-
-public func cancel() {
-    TransactionStore.shared.cancel()
-}
-
 final class Auth0WebAuth: WebAuth {
 
     let clientId: String

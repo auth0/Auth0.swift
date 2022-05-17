@@ -14,6 +14,8 @@ class ClearSessionTransaction: NSObject, AuthTransaction {
         self.userAgentCallback = userAgent.finish { result in
             if case let .failure(error) = result {
                 callback(.failure(error))
+            } else {
+                callback(.success(()))
             }
         }
     }
@@ -24,7 +26,6 @@ class ClearSessionTransaction: NSObject, AuthTransaction {
 
     func resume(_ url: URL) -> Bool {
         self.finishUserAgent(.success(()))
-        self.callback(.success(()))
         return true
     }
 

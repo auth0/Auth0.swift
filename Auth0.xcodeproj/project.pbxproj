@@ -42,6 +42,10 @@
 		5BE65DCA1F7270DE00CADD3B /* Auth0.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5BEDE1951EC333380007300D /* CredentialsManagerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */; };
+		5C0AF09A28330CBA00162044 /* SafariProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AF09928330CBA00162044 /* SafariProvider.swift */; };
+		5C0AF09B28330CBA00162044 /* SafariProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AF09928330CBA00162044 /* SafariProvider.swift */; };
+		5C0AF09D2833420200162044 /* WebAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AF09C2833420200162044 /* WebAuthentication.swift */; };
+		5C0AF09E2833420200162044 /* WebAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AF09C2833420200162044 /* WebAuthentication.swift */; };
 		5C29743223FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3F23D0BA2C00074024 /* Optional+DebugDescription.swift */; };
 		5C29743323FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3F23D0BA2C00074024 /* Optional+DebugDescription.swift */; };
 		5C29743423FDBD5500BC18FA /* Optional+DebugDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3F23D0BA2C00074024 /* Optional+DebugDescription.swift */; };
@@ -460,6 +464,8 @@
 		5BA58D33209081A700782DD1 /* Cartfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
 		5BEDE1891EC21B040007300D /* CredentialsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManager.swift; sourceTree = "<group>"; };
 		5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = CredentialsManagerSpec.swift; path = Auth0Tests/CredentialsManagerSpec.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		5C0AF09928330CBA00162044 /* SafariProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariProvider.swift; sourceTree = "<group>"; };
+		5C0AF09C2833420200162044 /* WebAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthentication.swift; sourceTree = "<group>"; };
 		5C354C03276CE1A500ADBC86 /* PasswordlessType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordlessType.swift; sourceTree = "<group>"; };
 		5C41F6A3244DC94E00252548 /* LoginTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTransaction.swift; sourceTree = "<group>"; };
 		5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearSessionTransaction.swift; sourceTree = "<group>"; };
@@ -711,6 +717,15 @@
 			name = Utils;
 			sourceTree = "<group>";
 		};
+		5C0AF09828330CA000162044 /* Providers */ = {
+			isa = PBXGroup;
+			children = (
+				5B16D88C1F7141A0009476A5 /* ASProvider.swift */,
+				5C0AF09928330CBA00162044 /* SafariProvider.swift */,
+			);
+			name = Providers;
+			sourceTree = "<group>";
+		};
 		5C41F6AF244DCC1100252548 /* Platforms */ = {
 			isa = PBXGroup;
 			children = (
@@ -842,16 +857,17 @@
 		5F3965C01CF679B500CDE7C0 /* WebAuth */ = {
 			isa = PBXGroup;
 			children = (
+				5C0AF09828330CA000162044 /* Providers */,
 				5B16D8901F7141E5009476A5 /* Transactions */,
 				5C41F6AF244DCC1100252548 /* Platforms */,
 				5F53F5CD1CFD157300476A46 /* AuthTransaction.swift */,
-				5B16D88C1F7141A0009476A5 /* ASProvider.swift */,
 				5B16D8921F714324009476A5 /* WebAuthUserAgent.swift */,
 				5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */,
 				5FCAB1751D0900CF00331C84 /* TransactionStore.swift */,
 				5F3965C11CF67CF000CDE7C0 /* WebAuth.swift */,
 				5FAE9C901D8878D400A871CE /* Auth0WebAuth.swift */,
 				5FD255B91D14F70B00387ECB /* WebAuthError.swift */,
+				5C0AF09C2833420200162044 /* WebAuthentication.swift */,
 			);
 			name = WebAuth;
 			sourceTree = "<group>";
@@ -1562,6 +1578,7 @@
 				5CB41D4423D0BA2C00074024 /* IDTokenSignatureValidator.swift in Sources */,
 				5CB41D4C23D0BA2C00074024 /* Optional+DebugDescription.swift in Sources */,
 				5C4F551A23C8FB8E00C89615 /* String+URLSafe.swift in Sources */,
+				5C0AF09D2833420200162044 /* WebAuthentication.swift in Sources */,
 				5CB41D4823D0BA2C00074024 /* IDTokenValidator.swift in Sources */,
 				5C354C04276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5FCAB1711D09005A00331C84 /* NSURLComponents+OAuth2.swift in Sources */,
@@ -1579,6 +1596,7 @@
 				5F53F5CE1CFD157300476A46 /* AuthTransaction.swift in Sources */,
 				5CB41D6C23D0BBA600074024 /* JWT+Header.swift in Sources */,
 				5FF465BC1CE2AC4500F7ED8C /* Management.swift in Sources */,
+				5C0AF09A28330CBA00162044 /* SafariProvider.swift in Sources */,
 				5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */,
 				5FCAB1731D09009600331C84 /* NSData+URLSafe.swift in Sources */,
 				5B16D88E1F7141A0009476A5 /* ASProvider.swift in Sources */,
@@ -1622,6 +1640,7 @@
 				5C41F6D1244F972000252548 /* JWT+Header.swift in Sources */,
 				5FE2F8BC1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5B7EE47420FCA00A00367724 /* CredentialsManagerError.swift in Sources */,
+				5C0AF09E2833420200162044 /* WebAuthentication.swift in Sources */,
 				5FDE876A1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5C354C05276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5F28B4621D8216180000EB23 /* Loggable.swift in Sources */,
@@ -1639,6 +1658,7 @@
 				5C41F6D0244F971700252548 /* JWK+RSA.swift in Sources */,
 				5C41F6C7244F968B00252548 /* AuthTransaction.swift in Sources */,
 				5FD255B51D14DD2600387ECB /* ManagementError.swift in Sources */,
+				5C0AF09B28330CBA00162044 /* SafariProvider.swift in Sources */,
 				5FE2F8B31CCEAED8003628F4 /* Requestable.swift in Sources */,
 				5B2860CF1EEAC30900C75D54 /* UserInfo.swift in Sources */,
 				5C4F552423C8FBA100C89615 /* JWKS.swift in Sources */,
