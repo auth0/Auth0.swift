@@ -14,11 +14,13 @@ class ASProvider: NSObject {
     func login(url: URL, callback: @escaping(WebAuthResult<Void>) -> Void) -> WebAuthUserAgent {
         let userAgent = ASWebAuthenticationSession(url: url,
                                                    callbackURLScheme: self.redirectURL.scheme) {
-            guard $1 == nil, let callbackURL = $0 else {
-                if let authError = $1, case ASWebAuthenticationSessionError.canceledLogin = authError {
+            guard let callbackURL = $0, $1 == nil else {
+                if let error = $1, case ASWebAuthenticationSessionError.canceledLogin = error {
                     callback(.failure(WebAuthError(code: .userCancelled)))
+                } else if let error = $1 {
+                    callback(.failure(WebAuthError(code: .other, cause: error)))
                 } else {
-                    callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
+                    callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession login failed"))))
                 }
                 return TransactionStore.shared.clear()
             }
@@ -37,10 +39,12 @@ class ASProvider: NSObject {
         let userAgent = ASWebAuthenticationSession(url: url,
                                                    callbackURLScheme: self.redirectURL.scheme) {
             guard $0 != nil, $1 == nil else {
-                if let authError = $1, case ASWebAuthenticationSessionError.canceledLogin = authError {
+                if let error = $1, case ASWebAuthenticationSessionError.canceledLogin = error {
                     callback(.failure(WebAuthError(code: .userCancelled)))
+                } else if let error = $1 {
+                    callback(.failure(WebAuthError(code: .other, cause: error)))
                 } else {
-                    callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
+                    callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession logout failed"))))
                 }
                 return TransactionStore.shared.clear()
             }
