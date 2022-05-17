@@ -89,5 +89,5 @@ class BaseTransactionSpec: QuickSpec {
 }
 
 struct MockUserAgent: WebAuthUserAgent {
-    func start() { }
+    func start() {}
 }

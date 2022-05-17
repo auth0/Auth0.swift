@@ -235,16 +235,9 @@ class Auth0Spec: QuickSpec {
 }
 
 class MockLogger: Logger {
+    func trace(url: URL, source: String?) {}
 
-    func trace(url: URL, source: String?) {
+    func trace(response: URLResponse, data: Data?) {}
 
-    }
-
-    func trace(response: URLResponse, data: Data?) {
-
-    }
-
-    func trace(request: URLRequest, session: URLSession) {
-
-    }
+    func trace(request: URLRequest, session: URLSession) {}
 }
