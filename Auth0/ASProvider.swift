@@ -1,7 +1,22 @@
 #if WEB_AUTH_PLATFORM
 import AuthenticationServices
 
+fileprivate extension WebAuthError {
+
+    init(from error: Error?) {
+        if let error = error, case ASWebAuthenticationSessionError.canceledLogin = error {
+            self.init(code: .userCancelled)
+        } else if let error = error {
+            self.init(code: .other, cause: error)
+        } else {
+            self.init(code: .unknown("ASWebAuthenticationSession failed"))
+        }
+    }
+
+}
+
 class ASProvider: NSObject {
+
     let ephemeralSession: Bool
     let redirectURL: URL
 
@@ -15,13 +30,7 @@ class ASProvider: NSObject {
         let userAgent = ASWebAuthenticationSession(url: url,
                                                    callbackURLScheme: self.redirectURL.scheme) {
             guard let callbackURL = $0, $1 == nil else {
-                if let error = $1, case ASWebAuthenticationSessionError.canceledLogin = error {
-                    callback(.failure(WebAuthError(code: .userCancelled)))
-                } else if let error = $1 {
-                    callback(.failure(WebAuthError(code: .other, cause: error)))
-                } else {
-                    callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession login failed"))))
-                }
+                callback(.failure(WebAuthError(from: $1)))
                 return TransactionStore.shared.clear()
             }
             _ = TransactionStore.shared.resume(callbackURL)
@@ -39,13 +48,7 @@ class ASProvider: NSObject {
         let userAgent = ASWebAuthenticationSession(url: url,
                                                    callbackURLScheme: self.redirectURL.scheme) {
             guard $0 != nil, $1 == nil else {
-                if let error = $1, case ASWebAuthenticationSessionError.canceledLogin = error {
-                    callback(.failure(WebAuthError(code: .userCancelled)))
-                } else if let error = $1 {
-                    callback(.failure(WebAuthError(code: .other, cause: error)))
-                } else {
-                    callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession logout failed"))))
-                }
+                callback(.failure(WebAuthError(from: $1)))
                 return TransactionStore.shared.clear()
             }
             callback(.success(()))
