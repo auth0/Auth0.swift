@@ -44,18 +44,8 @@ class TransactionStoreSpec: QuickSpec {
 
             it("should cancel current") {
                 storage.store(session)
-                storage.cancel(session)
+                storage.cancel()
                 expect(session.cancelled) == true
-            }
-
-            it("should cancel if matches current via state") {
-                session.state = "1"
-                let other = MockSession()
-                other.state = "2"
-                storage.store(session)
-                storage.cancel(other)
-                expect(session.cancelled) == false
-                expect(other.cancelled) == true
             }
 
         }
@@ -74,7 +64,7 @@ class TransactionStoreSpec: QuickSpec {
             }
 
             it("should return default when no current is available") {
-                storage.cancel(session)
+                storage.cancel()
                 expect(storage.resume(url)) == false
             }
 

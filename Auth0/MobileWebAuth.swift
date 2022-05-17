@@ -11,7 +11,7 @@ extension UIApplication {
 }
 
 @available(iOS 13.0, *)
-extension ASTransaction: ASWebAuthenticationPresentationContextProviding {
+extension ASProvider: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return UIApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()
@@ -19,12 +19,4 @@ extension ASTransaction: ASWebAuthenticationPresentationContextProviding {
 
 }
 
-@available(iOS 13.0, *)
-extension ASCallbackTransaction: ASWebAuthenticationPresentationContextProviding {
-
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return UIApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()
-    }
-
-}
 #endif

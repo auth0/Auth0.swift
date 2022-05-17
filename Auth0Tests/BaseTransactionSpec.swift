@@ -16,7 +16,7 @@ private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 class BaseTransactionSpec: QuickSpec {
 
     override func spec() {
-        var transaction: BaseTransaction!
+        var transaction: LoginTransaction!
         var result: WebAuthResult<Credentials>? = nil
         let callback: (WebAuthResult<Credentials>) -> () = { result = $0 }
         let authentication = Auth0Authentication(clientId: ClientId, url: Domain)
@@ -31,11 +31,12 @@ class BaseTransactionSpec: QuickSpec {
         let code = "123456"
 
         beforeEach {
-            transaction = BaseTransaction(redirectURL: RedirectURL,
-                                          state: "state",
-                                          handler: handler,
-                                          logger: nil,
-                                          callback: callback)
+            transaction = LoginTransaction(redirectURL: RedirectURL,
+                                           state: "state",
+                                           userAgent: MockUserAgent(),
+                                           handler: handler,
+                                           logger: nil,
+                                           callback: callback)
             result = nil
             stub(condition: isHost(Domain.host!)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
             stub(condition: isToken(Domain.host!) && hasAtLeast(["code": code,
@@ -85,4 +86,8 @@ class BaseTransactionSpec: QuickSpec {
         }
     }
 
+}
+
+struct MockUserAgent: WebAuthUserAgent {
+    func start() {}
 }

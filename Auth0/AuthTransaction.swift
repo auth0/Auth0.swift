@@ -11,9 +11,6 @@ The only way to communicate the results back is using a url with a registered cu
 */
 protocol AuthTransaction {
 
-    /// Value of the OAuth 2.0 state parameter. It must be a cryptographically secure random string used to protect the app with request forgery.
-    var state: String? { get }
-
     /**
      Resumes the transaction when the third party application notifies the application using a url with a custom scheme.
      
