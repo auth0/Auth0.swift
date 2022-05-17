@@ -32,10 +32,11 @@ class BaseTransactionSpec: QuickSpec {
 
         beforeEach {
             transaction = LoginTransaction(redirectURL: RedirectURL,
-                                          state: "state",
-                                          handler: handler,
-                                          logger: nil,
-                                          callback: callback)
+                                           state: "state",
+                                           userAgent: MockUserAgent(),
+                                           handler: handler,
+                                           logger: nil,
+                                           callback: callback)
             result = nil
             stub(condition: isHost(Domain.host!)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
             stub(condition: isToken(Domain.host!) && hasAtLeast(["code": code,
@@ -85,4 +86,8 @@ class BaseTransactionSpec: QuickSpec {
         }
     }
 
+}
+
+struct MockUserAgent: WebAuthUserAgent {
+    func start() { }
 }

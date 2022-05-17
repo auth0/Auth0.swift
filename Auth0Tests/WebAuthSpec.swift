@@ -17,6 +17,7 @@ extension URL {
 }
 
 private let ValidAuthorizeURLExample = "valid authorize url"
+
 class WebAuthSharedExamplesConfiguration: QuickConfiguration {
     override class func configure(_ configuration: Configuration) {
         sharedExamples(ValidAuthorizeURLExample) { (context: SharedExampleContext) in
@@ -154,20 +155,10 @@ class WebAuthSpec: QuickSpec {
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
-                return [
-                    "url": newWebAuth()
-                        .scope("openid email")
-                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
-                    "domain": Domain,
-                    "query": defaultQuery(withParameters: ["scope": "openid email"]),
-                ]
-            }
-
-            itBehavesLike(ValidAuthorizeURLExample) {
                 let state = UUID().uuidString
                 return [
                     "url": newWebAuth()
-                        .parameters(["state": state])
+                        .state(state)
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
                     "query": defaultQuery(withParameters: ["state": state]),
@@ -175,22 +166,24 @@ class WebAuthSpec: QuickSpec {
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
+                let scope = "openid email phone"
                 return [
                     "url": newWebAuth()
-                        .parameters(["scope": "openid email phone"])
+                        .scope(scope)
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
-                    "query": defaultQuery(withParameters: ["scope": "openid email phone"]),
+                    "query": defaultQuery(withParameters: ["scope": scope]),
                 ]
             }
 
             itBehavesLike(ValidAuthorizeURLExample) {
+                let scope = "email phone"
                 return [
                     "url": newWebAuth()
-                        .parameters(["scope": "email phone"])
+                        .scope(scope)
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
                     "domain": Domain,
-                    "query": defaultQuery(withParameters: ["scope": "openid email phone"]),
+                    "query": defaultQuery(withParameters: ["scope": "openid \(scope)"]),
                 ]
             }
 
@@ -407,8 +400,8 @@ class WebAuthSpec: QuickSpec {
             let storage = TransactionStore.shared
 
             beforeEach {
-                if let current = storage.current {
-                    storage.cancel(current)
+                if storage.current != nil {
+                    storage.cancel()
                 }
             }
 
@@ -420,27 +413,29 @@ class WebAuthSpec: QuickSpec {
             it("should have a generated state") {
                 let auth = newWebAuth()
                 auth.start { _ in }
-                expect(storage.current?.state).toNot(beNil())
-            }
-
-            it("should honor supplied state") {
-                let state = UUID().uuidString
-                newWebAuth().state(state).start { _ in }
-                expect(storage.current?.state) == state
-            }
-
-            it("should honor supplied state via parameters") {
-                let state = UUID().uuidString
-                newWebAuth().parameters(["state": state]).start { _ in }
-                expect(storage.current?.state) == state
+                expect(auth.state).toNot(beNil())
             }
 
             it("should generate different state on every start") {
                 let auth = newWebAuth()
                 auth.start { _ in }
-                let state = storage.current?.state
+                let state = auth.state
                 auth.start { _ in }
-                expect(storage.current?.state) != state
+                expect(auth.state) != state
+            }
+
+            it("should honor supplied state") {
+                let state = UUID().uuidString
+                let auth = newWebAuth()
+                auth.state(state).start { _ in }
+                expect(auth.state) == state
+            }
+
+            it("should honor supplied state via parameters") {
+                let state = UUID().uuidString
+                let auth = newWebAuth()
+                auth.parameters(["state": state]).start { _ in }
+                expect(auth.state) == state
             }
 
             it("should produce a no bundle identifier error") {
@@ -519,7 +514,7 @@ class WebAuthSpec: QuickSpec {
                 it("should cancel AuthenticationServicesSessionCallback") {
                     let auth = newWebAuth()
                     auth.clearSession() { result = $0 }
-                    TransactionStore.shared.cancel(TransactionStore.shared.current!)
+                    TransactionStore.shared.cancel()
                     expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
                 }

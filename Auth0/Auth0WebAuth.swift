@@ -33,6 +33,10 @@ final class Auth0WebAuth: WebAuth {
     private(set) var invitationURL: URL?
     private(set) var provider: WebAuthProvider?
 
+    var state: String {
+        return self.parameters["state"] ?? self.generateDefaultState()
+    }
+
     lazy var redirectURL: URL? = {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
         var components = URLComponents(url: self.url, resolvingAgainstBaseURL: true)
@@ -136,7 +140,7 @@ final class Auth0WebAuth: WebAuth {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
         let handler = self.handler(redirectURL)
-        let state = self.parameters["state"] ?? generateDefaultState()
+        let state = self.state
         var organization: String? = self.organization
         var invitation: String?
         if let invitationURL = self.invitationURL {
@@ -228,7 +232,7 @@ final class Auth0WebAuth: WebAuth {
         return components.url!
     }
 
-    func generateDefaultState() -> String? {
+    func generateDefaultState() -> String {
         let data = Data(count: 32)
         var tempData = data
 
@@ -236,8 +240,10 @@ final class Auth0WebAuth: WebAuth {
             SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
         }
 
-        guard result == 0 else { return nil }
-        return tempData.a0_encodeBase64URLSafe()
+        guard result == 0, let state = tempData.a0_encodeBase64URLSafe()
+        else { return UUID().uuidString.replacingOccurrences(of: "-", with: "") }
+
+        return state
     }
 
     private func handler(_ redirectURL: URL) -> OAuth2Grant {
