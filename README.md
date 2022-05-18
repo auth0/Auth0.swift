@@ -197,6 +197,8 @@ com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 
 Back in Xcode, go to the **Info** tab of your application target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
 
+![url-scheme](assets/url-scheme.png)
+
 This registers your bundle identifer as a custom URL scheme, so the callback and logout URLs can reach your application.
 
 ### Web Auth Login (iOS / macOS)
