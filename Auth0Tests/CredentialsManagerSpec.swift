@@ -623,7 +623,7 @@ class CredentialsManagerSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return apiFailureResponse() }
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
-                            expect(result).to(beFailure())
+                            expect(result).to(beUnsuccessful())
                             stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
                                 return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                             }
@@ -672,7 +672,7 @@ class CredentialsManagerSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         DispatchQueue.global(qos: .utility).sync {
                             credentialsManager.credentials(parameters: ["request": "first"]) { result in
-                                expect(result).to(beFailure())
+                                expect(result).to(beUnsuccessful())
                             }
                         }
                         DispatchQueue.global(qos: .background).sync {

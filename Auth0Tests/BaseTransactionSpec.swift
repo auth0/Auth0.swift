@@ -79,7 +79,7 @@ class BaseTransactionSpec: QuickSpec {
             context("cancel") {
                 it("should cancel current session") {
                     transaction.cancel()
-                    expect(result).to(beFailure())
+                    expect(result).to(beUnsuccessful())
                 }
             }
         }
