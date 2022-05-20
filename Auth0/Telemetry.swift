@@ -6,8 +6,6 @@ public struct Telemetry {
     static let VersionKey = "version"
     static let WrappedVersion = "core"
     static let EnvironmentKey = "env"
-
-    static let NoVersion = "0.0.0"
     static let LibraryName = "Auth0.swift"
 
     var enabled: Bool = true
@@ -26,11 +24,7 @@ public struct Telemetry {
     mutating func wrapped(inLibrary name: String, version: String) {
         let info = Telemetry.versionInformation()
         var env = Telemetry.generateEnviroment()
-        if let libVersion = info[Telemetry.VersionKey] as? String {
-            env[Telemetry.WrappedVersion] = libVersion
-        } else {
-            env[Telemetry.WrappedVersion] = Telemetry.NoVersion
-        }
+        env[Telemetry.WrappedVersion] = info[Telemetry.VersionKey] as? String
         let wrapped: [String: Any] = [
             Telemetry.NameKey: name,
             Telemetry.VersionKey: version,

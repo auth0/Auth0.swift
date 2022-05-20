@@ -1,6 +1,29 @@
 #if WEB_AUTH_PLATFORM
 import AuthenticationServices
 
+extension WebAuthentication {
+
+    static func asProvider(redirectURL: URL, ephemeralSession: Bool = false) -> WebAuthProvider {
+        return { url, callback in
+            let session = ASWebAuthenticationSession(url: url, callbackURLScheme: redirectURL.scheme) {
+                guard let callbackURL = $0, $1 == nil else {
+                    callback(.failure(WebAuthError(from: $1)))
+                    return TransactionStore.shared.clear()
+                }
+
+                _ = TransactionStore.shared.resume(callbackURL)
+            }
+
+            if #available(iOS 13.0, *) {
+                session.prefersEphemeralWebBrowserSession = ephemeralSession
+            }
+
+            return ASUserAgent(session: session, callback: callback)
+        }
+    }
+
+}
+
 fileprivate extension WebAuthError {
 
     init(from error: Error?) {
@@ -15,59 +38,29 @@ fileprivate extension WebAuthError {
 
 }
 
-class ASProvider: NSObject {
+class ASUserAgent: NSObject, WebAuthUserAgent {
 
-    let ephemeralSession: Bool
-    let redirectURL: URL
+    let session: ASWebAuthenticationSession
+    let callback: (WebAuthResult<Void>) -> Void
 
-    init(ephemeralSession: Bool, redirectURL: URL) {
-        self.ephemeralSession = ephemeralSession
-        self.redirectURL = redirectURL
+    init(session: ASWebAuthenticationSession, callback: @escaping (WebAuthResult<Void>) -> Void) {
+        self.session = session
+        self.callback = callback
         super.init()
-    }
-
-    func login(url: URL, callback: @escaping(WebAuthResult<Void>) -> Void) -> WebAuthUserAgent {
-        let userAgent = ASWebAuthenticationSession(url: url,
-                                                   callbackURLScheme: self.redirectURL.scheme) {
-            guard let callbackURL = $0, $1 == nil else {
-                callback(.failure(WebAuthError(from: $1)))
-                return TransactionStore.shared.clear()
-            }
-            _ = TransactionStore.shared.resume(callbackURL)
-        }
 
         if #available(iOS 13.0, *) {
-            userAgent.presentationContextProvider = self
-            userAgent.prefersEphemeralWebBrowserSession = ephemeralSession
+            session.presentationContextProvider = self
         }
-
-        return userAgent
     }
 
-    func clearSession(url: URL, callback: @escaping(WebAuthResult<Void>) -> Void) -> WebAuthUserAgent {
-        let userAgent = ASWebAuthenticationSession(url: url,
-                                                   callbackURLScheme: self.redirectURL.scheme) {
-            guard $0 != nil, $1 == nil else {
-                callback(.failure(WebAuthError(from: $1)))
-                return TransactionStore.shared.clear()
-            }
-            callback(.success(()))
-            TransactionStore.shared.clear()
-        }
-
-        if #available(iOS 13.0, *) {
-            userAgent.presentationContextProvider = self
-        }
-
-        return userAgent
+    func start() {
+        _ = self.session.start()
     }
 
-}
-
-extension ASWebAuthenticationSession: WebAuthUserAgent {
-
-    public func start() {
-        let _: Bool = self.start()
+    func finish() -> (WebAuthResult<Void>) -> Void {
+        return { [callback] result in
+            callback(result)
+        }
     }
 
     public override var description: String {

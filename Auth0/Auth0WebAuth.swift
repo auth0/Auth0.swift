@@ -4,7 +4,7 @@ import Foundation
 import Combine
 #endif
 
-public typealias WebAuthProvider = (_ url: URL, _ callback: (WebAuthResult<Void>) -> Void) -> WebAuthUserAgent
+public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping (WebAuthResult<Void>) -> Void) -> WebAuthUserAgent
 
 final class Auth0WebAuth: WebAuth {
 
@@ -139,10 +139,12 @@ final class Auth0WebAuth: WebAuth {
         guard let redirectURL = self.redirectURL else {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
+
         let handler = self.handler(redirectURL)
         let state = self.state
         var organization: String? = self.organization
         var invitation: String?
+
         if let invitationURL = self.invitationURL {
             guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
                 let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
@@ -158,9 +160,8 @@ final class Auth0WebAuth: WebAuth {
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
-
-        let provider = self.provider ?? ASProvider(ephemeralSession: self.ephemeralSession,
-                                                   redirectURL: redirectURL).login
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
+                                                                     ephemeralSession: ephemeralSession)
         let userAgent = provider(authorizeURL) { result in
             if case let .failure(error) = result {
                 callback(.failure(error))
@@ -181,7 +182,6 @@ final class Auth0WebAuth: WebAuth {
         let endpoint = federated ?
             URL(string: "v2/logout?federated", relativeTo: self.url)! :
             URL(string: "v2/logout", relativeTo: self.url)!
-
         let returnTo = URLQueryItem(name: "returnTo", value: self.redirectURL?.absoluteString)
         let clientId = URLQueryItem(name: "client_id", value: self.clientId)
         var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: true)
@@ -192,10 +192,9 @@ final class Auth0WebAuth: WebAuth {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
-        let provider = self.provider ?? ASProvider(ephemeralSession: self.ephemeralSession,
-                                                   redirectURL: redirectURL).clearSession
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL)
         let userAgent = provider(logoutURL, callback)
-        let transaction = ClearSessionTransaction(userAgent: userAgent, callback: callback)
+        let transaction = ClearSessionTransaction(userAgent: userAgent)
         userAgent.start()
         self.storage.store(transaction)
     }

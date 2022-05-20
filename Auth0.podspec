@@ -1,26 +1,27 @@
 web_auth_files = [
   'Auth0/Array+Encode.swift',
-  'Auth0/ASCallbackTransaction.swift',
-  'Auth0/ASTransaction.swift',
-  'Auth0/AuthSession.swift',
+  'Auth0/ASProvider.swift',
   'Auth0/AuthTransaction.swift',
   'Auth0/Auth0WebAuth.swift',
-  'Auth0/BaseCallbackTransaction.swift',
-  'Auth0/BaseTransaction.swift',
   'Auth0/BioAuthentication.swift',
   'Auth0/ChallengeGenerator.swift',
   'Auth0/ClaimValidators.swift',
+  'Auth0/ClearSessionTransaction.swift',
   'Auth0/IDTokenSignatureValidator.swift',
   'Auth0/IDTokenValidator.swift',
   'Auth0/IDTokenValidatorContext.swift',
   'Auth0/JWK+RSA.swift',
   'Auth0/JWT+Header.swift',
   'Auth0/JWTAlgorithm.swift',
+  'Auth0/LoginTransaction.swift',
   'Auth0/NSURLComponents+OAuth2.swift',
   'Auth0/OAuth2Grant.swift',
+  'Auth0/SafariProvider.swift',
   'Auth0/TransactionStore.swift',
   'Auth0/WebAuth.swift',
-  'Auth0/WebAuthError.swift'
+  'Auth0/WebAuthentication.swift',
+  'Auth0/WebAuthError.swift',
+  'Auth0/WebAuthUserAgent.swift'
 ]
 
 ios_files = ['Auth0/MobileWebAuth.swift']
