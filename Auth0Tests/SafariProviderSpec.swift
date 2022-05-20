@@ -110,7 +110,7 @@ class SafariProviderSpec: QuickSpec {
 
                 waitUntil(timeout: Timeout) { done in
                     let userAgent = SafariUserAgent(controller: safari, callback: { result in
-                        expect(result).to(beUnsuccessful())
+                        expect(result).to(beFailure())
                         done()
                     })
                     let callback = userAgent.finish()
