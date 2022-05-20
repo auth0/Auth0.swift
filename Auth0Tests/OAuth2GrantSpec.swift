@@ -60,7 +60,7 @@ class OAuth2GrantSpec: QuickSpec {
             it("shoud report error to get credentials") {
                 waitUntil { done in
                     pkce.credentials(from: [:]) {
-                        expect($0).to(beFailure())
+                        expect($0).to(beUnsuccessful())
                         done()
                     }
                 }
@@ -166,7 +166,7 @@ class OAuth2GrantSpec: QuickSpec {
             it("shoud report error to get credentials") {
                 waitUntil { done in
                     pkce.credentials(from: [:]) {
-                        expect($0).to(beFailure())
+                        expect($0).to(beUnsuccessful())
                         done()
                     }
                 }

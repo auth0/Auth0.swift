@@ -365,7 +365,7 @@ class AuthenticationErrorSpec: QuickSpec {
 }
 
 class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
-    override class func configure(_ configuration: Configuration) {
+    override class func configure(_ configuration: QCKConfiguration) {
         sharedExamples(OAuthErrorExample) { (context: SharedExampleContext) in
             let code = context()[ExampleCodeKey] as! String
             let description = context()[ExampleDescriptionKey] as? String
