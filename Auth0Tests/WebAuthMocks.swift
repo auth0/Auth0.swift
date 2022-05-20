@@ -76,11 +76,5 @@ class SpySafariViewController: SFSafariViewController {
         completion?()
     }
 
-    deinit {
-        print("!!!!!!!!!!!")
-        print("DEALLOCATED")
-        print("!!!!!!!!!!!")
-    }
-
 }
 #endif
