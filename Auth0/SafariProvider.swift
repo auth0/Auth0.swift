@@ -5,12 +5,11 @@ import SafariServices
 public extension WebAuthentication {
 
     static func safariProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
-        return { url, _ in
+        return { url, callback in
             let safari = SFSafariViewController(url: url)
             safari.dismissButtonStyle = .cancel
             safari.modalPresentationStyle = style
-
-            return SafariUserAgent(controller: safari)
+            return SafariUserAgent(controller: safari, callback: callback)
         }
     }
 
@@ -18,17 +17,13 @@ public extension WebAuthentication {
 
 extension SFSafariViewController {
 
+    var topViewController: UIViewController? {
+        guard let root = UIApplication.shared()?.keyWindow?.rootViewController else { return nil }
+        return findTopViewController(from: root)
+    }
+
     func present() {
         topViewController?.present(self, animated: true, completion: nil)
-    }
-
-    private var rootViewController: UIViewController? {
-        return UIApplication.shared()?.keyWindow?.rootViewController
-    }
-
-    private var topViewController: UIViewController? {
-        guard let root = self.rootViewController else { return nil }
-        return findTopViewController(from: root)
     }
 
     private func findTopViewController(from root: UIViewController) -> UIViewController? {
@@ -52,10 +47,12 @@ extension SFSafariViewController {
 
 class SafariUserAgent: NSObject, WebAuthUserAgent {
 
-    var controller: SFSafariViewController
+    let controller: SFSafariViewController
+    let callback: ((WebAuthResult<Void>) -> Void)
 
-    init(controller: SFSafariViewController) {
+    init(controller: SFSafariViewController, callback: @escaping (WebAuthResult<Void>) -> Void) {
         self.controller = controller
+        self.callback = callback
         super.init()
         self.controller.delegate = self
     }
@@ -64,8 +61,8 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
         self.controller.present()
     }
 
-    func finish(_ callback: @escaping (WebAuthResult<Void>) -> Void) -> (WebAuthResult<Void>) -> Void {
-        return { [weak controller] result -> Void in
+    func finish() -> (WebAuthResult<Void>) -> Void {
+        return { [weak controller, callback] result -> Void in
             if case .failure(let cause) = result, case .userCancelled = cause {
                 DispatchQueue.main.async {
                     callback(result)
@@ -73,7 +70,8 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
             } else {
                 DispatchQueue.main.async {
                     guard let presenting = controller?.presentingViewController else {
-                        return callback(Result.failure(WebAuthError.unknown))
+                        let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
+                        return callback(.failure(error))
                     }
                     presenting.dismiss(animated: true) {
                         callback(result)
@@ -92,7 +90,7 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 extension SafariUserAgent: SFSafariViewControllerDelegate {
 
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        WebAuthentication.cancel()
+        TransactionStore.shared.cancel()
     }
 
 }

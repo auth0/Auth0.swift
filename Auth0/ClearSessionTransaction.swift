@@ -5,31 +5,25 @@ class ClearSessionTransaction: NSObject, AuthTransaction {
 
     private(set) var userAgent: WebAuthUserAgent?
     private(set) var userAgentCallback: ((WebAuthResult<Void>) -> Void)?
-    let callback: (WebAuthResult<Void>) -> Void
 
-    init(userAgent: WebAuthUserAgent, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    init(userAgent: WebAuthUserAgent) {
         self.userAgent = userAgent
-        self.callback = callback
+        self.userAgentCallback = userAgent.finish()
         super.init()
-        self.userAgentCallback = userAgent.finish { result in
-            if case let .failure(error) = result {
-                callback(.failure(error))
-            } else {
-                callback(.success(()))
-            }
-        }
     }
 
     func cancel() {
-        self.finishUserAgent(.failure(WebAuthError(code: .userCancelled)))
+        // The user agent can handle the error
+        self.finishUserAgent(with: .failure(WebAuthError(code: .userCancelled)))
     }
 
     func resume(_ url: URL) -> Bool {
-        self.finishUserAgent(.success(()))
+        // The user agent can close itself
+        self.finishUserAgent(with: .success(()))
         return true
     }
 
-    private func finishUserAgent(_ result: WebAuthResult<Void>) {
+    private func finishUserAgent(with result: WebAuthResult<Void>) {
         self.userAgentCallback?(result)
         self.userAgent = nil
         self.userAgentCallback = nil

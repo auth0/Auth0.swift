@@ -25,16 +25,12 @@ class LoginTransaction: NSObject, AuthTransaction {
         self.handler = handler
         self.logger = logger
         self.callback = callback
+        self.userAgentCallback = userAgent.finish()
         super.init()
-        self.userAgentCallback = userAgent.finish { result in
-            if case let .failure(error) = result {
-                callback(.failure(error))
-            }
-        }
     }
 
     func cancel() {
-        self.finishUserAgent(.failure(WebAuthError(code: .userCancelled)))
+        self.finishUserAgent(with: .failure(WebAuthError(code: .userCancelled)))
     }
 
     func resume(_ url: URL) -> Bool {
@@ -47,22 +43,26 @@ class LoginTransaction: NSObject, AuthTransaction {
               let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               case let items = self.handler.values(fromComponents: components),
               has(state: self.state, inItems: items) else {
-                  let error = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
-                  self.finishUserAgent(.failure(error))
-                  return false
+            let error = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
+            // The user agent can handle the error
+            self.finishUserAgent(with: .failure(error))
+            return false
         }
 
         if items["error"] != nil {
             let error = WebAuthError(code: .other, cause: AuthenticationError(info: items))
-            self.finishUserAgent(.failure(error))
+            // The user agent can handle the error
+            self.finishUserAgent(with: .failure(error))
         } else {
-            self.finishUserAgent(.success(()))
+            // The user agent can close itself
+            self.finishUserAgent(with: .success(()))
+            // Continue with code exchange
             self.handler.credentials(from: items, callback: self.callback)
         }
         return true
     }
 
-    private func finishUserAgent(_ result: WebAuthResult<Void>) {
+    private func finishUserAgent(with result: WebAuthResult<Void>) {
         self.userAgentCallback?(result)
         self.userAgent = nil
         self.userAgentCallback = nil
