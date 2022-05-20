@@ -1,4 +1,5 @@
 #if os(iOS)
+import Foundation
 import UIKit
 import SafariServices
 import Quick
