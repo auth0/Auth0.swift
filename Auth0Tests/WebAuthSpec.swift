@@ -412,7 +412,7 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should use a custom provider") {
-                    expect(newWebAuth().provider(WebAuthentication.safariProvider()).provider).toNot(beNil())
+                    expect(newWebAuth().provider(WebAuthentication.asProvider(urlScheme: "")).provider).toNot(beNil())
                 }
 
             }
