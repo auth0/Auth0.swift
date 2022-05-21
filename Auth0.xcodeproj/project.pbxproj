@@ -170,12 +170,14 @@
 		5CE775B4244FD72500D054A0 /* JWKSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F553423C9124200C89615 /* JWKSpec.swift */; };
 		5CF5391D2836CEC00073F623 /* WebAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF5391C2836CEC00073F623 /* WebAuthenticationSpec.swift */; };
 		5CF5391E2836CEC00073F623 /* WebAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF5391C2836CEC00073F623 /* WebAuthenticationSpec.swift */; };
-		5CF539202836D9720073F623 /* WebAuthMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF5391F2836D9720073F623 /* WebAuthMocks.swift */; };
-		5CF539212836D9720073F623 /* WebAuthMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF5391F2836D9720073F623 /* WebAuthMocks.swift */; };
+		5CF539202836D9720073F623 /* WebAuthSpies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF5391F2836D9720073F623 /* WebAuthSpies.swift */; };
+		5CF539212836D9720073F623 /* WebAuthSpies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF5391F2836D9720073F623 /* WebAuthSpies.swift */; };
 		5CF539242836DCC10073F623 /* SafariProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF539232836DCC10073F623 /* SafariProviderSpec.swift */; };
 		5CF539252836DCC10073F623 /* SafariProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF539232836DCC10073F623 /* SafariProviderSpec.swift */; };
 		5CF539282836FB0C0073F623 /* ClearSessionTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF539272836FB0C0073F623 /* ClearSessionTransactionSpec.swift */; };
 		5CF539292836FB0C0073F623 /* ClearSessionTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF539272836FB0C0073F623 /* ClearSessionTransactionSpec.swift */; };
+		5CF5392B283835470073F623 /* ASProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF5392A283835460073F623 /* ASProviderSpec.swift */; };
+		5CF5392C283835470073F623 /* ASProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF5392A283835460073F623 /* ASProviderSpec.swift */; };
 		5F06DDC91CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
 		5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
 		5F1FBB9A1D8A44C0006B0B85 /* ResponseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1FBB981D8A4465006B0B85 /* ResponseSpec.swift */; };
@@ -512,9 +514,10 @@
 		5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = JWTDecode.xcframework; path = Carthage/Build/JWTDecode.xcframework; sourceTree = "<group>"; };
 		5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SimpleKeychain.xcframework; path = Carthage/Build/SimpleKeychain.xcframework; sourceTree = "<group>"; };
 		5CF5391C2836CEC00073F623 /* WebAuthenticationSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthenticationSpec.swift; sourceTree = "<group>"; };
-		5CF5391F2836D9720073F623 /* WebAuthMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthMocks.swift; sourceTree = "<group>"; };
+		5CF5391F2836D9720073F623 /* WebAuthSpies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthSpies.swift; sourceTree = "<group>"; };
 		5CF539232836DCC10073F623 /* SafariProviderSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariProviderSpec.swift; sourceTree = "<group>"; };
 		5CF539272836FB0C0073F623 /* ClearSessionTransactionSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearSessionTransactionSpec.swift; sourceTree = "<group>"; };
+		5CF5392A283835460073F623 /* ASProviderSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASProviderSpec.swift; sourceTree = "<group>"; };
 		5F049B6E1CB42C29006F6C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Auth0/Info.plist; sourceTree = "<group>"; };
 		5F06DD781CC448B10011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F06DD851CC448C90011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -781,6 +784,7 @@
 		5CF539222836DC360073F623 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
+				5CF5392A283835460073F623 /* ASProviderSpec.swift */,
 				5CF539232836DCC10073F623 /* SafariProviderSpec.swift */,
 			);
 			name = Providers;
@@ -992,7 +996,7 @@
 				5F53F5D61CFFAA4A00476A46 /* WebAuthSpec.swift */,
 				5F686A761D4AB90900412E3D /* TransactionStoreSpec.swift */,
 				5CF5391C2836CEC00073F623 /* WebAuthenticationSpec.swift */,
-				5CF5391F2836D9720073F623 /* WebAuthMocks.swift */,
+				5CF5391F2836D9720073F623 /* WebAuthSpies.swift */,
 			);
 			name = WebAuth;
 			sourceTree = "<group>";
@@ -1738,8 +1742,9 @@
 				5C41F6B6244DCF2F00252548 /* LoginTransactionSpec.swift in Sources */,
 				5CB41D6523D0BACF00074024 /* IDTokenValidatorMocks.swift in Sources */,
 				5FBBF03B1CC96AA70024D2AF /* Responses.swift in Sources */,
-				5CF539202836D9720073F623 /* WebAuthMocks.swift in Sources */,
+				5CF539202836D9720073F623 /* WebAuthSpies.swift in Sources */,
 				5CF539282836FB0C0073F623 /* ClearSessionTransactionSpec.swift in Sources */,
+				5CF5392B283835470073F623 /* ASProviderSpec.swift in Sources */,
 				5FCAB16A1D07AC3500331C84 /* ChallengeGeneratorSpec.swift in Sources */,
 				5CB41D6923D0BAD600074024 /* IDTokenSignatureValidatorSpec.swift in Sources */,
 				5CF5391D2836CEC00073F623 /* WebAuthenticationSpec.swift in Sources */,
@@ -1782,8 +1787,9 @@
 				5CE775A7244FCF4400D054A0 /* IDTokenValidatorSpec.swift in Sources */,
 				5CE775AE244FD66600D054A0 /* ChallengeGeneratorSpec.swift in Sources */,
 				5FADB6101CED7E5200D4BB50 /* UserPatchAttributesSpec.swift in Sources */,
-				5CF539212836D9720073F623 /* WebAuthMocks.swift in Sources */,
+				5CF539212836D9720073F623 /* WebAuthSpies.swift in Sources */,
 				5CF539292836FB0C0073F623 /* ClearSessionTransactionSpec.swift in Sources */,
+				5CF5392C283835470073F623 /* ASProviderSpec.swift in Sources */,
 				5FBBF0391CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5CE775B4244FD72500D054A0 /* JWKSpec.swift in Sources */,
 				5CF5391E2836CEC00073F623 /* WebAuthenticationSpec.swift in Sources */,

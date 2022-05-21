@@ -10,25 +10,19 @@ class ClearSessionTransactionSpec: QuickSpec {
         var transaction: ClearSessionTransaction!
 
         beforeEach {
-            transaction = ClearSessionTransaction(userAgent: MockUserAgent())
+            transaction = ClearSessionTransaction(userAgent: SpyUserAgent())
         }
 
         describe("code exchange") {
-            context("resume") {
-                it("should resume current transaction") {
-                    let url = URL(string: "https://samples.auth0.com/callback")!
-                    expect(transaction.resume(url)) == true
-                    expect(transaction.userAgent).to(beNil())
-                    expect(transaction.userAgentCallback).to(beNil())
-                }
+            it("should resume current transaction") {
+                let url = URL(string: "https://samples.auth0.com/callback")!
+                expect(transaction.resume(url)) == true
+                expect(transaction).to(haveClearedUserAgent())
             }
 
-            context("cancel") {
-                it("should cancel current transaction") {
-                    transaction.cancel()
-                    expect(transaction.userAgent).to(beNil())
-                    expect(transaction.userAgentCallback).to(beNil())
-                }
+            it("should cancel current transaction") {
+                transaction.cancel()
+                expect(transaction).to(haveClearedUserAgent())
             }
         }
     }

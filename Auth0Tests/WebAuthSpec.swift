@@ -270,6 +270,19 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
+            itBehavesLike(ValidAuthorizeURLExample) {
+                let organization = "foo"
+                let invitation = "bar"
+                let url = URL(string: "https://example.com?organization=\(organization)&invitation=\(invitation)")!
+                return [
+                    "url": newWebAuth()
+                        .invitationURL(url)
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: organization, invitation: invitation),
+                    "domain": Domain,
+                    "query": defaultQuery(withParameters: ["organization": organization, "invitation": invitation]),
+                ]
+            }
+
             context("encoding") {
                 
                 it("should encode + as %2B"){
@@ -392,6 +405,18 @@ class WebAuthSpec: QuickSpec {
 
             }
 
+            context("provider") {
+
+                it("should use no custom provider by default") {
+                    expect(newWebAuth().provider).to(beNil())
+                }
+
+                it("should use a custom provider") {
+                    expect(newWebAuth().provider(WebAuthentication.safariProvider()).provider).toNot(beNil())
+                }
+
+            }
+
         }
 
         #if os(iOS)
@@ -499,19 +524,19 @@ class WebAuthSpec: QuickSpec {
                     TransactionStore.shared.clear()
                 }
 
-                it("should launch AuthenticationServicesSessionCallback") {
+                it("should launch ClearSessionTransaction") {
                     let auth = newWebAuth()
                     auth.clearSession() { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
-                it("should launch AuthenticationServicesSessionCallback with federated") {
+                it("should launch federated ClearSessionTransaction") {
                     let auth = newWebAuth()
                     auth.clearSession(federated: true) { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
-                it("should cancel AuthenticationServicesSessionCallback") {
+                it("should cancel ClearSessionTransaction") {
                     let auth = newWebAuth()
                     auth.clearSession() { result = $0 }
                     TransactionStore.shared.cancel()
@@ -519,7 +544,7 @@ class WebAuthSpec: QuickSpec {
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
-                it("should resume AuthenticationServicesSessionCallback") {
+                it("should resume ClearSessionTransaction") {
                     let auth = newWebAuth()
                     auth.clearSession() { result = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)

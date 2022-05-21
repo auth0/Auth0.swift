@@ -18,5 +18,4 @@ extension ASUserAgent: ASWebAuthenticationPresentationContextProviding {
     }
 
 }
-
 #endif

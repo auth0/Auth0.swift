@@ -110,7 +110,6 @@ func isMultifactorChallenge(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/mfa/challenge")
 }
 
-
 func hasHeader(_ name: String, value: String) -> HTTPStubsTestBlock {
     return { request in
         return request.value(forHTTPHeaderField: name) == value
@@ -333,6 +332,24 @@ func haveObjectWithAttributes(_ attributes: [String]) -> Predicate<ManagementRes
 func haveJWKS() -> Predicate<AuthenticationResult<JWKS>> {
     return Predicate<AuthenticationResult<JWKS>>.define("have a JWKS object with at least one key") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage) { (jwks: JWKS) -> Bool in !jwks.keys.isEmpty }
+    }
+}
+
+func haveClearedUserAgent() -> Predicate<LoginTransaction> {
+    return Predicate<LoginTransaction>.define("have cleared user agent>") { expression, failureMessage -> PredicateResult in
+        if let actual = try expression.evaluate(), actual.userAgent == nil, actual.userAgentCallback == nil {
+            return PredicateResult(status: .matches, message: failureMessage)
+        }
+        return PredicateResult(status: .doesNotMatch, message: failureMessage)
+    }
+}
+
+func haveClearedUserAgent() -> Predicate<ClearSessionTransaction> {
+    return Predicate<ClearSessionTransaction>.define("have cleared user agent>") { expression, failureMessage -> PredicateResult in
+        if let actual = try expression.evaluate(), actual.userAgent == nil, actual.userAgentCallback == nil {
+            return PredicateResult(status: .matches, message: failureMessage)
+        }
+        return PredicateResult(status: .doesNotMatch, message: failureMessage)
     }
 }
 

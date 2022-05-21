@@ -8,57 +8,69 @@ class LoginTransactionSpec: QuickSpec {
 
     override func spec() {
         var transaction: LoginTransaction!
-        var result: WebAuthResult<Credentials>? = nil
-        let callback: (WebAuthResult<Credentials>) -> () = { result = $0 }
+        let userAgent = SpyUserAgent()
+        let handler = SpyGrant()
+        let loggerOutput = SpyOutput()
         let code = "123456"
 
         beforeEach {
             transaction = LoginTransaction(redirectURL: URL(string: "https://samples.auth0.com/callback")!,
                                            state: "state",
-                                           userAgent: MockUserAgent(),
-                                           handler: MockGrant(),
-                                           logger: nil,
-                                           callback: callback)
-            result = nil
+                                           userAgent: userAgent,
+                                           handler: handler,
+                                           logger: DefaultLogger(output: loggerOutput),
+                                           callback: { _ in })
         }
 
         describe("code exchange") {
             context("resume") {
                 it("should handle url") {
                     let url = URL(string: "https://samples.auth0.com/callback?code=\(code)&state=state")!
+                    let items = ["code": code, "state": "state"]
                     expect(transaction.resume(url)) == true
-                    expect(result).toEventually(haveCredentials())
-                    expect(transaction.userAgent).to(beNil())
-                    expect(transaction.userAgentCallback).to(beNil())
+                    expect(handler.items) == items
+                    expect(loggerOutput.messages.first).to(contain([url.absoluteString, "Callback URL"]))
+                    expect(transaction).to(haveClearedUserAgent())
                 }
 
                 it("should handle url with error") {
                     let url = URL(string: "https://samples.auth0.com/callback?error=error&error_description=description&state=state")!
+                    let errorInfo = ["error": "error", "error_description": "description", "state": "state"]
+                    let expectedError = WebAuthError(code: .other, cause: AuthenticationError(info: errorInfo))
                     expect(transaction.resume(url)) == true
-                    expect(transaction.userAgent).to(beNil())
-                    expect(transaction.userAgentCallback).to(beNil())
+                    expect(userAgent.result).to(haveWebAuthError(expectedError))
+                    expect(transaction).to(haveClearedUserAgent())
+                }
+
+                it("should fail to handle url with invalid prefix") {
+                    let url = URL(string: "https://invalid.auth0.com/callback?code=\(code)&state=state")!
+                    let expectedError = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
+                    expect(transaction.resume(url)) == false
+                    expect(userAgent.result).to(haveWebAuthError(expectedError))
+                    expect(transaction).to(haveClearedUserAgent())
                 }
 
                 it("should fail to handle url without state") {
                     let url = URL(string: "https://samples.auth0.com/callback?code=\(code)")!
+                    let expectedError = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
                     expect(transaction.resume(url)) == false
-                    expect(transaction.userAgent).to(beNil())
-                    expect(transaction.userAgentCallback).to(beNil())
+                    expect(userAgent.result).to(haveWebAuthError(expectedError))
+                    expect(transaction).to(haveClearedUserAgent())
                 }
 
                 it("should fail to handle invalid url") {
                     let url = URL(string: "foo")!
+                    let expectedError = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
                     expect(transaction.resume(url)) == false
-                    expect(transaction.userAgent).to(beNil())
-                    expect(transaction.userAgentCallback).to(beNil())
+                    expect(userAgent.result).to(haveWebAuthError(expectedError))
+                    expect(transaction).to(haveClearedUserAgent())
                 }
             }
 
             context("cancel") {
                 it("should cancel current transaction") {
                     transaction.cancel()
-                    expect(transaction.userAgent).to(beNil())
-                    expect(transaction.userAgentCallback).to(beNil())
+                    expect(transaction).to(haveClearedUserAgent())
                 }
             }
         }

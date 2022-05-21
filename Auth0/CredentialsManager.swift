@@ -21,7 +21,7 @@ public struct CredentialsManager {
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
     private let dispatchGroup = DispatchGroup()
     #if WEB_AUTH_PLATFORM
-    private var bioAuth: BioAuthentication?
+    var bioAuth: BioAuthentication?
     #endif
 
     /// Creates a new `CredentialsManager` instance.

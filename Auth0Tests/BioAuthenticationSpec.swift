@@ -14,7 +14,7 @@ class BioAuthenticationSpec: QuickSpec {
         beforeEach {
             evaluationPolicy = .deviceOwnerAuthenticationWithBiometrics
             mockContext = MockLAContext()
-            bioAuthentication = BioAuthentication(authContext: mockContext, evaluationPolicy: evaluationPolicy, title: "Touch Auth")
+            bioAuthentication = BioAuthentication(authContext: mockContext, evaluationPolicy: evaluationPolicy, title: "Biometric Auth")
         }
 
         describe("touch availablility") {
@@ -62,7 +62,7 @@ class BioAuthenticationSpec: QuickSpec {
             }
         }
 
-        describe("touch authentication") {
+        describe("biometric authentication") {
 
             var error: Error?
 
