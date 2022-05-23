@@ -539,6 +539,8 @@ credentialsManager.credentials { result in
 }
 ```
 
+> 💡 You do not need to call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials.
+
 <details>
   <summary>Using async/await</summary>
 
