@@ -1,29 +1,34 @@
 import Foundation
+import AuthenticationServices
 
 @testable import Auth0
 
-struct MockUserAgent: WebAuthUserAgent {
+class SpyGrant: OAuth2Grant {
 
-    func start() {}
+    var defaults: [String: String] = [:]
+    var items: [String: String] = [:]
 
-    func finish() -> (WebAuthResult<Void>) -> Void {
-        return { _ in }
+    func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+        self.items = values
+        callback(.success(Credentials()))
+    }
+
+    func values(fromComponents components: URLComponents) -> [String: String] {
+        var items = components.fragmentValues
+        components.queryValues.forEach { items[$0] = $1 }
+        return items
     }
 
 }
 
-struct MockGrant: OAuth2Grant {
+class SpyUserAgent: WebAuthUserAgent {
 
-    var defaults: [String:String] = [:]
+    var result: WebAuthResult<Void>?
 
-    func credentials(from values: [String : String], callback: @escaping (WebAuthResult<Credentials>) -> Void) {
-        callback(.success(Credentials()))
-    }
+    func start() {}
 
-    func values(fromComponents components: URLComponents) -> [String : String] {
-        var items = components.fragmentValues
-        components.queryValues.forEach { items[$0] = $1 }
-        return items
+    func finish() -> (WebAuthResult<Void>) -> Void {
+        return { self.result = $0 }
     }
 
 }

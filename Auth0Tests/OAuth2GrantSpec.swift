@@ -80,6 +80,14 @@ class OAuth2GrantSpec: QuickSpec {
                 expect(pkce.defaults["code_challenge"]) == generator.challenge
                 expect(pkce.verifier) == generator.verifier
             }
+
+            it("should extract query parameters from url components") {
+                let url = URL(string: "https://samples.auth0.com/callback?foo=bar&baz=qux")!
+                let values = ["foo": "bar", "baz": "qux"]
+                let components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+                expect(pkce.values(fromComponents: components)) == values
+            }
+
         }
 
         describe("Authorization Code w/PKCE and idToken") {
@@ -150,10 +158,12 @@ class OAuth2GrantSpec: QuickSpec {
                 pkce = PKCE(authentication: authentication, redirectURL: redirectURL, verifier: verifier, challenge: challenge, method: method, issuer: issuer, leeway: leeway, nonce: nonce)
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
-                let cause = AuthenticationError(info: ["error": "foo", "error_description": "bar"])
+                let errorCode = "foo"
+                let errorDescription = "bar"
+                let cause = AuthenticationError(info: ["error": errorCode, "error_description": errorDescription])
                 let expectedError = WebAuthError(code: .other, cause: cause)
                 stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
-                    return authFailure(error: "foo", description: "bar")
+                    return authFailure(error: errorCode, description: errorDescription)
                 }.name = "Failed Code Exchange Auth"
                 waitUntil { done in
                     pkce.credentials(from: values) {
@@ -187,6 +197,7 @@ class OAuth2GrantSpec: QuickSpec {
                 expect(pkce.verifier) == generator.verifier
             }
         }
+
     }
     
 }

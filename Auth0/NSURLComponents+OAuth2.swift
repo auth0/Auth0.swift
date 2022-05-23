@@ -8,11 +8,7 @@ extension URLComponents {
         let items = fragment?.components(separatedBy: "&")
         items?.forEach { item in
             let parts = item.components(separatedBy: "=")
-            guard
-                parts.count == 2,
-                let key = parts.first,
-                let value = parts.last
-                else { return }
+            guard parts.count == 2, let key = parts.first, let value = parts.last else { return }
             dict[key] = value
         }
         return dict

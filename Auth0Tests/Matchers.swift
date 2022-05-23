@@ -110,7 +110,6 @@ func isMultifactorChallenge(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/mfa/challenge")
 }
 
-
 func hasHeader(_ name: String, value: String) -> HTTPStubsTestBlock {
     return { request in
         return request.value(forHTTPHeaderField: name) == value
@@ -335,6 +334,26 @@ func haveJWKS() -> Predicate<AuthenticationResult<JWKS>> {
         return try beSuccessful(expression, failureMessage) { (jwks: JWKS) -> Bool in !jwks.keys.isEmpty }
     }
 }
+
+#if WEB_AUTH_PLATFORM
+func haveClearedUserAgent() -> Predicate<LoginTransaction> {
+    return Predicate<LoginTransaction>.define("have cleared user agent>") { expression, failureMessage -> PredicateResult in
+        if let actual = try expression.evaluate(), actual.userAgent == nil, actual.userAgentCallback == nil {
+            return PredicateResult(status: .matches, message: failureMessage)
+        }
+        return PredicateResult(status: .doesNotMatch, message: failureMessage)
+    }
+}
+
+func haveClearedUserAgent() -> Predicate<ClearSessionTransaction> {
+    return Predicate<ClearSessionTransaction>.define("have cleared user agent>") { expression, failureMessage -> PredicateResult in
+        if let actual = try expression.evaluate(), actual.userAgent == nil, actual.userAgentCallback == nil {
+            return PredicateResult(status: .matches, message: failureMessage)
+        }
+        return PredicateResult(status: .doesNotMatch, message: failureMessage)
+    }
+}
+#endif
 
 func beURLSafeBase64() -> Predicate<String> {
     return Predicate<String>.define("be url safe base64") { expression, failureMessage -> PredicateResult in

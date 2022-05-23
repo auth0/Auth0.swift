@@ -55,4 +55,5 @@ struct DefaultLogger: Logger {
     func trace(url: URL, source: String?) {
         output.log(message: "\(source ?? "URL"): \(url.absoluteString)")
     }
+
 }

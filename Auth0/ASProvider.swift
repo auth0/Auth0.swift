@@ -3,11 +3,17 @@ import AuthenticationServices
 
 extension WebAuthentication {
 
-    static func asProvider(redirectURL: URL, ephemeralSession: Bool = false) -> WebAuthProvider {
+    static func asProvider(urlScheme: String, ephemeralSession: Bool = false) -> WebAuthProvider {
         return { url, callback in
-            let session = ASWebAuthenticationSession(url: url, callbackURLScheme: redirectURL.scheme) {
+            let session = ASWebAuthenticationSession(url: url, callbackURLScheme: urlScheme) {
                 guard let callbackURL = $0, $1 == nil else {
-                    callback(.failure(WebAuthError(from: $1)))
+                    if let error = $1, case ASWebAuthenticationSessionError.canceledLogin = error {
+                        callback(.failure(WebAuthError(code: .userCancelled)))
+                    } else if let error = $1 {
+                        callback(.failure(WebAuthError(code: .other, cause: error)))
+                    } else {
+                        callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
+                    }
                     return TransactionStore.shared.clear()
                 }
 
@@ -19,20 +25,6 @@ extension WebAuthentication {
             }
 
             return ASUserAgent(session: session, callback: callback)
-        }
-    }
-
-}
-
-fileprivate extension WebAuthError {
-
-    init(from error: Error?) {
-        if let error = error, case ASWebAuthenticationSessionError.canceledLogin = error {
-            self.init(code: .userCancelled)
-        } else if let error = error {
-            self.init(code: .other, cause: error)
-        } else {
-            self.init(code: .unknown("ASWebAuthenticationSession failed"))
         }
     }
 

@@ -92,6 +92,11 @@ class UserInfoSpec: QuickSpec {
                 expect(userInfo?.zoneinfo?.identifier) == TimeZone(identifier: ZoneEST)!.identifier
             }
 
+            it("should build with ISO updated_at") {
+                let userInfo = UserInfo(json: basicProfile(updatedAt: UpdatedAt))
+                expect(userInfo?.updatedAt?.timeIntervalSince1970) == UpdatedAtTimestamp
+            }
+
             it("should build from jwt body") {
                 let jwt = try! decode(jwt: BasicProfileJWT)
                 let userInfo = UserInfo(json: jwt.body)

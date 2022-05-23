@@ -64,6 +64,7 @@ class CredentialsManagerSpec: QuickSpec {
             it("should fail to clear credentials") {
                 expect(credentialsManager.clear()).to(beFalse())
             }
+
         }
 
         describe("custom storage") {
@@ -169,9 +170,11 @@ class CredentialsManagerSpec: QuickSpec {
             }
             
             it("should include custom headers") {
-                stub(condition: hasHeader("foo", value: "bar")) { _ in return revokeTokenResponse() }.name = "revoke success"
+                let key = "foo"
+                let value = "bar"
+                stub(condition: hasHeader(key, value: value)) { _ in return revokeTokenResponse() }.name = "revoke success"
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.revoke(headers: ["foo": "bar"], { result in
+                    credentialsManager.revoke(headers: [key: value], { result in
                         expect(result).to(beSuccessful())
                         done()
                     })
@@ -408,15 +411,11 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             #if os(iOS)
-            context("require touch") {
+            context("require biometrics") {
 
-                beforeEach {
+                it("should error when biometrics are unavailable") {
+                    let expectedError = CredentialsManagerError(code: .biometricsFailed, cause: LAError(LAError.biometryNotAvailable))
                     credentialsManager.enableBiometrics(withTitle: "Auth Title", cancelTitle: "Cancel Title", fallbackTitle: "Fallback Title")
-                }
-
-                it("should error when touch unavailable") {
-                    let cause = LAError(LAError.biometryNotAvailable)
-                    let expectedError = CredentialsManagerError(code: .biometricsFailed, cause: cause)
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
 
@@ -427,6 +426,40 @@ class CredentialsManagerSpec: QuickSpec {
                         }
                     }
                 }
+
+                it("should error when biometric validation fails") {
+                    let laContext = MockLAContext()
+                    let bioAuth = BioAuthentication(authContext: laContext, evaluationPolicy: .deviceOwnerAuthenticationWithBiometrics, title: "Auth Title")
+                    let cause = LAError(.appCancel)
+                    let expectedError = CredentialsManagerError(code: .biometricsFailed, cause: cause)
+                    laContext.replyError = cause
+                    credentialsManager.bioAuth = bioAuth
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials)
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.credentials { result in
+                            expect(result).to(haveCredentialsManagerError(expectedError))
+                            done()
+                        }
+                    }
+                }
+
+                it("should yield new credentials when biometric validation succeeds") {
+                    let laContext = MockLAContext()
+                    let bioAuth = BioAuthentication(authContext: laContext, evaluationPolicy: .deviceOwnerAuthenticationWithBiometrics, title: "Biometric Auth")
+                    credentialsManager.bioAuth = bioAuth
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials)
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, RefreshToken))
+                            done()
+                        }
+                    }
+                }
+
             }
             #endif
 
@@ -501,13 +534,15 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should include custom headers") {
-                    stub(condition: hasHeader("foo", value: "bar")) {
+                    let key = "foo"
+                    let value = "bar"
+                    stub(condition: hasHeader(key, value: value)) {
                         _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials(headers: ["foo": "bar"]) { result in
+                        credentialsManager.credentials(headers: [key: value]) { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -742,7 +777,9 @@ class CredentialsManagerSpec: QuickSpec {
                     }
 
                     it("should complete using custom parameter values") {
-                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "foo": "bar"]) && hasHeader("foo", value: "bar")) { _ in
+                        let key = "foo"
+                        let value = "bar"
+                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: value)) { _ in
                             return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                         }
                         credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn), scope: "openid profile")
@@ -751,8 +788,8 @@ class CredentialsManagerSpec: QuickSpec {
                             credentialsManager
                                 .credentials(withScope: "openid profile offline_access",
                                              minTTL: ValidTTL,
-                                             parameters: ["foo": "bar"],
-                                             headers: ["foo": "bar"])
+                                             parameters: [key: value],
+                                             headers: [key: value])
                                 .sink(receiveCompletion: { completion in
                                     guard case .finished = completion else { return }
                                     done()
@@ -813,13 +850,15 @@ class CredentialsManagerSpec: QuickSpec {
                     }
 
                     it("should complete using custom parameter values") {
-                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader("foo", value: "bar")) { _ in
+                        let key = "foo"
+                        let value = "bar"
+                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader(key, value: value)) { _ in
                             return revokeTokenResponse()
                         }
                         _ = credentialsManager.store(credentials: credentials)
                         waitUntil(timeout: Timeout) { done in
                             credentialsManager
-                                .revoke(headers: ["foo": "bar"])
+                                .revoke(headers: [key: value])
                                 .sink(receiveCompletion: { completion in
                                     guard case .finished = completion else { return }
                                     done()
@@ -884,8 +923,10 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should return the credentials using custom parameter values") {
+                    let key = "foo"
+                    let value = "bar"
                     let credentialsManager = credentialsManager!
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "foo": "bar"]) && hasHeader("foo", value: "bar")) { _ in
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: "bar")) { _ in
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn), scope: "openid profile")
@@ -896,8 +937,8 @@ class CredentialsManagerSpec: QuickSpec {
                             Task.init {
                                 _ = try await credentialsManager.credentials(withScope: "openid profile offline_access",
                                                                              minTTL: ValidTTL,
-                                                                             parameters: ["foo": "bar"],
-                                                                             headers: ["foo": "bar"])
+                                                                             parameters: [key: value],
+                                                                             headers: [key: value])
                                 done()
                             }
                         }
@@ -906,8 +947,8 @@ class CredentialsManagerSpec: QuickSpec {
                             Task.init {
                                 _ = try await credentialsManager.credentials(withScope: "openid profile offline_access",
                                                                              minTTL: ValidTTL,
-                                                                             parameters: ["foo": "bar"],
-                                                                             headers: ["foo": "bar"])
+                                                                             parameters: [key: value],
+                                                                             headers: [key: value])
                                 done()
                             }
                         } else {
@@ -978,8 +1019,10 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should revoke using custom parameter values") {
+                    let key = "foo"
+                    let value = "bar"
                     let credentialsManager = credentialsManager!
-                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader("foo", value: "bar")) { _ in
+                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader(key, value: value)) { _ in
                         return revokeTokenResponse()
                     }
                     _ = credentialsManager.store(credentials: credentials)
@@ -987,14 +1030,14 @@ class CredentialsManagerSpec: QuickSpec {
                         #if compiler(>=5.5.2)
                         if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
                             Task.init {
-                                _ = try await credentialsManager.revoke(headers: ["foo": "bar"])
+                                _ = try await credentialsManager.revoke(headers: [key: value])
                                 done()
                             }
                         }
                         #else
                         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
                             Task.init {
-                                _ = try await credentialsManager.revoke(headers: ["foo": "bar"])
+                                _ = try await credentialsManager.revoke(headers: [key: value])
                                 done()
                             }
                         } else {
