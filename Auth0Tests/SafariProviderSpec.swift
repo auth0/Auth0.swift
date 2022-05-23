@@ -175,7 +175,7 @@ class SafariProviderSpec: QuickSpec {
                 }
             }
 
-            it("should cancel the transaction when the user when the user cancels the operation") {
+            it("should cancel the transaction when the user cancels the operation") {
                 let transaction = SpyTransaction()
                 TransactionStore.shared.store(transaction)
                 userAgent.safariViewControllerDidFinish(safari)
