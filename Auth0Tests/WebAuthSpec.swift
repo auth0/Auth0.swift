@@ -420,22 +420,15 @@ class WebAuthSpec: QuickSpec {
         }
 
         #if os(iOS)
-        describe("session") {
+        describe("login") {
 
-            let storage = TransactionStore.shared
-
-            beforeEach {
-                if storage.current != nil {
-                    storage.cancel()
-                }
-            }
-
-            it("should save started session") {
+            it("should save a new transaction") {
                 newWebAuth().start { _ in }
-                expect(storage.current).toNot(beNil())
+                expect(TransactionStore.shared.current).toNot(beNil())
+                TransactionStore.shared.cancel()
             }
 
-            it("should have a generated state") {
+            it("should generate a state") {
                 let auth = newWebAuth()
                 auth.start { _ in }
                 expect(auth.state).toNot(beNil())
@@ -449,30 +442,34 @@ class WebAuthSpec: QuickSpec {
                 expect(auth.state) != state
             }
 
-            it("should honor supplied state") {
+            it("should use the supplied state") {
                 let state = UUID().uuidString
                 let auth = newWebAuth()
                 auth.state(state).start { _ in }
                 expect(auth.state) == state
             }
 
-            it("should honor supplied state via parameters") {
+            it("should use the state supplied via parameters") {
                 let state = UUID().uuidString
                 let auth = newWebAuth()
                 auth.parameters(["state": state]).start { _ in }
                 expect(auth.state) == state
             }
 
-            it("should produce a no bundle identifier error") {
+            it("should use the organization and invitation from the invitation URL") {
                 let auth = newWebAuth()
-                let expectedError = WebAuthError(code: .noBundleIdentifier)
-                var result: WebAuthResult<Credentials>?
-                auth.redirectURL = nil
-                auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                let url = "https://\(Domain)?organization=foo&invitation=bar"
+                var redirectURL: URL?
+                _ = auth.invitationURL(URL(string: url)!).provider({ url, _ in
+                    redirectURL = url
+                    return SpyUserAgent()
+                })
+                auth.start { _ in }
+                expect(redirectURL?.query).toEventually(contain("organization=foo"))
+                expect(redirectURL?.query).toEventually(contain("invitation=bar"))
             }
 
-            it("should produce an invalid invitation URL error when organization is missing") {
+            it("should produce an invalid invitation URL error when the organization is missing") {
                 let auth = newWebAuth()
                 let url = "https://\(Domain)?invitation=foo"
                 let expectedError = WebAuthError(code: .invalidInvitationURL(url))
@@ -482,7 +479,7 @@ class WebAuthSpec: QuickSpec {
                 expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
-            it("should produce an invalid invitation URL error when invitation is missing") {
+            it("should produce an invalid invitation URL error when the invitation is missing") {
                 let auth = newWebAuth()
                 let url = "https://\(Domain)?organization=foo"
                 let expectedError = WebAuthError(code: .invalidInvitationURL(url))
@@ -492,7 +489,7 @@ class WebAuthSpec: QuickSpec {
                 expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
-            it("should produce an invalid invitation URL error when organization and invitation are missing") {
+            it("should produce an invalid invitation URL error when the organization and invitation are missing") {
                 let auth = newWebAuth()
                 let url = "https://\(Domain)?foo=bar"
                 let expectedError = WebAuthError(code: .invalidInvitationURL(url))
@@ -502,11 +499,20 @@ class WebAuthSpec: QuickSpec {
                 expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
-            it("should produce an invalid invitation URL error when query parameters are missing") {
+            it("should produce an invalid invitation URL error when the query parameters are missing") {
                 let auth = newWebAuth()
                 let expectedError = WebAuthError(code: .invalidInvitationURL(DomainURL.absoluteString))
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(DomainURL)
+                auth.start { result = $0 }
+                expect(result).toEventually(haveWebAuthError(expectedError))
+            }
+
+            it("should produce a no bundle identifier error") {
+                let auth = newWebAuth()
+                let expectedError = WebAuthError(code: .noBundleIdentifier)
+                var result: WebAuthResult<Credentials>?
+                auth.redirectURL = nil
                 auth.start { result = $0 }
                 expect(result).toEventually(haveWebAuthError(expectedError))
             }
