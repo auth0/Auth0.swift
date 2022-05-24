@@ -435,7 +435,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                expect(isStarted) == true
+                expect(isStarted).toEventually(beTrue())
             }
 
             it("should generate a state") {
@@ -556,7 +556,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                expect(isStarted) == true
+                expect(isStarted).toEventually(beTrue())
             }
 
             it("should not include the federated parameter by default") {
