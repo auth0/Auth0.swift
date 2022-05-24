@@ -566,7 +566,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.clearSession() { _ in }
-                expect(redirectURL?.query).toNotEventually(contain("federated"))
+                expect(redirectURL?.query?.contains("federated")).toEventually(beFalse())
             }
 
             it("should include the federated parameter") {
@@ -576,7 +576,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.clearSession(federated: true) { _ in }
-                expect(redirectURL?.query).toEventually(contain("federated"))
+                expect(redirectURL?.query?.contains("federated")).toEventually(beTrue())
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
