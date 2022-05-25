@@ -30,7 +30,7 @@ class LoginTransactionSpec: QuickSpec {
                     expect(transaction.resume(url)) == true
                     expect(handler.items) == items
                     expect(loggerOutput.messages.first).to(contain([url.absoluteString, "Callback URL"]))
-                    expect(transaction).to(haveClearedUserAgent())
+                    expect(transaction.userAgent).to(beNil())
                 }
 
                 it("should handle url with error") {
@@ -39,7 +39,7 @@ class LoginTransactionSpec: QuickSpec {
                     let expectedError = WebAuthError(code: .other, cause: AuthenticationError(info: errorInfo))
                     expect(transaction.resume(url)) == true
                     expect(userAgent.result).to(haveWebAuthError(expectedError))
-                    expect(transaction).to(haveClearedUserAgent())
+                    expect(transaction.userAgent).to(beNil())
                 }
 
                 it("should fail to handle url with invalid prefix") {
@@ -47,7 +47,7 @@ class LoginTransactionSpec: QuickSpec {
                     let expectedError = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
                     expect(transaction.resume(url)) == false
                     expect(userAgent.result).to(haveWebAuthError(expectedError))
-                    expect(transaction).to(haveClearedUserAgent())
+                    expect(transaction.userAgent).to(beNil())
                 }
 
                 it("should fail to handle url without state") {
@@ -55,7 +55,7 @@ class LoginTransactionSpec: QuickSpec {
                     let expectedError = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
                     expect(transaction.resume(url)) == false
                     expect(userAgent.result).to(haveWebAuthError(expectedError))
-                    expect(transaction).to(haveClearedUserAgent())
+                    expect(transaction.userAgent).to(beNil())
                 }
 
                 it("should fail to handle invalid url") {
@@ -63,14 +63,14 @@ class LoginTransactionSpec: QuickSpec {
                     let expectedError = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
                     expect(transaction.resume(url)) == false
                     expect(userAgent.result).to(haveWebAuthError(expectedError))
-                    expect(transaction).to(haveClearedUserAgent())
+                    expect(transaction.userAgent).to(beNil())
                 }
             }
 
             context("cancel") {
                 it("should cancel current transaction") {
                     transaction.cancel()
-                    expect(transaction).to(haveClearedUserAgent())
+                    expect(transaction.userAgent).to(beNil())
                 }
             }
         }

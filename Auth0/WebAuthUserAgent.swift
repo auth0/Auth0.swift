@@ -2,7 +2,7 @@
 public protocol WebAuthUserAgent {
 
     func start()
-    func finish() -> (WebAuthResult<Void>) -> Void
+    func finish(with result: WebAuthResult<Void>)
 
 }
 #endif

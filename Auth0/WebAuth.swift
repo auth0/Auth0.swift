@@ -4,6 +4,8 @@ import Foundation
 import Combine
 #endif
 
+public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping (WebAuthResult<Void>) -> Void) -> WebAuthUserAgent
+
 /// Web-based authentication using Auth0.
 ///
 /// - See: ``WebAuthError``

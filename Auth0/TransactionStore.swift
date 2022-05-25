@@ -10,9 +10,7 @@ class TransactionStore {
 
     func resume(_ url: URL) -> Bool {
         let isResumed = self.current?.resume(url) ?? false
-        if isResumed {
-            self.clear()
-        }
+        self.clear()
         return isResumed
     }
 
