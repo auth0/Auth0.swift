@@ -19,7 +19,6 @@ extension SFSafariViewController {
 
     var topViewController: UIViewController? {
         guard let root = UIApplication.shared()?.keyWindow?.rootViewController else { return nil }
-
         return findTopViewController(from: root)
     }
 
@@ -90,6 +89,8 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 extension SafariUserAgent: SFSafariViewControllerDelegate {
 
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+        // If you're developing a custom Web Auth provider, call WebAuthentication.cancel() instead
+        // TransactionStore is internal
         TransactionStore.shared.cancel()
     }
 
