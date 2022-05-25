@@ -61,21 +61,19 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
         self.controller.present()
     }
 
-    func finish() -> (WebAuthResult<Void>) -> Void {
-        return { [weak controller, callback] result -> Void in
-            if case .failure(let cause) = result, case .userCancelled = cause {
-                DispatchQueue.main.async {
-                    callback(result)
+    func finish(with result: WebAuthResult<Void>) {
+        if case .failure(let cause) = result, case .userCancelled = cause {
+            DispatchQueue.main.async { [callback] in
+                callback(result)
+            }
+        } else {
+            DispatchQueue.main.async { [callback, weak controller] in
+                guard let presenting = controller?.presentingViewController else {
+                    let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
+                    return callback(.failure(error))
                 }
-            } else {
-                DispatchQueue.main.async {
-                    guard let presenting = controller?.presentingViewController else {
-                        let error = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
-                        return callback(.failure(error))
-                    }
-                    presenting.dismiss(animated: true) {
-                        callback(result)
-                    }
+                presenting.dismiss(animated: true) {
+                    callback(result)
                 }
             }
         }

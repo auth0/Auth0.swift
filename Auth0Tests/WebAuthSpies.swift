@@ -27,8 +27,8 @@ class SpyUserAgent: WebAuthUserAgent {
 
     func start() {}
 
-    func finish() -> (WebAuthResult<Void>) -> Void {
-        return { self.result = $0 }
+    func finish(with result: WebAuthResult<Void>) {
+        self.result = result
     }
 
 }

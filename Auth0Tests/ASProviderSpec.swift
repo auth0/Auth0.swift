@@ -71,8 +71,7 @@ class ASProviderSpec: QuickSpec {
                         expect(result).to(beFailure())
                         done()
                     })
-                    let callback = userAgent.finish()
-                    callback(.failure(.userCancelled))
+                    userAgent.finish(with: .failure(.userCancelled))
                 }
             }
 
@@ -82,8 +81,7 @@ class ASProviderSpec: QuickSpec {
                         expect(result).to(beSuccessful())
                         done()
                     })
-                    let callback = userAgent.finish()
-                    callback(.success(()))
+                    userAgent.finish(with: .success(()))
                 }
             }
 

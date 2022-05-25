@@ -49,10 +49,8 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
         _ = self.session.start()
     }
 
-    func finish() -> (WebAuthResult<Void>) -> Void {
-        return { [callback] result in
-            callback(result)
-        }
+    func finish(with result: WebAuthResult<Void>) {
+        callback(result)
     }
 
     public override var description: String {

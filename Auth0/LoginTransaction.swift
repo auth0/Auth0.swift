@@ -6,7 +6,7 @@ class LoginTransaction: NSObject, AuthTransaction {
     typealias FinishTransaction = (WebAuthResult<Credentials>) -> Void
 
     private(set) var userAgent: WebAuthUserAgent?
-    private(set) var userAgentCallback: ((WebAuthResult<Void>) -> Void)?
+
     let redirectURL: URL
     let state: String?
     let handler: OAuth2Grant
@@ -25,7 +25,6 @@ class LoginTransaction: NSObject, AuthTransaction {
         self.handler = handler
         self.logger = logger
         self.callback = callback
-        self.userAgentCallback = userAgent.finish()
         super.init()
     }
 
@@ -63,9 +62,8 @@ class LoginTransaction: NSObject, AuthTransaction {
     }
 
     private func finishUserAgent(with result: WebAuthResult<Void>) {
-        self.userAgentCallback?(result)
+        self.userAgent?.finish(with: result)
         self.userAgent = nil
-        self.userAgentCallback = nil
     }
 
     private func has(state: String?, inItems items: [String: String]) -> Bool {

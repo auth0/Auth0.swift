@@ -140,8 +140,7 @@ class SafariProviderSpec: QuickSpec {
                         expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                         done()
                     })
-                    let callback = userAgent.finish()
-                    callback(.failure(.userCancelled))
+                    userAgent.finish(with: .failure(.userCancelled))
                 }
             }
 
@@ -153,8 +152,7 @@ class SafariProviderSpec: QuickSpec {
                         expect(result).to(haveWebAuthError(expectedError))
                         done()
                     })
-                    let callback = userAgent.finish()
-                    callback(.success(()))
+                    userAgent.finish(with: .success(()))
                 }
             }
 
@@ -170,8 +168,7 @@ class SafariProviderSpec: QuickSpec {
                         expect(result).to(beSuccessful())
                         done()
                     })
-                    let callback = userAgent.finish()
-                    callback(.success(()))
+                    userAgent.finish(with: .success(()))
                 }
             }
 

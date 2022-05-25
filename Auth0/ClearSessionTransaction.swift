@@ -4,11 +4,9 @@ import Foundation
 class ClearSessionTransaction: NSObject, AuthTransaction {
 
     private(set) var userAgent: WebAuthUserAgent?
-    private(set) var userAgentCallback: ((WebAuthResult<Void>) -> Void)?
 
     init(userAgent: WebAuthUserAgent) {
         self.userAgent = userAgent
-        self.userAgentCallback = userAgent.finish()
         super.init()
     }
 
@@ -24,9 +22,8 @@ class ClearSessionTransaction: NSObject, AuthTransaction {
     }
 
     private func finishUserAgent(with result: WebAuthResult<Void>) {
-        self.userAgentCallback?(result)
+        self.userAgent?.finish(with: result)
         self.userAgent = nil
-        self.userAgentCallback = nil
     }
 
 }
