@@ -19,6 +19,7 @@ extension SFSafariViewController {
 
     var topViewController: UIViewController? {
         guard let root = UIApplication.shared()?.keyWindow?.rootViewController else { return nil }
+
         return findTopViewController(from: root)
     }
 
@@ -28,6 +29,7 @@ extension SFSafariViewController {
 
     private func findTopViewController(from root: UIViewController) -> UIViewController? {
         if let presented = root.presentedViewController { return findTopViewController(from: presented) }
+
         switch root {
         case let split as UISplitViewController:
             guard let last = split.viewControllers.last else { return split }
