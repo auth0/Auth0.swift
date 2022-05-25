@@ -14,6 +14,7 @@ extension WebAuthentication {
                     } else {
                         callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
                     }
+
                     return TransactionStore.shared.clear()
                 }
 
