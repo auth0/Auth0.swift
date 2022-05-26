@@ -21,9 +21,9 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Auth0 2.0.1 Docs
+          Auth0 2.1.0 Docs
         </a>
-         (97% documented)
+         (98% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -87,7 +87,13 @@
                 <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions.html#/SafariUserAgent">SafariUserAgent</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/WebAuthentication.html">WebAuthentication</a>
               </li>
             </ul>
           </li>
@@ -150,6 +156,9 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/WebAuth.html">WebAuth</a>
               </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/WebAuthUserAgent.html">WebAuthUserAgent</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -188,6 +197,9 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/WebAuthError.html">WebAuthError</a>
               </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/WebAuthentication.html">WebAuthentication</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -207,6 +219,9 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth016ManagementResulta">ManagementResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth015WebAuthProvidera">WebAuthProvider</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Typealiases.html#/WebAuthResult">WebAuthResult</a>
@@ -1237,7 +1252,7 @@ application and user.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Authenticates a user with their Facebook <a href="https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/">Session Info Access Token</a> and profile data.</p>
+                        <p>Authenticates a user with their Facebook <a href="https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/">session info access token</a> and profile data.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="s">"session info access token"</span><span class="p">,</span>
@@ -1292,7 +1307,7 @@ application and user.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Session Info Access Token retrieved from Facebook.</p>
+                                  <p>Session info access token retrieved from Facebook.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1952,7 +1967,7 @@ application and user.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Access Token obtained by authenticating the user.</p>
+                                  <p>Access token obtained by authenticating the user.</p>
                                 </div>
                               </td>
                             </tr>
@@ -2080,7 +2095,7 @@ This will request the user&rsquo;s token using the code and its verifier after a
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Renews the user&rsquo;s credentials using a Refresh Token.</p>
+                        <p>Renews the user&rsquo;s credentials using a refresh token.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">refreshToken</span><span class="p">)</span>
     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
@@ -2093,7 +2108,7 @@ This will request the user&rsquo;s token using the code and its verifier after a
     <span class="p">}</span>
 </code></pre>
 
-<p>You can get a downscoped Access Token by requesting fewer scopes than were requested on login:</p>
+<p>You can get a downscoped access token by requesting fewer scopes than were requested on login:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">refreshToken</span><span class="p">,</span>
            <span class="nv">scope</span><span class="p">:</span> <span class="s">"openid offline_access"</span><span class="p">)</span>
@@ -2130,7 +2145,7 @@ This will request the user&rsquo;s token using the code and its verifier after a
                               </td>
                               <td>
                                 <div>
-                                  <p>The Refresh Token.</p>
+                                  <p>The refresh token.</p>
                                 </div>
                               </td>
                             </tr>
@@ -2169,7 +2184,7 @@ This will request the user&rsquo;s token using the code and its verifier after a
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Revokes a user&rsquo;s Refresh Token by performing a request to the <code>/oauth/revoke</code> endpoint.</p>
+                        <p>Revokes a user&rsquo;s refresh token by performing a request to the <code>/oauth/revoke</code> endpoint.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">revoke</span><span class="p">(</span><span class="nv">refreshToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">refreshToken</span><span class="p">)</span>
@@ -2206,7 +2221,7 @@ This will request the user&rsquo;s token using the code and its verifier after a
                               </td>
                               <td>
                                 <div>
-                                  <p>The Refresh Token to revoke.</p>
+                                  <p>The refresh token to revoke.</p>
                                 </div>
                               </td>
                             </tr>
@@ -2215,7 +2230,7 @@ This will request the user&rsquo;s token using the code and its verifier after a
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>A request for revoking the Refresh Token.</p>
+                        <p>A request for revoking the refresh token.</p>
                       </div>
                     </section>
                   </div>
@@ -2276,7 +2291,7 @@ This will request the user&rsquo;s token using the code and its verifier after a
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-04-29)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-05-26)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

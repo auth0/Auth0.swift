@@ -21,9 +21,9 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Auth0 2.0.1 Docs
+          Auth0 2.1.0 Docs
         </a>
-         (97% documented)
+         (98% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -87,7 +87,13 @@
                 <a class="nav-group-task-link" href="Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions.html#/SafariUserAgent">SafariUserAgent</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/WebAuthentication.html">WebAuthentication</a>
               </li>
             </ul>
           </li>
@@ -150,6 +156,9 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Protocols/WebAuth.html">WebAuth</a>
               </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/WebAuthUserAgent.html">WebAuthUserAgent</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -188,6 +197,9 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/WebAuthError.html">WebAuthError</a>
               </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/WebAuthentication.html">WebAuthentication</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -207,6 +219,9 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth016ManagementResulta">ManagementResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth015WebAuthProvidera">WebAuthProvider</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Typealiases.html#/WebAuthResult">WebAuthResult</a>
@@ -423,7 +438,8 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        
+                        <p>A type that can send the <code>Auth0-Client</code> header on every request to Auth0.</p>
+
                         <a href="Protocols/Trackable.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
@@ -490,7 +506,7 @@
 
 </div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/login/universal-login">Universal Login</a>
+    <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a>
 
 </div>
 
@@ -507,6 +523,39 @@
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth016WebAuthUserAgentP"></a>
+                    <a name="//apple_ref/swift/Protocol/WebAuthUserAgent" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth016WebAuthUserAgentP">WebAuthUserAgent</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Represents the external user agent used to perform a web-based operation.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <a href="https://github.com/auth0/Auth0.swift/blob/master/Auth0/SafariProvider.swift">Example</a>
+
+</div>
+
+                        <a href="Protocols/WebAuthUserAgent.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">WebAuthUserAgent</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
           </div>
@@ -515,7 +564,7 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-04-29)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-05-26)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

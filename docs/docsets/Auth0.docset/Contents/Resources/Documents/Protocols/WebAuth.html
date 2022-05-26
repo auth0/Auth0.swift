@@ -21,9 +21,9 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Auth0 2.0.1 Docs
+          Auth0 2.1.0 Docs
         </a>
-         (97% documented)
+         (98% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -87,7 +87,13 @@
                 <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions.html#/SafariUserAgent">SafariUserAgent</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/WebAuthentication.html">WebAuthentication</a>
               </li>
             </ul>
           </li>
@@ -150,6 +156,9 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/WebAuth.html">WebAuth</a>
               </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/WebAuthUserAgent.html">WebAuthUserAgent</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -188,6 +197,9 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/WebAuthError.html">WebAuthError</a>
               </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/WebAuthentication.html">WebAuthentication</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -207,6 +219,9 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth016ManagementResulta">ManagementResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:5Auth015WebAuthProvidera">WebAuthProvider</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Typealiases.html#/WebAuthResult">WebAuthResult</a>
@@ -237,7 +252,7 @@
 
 </div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/login/universal-login">Universal Login</a>
+    <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a>
 
 </div>
 
@@ -355,7 +370,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Specify an Auth0 connection to directly show that Identity Provider&rsquo;s login page, skipping the Universal Login
+                        <p>Specify an Auth0 connection to directly show that identity provider&rsquo;s login page, skipping the Universal Login
 page itself. By default no connection is specified, so the Universal Login page will be displayed.</p>
 
                       </div>
@@ -409,7 +424,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                         <p>Specify the scopes that will be requested during authentication.</p>
 <div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/configure/apis/scopes">Scopes</a>
+    <a href="https://auth0.com/docs/get-started/apis/scopes">Scopes</a>
 
 </div>
 
@@ -434,7 +449,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                               </td>
                               <td>
                                 <div>
-                                  <p>Space-separated list of requested scope values. E.g. <code>openid profile email offline_access</code>.</p>
+                                  <p>Space-separated list of requested scope values. For example, <code>openid profile email offline_access</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -461,7 +476,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Specify provider scopes for OAuth2/social connections, e.g. Facebook, Google, etc.</p>
+                        <p>Specify provider scopes for OAuth2/social connections, such as Facebook and Google.</p>
 <div class="aside aside-see">
     <p class="aside-title">See</p>
     <a href="https://auth0.com/docs/authenticate/identity-providers/adding-scopes-for-an-external-idp">Connection Scopes</a>
@@ -489,7 +504,7 @@ page itself. By default no connection is specified, so the Universal Login page 
                               </td>
                               <td>
                                 <div>
-                                  <p>Space-separated list of requested OAuth2/social scope values. E.g. <code>user_friends email</code>.</p>
+                                  <p>Space-separated list of requested OAuth2/social scope values. For example, <code>user_friends email</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -668,7 +683,7 @@ By default a random value is used.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Specify an audience name for the API that your application will call using the Access Token returned after
+                        <p>Specify an audience name for the API that your application will call using the access token returned after
  authentication.
  This value must match the <strong>API Identifier</strong> defined in the APIs section of the <a href="https://manage.auth0.com/#/apis">Auth0 Dashboard</a>.</p>
 <div class="aside aside-see">
@@ -698,7 +713,7 @@ By default a random value is used.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Audience value. E.g. <code>https://example.com/api</code>.</p>
+                                  <p>Audience value. For example, <code>https://example.com/api</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -725,7 +740,7 @@ By default a random value is used.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Specify a <code>nonce</code> parameter for ID Token validation.</p>
+                        <p>Specify a <code>nonce</code> parameter for ID token validation.</p>
 
                       </div>
                       <div class="declaration">
@@ -775,7 +790,7 @@ By default a random value is used.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Specify a custom issuer for ID Token validation.
+                        <p>Specify a custom issuer for ID token validation.
 This value will be used instead of the Auth0 Domain.</p>
 
                       </div>
@@ -799,7 +814,7 @@ This value will be used instead of the Auth0 Domain.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Custom issuer value. E.g. <code>https://example.com/</code>.</p>
+                                  <p>Custom issuer value. For example, <code>https://example.com/</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -826,8 +841,8 @@ This value will be used instead of the Auth0 Domain.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Specify a leeway amount for ID Token validation.
-This value represents the clock skew for the validation of date claims, e.g. <code>exp</code>.</p>
+                        <p>Specify a leeway amount for ID token validation.
+This value represents the clock skew for the validation of date claims, for example <code>exp</code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -878,7 +893,7 @@ This value represents the clock skew for the validation of date claims, e.g. <co
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>Specify a <code>max_age</code> parameter for authentication.
-Sending this parameter will require the presence of the <code>auth_time</code> claim in the ID Token.</p>
+Sending this parameter will require the presence of the <code>auth_time</code> claim in the ID token.</p>
 
                       </div>
                       <div class="declaration">
@@ -935,7 +950,7 @@ Sending this parameter will require the presence of the <code>auth_time</code> c
 
 </div><div class="aside aside-important">
     <p class="aside-title">Important</p>
-    This method will disable Single Sign On (SSO).
+    This method will disable single sign-on (SSO).
 
 </div><div class="aside aside-important">
     <p class="aside-title">Important</p>
@@ -1067,6 +1082,61 @@ Sending this parameter will require the presence of the <code>auth_time</code> c
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth07WebAuthP8provideryxAA0bC9UserAgent_p10Foundation3URLV_ys6ResultOyytAA0bC5ErrorVGctcF"></a>
+                    <a name="//apple_ref/swift/Method/provider(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth07WebAuthP8provideryxAA0bC9UserAgent_p10Foundation3URLV_ys6ResultOyytAA0bC5ErrorVGctcF">provider(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Specify a custom Web Auth provider to use instead of the default <code>ASWebAuthenticationSession</code> implementation.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <code><a href="../Typealiases.html#/s:5Auth015WebAuthProvidera">WebAuthProvider</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">provider</span><span class="p">(</span><span class="n">_</span> <span class="nv">provider</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:5Auth015WebAuthProvidera">WebAuthProvider</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="k">Self</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>provider</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A custom Web Auth provider.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The same <code>WebAuth</code> instance to allow method chaining.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
             <div class="task-group">
@@ -1106,8 +1176,8 @@ Sending this parameter will require the presence of the <code>auth_time</code> c
 <span class="p">}</span>
 </code></pre>
 
-<p>Any ongoing Web Auth session will be automatically cancelled when starting a new one,
-and its corresponding callback with be called with a failure result containing a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV13userCancelledACvpZ">userCancelled</a></code> error.</p>
+<p>Any ongoing Web Auth transaction will be automatically cancelled when starting a new one,
+and its corresponding callback with be called with a result containing a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV13userCancelledACvpZ">userCancelled</a></code> error.</p>
 <div class="aside aside-requires">
     <p class="aside-title">Requires</p>
     The <strong>Callback URL</strong> to have been added to the <strong>Allowed Callback URLs</strong> field of your Auth0 application settings in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.
@@ -1201,8 +1271,8 @@ and its corresponding callback with be called with a failure result containing a
     <span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">cancellables</span><span class="p">)</span>
 </code></pre>
 
-<p>Any ongoing Web Auth session will be automatically cancelled when starting a new one,
-and the subscription will complete with a failure result containing a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV13userCancelledACvpZ">userCancelled</a></code> error.</p>
+<p>Any ongoing Web Auth transaction will be automatically cancelled when starting a new one,
+and the subscription will complete with a result containing a <code><a href="../Structs/WebAuthError.html#/s:5Auth012WebAuthErrorV13userCancelledACvpZ">userCancelled</a></code> error.</p>
 <div class="aside aside-requires">
     <p class="aside-title">Requires</p>
     The <strong>Callback URL</strong> to have been added to the <strong>Allowed Callback URLs</strong> field of your Auth0 application settings in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.
@@ -1242,7 +1312,7 @@ and the subscription will complete with a failure result containing a <code><a h
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Removes the Auth0 session and optionally removes the Identity Provider (IdP) session.</p>
+                        <p>Removes the Auth0 session and optionally removes the identity provider (IdP) session.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="n">clearSession</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
@@ -1254,7 +1324,7 @@ and the subscription will complete with a failure result containing a <code><a h
     <span class="p">}</span>
 </code></pre>
 
-<p>Remove both the Auth0 session and the Identity Provider session:</p>
+<p>Remove both the Auth0 session and the identity provider session:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">clearSession</span><span class="p">(</span><span class="nv">federated</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
@@ -1269,7 +1339,7 @@ and the subscription will complete with a failure result containing a <code><a h
 
 </div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/login/logout">Logout</a>
+    <a href="https://auth0.com/docs/authenticate/login/logout">Logout</a>
 
 </div>
 
@@ -1298,7 +1368,7 @@ and the subscription will complete with a failure result containing a <code><a h
                               </td>
                               <td>
                                 <div>
-                                  <p>If the Identity Provider session should be removed. Defaults to <code>false</code>.</p>
+                                  <p>If the identity provider session should be removed. Defaults to <code>false</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1336,7 +1406,7 @@ and the subscription will complete with a failure result containing a <code><a h
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Removes the Auth0 session and optionally removes the Identity Provider (IdP) session.</p>
+                        <p>Removes the Auth0 session and optionally removes the identity provider (IdP) session.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">clearSession</span><span class="p">()</span>
@@ -1351,7 +1421,7 @@ and the subscription will complete with a failure result containing a <code><a h
     <span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">cancellables</span><span class="p">)</span>
 </code></pre>
 
-<p>Remove both the Auth0 session and the Identity Provider session:</p>
+<p>Remove both the Auth0 session and the identity provider session:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">clearSession</span><span class="p">(</span><span class="nv">federated</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
@@ -1369,7 +1439,7 @@ and the subscription will complete with a failure result containing a <code><a h
 
 </div><div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/login/logout">Logout</a>
+    <a href="https://auth0.com/docs/authenticate/login/logout">Logout</a>
 
 </div>
 
@@ -1399,7 +1469,7 @@ and the subscription will complete with a failure result containing a <code><a h
                               </td>
                               <td>
                                 <div>
-                                  <p>If the Identity Provider session should be removed. Defaults to <code>false</code>.</p>
+                                  <p>If the identity provider session should be removed. Defaults to <code>false</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1454,7 +1524,7 @@ and the subscription will complete with a failure result containing a <code><a h
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-04-29)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-05-26)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

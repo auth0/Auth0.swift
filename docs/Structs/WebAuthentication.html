@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>JWKS Structure Reference</title>
+    <title>WebAuthentication Structure Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -14,9 +14,9 @@
   </head>
   <body>
 
-    <a name="//apple_ref/swift/Struct/JWKS" class="dashAnchor"></a>
+    <a name="//apple_ref/swift/Struct/WebAuthentication" class="dashAnchor"></a>
 
-    <a title="JWKS Structure Reference"></a>
+    <a title="WebAuthentication Structure Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">Auth0 Reference</a>
       <img class="carat" src="../img/carat.png" alt=""/>
-      JWKS Structure Reference
+      WebAuthentication Structure Reference
     </p>
 
     <div class="content-wrapper">
@@ -237,18 +237,22 @@
 
         <section class="section">
           <div class="section-content top-matter">
-            <h1>JWKS</h1>
+            <h1>WebAuthentication</h1>
               <div class="declaration">
                 <div class="language">
                   
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">JWKS</span> <span class="p">:</span> <span class="kt">Codable</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">WebAuthentication</span></code></pre>
 
                 </div>
               </div>
-            <p>The JSON Web Key Set (JWKS) of your Auth0 tenant.</p>
+            <p>Utility methods needed when using a custom Web Auth provider.</p>
 <div class="aside aside-see">
     <p class="aside-title">See</p>
-    <a href="https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-key-sets">JSON Web Key Sets</a>
+    <code><a href="../Protocols/WebAuth.html#/s:5Auth07WebAuthP8provideryxAA0bC9UserAgent_p10Foundation3URLV_ys6ResultOyytAA0bC5ErrorVGctcF">provider(_:)</a></code>
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <code><a href="../Protocols/WebAuthUserAgent.html">WebAuthUserAgent</a></code>
 
 </div>
 
@@ -262,9 +266,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Auth04JWKSV4keysSayAA3JWKVGvp"></a>
-                    <a name="//apple_ref/swift/Property/keys" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Auth04JWKSV4keysSayAA3JWKVGvp">keys</a>
+                    <a name="/s:5Auth017WebAuthenticationV6resume4withSb10Foundation3URLV_tFZ"></a>
+                    <a name="//apple_ref/swift/Method/resume(with:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth017WebAuthenticationV6resume4withSb10Foundation3URLV_tFZ">resume(with:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -272,14 +276,97 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The keys in the key set.</p>
+                        <p>Resumes the web-based operation when the external user agent redirects back to the app using a URL with a custom scheme.</p>
+
+<p>Using the UIKit app lifecycle, in your <code>AppDelegate.swift</code>:</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">app</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span>
+                 <span class="kd">open</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span>
+                 <span class="nv">options</span><span class="p">:</span> <span class="p">[</span><span class="kt">UIApplication</span><span class="o">.</span><span class="kt">OpenURLOptionsKey</span><span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">Bool</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kt">WebAuthentication</span><span class="o">.</span><span class="nf">resume</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Using the UIKit app lifecycle with Scenes, in your <code>SceneDelegate.swift</code>:</p>
+<pre class="highlight swift"><code><span class="c1">// Called when your app is running or suspended in memory</span>
+<span class="kd">func</span> <span class="nf">scene</span><span class="p">(</span><span class="n">_</span> <span class="nv">scene</span><span class="p">:</span> <span class="kt">UIScene</span><span class="p">,</span> <span class="n">openURLContexts</span> <span class="kt">URLContexts</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="kt">UIOpenURLContext</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">guard</span> <span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">URLContexts</span><span class="o">.</span><span class="n">first</span><span class="p">?</span><span class="o">.</span><span class="n">url</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+    <span class="kt">WebAuthentication</span><span class="o">.</span><span class="nf">resume</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// Called when your app is not running</span>
+<span class="kd">func</span> <span class="nf">scene</span><span class="p">(</span><span class="n">_</span> <span class="nv">scene</span><span class="p">:</span> <span class="kt">UIScene</span><span class="p">,</span>
+           <span class="n">willConnectTo</span> <span class="nv">session</span><span class="p">:</span> <span class="kt">UISceneSession</span><span class="p">,</span>
+           <span class="n">options</span> <span class="nv">connectionOptions</span><span class="p">:</span> <span class="kt">UIScene</span><span class="o">.</span><span class="kt">ConnectionOptions</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">guard</span> <span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="n">connectionOptions</span><span class="o">.</span><span class="n">urlContexts</span><span class="o">.</span><span class="n">first</span><span class="p">?</span><span class="o">.</span><span class="n">url</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+    <span class="kt">WebAuthentication</span><span class="o">.</span><span class="nf">resume</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Using the SwiftUI app lifecycle:</p>
+<pre class="highlight swift"><code><span class="kt">SomeView</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">onOpenURL</span> <span class="p">{</span> <span class="n">url</span> <span class="k">in</span>
+        <span class="kt">WebAuthentication</span><span class="o">.</span><span class="nf">resume</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span>
+    <span class="p">}</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">keys</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Structs/JWK.html">JWK</a></span><span class="p">]</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">resume</span><span class="p">(</span><span class="n">with</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>url</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The URL sent by the external user agent that contains the result of the web-based operation.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>If the URL was expected and properly formatted.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth017WebAuthenticationV6cancelyyFZ"></a>
+                    <a name="//apple_ref/swift/Method/cancel()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth017WebAuthenticationV6cancelyyFZ">cancel()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Terminates the ongoing web-based operation and reports back that it was cancelled.
+You need to call this method within your custom Web Auth provider implementation whenever the operation is cancelled by the user.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">cancel</span><span class="p">()</span></code></pre>
 
                         </div>
                       </div>
@@ -289,9 +376,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Auth04JWKSV3key2idAA3JWKVSgSS_tF"></a>
-                    <a name="//apple_ref/swift/Method/key(id:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Auth04JWKSV3key2idAA3JWKVSgSS_tF">key(id:<wbr>)</a>
+                    <a name="/s:5Auth017WebAuthenticationV14safariProvider5styleAA0B13AuthUserAgent_p10Foundation3URLV_ys6ResultOyytAA0bG5ErrorVGctcSo24UIModalPresentationStyleV_tFZ"></a>
+                    <a name="//apple_ref/swift/Method/safariProvider(style:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth017WebAuthenticationV14safariProvider5styleAA0B13AuthUserAgent_p10Foundation3URLV_ys6ResultOyytAA0bG5ErrorVGctcSo24UIModalPresentationStyleV_tFZ">safariProvider(style:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -299,16 +386,55 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Gets a key from the key set by its identifier (<code>kid</code>).</p>
+                        <p>Creates a Web Auth provider that uses <code>SFSafariViewController</code> as the external user agent.</p>
+<pre class="highlight swift"><code> <span class="kt">Auth0</span>
+     <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+     <span class="o">.</span><span class="nf">provider</span><span class="p">(</span><span class="kt">WebAuthentication</span><span class="o">.</span><span class="nf">safariProvider</span><span class="p">())</span>
+     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+         <span class="c1">// ...</span>
+ <span class="p">}</span>
+</code></pre>
+
+<p>If you need specify a custom <code>UIModalPresentationStyle</code>:</p>
+<pre class="highlight swift"><code> <span class="kt">Auth0</span>
+     <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+     <span class="o">.</span><span class="nf">provider</span><span class="p">(</span><span class="kt">WebAuthentication</span><span class="o">.</span><span class="nf">safariProvider</span><span class="p">(</span><span class="nv">style</span><span class="p">:</span> <span class="o">.</span><span class="n">formSheet</span><span class="p">))</span>
+     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+         <span class="c1">// ...</span>
+ <span class="p">}</span>
+</code></pre>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">key</span><span class="p">(</span><span class="n">id</span> <span class="nv">kid</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/JWK.html">JWK</a></span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">static</span> <span class="kd">func</span> <span class="nf">safariProvider</span><span class="p">(</span><span class="nv">style</span><span class="p">:</span> <span class="kt">UIModalPresentationStyle</span> <span class="o">=</span> <span class="o">.</span><span class="n">fullScreen</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Typealiases.html#/s:5Auth015WebAuthProvidera">WebAuthProvider</a></span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>style</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p><code>UIModalPresentationStyle</code> to be used. Defaults to <code>.fullScreen</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code><a href="../Typealiases.html#/s:5Auth015WebAuthProvidera">WebAuthProvider</a></code> instance.</p>
                       </div>
                     </section>
                   </div>

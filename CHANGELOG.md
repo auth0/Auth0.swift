@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.1.0](https://github.com/auth0/Auth0.swift/tree/2.1.0) (2022-05-26)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.0.1...2.1.0)
+
+**Added**
+- Add support for custom Web Auth providers [SDK-3338] [\#699](https://github.com/auth0/Auth0.swift/pull/699) ([Widcket](https://github.com/Widcket))
+
 ## [2.0.1](https://github.com/auth0/Auth0.swift/tree/2.0.1) (2022-04-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.0.0...2.0.1)
 
