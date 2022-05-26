@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>String Extension Reference</title>
+    <title>WebAuthentication Extension Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -14,9 +14,9 @@
   </head>
   <body>
 
-    <a name="//apple_ref/swift/Extension/String" class="dashAnchor"></a>
+    <a name="//apple_ref/swift/Extension/WebAuthentication" class="dashAnchor"></a>
 
-    <a title="String Extension Reference"></a>
+    <a title="WebAuthentication Extension Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">Auth0 Reference</a>
       <img class="carat" src="../img/carat.png" alt=""/>
-      String Extension Reference
+      WebAuthentication Extension Reference
     </p>
 
     <div class="content-wrapper">
@@ -237,14 +237,7 @@
 
         <section class="section">
           <div class="section-content top-matter">
-            <h1>String</h1>
-              <div class="declaration">
-                <div class="language">
-                  
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">extension</span> <span class="kt">String</span></code></pre>
-
-                </div>
-              </div>
+            <h1>WebAuthentication</h1>
             
           </div>
         </section>
@@ -256,9 +249,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:SS5Auth0E22a0_decodeBase64URLSafe10Foundation4DataVSgyF"></a>
-                    <a name="//apple_ref/swift/Method/a0_decodeBase64URLSafe()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:SS5Auth0E22a0_decodeBase64URLSafe10Foundation4DataVSgyF">a0_decodeBase64URLSafe()</a>
+                    <a name="/"></a>
+                    <a name="//apple_ref/swift/Method/safariProvider(style:)" class="dashAnchor"></a>
+                    <a class="token" href="#/">safariProvider(style:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -266,16 +259,24 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Decodes base64url-encoded data.</p>
+                        <p>Creates a Web Auth provider that uses <code>SFSafariViewController</code> as the external user agent.</p>
+<pre class="highlight swift"><code> <span class="kt">Auth0</span>
+     <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+     <span class="o">.</span><span class="nf">provider</span><span class="p">(</span><span class="kt">WebAuthentication</span><span class="o">.</span><span class="nf">safariProvider</span><span class="p">())</span>
+     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+         <span class="c1">// ...</span>
+ <span class="p">}</span>
+</code></pre>
 
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">a0_decodeBase64URLSafe</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Data</span><span class="p">?</span></code></pre>
+<p>If you need specify a custom <code>UIModalPresentationStyle</code>:</p>
+<pre class="highlight swift"><code> <span class="kt">Auth0</span>
+     <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="n">clientId</span><span class="p">,</span> <span class="nv">domain</span><span class="p">:</span> <span class="s">"samples.auth0.com"</span><span class="p">)</span>
+     <span class="o">.</span><span class="nf">provider</span><span class="p">(</span><span class="kt">WebAuthentication</span><span class="o">.</span><span class="nf">safariProvider</span><span class="p">(</span><span class="nv">style</span><span class="p">:</span> <span class="o">.</span><span class="n">formSheet</span><span class="p">))</span>
+     <span class="o">.</span><span class="n">start</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+         <span class="c1">// ...</span>
+ <span class="p">}</span>
+</code></pre>
 
-                        </div>
                       </div>
                     </section>
                   </div>

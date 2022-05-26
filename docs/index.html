@@ -20,9 +20,9 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Auth0 2.0.1 Docs
+          Auth0 2.1.0 Docs
         </a>
-         (97% documented)
+         (98% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -86,7 +86,13 @@
                 <a class="nav-group-task-link" href="Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions.html#/SafariUserAgent">SafariUserAgent</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/WebAuthentication.html">WebAuthentication</a>
               </li>
             </ul>
           </li>
@@ -149,6 +155,9 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Protocols/WebAuth.html">WebAuth</a>
               </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/WebAuthUserAgent.html">WebAuthUserAgent</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -187,6 +196,9 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/WebAuthError.html">WebAuthError</a>
               </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/WebAuthentication.html">WebAuthentication</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -206,6 +218,9 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth016ManagementResulta">ManagementResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:5Auth015WebAuthProvidera">WebAuthProvider</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Typealiases.html#/WebAuthResult">WebAuthResult</a>
@@ -283,9 +298,9 @@
 
 <ul>
 <li><a href="https://auth0.com/docs/quickstart/native/ios-swift"><strong>Quickstart</strong></a>
-<br>Shows how to integrate Auth0.swift into an iOS / macOS application from scratch.</li>
+<br>Shows how to integrate Auth0.swift into an iOS / macOS app from scratch.</li>
 <li><a href="https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01"><strong>Sample app</strong></a>
-<br>A complete, running iOS / macOS application you can try.</li>
+<br>A complete, running iOS / macOS app you can try.</li>
 <li><a href="https://auth0.github.io/Auth0.swift/"><strong>API documentation</strong></a>
 <br>Documentation auto-generated from the code comments that explains all the available features.
 
@@ -328,7 +343,7 @@
 <h3 id='cocoapods' class='heading'>Cocoapods</h3>
 
 <p>Add the following line to your <code>Podfile</code>:</p>
-<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'~&gt; 2.0'</span>
+<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'~&gt; 2.1'</span>
 </code></pre>
 
 <p>Then, run <code>pod install</code>.</p>
@@ -339,7 +354,7 @@
 <h3 id='carthage' class='heading'>Carthage</h3>
 
 <p>Add the following line to your <code>Cartfile</code>:</p>
-<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" ~&gt; 2.0
+<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" ~&gt; 2.1
 </code></pre>
 
 <p>Then, run <code>carthage bootstrap --use-xcframeworks</code>.</p>
@@ -350,14 +365,14 @@
 <h2 id='getting-started' class='heading'>Getting Started</h2>
 <h3 id='configuration' class='heading'>Configuration</h3>
 
-<p>Auth0.swift needs the <strong>Client ID</strong> and <strong>Domain</strong> of the Auth0 application to communicate with Auth0. You can find these details on the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>. If you are using a <a href="https://auth0.com/docs/brand-and-customize/custom-domains">Custom Domain</a>, use the value of your Custom Domain instead of the value from the settings page.</p>
+<p>Auth0.swift needs the <strong>Client ID</strong> and <strong>Domain</strong> of the Auth0 application to communicate with Auth0. You can find these details in the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>. If you are using a <a href="https://auth0.com/docs/brand-and-customize/custom-domains">custom domain</a>, use the value of your custom domain instead of the value from the settings page.</p>
 
 <blockquote>
 <p>⚠️ Make sure that the <a href="https://auth0.com/docs/configure/applications">application type</a> of the Auth0 application is <strong>Native</strong>. If you don’t have a Native Auth0 application already, <a href="https://auth0.com/docs/get-started/create-apps/native-apps">create one</a> before continuing.</p>
 </blockquote>
 <h4 id='configure-client-id-and-domain-with-a-plist' class='heading'>Configure Client ID and Domain with a plist</h4>
 
-<p>Create a <code>plist</code> file named <code>Auth0.plist</code> in your application bundle with the following content:</p>
+<p>Create a <code>plist</code> file named <code>Auth0.plist</code> in your app bundle with the following content:</p>
 <pre class="highlight xml"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
 <span class="cp">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span>
 <span class="nt">&lt;plist</span> <span class="na">version=</span><span class="s">"1.0"</span><span class="nt">&gt;</span>
@@ -403,11 +418,11 @@ Auth0
 <h3 id='web-auth-configuration-ios-macos' class='heading'>Web Auth Configuration (iOS / macOS)</h3>
 <h4 id='configure-callback-and-logout-urls' class='heading'>Configure callback and logout URLs</h4>
 
-<p>The callback and logout URLs are the URLs that Auth0 invokes to redirect back to your application. Auth0 invokes the callback URL after authenticating the user, and the logout URL after removing the session cookie.</p>
+<p>The callback and logout URLs are the URLs that Auth0 invokes to redirect back to your app. Auth0 invokes the callback URL after authenticating the user, and the logout URL after removing the session cookie.</p>
 
-<p>Since callback and logout URLs can be manipulated, you will need to add your URLs to the <strong>Allowed Callback URLs</strong> and <strong>Allowed Logout URLs</strong> fields in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback and logout URLs are not set, users will be unable to log in and out of the application and will get an error.</p>
+<p>Since callback and logout URLs can be manipulated, you will need to add your URLs to the <strong>Allowed Callback URLs</strong> and <strong>Allowed Logout URLs</strong> fields in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback and logout URLs are not set, users will be unable to log in and out of the app and will get an error.</p>
 
-<p>Go to the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a> and add the corresponding URL to <strong>Allowed Callback URLs</strong> and <strong>Allowed Logout URLs</strong>, according to the platform of your application. If you are using a <a href="https://auth0.com/docs/brand-and-customize/custom-domains">Custom Domain</a>, replace <code>YOUR_AUTH0_DOMAIN</code> with the value of your Custom Domain instead of the value from the settings page.</p>
+<p>Go to the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a> and add the corresponding URL to <strong>Allowed Callback URLs</strong> and <strong>Allowed Logout URLs</strong>, according to the platform of your app. If you are using a <a href="https://auth0.com/docs/brand-and-customize/custom-domains">custom domain</a>, replace <code>YOUR_AUTH0_DOMAIN</code> with the value of your custom domain instead of the value from the settings page.</p>
 <h5 id='ios' class='heading'>iOS</h5>
 <pre class="highlight plaintext"><code>YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
 </code></pre>
@@ -415,14 +430,16 @@ Auth0
 <pre class="highlight plaintext"><code>YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/macos/YOUR_BUNDLE_IDENTIFIER/callback
 </code></pre>
 
-<p>E.g. if your iOS bundle identifier was <code>com.company.myapp</code> and your Auth0 Domain was <code>company.us.auth0.com</code>, then this value would be:</p>
+<p>For example, if your iOS bundle identifier was <code>com.company.myapp</code> and your Auth0 Domain was <code>company.us.auth0.com</code>, then this value would be:</p>
 <pre class="highlight plaintext"><code>com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 </code></pre>
 <h4 id='configure-custom-url-scheme' class='heading'>Configure custom URL scheme</h4>
 
-<p>Back in Xcode, go to the <strong>Info</strong> tab of your application target settings. In the <strong>URL Types</strong> section, click the <strong>＋</strong> button to add a new entry. There, enter <code>auth0</code> into the <strong>Identifier</strong> field and <code>$(PRODUCT_BUNDLE_IDENTIFIER)</code> into the <strong>URL Schemes</strong> field.</p>
+<p>Back in Xcode, go to the <strong>Info</strong> tab of your app target settings. In the <strong>URL Types</strong> section, click the <strong>＋</strong> button to add a new entry. There, enter <code>auth0</code> into the <strong>Identifier</strong> field and <code>$(PRODUCT_BUNDLE_IDENTIFIER)</code> into the <strong>URL Schemes</strong> field.</p>
 
-<p>This registers your Bundle Identifer as a custom URL scheme, so the callback and logout URLs can reach your application.</p>
+<p><img src="assets/url-scheme.png" alt="url-scheme"></p>
+
+<p>This registers your bundle identifer as a custom URL scheme, so the callback and logout URLs can reach your app.</p>
 <h3 id='web-auth-login-ios-macos' class='heading'>Web Auth Login (iOS / macOS)</h3>
 
 <p>Import the <code>Auth0</code> module in the file where you want to present the login page.</p>
@@ -476,7 +493,7 @@ Auth0
 </details>
 <h3 id='web-auth-logout-ios-macos' class='heading'>Web Auth Logout (iOS / macOS)</h3>
 
-<p>Logging the user out involves clearing the Universal Login session cookie and then deleting the user&rsquo;s credentials from your application.</p>
+<p>Logging the user out involves clearing the Universal Login session cookie and then deleting the user&rsquo;s credentials from your app.</p>
 
 <p>Call the <code>clearSession()</code> method in the action of your <strong>Logout</strong> button. Once the session cookie has been cleared, <a href="#clear-stored-credentials">delete the user&rsquo;s credentials</a>.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
@@ -534,7 +551,7 @@ Auth0
 <p>Check the <a href="FAQ.md">FAQ</a> for more information about the alert box that pops up <strong>by default</strong> when using Web Auth.</p>
 
 <blockquote>
-<p>💡 See also <a href="https://developer.okta.com/blog/2022/01/13/mobile-sso">this blog post</a> for a detailed overview of Single Sign-On (SSO) on iOS.</p>
+<p>💡 See also <a href="https://developer.okta.com/blog/2022/01/13/mobile-sso">this blog post</a> for a detailed overview of single sign-on (SSO) on iOS.</p>
 </blockquote>
 
 <p><a href="#table-of-contents">Go up ⤴</a></p>
@@ -560,7 +577,7 @@ Auth0
 <ul>
 <li><a href="#web-auth-signup">Web Auth signup</a></li>
 <li><a href="#web-auth-configuration">Web Auth configuration</a></li>
-<li><a href="#id-token-validation">ID Token validation</a></li>
+<li><a href="#id-token-validation">ID token validation</a></li>
 <li><a href="#web-auth-errors">Web Auth errors</a></li>
 </ul>
 <h4 id='web-auth-signup' class='heading'>Web Auth signup</h4>
@@ -651,7 +668,7 @@ Auth0
 <p>The following are some of the available Web Auth configuration options. Check the <a href="https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html">API documentation</a> for the full list.</p>
 <h5 id='use-any-auth0-connection' class='heading'>Use any Auth0 connection</h5>
 
-<p>Specify an Auth0 connection to directly show that Identity Provider&rsquo;s login page, skipping the <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a> page itself. The connection must first be enabled for your Auth0 application in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.</p>
+<p>Specify an Auth0 connection to directly show that identity provider&rsquo;s login page, skipping the <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a> page itself. The connection must first be enabled for your Auth0 application in the <a href="https://manage.auth0.com/#/applications/">Dashboard</a>.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">connection</span><span class="p">(</span><span class="s">"facebook"</span><span class="p">)</span> <span class="c1">// Show the Facebook login page</span>
@@ -659,7 +676,7 @@ Auth0
 </code></pre>
 <h5 id='add-an-audience-value' class='heading'>Add an audience value</h5>
 
-<p>Specify an <a href="https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience">audience</a> to obtain an Access Token that can be used to make authenticated requests to a backend. The audience value is the <strong>API Identifier</strong> of your <a href="https://auth0.com/docs/get-started/apis">Auth0 API</a>, e.g. <code>https://example.com/api</code>.</p>
+<p>Specify an <a href="https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience">audience</a> to obtain an access token that can be used to make authenticated requests to a backend. The audience value is the <strong>API Identifier</strong> of your <a href="https://auth0.com/docs/get-started/apis">Auth0 API</a>, for example <code>https://example.com/api</code>.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">audience</span><span class="p">(</span><span class="s">"YOUR_AUTH0_API_IDENTIFIER"</span><span class="p">)</span>
@@ -683,19 +700,19 @@ Auth0
 </code></pre>
 <h5 id='use-a-custom-code-urlsession-code-instance' class='heading'>Use a custom <code>URLSession</code> instance</h5>
 
-<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration, e.g. customizing timeout values.</p>
+<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration, such as customizing timeout values.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="n">customURLSession</span><span class="p">)</span>
     <span class="c1">// ...</span>
 </code></pre>
 
 <p>Note that this custom <code>URLSession</code> instance will be used when communicating with the Auth0 Authentication API, not when opening the <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a> page.</p>
-<h4 id='id-token-validation' class='heading'>ID Token validation</h4>
+<h4 id='id-token-validation' class='heading'>ID token validation</h4>
 
-<p>Auth0.swift automatically <a href="https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens">validates</a> the ID Token obtained from Web Auth login, following the <a href="https://openid.net/specs/openid-connect-core-1_0.html">OpenID Connect specification</a>. This ensures the contents of the ID Token have not been tampered with and can be safely used.</p>
+<p>Auth0.swift automatically <a href="https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens">validates</a> the ID token obtained from Web Auth login, following the <a href="https://openid.net/specs/openid-connect-core-1_0.html">OpenID Connect specification</a>. This ensures the contents of the ID token have not been tampered with and can be safely used.</p>
 <h5 id='custom-domains' class='heading'>Custom Domains</h5>
 
-<p>Users of Auth0 Private Cloud with Custom Domains still on the <a href="https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains">legacy behavior</a> need to specify a custom issuer to match the Auth0 Domain when performing Web Auth login. Otherwise, the ID Token validation will fail.</p>
+<p>Users of Auth0 Private Cloud with custom domains still on the <a href="https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains">legacy behavior</a> need to specify a custom issuer to match the Auth0 Domain when performing Web Auth login. Otherwise, the ID token validation will fail.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">issuer</span><span class="p">(</span><span class="s">"https://YOUR_AUTH0_DOMAIN/"</span><span class="p">)</span>
@@ -723,12 +740,12 @@ Auth0
 </code></pre>
 <h4 id='store-credentials' class='heading'>Store credentials</h4>
 
-<p>When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your application again.</p>
+<p>When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your app again.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">didStore</span> <span class="o">=</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">credentials</span><span class="p">:</span> <span class="n">credentials</span><span class="p">)</span>
 </code></pre>
 <h4 id='check-the-validity-of-stored-credentials' class='heading'>Check the validity of stored credentials</h4>
 
-<p>When the users open your application, check for valid credentials. If they exist, you can retrieve them and redirect the users to the application&rsquo;s main flow without any additional login steps.</p>
+<p>When the users open your app, check for valid credentials. If they exist, you can retrieve them and redirect the users to the app&rsquo;s main flow without any additional login steps.</p>
 <pre class="highlight swift"><code><span class="k">guard</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="nf">hasValid</span><span class="p">()</span> <span class="k">else</span> <span class="p">{</span>
     <span class="c1">// No valid credentials exist, present the login page</span>
 <span class="p">}</span>
@@ -736,7 +753,7 @@ Auth0
 </code></pre>
 <h4 id='retrieve-stored-credentials' class='heading'>Retrieve stored credentials</h4>
 
-<p>The credentials will be automatically renewed (if expired) using the <a href="https://auth0.com/docs/secure/tokens/refresh-tokens">Refresh Token</a>. <strong>This method is thread-safe.</strong></p>
+<p>The credentials will be automatically renewed (if expired) using the <a href="https://auth0.com/docs/secure/tokens/refresh-tokens">refresh token</a>. <strong>This method is thread-safe.</strong></p>
 <pre class="highlight swift"><code><span class="n">credentialsManager</span><span class="o">.</span><span class="n">credentials</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span> 
     <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
     <span class="k">case</span> <span class="o">.</span><span class="nf">success</span><span class="p">(</span><span class="k">let</span> <span class="nv">credentials</span><span class="p">):</span>
@@ -746,6 +763,10 @@ Auth0
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+
+<blockquote>
+<p>💡 You do not need to call <code>store(credentials:)</code> afterward. The Credentials Manager automatically persists the renewed credentials.</p>
+</blockquote>
 
 <details>
   <summary>Using async/await</summary>
@@ -778,11 +799,11 @@ credentialsManager
 </details>
 
 <blockquote>
-<p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/get-started/apis/scopes">scope</a> when logging in to get a Refresh Token from Auth0.</p>
+<p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/get-started/apis/scopes">scope</a> when logging in to get a refresh token from Auth0.</p>
 </blockquote>
 <h4 id='retrieve-stored-user-information' class='heading'>Retrieve stored user information</h4>
 
-<p>The stored <a href="https://auth0.com/docs/security/tokens/id-tokens">ID Token</a> contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.</p>
+<p>The stored <a href="https://auth0.com/docs/security/tokens/id-tokens">ID token</a> contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">user</span> <span class="o">=</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="n">user</span>
 </code></pre>
 
@@ -796,11 +817,11 @@ credentialsManager
 </code></pre>
 <h4 id='biometric-authentication' class='heading'>Biometric authentication</h4>
 
-<p>You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, e.g. Face ID or Touch ID.</p>
+<p>You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, for example Face ID or Touch ID.</p>
 <pre class="highlight swift"><code><span class="n">credentialsManager</span><span class="o">.</span><span class="nf">enableBiometrics</span><span class="p">(</span><span class="nv">withTitle</span><span class="p">:</span> <span class="s">"Touch to Login"</span><span class="p">)</span>
 </code></pre>
 
-<p>If needed, you can specify a particular <code>LAPolicy</code> to be used. E.g. you might want to support Face ID or Touch ID, but also allow fallback to passcode.</p>
+<p>If needed, you can specify a particular <code>LAPolicy</code> to be used. For example, you might want to support Face ID or Touch ID, but also allow fallback to passcode.</p>
 <pre class="highlight swift"><code><span class="n">credentialsManager</span><span class="o">.</span><span class="nf">enableBiometrics</span><span class="p">(</span><span class="nv">withTitle</span><span class="p">:</span> <span class="s">"Touch or enter passcode to Login"</span><span class="p">,</span> 
                                     <span class="nv">evaluationPolicy</span><span class="p">:</span> <span class="o">.</span><span class="n">deviceOwnerAuthentication</span><span class="p">)</span>
 </code></pre>
@@ -828,12 +849,12 @@ credentialsManager
 <p>The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
 We recommend using <a href="https://auth0.com/docs/authenticate/login/auth0-universal-login">Universal Login</a>, but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your <a href="https://manage.auth0.com/#/applications/">Auth0 application</a>, as explained in <a href="https://auth0.com/docs/get-started/applications/update-grant-types">Update Grant Types</a>.</p>
 
-<p>For login or signup with username/password, the <code>Password</code> grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both <code>http://auth0.com/oauth/grant-type/password-realm</code> and <code>Password</code>. Otherwise, the Auth0 Dashboard will take care of activating both when enabling <code>Password</code>.</p>
+<p>For login or signup with username/password, the <code>Password</code> grant type needs to be enabled in your Auth0 application. If you set the grants via the Management API you should activate both <code>http://auth0.com/oauth/grant-type/password-realm</code> and <code>Password</code>. Otherwise, the Auth0 Dashboard will take care of activating both when enabling <code>Password</code>.</p>
 
 <blockquote>
 <p>💡 If your Auth0 account has the <strong>Bot Detection</strong> feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the <a href="#bot-detection">Bot Detection</a> section.</p>
 
-<p>⚠️ The ID Tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. <strong>This is not the case for the ID Tokens obtained from the Authentication API client.</strong> You must <a href="https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens">validate</a> any ID Tokens received from the Authentication API client before using the information they contain.</p>
+<p>⚠️ The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. <strong>This is not the case for the ID tokens obtained from the Authentication API client.</strong> You must <a href="https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens">validate</a> any ID tokens received from the Authentication API client before using the information they contain.</p>
 </blockquote>
 <h4 id='login-with-database-connection' class='heading'>Login with database connection</h4>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
@@ -1123,7 +1144,7 @@ Auth0
 </details>
 <h4 id='renew-credentials' class='heading'>Renew credentials</h4>
 
-<p>Use a <a href="https://auth0.com/docs/secure/tokens/refresh-tokens">Refresh Token</a> to renew the user&rsquo;s credentials. It&rsquo;s recommended that you read and understand the Refresh Token process beforehand.</p>
+<p>Use a <a href="https://auth0.com/docs/secure/tokens/refresh-tokens">refresh token</a> to renew the user&rsquo;s credentials. It&rsquo;s recommended that you read and understand the refresh token process beforehand.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">renew</span><span class="p">(</span><span class="nv">withRefreshToken</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">refreshToken</span><span class="p">)</span>
@@ -1173,7 +1194,7 @@ Auth0
 </details>
 
 <blockquote>
-<p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/get-started/apis/scopes">scope</a> when logging in to get a Refresh Token from Auth0.</p>
+<p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/get-started/apis/scopes">scope</a> when logging in to get a refresh token from Auth0.</p>
 </blockquote>
 <h4 id='authentication-api-client-configuration' class='heading'>Authentication API client configuration</h4>
 <h5 id='add-custom-parameters' class='heading'>Add custom parameters</h5>
@@ -1196,7 +1217,7 @@ Auth0
 </code></pre>
 <h5 id='use-a-custom-code-urlsession-code-instance' class='heading'>Use a custom <code>URLSession</code> instance</h5>
 
-<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration, e.g. customizing timeout values.</p>
+<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration, such as customizing timeout values.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="n">customURLSession</span><span class="p">)</span>
     <span class="c1">// ...</span>
@@ -1218,9 +1239,9 @@ Auth0
 
 <p>You can request more information from a user&rsquo;s profile and manage the user&rsquo;s metadata by accessing the Auth0 <a href="https://auth0.com/docs/api/management/v2">Management API</a>.</p>
 
-<p>To call the Management API, you need an Access Token that has the API Identifier of the Management API as a target <a href="https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience">audience</a> value. Specify <code>https://YOUR_AUTH0_DOMAIN/api/v2/</code> as the audience when logging in to achieve this. </p>
+<p>To call the Management API, you need an access token that has the API Identifier of the Management API as a target <a href="https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience">audience</a> value. Specify <code>https://YOUR_AUTH0_DOMAIN/api/v2/</code> as the audience when logging in to achieve this. </p>
 
-<p>E.g. if you&rsquo;re using Web Auth:</p>
+<p>For example, if you&rsquo;re using Web Auth:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">audience</span><span class="p">(</span><span class="s">"https://YOUR_AUTH0_DOMAIN/api/v2/"</span><span class="p">)</span>
@@ -1228,13 +1249,13 @@ Auth0
 </code></pre>
 
 <blockquote>
-<p>💡 Auth0 Access Tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your application.</p>
+<p>💡 Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your app.</p>
 
-<p>⚠️ For security reasons, native mobile applications are restricted to a subset of the Management API functionality.</p>
+<p>⚠️ For security reasons, native mobile apps are restricted to a subset of the Management API functionality.</p>
 </blockquote>
 <h4 id='retrieve-user-metadata' class='heading'>Retrieve user metadata</h4>
 
-<p>To call this method, you need to request the <code>read:users</code> scope when logging in. You can get the user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
+<p>To call this method, you need to request the <code>read:users</code> scope when logging in. You can get the user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the user&rsquo;s ID token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="s">"user id"</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="s">"user_metadata"</span><span class="p">])</span>
@@ -1284,11 +1305,11 @@ Auth0
 </details>
 
 <blockquote>
-<p>💡 An alternative is to use a <a href="https://auth0.com/docs/customize/actions/triggers/post-login/api-object">post-login Action</a> to add the metadata to the ID Token as a custom claim.</p>
+<p>💡 An alternative is to use a <a href="https://auth0.com/docs/customize/actions/triggers/post-login/api-object">post-login Action</a> to add the metadata to the ID token as a custom claim.</p>
 </blockquote>
 <h4 id='update-user-metadata' class='heading'>Update user metadata</h4>
 
-<p>To call this method, you need to request either the <code>update:users</code> or the <code>update:users_app_metadata</code> scope when logging in. You can get the user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
+<p>To call this method, you need to request either the <code>update:users</code> or the <code>update:users_app_metadata</code> scope when logging in. You can get the user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the user&rsquo;s ID token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="s">"user id"</span><span class="p">,</span> 
@@ -1343,7 +1364,7 @@ Auth0
 
 <p>Your users may want to link their other accounts to the account they are logged in to. To achieve this, you need the user ID for the primary account and the idToken for the secondary account. You also need to request the <code>update:current_user_identities</code> scope when logging in.</p>
 
-<p>You can get the primary user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the primary user&rsquo;s ID Token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
+<p>You can get the primary user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the primary user&rsquo;s ID token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">link</span><span class="p">(</span><span class="s">"primary user id"</span><span class="p">,</span> <span class="nv">withOtherUserToken</span><span class="p">:</span> <span class="s">"secondary id token"</span><span class="p">)</span>
@@ -1413,7 +1434,7 @@ Auth0
 </code></pre>
 <h5 id='use-a-custom-code-urlsession-code-instance' class='heading'>Use a custom <code>URLSession</code> instance</h5>
 
-<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration, e.g. customizing timeout values.</p>
+<p>You can specify a custom <code>URLSession</code> instance for more advanced networking configuration, such as customizing timeout values.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">session</span><span class="p">:</span> <span class="n">customURLSession</span><span class="p">)</span>
     <span class="c1">// ...</span>
@@ -1423,18 +1444,23 @@ Auth0
 <p>The Management API client will only produce <code><a href="Structs/ManagementError.html">ManagementError</a></code> error values. You can find the error information in the <code>info</code> dictionary of the error value. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/ManagementError.html">API documentation</a> to learn more about the available <code><a href="Structs/ManagementError.html">ManagementError</a></code> properties.</p>
 <h3 id='logging' class='heading'>Logging</h3>
 
-<p>To enable Auth0.swift to print HTTP requests and responses for debugging, you can call the following method in either <code><a href="Protocols/WebAuth.html">WebAuth</a></code>, <code><a href="Protocols/Authentication.html">Authentication</a></code> or <code><a href="Protocols/Users.html">Users</a></code>:</p>
+<p>Auth0.swift can print HTTP requests and responses for debugging purposes. Enable it by calling the following method in either <code><a href="Protocols/WebAuth.html">WebAuth</a></code>, <code><a href="Protocols/Authentication.html">Authentication</a></code> or <code><a href="Protocols/Users.html">Users</a></code>:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
-    <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
+    <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">logging</span><span class="p">(</span><span class="nv">enabled</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
     <span class="c1">// ...</span>
 </code></pre>
 
-<p>Then, with a successful authentication you&rsquo;ll see something similar to the following:</p>
-<pre class="highlight plaintext"><code>Safari: https://samples.auth0.com/authorize?.....
-URL: com.auth0.myapp://samples.auth0.com/ios/com.auth0.MyApp/callback?...
+<blockquote>
+<p>⚠️ Set this flag only when <strong>DEBUGGING</strong> to avoid leaking user&rsquo;s credentials in the device log.</p>
+</blockquote>
+
+<p>With a successful authentication you&rsquo;ll see something similar to the following:</p>
+<pre class="highlight plaintext"><code>ASWebAuthenticationSession: https://samples.auth0.com/authorize?.....
+Callback URL: com.auth0.myapp://samples.auth0.com/ios/com.auth0.MyApp/callback?...
 POST https://samples.auth0.com/oauth/token HTTP/1.1
 Content-Type: application/json
+Auth0-Client: eyJ2ZXJzaW9uI...
 
 {"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.auth0.MyApp:\/\/samples.auth0.com\/ios\/com.auth0.MyApp\/callback","code_verifier":"..."}
 
@@ -1442,7 +1468,7 @@ HTTP/1.1 200
 Pragma: no-cache
 Content-Type: application/json
 Strict-Transport-Security: max-age=3600
-Date: Thu, 09 Jun 2016 19:04:39 GMT
+Date: Wed, 27 Apr 2022 19:04:39 GMT
 Content-Length: 57
 Cache-Control: no-cache
 Connection: keep-alive
@@ -1451,7 +1477,7 @@ Connection: keep-alive
 </code></pre>
 
 <blockquote>
-<p>⚠️ Set this flag only when <strong>DEBUGGING</strong> to avoid leaking user&rsquo;s credentials in the device log.</p>
+<p>💡 When troubleshooting, you can also check the logs in the <a href="https://manage.auth0.com/#/logs">Auth0 Dashboard</a> for more information.</p>
 </blockquote>
 
 <p><a href="#table-of-contents">Go up ⤴</a></p>
@@ -1513,7 +1539,7 @@ Auth0
 </blockquote>
 <h4 id='facebook-login' class='heading'>Facebook Login</h4>
 
-<p>If you&rsquo;ve added the <a href="https://developers.facebook.com/docs/facebook-login/ios">Facebook Login flow</a> to your app, after a successful Faceboook authentication you can request a <a href="https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/">Session Info Access Token</a> and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.</p>
+<p>If you&rsquo;ve added the <a href="https://developers.facebook.com/docs/facebook-login/ios">Facebook Login flow</a> to your app, after a successful Faceboook authentication you can request a <a href="https://developers.facebook.com/docs/facebook-login/guides/%20access-tokens/get-session-info">session info access token</a> and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">authentication</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">login</span><span class="p">(</span><span class="nv">facebookSessionAccessToken</span><span class="p">:</span> <span class="s">"session info access token"</span><span class="p">,</span>
@@ -1570,12 +1596,12 @@ Auth0
 </blockquote>
 <h3 id='organizations' class='heading'>Organizations</h3>
 
-<p><a href="https://auth0.com/docs/manage-users/organizations">Organizations</a> is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. </p>
+<p><a href="https://auth0.com/docs/manage-users/organizations">Organizations</a> is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) apps. </p>
 
 <p>Using Organizations, you can:</p>
 
 <ul>
-<li>Represent teams, business customers, partner companies, or any logical grouping of users that should have different ways of accessing your applications, as organizations.</li>
+<li>Represent teams, business customers, partner companies, or any logical grouping of users that should have different ways of accessing your apps, as organizations.</li>
 <li>Manage their membership in a variety of ways, including user invitation.</li>
 <li>Configure branded, federated login flows for each organization.</li>
 <li>Implement role-based access control, such that users can have different roles when authenticating in the context of different organizations.</li>
@@ -1635,12 +1661,12 @@ Auth0
 </details>
 <h4 id='accept-user-invitations' class='heading'>Accept user invitations</h4>
 
-<p>To accept organization invitations your application needs to support <a href="https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app">Universal Links</a>, as invitation links are HTTPS-only. Tapping on the invitation link should open your application.</p>
+<p>To accept organization invitations your app needs to support <a href="https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app">Universal Links</a>, as invitation links are HTTPS-only. Tapping on the invitation link should open your app.</p>
 
-<p>When your application gets opened by an invitation link, grab the invitation URL and pass it to <code>invitationURL()</code>.</p>
+<p>When your app gets opened by an invitation link, grab the invitation URL and pass it to <code>invitationURL()</code>.</p>
 <pre class="highlight swift"><code><span class="k">guard</span> <span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">URLContexts</span><span class="o">.</span><span class="n">first</span><span class="p">?</span><span class="o">.</span><span class="n">url</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
 
-<span class="c1">// You need to wait for the application to enter the foreground before launching Web Auth</span>
+<span class="c1">// You need to wait for the app to enter the foreground before launching Web Auth</span>
 <span class="kt">NotificationCenter</span><span class="o">.</span><span class="k">default</span>
     <span class="o">.</span><span class="nf">publisher</span><span class="p">(</span><span class="nv">for</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="o">.</span><span class="n">didBecomeActiveNotification</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">subscribe</span><span class="p">(</span><span class="nv">on</span><span class="p">:</span> <span class="kt">DispatchQueue</span><span class="o">.</span><span class="n">main</span><span class="p">)</span>
@@ -1721,7 +1747,7 @@ Auth0
 <li>watchOS <strong>6.2</strong></li>
 </ul>
 
-<p>Once a platform version becomes unsupported, dropping it from Auth0.swift <strong>will not be considered a breaking change</strong>, and will be done in a <strong>minor</strong> release. E.g. iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.</p>
+<p>Once a platform version becomes unsupported, dropping it from Auth0.swift <strong>will not be considered a breaking change</strong>, and will be done in a <strong>minor</strong> release. For example, iOS 12 will cease to be supported when iOS 16 gets released, and Auth0.swift will be able to drop it in a minor release.</p>
 
 <p>In the case of macOS, the yearly named releases are considered a major platform version for the purposes of this Policy, regardless of the actual version numbers.</p>
 <h2 id='issue-reporting' class='heading'>Issue Reporting</h2>
@@ -1734,7 +1760,7 @@ Auth0
 <p>Auth0 helps you to:</p>
 
 <ul>
-<li>Add authentication with <a href="https://auth0.com/docs/authenticate/identity-providers">multiple sources</a>, either social identity providers such as <strong>Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce</strong> (amongst others), or enterprise identity systems like <strong>Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML Identity Provider</strong>.</li>
+<li>Add authentication with <a href="https://auth0.com/docs/authenticate/identity-providers">multiple sources</a>, either social identity providers such as <strong>Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce</strong> (amongst others), or enterprise identity systems like <strong>Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML identity provider</strong>.</li>
 <li>Add authentication through more traditional <strong><a href="https://auth0.com/docs/authenticate/database-connections/custom-db">username/password databases</a></strong>.</li>
 <li>Add support for <strong><a href="https://auth0.com/docs/manage-users/user-accounts/user-account-linking">linking different user accounts</a></strong> with the same user.</li>
 <li>Support for generating signed <a href="https://auth0.com/docs/secure/tokens/json-web-tokens">JSON Web Tokens</a> to call your APIs and <strong>flow the user identity</strong> securely.</li>
@@ -1758,7 +1784,7 @@ Auth0
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-04-29)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-05-26)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
