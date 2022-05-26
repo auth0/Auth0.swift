@@ -16,6 +16,7 @@ class CredentialsSpec: QuickSpec {
     override func spec() {
 
         describe("decode from json") {
+
             let decoder = JSONDecoder()
 
             it("should have all properties") {
@@ -103,7 +104,20 @@ class CredentialsSpec: QuickSpec {
                     expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
                 }
 
+                it("should have valid expiresIn from ISO date") {
+                    let formatter = ISO8601DateFormatter()
+                    let json = """
+                            {
+                                "expires_in": "\(formatter.string(from: ExpiresInDate))"
+                            }
+                        """.data(using: .utf8)!
+                    decoder.dateDecodingStrategy = .iso8601
+                    let credentials = try decoder.decode(Credentials.self, from: json)
+                    expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
+                }
+
             }
+
         }
 
         describe("secure coding") {

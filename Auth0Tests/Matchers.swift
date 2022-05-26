@@ -110,7 +110,6 @@ func isMultifactorChallenge(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/mfa/challenge")
 }
 
-
 func hasHeader(_ name: String, value: String) -> HTTPStubsTestBlock {
     return { request in
         return request.value(forHTTPHeaderField: name) == value

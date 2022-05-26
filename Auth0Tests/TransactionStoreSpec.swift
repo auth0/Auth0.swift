@@ -9,53 +9,43 @@ class TransactionStoreSpec: QuickSpec {
     override func spec() {
 
         var storage: TransactionStore!
-        var session: MockSession!
+        var transaction: SpyTransaction!
 
         beforeEach {
             storage = TransactionStore()
-            session = MockSession()
+            transaction = SpyTransaction()
         }
 
         describe("storage") {
 
-
-            it("should store session") {
-                storage.store(session)
+            it("should store transaction") {
+                storage.store(transaction)
             }
 
-            it("should cancel current") {
-                storage.store(session)
-                storage.store(MockSession())
-                expect(session.cancelled) == true
+            it("should cancel current transaction") {
+                storage.store(transaction)
+                storage.store(SpyTransaction())
+                expect(transaction.isCancelled) == true
             }
 
-            it("should clear session") {
-                storage.store(session)
+            it("should clear current transaction") {
+                storage.store(transaction)
                 storage.clear()
                 expect(storage.current).to(beNil())
             }
+
         }
 
         describe("cancel") {
 
-            it("should be noop when there is no current session") {
-                session.cancel()
+            it("should be noop when there is no current transaction") {
+                transaction.cancel()
             }
 
-            it("should cancel current") {
-                storage.store(session)
-                storage.cancel(session)
-                expect(session.cancelled) == true
-            }
-
-            it("should cancel if matches current via state") {
-                session.state = "1"
-                let other = MockSession()
-                other.state = "2"
-                storage.store(session)
-                storage.cancel(other)
-                expect(session.cancelled) == false
-                expect(other.cancelled) == true
+            it("should cancel current transaction") {
+                storage.store(transaction)
+                storage.cancel()
+                expect(transaction.isCancelled) == true
             }
 
         }
@@ -65,37 +55,21 @@ class TransactionStoreSpec: QuickSpec {
             let url = URL(string: "https://auth0.com")!
 
             beforeEach {
-                storage.store(session)
-                session.resumeResult = true
+                storage.store(transaction)
+                transaction.isResumed = true
             }
 
-            it("should resume current") {
+            it("should resume current transaction") {
                 expect(storage.resume(url)) == true
             }
 
-            it("should return default when no current is available") {
-                storage.cancel(session)
+            it("should return false when there is no current transaction") {
+                storage.cancel()
                 expect(storage.resume(url)) == false
             }
 
         }
-    }
 
-}
-
-class MockSession: AuthTransaction {
-
-    var state: String? = nil
-
-    var cancelled = false
-    var resumeResult = false
-
-    func cancel() {
-        self.cancelled = true
-    }
-
-    func resume(_ url: URL) -> Bool {
-        return self.resumeResult
     }
 
 }

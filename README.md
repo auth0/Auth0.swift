@@ -46,9 +46,9 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
 ## Documentation
 
 - [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift)
-  <br>Shows how to integrate Auth0.swift into an iOS / macOS application from scratch.
+  <br>Shows how to integrate Auth0.swift into an iOS / macOS app from scratch.
 - [**Sample app**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01)
-  <br>A complete, running iOS / macOS application you can try.
+  <br>A complete, running iOS / macOS app you can try.
 - [**API documentation**](https://auth0.github.io/Auth0.swift/)
   <br>Documentation auto-generated from the code comments that explains all the available features.
   + [Web Auth](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)
@@ -118,7 +118,7 @@ Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to c
 
 #### Configure Client ID and Domain with a plist
 
-Create a `plist` file named `Auth0.plist` in your application bundle with the following content:
+Create a `plist` file named `Auth0.plist` in your app bundle with the following content:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -169,11 +169,11 @@ Auth0
 
 #### Configure callback and logout URLs
 
-The callback and logout URLs are the URLs that Auth0 invokes to redirect back to your application. Auth0 invokes the callback URL after authenticating the user, and the logout URL after removing the session cookie.
+The callback and logout URLs are the URLs that Auth0 invokes to redirect back to your app. Auth0 invokes the callback URL after authenticating the user, and the logout URL after removing the session cookie.
 
-Since callback and logout URLs can be manipulated, you will need to add your URLs to the **Allowed Callback URLs** and **Allowed Logout URLs** fields in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback and logout URLs are not set, users will be unable to log in and out of the application and will get an error.
+Since callback and logout URLs can be manipulated, you will need to add your URLs to the **Allowed Callback URLs** and **Allowed Logout URLs** fields in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback and logout URLs are not set, users will be unable to log in and out of the app and will get an error.
 
-Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your application. If you are using a [custom domain](https://auth0.com/docs/brand-and-customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with the value of your custom domain instead of the value from the settings page.
+Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your app. If you are using a [custom domain](https://auth0.com/docs/brand-and-customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with the value of your custom domain instead of the value from the settings page.
 
 ##### iOS
 
@@ -195,11 +195,11 @@ com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 
 #### Configure custom URL scheme
 
-Back in Xcode, go to the **Info** tab of your application target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
+Back in Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
 
 ![url-scheme](assets/url-scheme.png)
 
-This registers your bundle identifer as a custom URL scheme, so the callback and logout URLs can reach your application.
+This registers your bundle identifer as a custom URL scheme, so the callback and logout URLs can reach your app.
 
 ### Web Auth Login (iOS / macOS)
 
@@ -259,7 +259,7 @@ Auth0
 
 ### Web Auth Logout (iOS / macOS)
 
-Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your application.
+Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your app.
 
 Call the `clearSession()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](#clear-stored-credentials).
 
@@ -507,7 +507,7 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 
 #### Store credentials
 
-When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your application again.
+When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your app again.
 
 ```swift
 let didStore = credentialsManager.store(credentials: credentials)
@@ -515,7 +515,7 @@ let didStore = credentialsManager.store(credentials: credentials)
 
 #### Check the validity of stored credentials
 
-When the users open your application, check for valid credentials. If they exist, you can retrieve them and redirect the users to the application's main flow without any additional login steps.
+When the users open your app, check for valid credentials. If they exist, you can retrieve them and redirect the users to the app's main flow without any additional login steps.
 
 ```swift
 guard credentialsManager.hasValid() else {
@@ -627,7 +627,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 The Authentication API exposes the AuthN/AuthZ functionality of Auth0, as well as the supported identity protocols like OpenID Connect, OAuth 2.0, and SAML.
 We recommend using [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login), but if you prefer to build your own UI you can use our API endpoints to do so. However, some Auth flows (grant types) are disabled by default so you must enable them in the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/), as explained in [Update Grant Types](https://auth0.com/docs/get-started/applications/update-grant-types).
 
-For login or signup with username/password, the `Password` grant type needs to be enabled in your application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`. Otherwise, the Auth0 Dashboard will take care of activating both when enabling `Password`.
+For login or signup with username/password, the `Password` grant type needs to be enabled in your Auth0 application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`. Otherwise, the Auth0 Dashboard will take care of activating both when enabling `Password`.
 
 > 💡 If your Auth0 account has the **Bot Detection** feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the [Bot Detection](#bot-detection) section.
 
@@ -1045,9 +1045,9 @@ Auth0
     // ...
 ```
 
-> 💡 Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your application.
+> 💡 Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your app.
 
-> ⚠️ For security reasons, native mobile applications are restricted to a subset of the Management API functionality.
+> ⚠️ For security reasons, native mobile apps are restricted to a subset of the Management API functionality.
 
 #### Retrieve user metadata
 
@@ -1415,11 +1415,11 @@ Auth0
 
 ### Organizations
 
-[Organizations](https://auth0.com/docs/manage-users/organizations) is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) applications. 
+[Organizations](https://auth0.com/docs/manage-users/organizations) is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) apps. 
 
 Using Organizations, you can:
 
-- Represent teams, business customers, partner companies, or any logical grouping of users that should have different ways of accessing your applications, as organizations.
+- Represent teams, business customers, partner companies, or any logical grouping of users that should have different ways of accessing your apps, as organizations.
 - Manage their membership in a variety of ways, including user invitation.
 - Configure branded, federated login flows for each organization.
 - Implement role-based access control, such that users can have different roles when authenticating in the context of different organizations.
@@ -1480,14 +1480,14 @@ Auth0
 
 #### Accept user invitations
 
-To accept organization invitations your application needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app), as invitation links are HTTPS-only. Tapping on the invitation link should open your application.
+To accept organization invitations your app needs to support [Universal Links](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/supporting_universal_links_in_your_app), as invitation links are HTTPS-only. Tapping on the invitation link should open your app.
 
-When your application gets opened by an invitation link, grab the invitation URL and pass it to `invitationURL()`.
+When your app gets opened by an invitation link, grab the invitation URL and pass it to `invitationURL()`.
 
 ```swift
 guard let url = URLContexts.first?.url else { return }
 
-// You need to wait for the application to enter the foreground before launching Web Auth
+// You need to wait for the app to enter the foreground before launching Web Auth
 NotificationCenter.default
     .publisher(for: UIApplication.didBecomeActiveNotification)
     .subscribe(on: DispatchQueue.main)

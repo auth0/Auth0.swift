@@ -9,6 +9,7 @@ private let Token = UUID().uuidString
 private let DomainURL = URL(string: "https://\(Domain)")!
 
 class ManagementSpec: QuickSpec {
+
     override func spec() {
 
         describe("init") {
@@ -123,4 +124,5 @@ class ManagementSpec: QuickSpec {
         }
 
     }
+
 }

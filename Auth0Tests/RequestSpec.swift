@@ -12,6 +12,25 @@ import OHHTTPStubsSwift
 private let Url = URL(string: "https://samples.auth0.com")!
 private let Timeout: DispatchTimeInterval = .seconds(2)
 
+fileprivate extension Request where T == [String: Any], E == AuthenticationError {
+
+    init(session: URLSession = .shared,
+         url: URL = Url,
+         method: String = "GET",
+         parameters: [String: Any] = [:],
+         headers: [String: String] = [:]) {
+        self.init(session: session,
+                  url: url,
+                  method: method,
+                  handle: plainJson,
+                  parameters: parameters,
+                  headers: headers,
+                  logger: nil,
+                  telemetry: Telemetry())
+    }
+
+}
+
 class RequestSpec: QuickSpec {
     override func spec() {
 
@@ -28,79 +47,84 @@ class RequestSpec: QuickSpec {
             context("parameters") {
 
                 it("should create a request with parameters") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, parameters: ["foo": "bar"], logger: nil, telemetry: Telemetry())
+                    let request = Request(parameters: ["foo": "bar"])
                     expect(request.parameters["foo"] as? String) == "bar"
                 }
 
                 it("should create a new request with extra parameters") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry()).parameters(["foo": "bar"])
+                    let request = Request().parameters(["foo": "bar"])
                     expect(request.parameters["foo"] as? String) == "bar"
                 }
 
                 it("should merge extra parameters with existing parameters") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, parameters: ["foo": "bar"], logger: nil, telemetry: Telemetry()).parameters(["baz": "qux"])
+                    let request = Request(parameters: ["foo": "bar"]).parameters(["baz": "qux"])
                     expect(request.parameters["foo"] as? String) == "bar"
                     expect(request.parameters["baz"] as? String) == "qux"
                 }
 
                 it("should overwrite existing parameters with extra parameters") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, parameters: ["foo": "bar"], logger: nil, telemetry: Telemetry()).parameters(["foo": "baz"])
+                    let request = Request(parameters: ["foo": "bar"]).parameters(["foo": "baz"])
                     expect(request.parameters["foo"] as? String) == "baz"
                 }
 
                 it("should create a new request and not mutate an existing request") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, parameters: ["foo": "bar"], logger: nil, telemetry: Telemetry())
+                    let request = Request(parameters: ["foo": "bar"])
                     expect(request.parameters(["foo": "baz"]).parameters["foo"] as? String) == "baz"
                     expect(request.parameters["foo"] as? String) == "bar"
                 }
 
                 it("should enforce the openid scope when adding extra parameters") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, parameters: [:], logger: nil, telemetry: Telemetry())
+                    let request = Request(parameters: ["foo": "bar"])
                     expect(request.parameters(["scope": "email phone"]).parameters["scope"] as? String) == "openid email phone"
                 }
 
                 it("should add the parameters as query parameters") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, parameters: ["foo": "bar"], logger: nil, telemetry: Telemetry())
+                    let request = Request(parameters: ["foo": "bar"])
                     expect(request.request.url?.query) == "foo=bar"
                 }
 
                 it("should append the parameters to the existing query parameters") {
-                    let request = Request(session: URLSession.shared, url: URL(string: "\(Url.absoluteString)?foo=bar")!, method: "GET", handle: plainJson, parameters: ["baz": "qux"], logger: nil, telemetry: Telemetry())
+                    let request = Request(url: URL(string: "\(Url.absoluteString)?foo=bar")!, parameters: ["baz": "qux"])
                     expect(request.request.url?.query) == "foo=bar&baz=qux"
                 }
 
                 it("should add the parameters to the request body") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "POST", handle: plainJson, parameters: ["foo": "bar"], logger: nil, telemetry: Telemetry())
+                    let request = Request(method: "POST", parameters: ["foo": "bar"])
                     let body = try! JSONSerialization.jsonObject(with: request.request.httpBody!, options: []) as! [String: Any]
                     expect(body["foo"] as? String) == "bar"
+                }
+
+                it("should not add the parameters as query parameters when the URL is malformed") {
+                    let request = Request(url: URL(string: "//:foo/bar")!, parameters: ["foo": "bar"])
+                   expect(request.request.url?.query).to(beNil())
                 }
             }
 
             context("headers") {
 
                 it("should create a request with headers") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, headers: ["foo": "bar"], logger: nil, telemetry: Telemetry())
+                    let request = Request(headers: ["foo": "bar"])
                     expect(request.headers["foo"]) == "bar"
                 }
 
                 it("should create a new request with extra headers") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry()).headers(["foo": "bar"])
+                    let request = Request().headers(["foo": "bar"])
                     expect(request.headers["foo"]) == "bar"
                 }
 
                 it("should merge extra headers with existing headers") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, headers: ["foo": "bar"], logger: nil, telemetry: Telemetry()).headers(["baz": "qux"])
+                    let request = Request(headers: ["foo": "bar"]).headers(["baz": "qux"])
                     expect(request.headers["foo"]) == "bar"
                     expect(request.headers["baz"]) == "qux"
                 }
 
                 it("should overwrite existing headers with extra headers") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, headers: ["foo": "bar"], logger: nil, telemetry: Telemetry()).headers(["foo": "baz"])
+                    let request = Request(headers: ["foo": "bar"]).headers(["foo": "baz"])
                     expect(request.headers["foo"]) == "baz"
                 }
 
                 it("should create a new request and not mutate an existing request") {
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, headers: ["foo": "bar"], logger: nil, telemetry: Telemetry())
+                    let request = Request(headers: ["foo": "bar"])
                     expect(request.headers(["foo": "baz"]).headers["foo"]) == "baz"
                     expect(request.headers["foo"]) == "bar"
                 }
@@ -121,7 +145,7 @@ class RequestSpec: QuickSpec {
                     stub(condition: isHost(Url.host!)) { _ in
                         return apiSuccessResponse()
                     }
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
+                    let request = Request()
                     waitUntil(timeout: Timeout) { done in
                         request
                             .start()
@@ -139,7 +163,7 @@ class RequestSpec: QuickSpec {
                     stub(condition: isHost(Url.host!)) { _ in
                         return apiSuccessResponse(json: ["foo": "bar"])
                     }
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
+                    let request = Request()
                     waitUntil(timeout: Timeout) { done in
                         request
                             .start()
@@ -157,7 +181,7 @@ class RequestSpec: QuickSpec {
                     stub(condition: isHost(Url.host!)) { _ in
                         return apiFailureResponse()
                     }
-                    let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
+                    let request = Request()
                     waitUntil(timeout: Timeout) { done in
                         request
                             .start()
@@ -180,7 +204,7 @@ class RequestSpec: QuickSpec {
                 stub(condition: isHost(Url.host!)) { _ in
                     return apiSuccessResponse(json: ["foo": "bar"])
                 }
-                let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
+                let request = Request()
                 waitUntil(timeout: Timeout) { done in
                     #if compiler(>=5.5.2)
                     if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
@@ -208,7 +232,7 @@ class RequestSpec: QuickSpec {
                 stub(condition: isHost(Url.host!)) { _ in
                     return apiFailureResponse()
                 }
-                let request = Request(session: URLSession.shared, url: Url, method: "GET", handle: plainJson, logger: nil, telemetry: Telemetry())
+                let request = Request()
                 waitUntil(timeout: Timeout) { done in
                     #if compiler(>=5.5.2)
                     if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {

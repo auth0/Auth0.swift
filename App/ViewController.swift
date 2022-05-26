@@ -10,9 +10,9 @@ class ViewController: UIViewController {
         
         self.onAuth = {
             switch $0 {
-            case .failure(let cause):
+            case .failure(let error):
                 DispatchQueue.main.async {
-                    self.alert(title: "Error", message: "\(cause)")
+                    self.alert(title: "Error", message: "\(error)")
                 }
             case .success(let credentials):
                 DispatchQueue.main.async {
@@ -25,13 +25,15 @@ class ViewController: UIViewController {
     }
     
     @IBAction func login(_ sender: Any) {
-        Auth0.webAuth()
+        Auth0
+            .webAuth()
             .logging(enabled: true)
             .start(onAuth)
     }
-    
+
     @IBAction func logout(_ sender: Any) {
-        Auth0.webAuth()
+        Auth0
+            .webAuth()
             .logging(enabled: true)
             .clearSession(federated: false) { result in
                 switch result {
@@ -44,12 +46,12 @@ class ViewController: UIViewController {
 }
 
 extension UIViewController {
-    
+
     func alert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
 
         present(alert, animated: true)
     }
-    
+
 }

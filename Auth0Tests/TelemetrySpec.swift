@@ -67,7 +67,7 @@ class TelemetrySpec: QuickSpec {
         describe("wrapping") {
 
             var telemetry = Telemetry()
-            let version = Telemetry.versionInformation()["version"] ?? Telemetry.NoVersion
+            let version = Telemetry.versionInformation()["version"]!
 
             beforeEach {
                 telemetry.wrapped(inLibrary: "Lock.iOS", version: "1.0.0-alpha.4")

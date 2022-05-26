@@ -14,10 +14,10 @@ class LoggerSpec: QuickSpec {
         }
 
         var logger: Logger!
-        var output: MockOutput!
+        var output: SpyOutput!
 
         beforeEach {
-            output = MockOutput()
+            output = SpyOutput()
             logger = DefaultLogger(output: output)
         }
 
@@ -54,6 +54,12 @@ class LoggerSpec: QuickSpec {
                 request.httpBody = json.data(using: .utf8)
                 logger.trace(request: request, session: URLSession.shared)
                 expect(output.messages).to(contain(json))
+            }
+
+            it("should log nothing for invalid request") {
+                request.url = nil
+                logger.trace(request: request, session: URLSession.shared)
+                expect(output.messages).to(beEmpty())
             }
 
         }
@@ -106,7 +112,7 @@ class LoggerSpec: QuickSpec {
     }
 }
 
-class MockOutput: LoggerOutput {
+class SpyOutput: LoggerOutput {
     var messages: [String] = []
 
     func log(message: String) {

@@ -10,15 +10,7 @@ extension NSApplication {
 
 }
 
-extension ASTransaction: ASWebAuthenticationPresentationContextProviding {
-
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return NSApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()
-    }
-
-}
-
-extension ASCallbackTransaction: ASWebAuthenticationPresentationContextProviding {
+extension ASUserAgent: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return NSApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()

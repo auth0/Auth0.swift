@@ -29,6 +29,11 @@ final class Auth0WebAuth: WebAuth {
     private(set) var maxAge: Int?
     private(set) var organization: String?
     private(set) var invitationURL: URL?
+    private(set) var provider: WebAuthProvider?
+
+    var state: String {
+        return self.parameters["state"] ?? self.generateDefaultState()
+    }
 
     lazy var redirectURL: URL? = {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
@@ -123,20 +128,28 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
+    func provider(_ provider: @escaping WebAuthProvider) -> Self {
+        self.provider = provider
+        return self
+    }
+
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
-        guard let redirectURL = self.redirectURL else {
+        guard let redirectURL = self.redirectURL, let urlScheme = redirectURL.scheme else {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
+
         let handler = self.handler(redirectURL)
-        let state = self.parameters["state"] ?? generateDefaultState()
+        let state = self.state
         var organization: String? = self.organization
         var invitation: String?
+
         if let invitationURL = self.invitationURL {
             guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
                 let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
                 let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
                     return callback(.failure(WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))))
             }
+
             organization = organizationId
             invitation = invitationId
         }
@@ -146,36 +159,45 @@ final class Auth0WebAuth: WebAuth {
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
-        let session = ASTransaction(authorizeURL: authorizeURL,
-                                    redirectURL: redirectURL,
-                                    state: state,
-                                    handler: handler,
-                                    logger: self.logger,
-                                    ephemeralSession: self.ephemeralSession,
-                                    callback: callback)
-        logger?.trace(url: authorizeURL, source: String(describing: session.self))
-        self.storage.store(session)
+        let provider = self.provider ?? WebAuthentication.asProvider(urlScheme: urlScheme,
+                                                                     ephemeralSession: ephemeralSession)
+        let userAgent = provider(authorizeURL) { result in
+            if case let .failure(error) = result {
+                callback(.failure(error))
+            }
+        }
+        let transaction = LoginTransaction(redirectURL: redirectURL,
+                                           state: state,
+                                           userAgent: userAgent,
+                                           handler: handler,
+                                           logger: self.logger,
+                                           callback: callback)
+        userAgent.start()
+        self.storage.store(transaction)
+        logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
         let endpoint = federated ?
             URL(string: "v2/logout?federated", relativeTo: self.url)! :
             URL(string: "v2/logout", relativeTo: self.url)!
-
         let returnTo = URLQueryItem(name: "returnTo", value: self.redirectURL?.absoluteString)
         let clientId = URLQueryItem(name: "client_id", value: self.clientId)
         var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: true)
         let queryItems = components?.queryItems ?? []
         components?.queryItems = queryItems + [returnTo, clientId]
 
-        guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
+        guard let logoutURL = components?.url,
+              let redirectURL = self.redirectURL,
+              let urlScheme = redirectURL.scheme else {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
-        let session = ASCallbackTransaction(url: logoutURL,
-                                            schemeURL: redirectURL,
-                                            callback: callback)
-        self.storage.store(session)
+        let provider = self.provider ?? WebAuthentication.asProvider(urlScheme: urlScheme)
+        let userAgent = provider(logoutURL, callback)
+        let transaction = ClearSessionTransaction(userAgent: userAgent)
+        userAgent.start()
+        self.storage.store(transaction)
     }
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,
@@ -210,7 +232,7 @@ final class Auth0WebAuth: WebAuth {
         return components.url!
     }
 
-    func generateDefaultState() -> String? {
+    func generateDefaultState() -> String {
         let data = Data(count: 32)
         var tempData = data
 
@@ -218,8 +240,10 @@ final class Auth0WebAuth: WebAuth {
             SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
         }
 
-        guard result == 0 else { return nil }
-        return tempData.a0_encodeBase64URLSafe()
+        guard result == 0, let state = tempData.a0_encodeBase64URLSafe()
+        else { return UUID().uuidString.replacingOccurrences(of: "-", with: "") }
+
+        return state
     }
 
     private func handler(_ redirectURL: URL) -> OAuth2Grant {
