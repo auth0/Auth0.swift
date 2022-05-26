@@ -1173,7 +1173,7 @@ class AuthenticationSpec: QuickSpec {
                 
                 waitUntil { done in
                     auth.jwks().start {
-                        expect($0).to(beFailure())
+                        expect($0).to(beUnsuccessful())
                         done()
                     }
                 }

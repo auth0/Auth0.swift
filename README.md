@@ -40,7 +40,6 @@ Swift SDK that lets you communicate efficiently with many of the [Auth0 API](htt
   + [Bot Detection](#bot-detection)
 - [**Support Policy**](#support-policy)
 - [**Issue Reporting**](#issue-reporting)
-- [**Contributing**](#contributing)
 - [**What is Auth0?**](#what-is-auth0)
 - [**License**](#license)
 
@@ -197,6 +196,8 @@ com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 #### Configure custom URL scheme
 
 Back in Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
+
+![url-scheme](assets/url-scheme.png)
 
 This registers your bundle identifer as a custom URL scheme, so the callback and logout URLs can reach your app.
 
@@ -537,6 +538,8 @@ credentialsManager.credentials { result in
     }
 }
 ```
+
+> 💡 You do not need to call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials.
 
 <details>
   <summary>Using async/await</summary>
@@ -1581,20 +1584,6 @@ In the case of macOS, the yearly named releases are considered a major platform 
 For general support or usage questions, use the [Auth0 Community](https://community.auth0.com/tags/c/sdks/5/swift) forums or raise a [support ticket](https://support.auth0.com/). Only [raise an issue](https://github.com/auth0/Auth0.swift/issues) if you have found a bug or want to request a feature.
 
 **Do not report security vulnerabilities on the public GitHub issue tracker.** The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy) details the procedure for disclosing security issues.
-
-## Contributing
-
-We appreciate feedback and contribution to Auth0.swift! Before you get started, please read the following:
-
-- [Auth0's general contribution guidelines](https://github.com/auth0/open-source-template/blob/master/GENERAL-CONTRIBUTING.md)
-- [Auth0's code of conduct](https://github.com/auth0/open-source-template/blob/master/CODE-OF-CONDUCT.md)
-
-We use [Carthage](https://github.com/Carthage/Carthage) to manage Auth0.swift's dependencies. Run `carthage bootstrap --use-xcframeworks` after cloning this repository to fetch and build them.
-
-Then, open `Auth0.xcodeproj` in Xcode.
-
-> ⚠️ Tests must be added for all new functionality. Existing tests must be updated for all changed/fixed functionality, where applicable. All tests must complete without errors.
-<br>All new functionality must be documented as well.
 
 ## What is Auth0?
 

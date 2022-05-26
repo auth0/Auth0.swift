@@ -19,7 +19,7 @@ extension URL {
 private let ValidAuthorizeURLExample = "valid authorize url"
 
 class WebAuthSharedExamplesConfiguration: QuickConfiguration {
-    override class func configure(_ configuration: Configuration) {
+    override class func configure(_ configuration: QCKConfiguration) {
         sharedExamples(ValidAuthorizeURLExample) { (context: SharedExampleContext) in
             let attrs = context()
             let url = attrs["url"] as! URL
