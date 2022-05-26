@@ -11,13 +11,31 @@ public struct WebAuthentication {
 
     /// Resumes the web-based operation when the external user agent redirects back to the app using a URL with a custom scheme.
     ///
-    /// Using the UIKit app lifecycle:
+    /// Using the UIKit app lifecycle, in your `AppDelegate.swift`:
     ///
     /// ```
     /// func application(_ app: UIApplication,
     ///                  open url: URL,
     ///                  options: [UIApplication.OpenURLOptionsKey: Any]) -> Bool {
     ///     return WebAuthentication.resume(with: url)
+    /// }
+    /// ```
+    ///
+    /// Using the UIKit app lifecycle with Scenes, in your `SceneDelegate.swift`:
+    ///
+    /// ```
+    /// // Called when your app is running or suspended in memory
+    /// func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    ///     guard let url = URLContexts.first?.url else { return }
+    ///     WebAuthentication.resume(with: url)
+    /// }
+    ///
+    /// // Called when your app is not running
+    /// func scene(_ scene: UIScene,
+    ///            willConnectTo session: UISceneSession,
+    ///            options connectionOptions: UIScene.ConnectionOptions) {
+    ///     guard let url = connectionOptions.urlContexts.first?.url else { return }
+    ///     WebAuthentication.resume(with: url)
     /// }
     /// ```
     ///
