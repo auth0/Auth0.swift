@@ -11,7 +11,7 @@ public extension WebAuthentication {
     ///     .webAuth(clientId: clientId, domain: "samples.auth0.com")
     ///     .provider(WebAuthentication.safariProvider())
     ///     .start { result in
-    ///     // ...
+    ///         // ...
     /// }
     ///```
     ///
@@ -22,7 +22,7 @@ public extension WebAuthentication {
     ///     .webAuth(clientId: clientId, domain: "samples.auth0.com")
     ///     .provider(WebAuthentication.safariProvider(style: .formSheet))
     ///     .start { result in
-    ///     // ...
+    ///         // ...
     /// }
     ///```
     ///
