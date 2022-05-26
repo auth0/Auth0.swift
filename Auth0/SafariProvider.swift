@@ -4,6 +4,30 @@ import SafariServices
 
 public extension WebAuthentication {
 
+    /// Creates a Web Auth provider that uses `SFSafariViewController` as the external user agent.
+    ///
+    /// ```
+    /// Auth0
+    ///     .webAuth(clientId: clientId, domain: "samples.auth0.com")
+    ///     .provider(WebAuthentication.safariProvider())
+    ///     .start { result in
+    ///     // ...
+    /// }
+    ///```
+    ///
+    /// If you need specify a custom `UIModalPresentationStyle`:
+    ///
+    /// ```
+    /// Auth0
+    ///     .webAuth(clientId: clientId, domain: "samples.auth0.com")
+    ///     .provider(WebAuthentication.safariProvider(style: .formSheet))
+    ///     .start { result in
+    ///     // ...
+    /// }
+    ///```
+    ///
+    /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
+    /// - Returns: A ``WebAuthProvider`` instance.
     static func safariProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
         return { url, callback in
             let safari = SFSafariViewController(url: url)

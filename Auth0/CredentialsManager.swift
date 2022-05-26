@@ -109,12 +109,12 @@ public struct CredentialsManager {
     /// 
     /// ```
     /// credentialsManager.revoke { result in
-    ///    switch result {
-    ///    case .success:
-    ///        print("Revoked refresh token and cleared credentials")
-    ///    case .failure(let error):
-    ///        print("Failed with: \(error)")
-    ///    }
+    ///     switch result {
+    ///     case .success:
+    ///         print("Revoked refresh token and cleared credentials")
+    ///     case .failure(let error):
+    ///         print("Failed with: \(error)")
+    ///     }
     /// }
     /// ```
     ///
@@ -180,12 +180,12 @@ public struct CredentialsManager {
     ///
     /// ```
     /// credentialsManager.credentials { result in
-    ///    switch result {
-    ///    case .success(let credentials):
-    ///        print("Obtained credentials: \(credentials)")
-    ///    case .failure(let error):
-    ///        print("Failed with: \(error)")
-    ///    }
+    ///     switch result {
+    ///     case .success(let credentials):
+    ///         print("Obtained credentials: \(credentials)")
+    ///     case .failure(let error):
+    ///         print("Failed with: \(error)")
+    ///     }
     /// }
     /// ```
     ///
