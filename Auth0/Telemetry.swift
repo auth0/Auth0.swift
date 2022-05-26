@@ -1,5 +1,6 @@
 import Foundation
 
+/// Generates and sets the `Auth0-Client` header.
 public struct Telemetry {
 
     static let NameKey = "name"
@@ -94,6 +95,7 @@ public struct Telemetry {
     }
 }
 
+/// A type that can send the `Auth0-Client` header on every request to Auth0.
 public protocol Trackable {
 
     /// The ``Telemetry`` instance.
@@ -103,17 +105,17 @@ public protocol Trackable {
 
 public extension Trackable {
     /**
-     Avoids Auth0.swift sending its version on every request to Auth0.
+     Turn on/off sending the `Auth0-Client` header on every request to Auth0.
      By default we collect our libraries and SDKs versions to help us evaluate usage.
      
-     - Parameter enabled: If Auth0.swift should send its version on every request.
+     - Parameter enabled: Flag to turn telemetry on/off.
      */
     mutating func tracking(enabled: Bool) {
         self.telemetry.enabled = enabled
     }
 
     /**
-     Sends the library/framework which has Auth0.swift as dependency when sending telemetry information.
+     Includes the name and version of the library/framework which has Auth0.swift as dependency.
      
      - Parameter name:    Name of library or framework that uses Auth0.swift.
      - Parameter version: Version of library or framework.
