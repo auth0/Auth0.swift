@@ -1,5 +1,7 @@
 #if WEB_AUTH_PLATFORM
 /// Represents the external user agent used to perform q web-based operation.
+///
+/// - See: [Example](https://github.com/auth0/Auth0.swift/blob/master/Auth0/SafariProvider.swift)
 public protocol WebAuthUserAgent {
 
     /// Starts the external user agent.
