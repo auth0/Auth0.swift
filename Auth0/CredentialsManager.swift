@@ -133,8 +133,7 @@ public struct CredentialsManager {
     /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
     public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
-        guard let data = self.storage.getEntry(forKey: self.storeKey),
-              let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
+        guard let credentials = self.retrieveCredentials(),
               let refreshToken = credentials.refreshToken else {
                   _ = self.clear()
                   return callback(.success(()))
@@ -168,9 +167,17 @@ public struct CredentialsManager {
     /// - Returns: If there are credentials stored containing an access token that is neither expired or about to expire.
     /// - See: ``Credentials/expiresIn``
     public func hasValid(minTTL: Int = 0) -> Bool {
-        guard let data = self.storage.getEntry(forKey: self.storeKey),
-            let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data) else { return false }
+        guard let credentials = self.retrieveCredentials() else { return false }
         return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
+    }
+
+    /// Checks that there are credentials stored, and that the credential has a valid refresh token
+    ///
+    /// - Returns: If there are credentials stored containing an refresh token.
+    /// - See: ``Credentials/refreshToken``
+    public func hasValidRefreshToken() -> Bool {
+        guard let credentials = self.retrieveCredentials() else { return false }
+        return credentials.refreshToken != nil 
     }
 
     #if WEB_AUTH_PLATFORM
