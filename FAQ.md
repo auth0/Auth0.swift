@@ -41,7 +41,7 @@ Auth0
     }
 ```
 
-> ⚠️ `SFSafariViewController` does not share cookies with the Safari app, so SSO will not work either.
+> ⚠️ Since `SFSafariViewController` does not share cookies with the Safari app, SSO will not work either. But it will keep its own cookies, so you can use it to perform SSO between your app and your website as long as you open it inside your app using `SFSafariViewController`.
 
 If you choose to use the `SFSafariViewController` Web Auth provider, you need to perform an additional bit of setup. Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the callback URL when Auth0 redirects back to your app, so it's necessary to manually resume the Web Auth operation.
 
