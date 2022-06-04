@@ -1,13 +1,11 @@
 # Auth0.swift
 
-[![CircleCI](https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat-square)](https://circleci.com/gh/auth0/Auth0.swift/tree/master)
-[![Coverage Status](https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat-square)](https://codecov.io/github/auth0/Auth0.swift)
-![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat-square)
-![License](https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square)
-![Platform](https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square)
-![Swift 5.5](https://img.shields.io/badge/Swift-5.5-orange.svg?style=flat-square)
+[![CircleCI](https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat)](https://circleci.com/gh/auth0/Auth0.swift/tree/master)
+![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat)
+[![Coverage Status](https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat)](https://codecov.io/github/auth0/Auth0.swift)
+![License](https://img.shields.io/github/license/Auth0/Auth0.swift.svg?style=flat)
 
-Swift SDK that lets you communicate efficiently with many of the [Auth0 API](https://auth0.com/docs/api) endpoints and enables you to seamlessly integrate the Auth0 login.
+Easily integrate Auth0 into iOS, macOS, tvOS, and watchOS apps. Add **login** and **logout**, store **credentials** securely, and access **user information**.
 
 **Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).**
 
