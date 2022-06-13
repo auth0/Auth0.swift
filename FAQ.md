@@ -35,7 +35,7 @@ An alternative is to use `SFSafariViewController` instead of `ASWebAuthenticatio
 ```swift
 Auth0
     .webAuth()
-    .provider(WebAuthentication.safariProvider())
+    .provider(WebAuthentication.safariProvider()) // Use SFSafariViewController
     .start { result in
         // ...
     }
@@ -65,17 +65,8 @@ func application(_ app: UIApplication,
 ```swift
 // SceneDelegate.swift
 
-// Called when your app is running or suspended in memory
 func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     guard let url = URLContexts.first?.url else { return }
-    WebAuthentication.resume(with: url)
-}
-
-// Called when your app is not running
-func scene(_ scene: UIScene, 
-           willConnectTo session: UISceneSession, 
-           options connectionOptions: UIScene.ConnectionOptions) {
-    guard let url = connectionOptions.urlContexts.first?.url else { return }
     WebAuthentication.resume(with: url)
 }
 ```

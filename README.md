@@ -197,7 +197,7 @@ Back in Xcode, go to the **Info** tab of your app target settings. In the **URL 
 
 ![url-scheme](assets/url-scheme.png)
 
-This registers your bundle identifer as a custom URL scheme, so the callback and logout URLs can reach your app.
+This registers your bundle identifier as a custom URL scheme, so the callback and logout URLs can reach your app.
 
 ### Web Auth Login (iOS / macOS)
 
