@@ -35,13 +35,13 @@ An alternative is to use `SFSafariViewController` instead of `ASWebAuthenticatio
 ```swift
 Auth0
     .webAuth()
-    .provider(WebAuthentication.safariProvider())
+    .provider(WebAuthentication.safariProvider()) // Use SFSafariViewController
     .start { result in
         // ...
     }
 ```
 
-> ⚠️ Since `SFSafariViewController` does not share cookies with the Safari app, SSO will not work either. But it will keep its own cookies, so you can use it to perform SSO between your app and your website as long as you open it inside your app using `SFSafariViewController`.
+> ⚠️ Since `SFSafariViewController` does not share cookies with the Safari app, SSO will not work either. But it will keep its own cookies, so you can use it to perform SSO between your app and your website as long as you open it inside your app using `SFSafariViewController`. This also means that any feature that relies on the persistence of cookies will work as expected.
 
 If you choose to use the `SFSafariViewController` Web Auth provider, you need to perform an additional bit of setup. Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the callback URL when Auth0 redirects back to your app, so it's necessary to manually resume the Web Auth operation.
 
@@ -65,17 +65,8 @@ func application(_ app: UIApplication,
 ```swift
 // SceneDelegate.swift
 
-// Called when your app is running or suspended in memory
 func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     guard let url = URLContexts.first?.url else { return }
-    WebAuthentication.resume(with: url)
-}
-
-// Called when your app is not running
-func scene(_ scene: UIScene, 
-           willConnectTo session: UISceneSession, 
-           options connectionOptions: UIScene.ConnectionOptions) {
-    guard let url = connectionOptions.urlContexts.first?.url else { return }
     WebAuthentication.resume(with: url)
 }
 ```
