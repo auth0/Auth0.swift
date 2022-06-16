@@ -76,7 +76,7 @@ Pod::Spec.new do |s|
   s.ios.source_files = 'Auth0/*.{swift,h,m}', 'Auth0/ObjectiveC/*.{h,m}'
   s.ios.frameworks = 'UIKit', 'SafariServices', 'LocalAuthentication'
   s.ios.weak_framework = 'AuthenticationServices'
-  s.ios.dependency 'SimpleKeychain'
+  s.ios.dependency 'SimpleKeychain', '~> 0.12'
   s.ios.dependency 'JWTDecode', '~> 2.0'
   s.ios.exclude_files = macos_files
   s.ios.pod_target_xcconfig = {
@@ -86,7 +86,7 @@ Pod::Spec.new do |s|
 
   s.osx.source_files = 'Auth0/*.{swift,h,m}', 'Auth0/ObjectiveC/*.{h,m}'
   s.osx.exclude_files = ios_files
-  s.osx.dependency 'SimpleKeychain'
+  s.osx.dependency 'SimpleKeychain', '~> 0.12'
   s.osx.dependency 'JWTDecode', '~> 2.0'
   s.osx.pod_target_xcconfig = {
     'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM',
@@ -95,12 +95,12 @@ Pod::Spec.new do |s|
 
   s.watchos.source_files = 'Auth0/*.swift'
   s.watchos.exclude_files = excluded_files
-  s.watchos.dependency 'SimpleKeychain'
+  s.watchos.dependency 'SimpleKeychain', '~> 0.12'
   s.watchos.dependency 'JWTDecode', '~> 2.0'
 
   s.tvos.source_files = 'Auth0/*.swift'
   s.tvos.exclude_files = excluded_files
-  s.tvos.dependency 'SimpleKeychain'
+  s.tvos.dependency 'SimpleKeychain', '~> 0.12'
   s.tvos.dependency 'JWTDecode', '~> 2.0'
 
   s.swift_versions = ['4.0', '4.1', '4.2', '5.0', '5.1', '5.2', '5.3', '5.4', '5.5']
