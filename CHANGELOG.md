@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.39.1](https://github.com/auth0/Auth0.swift/tree/1.39.1) (2022-06-22)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.1.0...1.39.1)
+
+**Fixed**
+- Pin SimpleKeychain to v0.x [\#706](https://github.com/auth0/Auth0.swift/pull/706) ([Widcket](https://github.com/Widcket))
+
 ## [1.39.0](https://github.com/auth0/Auth0.swift/tree/1.39.0) (2022-03-07)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/1.38.1...1.39.0)
 
