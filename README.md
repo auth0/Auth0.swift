@@ -1049,7 +1049,7 @@ Auth0
 
 #### Retrieve user metadata
 
-To call this method, you need to request the `read:users` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you need to request the `read:current_user` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1104,7 +1104,7 @@ Auth0
 
 #### Update user metadata
 
-To call this method, you need to request either the `update:users` or the `update:users_app_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you need to request the `update:current_user_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
