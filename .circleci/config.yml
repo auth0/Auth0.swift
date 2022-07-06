@@ -64,7 +64,8 @@ commands:
       - run:
           name: Run iOS tests
           command: bundle exec fastlane ios ci
-      - codecov/upload
+      - codecov/upload:
+          xtra_args: -J << parameters.scheme >>
       - run:
           name: Run pod lib lint
           command: bundle exec fastlane ios pod_lint
