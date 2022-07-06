@@ -69,7 +69,6 @@ commands:
           command: bundle exec slather coverage -x --output-directory output --arch x86_64 --scheme << parameters.scheme >>.iOS << parameters.scheme >>.xcodeproj
       - codecov/upload:
           file: output/cobertura.xml
-          xtra_args: -J << parameters.scheme >>
       - run:
           name: Run pod lib lint
           command: bundle exec fastlane ios pod_lint
