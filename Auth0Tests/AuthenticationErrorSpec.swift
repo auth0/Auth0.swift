@@ -154,7 +154,6 @@ class AuthenticationErrorSpec: QuickSpec {
         describe("unknown error structure") {
 
             itBehavesLike(UnknownErrorExample) { return [ExampleValuesKey: ["key": "value"]] }
-
             itBehavesLike(UnknownErrorExample) { return [ExampleValuesKey: [:]] }
 
         }
@@ -433,10 +432,12 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
 
             it("should not match any custom error") {
                 expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
-                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")
-                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match pwd history")
-                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid creds")
+                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
+                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
+                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
                 expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
+                expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
+                expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
             }
 
         }
@@ -496,11 +497,13 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.isMultifactorTokenInvalid).to(beFalse(), description: "should not match mfa token invalid")
                 expect(error.isMultifactorRequired).to(beFalse(), description: "should not match mfa missing")
                 expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
-                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")
-                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match pwd history")
+                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
+                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
                 expect(error.isAccessDenied).to(beFalse(), description: "should not match access denied")
-                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid creds")
+                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
                 expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
+                expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
+                expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
             }
         }
 
