@@ -154,7 +154,6 @@ class AuthenticationErrorSpec: QuickSpec {
         describe("unknown error structure") {
 
             itBehavesLike(UnknownErrorExample) { return [ExampleValuesKey: ["key": "value"]] }
-
             itBehavesLike(UnknownErrorExample) { return [ExampleValuesKey: [:]] }
 
         }
@@ -359,9 +358,45 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isVerificationRequired) == true
             }
 
+            it("should detect password leaked") {
+                let values = [
+                    "error": "password_leaked",
+                    "error_description": "Password leaked"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isPasswordLeaked) == true
+            }
+
+            it("should detect login required") {
+                let values = [
+                    "error": "login_required",
+                    "error_description": "Login required"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isLoginRequired) == true
+            }
+
+            it("should detect network error") {
+                let networkErrorCodes: [URLError.Code] = [
+                    .notConnectedToInternet,
+                    .networkConnectionLost,
+                    .dnsLookupFailed,
+                    .cannotFindHost,
+                    .cannotConnectToHost,
+                    .timedOut,
+                    .internationalRoamingOff,
+                    .callIsActive
+                ]
+
+                for errorCode in networkErrorCodes {
+                    expect(AuthenticationError(cause: URLError.init(errorCode)).isNetworkError) == true
+                }
+            }
+
         }
 
     }
+
 }
 
 class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
@@ -397,10 +432,12 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
 
             it("should not match any custom error") {
                 expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
-                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")
-                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match pwd history")
-                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid creds")
+                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
+                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
+                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
                 expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
+                expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
+                expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
             }
 
         }
@@ -460,11 +497,13 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.isMultifactorTokenInvalid).to(beFalse(), description: "should not match mfa token invalid")
                 expect(error.isMultifactorRequired).to(beFalse(), description: "should not match mfa missing")
                 expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
-                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match pwd strength")
-                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match pwd history")
+                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
+                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
                 expect(error.isAccessDenied).to(beFalse(), description: "should not match access denied")
-                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid creds")
+                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
                 expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
+                expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
+                expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
             }
         }
 

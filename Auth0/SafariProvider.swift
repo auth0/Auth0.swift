@@ -13,7 +13,7 @@ public extension WebAuthentication {
     ///     .start { result in
     ///         // ...
     /// }
-    ///```
+    /// ```
     ///
     /// If you need specify a custom `UIModalPresentationStyle`:
     ///
@@ -24,7 +24,7 @@ public extension WebAuthentication {
     ///     .start { result in
     ///         // ...
     /// }
-    ///```
+    /// ```
     ///
     /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
     /// - Returns: A ``WebAuthProvider`` instance.
