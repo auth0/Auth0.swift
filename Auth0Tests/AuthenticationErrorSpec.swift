@@ -359,9 +359,45 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isVerificationRequired) == true
             }
 
+            it("should detect password leaked") {
+                let values = [
+                    "error": "password_leaked",
+                    "error_description": "Password leaked"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isPasswordLeaked) == true
+            }
+
+            it("should detect login required") {
+                let values = [
+                    "error": "login_required",
+                    "error_description": "Login required"
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isLoginRequired) == true
+            }
+
+            it("should detect network error") {
+                let networkErrorCodes: [URLError.Code] = [
+                    .notConnectedToInternet,
+                    .networkConnectionLost,
+                    .dnsLookupFailed,
+                    .cannotFindHost,
+                    .cannotConnectToHost,
+                    .timedOut,
+                    .internationalRoamingOff,
+                    .callIsActive
+                ]
+
+                for errorCode in networkErrorCodes {
+                    expect(AuthenticationError(cause: URLError.init(errorCode)).isNetworkError) == true
+                }
+            }
+
         }
 
     }
+
 }
 
 class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {

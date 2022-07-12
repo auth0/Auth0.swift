@@ -55,13 +55,15 @@ public struct AuthenticationError: Auth0APIError {
      */
     public var debugDescription: String {
         let description = self.info["description"] ?? self.info["error_description"]
+
         if let string = description as? String {
             return string
         }
+        if self.code == unknownError {
+            return "Failed with unknown error \(self.info)"
+        }
 
-        guard self.code == unknownError else { return "Received error with code \(self.code)" }
-
-        return "Failed with unknown error \(self.info)"
+        return "Received error with code \(self.code)"
     }
 
     // MARK: - Error Types
@@ -135,6 +137,44 @@ public struct AuthenticationError: Auth0APIError {
         return self.code == "requires_verification"
     }
 
+    /// When the password used was reported to be leaked.
+    public var isPasswordLeaked: Bool {
+        return self.code == "password_leaked"
+    }
+
+    /// When performing Web Auth login with `prompt: "none"` and the Auth0 session has expired.
+    public var isLoginRequired: Bool {
+        return self.code == "login_required"
+    }
+
+    /// When the request failed due to network issues.
+    ///
+    /// Returns `true` when the `URLError` code is one of the following:
+    /// - [notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet)
+    /// - [networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost)
+    /// - [dnsLookupFailed](https://developer.apple.com/documentation/foundation/urlerror/2293434-dnslookupfailed)
+    /// - [cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/2293460-cannotfindhost)
+    /// - [cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/2293028-cannotconnecttohost)
+    /// - [timedOut](https://developer.apple.com/documentation/foundation/urlerror/2293002-timedout)
+    /// - [internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/2292893-internationalroamingoff)
+    /// - [callIsActive](https://developer.apple.com/documentation/foundation/urlerror/2293147-callisactive)
+    public var isNetworkError: Bool {
+        guard let code = (self.cause as? URLError)?.code else {
+            return false
+        }
+
+        let networkErrorCodes: [URLError.Code] = [
+            .notConnectedToInternet,
+            .networkConnectionLost,
+            .dnsLookupFailed,
+            .cannotFindHost,
+            .cannotConnectToHost,
+            .timedOut,
+            .internationalRoamingOff,
+            .callIsActive
+        ]
+        return networkErrorCodes.contains(code)
+    }
 }
 
 // MARK: - Equatable
