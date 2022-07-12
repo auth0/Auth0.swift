@@ -10,13 +10,13 @@ class WebAuthErrorSpec: QuickSpec {
 
         describe("init") {
 
-            it("should initialize with type") {
+            it("should initialize with code") {
                 let error = WebAuthError(code: .other)
                 expect(error.code) == WebAuthError.Code.other
                 expect(error.cause).to(beNil())
             }
 
-            it("should initialize with type & cause") {
+            it("should initialize with code & cause") {
                 let cause = AuthenticationError(description: "")
                 let error = WebAuthError(code: .other, cause: cause)
                 expect(error.cause).to(matchError(cause))
