@@ -32,7 +32,7 @@ public struct CredentialsManagerError: Auth0Error {
      - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
      */
     public var debugDescription: String {
-        self.appendCauseDescription(to: self.message)
+        self.appendCause(to: self.message)
     }
 
     // MARK: - Error Cases

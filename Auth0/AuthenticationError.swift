@@ -54,7 +54,7 @@ public struct AuthenticationError: Auth0APIError {
      - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
      */
     public var debugDescription: String {
-        self.appendCauseDescription(to: self.message)
+        self.appendCause(to: self.message)
     }
 
     // MARK: - Error Types
