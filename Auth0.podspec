@@ -43,7 +43,7 @@ Pod::Spec.new do |s|
   s.source_files     = 'Auth0/*.swift'
   s.swift_versions   = ['5.3', '5.4', '5.5']
 
-  s.dependency 'SimpleKeychain'
+  s.dependency 'SimpleKeychain', '~> 0.12'
   s.dependency 'JWTDecode', '~> 2.0'
 
   s.ios.deployment_target   = '12.0'
