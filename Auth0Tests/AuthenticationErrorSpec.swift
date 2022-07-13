@@ -57,7 +57,6 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == description
                 expect(error.statusCode) == 0
                 expect(error.cause).to(beNil())
-                expect(error.cause).to(beNil())
             }
 
             it("should initialize with description & status code") {
