@@ -1,5 +1,15 @@
 # Change Log
 
+## [2.2.0](https://github.com/auth0/Auth0.swift/tree/2.2.0) (2022-07-13)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.1.0...2.2.0)
+
+**Added**
+- Add new error types to `AuthenticationError` [SDK-3492] [\#712](https://github.com/auth0/Auth0.swift/pull/712) ([Widcket](https://github.com/Widcket))
+
+**Changed**
+- Append the cause to the parent error message [\#714](https://github.com/auth0/Auth0.swift/pull/714) ([Widcket](https://github.com/Widcket))
+- Apply recommended Xcode 14 settings [\#705](https://github.com/auth0/Auth0.swift/pull/705) ([Widcket](https://github.com/Widcket))
+
 ## [2.1.0](https://github.com/auth0/Auth0.swift/tree/2.1.0) (2022-05-26)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.0.1...2.1.0)
 
