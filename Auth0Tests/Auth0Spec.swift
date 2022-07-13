@@ -241,3 +241,19 @@ class MockLogger: Logger {
 
     func trace(request: URLRequest, session: URLSession) {}
 }
+
+struct MockError: LocalizedError, CustomStringConvertible {
+    private let message = "foo"
+
+    var description: String {
+        return self.message
+    }
+
+    var localizedDescription: String {
+        return self.message
+    }
+
+    var errorDescription: String? {
+        return self.message
+    }
+}

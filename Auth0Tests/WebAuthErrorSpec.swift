@@ -118,13 +118,12 @@ class WebAuthErrorSpec: QuickSpec {
 
             it("should return message for id token validation failed") {
                 let message = "The ID token validation performed after authentication failed."
-                + " See the underlying 'Error' value available in the 'cause' property."
                 let error = WebAuthError(code: .idTokenValidationFailed)
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for other") {
-                let message = "An unexpected error occurred. See the underlying 'Error' value available in the 'cause' property."
+                let message = "An unexpected error occurred."
                 let error = WebAuthError(code: .other)
                 expect(error.localizedDescription) == message
             }
@@ -132,6 +131,21 @@ class WebAuthErrorSpec: QuickSpec {
             it("should return message for unknown") {
                 let message = "foo"
                 let error = WebAuthError(code: .unknown(message))
+                expect(error.localizedDescription) == message
+            }
+
+            it("should append the cause error message") {
+                let cause =  MockError()
+                let message = "An unexpected error occurred. CAUSE: \(cause.localizedDescription)"
+                let error = WebAuthError(code: .other, cause: cause)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should append the cause error message with a separator") {
+                let unknown = "foo"
+                let cause =  MockError()
+                let message = "\(unknown). CAUSE: \(cause.localizedDescription)"
+                let error = WebAuthError(code: .unknown(unknown), cause: cause)
                 expect(error.localizedDescription) == message
             }
 

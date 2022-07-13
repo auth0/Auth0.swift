@@ -79,6 +79,20 @@ class ManagementErrorSpec: QuickSpec {
                 expect(error.statusCode) == statusCode
             }
 
+            it("should initialize with a cause") {
+                let cause = MockError()
+                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)"
+                let error = AuthenticationError(cause: cause)
+                expect(error.cause).toNot(beNil())
+                expect(error.localizedDescription) == description
+                expect(error.statusCode) == 0
+            }
+
+            it("should initialize with a cause & status code") {
+                let statusCode = 400
+                let error = AuthenticationError(cause: MockError(), statusCode: statusCode)
+                expect(error.statusCode) == statusCode
+            }
         }
 
         describe("operators") {
@@ -145,7 +159,7 @@ class ManagementErrorSpec: QuickSpec {
 
             it("should return the default message") {
                 let info: [String: Any] = ["foo": "bar", "statusCode": 0]
-                let message = "Failed with unknown error \(info)"
+                let message = "Failed with unknown error \(info)."
                 let error = ManagementError(info: info)
                 expect(error.localizedDescription) == message
             }

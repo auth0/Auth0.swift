@@ -43,7 +43,7 @@ public struct CredentialsManager {
     /// let user = credentialsManager.user
     /// ```
     ///
-    /// - Important: Access to this property will not be protected by Biometric authentication.
+    /// - Important: Access to this property will not be protected by biometric authentication.
     public var user: UserInfo? {
         guard let credentials = retrieveCredentials(),
               let jwt = try? decode(jwt: credentials.idToken) else { return nil }
@@ -52,7 +52,7 @@ public struct CredentialsManager {
     }
 
     #if WEB_AUTH_PLATFORM
-    /// Enables Biometric authentication for additional security during credentials retrieval.
+    /// Enables biometric authentication for additional security during credentials retrieval.
     ///
     /// ```
     /// credentialsManager.enableBiometrics(withTitle: "Touch to Login")
@@ -71,7 +71,7 @@ public struct CredentialsManager {
     ///   - cancelTitle:      Cancel message to display when Face ID or Touch ID is used.
     ///   - fallbackTitle:    Fallback message to display when Face ID or Touch ID is used after a failed match.
     ///   - evaluationPolicy: Policy to be used for authentication policy evaluation.
-    /// - Important: Access to the ``user`` property will not be protected by Biometric authentication.
+    /// - Important: Access to the ``user`` property will not be protected by biometric authentication.
     public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil, evaluationPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics) {
         self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
