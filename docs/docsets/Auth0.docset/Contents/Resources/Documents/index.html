@@ -20,9 +20,9 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Auth0 2.1.0 Docs
+          Auth0 2.2.0 Docs
         </a>
-         (98% documented)
+         (97% documented)
       </p>
     
       <div class="header-col--secondary">
@@ -239,14 +239,12 @@
             
             <h1 id='auth0-swift' class='heading'>Auth0.swift</h1>
 
-<p><a href="https://circleci.com/gh/auth0/Auth0.swift/tree/master"><img src="https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat-square" alt="CircleCI"></a>
-<a href="https://codecov.io/github/auth0/Auth0.swift"><img src="https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat-square" alt="Coverage Status"></a>
-<img src="https://img.shields.io/cocoapods/v/Auth0.svg?style=flat-square" alt="Version">
-<img src="https://img.shields.io/cocoapods/l/Auth0.svg?style=flat-square" alt="License">
-<img src="https://img.shields.io/cocoapods/p/Auth0.svg?style=flat-square" alt="Platform">
-<img src="https://img.shields.io/badge/Swift-5.5-orange.svg?style=flat-square" alt="Swift 5.5"></p>
+<p><a href="https://circleci.com/gh/auth0/Auth0.swift/tree/master"><img src="https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat" alt="CircleCI"></a>
+<img src="https://img.shields.io/cocoapods/v/Auth0.svg?style=flat" alt="Version">
+<a href="https://codecov.io/github/auth0/Auth0.swift"><img src="https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat" alt="Coverage Status"></a>
+<img src="https://img.shields.io/github/license/Auth0/Auth0.swift.svg?style=flat" alt="License"></p>
 
-<p>Swift SDK that lets you communicate efficiently with many of the <a href="https://auth0.com/docs/api">Auth0 API</a> endpoints and enables you to seamlessly integrate the Auth0 login.</p>
+<p>Easily integrate Auth0 into iOS, macOS, tvOS, and watchOS apps. Add <strong>login</strong> and <strong>logout</strong>, store <strong>credentials</strong> securely, and access <strong>user information</strong>.</p>
 
 <p><strong>Migrating from v1? Check the <a href="V2_MIGRATION_GUIDE.md">Migration Guide</a>.</strong></p>
 
@@ -343,7 +341,7 @@
 <h3 id='cocoapods' class='heading'>Cocoapods</h3>
 
 <p>Add the following line to your <code>Podfile</code>:</p>
-<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'~&gt; 2.1'</span>
+<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'~&gt; 2.2'</span>
 </code></pre>
 
 <p>Then, run <code>pod install</code>.</p>
@@ -354,7 +352,7 @@
 <h3 id='carthage' class='heading'>Carthage</h3>
 
 <p>Add the following line to your <code>Cartfile</code>:</p>
-<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" ~&gt; 2.1
+<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" ~&gt; 2.2
 </code></pre>
 
 <p>Then, run <code>carthage bootstrap --use-xcframeworks</code>.</p>
@@ -439,7 +437,7 @@ Auth0
 
 <p><img src="assets/url-scheme.png" alt="url-scheme"></p>
 
-<p>This registers your bundle identifer as a custom URL scheme, so the callback and logout URLs can reach your app.</p>
+<p>This registers your bundle identifier as a custom URL scheme, so the callback and logout URLs can reach your app.</p>
 <h3 id='web-auth-login-ios-macos' class='heading'>Web Auth Login (iOS / macOS)</h3>
 
 <p>Import the <code>Auth0</code> module in the file where you want to present the login page.</p>
@@ -827,7 +825,7 @@ credentialsManager
 </code></pre>
 
 <blockquote>
-<p>⚠️ Retrieving the user information with <code>credentialsManager.user</code> will not be protected by Biometric authentication.</p>
+<p>⚠️ Retrieving the user information with <code>credentialsManager.user</code> will not be protected by biometric authentication.</p>
 </blockquote>
 <h4 id='credentials-manager-errors' class='heading'>Credentials Manager errors</h4>
 
@@ -1255,7 +1253,7 @@ Auth0
 </blockquote>
 <h4 id='retrieve-user-metadata' class='heading'>Retrieve user metadata</h4>
 
-<p>To call this method, you need to request the <code>read:users</code> scope when logging in. You can get the user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the user&rsquo;s ID token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
+<p>To call this method, you need to request the <code>read:current_user</code> scope when logging in. You can get the user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the user&rsquo;s ID token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">get</span><span class="p">(</span><span class="s">"user id"</span><span class="p">,</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="s">"user_metadata"</span><span class="p">])</span>
@@ -1309,7 +1307,7 @@ Auth0
 </blockquote>
 <h4 id='update-user-metadata' class='heading'>Update user metadata</h4>
 
-<p>To call this method, you need to request either the <code>update:users</code> or the <code>update:users_app_metadata</code> scope when logging in. You can get the user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the user&rsquo;s ID token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
+<p>To call this method, you need to request the <code>update:current_user_metadata</code> scope when logging in. You can get the user ID value from the <code>sub</code> <a href="https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims">claim</a> of the user&rsquo;s ID token, or from the <code>sub</code> property of a <code><a href="Structs/UserInfo.html">UserInfo</a></code> instance.</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">users</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">accessToken</span><span class="p">)</span>
     <span class="o">.</span><span class="nf">patch</span><span class="p">(</span><span class="s">"user id"</span><span class="p">,</span> 
@@ -1784,7 +1782,7 @@ Auth0
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-05-26)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-07-13)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
