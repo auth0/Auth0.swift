@@ -108,15 +108,16 @@ class ManagementSpec: QuickSpec {
                     let response = Response<ManagementError>(data: nil, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveManagementError(description: "Empty response body", code: emptyBodyError, statusCode: statusCode))
+                    expect(actual).toEventually(haveManagementError(description: "Empty response body.", code: emptyBodyError, statusCode: statusCode))
                 }
 
                 it("should yield error with a cause") {
-                    let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+                    let cause = MockError()
+                    let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)"
                     let response = Response<ManagementError>(data: nil, response: nil, error: cause)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveManagementError(description: cause.localizedDescription, code: nonJSONError, cause: cause))
+                    expect(actual).toEventually(haveManagementError(description: description, code: nonJSONError, cause: cause))
                 }
 
             }

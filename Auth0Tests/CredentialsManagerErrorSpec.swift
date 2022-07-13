@@ -10,13 +10,13 @@ class CredentialsManagerErrorSpec: QuickSpec {
 
         describe("init") {
 
-            it("should initialize with type") {
+            it("should initialize with code") {
                 let error = CredentialsManagerError(code: .noCredentials)
                 expect(error.code) == CredentialsManagerError.Code.noCredentials
                 expect(error.cause).to(beNil())
             }
 
-            it("should initialize with type & cause") {
+            it("should initialize with code & cause") {
                 let cause = AuthenticationError(description: "")
                 let error = CredentialsManagerError(code: .noCredentials, cause: cause)
                 expect(error.cause).to(matchError(cause))
@@ -92,22 +92,19 @@ class CredentialsManagerErrorSpec: QuickSpec {
             }
 
             it("should return message for renew failed") {
-                let message = "The credentials renewal failed. See the underlying 'AuthenticationError' value"
-                + " available in the 'cause' property."
+                let message = "The credentials renewal failed."
                 let error = CredentialsManagerError(code: .renewFailed)
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for biometrics failed") {
-                let message = "The Biometric authentication failed. See the underlying 'LAError' value"
-                + " available in the 'cause' property."
+                let message = "The biometric authentication failed."
                 let error = CredentialsManagerError(code: .biometricsFailed)
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for revoke failed") {
-                let message = "The revocation of the refresh token failed. See the underlying 'AuthenticationError'"
-                + " value available in the 'cause' property."
+                let message = "The revocation of the refresh token failed."
                 let error = CredentialsManagerError(code: .revokeFailed)
                 expect(error.localizedDescription) == message
             }
@@ -119,6 +116,13 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 + " lifetime of the renewed access token (\(lifetime)s). Request a lower minTTL or increase the"
                 + " 'Token Expiration' value in the settings page of your Auth0 API."
                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: lifetime))
+                expect(error.localizedDescription) == message
+            }
+
+            it("should append the cause error message") {
+                let cause = MockError()
+                let message = "The revocation of the refresh token failed. CAUSE: \(cause.localizedDescription)"
+                let error = CredentialsManagerError(code: .revokeFailed, cause: cause)
                 expect(error.localizedDescription) == message
             }
 

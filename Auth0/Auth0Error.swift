@@ -38,6 +38,14 @@ public extension Auth0Error {
      */
     var errorDescription: String? { return self.debugDescription }
 
+    func appendCause(to errorMessage: String) -> String {
+        guard let cause = self.cause else {
+            return errorMessage
+        }
+
+        let separator = errorMessage.hasSuffix(".") ? "" : "."
+        return "\(errorMessage)\(separator) CAUSE: \(String(describing: cause))"
+    }
 }
 
 /**
@@ -82,7 +90,7 @@ extension Auth0APIError {
     init(cause error: Error, statusCode: Int = 0) {
         let info: [String: Any] = [
             "code": nonJSONError,
-            "description": error.localizedDescription,
+            "description": "Unable to complete the operation.",
             "cause": error
         ]
         self.init(info: info, statusCode: statusCode)
@@ -91,7 +99,7 @@ extension Auth0APIError {
     init(description: String?, statusCode: Int = 0) {
         let info: [String: Any] = [
             "code": description != nil ? nonJSONError : emptyBodyError,
-            "description": description ?? "Empty response body"
+            "description": description ?? "Empty response body."
         ]
         self.init(info: info, statusCode: statusCode)
     }

@@ -35,22 +35,7 @@ public struct WebAuthError: Auth0Error {
      - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
      */
     public var debugDescription: String {
-        switch self.code {
-        case .noBundleIdentifier: return "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
-            + " or it could not be used to build a valid URL."
-        case .invalidInvitationURL(let url): return "The invitation URL (\(url)) is missing the 'invitation' and/or"
-            + " the 'organization' query parameters."
-        case .userCancelled: return "The user cancelled the Web Auth operation."
-        case .pkceNotAllowed: return "Unable to perform authentication with PKCE."
-            + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
-            + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
-        case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
-            + " query parameters (\(values))."
-        case .idTokenValidationFailed: return "The ID token validation performed after authentication failed."
-            + " See the underlying 'Error' value available in the 'cause' property."
-        case .other: return "An unexpected error occurred. See the underlying 'Error' value available in the 'cause' property."
-        case .unknown(let message): return message
-        }
+        self.appendCause(to: self.message)
     }
 
     // MARK: - Error Cases
@@ -82,6 +67,30 @@ public struct WebAuthError: Auth0Error {
     /// An unexpected error occurred, but an `Error` value is not available.
     /// This error does not include a ``cause``.
     public static let unknown: WebAuthError = .init(code: .unknown(""))
+
+}
+
+// MARK: - Error Messages
+
+extension WebAuthError {
+
+    var message: String {
+        switch self.code {
+        case .noBundleIdentifier: return "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
+            + " or it could not be used to build a valid URL."
+        case .invalidInvitationURL(let url): return "The invitation URL (\(url)) is missing the 'invitation' and/or"
+            + " the 'organization' query parameters."
+        case .userCancelled: return "The user cancelled the Web Auth operation."
+        case .pkceNotAllowed: return "Unable to perform authentication with PKCE."
+            + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
+            + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
+        case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
+            + " query parameters (\(values))."
+        case .idTokenValidationFailed: return "The ID token validation performed after authentication failed."
+        case .other: return "An unexpected error occurred."
+        case .unknown(let message): return message
+        }
+    }
 
 }
 

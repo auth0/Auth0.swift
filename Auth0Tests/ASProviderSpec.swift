@@ -57,14 +57,6 @@ class ASProviderSpec: QuickSpec {
                 }
             }
 
-            if #available(iOS 13.4, macOS 10.15.4,  *) {
-                it("should start the web authentication session") {
-                    expect(session.canStart) == true
-                    userAgent.start()
-                    expect(session.canStart) == false
-                }
-            }
-
             it("should call the callback with an error") {
                 waitUntil(timeout: Timeout) { done in
                     let userAgent = ASUserAgent(session: session, callback: { result in

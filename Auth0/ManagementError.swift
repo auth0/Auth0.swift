@@ -51,10 +51,20 @@ public struct ManagementError: Auth0APIError {
      - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
      */
     public var debugDescription: String {
+        self.appendCause(to: self.message)
+    }
+
+}
+
+// MARK: - Error Messages
+
+extension ManagementError {
+
+    var message: String {
         if let string = self.info["description"] as? String {
             return string
         }
-        return "Failed with unknown error \(self.info)"
+        return "Failed with unknown error \(self.info)."
     }
 
 }

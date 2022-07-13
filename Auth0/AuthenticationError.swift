@@ -54,16 +54,7 @@ public struct AuthenticationError: Auth0APIError {
      - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
      */
     public var debugDescription: String {
-        let description = self.info["description"] ?? self.info["error_description"]
-
-        if let string = description as? String {
-            return string
-        }
-        if self.code == unknownError {
-            return "Failed with unknown error \(self.info)"
-        }
-
-        return "Received error with code \(self.code)"
+        self.appendCause(to: self.message)
     }
 
     // MARK: - Error Types
@@ -175,6 +166,25 @@ public struct AuthenticationError: Auth0APIError {
         ]
         return networkErrorCodes.contains(code)
     }
+}
+
+// MARK: - Error Messages
+
+extension AuthenticationError {
+
+    var message: String {
+        let description = self.info["description"] ?? self.info["error_description"]
+
+        if let string = description as? String {
+            return string
+        }
+        if self.code == unknownError {
+            return "Failed with unknown error \(self.info)."
+        }
+
+        return "Received error with code \(self.code)."
+    }
+
 }
 
 // MARK: - Equatable
