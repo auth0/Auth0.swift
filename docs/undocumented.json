@@ -1,34 +1,6 @@
 {
   "warnings": [
     {
-      "file": "/Users/rita/Code/Auth0.swift/Auth0/Auth0Error.swift",
-      "line": 41,
-      "symbol": "Auth0Error.appendCause(to:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/rita/Code/Auth0.swift/Auth0/Auth0Error.swift",
-      "line": 41,
-      "symbol": "Auth0Error.appendCause(to:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/rita/Code/Auth0.swift/Auth0/Auth0Error.swift",
-      "line": 41,
-      "symbol": "Auth0Error.appendCause(to:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/rita/Code/Auth0.swift/Auth0/Auth0Error.swift",
-      "line": 41,
-      "symbol": "Auth0Error.appendCause(to:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
       "line": 241,
       "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:callback:)",
