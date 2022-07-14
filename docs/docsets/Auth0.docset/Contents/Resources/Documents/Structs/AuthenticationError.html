@@ -21,7 +21,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Auth0 2.1.0 Docs
+          Auth0 2.2.0 Docs
         </a>
          (98% documented)
       </p>
@@ -803,6 +803,100 @@ The message returned by the rule is available in <code>localizedDescription</cod
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth019AuthenticationErrorV16isPasswordLeakedSbvp"></a>
+                    <a name="//apple_ref/swift/Property/isPasswordLeaked" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth019AuthenticationErrorV16isPasswordLeakedSbvp">isPasswordLeaked</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>When the password used was reported to be leaked.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">isPasswordLeaked</span><span class="p">:</span> <span class="kt">Bool</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth019AuthenticationErrorV15isLoginRequiredSbvp"></a>
+                    <a name="//apple_ref/swift/Property/isLoginRequired" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth019AuthenticationErrorV15isLoginRequiredSbvp">isLoginRequired</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>When performing Web Auth login with <code>prompt: &quot;none&quot;</code> and the Auth0 session has expired.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">isLoginRequired</span><span class="p">:</span> <span class="kt">Bool</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Auth019AuthenticationErrorV09isNetworkC0Sbvp"></a>
+                    <a name="//apple_ref/swift/Property/isNetworkError" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Auth019AuthenticationErrorV09isNetworkC0Sbvp">isNetworkError</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>When the request failed due to network issues.</p>
+
+<p>Returns <code>true</code> when the <code>URLError</code> code is one of the following:</p>
+
+<ul>
+<li><a href="https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet">notConnectedToInternet</a></li>
+<li><a href="https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost">networkConnectionLost</a></li>
+<li><a href="https://developer.apple.com/documentation/foundation/urlerror/2293434-dnslookupfailed">dnsLookupFailed</a></li>
+<li><a href="https://developer.apple.com/documentation/foundation/urlerror/2293460-cannotfindhost">cannotFindHost</a></li>
+<li><a href="https://developer.apple.com/documentation/foundation/urlerror/2293028-cannotconnecttohost">cannotConnectToHost</a></li>
+<li><a href="https://developer.apple.com/documentation/foundation/urlerror/2293002-timedout">timedOut</a></li>
+<li><a href="https://developer.apple.com/documentation/foundation/urlerror/2292893-internationalroamingoff">internationalRoamingOff</a></li>
+<li><a href="https://developer.apple.com/documentation/foundation/urlerror/2293147-callisactive">callIsActive</a></li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">isNetworkError</span><span class="p">:</span> <span class="kt">Bool</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
             <div class="task-group">
@@ -851,7 +945,7 @@ The message returned by the rule is available in <code>localizedDescription</cod
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-05-26)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-07-14)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
