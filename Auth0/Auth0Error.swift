@@ -38,6 +38,10 @@ public extension Auth0Error {
      */
     var errorDescription: String? { return self.debugDescription }
 
+}
+
+extension Auth0Error {
+
     func appendCause(to errorMessage: String) -> String {
         guard let cause = self.cause else {
             return errorMessage
@@ -46,6 +50,7 @@ public extension Auth0Error {
         let separator = errorMessage.hasSuffix(".") ? "" : "."
         return "\(errorMessage)\(separator) CAUSE: \(String(describing: cause))"
     }
+
 }
 
 /**
