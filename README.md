@@ -521,7 +521,7 @@ When the users open your app, check for valid credentials. If they exist, you ca
 guard credentialsManager.hasValid() else {
     // No valid credentials exist, present the login page
 }
-// Retrieve the credentials and redirect to the main flow
+// Retrieve the credentials
 ```
 
 #### Retrieve stored credentials 
