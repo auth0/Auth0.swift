@@ -485,12 +485,14 @@ Auth0
 
 Web Auth will only produce `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
+> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html#/Error%20Cases) instead, which are part of the API.
+
 ### Credentials Manager (iOS / macOS / tvOS / watchOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)**
 
 - [Store credentials](#store-credentials)
-- [Check the validity of stored credentials](#check-the-validity-of-stored-credentials)
+- [Check for stored credentials](#check-for-stored-credentials)
 - [Retrieve stored credentials](#retrieve-stored-credentials)
 - [Retrieve stored user information](#retrieve-stored-user-information)
 - [Clear stored credentials](#clear-stored-credentials)
@@ -511,7 +513,7 @@ When your users log in, store their credentials securely in the Keychain. You ca
 let didStore = credentialsManager.store(credentials: credentials)
 ```
 
-#### Check the validity of stored credentials
+#### Check for stored credentials
 
 When the users open your app, check for valid credentials. If they exist, you can retrieve them and redirect the users to the app's main flow without any additional login steps.
 
@@ -519,7 +521,7 @@ When the users open your app, check for valid credentials. If they exist, you ca
 guard credentialsManager.hasValid() else {
     // No valid credentials exist, present the login page
 }
-// Retrieve stored credentials
+// Retrieve the credentials and redirect to the main flow
 ```
 
 #### Retrieve stored credentials 
@@ -609,6 +611,8 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
 #### Credentials Manager errors
 
 The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
+
+> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html#/Error%20Cases) instead, which are part of the API.
 
 ### Authentication API (iOS / macOS / tvOS / watchOS)
 
@@ -1019,6 +1023,8 @@ Auth0
 #### Authentication API client errors
 
 The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html) to learn more about the available `AuthenticationError` properties.
+
+> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the [error types](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html#/Error%20Types) instead, which are part of the API.
 
 ### Management API (Users) (iOS / macOS / tvOS / watchOS)
 
