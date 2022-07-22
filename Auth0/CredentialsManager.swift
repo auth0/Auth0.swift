@@ -155,22 +155,39 @@ public struct CredentialsManager {
     }
 
     /// Checks that there are credentials stored, and that the access token has not expired and will not expire within
-    /// the specified TTL.
+    /// the specified TTL. If you are not using refresh tokens, use this method instead of ``canRenew()`` to
+    /// check for stored credentials when your app starts up.
     ///
     /// ```
     /// guard credentialsManager.hasValid() else {
     ///     // No valid credentials exist, present the login page
     /// }
-    /// // Retrieve stored credentials
+    /// // Retrieve the stored credentials
     /// ```
     ///
     /// - Parameter minTTL: Minimum lifetime in seconds the access token must have left. Defaults to `0`.
     /// - Returns: If there are credentials stored containing an access token that is neither expired or about to expire.
     /// - See: ``Credentials/expiresIn``
     public func hasValid(minTTL: Int = 0) -> Bool {
-        guard let data = self.storage.getEntry(forKey: self.storeKey),
-            let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data) else { return false }
+        guard let credentials = self.retrieveCredentials() else { return false }
         return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
+    }
+
+    /// Checks that there are credentials stored, and that the credentials contain a refresh token. If you are using
+    /// refresh tokens, use this method instead of ``hasValid(minTTL:)`` to check for stored credentials when your app
+    /// starts up.
+    ///
+    /// ```
+    /// guard credentialsManager.canRenew() else {
+    ///     // No renewable credentials exist, present the login page
+    /// }
+    /// // Retrieve the stored credentials
+    /// ```
+    ///
+    /// - Returns: If there are credentials stored containing a refresh token.
+    public func canRenew() -> Bool {
+        guard let credentials = self.retrieveCredentials() else { return false }
+        return credentials.refreshToken != nil
     }
 
     #if WEB_AUTH_PLATFORM
@@ -244,10 +261,8 @@ public struct CredentialsManager {
     #endif
 
     private func retrieveCredentials() -> Credentials? {
-        guard let data = self.storage.getEntry(forKey: self.storeKey),
-              let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data) else { return nil }
-
-        return credentials
+        guard let data = self.storage.getEntry(forKey: self.storeKey) else { return nil }
+        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any], headers: [String: String], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {

@@ -113,7 +113,7 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 extension SafariUserAgent: SFSafariViewControllerDelegate {
 
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        // If you're developing a custom Web Auth provider, call WebAuthentication.cancel() instead
+        // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead
         // TransactionStore is internal
         TransactionStore.shared.cancel()
     }

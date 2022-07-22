@@ -281,7 +281,7 @@ class CredentialsManagerSpec: QuickSpec {
                 expect(credentialsManager.hasValid()).to(beTrue())
             }
 
-            it("should not have valid credentials when keychain empty") {
+            it("should not have valid credentials when keychain is empty") {
                 expect(credentialsManager.hasValid()).to(beFalse())
             }
 
@@ -331,6 +331,29 @@ class CredentialsManagerSpec: QuickSpec {
             it("should be expired when expiry of at is - 1 hour") {
                 let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 expect(credentialsManager.hasExpired(credentials)).to(beTrue())
+            }
+
+        }
+
+        describe("renewability") {
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should have renewable credentials when stored and have a refresh token") {
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.canRenew()).to(beTrue())
+            }
+
+            it("should not have renewable credentials when keychain is empty") {
+                expect(credentialsManager.canRenew()).to(beFalse())
+            }
+
+            it("should not have renewable credentials without a refresh token") {
+                let credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil)
+                expect(credentialsManager.store(credentials: credentials)).to(beTrue())
+                expect(credentialsManager.canRenew()).to(beFalse())
             }
 
         }
