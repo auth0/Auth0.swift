@@ -293,14 +293,18 @@ extension Auth0WebAuth {
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func start() async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            self.start(continuation.resume)
+            DispatchQueue.main.async {
+                self.start(continuation.resume)
+            }
         }
     }
     #else
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
     func start() async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            self.start(continuation.resume)
+            DispatchQueue.main.async {
+                self.start(continuation.resume)
+            }
         }
     }
     #endif
@@ -309,8 +313,10 @@ extension Auth0WebAuth {
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            self.clearSession(federated: federated) { result in
-                continuation.resume(with: result)
+            DispatchQueue.main.async {
+                self.clearSession(federated: federated) { result in
+                    continuation.resume(with: result)
+                }
             }
         }
     }
@@ -318,8 +324,10 @@ extension Auth0WebAuth {
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
     func clearSession(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            self.clearSession(federated: federated) { result in
-                continuation.resume(with: result)
+            DispatchQueue.main.async {
+                self.clearSession(federated: federated) { result in
+                    continuation.resume(with: result)
+                }
             }
         }
     }
