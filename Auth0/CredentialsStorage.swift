@@ -51,6 +51,10 @@ extension SimpleKeychain: CredentialsStorage {
         }
     }
 
+    /// Deletes a storage entry.
+    ///
+    /// - Parameter key: The key to delete from the Keychain.
+    /// - Returns: If the data was deleted.
     public func deleteEntry(forKey key: String) -> Bool {
         do {
             try self.deleteItem(forKey: key)
