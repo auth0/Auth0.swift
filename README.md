@@ -59,7 +59,7 @@ Easily integrate Auth0 into iOS, macOS, tvOS, and watchOS apps. Add **login** an
 ## Requirements
 
 - iOS 12+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+
-- Xcode 12.x / 13.x
+- Xcode 13.x / 14.x
 - Swift 5.3+
 
 > ⚠️ Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
@@ -515,7 +515,20 @@ let didStore = credentialsManager.store(credentials: credentials)
 
 #### Check for stored credentials
 
-When the users open your app, check for valid credentials. If they exist, you can retrieve them and redirect the users to the app's main flow without any additional login steps.
+When the users open your app, check for stored credentials. If they exist, you can retrieve them and redirect the users to the app's main flow without any additional login steps.
+
+##### If you are using refresh tokens
+
+```swift
+guard credentialsManager.canRenew() else {
+    // No renewable credentials exist, present the login page
+}
+// Retrieve the stored credentials
+```
+
+> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0.
+
+##### If you are not using refresh tokens
 
 ```swift
 guard credentialsManager.hasValid() else {
@@ -606,7 +619,7 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
                                     evaluationPolicy: .deviceOwnerAuthentication)
 ```
 
-> ⚠️ Retrieving the user information with `credentialsManager.user` will not be protected by Biometric authentication.
+> ⚠️ Retrieving the user information with `credentialsManager.user` will not be protected by biometric authentication.
 
 #### Credentials Manager errors
 
@@ -1040,7 +1053,7 @@ You can request more information from a user's profile and manage the user's met
 
 To call the Management API, you need an access token that has the API Identifier of the Management API as a target [audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience) value. Specify `https://YOUR_AUTH0_DOMAIN/api/v2/` as the audience when logging in to achieve this. 
 
-For example, if you're using Web Auth:
+For example, if you are using Web Auth:
 
 ```swift
 Auth0

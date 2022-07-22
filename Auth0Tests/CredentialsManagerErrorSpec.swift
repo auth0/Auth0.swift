@@ -97,6 +97,12 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for store failed") {
+                let message = "Storing the renewed credentials failed."
+                let error = CredentialsManagerError(code: .storeFailed)
+                expect(error.localizedDescription) == message
+            }
+
             it("should return message for biometrics failed") {
                 let message = "The biometric authentication failed."
                 let error = CredentialsManagerError(code: .biometricsFailed)

@@ -29,8 +29,8 @@ public struct CredentialsManager {
     /// - Parameters:
     ///   - authentication: Auth0 Authentication API client.
     ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to 'credentials'.
-    ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `A0SimpleKeychain` instance.
-    public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = A0SimpleKeychain()) {
+    ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `SimpleKeychain` instance.
+    public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = SimpleKeychain()) {
         self.storeKey = storeKey
         self.authentication = authentication
         self.storage = storage
@@ -89,6 +89,7 @@ public struct CredentialsManager {
         guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true) else {
             return false
         }
+
         return self.storage.setEntry(data, forKey: storeKey)
     }
 
@@ -155,22 +156,39 @@ public struct CredentialsManager {
     }
 
     /// Checks that there are credentials stored, and that the access token has not expired and will not expire within
-    /// the specified TTL.
+    /// the specified TTL. If you are not using refresh tokens, use this method instead of ``canRenew()`` to
+    /// check for stored credentials when your app starts up.
     ///
     /// ```
     /// guard credentialsManager.hasValid() else {
     ///     // No valid credentials exist, present the login page
     /// }
-    /// // Retrieve stored credentials
+    /// // Retrieve the stored credentials
     /// ```
     ///
     /// - Parameter minTTL: Minimum lifetime in seconds the access token must have left. Defaults to `0`.
     /// - Returns: If there are credentials stored containing an access token that is neither expired or about to expire.
     /// - See: ``Credentials/expiresIn``
     public func hasValid(minTTL: Int = 0) -> Bool {
-        guard let data = self.storage.getEntry(forKey: self.storeKey),
-            let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data) else { return false }
+        guard let credentials = self.retrieveCredentials() else { return false }
         return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
+    }
+
+    /// Checks that there are credentials stored, and that the credentials contain a refresh token. If you are using
+    /// refresh tokens, use this method instead of ``hasValid(minTTL:)`` to check for stored credentials when your app
+    /// starts up.
+    ///
+    /// ```
+    /// guard credentialsManager.canRenew() else {
+    ///     // No renewable credentials exist, present the login page
+    /// }
+    /// // Retrieve the stored credentials
+    /// ```
+    ///
+    /// - Returns: If there are credentials stored containing a refresh token.
+    public func canRenew() -> Bool {
+        guard let credentials = self.retrieveCredentials() else { return false }
+        return credentials.refreshToken != nil
     }
 
     #if WEB_AUTH_PLATFORM
@@ -227,10 +245,12 @@ public struct CredentialsManager {
                                                     cause: LAError(LAError.biometryNotAvailable))
                 return callback(.failure(error))
             }
+
             bioAuth.validateBiometric {
                 guard $0 == nil else {
                     return callback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: $0!)))
                 }
+
                 self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
             }
         } else {
@@ -244,12 +264,11 @@ public struct CredentialsManager {
     #endif
 
     private func retrieveCredentials() -> Credentials? {
-        guard let data = self.storage.getEntry(forKey: self.storeKey),
-              let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data) else { return nil }
-
-        return credentials
+        guard let data = self.storage.getEntry(forKey: self.storeKey) else { return nil }
+        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
+    // swiftlint:disable:next function_body_length
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any], headers: [String: String], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.dispatchQueue.async {
             self.dispatchGroup.enter()
@@ -269,6 +288,7 @@ public struct CredentialsManager {
                     self.dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
+
                 self.authentication
                     .renew(withRefreshToken: refreshToken, scope: scope)
                     .parameters(parameters)
@@ -287,8 +307,10 @@ public struct CredentialsManager {
                                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
                                 self.dispatchGroup.leave()
                                 callback(.failure(error))
+                            } else if !self.store(credentials: newCredentials) {
+                                self.dispatchGroup.leave()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
-                                _ = self.store(credentials: newCredentials)
                                 self.dispatchGroup.leave()
                                 callback(.success(newCredentials))
                             }
