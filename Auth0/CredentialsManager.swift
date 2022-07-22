@@ -29,8 +29,8 @@ public struct CredentialsManager {
     /// - Parameters:
     ///   - authentication: Auth0 Authentication API client.
     ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to 'credentials'.
-    ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `A0SimpleKeychain` instance.
-    public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = A0SimpleKeychain()) {
+    ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `SimpleKeychain` instance.
+    public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = SimpleKeychain()) {
         self.storeKey = storeKey
         self.authentication = authentication
         self.storage = storage
@@ -89,6 +89,7 @@ public struct CredentialsManager {
         guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true) else {
             return false
         }
+
         return self.storage.setEntry(data, forKey: storeKey)
     }
 
@@ -244,10 +245,12 @@ public struct CredentialsManager {
                                                     cause: LAError(LAError.biometryNotAvailable))
                 return callback(.failure(error))
             }
+
             bioAuth.validateBiometric {
                 guard $0 == nil else {
                     return callback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: $0!)))
                 }
+
                 self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
             }
         } else {
@@ -265,6 +268,7 @@ public struct CredentialsManager {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
+    // swiftlint:disable:next function_body_length
     private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any], headers: [String: String], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.dispatchQueue.async {
             self.dispatchGroup.enter()
@@ -284,6 +288,7 @@ public struct CredentialsManager {
                     self.dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
+
                 self.authentication
                     .renew(withRefreshToken: refreshToken, scope: scope)
                     .parameters(parameters)
@@ -302,8 +307,10 @@ public struct CredentialsManager {
                                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
                                 self.dispatchGroup.leave()
                                 callback(.failure(error))
+                            } else if !self.store(credentials: newCredentials) {
+                                self.dispatchGroup.leave()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
-                                _ = self.store(credentials: newCredentials)
                                 self.dispatchGroup.leave()
                                 callback(.success(newCredentials))
                             }

@@ -59,7 +59,7 @@ Easily integrate Auth0 into iOS, macOS, tvOS, and watchOS apps. Add **login** an
 ## Requirements
 
 - iOS 12+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+
-- Xcode 12.x / 13.x
+- Xcode 13.x / 14.x
 - Swift 5.3+
 
 > ⚠️ Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.

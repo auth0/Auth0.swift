@@ -541,7 +541,36 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
-                it("request should include custom parameters on renew") {
+                it("should yield error on failed store") {
+                    class MockStore: CredentialsStorage {
+                        func getEntry(forKey: String) -> Data? {
+                            let credentials = Credentials(accessToken: AccessToken,
+                                                          tokenType: TokenType,
+                                                          idToken: IdToken,
+                                                          refreshToken: RefreshToken,
+                                                          expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                            let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
+                                                                         requiringSecureCoding: true)
+                            return data
+                        }
+                        func setEntry(_ data: Data, forKey: String) -> Bool {
+                            return false
+                        }
+                        func deleteEntry(forKey: String) -> Bool {
+                            return true
+                        }
+                    }
+
+                    credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.credentials { result in
+                            expect(result).to(haveCredentialsManagerError(.storeFailed))
+                            done()
+                        }
+                    }
+                }
+
+                it("renew request should include custom parameters") {
                     let someId = UUID().uuidString
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])) {
                         _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
@@ -556,7 +585,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
-                it("should include custom headers") {
+                it("renew request should include custom headers") {
                     let key = "foo"
                     let value = "bar"
                     stub(condition: hasHeader(key, value: value)) {
@@ -745,7 +774,8 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             context("custom keychain") {
-                let storage = A0SimpleKeychain(service: "test_service")
+                let storage = SimpleKeychain(service: "test_service")
+
                 beforeEach {
                     credentialsManager = CredentialsManager(authentication: authentication,
                                                             storage: storage)
@@ -753,9 +783,9 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("custom keychain should successfully set and clear credentials") {
                     _ = credentialsManager.store(credentials: credentials)
-                    expect(storage.data(forKey: "credentials")).toNot(beNil())
+                    expect { try storage.data(forKey: "credentials") }.toNot(beNil())
                     _ = credentialsManager.clear()
-                    expect(storage.data(forKey: "credentials")).to(beNil())
+                    expect { try storage.data(forKey: "credentials") }.to(throwError(SimpleKeychainError.itemNotFound))
                 }
             }
         }
