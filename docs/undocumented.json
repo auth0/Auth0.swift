@@ -2,70 +2,70 @@
   "warnings": [
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 241,
+      "line": 261,
       "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:callback:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 241,
+      "line": 261,
       "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:callback:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 479,
+      "line": 501,
       "symbol": "CredentialsManager.revoke(headers:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 479,
+      "line": 501,
       "symbol": "CredentialsManager.revoke(headers:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 479,
+      "line": 501,
       "symbol": "CredentialsManager.revoke(headers:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 479,
+      "line": 501,
       "symbol": "CredentialsManager.revoke(headers:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 540,
+      "line": 562,
       "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 540,
+      "line": 562,
       "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 540,
+      "line": 562,
       "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/rita/Code/Auth0.swift/Auth0/CredentialsManager.swift",
-      "line": 540,
+      "line": 562,
       "symbol": "CredentialsManager.credentials(withScope:minTTL:parameters:headers:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"

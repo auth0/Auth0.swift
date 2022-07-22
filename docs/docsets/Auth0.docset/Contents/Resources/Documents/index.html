@@ -20,7 +20,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Auth0 2.2.0 Docs
+          Auth0 2.3.0 Docs
         </a>
          (98% documented)
       </p>
@@ -80,13 +80,13 @@
             <a class="nav-group-name-link" href="Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Extensions/A0SimpleKeychain.html">A0SimpleKeychain</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Extensions.html#/SafariUserAgent">SafariUserAgent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/SimpleKeychain.html">SimpleKeychain</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Extensions/String.html">String</a>
@@ -315,7 +315,7 @@
 
 <ul>
 <li>iOS 12+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+</li>
-<li>Xcode 12.x / 13.x</li>
+<li>Xcode 13.x / 14.x</li>
 <li>Swift 5.3+</li>
 </ul>
 
@@ -341,7 +341,7 @@
 <h3 id='cocoapods' class='heading'>Cocoapods</h3>
 
 <p>Add the following line to your <code>Podfile</code>:</p>
-<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'~&gt; 2.2'</span>
+<pre class="highlight ruby"><code><span class="n">pod</span> <span class="s1">'Auth0'</span><span class="p">,</span> <span class="s1">'~&gt; 2.3'</span>
 </code></pre>
 
 <p>Then, run <code>pod install</code>.</p>
@@ -352,7 +352,7 @@
 <h3 id='carthage' class='heading'>Carthage</h3>
 
 <p>Add the following line to your <code>Cartfile</code>:</p>
-<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" ~&gt; 2.2
+<pre class="highlight plaintext"><code>github "auth0/Auth0.swift" ~&gt; 2.3
 </code></pre>
 
 <p>Then, run <code>carthage bootstrap --use-xcframeworks</code>.</p>
@@ -719,13 +719,17 @@ Auth0
 <h4 id='web-auth-errors' class='heading'>Web Auth errors</h4>
 
 <p>Web Auth will only produce <code><a href="Structs/WebAuthError.html">WebAuthError</a></code> error values. You can find the underlying error (if any) in the <code>cause: Error?</code> property of the <code><a href="Structs/WebAuthError.html">WebAuthError</a></code>. Not all error cases will have an underlying <code>cause</code>. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html">API documentation</a> to learn more about the error cases you need to handle, and which ones include a <code>cause</code> value.</p>
+
+<blockquote>
+<p>⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the <a href="https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html#/Error%20Cases">error cases</a> instead, which are part of the API.</p>
+</blockquote>
 <h3 id='credentials-manager-ios-macos-tvos-watchos' class='heading'>Credentials Manager (iOS / macOS / tvOS / watchOS)</h3>
 
 <p><strong>See all the available features in the <a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html">API documentation ↗</a></strong></p>
 
 <ul>
 <li><a href="#store-credentials">Store credentials</a></li>
-<li><a href="#check-the-validity-of-stored-credentials">Check the validity of stored credentials</a></li>
+<li><a href="#check-for-stored-credentials">Check for stored credentials</a></li>
 <li><a href="#retrieve-stored-credentials">Retrieve stored credentials</a></li>
 <li><a href="#retrieve-stored-user-information">Retrieve stored user information</a></li>
 <li><a href="#clear-stored-credentials">Clear stored credentials</a></li>
@@ -741,13 +745,24 @@ Auth0
 <p>When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your app again.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">didStore</span> <span class="o">=</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">credentials</span><span class="p">:</span> <span class="n">credentials</span><span class="p">)</span>
 </code></pre>
-<h4 id='check-the-validity-of-stored-credentials' class='heading'>Check the validity of stored credentials</h4>
+<h4 id='check-for-stored-credentials' class='heading'>Check for stored credentials</h4>
 
-<p>When the users open your app, check for valid credentials. If they exist, you can retrieve them and redirect the users to the app&rsquo;s main flow without any additional login steps.</p>
+<p>When the users open your app, check for stored credentials. If they exist, you can retrieve them and redirect the users to the app&rsquo;s main flow without any additional login steps.</p>
+<h5 id='if-you-are-using-refresh-tokens' class='heading'>If you are using refresh tokens</h5>
+<pre class="highlight swift"><code><span class="k">guard</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="nf">canRenew</span><span class="p">()</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// No renewable credentials exist, present the login page</span>
+<span class="p">}</span>
+<span class="c1">// Retrieve the stored credentials</span>
+</code></pre>
+
+<blockquote>
+<p>💡 You need to request the <code>offline_access</code> <a href="https://auth0.com/docs/get-started/apis/scopes">scope</a> when logging in to get a refresh token from Auth0.</p>
+</blockquote>
+<h5 id='if-you-are-not-using-refresh-tokens' class='heading'>If you are not using refresh tokens</h5>
 <pre class="highlight swift"><code><span class="k">guard</span> <span class="n">credentialsManager</span><span class="o">.</span><span class="nf">hasValid</span><span class="p">()</span> <span class="k">else</span> <span class="p">{</span>
     <span class="c1">// No valid credentials exist, present the login page</span>
 <span class="p">}</span>
-<span class="c1">// Retrieve stored credentials</span>
+<span class="c1">// Retrieve the stored credentials</span>
 </code></pre>
 <h4 id='retrieve-stored-credentials' class='heading'>Retrieve stored credentials</h4>
 
@@ -825,11 +840,15 @@ credentialsManager
 </code></pre>
 
 <blockquote>
-<p>⚠️ Retrieving the user information with <code>credentialsManager.user</code> will not be protected by Biometric authentication.</p>
+<p>⚠️ Retrieving the user information with <code>credentialsManager.user</code> will not be protected by biometric authentication.</p>
 </blockquote>
 <h4 id='credentials-manager-errors' class='heading'>Credentials Manager errors</h4>
 
 <p>The Credentials Manager will only produce <code><a href="Structs/CredentialsManagerError.html">CredentialsManagerError</a></code> error values. You can find the underlying error (if any) in the <code>cause: Error?</code> property of the <code><a href="Structs/CredentialsManagerError.html">CredentialsManagerError</a></code>. Not all error cases will have an underlying <code>cause</code>. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html">API documentation</a> to learn more about the error cases you need to handle, and which ones include a <code>cause</code> value.</p>
+
+<blockquote>
+<p>⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the <a href="https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html#/Error%20Cases">error cases</a> instead, which are part of the API.</p>
+</blockquote>
 <h3 id='authentication-api-ios-macos-tvos-watchos' class='heading'>Authentication API (iOS / macOS / tvOS / watchOS)</h3>
 
 <p><strong>See all the available features in the <a href="https://auth0.github.io/Auth0.swift/Protocols/Authentication.html">API documentation ↗</a></strong></p>
@@ -1223,6 +1242,10 @@ Auth0
 <h4 id='authentication-api-client-errors' class='heading'>Authentication API client errors</h4>
 
 <p>The Authentication API client will only produce <code><a href="Structs/AuthenticationError.html">AuthenticationError</a></code> error values. You can find the error information in the <code>info</code> dictionary of the error value. Check the <a href="https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html">API documentation</a> to learn more about the available <code><a href="Structs/AuthenticationError.html">AuthenticationError</a></code> properties.</p>
+
+<blockquote>
+<p>⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the <a href="https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html#/Error%20Types">error types</a> instead, which are part of the API.</p>
+</blockquote>
 <h3 id='management-api-users-ios-macos-tvos-watchos' class='heading'>Management API (Users) (iOS / macOS / tvOS / watchOS)</h3>
 
 <p><strong>See all the available features in the <a href="https://auth0.github.io/Auth0.swift/Protocols/Users.html">API documentation ↗</a></strong></p>
@@ -1239,7 +1262,7 @@ Auth0
 
 <p>To call the Management API, you need an access token that has the API Identifier of the Management API as a target <a href="https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience">audience</a> value. Specify <code>https://YOUR_AUTH0_DOMAIN/api/v2/</code> as the audience when logging in to achieve this. </p>
 
-<p>For example, if you&rsquo;re using Web Auth:</p>
+<p>For example, if you are using Web Auth:</p>
 <pre class="highlight swift"><code><span class="kt">Auth0</span>
     <span class="o">.</span><span class="nf">webAuth</span><span class="p">()</span>
     <span class="o">.</span><span class="nf">audience</span><span class="p">(</span><span class="s">"https://YOUR_AUTH0_DOMAIN/api/v2/"</span><span class="p">)</span>
@@ -1761,7 +1784,7 @@ Auth0
 <li>Add authentication with <a href="https://auth0.com/docs/authenticate/identity-providers">multiple sources</a>, either social identity providers such as <strong>Google, Facebook, Microsoft Account, LinkedIn, GitHub, Twitter, Box, Salesforce</strong> (amongst others), or enterprise identity systems like <strong>Windows Azure AD, Google Apps, Active Directory, ADFS, or any SAML identity provider</strong>.</li>
 <li>Add authentication through more traditional <strong><a href="https://auth0.com/docs/authenticate/database-connections/custom-db">username/password databases</a></strong>.</li>
 <li>Add support for <strong><a href="https://auth0.com/docs/manage-users/user-accounts/user-account-linking">linking different user accounts</a></strong> with the same user.</li>
-<li>Support for generating signed <a href="https://auth0.com/docs/secure/tokens/json-web-tokens">JSON Web Tokens</a> to call your APIs and <strong>flow the user identity</strong> securely.</li>
+<li>Support for generating signed <a href="https://auth0.com/docs/secure/tokens/json-web-tokens">JSON web tokens</a> to call your APIs and <strong>flow the user identity</strong> securely.</li>
 <li>Analytics of how, when, and where users are logging in.</li>
 <li>Pull data from other sources and add it to the user profile through <a href="https://auth0.com/docs/customize/actions">JavaScript Actions</a>.</li>
 </ul>
@@ -1782,7 +1805,7 @@ Auth0
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-07-14)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-07-22)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

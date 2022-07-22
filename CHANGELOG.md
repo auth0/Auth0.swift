@@ -1,5 +1,18 @@
 # Change Log
 
+## [2.3.0](https://github.com/auth0/Auth0.swift/tree/2.3.0) (2022-07-22)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.2.0...2.3.0)
+
+**Added**
+- Expose error when storing renewed credentials fails [\#724](https://github.com/auth0/Auth0.swift/pull/724) ([Widcket](https://github.com/Widcket))
+- Add `canRenew()` to the Credentials Manager [\#723](https://github.com/auth0/Auth0.swift/pull/723) ([Widcket](https://github.com/Widcket))
+
+**Changed**
+- Update SimpleKeychain to v1.0.0 & JWTDecode.swift to v3.0.0 [\#725](https://github.com/auth0/Auth0.swift/pull/725) ([Widcket](https://github.com/Widcket))
+
+**Fixed**
+- Fix async/await threading issues with Swift 5.7 [\#722](https://github.com/auth0/Auth0.swift/pull/722) ([Widcket](https://github.com/Widcket))
+
 ## [2.2.0](https://github.com/auth0/Auth0.swift/tree/2.2.0) (2022-07-14)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.1.0...2.2.0)
 
