@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>A0SimpleKeychain Extension Reference</title>
+    <title>SimpleKeychain Extension Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -14,14 +14,14 @@
   </head>
   <body>
 
-    <a name="//apple_ref/swift/Extension/A0SimpleKeychain" class="dashAnchor"></a>
+    <a name="//apple_ref/swift/Extension/SimpleKeychain" class="dashAnchor"></a>
 
-    <a title="A0SimpleKeychain Extension Reference"></a>
+    <a title="SimpleKeychain Extension Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Auth0 2.2.0 Docs
+          Auth0 2.3.0 Docs
         </a>
          (98% documented)
       </p>
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">Auth0 Reference</a>
       <img class="carat" src="../img/carat.png" alt=""/>
-      A0SimpleKeychain Extension Reference
+      SimpleKeychain Extension Reference
     </p>
 
     <div class="content-wrapper">
@@ -81,13 +81,13 @@
             <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Extensions/A0SimpleKeychain.html">A0SimpleKeychain</a>
-              </li>
-              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions.html#/SafariUserAgent">SafariUserAgent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/SimpleKeychain.html">SimpleKeychain</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
@@ -237,11 +237,11 @@
 
         <section class="section">
           <div class="section-content top-matter">
-            <h1>A0SimpleKeychain</h1>
+            <h1>SimpleKeychain</h1>
               <div class="declaration">
                 <div class="language">
                   
-                  <pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">A0SimpleKeychain</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CredentialsStorage.html">CredentialsStorage</a></span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">SimpleKeychain</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CredentialsStorage.html">CredentialsStorage</a></span></code></pre>
 
                 </div>
               </div>
@@ -256,9 +256,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:So16A0SimpleKeychainC5Auth0E8getEntry6forKey10Foundation4DataVSgSS_tF"></a>
+                    <a name="/s:14SimpleKeychainAAV5Auth0E8getEntry6forKey10Foundation4DataVSgSS_tF"></a>
                     <a name="//apple_ref/swift/Method/getEntry(forKey:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:So16A0SimpleKeychainC5Auth0E8getEntry6forKey10Foundation4DataVSgSS_tF">getEntry(forKey:<wbr>)</a>
+                    <a class="token" href="#/s:14SimpleKeychainAAV5Auth0E8getEntry6forKey10Foundation4DataVSgSS_tF">getEntry(forKey:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -306,9 +306,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:So16A0SimpleKeychainC5Auth0E8setEntry_6forKeySb10Foundation4DataV_SStF"></a>
+                    <a name="/s:14SimpleKeychainAAV5Auth0E8setEntry_6forKeySb10Foundation4DataV_SStF"></a>
                     <a name="//apple_ref/swift/Method/setEntry(_:forKey:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:So16A0SimpleKeychainC5Auth0E8setEntry_6forKeySb10Foundation4DataV_SStF">setEntry(_:<wbr>forKey:<wbr>)</a>
+                    <a class="token" href="#/s:14SimpleKeychainAAV5Auth0E8setEntry_6forKeySb10Foundation4DataV_SStF">setEntry(_:<wbr>forKey:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -365,6 +365,56 @@
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14SimpleKeychainAAV5Auth0E11deleteEntry6forKeySbSS_tF"></a>
+                    <a name="//apple_ref/swift/Method/deleteEntry(forKey:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14SimpleKeychainAAV5Auth0E11deleteEntry6forKeySbSS_tF">deleteEntry(forKey:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Deletes a storage entry.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">deleteEntry</span><span class="p">(</span><span class="n">forKey</span> <span class="nv">key</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>key</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The key to delete from the Keychain.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>If the data was deleted.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
           </div>
@@ -373,7 +423,7 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-07-14)</p>
+      <p>&copy; 2022 <a class="link" href="https://auth0.com" target="_blank" rel="external noopener">Auth0</a>. All rights reserved. (Last updated: 2022-07-22)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

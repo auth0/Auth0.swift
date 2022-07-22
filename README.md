@@ -87,7 +87,7 @@ Then, select the dependency rule and press **Add Package**.
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 2.2'
+pod 'Auth0', '~> 2.3'
 ```
 
 Then, run `pod install`.
@@ -99,7 +99,7 @@ Then, run `pod install`.
 Add the following line to your `Cartfile`:
 
 ```text
-github "auth0/Auth0.swift" ~> 2.2
+github "auth0/Auth0.swift" ~> 2.3
 ```
 
 Then, run `carthage bootstrap --use-xcframeworks`.
