@@ -774,7 +774,8 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             context("custom keychain") {
-                let storage = A0SimpleKeychain(service: "test_service")
+                let storage = SimpleKeychain(service: "test_service")
+
                 beforeEach {
                     credentialsManager = CredentialsManager(authentication: authentication,
                                                             storage: storage)
@@ -782,9 +783,9 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("custom keychain should successfully set and clear credentials") {
                     _ = credentialsManager.store(credentials: credentials)
-                    expect(storage.data(forKey: "credentials")).toNot(beNil())
+                    expect { try storage.data(forKey: "credentials") }.toNot(beNil())
                     _ = credentialsManager.clear()
-                    expect(storage.data(forKey: "credentials")).to(beNil())
+                    expect { try storage.data(forKey: "credentials") }.to(throwError(SimpleKeychainError.itemNotFound))
                 }
             }
         }
