@@ -28,7 +28,7 @@ Auth0
 
 Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
 
-> ⚠️ `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`. This option is only available on [iOS 13+](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio), so `useEphemeralSession()` will have no effect on iOS 12. To improve the experience for iOS 12 users, see the approach described below.
+> ⚠️ `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`. This option is only available on [iOS 13+ and macOS](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio), so `useEphemeralSession()` will have no effect on iOS 12. To improve the experience for iOS 12 users, see the approach described below.
 
 An alternative is to use `SFSafariViewController` instead of `ASWebAuthenticationSession`. You can do so with the built-in `SFSafariViewController` Web Auth provider:
 
