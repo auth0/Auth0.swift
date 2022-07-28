@@ -49,7 +49,7 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func finish(with result: WebAuthResult<Void>) {
-        callback(result)
+        self.callback(result)
     }
 
     public override var description: String {

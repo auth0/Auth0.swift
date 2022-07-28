@@ -15,7 +15,6 @@ class TransactionStore {
     }
 
     func store(_ transaction: AuthTransaction) {
-        self.current?.cancel()
         self.current = transaction
     }
 
