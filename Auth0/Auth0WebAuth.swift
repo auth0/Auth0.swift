@@ -161,8 +161,8 @@ final class Auth0WebAuth: WebAuth {
                                                   invitation: invitation)
         let provider = self.provider ?? WebAuthentication.asProvider(urlScheme: urlScheme,
                                                                      ephemeralSession: ephemeralSession)
-        let userAgent = provider(authorizeURL) { result in
-            self.storage.clear()
+        let userAgent = provider(authorizeURL) { [storage] result in
+            storage.clear()
 
             if case let .failure(error) = result {
                 callback(.failure(error))
@@ -196,8 +196,8 @@ final class Auth0WebAuth: WebAuth {
         }
 
         let provider = self.provider ?? WebAuthentication.asProvider(urlScheme: urlScheme)
-        let userAgent = provider(logoutURL) { result in
-            self.storage.clear()
+        let userAgent = provider(logoutURL) { [storage] result in
+            storage.clear()
             callback(result)
         }
         let transaction = ClearSessionTransaction(userAgent: userAgent)
