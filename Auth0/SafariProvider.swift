@@ -43,26 +43,26 @@ extension SFSafariViewController {
 
     var topViewController: UIViewController? {
         guard let root = UIApplication.shared()?.keyWindow?.rootViewController else { return nil }
-        return findTopViewController(from: root)
+        return self.findTopViewController(from: root)
     }
 
     func present() {
-        topViewController?.present(self, animated: true, completion: nil)
+        self.topViewController?.present(self, animated: true, completion: nil)
     }
 
     private func findTopViewController(from root: UIViewController) -> UIViewController? {
-        if let presented = root.presentedViewController { return findTopViewController(from: presented) }
+        if let presented = root.presentedViewController { return self.findTopViewController(from: presented) }
 
         switch root {
         case let split as UISplitViewController:
             guard let last = split.viewControllers.last else { return split }
-            return findTopViewController(from: last)
+            return self.findTopViewController(from: last)
         case let navigation as UINavigationController:
             guard let top = navigation.topViewController else { return navigation }
-            return findTopViewController(from: top)
+            return self.findTopViewController(from: top)
         case let tab as UITabBarController:
             guard let selected = tab.selectedViewController else { return tab }
-            return findTopViewController(from: selected)
+            return self.findTopViewController(from: selected)
         default:
             return root
         }
