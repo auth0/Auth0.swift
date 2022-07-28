@@ -29,6 +29,11 @@ class TransactionStoreSpec: QuickSpec {
                 expect(storage.current).to(beNil())
             }
 
+            it("should not cancel current transaction") {
+                storage.store(transaction)
+                storage.store(SpyTransaction())
+                expect(transaction.isCancelled) == false
+            }
         }
 
         describe("cancel") {
