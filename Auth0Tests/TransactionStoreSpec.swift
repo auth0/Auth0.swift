@@ -20,6 +20,7 @@ class TransactionStoreSpec: QuickSpec {
 
             it("should store transaction") {
                 storage.store(transaction)
+                expect(storage.current).toNot(beNil())
             }
 
             it("should cancel current transaction") {
@@ -37,10 +38,6 @@ class TransactionStoreSpec: QuickSpec {
         }
 
         describe("cancel") {
-
-            it("should be noop when there is no current transaction") {
-                transaction.cancel()
-            }
 
             it("should cancel current transaction") {
                 storage.store(transaction)
