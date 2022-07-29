@@ -58,6 +58,7 @@ class LoginTransaction: NSObject, AuthTransaction {
             // Continue with code exchange
             self.handler.credentials(from: items, callback: self.callback)
         }
+
         return true
     }
 

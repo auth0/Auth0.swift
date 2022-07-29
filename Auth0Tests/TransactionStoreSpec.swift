@@ -20,12 +20,7 @@ class TransactionStoreSpec: QuickSpec {
 
             it("should store transaction") {
                 storage.store(transaction)
-            }
-
-            it("should cancel current transaction") {
-                storage.store(transaction)
-                storage.store(SpyTransaction())
-                expect(transaction.isCancelled) == true
+                expect(storage.current).toNot(beNil())
             }
 
             it("should clear current transaction") {
@@ -34,13 +29,14 @@ class TransactionStoreSpec: QuickSpec {
                 expect(storage.current).to(beNil())
             }
 
+            it("should not cancel current transaction") {
+                storage.store(transaction)
+                storage.store(SpyTransaction())
+                expect(transaction.isCancelled) == false
+            }
         }
 
         describe("cancel") {
-
-            it("should be noop when there is no current transaction") {
-                transaction.cancel()
-            }
 
             it("should cancel current transaction") {
                 storage.store(transaction)

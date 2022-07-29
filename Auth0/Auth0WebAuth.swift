@@ -145,9 +145,9 @@ final class Auth0WebAuth: WebAuth {
 
         if let invitationURL = self.invitationURL {
             guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
-                let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
-                let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
-                    return callback(.failure(WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))))
+                  let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
+                  let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
+                return callback(.failure(WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))))
             }
 
             organization = organizationId
@@ -161,7 +161,9 @@ final class Auth0WebAuth: WebAuth {
                                                   invitation: invitation)
         let provider = self.provider ?? WebAuthentication.asProvider(urlScheme: urlScheme,
                                                                      ephemeralSession: ephemeralSession)
-        let userAgent = provider(authorizeURL) { result in
+        let userAgent = provider(authorizeURL) { [storage] result in
+            storage.clear()
+
             if case let .failure(error) = result {
                 callback(.failure(error))
             }
@@ -172,8 +174,8 @@ final class Auth0WebAuth: WebAuth {
                                            handler: handler,
                                            logger: self.logger,
                                            callback: callback)
-        userAgent.start()
         self.storage.store(transaction)
+        userAgent.start()
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
@@ -194,10 +196,13 @@ final class Auth0WebAuth: WebAuth {
         }
 
         let provider = self.provider ?? WebAuthentication.asProvider(urlScheme: urlScheme)
-        let userAgent = provider(logoutURL, callback)
+        let userAgent = provider(logoutURL) { [storage] result in
+            storage.clear()
+            callback(result)
+        }
         let transaction = ClearSessionTransaction(userAgent: userAgent)
-        userAgent.start()
         self.storage.store(transaction)
+        userAgent.start()
     }
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,

@@ -8,14 +8,12 @@ extension WebAuthentication {
             let session = ASWebAuthenticationSession(url: url, callbackURLScheme: urlScheme) {
                 guard let callbackURL = $0, $1 == nil else {
                     if let error = $1, case ASWebAuthenticationSessionError.canceledLogin = error {
-                        callback(.failure(WebAuthError(code: .userCancelled)))
+                        return callback(.failure(WebAuthError(code: .userCancelled)))
                     } else if let error = $1 {
-                        callback(.failure(WebAuthError(code: .other, cause: error)))
-                    } else {
-                        callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
+                        return callback(.failure(WebAuthError(code: .other, cause: error)))
                     }
 
-                    return TransactionStore.shared.clear()
+                    return callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
                 }
 
                 _ = TransactionStore.shared.resume(callbackURL)
@@ -51,7 +49,7 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func finish(with result: WebAuthResult<Void>) {
-        callback(result)
+        self.callback(result)
     }
 
     public override var description: String {
