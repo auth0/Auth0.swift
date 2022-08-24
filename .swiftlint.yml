@@ -2,6 +2,8 @@ opt_in_rules: # some rules are only opt-in
   - empty_count
   # Find all the available rules by running:
   # swiftlint rules
+disabled_rules:
+  - void_function_in_ternary
 included: # paths to include during linting. `--path` is ignored if present.
   - Auth0
 excluded: # paths to ignore during linting. Takes precedence over `included`.
