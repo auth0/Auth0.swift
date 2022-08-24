@@ -49,6 +49,7 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func finish(with result: WebAuthResult<Void>) {
+        self.session.cancel()
         self.callback(result)
     }
 
