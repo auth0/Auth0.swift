@@ -612,7 +612,7 @@ You can enable an additional level of user authentication before retrieving cred
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
-> ⚠️ You need a real device to test biometric authentication. Biometrics are not available in simulators.
+> 💡 You need a real device to test biometric authentication. Biometrics are not available in simulators.
 
 If needed, you can specify a particular `LAPolicy` to be used. For example, you might want to support Face ID or Touch ID, but also allow fallback to passcode.
 
