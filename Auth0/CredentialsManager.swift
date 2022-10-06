@@ -70,9 +70,9 @@ private final class ThreadGuard {
         let currentThreadName = Thread.current.threadName
         let currentThreadQueue = Thread.current.queueName
         if let lastThread = self.lastThread, lastThread.name != currentThreadName {
-            fatalError("The method '\(self.method)' is being called from a different thread!"
-                       + " Last time it was called from '\(lastThread.name)' (queue: '\(lastThread.queue)',"
-                       + " now it's being called from '\(currentThreadName)' (queue: '\(currentThreadQueue)'")
+            fatalError("The CredentialsManager method '\(self.method)' is being called from a different thread!"
+                       + " Last time it was called from '\(lastThread.name)' (queue: '\(lastThread.queue)'),"
+                       + " now it's being called from '\(currentThreadName)' (queue: '\(currentThreadQueue)')")
         } else {
             self.lastThread = (name: currentThreadName, queue: currentThreadQueue)
         }
