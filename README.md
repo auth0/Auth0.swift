@@ -9,6 +9,8 @@ Easily integrate Auth0 into iOS, macOS, tvOS, and watchOS apps. Add **login** an
 
 **Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).**
 
+_**⚠️ IMPORTANT** this branch is meant for manual debugging only. Under no circumstances submit to the App Store a build with this branch, because the debug guards will CRASH THE APP._
+
 ---
 
 ## Table of Contents
