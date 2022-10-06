@@ -505,6 +505,8 @@ The Credentials Manager utility allows you to securely store and retrieve the us
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 ```
 
+> ⚠️ The Credentials Manager is not thread-safe, with the exception of the `credentials()` method. Do not call its non thread-safe methods and properties from different threads without proper synchronization.
+
 #### Store credentials
 
 When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your app again.
@@ -552,7 +554,9 @@ credentialsManager.credentials { result in
 }
 ```
 
-> 💡 You do not need to call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials.
+> ⚠️ You do not need to call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials. Since this method is thread-safe and `store(credentials:)` is not, calling it anyway can cause concurrency issues.
+
+> ⚠️ To ensure that no concurrent renewal requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances. Therefore, it's recommended to use only a single Credentials Manager instance in your app.
 
 <details>
   <summary>Using async/await</summary>
