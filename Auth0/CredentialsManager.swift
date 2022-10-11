@@ -10,29 +10,13 @@ import LocalAuthentication
 import Combine
 #endif
 
-// MARK: - Instance Guard
+// MARK: - Debug Utilities
 
-private final class InstanceGuard {
-    static let shared = InstanceGuard()
-    private let lock = NSLock()
-    private var isInstantiated = false
-
-    private init() {}
-
-    func assert() {
-        self.lock.lock()
-        if self.isInstantiated {
-            fatalError("The Credentials Manager was instantiated before!")
-        } else {
-            self.isInstantiated = true
-        }
-        self.lock.unlock()
+private extension Thread {
+    static var stackTrace: String {
+        return Thread.callStackSymbols.joined(separator: "\n")
     }
-}
 
-// MARK: - Thread Guard
-
-extension Thread {
     var threadName: String {
         if self.isMainThread {
             return "main"
@@ -56,27 +40,80 @@ extension Thread {
     }
 }
 
+public enum LogLevel {
+    case info
+    case error
+}
+
+public struct Log {
+    public let message: String
+    public let stackTrace: String
+    public let level: LogLevel
+
+    private static let formatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss.SSSS"
+        return formatter
+    }()
+
+    private init(message: String, level: LogLevel) {
+        self.message = "CredentialsManager: \(message) [\(Log.formatter.string(from: Date()))]"
+        self.stackTrace = Thread.stackTrace
+        self.level = level
+    }
+
+    fileprivate static func info(_ message: String) -> Log {
+        return Log(message: message, level: .info)
+    }
+
+    fileprivate static func error(_ message: String) -> Log {
+        return Log(message: message, level: .error)
+    }
+}
+
+// MARK: - Instance Guard
+
+private final class InstanceGuard {
+    static let shared = InstanceGuard()
+    private let lock = NSLock()
+    private var isInstantiated = false
+
+    private init() {}
+
+    func check() -> Log? {
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        if self.isInstantiated {
+            return Log.error("An instance already exists!")
+        }
+        self.isInstantiated = true
+        return nil
+    }
+}
+
+// MARK: - Thread Guard
+
 private final class ThreadGuard {
     private let method: String
     private let lock = NSLock()
-    private var lastThread: (name: String, queue: String)?
+    private var firstThread: (name: String, queue: String)?
 
     init(method: String) {
         self.method = method
     }
 
-    func assert() {
+    func check() -> Log? {
         self.lock.lock()
+        defer { self.lock.unlock() }
         let currentThreadName = Thread.current.threadName
         let currentThreadQueue = Thread.current.queueName
-        if let lastThread = self.lastThread, lastThread.name != currentThreadName {
-            fatalError("The Credentials Manager method '\(self.method)' is being called from a different thread!"
-                       + " Last time it was called from '\(lastThread.name)' (queue: '\(lastThread.queue)'),"
-                       + " now it's being called from '\(currentThreadName)' (queue: '\(currentThreadQueue)')")
-        } else {
-            self.lastThread = (name: currentThreadName, queue: currentThreadQueue)
+        if let firstThread = self.firstThread, firstThread.name != currentThreadName {
+            return Log.error("The non-thread safe method '\(self.method)' is being called from a different thread!"
+                             + " It was first called from '\(firstThread.name)' on queue '\(firstThread.queue)',"
+                             + " now it's being called from '\(currentThreadName)' on queue '\(currentThreadQueue)'")
         }
-        self.lock.unlock()
+        self.firstThread = (name: currentThreadName, queue: currentThreadQueue)
+        return nil
     }
 }
 
@@ -86,18 +123,7 @@ private let hasValidThreadGuard = ThreadGuard(method: "hasValid()")
 private let canRenewThreadGuard = ThreadGuard(method: "canRenew()")
 private let storeThreadGuard = ThreadGuard(method: "store()")
 private let userThreadGuard = ThreadGuard(method: "user (getter)")
-
-// MARK: - Debug Utils
-
-let formatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "HH:mm:ss.SSSS"
-    return formatter
-}()
-
-private func log(_ message: String) {
-    print("CredentialsManager: \(message) [\(formatter.string(from: Date()))]")
-}
+private let enableBiometricsThreadGuard = ThreadGuard(method: "enableBiometrics()")
 
 // MARK: - Credentials Manager
 
@@ -111,6 +137,7 @@ public struct CredentialsManager {
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
     private let dispatchGroup = DispatchGroup()
+    private let logger: (Log) -> Void
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     #endif
@@ -121,10 +148,13 @@ public struct CredentialsManager {
     ///   - authentication: Auth0 Authentication API client.
     ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to 'credentials'.
     ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `SimpleKeychain` instance.
-    public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = SimpleKeychain()) {
-        log("Using 'debug' branch")
-        log("Instantiating from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
-        InstanceGuard.shared.assert()
+    public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = SimpleKeychain(), logger: @escaping (Log) -> Void) {
+        logger(Log.info("Using 'debug-logger' branch"))
+        logger(Log.info("Instantiating from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'"))
+        if let error = InstanceGuard.shared.check() {
+            logger(error)
+        }
+        self.logger = logger
         self.storeKey = storeKey
         self.authentication = authentication
         self.storage = storage
@@ -139,8 +169,10 @@ public struct CredentialsManager {
     ///
     /// - Important: Access to this property will not be protected by biometric authentication.
     public var user: UserInfo? {
-        log("Calling 'user (getter)' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
-        userThreadGuard.assert()
+        self.logger(Log.info("Calling 'user (getter)' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'"))
+        if let error = userThreadGuard.check() {
+            self.logger(error)
+        }
         guard let credentials = retrieveCredentials(),
               let jwt = try? decode(jwt: credentials.idToken) else { return nil }
 
@@ -169,6 +201,10 @@ public struct CredentialsManager {
     ///   - evaluationPolicy: Policy to be used for authentication policy evaluation.
     /// - Important: Access to the ``user`` property will not be protected by biometric authentication.
     public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil, evaluationPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics) {
+        self.logger(Log.info("Calling 'enableBiometrics()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'"))
+        if let error = enableBiometricsThreadGuard.check() {
+            self.logger(error)
+        }
         self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
     #endif
@@ -182,8 +218,10 @@ public struct CredentialsManager {
     /// - Parameter credentials: Credentials instance to store.
     /// - Returns: If the credentials were stored.
     public func store(credentials: Credentials) -> Bool {
-        log("Calling 'store()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
-        storeThreadGuard.assert()
+        self.logger(Log.info("Calling 'store()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'"))
+        if let error = storeThreadGuard.check() {
+            self.logger(error)
+        }
         guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true) else {
             return false
         }
@@ -199,8 +237,10 @@ public struct CredentialsManager {
     ///
     /// - Returns: If the credentials were removed.
     public func clear() -> Bool {
-        log("Calling 'clear()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
-        clearThreadGuard.assert()
+        self.logger(Log.info("Calling 'clear()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'"))
+        if let error = clearThreadGuard.check() {
+            self.logger(error)
+        }
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
@@ -234,8 +274,10 @@ public struct CredentialsManager {
     /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
     public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
-        log("Calling 'revoke()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
-        revokeThreadGuard.assert()
+        self.logger(Log.info("Calling 'revoke()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'"))
+        if let error = revokeThreadGuard.check() {
+            self.logger(error)
+        }
         guard let data = self.storage.getEntry(forKey: self.storeKey),
               let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
               let refreshToken = credentials.refreshToken else {
@@ -272,8 +314,10 @@ public struct CredentialsManager {
     /// - Returns: If there are credentials stored containing an access token that is neither expired or about to expire.
     /// - See: ``Credentials/expiresIn``
     public func hasValid(minTTL: Int = 0) -> Bool {
-        log("Calling 'hasValid()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
-        hasValidThreadGuard.assert()
+        self.logger(Log.info("Calling 'hasValid()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'"))
+        if let error = hasValidThreadGuard.check() {
+            self.logger(error)
+        }
         guard let credentials = self.retrieveCredentials() else { return false }
         return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
     }
@@ -291,8 +335,10 @@ public struct CredentialsManager {
     ///
     /// - Returns: If there are credentials stored containing a refresh token.
     public func canRenew() -> Bool {
-        log("Calling 'canRenew()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
-        canRenewThreadGuard.assert()
+        self.logger(Log.info("Calling 'canRenew()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'"))
+        if let error = canRenewThreadGuard.check() {
+            self.logger(error)
+        }
         guard let credentials = self.retrieveCredentials() else { return false }
         return credentials.refreshToken != nil
     }
