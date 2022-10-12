@@ -391,6 +391,7 @@ public struct CredentialsManager {
     /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        self.logger(Log.info("Calling 'credentials()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'"))
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
                 let error = CredentialsManagerError(code: .biometricsFailed,
