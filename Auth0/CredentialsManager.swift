@@ -22,7 +22,7 @@ private final class InstanceGuard {
     func assert() {
         self.lock.lock()
         if self.isInstantiated {
-            fatalError("The Credentials Manager was instantiated before!")
+            fatalError("Credentials Manager: An instance already exists!")
         } else {
             self.isInstantiated = true
         }
@@ -32,7 +32,7 @@ private final class InstanceGuard {
 
 // MARK: - Thread Guard
 
-extension Thread {
+private extension Thread {
     var threadName: String {
         if self.isMainThread {
             return "main"
@@ -70,9 +70,9 @@ private final class ThreadGuard {
         let currentThreadName = Thread.current.threadName
         let currentThreadQueue = Thread.current.queueName
         if let lastThread = self.lastThread, lastThread.name != currentThreadName {
-            fatalError("The Credentials Manager method '\(self.method)' is being called from a different thread!"
-                       + " Last time it was called from '\(lastThread.name)' (queue: '\(lastThread.queue)'),"
-                       + " now it's being called from '\(currentThreadName)' (queue: '\(currentThreadQueue)')")
+            fatalError("Credentials Manager: The non-thread safe method '\(self.method)' is being called from a different thread!"
+                       + " Last time it was called from '\(lastThread.name)' on queue '\(lastThread.queue)',"
+                       + " now it's being called from '\(currentThreadName)' on queue '\(currentThreadQueue)'")
         } else {
             self.lastThread = (name: currentThreadName, queue: currentThreadQueue)
         }
@@ -86,10 +86,11 @@ private let hasValidThreadGuard = ThreadGuard(method: "hasValid()")
 private let canRenewThreadGuard = ThreadGuard(method: "canRenew()")
 private let storeThreadGuard = ThreadGuard(method: "store()")
 private let userThreadGuard = ThreadGuard(method: "user (getter)")
+private let enableBiometricsThreadGuard = ThreadGuard(method: "enableBiometrics()")
 
 // MARK: - Debug Utils
 
-let formatter = {
+private let formatter = {
     let formatter = DateFormatter()
     formatter.dateFormat = "HH:mm:ss.SSSS"
     return formatter
@@ -123,7 +124,7 @@ public struct CredentialsManager {
     ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `SimpleKeychain` instance.
     public init(authentication: Authentication, storeKey: String = "credentials", storage: CredentialsStorage = SimpleKeychain()) {
         log("Using 'debug' branch")
-        log("Instantiating from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
+        log("Instantiating from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'")
         InstanceGuard.shared.assert()
         self.storeKey = storeKey
         self.authentication = authentication
@@ -139,7 +140,7 @@ public struct CredentialsManager {
     ///
     /// - Important: Access to this property will not be protected by biometric authentication.
     public var user: UserInfo? {
-        log("Calling 'user (getter)' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
+        log("Calling 'user (getter)' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'")
         userThreadGuard.assert()
         guard let credentials = retrieveCredentials(),
               let jwt = try? decode(jwt: credentials.idToken) else { return nil }
@@ -169,6 +170,8 @@ public struct CredentialsManager {
     ///   - evaluationPolicy: Policy to be used for authentication policy evaluation.
     /// - Important: Access to the ``user`` property will not be protected by biometric authentication.
     public mutating func enableBiometrics(withTitle title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil, evaluationPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics) {
+        log("Calling 'enableBiometrics()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'")
+        enableBiometricsThreadGuard.assert()
         self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
     #endif
@@ -182,7 +185,7 @@ public struct CredentialsManager {
     /// - Parameter credentials: Credentials instance to store.
     /// - Returns: If the credentials were stored.
     public func store(credentials: Credentials) -> Bool {
-        log("Calling 'store()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
+        log("Calling 'store()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'")
         storeThreadGuard.assert()
         guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true) else {
             return false
@@ -199,7 +202,7 @@ public struct CredentialsManager {
     ///
     /// - Returns: If the credentials were removed.
     public func clear() -> Bool {
-        log("Calling 'clear()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
+        log("Calling 'clear()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'")
         clearThreadGuard.assert()
         return self.storage.deleteEntry(forKey: storeKey)
     }
@@ -234,7 +237,7 @@ public struct CredentialsManager {
     /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
     public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
-        log("Calling 'revoke()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
+        log("Calling 'revoke()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'")
         revokeThreadGuard.assert()
         guard let data = self.storage.getEntry(forKey: self.storeKey),
               let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
@@ -272,7 +275,7 @@ public struct CredentialsManager {
     /// - Returns: If there are credentials stored containing an access token that is neither expired or about to expire.
     /// - See: ``Credentials/expiresIn``
     public func hasValid(minTTL: Int = 0) -> Bool {
-        log("Calling 'hasValid()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
+        log("Calling 'hasValid()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'")
         hasValidThreadGuard.assert()
         guard let credentials = self.retrieveCredentials() else { return false }
         return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
@@ -291,7 +294,7 @@ public struct CredentialsManager {
     ///
     /// - Returns: If there are credentials stored containing a refresh token.
     public func canRenew() -> Bool {
-        log("Calling 'canRenew()' from thread '\(Thread.current.threadName)' (queue: '\(Thread.current.queueName)')")
+        log("Calling 'canRenew()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'")
         canRenewThreadGuard.assert()
         guard let credentials = self.retrieveCredentials() else { return false }
         return credentials.refreshToken != nil
@@ -345,6 +348,7 @@ public struct CredentialsManager {
     /// - See: [Refresh tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - See: [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     public func credentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        log("Calling 'credentials()' from thread '\(Thread.current.threadName)' on queue '\(Thread.current.queueName)'")
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
                 let error = CredentialsManagerError(code: .biometricsFailed,
