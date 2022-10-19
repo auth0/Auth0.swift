@@ -50,7 +50,7 @@ public struct Log {
     public let stackTrace: String
     public let level: LogLevel
 
-    private static let formatter = {
+    private static let formatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss.SSSS"
         return formatter
