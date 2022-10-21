@@ -7,7 +7,7 @@
 
 ## 1. How can I disable the _login_ alert box?
 
-![sso-alert](assets/sso-alert.png)
+![sso-alert](assets/sso-alert.png?raw=true)
 
 Under the hood, Auth0.swift uses `ASWebAuthenticationSession` by default to perform web-based authentication, which is the [API provided by Apple](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) for such purpose.
 
@@ -85,7 +85,7 @@ SomeView()
 
 ## 2. How can I disable the _logout_ alert box?
 
-![sso-alert](assets/sso-alert.png)
+![sso-alert](assets/sso-alert.png?raw=true)
 
 If you need SSO and/or are willing to tolerate the alert box on the login call, but would prefer to get rid of it when calling `clearSession(federated:)`, you can simply not call `clearSession(federated:)` and just clear the credentials from the app. This means that the shared session cookie will not be removed, so to get the user to log in again you need to add the `"prompt": "login"` parameter to the _login_ call.
 

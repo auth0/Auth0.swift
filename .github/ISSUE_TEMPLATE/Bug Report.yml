@@ -1,5 +1,6 @@
 name: 🐞 Report a bug
 description: Have you found a bug or issue? Create a bug report for this library
+labels: ["bug"]
 
 body:
   - type: markdown
@@ -14,7 +15,7 @@ body:
       options:
         - label: The issue can be reproduced in the [Auth0.swift sample app](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01) (or N/A).
           required: true
-        - label: I have looked into the [README](https://github.com/auth0/Auth0.swift#readme) and have not found a suitable solution or answer.
+        - label: I have looked into the [README](https://github.com/auth0/Auth0.swift#readme), [EXAMPLES](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md), and [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md) and have not found a suitable solution or answer.
           required: true
         - label: I have looked into the [API documentation](https://auth0.github.io/Auth0.swift/) and have not found a suitable solution or answer.
           required: true
@@ -59,7 +60,9 @@ body:
       multiple: true
       options:
         - iOS
+        - iPadOS
         - macOS
+        - macCatalyst
         - tvOS
         - watchOS
     validations:
