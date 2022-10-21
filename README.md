@@ -7,7 +7,7 @@
 
 📚 [**Documentation**](#documentation) **·** 🚀 [**Getting Started**](#getting-started) **·** 💻 [**API Reference**](#api-reference) **·** ❓ [**FAQs**](FAQ.md) **·** 💬 [**Feedback**](#feedback)
 
-> Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
+Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 ## Documentation
 
