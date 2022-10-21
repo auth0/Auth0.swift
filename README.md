@@ -5,7 +5,7 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat)](https://codecov.io/github/auth0/Auth0.swift)
 ![License](https://img.shields.io/github/license/Auth0/Auth0.swift.svg?style=flat)
 
-📚 [**Documentation**](#documentation) **·** 🚀 [**Getting Started**](#getting-started) **·** 💻 [**API Documentation**](https://auth0.github.io/Auth0.swift/) **·** 💬 [**Feedback**](#feedback)
+📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 💻 [**API Documentation**](https://auth0.github.io/Auth0.swift/) • 💬 [**Feedback**](#feedback)
 
 Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
