@@ -303,7 +303,7 @@ Only the last 4 major platform versions are supported, starting from:
 
 - iOS **12**
 - macOS **10.15**
-- Catalyst **13**
+- macCatalyst **13**
 - tvOS **12**
 - watchOS **6.2**
 
