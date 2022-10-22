@@ -280,6 +280,8 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 ## Common Tasks
 
+**Learn about most features in the [Examples ↗](EXAMPLES.md)**
+
 - [**Store credentials**](EXAMPLES.md#store-credentials) - store the user's credentials securely in the Keychain.
 - [**Check for stored credentials**](EXAMPLES.md#check-for-stored-credentials) - check if the user is already logged in when your app starts up.
 - [**Retrieve stored credentials**](EXAMPLES.md#retrieve-stored-credentials) - fetch the user's credentials from the Keychain, automatically renewing them if they have expired.
