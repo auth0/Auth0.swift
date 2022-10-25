@@ -91,7 +91,7 @@ Specify an Auth0 connection to directly show that identity provider's login page
 ```swift
 Auth0
     .webAuth()
-    .connection("facebook") // Show the Facebook login page
+    .connection("github") // Show the GitHub login page
     // ...
 ```
 
@@ -122,8 +122,8 @@ Use `connectionScope()` to configure a scope value for an Auth0 connection.
 ```swift
 Auth0
     .webAuth()
-    .connection("connection-name")
-    .connectionScope("user_friends email")
+    .connection("github")
+    .connectionScope("public_repo read:user")
     // ...
 ```
 
