@@ -282,11 +282,11 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 **Learn about most features in [Examples ↗](EXAMPLES.md)**
 
-- [**Store credentials**](EXAMPLES.md#store-credentials) - store the user's credentials securely in the Keychain.
-- [**Check for stored credentials**](EXAMPLES.md#check-for-stored-credentials) - check if the user is already logged in when your app starts up.
-- [**Retrieve stored credentials**](EXAMPLES.md#retrieve-stored-credentials) - fetch the user's credentials from the Keychain, automatically renewing them if they have expired.
-- [**Clear stored credentials**](EXAMPLES.md#clear-stored-credentials) - delete the user's credentials to complete the logout process.
-- [**Retrieve user information**](EXAMPLES.md#retrieve-user-information) - fetch the latest user information from the `/userinfo` endpoint.
+- [**Store credentials**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#store-credentials) - store the user's credentials securely in the Keychain.
+- [**Check for stored credentials**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#check-for-stored-credentials) - check if the user is already logged in when your app starts up.
+- [**Retrieve stored credentials**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#retrieve-stored-credentials) - fetch the user's credentials from the Keychain, automatically renewing them if they have expired.
+- [**Clear stored credentials**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#clear-stored-credentials) - delete the user's credentials to complete the logout process.
+- [**Retrieve user information**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#retrieve-user-information) - fetch the latest user information from the `/userinfo` endpoint.
 
 ## Support Policy
 
