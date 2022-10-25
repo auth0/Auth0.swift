@@ -3,9 +3,9 @@
 ![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat)
 [![CircleCI](https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat)](https://circleci.com/gh/auth0/Auth0.swift/tree/master)
 [![Coverage Status](https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat)](https://codecov.io/github/auth0/Auth0.swift)
-![License](https://img.shields.io/github/license/Auth0/Auth0.swift.svg?style=flat)
+![License](https://img.shields.io/github/license/auth0/Auth0.swift.svg?style=flat)
 
-📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 💻 [**API Documentation**](https://auth0.github.io/Auth0.swift/) • 💬 [**Feedback**](#feedback)
+📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
 
 Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
@@ -75,8 +75,6 @@ Head to the [Auth0 Dashboard](https://manage.auth0.com/#/applications/) and crea
 
 Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details in the settings page of your Auth0 application. If you are using a [custom domain](https://auth0.com/docs/brand-and-customize/custom-domains), use the value of your custom domain instead of the value from the settings page.
 
-> ⚠️ If you already have a Native Auth0 application, make sure that the **Token Endpoint Authentication Method** setting is set to `None`.
-
 #### Configure Client ID and Domain with a plist
 
 Create a `plist` file named `Auth0.plist` in your app bundle with the following content:
@@ -126,7 +124,7 @@ Auth0
 ```
 </details>
 
-### Web Auth Configuration (iOS / macOS)
+### Configure Web Auth (iOS / macOS)
 
 #### Configure callback and logout URLs
 
@@ -154,6 +152,8 @@ For example, if your iOS bundle identifier was `com.company.myapp` and your Auth
 com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 ```
 
+> ⚠️ Make sure that the **Token Endpoint Authentication Method** setting is set to `None`.
+
 #### Configure custom URL scheme
 
 Back in Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
@@ -162,7 +162,7 @@ Back in Xcode, go to the **Info** tab of your app target settings. In the **URL 
 
 This registers your bundle identifier as a custom URL scheme, so the callback and logout URLs can reach your app.
 
-### Web Auth Login (iOS / macOS)
+### Web Auth login (iOS / macOS)
 
 Import the `Auth0` module in the file where you want to present the login page.
 
@@ -216,7 +216,7 @@ Auth0
 ```
 </details>
 
-### Web Auth Logout (iOS / macOS)
+### Web Auth logout (iOS / macOS)
 
 Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your app.
 
@@ -270,7 +270,7 @@ Auth0
 ```
 </details>
 
-### SSO Alert Box (iOS / macOS)
+### SSO alert box (iOS / macOS)
 
 ![sso-alert](assets/sso-alert.png?raw=true)
 
@@ -278,7 +278,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 > 💡 See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of single sign-on (SSO) on iOS.
 
-## Common Tasks
+### Next steps
 
 **Learn about most features in the [Examples ↗](EXAMPLES.md)**
 
