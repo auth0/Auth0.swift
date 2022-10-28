@@ -42,8 +42,7 @@ extension Auth0Error {
 
 }
 
-/// Generic representation of Auth0 API errors. ``AuthenticationError`` and ``ManagementError`` conform to this
-/// protocol.
+/// Generic representation of Auth0 API errors.
 public protocol Auth0APIError: Auth0Error {
 
     /// Additional information about the error.
