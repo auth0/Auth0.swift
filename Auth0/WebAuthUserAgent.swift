@@ -1,5 +1,5 @@
 #if WEB_AUTH_PLATFORM
-/// Represents the external user agent used to perform a web-based operation.
+/// The external user agent used to perform a web-based operation.
 ///
 /// ## See Also
 ///
