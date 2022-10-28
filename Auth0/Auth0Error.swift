@@ -4,8 +4,7 @@ let unknownError = "a0.sdk.internal_error.unknown"
 let nonJSONError = "a0.sdk.internal_error.plain"
 let emptyBodyError = "a0.sdk.internal_error.empty"
 
-/// Generic representation of Auth0 errors. ``AuthenticationError``, ``ManagementError``, ``WebAuthError``, and
-/// ``CredentialsManagerError`` conform to this protocol.
+/// Generic representation of Auth0 errors.
 public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
 
     /// The underlying `Error` value, if any.
