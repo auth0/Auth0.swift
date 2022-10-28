@@ -286,15 +286,15 @@ public protocol Authentication: Trackable, Loggable {
     /// * `otp`:  for one-time password (OTP)
     /// * `oob`:  for SMS/voice messages or out-of-band (OOB)
     ///
-    /// ## See Also
-    ///
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#challenge-request)
-    ///
     /// - Parameters:
     ///   - mfaToken:        Token returned when authentication fails with an ``AuthenticationError/isMultifactorRequired`` error due to MFA requirement.
     ///   - types:           A list of the challenges types accepted by your application. Accepted challenge types are `oob` or `otp`. Excluding this parameter means that your application accepts all supported challenge types.
     ///   - authenticatorId: The ID of the authenticator to challenge. You can get the ID by querying the list of available authenticators for the user.
     /// - Returns: A request that will yield a multi-factor challenge.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#challenge-request)
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
 
     /**
