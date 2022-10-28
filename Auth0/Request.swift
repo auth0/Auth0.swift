@@ -10,7 +10,9 @@ let parameterPropertyKey = "com.auth0.parameter"
 /**
  Auth0 API request.
 
- ```
+ ## Usage
+
+ ```swift
  let request: Request<Credentials, AuthenticationError> = // ...
  
  request.start { result in
@@ -90,7 +92,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     }
 
     /**
-     Modifies the parameters by creating a copy of the request and adding the provided parameters to ``parameters``.
+     Modifies the parameters by creating a copy of the request and adding the provided parameters to the existing ones.
 
      - Parameter extraParameters: Additional parameters for the request.
      */
@@ -102,7 +104,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     }
 
     /**
-     Modifies the headers by creating a copy of the request and adding the provided headers to ``headers``.
+     Modifies the headers by creating a copy of the request and adding the provided headers to the existing ones.
 
      - Parameter extraHeaders: Additional headers for the request.
      */
@@ -134,12 +136,13 @@ public extension Request {
 #if compiler(>=5.5) && canImport(_Concurrency)
 public extension Request {
 
+    #if compiler(>=5.5.2)
     /**
      Performs the request.
 
      - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
      */
-    #if compiler(>=5.5.2)
+
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func start() async throws -> T {
         return try await withCheckedThrowingContinuation { continuation in

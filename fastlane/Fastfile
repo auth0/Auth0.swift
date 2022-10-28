@@ -46,4 +46,32 @@ platform :ios do
     perform_release target: 'Auth0.iOS'
     publish_release repository: 'Auth0.swift'
   end
+
+  desc 'Generate API documentation'
+  lane :build_docs do
+    target = 'Auth0'
+    docs_dir = 'docs'
+    docs_archive = 'docs.archive'
+    redirect_file = <<~HEREDOC
+      <!DOCTYPE html>
+        <head>
+          <meta http-equiv="refresh" content="0; url=documentation/#{target.downcase}/" />
+        </head>
+        <body>
+          <a href="documentation/#{target.downcase}/">Redirect</a>
+        </body>
+      </html>
+    HEREDOC
+    # Work from project root (defaults to /fastlane)
+    Dir.chdir('..') do
+      # Clear existing docs, or create docs folder if it doesn't already exist
+      Dir.exist?(docs_dir) ? FileUtils.rm_r(docs_dir) : FileUtils.mkdir(docs_dir)
+      # Generate the .doccarchive
+      sh "xcodebuild docbuild -scheme #{target}.iOS -configuration Release -destination 'generic/platform=iOS' -derivedDataPath #{docs_archive} FRAMEWORK_SEARCH_PATHS='Carthage/Build/**'"
+      # Generate the static site
+      sh "$(xcrun --find docc) process-archive transform-for-static-hosting #{docs_archive}/Build/Products/Release-iphoneos/#{target}.doccarchive --hosting-base-path #{target}.swift --output-path #{docs_dir}"
+      # Write redirect file
+      File.write("#{docs_dir}/index.html", redirect_file)
+    end
+  end
 end

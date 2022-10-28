@@ -1,5 +1,6 @@
 import Foundation
 
+/// Adds a utility method for decoding base64url-encoded data, like ID tokens.
 public extension String {
 
     /// Decodes base64url-encoded data.

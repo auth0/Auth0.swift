@@ -1,5 +1,6 @@
 import Foundation
 
+/// Adds a utility method for encoding data to base64url.
 public extension Data {
 
     /// Encodes data to base64url.

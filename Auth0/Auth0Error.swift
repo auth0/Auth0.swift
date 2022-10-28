@@ -4,38 +4,27 @@ let unknownError = "a0.sdk.internal_error.unknown"
 let nonJSONError = "a0.sdk.internal_error.plain"
 let emptyBodyError = "a0.sdk.internal_error.empty"
 
-/**
- Generic representation of Auth0 errors. ``AuthenticationError``, ``ManagementError``, ``WebAuthError``, and
- ``CredentialsManagerError`` conform to this protocol.
- */
+/// Generic representation of Auth0 errors.
 public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible {
 
-    /**
-     The underlying `Error` value, if any.
-     */
+    /// The underlying `Error` value, if any.
     var cause: Error? { get }
 
 }
 
 public extension Auth0Error {
 
-    /**
-     Defaults to `nil`.
-     */
+    /// The underlying `Error` value, if any. Defaults to `nil`.
     var cause: Error? { return nil }
 
-    /**
-     Description of the error.
-
-     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
-     */
+    /// Description of the error.
+    ///
+    /// - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
     var localizedDescription: String { return self.debugDescription }
 
-    /**
-     Description of the error.
-
-     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
-     */
+    /// Description of the error.
+    ///
+    /// - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
     var errorDescription: String? { return self.debugDescription }
 
 }
@@ -53,35 +42,25 @@ extension Auth0Error {
 
 }
 
-/**
- Generic representation of Auth0 API errors. ``AuthenticationError`` and ``ManagementError`` conform to this protocol.
- */
+/// Generic representation of Auth0 API errors.
 public protocol Auth0APIError: Auth0Error {
 
-    /**
-     Additional information about the error.
-     */
+    /// Additional information about the error.
     var info: [String: Any] { get }
 
-    /**
-     The code of the error as a string.
-     */
+    /// The code of the error as a string.
     var code: String { get }
 
-    /**
-     HTTP status code of the response.
-     */
+    /// HTTP status code of the response.
     var statusCode: Int { get }
 
-    /**
-     Creates an error from a JSON response.
-
-     - Parameters:
-       - info:       JSON response from Auth0.
-       - statusCode: HTTP status code of the response.
-
-     - Returns: A new `Auth0APIError`.
-     */
+    /// Creates an error from a JSON response.
+    ///
+    /// - Parameters:
+    ///   - info:       JSON response from Auth0.
+    ///   - statusCode: HTTP status code of the response.
+    ///
+    /// - Returns: A new `Auth0APIError`.
     init(info: [String: Any], statusCode: Int)
 
 }

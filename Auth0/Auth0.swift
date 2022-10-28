@@ -30,13 +30,15 @@ public let defaultScope = "openid profile email"
 /**
  Auth0 [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate your user using Database, Social, Enterprise or Passwordless connections.
 
- ```
- Auth0.authentication(clientId: clientId, domain: "samples.auth0.com")
+ ## Usage
+
+ ```swift
+ Auth0.authentication(clientId: "client-id", domain: "samples.us.auth0.com")
  ```
 
  - Parameters:
    - clientId: Client ID of your Auth0 application.
-   - domain:   Domain of your Auth0 account, for example 'samples.auth0.com'.
+   - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
    - session:  `URLSession` instance used for networking. Defaults to `URLSession.shared`.
  - Returns: Auth0 Authentication API client.
  */
@@ -45,15 +47,19 @@ public func authentication(clientId: String, domain: String, session: URLSession
 }
 
 /**
- Auth0 [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate your user using Database, Social, Enterprise or Passwordless connections.
+ Auth0 [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate your user using Database,
+ Social, Enterprise or Passwordless connections.
 
- ```
+ ## Usage
+
+ ```swift
  Auth0.authentication()
  ```
 
- The Auth0 Client ID & Domain are loaded from the `Auth0.plist` file in your main bundle. It should have the following content:
+ The Auth0 Client ID & Domain are loaded from the `Auth0.plist` file in your main bundle. It should have the following
+ content:
  
- ```
+ ```xml
  <?xml version="1.0" encoding="UTF-8"?>
  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
  <plist version="1.0">
@@ -70,7 +76,7 @@ public func authentication(clientId: String, domain: String, session: URLSession
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
    - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
  - Returns: Auth0 Authentication API client.
- - Important: Calling this method without a valid `Auth0.plist` file will crash your application.
+ - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
 public func authentication(session: URLSession = .shared, bundle: Bundle = .main) -> Authentication {
     let values = plistValues(bundle: bundle)!
@@ -81,7 +87,9 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
  Auth0 [Management API v2](https://auth0.com/docs/api/management/v2) client to perform operations with the Users
  endpoints.
 
- ```
+ ## Usage
+
+ ```swift
  Auth0.users(token: credentials.accessToken)
  ```
 
@@ -94,7 +102,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
 
  The Auth0 Domain is loaded from the `Auth0.plist` file in your main bundle. It should have the following content:
 
- ```
+ ```xml
  <?xml version="1.0" encoding="UTF-8"?>
  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
  <plist version="1.0">
@@ -112,7 +120,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
    - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
  - Returns: Auth0 Management API v2 client.
- - Important: Calling this method without a valid `Auth0.plist` file will crash your application.
+ - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
 public func users(token: String, session: URLSession = .shared, bundle: Bundle = .main) -> Users {
     let values = plistValues(bundle: bundle)!
@@ -122,9 +130,11 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
 /**
  Auth0 [Management API v2](https://auth0.com/docs/api/management/v2) client to perform operations with the Users
  endpoints.
- 
- ```
- Auth0.users(token: credentials.accessToken, domain: "samples.auth0.com")
+
+ ## Usage
+
+ ```swift
+ Auth0.users(token: credentials.accessToken, domain: "samples.us.auth0.com")
  ```
 
  Currently you can only perform the following operations:
@@ -136,7 +146,7 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
 
  - Parameters:
    - token:   Management API token with the correct allowed scopes to perform the desired action.
-   - domain:  Domain of your Auth0 account, for example 'samples.auth0.com'.
+   - domain:  Domain of your Auth0 account, for example `samples.us.auth0.com`.
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
  - Returns: Auth0 Management API v2 client.
  */
@@ -148,13 +158,15 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
 /**
  Auth0 client for performing web-based authentication with [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login).
 
- ```
+ ## Usage
+
+ ```swift
  Auth0.webAuth()
  ```
 
  The Auth0 Domain is loaded from the `Auth0.plist` file in your main bundle. It should have the following content:
 
- ```
+ ```xml
  <?xml version="1.0" encoding="UTF-8"?>
  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
  <plist version="1.0">
@@ -171,7 +183,7 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
    - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
  - Returns: Auth0 Web Auth client.
- - Important: Calling this method without a valid `Auth0.plist` file will crash your application.
+ - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
 public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main) -> WebAuth {
     let values = plistValues(bundle: bundle)!
@@ -181,13 +193,15 @@ public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main)
 /**
  Auth0 client for performing web-based authentication with [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login).
 
- ```
- Auth0.webAuth(clientId: clientId, domain: "samples.auth0.com")
+ ## Usage
+
+ ```swift
+ Auth0.webAuth(clientId: "client-id", domain: "samples.us.auth0.com")
  ```
 
  - Parameters:
    - clientId: Client ID of your Auth0 application.
-   - domain:   Domain of your Auth0 account, for example 'samples.auth0.com'.
+   - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
    - session:  `URLSession` instance used for networking. Defaults to `URLSession.shared`.
  - Returns: Auth0 Web Auth client.
  */

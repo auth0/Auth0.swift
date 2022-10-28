@@ -104,6 +104,7 @@ public protocol Trackable {
 }
 
 public extension Trackable {
+
     /**
      Turn on/off sending the `Auth0-Client` header on every request to Auth0.
      By default we collect our libraries and SDKs versions to help us evaluate usage.
@@ -123,4 +124,5 @@ public extension Trackable {
     mutating func using(inLibrary name: String, version: String) {
         self.telemetry.wrapped(inLibrary: name, version: version)
     }
+
 }

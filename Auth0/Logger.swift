@@ -2,12 +2,16 @@ import Foundation
 
 /// Logger for debugging purposes.
 public protocol Logger {
+
     /// Log an HTTP request.
     func trace(request: URLRequest, session: URLSession)
+
     /// Log an HTTP response.
     func trace(response: URLResponse, data: Data?)
+
     /// Log a URL.
     func trace(url: URL, source: String?)
+
 }
 
 protocol LoggerOutput {

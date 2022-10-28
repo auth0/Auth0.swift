@@ -11,7 +11,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 ## Documentation
 
-- [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift)
+- [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift/interactive)
  - shows how to integrate Auth0.swift into an iOS / macOS app from scratch.
 - [**Sample App**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01) - a complete, running iOS / macOS app you can try.
 - [**Examples**](EXAMPLES.md) - explains how to use most features.
@@ -27,7 +27,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 ### Requirements
 
-- iOS 12+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+
+- iOS 12.0+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+
 - Xcode 13.x / 14.x
 - Swift 5.3+
 
@@ -73,7 +73,7 @@ Then, run `carthage bootstrap --use-xcframeworks`.
 
 Head to the [Auth0 Dashboard](https://manage.auth0.com/#/applications/) and create a new **Native** application.
 
-Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details in the settings page of your Auth0 application. If you are using a [custom domain](https://auth0.com/docs/brand-and-customize/custom-domains), use the value of your custom domain instead of the value from the settings page.
+Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details in the settings page of your Auth0 application. If you are using a [custom domain](https://auth0.com/docs/customize/custom-domains), use the value of your custom domain instead of the value from the settings page.
 
 #### Configure Client ID and Domain with a plist
 
@@ -132,7 +132,7 @@ The callback and logout URLs are the URLs that Auth0 invokes to redirect back to
 
 Since callback and logout URLs can be manipulated, you will need to add your URLs to the **Allowed Callback URLs** and **Allowed Logout URLs** fields in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback and logout URLs are not set, users will be unable to log in and out of the app and will get an error.
 
-Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your app. If you are using a [custom domain](https://auth0.com/docs/brand-and-customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with the value of your custom domain instead of the value from the settings page.
+Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your app. If you are using a [custom domain](https://auth0.com/docs/customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with the value of your custom domain instead of the value from the settings page.
 
 ##### iOS
 
