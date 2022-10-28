@@ -76,7 +76,7 @@ public func authentication(clientId: String, domain: String, session: URLSession
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
    - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
  - Returns: Auth0 Authentication API client.
- - Important: Calling this method without a valid `Auth0.plist` file will crash your application.
+ - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
 public func authentication(session: URLSession = .shared, bundle: Bundle = .main) -> Authentication {
     let values = plistValues(bundle: bundle)!
@@ -120,7 +120,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
    - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
  - Returns: Auth0 Management API v2 client.
- - Important: Calling this method without a valid `Auth0.plist` file will crash your application.
+ - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
 public func users(token: String, session: URLSession = .shared, bundle: Bundle = .main) -> Users {
     let values = plistValues(bundle: bundle)!
@@ -183,7 +183,7 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
    - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
  - Returns: Auth0 Web Auth client.
- - Important: Calling this method without a valid `Auth0.plist` file will crash your application.
+ - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
 public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main) -> WebAuth {
     let values = plistValues(bundle: bundle)!
