@@ -15,11 +15,11 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
  - shows how to integrate Auth0.swift into an iOS / macOS app from scratch.
 - [**Sample App**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01) - a complete, running iOS / macOS app you can try.
 - [**Examples**](EXAMPLES.md) - explains how to use most features.
-- [**API Documentation**](https://auth0.github.io/Auth0.swift/) - documentation auto-generated from the code comments that explains all the available features.
-  + [Web Auth](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)
-  + [Credentials Manager](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)
-  + [Authentication API Client](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)
-  + [Management API Client (Users)](https://auth0.github.io/Auth0.swift/Protocols/Users.html)
+- [**API Documentation**](https://auth0.github.io/Auth0.swift/documentation/auth0) - documentation auto-generated from the code comments that explains all the available features.
+  + [Web Auth](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)
+  + [Credentials Manager](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)
+  + [Authentication API Client](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)
+  + [Management API Client (Users)](https://auth0.github.io/Auth0.swift/documentation/auth0/users)
 - [**FAQ**](FAQ.md) - answers some common questions about Auth0.swift.
 - [**Auth0 Documentation**](https://auth0.com/docs) - explore our docs site and learn more about Auth0.
 

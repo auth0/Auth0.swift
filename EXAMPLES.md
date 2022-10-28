@@ -11,7 +11,7 @@
 
 ## Web Auth (iOS / macOS)
 
-**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html)**
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)**
 
 - [Web Auth signup](#web-auth-signup)
 - [Web Auth configuration](#web-auth-configuration)
@@ -82,7 +82,7 @@ Auth0
 
 ### Web Auth configuration
 
-The following are some of the available Web Auth configuration options. Check the [API documentation](https://auth0.github.io/Auth0.swift/Protocols/WebAuth.html) for the full list.
+The following are some of the available Web Auth configuration options. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth/#topics) for the full list.
 
 #### Use any Auth0 connection
 
@@ -156,15 +156,15 @@ Auth0
 
 ### Web Auth errors
 
-Web Auth will only produce `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
+Web Auth will only produce `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/webautherror) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
-> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/Structs/WebAuthError.html#/Error%20Cases) instead, which are part of the API.
+> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/documentation/auth0/webautherror/#topics) instead, which are part of the API.
 
 [Go up ⤴](#examples)
 
 ## Credentials Manager (iOS / macOS / tvOS / watchOS)
 
-**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Structs/CredentialsManager.html)**
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)**
 
 - [Store credentials](#store-credentials)
 - [Check for stored credentials](#check-for-stored-credentials)
@@ -304,15 +304,15 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
 
 ### Credentials Manager errors
 
-The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html) to learn more about the error cases you need to handle, and which ones include a `cause` value.
+The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
-> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/Structs/CredentialsManagerError.html#/Error%20Cases) instead, which are part of the API.
+> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror/#topics) instead, which are part of the API.
 
 [Go up ⤴](#examples)
 
 ## Authentication API (iOS / macOS / tvOS / watchOS)
 
-**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Authentication.html)**
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)**
 
 - [Login with database connection](#login-with-database-connection)
 - [Sign up with database connection](#sign-up-with-database-connection)
@@ -574,7 +574,7 @@ Auth0
 
 Fetch the latest user information from the `/userinfo` endpoint.
 
-This method will yield a `UserInfo` instance. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/UserInfo.html) to learn more about its available properties.
+This method will yield a `UserInfo` instance. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/userinfo) to learn more about its available properties.
 
 ```swift
 Auth0
@@ -718,15 +718,15 @@ Auth0
 
 ### Authentication API client errors
 
-The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html) to learn more about the available `AuthenticationError` properties.
+The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about the available `AuthenticationError` properties.
 
-> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the [error types](https://auth0.github.io/Auth0.swift/Structs/AuthenticationError.html#/Error%20Types) instead, which are part of the API.
+> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the [error types](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror/#topics) instead, which are part of the API.
 
 [Go up ⤴](#examples)
 
 ## Management API (Users) (iOS / macOS / tvOS / watchOS)
 
-**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/Protocols/Users.html)**
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/users)**
 
 - [Retrieve user metadata](#retrieve-user-metadata)
 - [Update user metadata](#update-user-metadata)
@@ -956,7 +956,7 @@ Auth0
 
 ### Management API client errors
 
-The Management API client will only produce `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/Structs/ManagementError.html) to learn more about the available `ManagementError` properties.
+The Management API client will only produce `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/managementerror) to learn more about the available `ManagementError` properties.
 
 [Go up ⤴](#examples)
 

@@ -10,5 +10,5 @@ contact_links:
     url: https://github.com/auth0/Auth0.swift#common-tasks
     about: Check the Common Tasks section of the README to get up to speed with Auth0.swift
   - name: 📖 API Documentation
-    url: https://auth0.github.io/Auth0.swift/
+    url: https://auth0.github.io/Auth0.swift/documentation/auth0
     about: Check the public API documentation for in-depth overview of all the available features
