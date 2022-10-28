@@ -66,7 +66,7 @@ platform :ios do
     HEREDOC
     # Work from project root (defaults to /fastlane)
     Dir.chdir('..') do
-      # Clear existing docs, or create docs folder if it doesn't already exists
+      # Clear existing docs, or create docs folder if it doesn't already exist
       Dir.exist?(docs_dir) ? FileUtils.rm_r(docs_dir) : FileUtils.mkdir(docs_dir)
       # Generate the .doccarchive
       sh "xcodebuild docbuild -scheme #{target}.iOS -configuration Release -destination 'generic/platform=iOS' -derivedDataPath #{docs_archive} FRAMEWORK_SEARCH_PATHS='Carthage/Build/**'"
