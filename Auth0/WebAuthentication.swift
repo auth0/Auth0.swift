@@ -11,7 +11,8 @@ public struct WebAuthentication {
 
     private init() {}
 
-    /// Resumes the web-based operation when the external user agent redirects back to the app using a URL with a custom scheme.
+    /// Resumes the web-based operation when the external user agent redirects back to the app using a URL with a
+    /// custom scheme.
     ///
     /// ## Usage
     ///
@@ -55,7 +56,8 @@ public struct WebAuthentication {
     }
 
     /// Terminates the ongoing web-based operation and reports back that it was cancelled.
-    /// You need to call this method within your custom Web Auth provider implementation whenever the operation is cancelled by the user.
+    /// You need to call this method within your custom Web Auth provider implementation whenever the operation is
+    /// cancelled by the user.
     public static func cancel() {
         TransactionStore.shared.cancel()
     }

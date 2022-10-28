@@ -1,3 +1,5 @@
+// swiftlint:disable file_length
+
 #if WEB_AUTH_PLATFORM
 import Foundation
 #if canImport(Combine)
@@ -43,24 +45,26 @@ public protocol WebAuth: Trackable, Loggable {
     /**
      Specify the scopes that will be requested during authentication.
 
+     - Parameter scope: Space-separated list of requested scope values. For example,
+     `openid profile email offline_access`.
+     - Returns: The same `WebAuth` instance to allow method chaining.
+
      ## See Also
 
      - [Scopes](https://auth0.com/docs/get-started/apis/scopes)
-
-     - Parameter scope: Space-separated list of requested scope values. For example, `openid profile email offline_access`.
-     - Returns: The same `WebAuth` instance to allow method chaining.
      */
     func scope(_ scope: String) -> Self
 
     /**
      Specify provider scopes for OAuth2/social connections, such as GitHub or Google.
 
+     - Parameter connectionScope: Space-separated list of requested OAuth2/social scope values. For example,
+     `public_repo read:user`.
+     - Returns: The same `WebAuth` instance to allow method chaining.
+
      ## See Also
 
      - [Connection Scopes](https://auth0.com/docs/authenticate/identity-providers/adding-scopes-for-an-external-idp)
-
-     - Parameter connectionScope: Space-separated list of requested OAuth2/social scope values. For example, `public_repo read:user`.
-     - Returns: The same `WebAuth` instance to allow method chaining.
      */
     func connectionScope(_ connectionScope: String) -> Self
 
@@ -92,12 +96,12 @@ public protocol WebAuth: Trackable, Loggable {
     /// authentication.
     /// This value must match the **API Identifier** displayed in the APIs section of the [Auth0 Dashboard](https://manage.auth0.com/#/apis).
     ///
+    /// - Parameter audience: Audience value. For example, `https://example.com/api`.
+    /// - Returns: The same `WebAuth` instance to allow method chaining.
+    ///
     /// ## See Also
     ///
     /// - [Audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)
-    ///
-    /// - Parameter audience: Audience value. For example, `https://example.com/api`.
-    /// - Returns: The same `WebAuth` instance to allow method chaining.
     func audience(_ audience: String) -> Self
 
     /// Specify a `nonce` parameter for ID token validation.
@@ -130,15 +134,17 @@ public protocol WebAuth: Trackable, Loggable {
     /// Use a private browser session to avoid storing the session cookie in the shared cookie jar.
     /// Using this method will disable single sign-on (SSO).
     ///
+    /// - Returns: The same `WebAuth` instance to allow method chaining.
+    /// - Requires: iOS 13+ or macOS. Has no effect on iOS 12.
+    /// - Important: You don't need to call ``WebAuth/clearSession(federated:callback:)-9yv61`` if you are using this
+    /// method on login, because there will be no shared cookie to remove.
+    /// - Note: Don't use this method along with ``provider(_:)``. Use either one or the other, because this
+    /// method will only work with the default `ASWebAuthenticationSession` implementation.
+    ///
     /// ## See Also
     ///
     /// - [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md)
     /// - [prefersEphemeralWebBrowserSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio)
-    ///
-    /// - Returns: The same `WebAuth` instance to allow method chaining.
-    /// - Requires: iOS 13+ or macOS. Has no effect on iOS 12.
-    /// - Important: You don't need to call ``WebAuth/clearSession(federated:callback:)-9yv61`` if you are using this method on login, because there will be no shared cookie to remove.
-    /// - Important: Don't use this method along with ``provider(_:)``. Use either one or the other, because this method will only work with the default `ASWebAuthenticationSession` implementation.
     func useEphemeralSession() -> Self
 
     /// Specify an invitation URL to join an organization.
@@ -155,13 +161,14 @@ public protocol WebAuth: Trackable, Loggable {
 
     /// Specify a custom Web Auth provider to use instead of the default `ASWebAuthenticationSession` implementation.
     ///
+    /// - Parameter provider: A custom Web Auth provider.
+    /// - Returns: The same `WebAuth` instance to allow method chaining.
+    /// - Note: Don't use this method along with ``useEphemeralSession()``. Use either one or the other, because
+    /// ``useEphemeralSession()`` will only work with the default `ASWebAuthenticationSession` implementation.
+    ///
     /// ## See Also
     ///
     /// - ``WebAuthProvider``
-    ///
-    /// - Parameter provider: A custom Web Auth provider.
-    /// - Returns: The same `WebAuth` instance to allow method chaining.
-    /// - Important: Don't use this method along with ``useEphemeralSession()``. Use either one or the other, because ``useEphemeralSession()`` will only work with the default `ASWebAuthenticationSession` implementation.
     func provider(_ provider: @escaping WebAuthProvider) -> Self
 
     // MARK: - Methods
@@ -188,11 +195,13 @@ public protocol WebAuth: Trackable, Loggable {
      and its corresponding callback with be called with a result containing a ``WebAuthError/userCancelled`` error.
 
      - Parameter callback: Callback that receives a `Result` containing either the user's credentials or an error.
-     - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0 application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
+     - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
+     application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
 
     #if compiler(>=5.5) && canImport(_Concurrency)
+    #if compiler(>=5.5.2)
     /**
      Starts the Web Auth flow.
 
@@ -212,9 +221,9 @@ public protocol WebAuth: Trackable, Loggable {
 
      - Returns: The result of the Web Auth flow.
      - Throws: An error of type ``WebAuthError``.
-     - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0 application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
+     - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
+     application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
-    #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func start() async throws -> Credentials
     #else
@@ -246,7 +255,8 @@ public protocol WebAuth: Trackable, Loggable {
      and the subscription will complete with a result containing a ``WebAuthError/userCancelled`` error.
 
      - Returns: A type-erased publisher.
-     - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0 application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
+     - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
+     application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func start() -> AnyPublisher<Credentials, WebAuthError>
@@ -276,15 +286,17 @@ public protocol WebAuth: Trackable, Loggable {
          .clearSession(federated: true) { print($0) }
      ```
 
-     ## See Also
-
-     - [Logout](https://auth0.com/docs/authenticate/login/logout)
-
      - Parameters:
        - federated: If the identity provider session should be removed. Defaults to `false`.
        - callback: Callback that receives a `Result` containing either an empty success case or an error.
-     - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
-     - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will be no shared cookie to remove.
+     - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application
+     settings in the [Dashboard](https://manage.auth0.com/#/applications/).
+     - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will
+     be no shared cookie to remove.
+
+     ## See Also
+
+     - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
 
@@ -319,19 +331,22 @@ public protocol WebAuth: Trackable, Loggable {
          .store(in: &cancellables)
      ```
 
+     - Parameter federated: If the identity provider session should be removed. Defaults to `false`.
+     - Returns: A type-erased publisher.
+     - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application
+     settings in the [Dashboard](https://manage.auth0.com/#/applications/).
+     - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will
+     be no shared cookie to remove.
+
      ## See Also
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
-
-     - Parameter federated: If the identity provider session should be removed. Defaults to `false`.
-     - Returns: A type-erased publisher.
-     - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
-     - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will be no shared cookie to remove.
      */
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError>
 
     #if compiler(>=5.5) && canImport(_Concurrency)
+    #if compiler(>=5.5.2)
     /**
      Removes the Auth0 session and optionally removes the identity provider (IdP) session.
 
@@ -352,15 +367,16 @@ public protocol WebAuth: Trackable, Loggable {
      try await Auth0.webAuth().clearSession(federated: true)
      ```
 
+     - Parameter federated: If the identity provider session should be removed. Defaults to `false`.
+     - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application
+     settings in the [Dashboard](https://manage.auth0.com/#/applications/).
+     - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will
+     be no shared cookie to remove.
+
      ## See Also
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
-
-     - Parameter federated: If the identity provider session should be removed. Defaults to `false`.
-     - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
-     - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will be no shared cookie to remove.
      */
-    #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) async throws
     #else

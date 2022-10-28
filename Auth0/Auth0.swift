@@ -47,7 +47,8 @@ public func authentication(clientId: String, domain: String, session: URLSession
 }
 
 /**
- Auth0 [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate your user using Database, Social, Enterprise or Passwordless connections.
+ Auth0 [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate your user using Database,
+ Social, Enterprise or Passwordless connections.
 
  ## Usage
 
@@ -55,7 +56,8 @@ public func authentication(clientId: String, domain: String, session: URLSession
  Auth0.authentication()
  ```
 
- The Auth0 Client ID & Domain are loaded from the `Auth0.plist` file in your main bundle. It should have the following content:
+ The Auth0 Client ID & Domain are loaded from the `Auth0.plist` file in your main bundle. It should have the following
+ content:
  
  ```xml
  <?xml version="1.0" encoding="UTF-8"?>

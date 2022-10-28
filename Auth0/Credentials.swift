@@ -30,23 +30,26 @@ public final class Credentials: NSObject {
 
     /// Token that can be used to request a new access token.
     ///
+    /// - Requires: The scope `offline_access` to have been requested on login. Make sure that your Auth0 application
+    /// has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types).
+    /// If you are also specifying an audience value, make sure that the corresponding Auth0 API has the
+    /// **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+    ///
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    ///
-    /// - Requires: The scope `offline_access` to have been requested on login.
     public let refreshToken: String?
 
     /// Token that contains the user information.
-    ///
-    /// ## See Also
-    ///
-    /// - [ID Tokens](https://auth0.com/docs/secure/tokens/id-tokens)
     ///
     /// - Important: The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their
     /// contents have not been tampered with. **This is not the case for the ID tokens obtained from the Authentication API
     /// client.** You must [validate](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) any ID
     /// Tokens received from the Authentication API client before using the information they contain.
+    ///
+    /// ## See Also
+    ///
+    /// - [ID Tokens](https://auth0.com/docs/secure/tokens/id-tokens)
     public let idToken: String
 
     /// The scopes that have been granted by Auth0.

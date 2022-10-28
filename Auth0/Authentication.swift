@@ -24,7 +24,8 @@ public protocol Authentication: Trackable, Loggable {
     // MARK: - Methods
 
     /**
-     Logs in a user using an email and an OTP code received via email. This is the last part of the passwordless login flow.
+     Logs in a user using an email and an OTP code received via email. This is the last part of the passwordless login
+     flow.
 
      ## Usage
 
@@ -54,18 +55,19 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
-     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
-
      - Parameters:
        - email:    Email the user used to start the passwordless login flow.
        - code:     One-time password (OTP) code the user received via email.
        - audience: API Identifier that your application is requesting access to. Defaults to `nil`.
        - scope:    Space-separated list of requested scope values. Defaults to `openid profile email`.
      - Returns: Request that will yield Auth0 user's credentials.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check
+     [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
+     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
      */
     func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -100,18 +102,19 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
-     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
-
      - Parameters:
        - phoneNumber: Phone number the user used to start the passwordless login flow.
        - code:        One-time password (OTP) code the user received via SMS.
        - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
        - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
      - Returns: Request that will yield Auth0 user's credentials.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check
+     [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
+     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
      */
     func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -156,7 +159,8 @@ public protocol Authentication: Trackable, Loggable {
        - audience:          API Identifier that your application is requesting access to.
        - scope:             Space-separated list of requested scope values.
      - Returns: Request that will yield Auth0 user's credentials.
-     - Requires: The `http://auth0.com/oauth/grant-type/password-realm` grant. Check [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+     - Requires: The `http://auth0.com/oauth/grant-type/password-realm` grant. Check
+     [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
      */
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -179,15 +183,16 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-one-time-password-otp-)
-
      - Parameters:
        - otp:      One-time password supplied by a MFA authenticator.
        - mfaToken: Token returned when authentication fails with an ``AuthenticationError/isMultifactorRequired`` error due to MFA requirement.
      - Returns: A request that will yield Auth0 user's credentials.
-     - Requires: The `http://auth0.com/oauth/grant-type/mfa-otp` grant. Check [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+     - Requires: The `http://auth0.com/oauth/grant-type/mfa-otp` grant. Check
+     [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-one-time-password-otp-)
      */
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
@@ -210,16 +215,17 @@ public protocol Authentication: Trackable, Loggable {
     ///     }
     /// ```
     ///
-    /// ## See Also
-    ///
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-out-of-band-oob-)
-    ///
     /// - Parameters:
     ///   - oobCode:     The OOB code received from the challenge request.
     ///   - mfaToken:    Token returned when authentication fails with an ``AuthenticationError/isMultifactorRequired`` error due to MFA requirement.
     ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message.
     /// - Returns: A request that will yield Auth0 user's credentials.
-    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-oob` grant. Check [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-oob` grant. Check
+    /// [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-out-of-band-oob-)
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using a recovery code.
@@ -243,17 +249,18 @@ public protocol Authentication: Trackable, Loggable {
     ///     }
     /// ```
     ///
-    /// ## See Also
-    ///
-    /// - ``Credentials/recoveryCode``
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-recovery-code)
-    ///
     /// - Parameters:
     ///   - recoveryCode: Recovery code provided by the user.
     ///   - mfaToken:     Token returned when authentication fails with an ``AuthenticationError/isMultifactorRequired`` error due to MFA requirement.
     /// - Returns: A request that will yield Auth0 user's credentials. Might include a **recovery code**, which the
     /// application must display to the user to be stored securely for future use.
-    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-recovery-code` grant. Check [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-recovery-code` grant. Check
+    /// [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+    ///
+    /// ## See Also
+    ///
+    /// - ``Credentials/recoveryCode``
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-recovery-code)
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
     /// Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
@@ -321,10 +328,6 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#token-exchange-for-native-social)
-
      - Parameters:
        - authorizationCode: Authorization Code retrieved from Apple Authorization.
        - fullName:          The full name property returned with the Apple ID Credentials.
@@ -332,6 +335,10 @@ public protocol Authentication: Trackable, Loggable {
        - audience:          API Identifier that your application is requesting access to.   
        - scope:             Space-separated list of requested scope values. Defaults to `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#token-exchange-for-native-social)
      */
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -367,16 +374,16 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#token-exchange-for-native-social)
-
      - Parameters:
        - sessionAccessToken: Session info access token retrieved from Facebook.
        - profile:            The user profile data retrieved from Facebook.
        - audience:           API Identifier that your application is requesting access to.
        - scope:              Space-separated list of requested scope values. Defaults to `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#token-exchange-for-native-social)
      */
     func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -466,10 +473,6 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#signup)
-
      - Parameters:
        - email:          Email for the new user.
        - username:       Username for the new user (if the connection requires a username). Defaults to `nil`.
@@ -478,6 +481,10 @@ public protocol Authentication: Trackable, Loggable {
        - userMetadata:   Additional user metadata parameters that will be added to the newly created user.
        - rootAttributes: Root attributes that will be added to the newly created user. These will not overwrite existing parameters. See https://auth0.com/docs/api/authentication#signup for the full list of supported attributes.
      - Returns: A request that will yield a newly created database user (just the email, username, and email verified flag).
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#signup)
      */
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
@@ -494,19 +501,20 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#change-password)
-
      - Parameters:
        - email:      Email of the database user.
        - connection: Name of the database connection.
      - Returns: A request for resetting the password.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#change-password)
      */
     func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError>
 
     /**
-     Starts passwordless authentication by sending an email with an OTP code. This is the first part of the passwordless login flow.
+     Starts passwordless authentication by sending an email with an OTP code. This is the first part of the
+     passwordless login flow.
 
      ## Usage
 
@@ -526,22 +534,24 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
-     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
-
      - Parameters:
        - email:      Email where to send the code or link.
        - type:       Type of passwordless authentication. Defaults to 'code'.
        - connection: Name of the passwordless connection. Defaults to 'email'.
      - Returns: A request for starting the passwordless flow.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check
+     [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
+     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
      */
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
     /**
-     Starts passwordless authentication by sending an SMS with an OTP code. This is the first part of the passwordless login flow.
+     Starts passwordless authentication by sending an SMS with an OTP code. This is the first part of the passwordless
+     login flow.
 
      ## Usage
 
@@ -561,17 +571,18 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
-     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
-
      - Parameters:
        - phoneNumber: Phone number where to send the SMS with the code or link.
        - type:        Type of passwordless authentication. Defaults to 'code'.
        - connection:  Name of the passwordless connection. Defaults to 'sms'.
      - Returns: A request for starting the passwordless flow.
-     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+     - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check
+     [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
+     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
      */
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
@@ -594,12 +605,12 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
+     - Parameter accessToken: Access token obtained by authenticating the user.
+     - Returns: A request that will yield user information.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-user-info)
-
-     - Parameter accessToken: Access token obtained by authenticating the user.
-     - Returns: A request that will yield user information.
      */
     func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError>
 
@@ -625,16 +636,16 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     ## See Also
-
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authorization-code-flow-with-pkce45)
-     - [RFC 7636](https://tools.ietf.org/html/rfc7636)
-
      - Parameters:
        - code:         Code returned after a request to `/oauth/authorize`.
        - codeVerifier: Verifier used to generate the challenge sent in the request to `/oauth/authorize`.
        - redirectURI:  Redirect URI sent in the request to `/oauth/authorize`.
      - Returns: A request that will yield Auth0 user's credentials.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authorization-code-flow-with-pkce45)
+     - [RFC 7636](https://tools.ietf.org/html/rfc7636)
      */
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
@@ -667,14 +678,14 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
+     - Parameters:
+       - refreshToken: The refresh token.
+       - scope:        Space-separated list of scope values to request. Defaults to `nil`, which will ask for the same scopes that were originally requested on login.
+     - Returns: A request that will yield Auth0 user's credentials.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
-
-     - Parameters:
-       - refreshToken: The refresh token.
-       - scope:        Space-separated list of scope values to request. Defaults to `nil`, which will ask for the same scopes that were requested on login.
-     - Returns: A request that will yield Auth0 user's credentials.
      */
     func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
 
@@ -690,13 +701,13 @@ public protocol Authentication: Trackable, Loggable {
          .start { print($0) }
      ```
 
+     - Parameter refreshToken: The refresh token to revoke.
+     - Returns: A request for revoking the refresh token.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
      - [Error Responses](https://auth0.com/docs/api/authentication#post-oauth-revoke)
-
-     - Parameter refreshToken: The refresh token to revoke.
-     - Returns: A request for revoking the refresh token.
      */
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError>
 
@@ -719,11 +730,11 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
+     - Returns: A request that will yield JWKS information.
+
      ## See Also
 
      - [JSON Web Key Sets](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-key-sets)
-
-     - Returns: A request that will yield JWKS information.
      */
     func jwks() -> Request<JWKS, AuthenticationError>
 

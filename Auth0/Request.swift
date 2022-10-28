@@ -136,12 +136,13 @@ public extension Request {
 #if compiler(>=5.5) && canImport(_Concurrency)
 public extension Request {
 
+    #if compiler(>=5.5.2)
     /**
      Performs the request.
 
      - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
      */
-    #if compiler(>=5.5.2)
+
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func start() async throws -> T {
         return try await withCheckedThrowingContinuation { continuation in
