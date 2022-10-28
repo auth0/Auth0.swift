@@ -1,24 +1,18 @@
 import Foundation
 
-/**
- *  Represents an error during a request to the Auth0 Management API v2.
- */
+/// Represents an error during a request to the Auth0 Management API v2.
 public struct ManagementError: Auth0APIError {
 
-    /**
-     Additional information about the error.
-     */
+    /// Additional information about the error.
     public let info: [String: Any]
 
-    /**
-     Creates an error from a JSON response.
-
-     - Parameters:
-       - info:       JSON response from Auth0.
-       - statusCode: HTTP status code of the response.
-
-     - Returns: A new `ManagementError`.
-     */
+    /// Creates an error from a JSON response.
+    ///
+    /// - Parameters:
+    ///   - info:       JSON response from Auth0.
+    ///   - statusCode: HTTP status code of the response.
+    ///
+    /// - Returns: A new `ManagementError`.
     public init(info: [String: Any], statusCode: Int) {
         var values = info
         values["statusCode"] = statusCode
@@ -26,30 +20,22 @@ public struct ManagementError: Auth0APIError {
         self.statusCode = statusCode
     }
 
-    /**
-     HTTP status code of the response.
-     */
+    /// HTTP status code of the response.
     public let statusCode: Int
 
-    /**
-     The underlying `Error` value, if any. Defaults to `nil`.
-     */
+    /// The underlying `Error` value, if any. Defaults to `nil`.
     public var cause: Error? {
         return self.info["cause"] as? Error
     }
 
-    /**
-     The code of the error as a string.
-     */
+    /// The code of the error as a string.
     public var code: String {
         return self.info["code"] as? String ?? unknownError
     }
 
-    /**
-     Description of the error.
-
-     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
-     */
+    /// Description of the error.
+    ///
+    /// - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
     public var debugDescription: String {
         self.appendCause(to: self.message)
     }

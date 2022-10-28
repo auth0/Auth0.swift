@@ -10,7 +10,9 @@ let parameterPropertyKey = "com.auth0.parameter"
 /**
  Auth0 API request.
 
- ```
+ ## Usage
+
+ ```swift
  let request: Request<Credentials, AuthenticationError> = // ...
  
  request.start { result in
@@ -90,7 +92,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     }
 
     /**
-     Modifies the parameters by creating a copy of the request and adding the provided parameters to ``parameters``.
+     Modifies the parameters by creating a copy of the request and adding the provided parameters to the existing ones.
 
      - Parameter extraParameters: Additional parameters for the request.
      */
@@ -102,7 +104,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     }
 
     /**
-     Modifies the headers by creating a copy of the request and adding the provided headers to ``headers``.
+     Modifies the headers by creating a copy of the request and adding the provided headers to the existing ones.
 
      - Parameter extraHeaders: Additional headers for the request.
      */

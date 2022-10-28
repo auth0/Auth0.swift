@@ -5,6 +5,6 @@
         "Auth0.podspec": [],
         "README.md": ["~> {MAJOR}.{MINOR}"]
     },
-    "postbump": "bundle update && bundle exec jazzy",
+    "postbump": "bundle update && bundle exec fastlane ios build_docs",
     "prefixVersion": false
 }

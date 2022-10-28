@@ -26,6 +26,7 @@ public protocol CredentialsStorage {
 
 }
 
+/// Conformance to ``CredentialsStorage``.
 extension SimpleKeychain: CredentialsStorage {
 
     /// Retrieves a storage entry.

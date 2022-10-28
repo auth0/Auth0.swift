@@ -6,9 +6,11 @@ public extension WebAuthentication {
 
     /// Creates a Web Auth provider that uses `SFSafariViewController` as the external user agent.
     ///
-    /// ```
+    /// ## Usage
+    ///
+    /// ```swift
     /// Auth0
-    ///     .webAuth(clientId: clientId, domain: "samples.auth0.com")
+    ///     .webAuth()
     ///     .provider(WebAuthentication.safariProvider())
     ///     .start { result in
     ///         // ...
@@ -17,9 +19,9 @@ public extension WebAuthentication {
     ///
     /// If you need specify a custom `UIModalPresentationStyle`:
     ///
-    /// ```
+    /// ```swift
     /// Auth0
-    ///     .webAuth(clientId: clientId, domain: "samples.auth0.com")
+    ///     .webAuth()
     ///     .provider(WebAuthentication.safariProvider(style: .formSheet))
     ///     .start { result in
     ///         // ...

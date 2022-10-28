@@ -141,11 +141,11 @@ Note that this custom `URLSession` instance will be used when communicating with
 
 ### ID token validation
 
-Auth0.swift automatically [validates](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) the ID token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID token have not been tampered with and can be safely used.
+Auth0.swift automatically [validates](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) the ID token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID token have not been tampered with and can be safely used.
 
 #### Custom Domains
 
-Users of Auth0 Private Cloud with custom domains still on the [legacy behavior](https://auth0.com/docs/deploy/private-cloud/private-cloud-migrations/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 Domain when performing Web Auth login. Otherwise, the ID token validation will fail.
+Users of Auth0 Private Cloud with custom domains still on the [legacy behavior](https://auth0.com/docs/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 Domain when performing Web Auth login. Otherwise, the ID token validation will fail.
 
 ```swift
 Auth0
@@ -267,7 +267,7 @@ credentialsManager
 
 ### Retrieve stored user information
 
-The stored [ID token](https://auth0.com/docs/security/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.
+The stored [ID token](https://auth0.com/docs/secure/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.
 
 ```swift
 let user = credentialsManager.user
@@ -329,7 +329,7 @@ For login or signup with username/password, the `Password` grant type needs to b
 
 > 💡 If your Auth0 account has the **Bot Detection** feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the [Bot Detection](#bot-detection) section.
 
-> ⚠️ The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/security/tokens/id-tokens/validate-id-tokens) any ID tokens received from the Authentication API client before using the information they contain.
+> ⚠️ The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) any ID tokens received from the Authentication API client before using the information they contain.
 
 ### Login with database connection
 
@@ -457,7 +457,7 @@ Auth0
 
 ### Passwordless login
 
-Passwordless is a two-step authentication flow that requires the **Passwordless OTP** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/configure/applications/application-grant-types) for more information.
+Passwordless is a two-step authentication flow that requires the **Passwordless OTP** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
 
 #### 1. Start the passwordless flow
 
@@ -465,7 +465,7 @@ Request a code to be sent to the user's email or phone number. For email scenari
 
 ```swift
 Auth0
-    .authentication(clientId: clientId, domain: "samples.auth0.com")
+    .authentication()
     .startPasswordless(email: "support@auth0.com")
     .start { result in
         switch result {
@@ -521,7 +521,7 @@ To complete the authentication, you must send back that code the user received a
 
 ```swift
 Auth0
-    .authentication(clientId: clientId, domain: "samples.auth0.com")
+    .authentication()
     .login(email: "support@auth0.com", code: "123456")
     .start { result in
         switch result {
@@ -758,7 +758,7 @@ To call this method, you need to request the `read:current_user` scope when logg
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .get("user id", fields: ["user_metadata"])
+    .get("user-id", fields: ["user_metadata"])
     .start { result in
         switch result {
         case .success(let user):
@@ -776,7 +776,7 @@ Auth0
 do {
     let user = try await Auth0
         .users(token: credentials.accessToken)
-        .get("user id", fields: ["user_metadata"])
+        .get("user-id", fields: ["user_metadata"])
         .start()
     print("Obtained user with metadata: \(user)") 
 } catch {
@@ -791,7 +791,7 @@ do {
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .get("user id", fields: ["user_metadata"])
+    .get("user-id", fields: ["user_metadata"])
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -804,7 +804,7 @@ Auth0
 ```
 </details>
 
-> 💡 An alternative is to use a [post-login Action](https://auth0.com/docs/customize/actions/triggers/post-login/api-object) to add the metadata to the ID token as a custom claim.
+> 💡 An alternative is to use a [post-login Action](https://auth0.com/docs/customize/actions/flows-and-triggers/login-flow/api-object) to add the metadata to the ID token as a custom claim.
 
 ### Update user metadata
 
@@ -813,7 +813,7 @@ To call this method, you need to request the `update:current_user_metadata` scop
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .patch("user id", 
+    .patch("user-id", 
            userMetadata: ["first_name": "John", "last_name": "Appleseed"])
     .start { result in
         switch result {
@@ -832,7 +832,7 @@ Auth0
 do {
     let user = try await Auth0
         .users(token: credentials.accessToken)
-        .patch("user id", 
+        .patch("user-id", 
                userMetadata: ["first_name": "John", "last_name": "Appleseed"])
         .start()
     print("Updated user: \(user)") 
@@ -848,7 +848,7 @@ do {
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .patch("user id", 
+    .patch("user-id", 
            userMetadata: ["first_name": "John", "last_name": "Appleseed"])
     .start()
     .sink(receiveCompletion: { completion in
@@ -871,7 +871,7 @@ You can get the primary user ID value from the `sub` [claim](https://auth0.com/d
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .link("primary user id", withOtherUserToken: "secondary id token")
+    .link("primary-user-id", withOtherUserToken: "secondary-id-token")
     .start { result in
         switch result {
         case .success:
@@ -889,7 +889,7 @@ Auth0
 do {
     _ = try await Auth0
         .users(token: credentials.accessToken)
-        .link("primary user id", withOtherUserToken: "secondary id token")
+        .link("primary-user-id", withOtherUserToken: "secondary-id-token")
         .start()
     print("Accounts linked")
 } catch {
@@ -904,7 +904,7 @@ do {
 ```swift
 Auth0
     .users(token: credentials.accessToken)
-    .link("primary user id", withOtherUserToken: "secondary id token")
+    .link("primary-user-id", withOtherUserToken: "secondary-id-token")
     .start()
     .sink(receiveCompletion: { completion in
         switch completion {
@@ -976,13 +976,13 @@ Auth0
 With a successful authentication you'll see something similar to the following:
 
 ```text
-ASWebAuthenticationSession: https://samples.auth0.com/authorize?.....
-Callback URL: com.auth0.myapp://samples.auth0.com/ios/com.auth0.MyApp/callback?...
-POST https://samples.auth0.com/oauth/token HTTP/1.1
+ASWebAuthenticationSession: https://samples.us.auth0.com/authorize?.....
+Callback URL: com.auth0.myapp://samples.us.auth0.com/ios/com.auth0.MyApp/callback?...
+POST https://samples.us.auth0.com/oauth/token HTTP/1.1
 Content-Type: application/json
 Auth0-Client: eyJ2ZXJzaW9uI...
 
-{"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.auth0.MyApp:\/\/samples.auth0.com\/ios\/com.auth0.MyApp\/callback","code_verifier":"..."}
+{"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.auth0.MyApp:\/\/samples.us.auth0.com\/ios\/com.auth0.MyApp\/callback","code_verifier":"..."}
 
 HTTP/1.1 200
 Pragma: no-cache
@@ -1015,7 +1015,7 @@ If you've added the [Sign In with Apple flow](https://developer.apple.com/docume
 ```swift
 Auth0
     .authentication()
-    .login(appleAuthorizationCode: "auth code")
+    .login(appleAuthorizationCode: "auth-code")
     .start { result in
         switch result {
         case .success(let credentials):
@@ -1033,7 +1033,7 @@ Auth0
 do {
     let credentials = try await Auth0
         .authentication()
-        .login(appleAuthorizationCode: "auth code")
+        .login(appleAuthorizationCode: "auth-code")
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -1048,7 +1048,7 @@ do {
 ```swift
 Auth0
     .authentication()
-    .login(appleAuthorizationCode: "auth code")
+    .login(appleAuthorizationCode: "auth-code")
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1061,16 +1061,16 @@ Auth0
 ```
 </details>
 
-> 💡 See the [Setting up Sign In with Apple](https://auth0.com/docs/connections/social/apple-native) guide for more information about integrating Sign In with Apple with Auth0.
+> 💡 See the [Setting up Sign In with Apple](https://auth0.com/docs/authenticate/identity-providers/social-identity-providers/apple-native) guide for more information about integrating Sign In with Apple with Auth0.
 
 #### Facebook Login
 
-If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a [session info access token](https://developers.facebook.com/docs/facebook-login/guides/%20access-tokens/get-session-info) and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.
+If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a [session info access token](https://developers.facebook.com/docs/facebook-login/guides/access-tokens/get-session-info) and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.
 
 ```swift
 Auth0
     .authentication()
-    .login(facebookSessionAccessToken: "session info access token",
+    .login(facebookSessionAccessToken: "session-info-access-token",
            profile: ["key": "value"])
     .start { result in
         switch result {
@@ -1089,7 +1089,7 @@ Auth0
 do {
     let credentials = try await Auth0
         .authentication()
-        .login(facebookSessionAccessToken: "session info access token",
+        .login(facebookSessionAccessToken: "session-info-access-token",
                profile: ["key": "value"])
         .start()
     print("Obtained credentials: \(credentials)")
@@ -1105,7 +1105,7 @@ do {
 ```swift
 Auth0
     .authentication()
-    .login(facebookSessionAccessToken: "session info access token",
+    .login(facebookSessionAccessToken: "session-info-access-token",
            profile: ["key": "value"])
     .start()
     .sink(receiveCompletion: { completion in
@@ -1119,7 +1119,7 @@ Auth0
 ```
 </details>
 
-> 💡 See the [Setting up Facebook Login](https://auth0.com/docs/connections/social/facebook-native) guide for more information about integrating Facebook Login with Auth0.
+> 💡 See the [Setting up Facebook Login](https://auth0.com/docs/authenticate/identity-providers/social-identity-providers/facebook-native) guide for more information about integrating Facebook Login with Auth0.
 
 ### Organizations
 

@@ -55,6 +55,14 @@ Runs all the tests in a CI environment
 
 Tags the release and pushes the Podspec to CocoaPods
 
+### ios build_docs
+
+```sh
+[bundle exec] fastlane ios build_docs
+```
+
+Generate API documentation
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

@@ -3,7 +3,10 @@
 import Foundation
 
 /// OIDC Standard Claims user information.
-/// - See: [Claims](https://auth0.com/docs/security/tokens/json-web-tokens/json-web-token-claims)
+///
+/// ## See Also
+///
+/// - [Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims)
 public struct UserInfo: JSONObjectPayload {
 
     /// The list of public claims.
@@ -39,22 +42,27 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `profile` scope.
     public let name: String?
+
     /// The first name of the user.
     ///
     /// - Requires: The `profile` scope.
     public let givenName: String?
+
     /// The last name of the user.
     ///
     /// - Requires: The `profile` scope.
     public let familyName: String?
+
     /// The middle name of the user.
     ///
     /// - Requires: The `profile` scope.
     public let middleName: String?
+
     /// The nickname of the user.
     ///
     /// - Requires: The `profile` scope.
     public let nickname: String?
+
     /// The preferred username of the user.
     ///
     /// - Requires: The `profile` scope.
@@ -64,10 +72,12 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `profile` scope.
     public let profile: URL?
+
     /// The URL of the user's picture.
     ///
     /// - Requires: The `profile` scope.
     public let picture: URL?
+
     /// The URL of the user's website.
     ///
     /// - Requires: The `profile` scope.
@@ -77,6 +87,7 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `email` scope.
     public let email: String?
+
     /// If the user's email is verified.
     ///
     /// - Requires: The `email` scope.
@@ -86,6 +97,7 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `profile` scope.
     public let gender: String?
+
     /// The birthdate of the user.
     ///
     /// - Requires: The `profile` scope.
@@ -95,6 +107,7 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `profile` scope.
     public let zoneinfo: TimeZone?
+
     /// The locale of the user.
     ///
     /// - Requires: The `profile` scope.
@@ -104,6 +117,7 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `phone_number` scope.
     public let phoneNumber: String?
+
     /// If the user's phone number is verified.
     ///
     /// - Requires: The `phone_number` scope.
@@ -113,6 +127,7 @@ public struct UserInfo: JSONObjectPayload {
     ///
     /// - Requires: The `address` scope.
     public let address: [String: String]?
+
     /// The date and time the user's information was last updated.
     ///
     /// - Requires: The `profile` scope.

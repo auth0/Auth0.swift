@@ -1,6 +1,6 @@
 import Foundation
 
-/// User attributes that can be updated using the ``patch()`` method of ``Users``.
+/// User attributes that can be updated using the ``Users/patch(_:attributes:)`` method of ``Users``.
 final public class UserPatchAttributes {
 
     private(set) var dictionary: [String: Any]

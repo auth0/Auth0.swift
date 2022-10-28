@@ -3,17 +3,23 @@ import Foundation
 
 /// Utility methods needed when using a custom Web Auth provider.
 ///
-/// - See: ``WebAuth/provider(_:)``
-/// - See: ``WebAuthUserAgent``
+/// ## See Also
+///
+/// - ``WebAuth/provider(_:)``
+/// - ``WebAuthUserAgent``
 public struct WebAuthentication {
 
     private init() {}
 
     /// Resumes the web-based operation when the external user agent redirects back to the app using a URL with a custom scheme.
     ///
-    /// Using the UIKit app lifecycle, in your `AppDelegate.swift`:
+    /// ## Usage
     ///
-    /// ```
+    /// ### For UIKit app lifecycle
+    ///
+    /// In your `AppDelegate.swift`:
+    ///
+    /// ```swift
     /// func application(_ app: UIApplication,
     ///                  open url: URL,
     ///                  options: [UIApplication.OpenURLOptionsKey: Any]) -> Bool {
@@ -21,27 +27,20 @@ public struct WebAuthentication {
     /// }
     /// ```
     ///
-    /// Using the UIKit app lifecycle with Scenes, in your `SceneDelegate.swift`:
+    /// ### For UIKit app lifecycle with Scenes
     ///
-    /// ```
-    /// // Called when your app is running or suspended in memory
+    /// In your `SceneDelegate.swift`:
+    ///
+    /// ```swift
     /// func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     ///     guard let url = URLContexts.first?.url else { return }
     ///     WebAuthentication.resume(with: url)
     /// }
-    ///
-    /// // Called when your app is not running
-    /// func scene(_ scene: UIScene,
-    ///            willConnectTo session: UISceneSession,
-    ///            options connectionOptions: UIScene.ConnectionOptions) {
-    ///     guard let url = connectionOptions.urlContexts.first?.url else { return }
-    ///     WebAuthentication.resume(with: url)
-    /// }
     /// ```
     ///
-    /// Using the SwiftUI app lifecycle:
+    /// ### For SwiftUI app lifecycle
     ///
-    /// ```
+    /// ```swift
     /// SomeView()
     ///     .onOpenURL { url in
     ///         WebAuthentication.resume(with: url)

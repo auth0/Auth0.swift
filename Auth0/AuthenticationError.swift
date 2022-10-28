@@ -1,26 +1,22 @@
 import Foundation
 
-/**
- *  Represents an error during a request to the Auth0 Authentication API.
- *
- *  - See: [Standard Error Responses](https://auth0.com/docs/api/authentication#standard-error-responses)
- */
+/// Represents an error during a request to the Auth0 Authentication API.
+///
+/// ## See Also
+///
+/// - [Standard Error Responses](https://auth0.com/docs/api/authentication#standard-error-responses)
 public struct AuthenticationError: Auth0APIError {
 
-    /**
-     Additional information about the error.
-     */
+    /// Additional information about the error.
     public let info: [String: Any]
 
-    /**
-     Creates an error from a JSON response.
-
-     - Parameters:
-       - info:       JSON response from Auth0.
-       - statusCode: HTTP status code of the response.
-
-     - Returns: A new `AuthenticationError`.
-     */
+    /// Creates an error from a JSON response.
+    ///
+    /// - Parameters:
+    ///   - info:       JSON response from Auth0.
+    ///   - statusCode: HTTP status code of the response.
+    ///
+    /// - Returns: A new `AuthenticationError`.
     public init(info: [String: Any], statusCode: Int) {
         var values = info
         values["statusCode"] = statusCode
@@ -28,31 +24,23 @@ public struct AuthenticationError: Auth0APIError {
         self.statusCode = statusCode
     }
 
-    /**
-     HTTP status code of the response.
-     */
+    /// HTTP status code of the response.
     public let statusCode: Int
 
-    /**
-     The underlying `Error` value, if any. Defaults to `nil`.
-     */
+    /// The underlying `Error` value, if any. Defaults to `nil`.
     public var cause: Error? {
         return self.info["cause"] as? Error
     }
 
-    /**
-     The code of the error as a string.
-     */
+    /// The code of the error as a string.
     public var code: String {
         let code = self.info["error"] ?? self.info["code"]
         return code as? String ?? unknownError
     }
 
-    /**
-     Description of the error.
-
-     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
-     */
+    /// Description of the error.
+    ///
+    /// - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
     public var debugDescription: String {
         self.appendCause(to: self.message)
     }
@@ -93,7 +81,7 @@ public struct AuthenticationError: Auth0APIError {
     }
 
     /// When an Auth0 rule returns an error.
-    /// The message returned by the rule is available in ``localizedDescription``.
+    /// The message returned by the rule is available in ``Auth0Error/localizedDescription``.
     public var isRuleError: Bool {
         return self.code == "unauthorized"
     }
@@ -149,6 +137,8 @@ public struct AuthenticationError: Auth0APIError {
     /// - [timedOut](https://developer.apple.com/documentation/foundation/urlerror/2293002-timedout)
     /// - [internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/2292893-internationalroamingoff)
     /// - [callIsActive](https://developer.apple.com/documentation/foundation/urlerror/2293147-callisactive)
+    ///
+    /// The underlying `URLError` is available in the ``Auth0Error/cause-9wuyi`` property.
     public var isNetworkError: Bool {
         guard let code = (self.cause as? URLError)?.code else {
             return false

@@ -99,3 +99,6 @@ fastlane/test_output
 
 # Gems
 vendor/bundle
+
+# Documentation generation
+docs.archive/

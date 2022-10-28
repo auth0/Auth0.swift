@@ -1,9 +1,7 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-/**
- *  Represents an error during a Web Auth operation.
- */
+/// Represents an error during a Web Auth operation.
 public struct WebAuthError: Auth0Error {
 
     enum Code: Equatable {
@@ -24,16 +22,12 @@ public struct WebAuthError: Auth0Error {
         self.cause = cause
     }
 
-    /**
-     The underlying `Error` value, if any. Defaults to `nil`.
-     */
+    /// The underlying `Error` value, if any. Defaults to `nil`.
     public let cause: Error?
 
-    /**
-     Description of the error.
-
-     - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
-     */
+    /// Description of the error.
+    ///
+    /// - Important: You should avoid displaying the error description to the user, it's meant for **debugging** only.
     public var debugDescription: String {
         self.appendCause(to: self.message)
     }
@@ -42,30 +36,37 @@ public struct WebAuthError: Auth0Error {
 
     /// The bundle identifier could not be retrieved from `Bundle.main.bundleIdentifier`, or it could not be used to
     /// build a valid URL.
-    /// This error does not include a ``cause``.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let noBundleIdentifier: WebAuthError = .init(code: .noBundleIdentifier)
+
     /// The invitation URL is missing the `invitation` and/or the `organization` query parameters.
-    /// This error does not include a ``cause``.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let invalidInvitationURL: WebAuthError = .init(code: .invalidInvitationURL(""))
+
     /// The user cancelled the Web Auth operation.
-    /// This error does not include a ``cause``.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let userCancelled: WebAuthError = .init(code: .userCancelled)
+
     /// The Auth0 application does not support authentication with Proof Key for Code Exchange (PKCE).
     /// PKCE support needs to be enabled in the settings page of the [Auth0 application](https://manage.auth0.com/#/applications/),
     /// by setting the **Application Type** to 'Native' and the **Token Endpoint Authentication Method** to 'None'.
-    /// This error does not include a ``cause``.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
+
     /// The callback URL is missing the `code` query parameter.
-    /// This error does not include a ``cause``.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let noAuthorizationCode: WebAuthError = .init(code: .noAuthorizationCode([:]))
+
     /// The ID token validation performed after authentication failed.
-    /// The underlying `Error` value can be accessed via the ``cause`` property.
+    /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let idTokenValidationFailed: WebAuthError = .init(code: .idTokenValidationFailed)
+
     /// An unexpected error occurred, and an `Error` value is available.
-    /// The underlying `Error` value can be accessed via the ``cause`` property.
+    /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let other: WebAuthError = .init(code: .other)
+
     /// An unexpected error occurred, but an `Error` value is not available.
-    /// This error does not include a ``cause``.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let unknown: WebAuthError = .init(code: .unknown(""))
 
 }
