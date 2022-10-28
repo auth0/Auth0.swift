@@ -976,13 +976,13 @@ Auth0
 With a successful authentication you'll see something similar to the following:
 
 ```text
-ASWebAuthenticationSession: https://samples.us.auth0.com/authorize?.....
-Callback URL: com.auth0.myapp://samples.us.auth0.com/ios/com.auth0.MyApp/callback?...
-POST https://samples.us.auth0.com/oauth/token HTTP/1.1
+ASWebAuthenticationSession: https://example.us.auth0.com/authorize?.....
+Callback URL: com.example.MyApp://example.us.auth0.com/ios/com.example.MyApp/callback?...
+POST https://example.us.auth0.com/oauth/token HTTP/1.1
 Content-Type: application/json
 Auth0-Client: eyJ2ZXJzaW9uI...
 
-{"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.auth0.MyApp:\/\/samples.us.auth0.com\/ios\/com.auth0.MyApp\/callback","code_verifier":"..."}
+{"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.example.MyApp:\/\/example.us.auth0.com\/ios\/com.example.MyApp\/callback","code_verifier":"..."}
 
 HTTP/1.1 200
 Pragma: no-cache

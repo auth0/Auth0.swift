@@ -146,10 +146,10 @@ YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
 YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/macos/YOUR_BUNDLE_IDENTIFIER/callback
 ```
 
-For example, if your iOS bundle identifier was `com.company.myapp` and your Auth0 Domain was `company.us.auth0.com`, then this value would be:
+For example, if your iOS bundle identifier was `com.example.MyApp` and your Auth0 Domain was `example.us.auth0.com`, then this value would be:
 
 ```text
-com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
+com.example.MyApp://example.us.auth0.com/ios/com.example.MyApp/callback
 ```
 
 > ⚠️ Make sure that the **Token Endpoint Authentication Method** setting is set to `None`.
@@ -158,7 +158,7 @@ com.company.myapp://company.us.auth0.com/ios/com.company.myapp/callback
 
 Back in Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
 
-![url-scheme](assets/url-scheme.png?raw=true)
+![url-scheme](https://user-images.githubusercontent.com/5055789/198689930-15f12179-15df-437e-ba50-dec26dbfb21f.png)
 
 This registers your bundle identifier as a custom URL scheme, so the callback and logout URLs can reach your app.
 
@@ -272,7 +272,7 @@ Auth0
 
 ### SSO alert box (iOS / macOS)
 
-![sso-alert](assets/sso-alert.png?raw=true)
+![sso-alert](https://user-images.githubusercontent.com/5055789/198689762-8f3459a7-fdde-4c14-a13b-68933ef675e6.png)
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
@@ -282,11 +282,11 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 **Learn about most features in [Examples ↗](EXAMPLES.md)**
 
-- [**Store credentials**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#store-credentials) - store the user's credentials securely in the Keychain.
-- [**Check for stored credentials**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#check-for-stored-credentials) - check if the user is already logged in when your app starts up.
-- [**Retrieve stored credentials**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#retrieve-stored-credentials) - fetch the user's credentials from the Keychain, automatically renewing them if they have expired.
-- [**Clear stored credentials**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#clear-stored-credentials) - delete the user's credentials to complete the logout process.
-- [**Retrieve user information**](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#retrieve-user-information) - fetch the latest user information from the `/userinfo` endpoint.
+- [**Store credentials**](EXAMPLES.md#store-credentials) - store the user's credentials securely in the Keychain.
+- [**Check for stored credentials**](EXAMPLES.md#check-for-stored-credentials) - check if the user is already logged in when your app starts up.
+- [**Retrieve stored credentials**](EXAMPLES.md#retrieve-stored-credentials) - fetch the user's credentials from the Keychain, automatically renewing them if they have expired.
+- [**Clear stored credentials**](EXAMPLES.md#clear-stored-credentials) - delete the user's credentials to complete the logout process.
+- [**Retrieve user information**](EXAMPLES.md#retrieve-user-information) - fetch the latest user information from the `/userinfo` endpoint.
 
 ## Support Policy
 

@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.3.2](https://github.com/auth0/Auth0.swift/tree/2.3.2) (2022-10-28)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.3.1...2.3.2)
+
+**Fixed**
+- Fix login web page cannot be open by canceling the AS session  [\#735](https://github.com/auth0/Auth0.swift/pull/735) ([hadiidbouk](https://github.com/hadiidbouk))
+
 ## [2.3.1](https://github.com/auth0/Auth0.swift/tree/2.3.1) (2022-07-29)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.3.0...2.3.1)
 
