@@ -304,7 +304,8 @@ The `useUniversalLink()` method was removed as well, as Universal Links [cannot 
 
 `useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were also removed. Auth0.swift now only uses `ASWebAuthenticationSession` to perform web-based authentication.
 
-> 💡 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
+> **Note**
+> Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
 ### Credentials Manager
 
