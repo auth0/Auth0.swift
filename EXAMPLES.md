@@ -43,7 +43,8 @@ Auth0
     }
 ```
 
-> ⚠️ The `screen_hint` parameter will work with the **New Universal Login Experience** without any further configuration. If you are using the **Classic Universal Login Experience**, you need to customize the [login template](https://manage.auth0.com/#/login_page) to look for this parameter and set the `initialScreen` [option](https://github.com/auth0/lock#database-options) of the `Auth0Lock` constructor.
+> **Note**
+> The `screen_hint` parameter will work with the **New Universal Login Experience** without any further configuration. If you are using the **Classic Universal Login Experience**, you need to customize the [login template](https://manage.auth0.com/#/login_page) to look for this parameter and set the `initialScreen` [option](https://github.com/auth0/lock#database-options) of the `Auth0Lock` constructor.
 
 <details>
   <summary>Using async/await</summary>
@@ -158,7 +159,8 @@ Auth0
 
 Web Auth will only produce `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/webautherror) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
-> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/documentation/auth0/webautherror/#topics) instead, which are part of the API.
+> **Warning**
+> Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/documentation/auth0/webautherror/#topics) instead, which are part of the API.
 
 [Go up ⤴](#examples)
 
@@ -180,7 +182,8 @@ The Credentials Manager utility allows you to securely store and retrieve the us
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 ```
 
-> ⚠️ The Credentials Manager is not thread-safe, except for the `credentials()` method. Do not call its non thread-safe methods and properties from different threads without proper synchronization.
+> **Warning**
+> The Credentials Manager is not thread-safe, except for the `credentials()` method. Do not call its non thread-safe methods and properties from different threads without proper synchronization.
 
 ### Store credentials
 
@@ -203,7 +206,8 @@ guard credentialsManager.canRenew() else {
 // Retrieve the stored credentials
 ```
 
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+> **Note**
+> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
 
 #### If you are not using refresh tokens
 
@@ -259,11 +263,14 @@ credentialsManager
 ```
 </details>
 
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+> **Note**
+> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
 
-> ⚠️ Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials. Since this method is thread-safe and `store(credentials:)` is not, calling it anyway can cause concurrency issues.
+> **Warning**
+> Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials. Since this method is thread-safe and `store(credentials:)` is not, calling it anyway can cause concurrency issues.
 
-> ⚠️ To ensure that no concurrent renewal requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+> **Warning**
+> To ensure that no concurrent renewal requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
 
 ### Retrieve stored user information
 
@@ -273,7 +280,8 @@ The stored [ID token](https://auth0.com/docs/secure/tokens/id-tokens) contains a
 let user = credentialsManager.user
 ```
 
-> 💡 To get the latest user information, use the `userInfo(withAccessToken:)` method of the Authentication API client.
+> **Note**
+> To get the latest user information, use the `userInfo(withAccessToken:)` [method](#retrieve-user-information) of the Authentication API client.
 
 ### Clear stored credentials
 
@@ -291,7 +299,8 @@ You can enable an additional level of user authentication before retrieving cred
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 ```
 
-> 💡 You need a real device to test biometric authentication. Biometrics are not available in simulators.
+> **Note**
+> You need a real device to test biometric authentication. Biometrics are not available in simulators.
 
 If needed, you can specify a particular `LAPolicy` to be used. For example, you might want to support Face ID or Touch ID, but also allow fallback to passcode.
 
@@ -300,13 +309,15 @@ credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login
                                     evaluationPolicy: .deviceOwnerAuthentication)
 ```
 
-> ⚠️ Retrieving the user information with `credentialsManager.user` will not be protected by biometric authentication.
+> **Note**
+> Retrieving the user information with `credentialsManager.user` will not be protected by biometric authentication.
 
 ### Credentials Manager errors
 
 The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror) to learn more about the error cases you need to handle, and which ones include a `cause` value.
 
-> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror/#topics) instead, which are part of the API.
+> **Warning**
+> Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Run a switch statement on the [error cases](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror/#topics) instead, which are part of the API.
 
 [Go up ⤴](#examples)
 
@@ -327,9 +338,11 @@ We recommend using [Universal Login](https://auth0.com/docs/authenticate/login/a
 
 For login or signup with username/password, the `Password` grant type needs to be enabled in your Auth0 application. If you set the grants via the Management API you should activate both `http://auth0.com/oauth/grant-type/password-realm` and `Password`. Otherwise, the Auth0 Dashboard will take care of activating both when enabling `Password`.
 
-> 💡 If your Auth0 account has the **Bot Detection** feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the [Bot Detection](#bot-detection) section.
+> **Note**
+> If your Auth0 account has the **Bot Detection** feature enabled, your requests might be flagged for verification. Check how to handle this scenario in the [Bot Detection](#bot-detection) section.
 
-> ⚠️ The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) any ID tokens received from the Authentication API client before using the information they contain.
+> **Warning**
+> The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID tokens obtained from the Authentication API client.** You must [validate](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) any ID tokens received from the Authentication API client before using the information they contain.
 
 ### Login with database connection
 
@@ -391,7 +404,8 @@ Auth0
 ```
 </details>
 
-> 💡 The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
+> **Note**
+> The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
 
 ### Sign up with database connection
 
@@ -453,7 +467,8 @@ Auth0
 ```
 </details>
 
-> 💡 You might want to log the user in after signup. See [Login with database connection](#login-with-database-connection) above for an example.
+> **Note**
+> You might want to log the user in after signup. See [Login with database connection](#login-with-database-connection) above for an example.
 
 ### Passwordless login
 
@@ -513,7 +528,8 @@ Auth0
 ```
 </details>
 
-> 💡 Use `startPasswordless(phoneNumber:)` to send a code to the user's phone number instead.
+> **Note**
+> Use `startPasswordless(phoneNumber:)` to send a code to the user's phone number instead.
 
 #### 2. Login with the received code
 
@@ -568,7 +584,8 @@ Auth0
 ```
 </details>
 
-> 💡 Use `login(phoneNumber:code:)` if the code was sent to the user's phone number.
+> **Note**
+> Use `login(phoneNumber:code:)` if the code was sent to the user's phone number.
 
 ### Retrieve user information
 
@@ -678,7 +695,8 @@ Auth0
 ```
 </details>
 
-> 💡 You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+> **Note**
+> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
 
 ### Authentication API client configuration
 
@@ -720,7 +738,8 @@ Auth0
 
 The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about the available `AuthenticationError` properties.
 
-> ⚠️ Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the [error types](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror/#topics) instead, which are part of the API.
+> **Warning**
+> Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the [error types](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror/#topics) instead, which are part of the API.
 
 [Go up ⤴](#examples)
 
@@ -747,9 +766,11 @@ Auth0
     // ...
 ```
 
-> 💡 Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your app.
+> **Note**
+> Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your app.
 
-> ⚠️ For security reasons, native mobile apps are restricted to a subset of the Management API functionality.
+> **Note**
+> For security reasons, native mobile apps are restricted to a subset of the Management API functionality.
 
 ### Retrieve user metadata
 
@@ -804,7 +825,8 @@ Auth0
 ```
 </details>
 
-> 💡 An alternative is to use a [post-login Action](https://auth0.com/docs/customize/actions/flows-and-triggers/login-flow/api-object) to add the metadata to the ID token as a custom claim.
+> **Note**
+> An alternative is to use a [post-login Action](https://auth0.com/docs/customize/actions/flows-and-triggers/login-flow/api-object) to add the metadata to the ID token as a custom claim.
 
 ### Update user metadata
 
@@ -971,7 +993,8 @@ Auth0
     // ...
 ```
 
-> ⚠️ Set this flag only when **DEBUGGING** to avoid leaking user's credentials in the device log.
+> **Warning**
+> Set this flag only when **DEBUGGING** to avoid leaking user's credentials in the device log.
 
 With a successful authentication you'll see something similar to the following:
 
@@ -996,7 +1019,8 @@ Connection: keep-alive
 {"access_token":"...","token_type":"Bearer"}
 ```
 
-> 💡 When troubleshooting, you can also check the logs in the [Auth0 Dashboard](https://manage.auth0.com/#/logs) for more information.
+> **Note**
+> When troubleshooting, you can also check the logs in the [Auth0 Dashboard](https://manage.auth0.com/#/logs) for more information.
 
 [Go up ⤴](#examples)
 
@@ -1061,7 +1085,8 @@ Auth0
 ```
 </details>
 
-> 💡 See the [Setting up Sign In with Apple](https://auth0.com/docs/authenticate/identity-providers/social-identity-providers/apple-native) guide for more information about integrating Sign In with Apple with Auth0.
+> **Note**
+> See the [Setting up Sign In with Apple](https://auth0.com/docs/authenticate/identity-providers/social-identity-providers/apple-native) guide for more information about integrating Sign In with Apple with Auth0.
 
 #### Facebook Login
 
@@ -1119,13 +1144,15 @@ Auth0
 ```
 </details>
 
-> 💡 See the [Setting up Facebook Login](https://auth0.com/docs/authenticate/identity-providers/social-identity-providers/facebook-native) guide for more information about integrating Facebook Login with Auth0.
+> **Note**
+> See the [Setting up Facebook Login](https://auth0.com/docs/authenticate/identity-providers/social-identity-providers/facebook-native) guide for more information about integrating Facebook Login with Auth0.
 
 ### Organizations
 
 [Organizations](https://auth0.com/docs/manage-users/organizations) is a set of features that provide better support for developers who build and maintain SaaS and Business-to-Business (B2B) apps. 
 
-> 💡 Organizations is currently only available to customers on our Enterprise and Startup subscription plans.
+> **Note**
+> Organizations is currently only available to customers on our Enterprise and Startup subscription plans.
 
 #### Log in to an organization
 
@@ -1196,7 +1223,7 @@ NotificationCenter.default
     .flatMap { _ in
         Auth0
             .webAuth()
-            .invitationURL(url) // 👈🏻
+            .invitationURL(url) // 👈🏼
             .start()
     }
     .sink(receiveCompletion: { completion in

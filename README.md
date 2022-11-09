@@ -31,7 +31,8 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 - Xcode 13.x / 14.x
 - Swift 5.3+
 
-> ⚠️ Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
+> **Note**
+> Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
 
 ### Installation
 
@@ -152,7 +153,8 @@ For example, if your iOS bundle identifier was `com.example.MyApp` and your Auth
 com.example.MyApp://example.us.auth0.com/ios/com.example.MyApp/callback
 ```
 
-> ⚠️ Make sure that the **Token Endpoint Authentication Method** setting is set to `None`.
+> **Note**
+> Make sure that the **Token Endpoint Authentication Method** [setting](https://auth0.com/docs/get-started/applications/confidential-and-public-applications/view-application-type) is set to `None`.
 
 #### Configure custom URL scheme
 
@@ -220,7 +222,7 @@ Auth0
 
 Logging the user out involves clearing the Universal Login session cookie and then deleting the user's credentials from your app.
 
-Call the `clearSession()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](#clear-stored-credentials).
+Call the `clearSession()` method in the action of your **Logout** button. Once the session cookie has been cleared, [delete the user's credentials](EXAMPLES.md#clear-stored-credentials).
 
 ```swift
 Auth0
@@ -276,7 +278,8 @@ Auth0
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
-> 💡 See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of single sign-on (SSO) on iOS.
+> **Note**
+> See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of single sign-on (SSO) on iOS.
 
 ### Next steps
 
