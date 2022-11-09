@@ -36,8 +36,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 ### Installation
 
-<details>
-  <summary>Swift Package Manager</summary>
+#### Swift Package Manager
 
 Open the following menu item in Xcode:
 
@@ -50,10 +49,8 @@ https://github.com/auth0/Auth0.swift
 ```
 
 Then, select the dependency rule and press **Add Package**.
-</details>
 
-<details>
-  <summary>Cocoapods</summary>
+#### Cocoapods
 
 Add the following line to your `Podfile`:
 
@@ -62,10 +59,8 @@ pod 'Auth0', '~> 2.3'
 ```
 
 Then, run `pod install`.
-</details>
 
-<details>
-  <summary>Carthage</summary>
+#### Carthage
 
 Add the following line to your `Cartfile`:
 
@@ -74,7 +69,6 @@ github "auth0/Auth0.swift" ~> 2.3
 ```
 
 Then, run `carthage bootstrap --use-xcframeworks`.
-</details>
 
 ### Configure the SDK
 
