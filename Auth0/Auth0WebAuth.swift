@@ -158,7 +158,7 @@ final class Auth0WebAuth: WebAuth {
         }
 
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL,
-                                                  defaults: shouldStartWithDefaultParameters ? handler.defaults : [:],
+                                                  defaults: handler.defaults,
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
@@ -216,7 +216,7 @@ final class Auth0WebAuth: WebAuth {
         let authorize = URL(string: "authorize", relativeTo: self.url)!
         var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true)!
         var items: [URLQueryItem] = []
-        var entries = defaults
+        var entries = shouldStartWithDefaultParameters ? defaults : [:]
 
         entries["scope"] = defaultScope
         entries["client_id"] = self.clientId
