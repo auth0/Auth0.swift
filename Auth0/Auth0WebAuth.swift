@@ -10,6 +10,7 @@ final class Auth0WebAuth: WebAuth {
     let url: URL
     let session: URLSession
     let storage: TransactionStore
+    let shouldStartWithDefaultParameters: Bool
 
     var telemetry: Telemetry
     var logger: Logger?
@@ -49,13 +50,15 @@ final class Auth0WebAuth: WebAuth {
          url: URL,
          session: URLSession = URLSession.shared,
          storage: TransactionStore = TransactionStore.shared,
-         telemetry: Telemetry = Telemetry()) {
+         telemetry: Telemetry = Telemetry(),
+         shouldStartWithDefaultParameters: Bool = true) {
         self.clientId = clientId
         self.url = url
         self.session = session
         self.storage = storage
         self.telemetry = telemetry
         self.issuer = url.absoluteString
+        self.shouldStartWithDefaultParameters = shouldStartWithDefaultParameters
     }
 
     func connection(_ connection: String) -> Self {
@@ -155,7 +158,7 @@ final class Auth0WebAuth: WebAuth {
         }
 
         let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL,
-                                                  defaults: handler.defaults,
+                                                  defaults: shouldStartWithDefaultParameters ? handler.defaults : [:],
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
