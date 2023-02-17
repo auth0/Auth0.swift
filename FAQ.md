@@ -1,6 +1,8 @@
 # Frequently Asked Questions
 
 1. [How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box)
+    - [Use ephemeral sessions](#use-ephemeral-sessions)
+    - [Use `SFSafariViewController`](#use-sfsafariviewcontroller)
 2. [How can I disable the _logout_ alert box?](#2-how-can-i-disable-the-logout-alert-box)
 3. [How can I change the message in the alert box?](#3-how-can-i-change-the-message-in-the-alert-box)
 4. [How can I programmatically close the alert box?](#4-how-can-i-programmatically-close-the-alert-box)
@@ -95,6 +97,8 @@ SomeView()
 ## 2. How can I disable the _logout_ alert box?
 
 ![sso-alert](https://user-images.githubusercontent.com/5055789/198689762-8f3459a7-fdde-4c14-a13b-68933ef675e6.png)
+
+Since `clearSession(federated:)` needs to use `ASWebAuthenticationSession` as well to clear the shared session cookie, the same alert box will be displayed. 
 
 If you need SSO and/or are willing to tolerate the alert box on the login call, but would prefer to get rid of it when calling `clearSession(federated:)`, you can simply not call `clearSession(federated:)` and just clear the credentials from the app. This means that the shared session cookie will not be removed, so to get the user to log in again you need to add the `"prompt": "login"` parameter to the _login_ call.
 
