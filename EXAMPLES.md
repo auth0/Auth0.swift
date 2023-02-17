@@ -293,7 +293,7 @@ let didClear = credentialsManager.clear()
 
 ### Biometric authentication
 
-You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, for example Face ID or Touch ID.
+You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, such as Face ID or Touch ID.
 
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Touch to Login")
