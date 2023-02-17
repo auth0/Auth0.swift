@@ -82,6 +82,7 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
         self.callback = callback
         super.init()
         self.controller.delegate = self
+        self.controller.presentationController?.delegate = self
     }
 
     func start() {
@@ -115,6 +116,17 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 extension SafariUserAgent: SFSafariViewControllerDelegate {
 
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+        // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead
+        // TransactionStore is internal
+        TransactionStore.shared.cancel()
+
+    }
+
+}
+
+extension SafariUserAgent: UIAdaptivePresentationControllerDelegate {
+
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead
         // TransactionStore is internal
         TransactionStore.shared.cancel()
