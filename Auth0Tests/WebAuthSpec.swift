@@ -417,6 +417,18 @@ class WebAuthSpec: QuickSpec {
 
             }
 
+            context("onClose") {
+
+                it("should use no onCloseCallback by default") {
+                    expect(newWebAuth().onCloseCallback).to(beNil())
+                }
+
+                it("should use an onCloseCallback") {
+                    expect(newWebAuth().onClose({ /* Empty */ }).onCloseCallback).toNot(beNil())
+                }
+
+            }
+
         }
 
         #if os(iOS)
