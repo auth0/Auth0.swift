@@ -30,7 +30,7 @@ final class Auth0WebAuth: WebAuth {
     private(set) var organization: String?
     private(set) var invitationURL: URL?
     private(set) var provider: WebAuthProvider?
-    private(set) var onWebViewClose: (() -> Void)?
+    private(set) var onCloseCallback: (() -> Void)?
 
     var state: String {
         return self.parameters["state"] ?? self.generateDefaultState()
@@ -134,8 +134,8 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    func onWebViewClose(_ onWebViewClose: (() -> Void)?) -> Self {
-        self.onWebViewClose = onWebViewClose
+    func onClose(_ callback: (() -> Void)?) -> Self {
+        self.onCloseCallback = callback
         return self
     }
 
@@ -167,12 +167,12 @@ final class Auth0WebAuth: WebAuth {
                                                   invitation: invitation)
         let provider = self.provider ?? WebAuthentication.asProvider(urlScheme: urlScheme,
                                                                      ephemeralSession: ephemeralSession)
-        let userAgent = provider(authorizeURL) { [storage, onWebViewClose] result in
+        let userAgent = provider(authorizeURL) { [storage, onCloseCallback] result in
             storage.clear()
 
             switch result {
             case .success:
-                onWebViewClose?()
+                onCloseCallback?()
             case .failure(let error):
                 callback(.failure(error))
             }

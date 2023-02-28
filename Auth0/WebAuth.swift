@@ -171,11 +171,11 @@ public protocol WebAuth: Trackable, Loggable {
     /// - ``WebAuthProvider``
     func provider(_ provider: @escaping WebAuthProvider) -> Self
 
-    /// Specify a closure to be called when the `provider` is finished and the Auth Transaction starts running
+    /// Specify a callback to be called when the ``WebAuthUserAgent`` closes, and the flow continues with the code exchange.
     ///
-    /// - Parameter onWebViewClose: A closure to be executed
+    /// - Parameter callback: A callback to be executed
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func onWebViewClose(_ onWebViewClose: (() -> Void)?) -> Self
+    func onClose(_ callback: (() -> Void)?) -> Self
 
     // MARK: - Methods
 
