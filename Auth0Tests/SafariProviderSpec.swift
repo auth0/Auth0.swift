@@ -124,6 +124,10 @@ class SafariProviderSpec: QuickSpec {
                 expect(safari.delegate).to(be(userAgent))
             }
 
+            it("should be the safari view controller's presentation delegate") {
+                expect(safari.presentationController?.delegate).to(be(userAgent))
+            }
+
             it("should present the safari view controller") {
                 let root = SpyViewController()
                 UIApplication.shared.keyWindow?.rootViewController = root
@@ -179,6 +183,12 @@ class SafariProviderSpec: QuickSpec {
                 expect(transaction.isCancelled) == true
             }
 
+            it("should cancel the transaction when the user dismisses the safari view controller") {
+                let transaction = SpyTransaction()
+                TransactionStore.shared.store(transaction)
+                userAgent.presentationControllerDidDismiss(safari.presentationController!)
+                expect(transaction.isCancelled) == true
+            }
         }
 
     }
