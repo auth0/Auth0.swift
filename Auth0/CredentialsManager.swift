@@ -520,7 +520,7 @@ public extension CredentialsManager {
 
 // MARK: - Async/Await
 
-#if compiler(>=5.5) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 public extension CredentialsManager {
 
     #if compiler(>=5.5.2)

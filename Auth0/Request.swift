@@ -133,7 +133,7 @@ public extension Request {
 
 // MARK: - Async/Await
 
-#if compiler(>=5.5) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 public extension Request {
 
     #if compiler(>=5.5.2)

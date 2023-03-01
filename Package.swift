@@ -1,12 +1,8 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.5
 
 import PackageDescription
 
-#if compiler(>=5.5)
 let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst]
-#else
-let webAuthPlatforms: [Platform] = [.iOS, .macOS]
-#endif
 let swiftSettings: [SwiftSetting] = [.define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms))]
 
 let package = Package(

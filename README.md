@@ -29,7 +29,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 - iOS 12.0+ / macOS 10.15+ / tvOS 12.0+ / watchOS 6.2+
 - Xcode 13.x / 14.x
-- Swift 5.3+
+- Swift 5.5+
 
 > **Note**
 > Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.

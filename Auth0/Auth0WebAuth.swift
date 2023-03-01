@@ -300,7 +300,7 @@ extension Auth0WebAuth {
 
 // MARK: - Async/Await
 
-#if compiler(>=5.5) && canImport(_Concurrency)
+#if canImport(_Concurrency)
 extension Auth0WebAuth {
 
     #if compiler(>=5.5.2)
