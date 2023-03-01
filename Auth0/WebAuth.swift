@@ -206,7 +206,7 @@ public protocol WebAuth: Trackable, Loggable {
      */
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
 
-    #if compiler(>=5.5) && canImport(_Concurrency)
+    #if canImport(_Concurrency)
     #if compiler(>=5.5.2)
     /**
      Starts the Web Auth flow.
@@ -351,7 +351,7 @@ public protocol WebAuth: Trackable, Loggable {
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError>
 
-    #if compiler(>=5.5) && canImport(_Concurrency)
+    #if canImport(_Concurrency)
     #if compiler(>=5.5.2)
     /**
      Removes the Auth0 session and optionally removes the identity provider (IdP) session.
@@ -404,7 +404,7 @@ public extension WebAuth {
         return self.clearSession(federated: federated)
     }
 
-    #if compiler(>=5.5) && canImport(_Concurrency)
+    #if canImport(_Concurrency)
     #if compiler(>=5.5.2)
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool = false) async throws {

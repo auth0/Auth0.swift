@@ -942,7 +942,7 @@ class CredentialsManagerSpec: QuickSpec {
             }
         }
 
-        #if compiler(>=5.5) && canImport(_Concurrency)
+        #if canImport(_Concurrency)
         describe("async await") {
 
             afterEach {
