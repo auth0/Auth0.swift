@@ -12,8 +12,8 @@ let package = Package(
     dependencies: [
         .package(name: "SimpleKeychain", url: "https://github.com/auth0/SimpleKeychain.git", .upToNextMajor(from: "1.0.0")),
         .package(name: "JWTDecode", url: "https://github.com/auth0/JWTDecode.swift.git", .upToNextMajor(from: "3.0.0")),
-        .package(name: "Quick", url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "5.0.0")),
-        .package(name: "Nimble", url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "10.0.0")),
+        .package(name: "Quick", url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "6.0.0")),
+        .package(name: "Nimble", url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "12.0.0")),
         .package(name: "OHHTTPStubs", url: "https://github.com/AliSoftware/OHHTTPStubs.git", .upToNextMajor(from: "9.0.0"))
     ],
     targets: [
