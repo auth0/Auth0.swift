@@ -63,6 +63,7 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
 
 private let defaults = ["response_type": "code"]
 
+@MainActor
 class WebAuthSpec: QuickSpec {
 
     override func spec() {
@@ -447,7 +448,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                expect(isStarted).toEventually(beTrue())
+                await expect(isStarted).toEventually(beTrue())
             }
 
             it("should generate a state") {
@@ -482,8 +483,8 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                expect(redirectURL?.query).toEventually(contain("organization=foo"))
-                expect(redirectURL?.query).toEventually(contain("invitation=bar"))
+                await expect(redirectURL?.query).toEventually(contain("organization=foo"))
+                await expect(redirectURL?.query).toEventually(contain("invitation=bar"))
             }
 
             it("should produce an invalid invitation URL error when the organization is missing") {
@@ -492,7 +493,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                await expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce an invalid invitation URL error when the invitation is missing") {
@@ -501,7 +502,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                await expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce an invalid invitation URL error when the organization and invitation are missing") {
@@ -510,7 +511,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                await expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce an invalid invitation URL error when the query parameters are missing") {
@@ -518,7 +519,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(DomainURL)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                await expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
@@ -526,7 +527,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 auth.redirectURL = nil
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                await expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             context("transaction") {
@@ -568,7 +569,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                expect(isStarted).toEventually(beTrue())
+                await expect(isStarted).toEventually(beTrue())
             }
 
             it("should not include the federated parameter by default") {
@@ -578,7 +579,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.clearSession() { _ in }
-                expect(redirectURL?.query?.contains("federated")).toEventually(beFalse())
+                await expect(redirectURL?.query?.contains("federated")).toEventually(beFalse())
             }
 
             it("should include the federated parameter") {
@@ -588,7 +589,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.clearSession(federated: true) { _ in }
-                expect(redirectURL?.query?.contains("federated")).toEventually(beTrue())
+                await expect(redirectURL?.query?.contains("federated")).toEventually(beTrue())
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {

@@ -10,7 +10,7 @@ import OHHTTPStubsSwift
 @testable import Auth0
 
 private let Url = URL(string: "https://samples.auth0.com")!
-private let Timeout: DispatchTimeInterval = .seconds(2)
+private let Timeout: NimbleTimeInterval = .seconds(2)
 
 fileprivate extension Request where T == [String: Any], E == AuthenticationError {
 
@@ -146,7 +146,7 @@ class RequestSpec: QuickSpec {
                         return apiSuccessResponse()
                     }
                     let request = Request()
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         request
                             .start()
                             .assertNoFailure()
@@ -164,7 +164,7 @@ class RequestSpec: QuickSpec {
                         return apiSuccessResponse(json: ["foo": "bar"])
                     }
                     let request = Request()
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         request
                             .start()
                             .sink(receiveCompletion: { completion in
@@ -182,7 +182,7 @@ class RequestSpec: QuickSpec {
                         return apiFailureResponse()
                     }
                     let request = Request()
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         request
                             .start()
                             .ignoreOutput()
@@ -205,7 +205,7 @@ class RequestSpec: QuickSpec {
                     return apiSuccessResponse(json: ["foo": "bar"])
                 }
                 let request = Request()
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     #if compiler(>=5.5.2)
                     if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
                         Task.init {
@@ -233,7 +233,7 @@ class RequestSpec: QuickSpec {
                     return apiFailureResponse()
                 }
                 let request = Request()
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     #if compiler(>=5.5.2)
                     if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
                         Task.init {

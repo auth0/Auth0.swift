@@ -6,7 +6,7 @@ import Nimble
 @testable import Auth0
 
 private let Url = URL(string: "https://auth0.com")!
-private let Timeout: DispatchTimeInterval = .seconds(2)
+private let Timeout: NimbleTimeInterval = .seconds(2)
 
 class ASProviderSpec: QuickSpec {
 
@@ -58,7 +58,7 @@ class ASProviderSpec: QuickSpec {
             }
 
             it("should call the callback with an error") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     let userAgent = ASUserAgent(session: session, callback: { result in
                         expect(result).to(beFailure())
                         done()
@@ -68,7 +68,7 @@ class ASProviderSpec: QuickSpec {
             }
 
             it("should call the callback with success") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     let userAgent = ASUserAgent(session: session, callback: { result in
                         expect(result).to(beSuccessful())
                         done()

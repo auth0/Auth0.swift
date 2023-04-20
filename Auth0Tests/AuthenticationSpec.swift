@@ -20,7 +20,7 @@ private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: 
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-private let Timeout: DispatchTimeInterval = .seconds(2)
+private let Timeout: NimbleTimeInterval = .seconds(2)
 private let TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange"
 private let PasswordlessGrantType = "http://auth0.com/oauth/grant-type/passwordless/otp"
 
@@ -70,7 +70,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should login with otp and mfa tokens") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withOTP: OTP, mfaToken: MFAToken).start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -79,7 +79,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should fail login with bad otp") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withOTP: "bad_otp", mfaToken: MFAToken).start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid otp_code."))
                         done()
@@ -88,7 +88,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should fail login with invalid mfa") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withOTP: OTP, mfaToken: "bad_token").start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
                         done()
@@ -107,7 +107,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should login with oob code and mfa tokens with default parameters") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withOOBCode: OOB, mfaToken: MFAToken).start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -116,7 +116,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should login with oob code and mfa tokens with binding code") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withOOBCode: OOB, mfaToken: MFAToken, bindingCode: BindingCode).start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -125,7 +125,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should fail login with bad oob code") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withOOBCode: "bad_oob", mfaToken: MFAToken, bindingCode: nil).start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid oob_code."))
                         done()
@@ -134,7 +134,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should fail login with invalid mfa") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withOOBCode: OOB, mfaToken: "bad_token", bindingCode: nil).start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
                         done()
@@ -152,7 +152,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should login with recovery code and mfa tokens") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withRecoveryCode: RecoveryCode, mfaToken: MFAToken).start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -161,7 +161,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should fail login with bad recovery code") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withRecoveryCode: "bad_recovery", mfaToken: MFAToken).start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Invalid recovery_code."))
                         done()
@@ -170,7 +170,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should fail login with invalid mfa") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(withRecoveryCode: RecoveryCode, mfaToken: "bad_token").start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_grant", description: "Malformed mfa_token"))
                         done()
@@ -207,7 +207,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should request MFA challenge with default parameters") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken).start { result in
                         expect(result).to(beSuccessful())
                         done()
@@ -216,7 +216,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should request MFA challenge with challenge types") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes).start { result in
                         expect(result).to(beSuccessful())
                         done()
@@ -225,7 +225,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should request MFA challenge with authenticator id") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken, authenticatorId: AuthenticatorId).start { result in
                         expect(result).to(beSuccessful())
                         done()
@@ -234,7 +234,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should request MFA challenge with all parameters") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes, authenticatorId: AuthenticatorId).start { result in
                         expect(result).to(beSuccessful())
                         done()
@@ -254,7 +254,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should receive access token") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken).start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -265,7 +265,7 @@ class AuthenticationSpec: QuickSpec {
             it("should receive access token sending scope") {
                 HTTPStubs.removeAllStubs()
                 stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": refreshToken, "scope": "openid email"])) { _ in return authResponse(accessToken: AccessToken) }
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken, scope: "openid email").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -276,7 +276,7 @@ class AuthenticationSpec: QuickSpec {
             it("should receive access token sending scope without enforcing openid scope") {
                 HTTPStubs.removeAllStubs()
                 stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": refreshToken, "scope": "email phone"])) { _ in return authResponse(accessToken: AccessToken) }
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken, scope: "email phone").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -291,7 +291,7 @@ class AuthenticationSpec: QuickSpec {
                     return authFailure(error: "", description: "")
                 }.name = "refresh_token login"
 
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: invalidRefreshToken).start { result in
                         expect(result).toNot(haveCredentials())
                         done()
@@ -382,7 +382,7 @@ class AuthenticationSpec: QuickSpec {
                 }
 
                 it("should exchange apple auth code for credentials") {
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: validCode)
                             .start { result in
                                 expect(result).to(haveCredentials())
@@ -393,7 +393,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should exchange apple auth code and fail") {
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: invalidCode)
                             .start { result in
                                 expect(result).toNot(haveCredentials())
@@ -404,7 +404,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should exchange apple auth code for credentials with custom scope") {
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: validCode, scope: "openid email")
                             .start { result in
                                 expect(result).to(haveCredentials())
@@ -415,7 +415,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should exchange apple auth code for credentials with custom scope enforcing openid scope") {
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: validCode, scope: "email phone")
                             .start { result in
                                 expect(result).to(haveCredentials())
@@ -426,7 +426,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should exchange apple auth code for credentials with custom scope and audience") {
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: validCode, audience: "https://myapi.com/api", scope: "openid email")
                             .start { result in
                                 expect(result).to(haveCredentials())
@@ -442,7 +442,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.familyName = "Smith"
                     fullName.middleName = "Ignored"
 
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: validNameCode, fullName: fullName)
                             .start { result in
                                 expect(result).to(haveCredentials())
@@ -457,7 +457,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.familyName = nil
                     fullName.middleName = "Ignored"
                     
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: validPartialNameCode, fullName: fullName)
                             .start { result in
                                 expect(result).to(haveCredentials())
@@ -472,7 +472,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.familyName = nil
                     fullName.middleName = nil
                     
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: validMissingNameCode, fullName: fullName)
                             .start { result in
                                 expect(result).to(haveCredentials())
@@ -488,7 +488,7 @@ class AuthenticationSpec: QuickSpec {
                     fullName.middleName = "Ignored"
                     let profile = ["user_metadata": ["custom_key": "custom_value"]]
 
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(appleAuthorizationCode: validNameAndProfileCode,
                                    fullName: fullName,
                                    profile: profile)
@@ -516,7 +516,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken, idToken: IdToken)
                     }
 
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
@@ -532,7 +532,7 @@ class AuthenticationSpec: QuickSpec {
                             return authResponse(accessToken: AccessToken, idToken: IdToken)
                     }
 
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(facebookSessionAccessToken: sessionAccessToken,
                                    profile: ["name": "John Smith", "email": "john@smith.com"])
                             .start { result in
@@ -547,7 +547,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken, idToken: IdToken)
                     }
 
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(facebookSessionAccessToken: sessionAccessToken,
                                    profile: profile,
                                    scope: "openid email")
@@ -563,7 +563,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken, idToken: IdToken)
                     }
 
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(facebookSessionAccessToken: sessionAccessToken,
                                    profile: profile,
                                    scope: "email phone")
@@ -579,7 +579,7 @@ class AuthenticationSpec: QuickSpec {
                         return authResponse(accessToken: AccessToken, idToken: IdToken)
                     }
 
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(facebookSessionAccessToken: sessionAccessToken,
                                    profile: profile,
                                    audience: "https://myapi.com/api")
@@ -600,7 +600,7 @@ class AuthenticationSpec: QuickSpec {
             it("should revoke token") {
                 stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": refreshToken])) { _ in
                     return revokeTokenResponse() }.name = "revokeToken"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.revoke(refreshToken: refreshToken).start { result in
                         guard case .success = result else { return fail("Failed to revoke token") }
                         done()
@@ -613,7 +613,7 @@ class AuthenticationSpec: QuickSpec {
                 let description = "missing params"
                 stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": refreshToken])) { _ in
                     return authFailure(code: code, description: description) }.name = "revoke failed"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.revoke(refreshToken: refreshToken).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
@@ -629,7 +629,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should receive token with username and password") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -639,7 +639,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should fail to return token") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": InvalidPassword, "realm": "myrealm"])) { _ in return authFailure(error: "", description: "") }.name = "Grant Password"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: InvalidPassword, realmOrConnection: "myrealm").start { result in
                         expect(result).toNot(haveCredentials())
                         done()
@@ -649,7 +649,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should specify scope in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -659,7 +659,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should specify scope in request enforcing openid scope") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid email phone", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", scope: "email phone").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -669,7 +669,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should specify audience in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : "https://myapi.com/api", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", audience: "https://myapi.com/api").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -679,7 +679,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should specify audience and scope in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm": "myrealm"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", audience: "https://myapi.com/api", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -689,7 +689,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should specify audience, scope and realm/connection in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api", "realm" : "customconnection"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom audience, scope and realm"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "customconnection", audience: "https://myapi.com/api", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -706,7 +706,7 @@ class AuthenticationSpec: QuickSpec {
             it("should receive token with username and password") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username":SupportAtAuth0, "password": ValidPassword])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password"
                 
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword).start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -716,7 +716,7 @@ class AuthenticationSpec: QuickSpec {
             
             it("should fail to return token") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": InvalidPassword])) { _ in return authFailure(error: "", description: "") }.name = "Grant Password"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: InvalidPassword).start { result in
                         expect(result).toNot(haveCredentials())
                         done()
@@ -726,7 +726,7 @@ class AuthenticationSpec: QuickSpec {
             
             it("should specify scope in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword,  scope: "openid").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -736,7 +736,7 @@ class AuthenticationSpec: QuickSpec {
             
             it("should specify scope in request enforcing openid scope") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid email phone"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword,  scope: "email phone").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -746,7 +746,7 @@ class AuthenticationSpec: QuickSpec {
             
             it("should specify audience in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Audience"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -756,7 +756,7 @@ class AuthenticationSpec: QuickSpec {
             
             it("should specify audience and scope in request") {
                 stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : "https://myapi.com/api"])) { _ in return authResponse(accessToken: AccessToken) }.name = "Grant Password Custom Scope and audience"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: "https://myapi.com/api", scope: "openid").start { result in
                         expect(result).to(haveCredentials())
                         done()
@@ -774,7 +774,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should create a user with email & password") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.signup(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCreatedUser(SupportAtAuth0))
                         done()
@@ -783,7 +783,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should create a user with email, username & password") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.signup(email: SupportAtAuth0, username: Support, password: ValidPassword, connection: ConnectionName).start { result in
                         expect(result).to(haveCreatedUser(SupportAtAuth0, username: Support))
                         done()
@@ -792,7 +792,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should provide error payload from auth api") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     let code = "invalid_username_password"
                     let description = "Invalid password"
                     let password = "return invalid password"
@@ -809,7 +809,7 @@ class AuthenticationSpec: QuickSpec {
                 let email = "metadata@auth0.com"
                 let metadata = ["country": country]
                 stub(condition: isSignUp(Domain) && hasUserMetadata(metadata)) { _ in return createdUser(email: email) }.name = "User w/metadata"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.signup(email: email, password: ValidPassword, connection: ConnectionName, userMetadata: metadata).start { result in
                         expect(result).to(haveCreatedUser(email))
                         done()
@@ -823,7 +823,7 @@ class AuthenticationSpec: QuickSpec {
                     let attributes = ["family_name": "Doe",
                                       "nickname" : "Johnny"]
                     stub(condition: isSignUp(Domain) && hasAtLeast(attributes)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/root attributes"
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.signup(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, rootAttributes: attributes).start { result in
                             expect(result).to(haveCreatedUser(SupportAtAuth0))
                             done()
@@ -836,7 +836,7 @@ class AuthenticationSpec: QuickSpec {
                                       "nickname" : "Johnny",
                                       "email" : "root@email.com"]
                     stub(condition: isSignUp(Domain) && !hasAtLeast(attributes)) { _ in return createdUser(email: SupportAtAuth0) }.name = "User w/root attributes"
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.signup(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName, rootAttributes: attributes).start { result in
                             expect(result).to(haveCreatedUser(SupportAtAuth0))
                             done()
@@ -852,7 +852,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should reset password") {
                 stub(condition: isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return resetPasswordResponse() }.name = "reset request sent"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName).start { result in
                         guard case .success = result else { return fail("Failed to reset password") }
                         done()
@@ -864,7 +864,7 @@ class AuthenticationSpec: QuickSpec {
                 let code = "reset_failed"
                 let description = "failed reset password"
                 stub(condition: isResetPassword(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": ConnectionName, "client_id": ClientId])) { _ in return authFailure(code: code, description: description) }.name = "reset failed"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
@@ -878,7 +878,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should start with email with default values") {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "email", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0).start { result in
                         expect(result).to(beSuccessful())
                         done()
@@ -888,7 +888,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should start with email") {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["email": SupportAtAuth0, "connection": "custom_email", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "email passwordless custom"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0, type: .iOSLink, connection: "custom_email").start { result in
                         expect(result).to(beSuccessful())
                         done()
@@ -898,7 +898,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should fail to start") {
                 stub(condition: isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(email: SupportAtAuth0).start { result in
                         expect(result).to(haveAuthenticationError(code: "error", description: "description"))
                         done()
@@ -912,7 +912,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["username": SupportAtAuth0, "otp": OTP, "realm": "email", "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP).start { result in
                             expect(result).to(haveCredentials(AccessToken))
                             done()
@@ -924,7 +924,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP, scope: "openid email").start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -936,7 +936,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email phone"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP, scope: "email phone").start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -948,7 +948,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["audience": "https://myapi.com/api"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP, audience: "https://myapi.com/api").start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -960,7 +960,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP, audience: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -972,7 +972,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP).start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -988,7 +988,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should start with sms with default values") {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "sms", "client_id": ClientId, "send": "code"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone).start { result in
                         expect(result).to(beSuccessful())
                         done()
@@ -998,7 +998,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should start with sms") {
                 stub(condition: isPasswordless(Domain) && hasAllOf(["phone_number": Phone, "connection": "custom_sms", "client_id": ClientId, "send": "link_ios"])) { _ in return passwordless(SupportAtAuth0, verified: true) }.name = "sms passwordless custom"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone, type: .iOSLink, connection: "custom_sms").start { result in
                         expect(result).to(beSuccessful())
                         done()
@@ -1008,7 +1008,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should fail to start") {
                 stub(condition: isPasswordless(Domain)) { _ in return authFailure(error: "error", description: "description") }.name = "failed passwordless start"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.startPasswordless(phoneNumber: Phone).start { result in
                         expect(result).to(haveAuthenticationError(code: "error", description: "description"))
                         done()
@@ -1024,7 +1024,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["username": Phone, "otp": OTP, "realm": smsRealm, "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP).start { result in
                             expect(result).to(haveCredentials(AccessToken))
                             done()
@@ -1036,7 +1036,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP, scope: "openid email").start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -1048,7 +1048,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["scope": "openid email phone"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP, scope: "email phone").start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -1060,7 +1060,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["audience": "https://myapi.com/api"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP, audience: "https://myapi.com/api").start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -1072,7 +1072,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP, audience: nil).start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -1084,7 +1084,7 @@ class AuthenticationSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasNoneOf(["audience"])) { _ in
                         return authResponse(accessToken: AccessToken)
                     }
-                    waitUntil(timeout: Timeout) { done in
+                    await waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP).start { result in
                             expect(result).to(beSuccessful())
                             done()
@@ -1099,7 +1099,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should return user information") {
                 stub(condition: isUserInfo(Domain) && hasBearerToken(AccessToken)) { _ in return apiSuccessResponse(json: basicProfile()) }.name = "user info"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.userInfo(withAccessToken: AccessToken).start { result in
                         expect(result).to(haveProfile(Sub))
                         done()
@@ -1109,7 +1109,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should fail to get user info") {
                 stub(condition: isUserInfo(Domain)) { _ in return authFailure(error: "invalid_token", description: "the token is invalid") }.name = "token info failed"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.userInfo(withAccessToken: AccessToken).start { result in
                         expect(result).to(haveAuthenticationError(code: "invalid_token", description: "the token is invalid"))
                         done()
@@ -1133,7 +1133,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should exchange code for tokens") {
                 stub(condition: isToken(Domain) && hasAtLeast(["code": code, "code_verifier": codeVerifier, "grant_type": "authorization_code", "redirect_uri": redirectURI])) { _ in return authResponse(accessToken: AccessToken, idToken: IdToken) }.name = "Code Exchange Auth"
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     auth.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
@@ -1142,7 +1142,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
             it("should provide error payload from auth api") {
-                waitUntil(timeout: Timeout) { done in
+                await waitUntil(timeout: Timeout) { done in
                     let code = "invalid_code"
                     let description = "Invalid code"
                     let invalidCode = "return invalid code"
@@ -1160,7 +1160,7 @@ class AuthenticationSpec: QuickSpec {
             it("should fetch the jwks") {
                 stub(condition: isJWKSPath(Domain)) { _ in jwksResponse() }
                 
-                waitUntil { done in
+                await waitUntil { done in
                     auth.jwks().start {
                         expect($0).to(haveJWKS())
                         done()
@@ -1171,7 +1171,7 @@ class AuthenticationSpec: QuickSpec {
             it("should produce an error") {
                 stub(condition: isJWKSPath(Domain)) { _ in apiFailureResponse() }
                 
-                waitUntil { done in
+                await waitUntil { done in
                     auth.jwks().start {
                         expect($0).to(beUnsuccessful())
                         done()
