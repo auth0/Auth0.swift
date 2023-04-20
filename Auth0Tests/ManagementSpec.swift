@@ -52,7 +52,7 @@ class ManagementSpec: QuickSpec {
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveObjectWithAttributes(["key"]))
+                    await expect(actual).toEventually(haveObjectWithAttributes(["key"]))
                 }
             }
 
@@ -66,7 +66,7 @@ class ManagementSpec: QuickSpec {
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
+                    await expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
                 }
 
                 it("should yield invalid response") {
@@ -77,7 +77,7 @@ class ManagementSpec: QuickSpec {
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
+                    await expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
                 }
 
                 it("should yield generic failure when error response is unknown") {
@@ -88,7 +88,7 @@ class ManagementSpec: QuickSpec {
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
+                    await expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
                 }
 
                 it("should yield server error") {
@@ -99,7 +99,7 @@ class ManagementSpec: QuickSpec {
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveManagementError("error", description: "description", code: "code", statusCode: statusCode))
+                    await expect(actual).toEventually(haveManagementError("error", description: "description", code: "code", statusCode: statusCode))
                 }
 
                 it("should yield generic failure when no payload") {
@@ -108,7 +108,7 @@ class ManagementSpec: QuickSpec {
                     let response = Response<ManagementError>(data: nil, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveManagementError(description: "Empty response body.", code: emptyBodyError, statusCode: statusCode))
+                    await expect(actual).toEventually(haveManagementError(description: "Empty response body.", code: emptyBodyError, statusCode: statusCode))
                 }
 
                 it("should yield error with a cause") {
@@ -117,7 +117,7 @@ class ManagementSpec: QuickSpec {
                     let response = Response<ManagementError>(data: nil, response: nil, error: cause)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
-                    expect(actual).toEventually(haveManagementError(description: description, code: nonJSONError, cause: cause))
+                    await expect(actual).toEventually(haveManagementError(description: description, code: nonJSONError, cause: cause))
                 }
 
             }

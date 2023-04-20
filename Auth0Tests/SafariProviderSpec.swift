@@ -8,10 +8,10 @@ import Nimble
 @testable import Auth0
 
 private let Url = URL(string: "https://auth0.com")!
-private let Timeout: DispatchTimeInterval = .seconds(2)
+private let Timeout: NimbleTimeInterval = .seconds(2)
 
+@MainActor
 class SafariProviderSpec: QuickSpec {
-
     override func spec() {
 
         var safari: SFSafariViewController!
@@ -139,24 +139,28 @@ class SafariProviderSpec: QuickSpec {
             }
 
             it("should call the callback with an error when the user cancels the operation") {
-                waitUntil(timeout: Timeout) { done in
-                    userAgent = SafariUserAgent(controller: safari, callback: { result in
-                        expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
-                        done()
-                    })
-                    userAgent.finish(with: .failure(.userCancelled))
+                await waitUntil(timeout: Timeout) { done in
+                    DispatchQueue.main.sync {
+                        userAgent = SafariUserAgent(controller: safari, callback: { result in
+                            expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
+                            done()
+                        })
+                        userAgent.finish(with: .failure(.userCancelled))
+                    }
                 }
             }
 
             it("should call the callback with an error when the safari view controller cannot be dismissed") {
                 let expectedError = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
 
-                waitUntil(timeout: Timeout) { done in
-                    userAgent = SafariUserAgent(controller: safari, callback: { result in
-                        expect(result).to(haveWebAuthError(expectedError))
-                        done()
-                    })
-                    userAgent.finish(with: .success(()))
+                await waitUntil(timeout: Timeout) { done in
+                    DispatchQueue.main.sync {
+                        userAgent = SafariUserAgent(controller: safari, callback: { result in
+                            expect(result).to(haveWebAuthError(expectedError))
+                            done()
+                        })
+                        userAgent.finish(with: .success(()))
+                    }
                 }
             }
 
@@ -167,12 +171,14 @@ class SafariProviderSpec: QuickSpec {
                 window.makeKeyAndVisible()
                 root.present(safari, animated: false)
 
-                waitUntil(timeout: Timeout) { done in
-                    userAgent = SafariUserAgent(controller: safari, callback: { result in
-                        expect(result).to(beSuccessful())
-                        done()
-                    })
-                    userAgent.finish(with: .success(()))
+                await waitUntil(timeout: Timeout) { done in
+                    DispatchQueue.main.sync {
+                        userAgent = SafariUserAgent(controller: safari, callback: { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                        })
+                        userAgent.finish(with: .success(()))
+                    }
                 }
             }
 
