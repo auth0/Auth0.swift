@@ -12,6 +12,7 @@ private let Timeout: NimbleTimeInterval = .seconds(2)
 
 @MainActor
 class SafariProviderSpec: QuickSpec {
+
     override func spec() {
 
         var safari: SFSafariViewController!
