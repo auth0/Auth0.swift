@@ -31,7 +31,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     
                     let jwt = generateJWT(alg: "RS256")
                     
-                    waitUntil { done in
+                    await waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(beNil())
                             done()
@@ -44,7 +44,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     let jwt = generateJWT(alg: alg)
                     let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: alg, expected: "RS256")
                     
-                    waitUntil { done in
+                    await waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -58,7 +58,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     let jwt = generateJWT(alg: alg)
                     let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: alg, expected: "RS256")
                     
-                    waitUntil { done in
+                    await waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -73,7 +73,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     let jwt = generateJWT(alg: "RS256", signature: "foo")
                     let expectedError = IDTokenSignatureValidator.ValidationError.invalidSignature
                     
-                    waitUntil { done in
+                    await waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -90,7 +90,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should fail if the jwk has no kid") {
                     stub(condition: isJWKSPath(domain)) { _ in jwksResponse(kid: nil) }
                     
-                    waitUntil { done in
+                    await waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -102,7 +102,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should fail if the jwk kid does not match the jwt kid") {
                     stub(condition: isJWKSPath(domain)) { _ in jwksResponse(kid: "abc123") }
                     
-                    waitUntil { done in
+                    await waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -114,7 +114,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should fail if the keys cannot be retrieved") {
                     stub(condition: isJWKSPath(domain)) { _ in apiFailureResponse() }
                     
-                    waitUntil { done in
+                    await waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))

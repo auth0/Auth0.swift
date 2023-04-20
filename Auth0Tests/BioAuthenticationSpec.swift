@@ -72,21 +72,21 @@ class BioAuthenticationSpec: QuickSpec {
 
             it("should authenticate") {
                 bioAuthentication.validateBiometric { error = $0 }
-                expect(error).toEventually(beNil())
+                await expect(error).toEventually(beNil())
             }
 
             it("should return error on touch authentication") {
                 let touchError = LAError(.appCancel)
                 mockContext.replyError = touchError
                 bioAuthentication.validateBiometric { error = $0 }
-                expect(error).toEventually(matchError(touchError))
+                await expect(error).toEventually(matchError(touchError))
             }
 
             it("should return authenticationFailed error if no policy success") {
                 let touchError = LAError(.authenticationFailed)
                 mockContext.replySuccess = false
                 bioAuthentication.validateBiometric { error = $0 }
-                expect(error).toEventually(matchError(touchError))
+                await expect(error).toEventually(matchError(touchError))
             }
             
             it("should evaluate passed policy") {
