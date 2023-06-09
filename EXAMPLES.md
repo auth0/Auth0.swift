@@ -87,7 +87,7 @@ The following are some of the available Web Auth configuration options. Check th
 
 #### Use any Auth0 connection
 
-Specify an Auth0 connection to directly show that identity provider's login page, skipping the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
+Specify an Auth0 connection to directly open that identity provider's login page, skipping the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
 
 ```swift
 Auth0

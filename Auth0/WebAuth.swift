@@ -34,7 +34,7 @@ public protocol WebAuth: Trackable, Loggable {
     // MARK: - Builder
 
     /**
-     Specify an Auth0 connection to directly show that identity provider's login page, skipping the Universal Login
+     Specify an Auth0 connection to directly open that identity provider's login page, skipping the Universal Login
      page itself. By default no connection is specified, so the Universal Login page will be displayed.
 
      - Parameter connection: Name of the connection. For example, `github`.
