@@ -339,7 +339,7 @@ public struct CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     public func renew(parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
-        self.retrieveCredentials(withScope: nil, parameters: parameters, headers: headers, forceRenewal: true, callback: callback)
+        self.retrieveCredentials(parameters: parameters, headers: headers, forceRenewal: true, callback: callback)
     }
 
     private func retrieveCredentials() -> Credentials? {
@@ -348,7 +348,7 @@ public struct CredentialsManager {
     }
 
     // swiftlint:disable:next function_body_length
-    private func retrieveCredentials(withScope scope: String?, minTTL: Int = 0, parameters: [String: Any], headers: [String: String], forceRenewal: Bool = false, callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+    private func retrieveCredentials(withScope scope: String? = nil, minTTL: Int = 0, parameters: [String: Any], headers: [String: String], forceRenewal: Bool = false, callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.dispatchQueue.async {
             self.dispatchGroup.enter()
 
