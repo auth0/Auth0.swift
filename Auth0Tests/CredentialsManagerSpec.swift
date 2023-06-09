@@ -620,7 +620,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            context("immediate renewal") {
+            context("forced renewal") {
 
                 beforeEach {
                     _ = credentialsManager.store(credentials: credentials)
