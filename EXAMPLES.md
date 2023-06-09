@@ -335,8 +335,7 @@ The stored [ID token](https://auth0.com/docs/secure/tokens/id-tokens) contains a
 let user = credentialsManager.user
 ```
 
-> **Note**
-> To get the latest user information, you can use the `renew()` [method](#renew-stored-credentials). Calling this method will update the stored user information. You can also use the `userInfo(withAccessToken:)` [method](#retrieve-user-information) of the Authentication API client, but it will not update the stored user information.
+To get the latest user information, you can use the `renew()` [method](#renew-stored-credentials). Calling this method will update the stored user information. You can also use the `userInfo(withAccessToken:)` [method](#retrieve-user-information) of the Authentication API client, but it will not update the stored user information.
 
 ### Clear stored credentials
 
