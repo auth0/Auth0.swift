@@ -480,6 +480,8 @@ Auth0
     }
 ```
 
+You might want to log the user in after signup. See [Login with database connection](#login-with-database-connection) above for an example.
+
 <details>
   <summary>Using async/await</summary>
 
@@ -520,9 +522,6 @@ Auth0
     .store(in: &cancellables)
 ```
 </details>
-
-> **Note**
-> You might want to log the user in after signup. See [Login with database connection](#login-with-database-connection) above for an example.
 
 ### Passwordless login
 
@@ -821,10 +820,10 @@ Auth0
 ```
 
 > **Note**
-> Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your app.
+> For security reasons, native mobile apps are restricted to a subset of the Management API functionality.
 
 > **Note**
-> For security reasons, native mobile apps are restricted to a subset of the Management API functionality.
+> Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your app.
 
 ### Retrieve user metadata
 
