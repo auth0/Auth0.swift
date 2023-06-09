@@ -528,17 +528,20 @@ class CredentialsManagerSpec: QuickSpec {
                         }
                     }
                 }
-                
+
                 it("should store new credentials") {
+                    let store = SimpleKeychain()
+                    credentialsManager = CredentialsManager(authentication: authentication, storage: store)
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     await waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
                             expect(result).to(beSuccessful())
-                            credentialsManager.credentials { result in
-                                expect(result).to(haveCredentials(NewAccessToken, NewIdToken, RefreshToken))
-                                done()
-                            }
+                            let storedCredentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: store.data(forKey: "credentials"))
+                            expect(storedCredentials?.accessToken) == NewAccessToken
+                            expect(storedCredentials?.idToken) == NewIdToken
+                            expect(storedCredentials?.refreshToken) == RefreshToken
+                            done()
                         }
                     }
                 }
@@ -851,14 +854,17 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             it("should store new credentials") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
                 _ = credentialsManager.store(credentials: credentials)
                 await waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew { result in
                         expect(result).to(beSuccessful())
-                        credentialsManager.credentials { result in
-                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
-                            done()
-                        }
+                        let storedCredentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: store.data(forKey: "credentials"))
+                        expect(storedCredentials?.accessToken) == NewAccessToken
+                        expect(storedCredentials?.idToken) == NewIdToken
+                        expect(storedCredentials?.refreshToken) == NewRefreshToken
+                        done()
                     }
                 }
             }
