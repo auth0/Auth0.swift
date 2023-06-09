@@ -142,9 +142,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
             
-            it("should not return an error if there were no credentials stored") {
-                _ = credentialsManager.clear()
-                
+            it("should not return an error if there were no credentials stored") {                
                 await waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke { result in
                         expect(result).to(beSuccessful())

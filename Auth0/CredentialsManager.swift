@@ -153,11 +153,11 @@ public struct CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
     public func revoke(headers: [String: String] = [:], _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
-        guard let data = self.storage.getEntry(forKey: self.storeKey),
-              let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
-              let refreshToken = credentials.refreshToken else {
-                  _ = self.clear()
-                  return callback(.success(()))
+        guard let credentials = retrieveCredentials(), let refreshToken = credentials.refreshToken else {
+            if !self.clear() {
+                return callback(.failure(CredentialsManagerError(code: .clearFailed)))
+            }
+            return callback(.success(()))
         }
 
         self.authentication
@@ -168,7 +168,9 @@ public struct CredentialsManager {
                 case .failure(let error):
                     callback(.failure(CredentialsManagerError(code: .revokeFailed, cause: error)))
                 case .success:
-                    _ = self.clear()
+                    if !self.clear() {
+                        return callback(.failure(CredentialsManagerError(code: .clearFailed)))
+                    }
                     callback(.success(()))
                 }
             }

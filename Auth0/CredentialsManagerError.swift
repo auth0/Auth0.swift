@@ -8,6 +8,7 @@ public struct CredentialsManagerError: Auth0Error {
         case noRefreshToken
         case renewFailed
         case storeFailed
+        case clearFailed
         case biometricsFailed
         case revokeFailed
         case largeMinTTL(minTTL: Int, lifetime: Int)
@@ -48,6 +49,10 @@ public struct CredentialsManagerError: Auth0Error {
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let storeFailed: CredentialsManagerError = .init(code: .storeFailed)
 
+    /// Clearing the revoked credentials failed.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
+    public static let clearFailed: CredentialsManagerError = .init(code: .clearFailed)
+
     /// The biometric authentication failed.
     /// The underlying `LAError` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let biometricsFailed: CredentialsManagerError = .init(code: .biometricsFailed)
@@ -73,6 +78,7 @@ extension CredentialsManagerError {
         case .noRefreshToken: return "The stored credentials instance does not contain a refresh token."
         case .renewFailed: return "The credentials renewal failed."
         case .storeFailed: return "Storing the renewed credentials failed."
+        case .clearFailed: return "Clearing the revoked credentials failed."
         case .biometricsFailed: return "The biometric authentication failed."
         case .revokeFailed: return "The revocation of the refresh token failed."
         case .largeMinTTL(let minTTL, let lifetime): return "The minTTL requested (\(minTTL)s) is greater than the"
