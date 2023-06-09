@@ -263,7 +263,8 @@ public struct CredentialsManager {
     ///   - headers:    Additional headers to use when renewing credentials.
     ///   - callback:   Callback that receives a `Result` containing either the user's credentials or an error.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
-    /// the credentials are expired and there is no refresh token, the subscription will complete with a ``CredentialsManagerError/noRefreshToken`` error.
+    /// the credentials are expired and there is no refresh token, the callback will be called with a
+    /// ``CredentialsManagerError/noRefreshToken`` error.
     /// - Warning: Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the
     /// renewed credentials. Since this method is thread-safe and ``store(credentials:)`` is not, calling it anyway can
     /// cause concurrency issues.
@@ -299,13 +300,55 @@ public struct CredentialsManager {
     }
     #endif
 
+    /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// credentialsManager.renew { result in
+    ///     switch result {
+    ///     case .success(let credentials):
+    ///         print("Renewed credentials: \(credentials)")
+    ///     case .failure(let error):
+    ///         print("Failed with: \(error)")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// If you need to specify custom parameters or headers:
+    ///
+    /// ```swift
+    /// credentialsManager.renew(parameters: ["key": "value"],
+    ///                          headers: ["key": "value"]) { print($0) }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - parameters: Additional parameters to use.
+    ///   - headers:    Additional headers to use.
+    ///   - callback:   Callback that receives a `Result` containing either the renewed user's credentials or an error.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// there is no refresh token, the callback will be called with a ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Warning: Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the
+    /// renewed credentials. Since this method is thread-safe and ``store(credentials:)`` is not, calling it anyway can
+    /// cause concurrency issues.
+    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    public func renew(parameters: [String: Any] = [:], headers: [String: String] = [:], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        self.retrieveCredentials(withScope: nil, parameters: parameters, headers: headers, forceRenewal: true, callback: callback)
+    }
+
     private func retrieveCredentials() -> Credentials? {
         guard let data = self.storage.getEntry(forKey: self.storeKey) else { return nil }
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
     // swiftlint:disable:next function_body_length
-    private func retrieveCredentials(withScope scope: String?, minTTL: Int, parameters: [String: Any], headers: [String: String], callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+    private func retrieveCredentials(withScope scope: String?, minTTL: Int = 0, parameters: [String: Any], headers: [String: String], forceRenewal: Bool = false, callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.dispatchQueue.async {
             self.dispatchGroup.enter()
 
@@ -314,12 +357,13 @@ public struct CredentialsManager {
                     self.dispatchGroup.leave()
                     return callback(.failure(.noCredentials))
                 }
-                guard self.hasExpired(credentials) ||
-                        self.willExpire(credentials, within: minTTL) ||
-                        self.hasScopeChanged(credentials, from: scope) else {
-                            self.dispatchGroup.leave()
-                            return callback(.success(credentials))
-                        }
+                guard forceRenewal ||
+                      self.hasExpired(credentials) ||
+                      self.willExpire(credentials, within: minTTL) ||
+                      self.hasScopeChanged(credentials, from: scope) else {
+                    self.dispatchGroup.leave()
+                    return callback(.success(credentials))
+                }
                 guard let refreshToken = credentials.refreshToken else {
                     self.dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
@@ -493,7 +537,8 @@ public extension CredentialsManager {
     ///   - headers:    Additional headers to use when renewing credentials.
     /// - Returns: A type-erased publisher.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
-    /// the credentials are expired and there is no refresh token, the subscription will complete with a ``CredentialsManagerError/noRefreshToken`` error.
+    /// the credentials are expired and there is no refresh token, the subscription will complete with a
+    /// ``CredentialsManagerError/noRefreshToken`` error.
     /// - Warning: Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the
     /// renewed credentials. Since this method is thread-safe and ``store(credentials:)`` is not, calling it anyway can
     /// cause concurrency issues.
@@ -512,6 +557,58 @@ public extension CredentialsManager {
                                         parameters: parameters,
                                         headers: headers,
                                         callback: callback)
+            }
+        }.eraseToAnyPublisher()
+    }
+
+    /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// credentialsManager
+    ///     .renew()
+    ///     .sink(receiveCompletion: { completion in
+    ///         if case .failure(let error) = completion {
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }, receiveValue: { credentials in
+    ///         print("Renewed credentials: \(credentials)")
+    ///     })
+    ///     .store(in: &cancellables)
+    /// ```
+    ///
+    /// If you need to specify custom parameters or headers:
+    ///
+    /// ```swift
+    /// credentialsManager
+    ///     .renew(parameters: ["key": "value"],
+    ///            headers: ["key": "value"])
+    ///     .sink(receiveCompletion: { print($0) },
+    ///           receiveValue: { print($0) })
+    ///     .store(in: &cancellables)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - parameters: Additional parameters to use.
+    ///   - headers:    Additional headers to use.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// there is no refresh token, the subscription will complete with a ``CredentialsManagerError/noRefreshToken``
+    /// error.
+    /// - Warning: Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the
+    /// renewed credentials. Since this method is thread-safe and ``store(credentials:)`` is not, calling it anyway can
+    /// cause concurrency issues.
+    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    func renew(parameters: [String: Any] = [:], headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
+        return Deferred {
+            Future { callback in
+                return self.renew(parameters: parameters, headers: headers, callback: callback)
             }
         }.eraseToAnyPublisher()
     }
@@ -613,7 +710,8 @@ public extension CredentialsManager {
     /// - Returns: The user's credentials.
     /// - Throws: An error of type ``CredentialsManagerError``.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
-    /// the credentials are expired and there is no refresh token, the subscription will complete with a ``CredentialsManagerError/noRefreshToken`` error.
+    /// the credentials are expired and there is no refresh token, a ``CredentialsManagerError/noRefreshToken`` error
+    /// will be thrown.
     /// - Warning: Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the
     /// renewed credentials. Since this method is thread-safe and ``store(credentials:)`` is not, calling it anyway can
     /// cause concurrency issues.
@@ -643,6 +741,58 @@ public extension CredentialsManager {
                              parameters: parameters,
                              headers: headers,
                              callback: continuation.resume)
+        }
+    }
+    #endif
+
+    #if compiler(>=5.5.2)
+    /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// do {
+    ///     let credentials = try await credentialsManager.renew()
+    ///     print("Renewed credentials: \(credentials)")
+    /// } catch {
+    ///     print("Failed with: \(error)")
+    /// }
+    /// ```
+    ///
+    /// If you need to specify custom parameters or headers:
+    ///
+    /// ```swift
+    /// let credentials = try await credentialsManager.renew(parameters: ["key": "value"],
+    ///                                                      headers: ["key": "value"])
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - parameters: Additional parameters to use.
+    ///   - headers:    Additional headers to use.
+    ///   - callback:   Callback that receives a `Result` containing either the renewed user's credentials or an error.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// there is no refresh token, a ``CredentialsManagerError/noRefreshToken`` error will be thrown.
+    /// - Warning: Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the
+    /// renewed credentials. Since this method is thread-safe and ``store(credentials:)`` is not, calling it anyway can
+    /// cause concurrency issues.
+    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
+    func renew(parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.renew(parameters: parameters, headers: headers, callback: continuation.resume)
+        }
+    }
+    #else
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    func renew(parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.renew(parameters: parameters, headers: headers, callback: continuation.resume)
         }
     }
     #endif

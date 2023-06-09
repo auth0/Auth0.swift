@@ -104,6 +104,22 @@ class CredentialsManagerSpec: QuickSpec {
             }
         }
 
+        describe("custom keychain") {
+            let storage = SimpleKeychain(service: "test_service")
+
+            beforeEach {
+                credentialsManager = CredentialsManager(authentication: authentication,
+                                                        storage: storage)
+            }
+
+            it("custom keychain should successfully set and clear credentials") {
+                _ = credentialsManager.store(credentials: credentials)
+                expect { try storage.data(forKey: "credentials") }.toNot(beNil())
+                _ = credentialsManager.clear()
+                expect { try storage.data(forKey: "credentials") }.to(throwError(SimpleKeychainError.itemNotFound))
+            }
+        }
+
         describe("clearing and revoking refresh token") {
             
             beforeEach {
@@ -181,7 +197,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
         }
-        
+
         describe("multi instances of credentials manager") {
             
             var secondaryCredentialsManager: CredentialsManager!
@@ -390,9 +406,9 @@ class CredentialsManagerSpec: QuickSpec {
         describe("retrieval") {
 
             beforeEach {
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) {
-                    _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn * 2)
-                }.name = "renew success"
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                    return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn * 2)
+                }.name = "renewal succeeded"
             }
 
             afterEach {
@@ -486,7 +502,7 @@ class CredentialsManagerSpec: QuickSpec {
             }
             #endif
 
-            context("renew") {
+            context("renewal") {
 
                 it("should yield new credentials without refresh token rotation") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
@@ -527,10 +543,12 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
-                it("should yield error on failed renew") {
+                it("should yield error on failed renewal") {
                     let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
                     let expectedError = CredentialsManagerError(code: .renewFailed, cause: cause)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return authFailure(code: "invalid_request", description: "missing_params") }.name = "renew failed"
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                        return authFailure(code: "invalid_request", description: "missing_params")
+                    }.name = "renewal failed"
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     await waitUntil(timeout: Timeout) { done in
@@ -570,7 +588,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
-                it("renew request should include custom parameters") {
+                it("renewal request should include custom parameters") {
                     let someId = UUID().uuidString
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])) {
                         _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
@@ -585,7 +603,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
-                it("renew request should include custom headers") {
+                it("renewal request should include custom headers") {
                     let key = "foo"
                     let value = "bar"
                     stub(condition: hasHeader(key, value: value)) {
@@ -602,7 +620,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            context("forced renew") {
+            context("immediate renewal") {
 
                 beforeEach {
                     _ = credentialsManager.store(credentials: credentials)
@@ -673,7 +691,7 @@ class CredentialsManagerSpec: QuickSpec {
                     // The dates are not mocked, so they won't match exactly
                     let expectedError = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: Int(ExpiresIn - 1)))
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) {
-                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn)
+                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
                     await waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials(withScope: nil, minTTL: minTTL) { result in
@@ -685,7 +703,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             }
 
-            context("serial renew from same thread") {
+            context("serial renewal from same thread") {
 
                 it("should yield the stored credentials after the previous renewal operation succeeded") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
@@ -724,7 +742,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             }
 
-            context("serial renew from different threads") {
+            context("serial renewal from different threads") {
 
                 it("should yield the stored credentials after the previous renewal operation succeeded") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
@@ -770,24 +788,202 @@ class CredentialsManagerSpec: QuickSpec {
                         }
                     }
                 }
-
             }
 
-            context("custom keychain") {
-                let storage = SimpleKeychain(service: "test_service")
+        }
 
-                beforeEach {
-                    credentialsManager = CredentialsManager(authentication: authentication,
-                                                            storage: storage)
+        describe("renew") {
+
+            beforeEach {
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                    return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
+                }.name = "renewal succeeded"
+            }
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should error when no credentials stored") {
+                _ = credentialsManager.clear()
+
+                await waitUntil(timeout: Timeout) { done in
+                    credentialsManager.renew { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        done()
+                    }
+                }
+            }
+
+            it("should error when no refresh token") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil)
+                _ = credentialsManager.store(credentials: credentials)
+
+                await waitUntil(timeout: Timeout) { done in
+                    credentialsManager.renew { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noRefreshToken)))
+                        done()
+                    }
+                }
+            }
+
+            it("should yield new credentials without refresh token rotation") {
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                    return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn * 2)
+                }.name = "renewal succeeded"
+                _ = credentialsManager.store(credentials: credentials)
+                await waitUntil(timeout: Timeout) { done in
+                    credentialsManager.renew { result in
+                        expect(result).to(haveCredentials(NewAccessToken, NewIdToken, RefreshToken))
+                        done()
+                    }
+                }
+            }
+
+            it("should yield new credentials with refresh token rotation") {
+                _ = credentialsManager.store(credentials: credentials)
+                await waitUntil(timeout: Timeout) { done in
+                    credentialsManager.renew { result in
+                        expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        done()
+                    }
+                }
+            }
+
+            it("should store new credentials") {
+                _ = credentialsManager.store(credentials: credentials)
+                await waitUntil(timeout: Timeout) { done in
+                    credentialsManager.renew { result in
+                        expect(result).to(beSuccessful())
+                        credentialsManager.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            done()
+                        }
+                    }
+                }
+            }
+
+            it("should yield error on failed renewal") {
+                let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
+                let expectedError = CredentialsManagerError(code: .renewFailed, cause: cause)
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                    return authFailure(code: "invalid_request", description: "missing_params")
+                }.name = "renewal failed"
+                _ = credentialsManager.store(credentials: credentials)
+                await waitUntil(timeout: Timeout) { done in
+                    credentialsManager.renew { result in
+                        expect(result).to(haveCredentialsManagerError(expectedError))
+                        done()
+                    }
+                }
+            }
+
+            it("should yield error on failed store") {
+                class MockStore: CredentialsStorage {
+                    func getEntry(forKey: String) -> Data? {
+                        let credentials = Credentials(accessToken: AccessToken, idToken: IdToken, refreshToken: RefreshToken)
+                        let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
+                                                                     requiringSecureCoding: true)
+                        return data
+                    }
+                    func setEntry(_ data: Data, forKey: String) -> Bool {
+                        return false
+                    }
+                    func deleteEntry(forKey: String) -> Bool {
+                        return true
+                    }
                 }
 
-                it("custom keychain should successfully set and clear credentials") {
+                credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
+                await waitUntil(timeout: Timeout) { done in
+                    credentialsManager.renew { result in
+                        expect(result).to(haveCredentialsManagerError(.storeFailed))
+                        done()
+                    }
+                }
+            }
+
+            it("renewal request should include custom parameters") {
+                let someId = UUID().uuidString
+                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])) {
+                    _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
+                }
+                _ = credentialsManager.store(credentials: credentials)
+                await waitUntil(timeout: Timeout) { done in
+                    credentialsManager.renew(parameters: ["some_id": someId]) { result in
+                        expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        done()
+                    }
+                }
+            }
+
+            it("renewal request should include custom headers") {
+                let key = "foo"
+                let value = "bar"
+                stub(condition: hasHeader(key, value: value)) {
+                    _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
+                }
+                _ = credentialsManager.store(credentials: credentials)
+                await waitUntil(timeout: Timeout) { done in
+                    credentialsManager.renew(headers: [key: value]) { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            context("concurrency") {
+                let newAccessToken1 = "new-access-token-1"
+                let newIDToken1 = "new-id-token-1"
+                let newRefreshToken1 = "new-refresh-token-1"
+                let newAccessToken2 = "new-access-token-2"
+                let newIDToken2 = "new-id-token-2"
+                let newRefreshToken2 = "new-refresh-token-2"
+
+                it("should renew the credentials serially from the same thread") {
                     _ = credentialsManager.store(credentials: credentials)
-                    expect { try storage.data(forKey: "credentials") }.toNot(beNil())
-                    _ = credentialsManager.clear()
-                    expect { try storage.data(forKey: "credentials") }.to(throwError(SimpleKeychainError.itemNotFound))
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
+                        return authResponse(accessToken: newAccessToken1, idToken: newIDToken1, refreshToken: newRefreshToken1, expiresIn: ExpiresIn)
+                    }
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager.renew(parameters: ["request": "first"]) { result in
+                            expect(result).to(haveCredentials(newAccessToken1, newIDToken1, newRefreshToken1))
+                            stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": newRefreshToken1, "request": "second"])) { request in
+                                return authResponse(accessToken: newAccessToken2, idToken: newIDToken2, refreshToken: newRefreshToken2, expiresIn: ExpiresIn)
+                            }
+                        }
+                        credentialsManager.renew(parameters: ["request": "second"]) { result in
+                            expect(result).to(haveCredentials(newAccessToken2, newIDToken2, newRefreshToken2))
+                            done()
+                        }
+                    }
                 }
+
+                it("should renew the credentials serially from different threads") {
+                    _ = credentialsManager.store(credentials: credentials)
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
+                        return authResponse(accessToken: newAccessToken1, idToken: newIDToken1, refreshToken: newRefreshToken1, expiresIn: ExpiresIn)
+                    }
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": newRefreshToken1, "request": "second"])) { request in
+                        return authResponse(accessToken: newAccessToken2, idToken: newIDToken2, refreshToken: newRefreshToken2, expiresIn: ExpiresIn)
+                    }
+                    await waitUntil(timeout: Timeout) { [credentialsManager] done in
+                        DispatchQueue.global(qos: .utility).sync {
+                            credentialsManager?.renew(parameters: ["request": "first"]) { result in
+                                expect(result).to(haveCredentials(newAccessToken1, newIDToken1, newRefreshToken1))
+                            }
+                        }
+                        DispatchQueue.global(qos: .background).sync {
+                            credentialsManager?.renew(parameters: ["request": "second"]) { result in
+                                expect(result).to(haveCredentials(newAccessToken2, newIDToken2, newRefreshToken2))
+                                done()
+                            }
+                        }
+                    }
+                }
+
             }
+
         }
 
         if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
@@ -835,7 +1031,7 @@ class CredentialsManagerSpec: QuickSpec {
                         stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: value)) { _ in
                             return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                         }
-                        credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn), scope: "openid profile")
+                        credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                         _ = credentialsManager.store(credentials: credentials)
                         await waitUntil(timeout: Timeout) { done in
                             credentialsManager
@@ -855,6 +1051,79 @@ class CredentialsManagerSpec: QuickSpec {
                         await waitUntil(timeout: Timeout) { done in
                             credentialsManager
                                 .credentials()
+                                .ignoreOutput()
+                                .sink(receiveCompletion: { completion in
+                                    guard case .failure = completion else { return }
+                                    done()
+                                }, receiveValue: { _ in })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                }
+
+                context("renew") {
+
+                    beforeEach {
+                        _ = credentialsManager.store(credentials: credentials)
+                    }
+
+                    it("should emit only one value") {
+                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
+                        }.name = "renewal succeeded"
+                        await waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .renew()
+                                .assertNoFailure()
+                                .count()
+                                .sink(receiveValue: { count in
+                                    expect(count) == 1
+                                    done()
+                                })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                    it("should complete using the default parameter values") {
+                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
+                        }.name = "renewal succeeded"
+                        await waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .renew()
+                                .sink(receiveCompletion: { completion in
+                                    guard case .finished = completion else { return }
+                                    done()
+                                }, receiveValue: { _ in })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                    it("should complete using custom parameter values") {
+                        let key = "foo"
+                        let value = "bar"
+                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: value)) { _ in
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
+                        }
+                        await waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .renew(parameters: [key: value], headers: [key: value])
+                                .sink(receiveCompletion: { completion in
+                                    guard case .finished = completion else { return }
+                                    done()
+                                }, receiveValue: { _ in })
+                                .store(in: &cancellables)
+                        }
+                    }
+
+                    it("should complete with an error") {
+                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                            return authFailure(code: "invalid_request", description: "missing_params")
+                        }.name = "renewal failed"
+                        await waitUntil(timeout: Timeout) { done in
+                            credentialsManager
+                                .renew()
                                 .ignoreOutput()
                                 .sink(receiveCompletion: { completion in
                                     guard case .failure = completion else { return }
@@ -982,7 +1251,7 @@ class CredentialsManagerSpec: QuickSpec {
                     stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: "bar")) { _ in
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
-                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn), scope: "openid profile")
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     await waitUntil(timeout: Timeout) { done in
                         #if compiler(>=5.5.2)
@@ -1029,6 +1298,112 @@ class CredentialsManagerSpec: QuickSpec {
                             Task.init {
                                 do {
                                     _ = try await credentialsManager.credentials()
+                                } catch {
+                                    done()
+                                }
+                            }
+                        } else {
+                            done()
+                        }
+                        #endif
+                    }
+                }
+
+            }
+
+            context("renew") {
+
+                beforeEach {
+                    _ = credentialsManager.store(credentials: credentials)
+                }
+
+                it("should renew the credentials using the default parameter values") {
+                    let credentialsManager = credentialsManager!
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
+                    }.name = "renewal succeeded"
+                    await waitUntil(timeout: Timeout) { done in
+                        #if compiler(>=5.5.2)
+                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                            Task.init {
+                                    let newCredentials = try await credentialsManager.renew()
+                                    expect(newCredentials.accessToken) == NewAccessToken
+                                    expect(newCredentials.idToken) == NewIdToken
+                                    expect(newCredentials.refreshToken) == NewRefreshToken
+                                    done()
+                            }
+                        }
+                        #else
+                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                            Task.init {
+                                let newCredentials = try await credentialsManager.renew()
+                                expect(newCredentials.accessToken) == NewAccessToken
+                                expect(newCredentials.idToken) == NewIdToken
+                                expect(newCredentials.refreshToken) == NewRefreshToken
+                                done()
+                            }
+                        } else {
+                            done()
+                        }
+                        #endif
+                    }
+                }
+
+                it("should renew the credentials using custom parameter values") {
+                    let key = "foo"
+                    let value = "bar"
+                    let credentialsManager = credentialsManager!
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: "bar")) { _ in
+                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
+                    }
+                    await waitUntil(timeout: Timeout) { done in
+                        #if compiler(>=5.5.2)
+                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                            Task.init {
+                                let newCredentials = try await credentialsManager.renew(parameters: [key: value], headers: [key: value])
+                                expect(newCredentials.accessToken) == NewAccessToken
+                                expect(newCredentials.idToken) == NewIdToken
+                                expect(newCredentials.refreshToken) == NewRefreshToken
+                                done()
+                            }
+                        }
+                        #else
+                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                            Task.init {
+                                let newCredentials = try await credentialsManager.renew(parameters: [key: value], headers: [key: value])
+                                expect(newCredentials.accessToken) == NewAccessToken
+                                expect(newCredentials.idToken) == NewIdToken
+                                expect(newCredentials.refreshToken) == NewRefreshToken
+                                done()
+                            }
+                        } else {
+                            done()
+                        }
+                        #endif
+                    }
+                }
+
+                it("should throw an error") {
+                    let credentialsManager = credentialsManager!
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                        return authFailure(code: "invalid_request", description: "missing_params")
+                    }.name = "renewal failed"
+                    await waitUntil(timeout: Timeout) { done in
+                        #if compiler(>=5.5.2)
+                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                            Task.init {
+                                do {
+                                    _ = try await credentialsManager.renew()
+                                } catch {
+                                    done()
+                                }
+                            }
+                        }
+                        #else
+                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
+                            Task.init {
+                                do {
+                                    _ = try await credentialsManager.renew()
                                 } catch {
                                     done()
                                 }
