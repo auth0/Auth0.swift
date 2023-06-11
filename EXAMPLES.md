@@ -87,7 +87,7 @@ The following are some of the available Web Auth configuration options. Check th
 
 #### Use any Auth0 connection
 
-Specify an Auth0 connection to directly show that identity provider's login page, skipping the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
+Specify an Auth0 connection to directly open that identity provider's login page, skipping the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page itself. The connection must first be enabled for your Auth0 application in the [Dashboard](https://manage.auth0.com/#/applications/).
 
 ```swift
 Auth0
@@ -171,6 +171,7 @@ Web Auth will only produce `WebAuthError` error values. You can find the underly
 - [Store credentials](#store-credentials)
 - [Check for stored credentials](#check-for-stored-credentials)
 - [Retrieve stored credentials](#retrieve-stored-credentials)
+- [Renew stored credentials](#renew-stored-credentials)
 - [Retrieve stored user information](#retrieve-stored-user-information)
 - [Clear stored credentials](#clear-stored-credentials)
 - [Biometric authentication](#biometric-authentication)
@@ -183,7 +184,7 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 ```
 
 > **Warning**
-> The Credentials Manager is not thread-safe, except for the `credentials()` method. Do not call its non thread-safe methods and properties from different threads without proper synchronization.
+> The Credentials Manager is not thread-safe, except for the `credentials()` and `renew()` methods. Do not call its non thread-safe methods and properties from different threads without proper synchronization.
 
 ### Store credentials
 
@@ -272,6 +273,60 @@ credentialsManager
 > **Warning**
 > To ensure that no concurrent renewal requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
 
+### Renew stored credentials
+
+The `credentials()` method automatically renews the stored credentials when needed, using the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens). However, you can also force a renewal using the `renew()` method. **This method is thread-safe**.
+
+```swift
+credentialsManager.renew { result in
+    switch result {
+    case .success(let credentials):
+        print("Renewed credentials: \(credentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await credentialsManager.renew()
+    print("Renewed credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+credentialsManager
+    .renew()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Renewed credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+> **Note**
+> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+
+> **Warning**
+> Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials. Since this method is thread-safe and `store(credentials:)` is not, calling it anyway can cause concurrency issues.
+
+> **Warning**
+> To ensure that no concurrent renewal requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+
 ### Retrieve stored user information
 
 The stored [ID token](https://auth0.com/docs/secure/tokens/id-tokens) contains a copy of the user information at the time of authentication (or renewal, if the credentials were renewed). That user information can be retrieved from the Keychain synchronously, without checking if the credentials expired.
@@ -280,8 +335,7 @@ The stored [ID token](https://auth0.com/docs/secure/tokens/id-tokens) contains a
 let user = credentialsManager.user
 ```
 
-> **Note**
-> To get the latest user information, use the `userInfo(withAccessToken:)` [method](#retrieve-user-information) of the Authentication API client.
+To get the latest user information, you can use the `renew()` [method](#renew-stored-credentials). Calling this method will update the stored user information. You can also use the `userInfo(withAccessToken:)` [method](#retrieve-user-information) of the Authentication API client, but it will not update the stored user information.
 
 ### Clear stored credentials
 
@@ -426,6 +480,8 @@ Auth0
     }
 ```
 
+You might want to log the user in after signup. See [Login with database connection](#login-with-database-connection) above for an example.
+
 <details>
   <summary>Using async/await</summary>
 
@@ -466,9 +522,6 @@ Auth0
     .store(in: &cancellables)
 ```
 </details>
-
-> **Note**
-> You might want to log the user in after signup. See [Login with database connection](#login-with-database-connection) above for an example.
 
 ### Passwordless login
 
@@ -767,10 +820,10 @@ Auth0
 ```
 
 > **Note**
-> Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your app.
+> For security reasons, native mobile apps are restricted to a subset of the Management API functionality.
 
 > **Note**
-> For security reasons, native mobile apps are restricted to a subset of the Management API functionality.
+> Auth0 access tokens do not support multiple custom audience values. If you are already using the API Identifier of your own API as the audience because you need to make authenticated requests to your backend, you cannot add the Management API one, and vice versa. Consider instead exposing API endpoints in your backend to perform operations that require interacting with the Management API, and then calling them from your app.
 
 ### Retrieve user metadata
 
