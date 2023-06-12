@@ -65,14 +65,14 @@ public struct CredentialsManager {
     /// ## Usage
     ///
     /// ```swift
-    /// credentialsManager.enableBiometrics(withTitle: "Touch to Login")
+    /// credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID")
     /// ```
     ///
     /// If needed, you can specify a particular `LAPolicy` to be used. For example, you might want to support Face ID or
     /// Touch ID, but also allow fallback to passcode.
     ///
     /// ```swift
-    /// credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login", 
+    /// credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID or passcode", 
     ///                                     evaluationPolicy: .deviceOwnerAuthentication)
     /// ```
     ///
