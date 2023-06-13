@@ -31,17 +31,15 @@ class ASProviderSpec: QuickSpec {
                 expect(provider(Url, {_ in })).to(beAKindOf(ASUserAgent.self))
             }
 
-            if #available(iOS 13.0, *) {
-                it("should not use an ephemeral session by default") {
-                    userAgent = WebAuthentication.asProvider(urlScheme: Url.scheme!)(Url, { _ in }) as? ASUserAgent
-                    expect(userAgent.session.prefersEphemeralWebBrowserSession) == false
-                }
+            it("should not use an ephemeral session by default") {
+                userAgent = WebAuthentication.asProvider(urlScheme: Url.scheme!)(Url, { _ in }) as? ASUserAgent
+                expect(userAgent.session.prefersEphemeralWebBrowserSession) == false
+            }
 
-                it("should use an ephemeral session") {
-                    userAgent = WebAuthentication.asProvider(urlScheme: Url.scheme!,
-                                                             ephemeralSession: true)(Url, { _ in }) as? ASUserAgent
-                    expect(userAgent.session.prefersEphemeralWebBrowserSession) == true
-                }
+            it("should use an ephemeral session") {
+                userAgent = WebAuthentication.asProvider(urlScheme: Url.scheme!,
+                                                         ephemeralSession: true)(Url, { _ in }) as? ASUserAgent
+                expect(userAgent.session.prefersEphemeralWebBrowserSession) == true
             }
         }
 
@@ -51,10 +49,8 @@ class ASProviderSpec: QuickSpec {
                 expect(userAgent.description) == "ASWebAuthenticationSession"
             }
 
-            if #available(iOS 13.0, *) {
-                it("should be the web authentication session's presentation context provider") {
-                    expect(session.presentationContextProvider).to(be(userAgent))
-                }
+            it("should be the web authentication session's presentation context provider") {
+                expect(session.presentationContextProvider).to(be(userAgent))
             }
 
             it("should call the callback with an error") {

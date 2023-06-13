@@ -44,7 +44,9 @@ public extension WebAuthentication {
 extension SFSafariViewController {
 
     var topViewController: UIViewController? {
-        guard let root = UIApplication.shared()?.keyWindow?.rootViewController else { return nil }
+        guard let root = UIApplication.shared()?.windows.last(where: \.isKeyWindow)?.rootViewController else {
+            return nil
+        }
         return self.findTopViewController(from: root)
     }
 

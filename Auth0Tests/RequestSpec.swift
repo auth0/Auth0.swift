@@ -133,68 +133,66 @@ class RequestSpec: QuickSpec {
 
         }
 
-        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-            describe("combine") {
-                var cancellables: Set<AnyCancellable> = []
+        describe("combine") {
+            var cancellables: Set<AnyCancellable> = []
 
-                afterEach {
-                    cancellables.removeAll()
-                }
-
-                it("should emit only one value") {
-                    stub(condition: isHost(Url.host!)) { _ in
-                        return apiSuccessResponse()
-                    }
-                    let request = Request()
-                    await waitUntil(timeout: Timeout) { done in
-                        request
-                            .start()
-                            .assertNoFailure()
-                            .count()
-                            .sink(receiveValue: { count in
-                                expect(count) == 1
-                                done()
-                            })
-                            .store(in: &cancellables)
-                    }
-                }
-
-                it("should complete with the response") {
-                    stub(condition: isHost(Url.host!)) { _ in
-                        return apiSuccessResponse(json: ["foo": "bar"])
-                    }
-                    let request = Request()
-                    await waitUntil(timeout: Timeout) { done in
-                        request
-                            .start()
-                            .sink(receiveCompletion: { completion in
-                                guard case .finished = completion else { return }
-                                done()
-                            }, receiveValue: { response in
-                                expect(response).toNot(beEmpty())
-                            })
-                            .store(in: &cancellables)
-                    }
-                }
-
-                it("should complete with an error") {
-                    stub(condition: isHost(Url.host!)) { _ in
-                        return apiFailureResponse()
-                    }
-                    let request = Request()
-                    await waitUntil(timeout: Timeout) { done in
-                        request
-                            .start()
-                            .ignoreOutput()
-                            .sink(receiveCompletion: { completion in
-                                guard case .failure = completion else { return }
-                                done()
-                            }, receiveValue: { _ in })
-                            .store(in: &cancellables)
-                    }
-                }
-
+            afterEach {
+                cancellables.removeAll()
             }
+
+            it("should emit only one value") {
+                stub(condition: isHost(Url.host!)) { _ in
+                    return apiSuccessResponse()
+                }
+                let request = Request()
+                await waitUntil(timeout: Timeout) { done in
+                    request
+                        .start()
+                        .assertNoFailure()
+                        .count()
+                        .sink(receiveValue: { count in
+                            expect(count) == 1
+                            done()
+                        })
+                        .store(in: &cancellables)
+                }
+            }
+
+            it("should complete with the response") {
+                stub(condition: isHost(Url.host!)) { _ in
+                    return apiSuccessResponse(json: ["foo": "bar"])
+                }
+                let request = Request()
+                await waitUntil(timeout: Timeout) { done in
+                    request
+                        .start()
+                        .sink(receiveCompletion: { completion in
+                            guard case .finished = completion else { return }
+                            done()
+                        }, receiveValue: { response in
+                            expect(response).toNot(beEmpty())
+                        })
+                        .store(in: &cancellables)
+                }
+            }
+
+            it("should complete with an error") {
+                stub(condition: isHost(Url.host!)) { _ in
+                    return apiFailureResponse()
+                }
+                let request = Request()
+                await waitUntil(timeout: Timeout) { done in
+                    request
+                        .start()
+                        .ignoreOutput()
+                        .sink(receiveCompletion: { completion in
+                            guard case .failure = completion else { return }
+                            done()
+                        }, receiveValue: { _ in })
+                        .store(in: &cancellables)
+                }
+            }
+
         }
 
         #if canImport(_Concurrency)
@@ -206,25 +204,11 @@ class RequestSpec: QuickSpec {
                 }
                 let request = Request()
                 await waitUntil(timeout: Timeout) { done in
-                    #if compiler(>=5.5.2)
-                    if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                        Task.init {
-                            let response = try await request.start()
-                            expect(response).toNot(beEmpty())
-                            done()
-                        }
-                    }
-                    #else
-                    if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                        Task.init {
-                            let response = try await request.start()
-                            expect(response).toNot(beEmpty())
-                            done()
-                        }
-                    } else {
+                    Task.init {
+                        let response = try await request.start()
+                        expect(response).toNot(beEmpty())
                         done()
                     }
-                    #endif
                 }
             }
 
@@ -234,29 +218,13 @@ class RequestSpec: QuickSpec {
                 }
                 let request = Request()
                 await waitUntil(timeout: Timeout) { done in
-                    #if compiler(>=5.5.2)
-                    if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                        Task.init {
-                            do {
-                                _ = try await request.start()
-                            } catch {
-                                done()
-                            }
+                    Task.init {
+                        do {
+                            _ = try await request.start()
+                        } catch {
+                            done()
                         }
                     }
-                    #else
-                    if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                        Task.init {
-                            do {
-                                _ = try await request.start()
-                            } catch {
-                                done()
-                            }
-                        }
-                    } else {
-                        done()
-                    }
-                    #endif
                 }
             }
 
