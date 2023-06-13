@@ -196,7 +196,7 @@ let didStore = credentialsManager.store(credentials: credentials)
 
 ### Check for stored credentials
 
-When the users open your app, check for stored credentials. If they exist, you can retrieve them and redirect the users to the app's main flow without any additional login steps.
+When the users open your app, check for stored credentials. If they exist and are valid / can be renewed, you can retrieve them and redirect the users to the app's main flow without any additional login steps.
 
 #### If you are using refresh tokens
 
@@ -335,7 +335,7 @@ The stored [ID token](https://auth0.com/docs/secure/tokens/id-tokens) contains a
 let user = credentialsManager.user
 ```
 
-To get the latest user information, you can use the `renew()` [method](#renew-stored-credentials). Calling this method will update the stored user information. You can also use the `userInfo(withAccessToken:)` [method](#retrieve-user-information) of the Authentication API client, but it will not update the stored user information.
+To get the latest user information, you can use the `renew()` [method](#renew-stored-credentials). Calling this method will automatically update the stored user information. You can also use the `userInfo(withAccessToken:)` [method](#retrieve-user-information) of the Authentication API client, but it will not update the stored user information.
 
 ### Clear stored credentials
 
@@ -350,7 +350,7 @@ let didClear = credentialsManager.clear()
 You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, such as Face ID or Touch ID.
 
 ```swift
-credentialsManager.enableBiometrics(withTitle: "Touch to Login")
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID")
 ```
 
 > **Note**
@@ -359,7 +359,7 @@ credentialsManager.enableBiometrics(withTitle: "Touch to Login")
 If needed, you can specify a particular `LAPolicy` to be used. For example, you might want to support Face ID or Touch ID, but also allow fallback to passcode.
 
 ```swift
-credentialsManager.enableBiometrics(withTitle: "Touch or enter passcode to Login", 
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID or passcode", 
                                     evaluationPolicy: .deviceOwnerAuthentication)
 ```
 
@@ -1143,7 +1143,7 @@ Auth0
 
 #### Facebook Login
 
-If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Faceboook authentication you can request a [session info access token](https://developers.facebook.com/docs/facebook-login/guides/access-tokens/get-session-info) and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.
+If you've added the [Facebook Login flow](https://developers.facebook.com/docs/facebook-login/ios) to your app, after a successful Facebook authentication you can request a [session info access token](https://developers.facebook.com/docs/facebook-login/guides/access-tokens/get-session-info) and the Facebook user profile, and then use them both to perform a token exchange for Auth0 credentials.
 
 ```swift
 Auth0
@@ -1322,7 +1322,7 @@ Auth0
     }
 ```
 
-In the case of signup, you can add an [additional parameter](#signup-with-universal-login-ios--macos) to make the user land directly on the signup page.
+In the case of signup, you can add an [additional parameter](#web-auth-signup) to make the user land directly on the signup page.
 
 ```swift
 Auth0
@@ -1331,7 +1331,7 @@ Auth0
     // ...
 ```
 
-Check how to set up Web Auth in the [Web Auth Configuration](#web-auth-configuration-ios--macos) section.
+Check how to set up Web Auth in the [Web Auth Configuration](#web-auth-configuration) section.
 
 ---
 
