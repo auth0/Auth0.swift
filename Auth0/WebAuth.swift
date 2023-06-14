@@ -2,9 +2,7 @@
 
 #if WEB_AUTH_PLATFORM
 import Foundation
-#if canImport(Combine)
 import Combine
-#endif
 
 /// Thunk that returns a function that creates and returns a ``WebAuthUserAgent`` to perform a web-based operation.
 /// The ``WebAuthUserAgent`` opens the URL in an external user agent and then invokes the callback when done.
@@ -207,7 +205,6 @@ public protocol WebAuth: Trackable, Loggable {
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
 
     #if canImport(_Concurrency)
-    #if compiler(>=5.5.2)
     /**
      Starts the Web Auth flow.
 
@@ -230,12 +227,7 @@ public protocol WebAuth: Trackable, Loggable {
      - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
      application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func start() async throws -> Credentials
-    #else
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func start() async throws -> Credentials
-    #endif
     #endif
 
     /**
@@ -264,7 +256,6 @@ public protocol WebAuth: Trackable, Loggable {
      - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
      application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func start() -> AnyPublisher<Credentials, WebAuthError>
 
     /**
@@ -348,11 +339,9 @@ public protocol WebAuth: Trackable, Loggable {
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError>
 
     #if canImport(_Concurrency)
-    #if compiler(>=5.5.2)
     /**
      Removes the Auth0 session and optionally removes the identity provider (IdP) session.
 
@@ -383,12 +372,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) async throws
-    #else
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func clearSession(federated: Bool) async throws
-    #endif
     #endif
 
 }
@@ -399,23 +383,14 @@ public extension WebAuth {
         self.clearSession(federated: federated, callback: callback)
     }
 
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool = false) -> AnyPublisher<Void, WebAuthError> {
         return self.clearSession(federated: federated)
     }
 
     #if canImport(_Concurrency)
-    #if compiler(>=5.5.2)
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool = false) async throws {
         return try await self.clearSession(federated: federated)
     }
-    #else
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func clearSession(federated: Bool = false) async throws {
-        return try await self.clearSession(federated: federated)
-    }
-    #endif
     #endif
 
 }

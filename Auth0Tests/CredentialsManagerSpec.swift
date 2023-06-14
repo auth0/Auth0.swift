@@ -453,7 +453,7 @@ class CredentialsManagerSpec: QuickSpec {
             context("require biometrics") {
 
                 it("should error when biometrics are unavailable") {
-                    let expectedError = CredentialsManagerError(code: .biometricsFailed, cause: LAError(LAError.biometryNotAvailable))
+                    let expectedError = CredentialsManagerError(code: .biometricsFailed, cause: LAError(.biometryNotAvailable))
                     credentialsManager.enableBiometrics(withTitle: "Auth Title", cancelTitle: "Cancel Title", fallbackTitle: "Fallback Title")
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
@@ -992,229 +992,227 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
-        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-            describe("combine") {
-                var cancellables: Set<AnyCancellable> = []
+        describe("combine") {
+            var cancellables: Set<AnyCancellable> = []
 
-                afterEach {
-                    _ = credentialsManager.clear()
-                    cancellables.removeAll()
+            afterEach {
+                _ = credentialsManager.clear()
+                cancellables.removeAll()
+            }
+
+            context("credentials") {
+
+                it("should emit only one value") {
+                    _ = credentialsManager.store(credentials: credentials)
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .credentials()
+                            .assertNoFailure()
+                            .count()
+                            .sink(receiveValue: { count in
+                                expect(count) == 1
+                                done()
+                            })
+                            .store(in: &cancellables)
+                    }
                 }
 
-                context("credentials") {
-
-                    it("should emit only one value") {
-                        _ = credentialsManager.store(credentials: credentials)
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .credentials()
-                                .assertNoFailure()
-                                .count()
-                                .sink(receiveValue: { count in
-                                    expect(count) == 1
-                                    done()
-                                })
-                                .store(in: &cancellables)
-                        }
+                it("should complete using the default parameter values") {
+                    _ = credentialsManager.store(credentials: credentials)
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .credentials()
+                            .sink(receiveCompletion: { completion in
+                                guard case .finished = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
                     }
-
-                    it("should complete using the default parameter values") {
-                        _ = credentialsManager.store(credentials: credentials)
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .credentials()
-                                .sink(receiveCompletion: { completion in
-                                    guard case .finished = completion else { return }
-                                    done()
-                                }, receiveValue: { _ in })
-                                .store(in: &cancellables)
-                        }
-                    }
-
-                    it("should complete using custom parameter values") {
-                        let key = "foo"
-                        let value = "bar"
-                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: value)) { _ in
-                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                        }
-                        credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                        _ = credentialsManager.store(credentials: credentials)
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .credentials(withScope: "openid profile offline_access",
-                                             minTTL: ValidTTL,
-                                             parameters: [key: value],
-                                             headers: [key: value])
-                                .sink(receiveCompletion: { completion in
-                                    guard case .finished = completion else { return }
-                                    done()
-                                }, receiveValue: { _ in })
-                                .store(in: &cancellables)
-                        }
-                    }
-
-                    it("should complete with an error") {
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .credentials()
-                                .ignoreOutput()
-                                .sink(receiveCompletion: { completion in
-                                    guard case .failure = completion else { return }
-                                    done()
-                                }, receiveValue: { _ in })
-                                .store(in: &cancellables)
-                        }
-                    }
-
                 }
 
-                context("renew") {
-
-                    beforeEach {
-                        _ = credentialsManager.store(credentials: credentials)
+                it("should complete using custom parameter values") {
+                    let key = "foo"
+                    let value = "bar"
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: value)) { _ in
+                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
-
-                    it("should emit only one value") {
-                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
-                        }.name = "renewal succeeded"
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .renew()
-                                .assertNoFailure()
-                                .count()
-                                .sink(receiveValue: { count in
-                                    expect(count) == 1
-                                    done()
-                                })
-                                .store(in: &cancellables)
-                        }
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials)
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .credentials(withScope: "openid profile offline_access",
+                                         minTTL: ValidTTL,
+                                         parameters: [key: value],
+                                         headers: [key: value])
+                            .sink(receiveCompletion: { completion in
+                                guard case .finished = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
                     }
-
-                    it("should complete using the default parameter values") {
-                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
-                        }.name = "renewal succeeded"
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .renew()
-                                .sink(receiveCompletion: { completion in
-                                    guard case .finished = completion else { return }
-                                    done()
-                                }, receiveValue: { _ in })
-                                .store(in: &cancellables)
-                        }
-                    }
-
-                    it("should complete using custom parameter values") {
-                        let key = "foo"
-                        let value = "bar"
-                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: value)) { _ in
-                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                        }
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .renew(parameters: [key: value], headers: [key: value])
-                                .sink(receiveCompletion: { completion in
-                                    guard case .finished = completion else { return }
-                                    done()
-                                }, receiveValue: { _ in })
-                                .store(in: &cancellables)
-                        }
-                    }
-
-                    it("should complete with an error") {
-                        stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                            return authFailure(code: "invalid_request", description: "missing_params")
-                        }.name = "renewal failed"
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .renew()
-                                .ignoreOutput()
-                                .sink(receiveCompletion: { completion in
-                                    guard case .failure = completion else { return }
-                                    done()
-                                }, receiveValue: { _ in })
-                                .store(in: &cancellables)
-                        }
-                    }
-
                 }
 
-                context("revoke") {
-
-                    it("should emit only one value") {
-                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                            return revokeTokenResponse()
-                        }
-                        _ = credentialsManager.store(credentials: credentials)
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .revoke()
-                                .assertNoFailure()
-                                .count()
-                                .sink(receiveValue: { count in
-                                    expect(count) == 1
-                                    done()
-                                })
-                                .store(in: &cancellables)
-                        }
+                it("should complete with an error") {
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .credentials()
+                            .ignoreOutput()
+                            .sink(receiveCompletion: { completion in
+                                guard case .failure = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
                     }
-
-                    it("should complete using the default parameter values") {
-                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                            return revokeTokenResponse()
-                        }
-                        _ = credentialsManager.store(credentials: credentials)
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .revoke()
-                                .sink(receiveCompletion: { completion in
-                                    guard case .finished = completion else { return }
-                                    done()
-                                }, receiveValue: { _ in })
-                                .store(in: &cancellables)
-                        }
-                    }
-
-                    it("should complete using custom parameter values") {
-                        let key = "foo"
-                        let value = "bar"
-                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader(key, value: value)) { _ in
-                            return revokeTokenResponse()
-                        }
-                        _ = credentialsManager.store(credentials: credentials)
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .revoke(headers: [key: value])
-                                .sink(receiveCompletion: { completion in
-                                    guard case .finished = completion else { return }
-                                    done()
-                                }, receiveValue: { _ in })
-                                .store(in: &cancellables)
-                        }
-                    }
-
-                    it("should complete with an error") {
-                        stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                            return apiFailureResponse()
-                        }
-                        _ = credentialsManager.store(credentials: credentials)
-                        await waitUntil(timeout: Timeout) { done in
-                            credentialsManager
-                                .revoke()
-                                .ignoreOutput()
-                                .sink(receiveCompletion: { completion in
-                                    guard case .failure = completion else { return }
-                                    done()
-                                }, receiveValue: { _ in })
-                                .store(in: &cancellables)
-                        }
-                    }
-
                 }
 
             }
+
+            context("renew") {
+
+                beforeEach {
+                    _ = credentialsManager.store(credentials: credentials)
+                }
+
+                it("should emit only one value") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
+                    }.name = "renewal succeeded"
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .renew()
+                            .assertNoFailure()
+                            .count()
+                            .sink(receiveValue: { count in
+                                expect(count) == 1
+                                done()
+                            })
+                            .store(in: &cancellables)
+                    }
+                }
+
+                it("should complete using the default parameter values") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
+                    }.name = "renewal succeeded"
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .renew()
+                            .sink(receiveCompletion: { completion in
+                                guard case .finished = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
+                    }
+                }
+
+                it("should complete using custom parameter values") {
+                    let key = "foo"
+                    let value = "bar"
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: value)) { _ in
+                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
+                    }
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .renew(parameters: [key: value], headers: [key: value])
+                            .sink(receiveCompletion: { completion in
+                                guard case .finished = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
+                    }
+                }
+
+                it("should complete with an error") {
+                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
+                        return authFailure(code: "invalid_request", description: "missing_params")
+                    }.name = "renewal failed"
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .renew()
+                            .ignoreOutput()
+                            .sink(receiveCompletion: { completion in
+                                guard case .failure = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
+                    }
+                }
+
+            }
+
+            context("revoke") {
+
+                it("should emit only one value") {
+                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                        return revokeTokenResponse()
+                    }
+                    _ = credentialsManager.store(credentials: credentials)
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .revoke()
+                            .assertNoFailure()
+                            .count()
+                            .sink(receiveValue: { count in
+                                expect(count) == 1
+                                done()
+                            })
+                            .store(in: &cancellables)
+                    }
+                }
+
+                it("should complete using the default parameter values") {
+                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                        return revokeTokenResponse()
+                    }
+                    _ = credentialsManager.store(credentials: credentials)
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .revoke()
+                            .sink(receiveCompletion: { completion in
+                                guard case .finished = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
+                    }
+                }
+
+                it("should complete using custom parameter values") {
+                    let key = "foo"
+                    let value = "bar"
+                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader(key, value: value)) { _ in
+                        return revokeTokenResponse()
+                    }
+                    _ = credentialsManager.store(credentials: credentials)
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .revoke(headers: [key: value])
+                            .sink(receiveCompletion: { completion in
+                                guard case .finished = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
+                    }
+                }
+
+                it("should complete with an error") {
+                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
+                        return apiFailureResponse()
+                    }
+                    _ = credentialsManager.store(credentials: credentials)
+                    await waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .revoke()
+                            .ignoreOutput()
+                            .sink(receiveCompletion: { completion in
+                                guard case .failure = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
+                    }
+                }
+
+            }
+
         }
 
         #if canImport(_Concurrency)
@@ -1230,23 +1228,10 @@ class CredentialsManagerSpec: QuickSpec {
                     let credentialsManager = credentialsManager!
                     _ = credentialsManager.store(credentials: credentials)
                     await waitUntil(timeout: Timeout) { done in
-                        #if compiler(>=5.5.2)
-                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                            Task.init {
-                                _ = try await credentialsManager.credentials()
-                                done()
-                            }
-                        }
-                        #else
-                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                            Task.init {
-                                _ = try await credentialsManager.credentials()
-                                done()
-                            }
-                        } else {
+                        Task.init {
+                            _ = try await credentialsManager.credentials()
                             done()
                         }
-                        #endif
                     }
                 }
 
@@ -1260,58 +1245,26 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     await waitUntil(timeout: Timeout) { done in
-                        #if compiler(>=5.5.2)
-                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                            Task.init {
-                                _ = try await credentialsManager.credentials(withScope: "openid profile offline_access",
-                                                                             minTTL: ValidTTL,
-                                                                             parameters: [key: value],
-                                                                             headers: [key: value])
-                                done()
-                            }
-                        }
-                        #else
-                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                            Task.init {
-                                _ = try await credentialsManager.credentials(withScope: "openid profile offline_access",
-                                                                             minTTL: ValidTTL,
-                                                                             parameters: [key: value],
-                                                                             headers: [key: value])
-                                done()
-                            }
-                        } else {
+                        Task.init {
+                            _ = try await credentialsManager.credentials(withScope: "openid profile offline_access",
+                                                                         minTTL: ValidTTL,
+                                                                         parameters: [key: value],
+                                                                         headers: [key: value])
                             done()
                         }
-                        #endif
                     }
                 }
 
                 it("should throw an error") {
                     let credentialsManager = credentialsManager!
                     await waitUntil(timeout: Timeout) { done in
-                        #if compiler(>=5.5.2)
-                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                            Task.init {
-                                do {
-                                    _ = try await credentialsManager.credentials()
-                                } catch {
-                                    done()
-                                }
+                        Task.init {
+                            do {
+                                _ = try await credentialsManager.credentials()
+                            } catch {
+                                done()
                             }
                         }
-                        #else
-                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                            Task.init {
-                                do {
-                                    _ = try await credentialsManager.credentials()
-                                } catch {
-                                    done()
-                                }
-                            }
-                        } else {
-                            done()
-                        }
-                        #endif
                     }
                 }
 
@@ -1329,29 +1282,13 @@ class CredentialsManagerSpec: QuickSpec {
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
                     }.name = "renewal succeeded"
                     await waitUntil(timeout: Timeout) { done in
-                        #if compiler(>=5.5.2)
-                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                            Task.init {
-                                    let newCredentials = try await credentialsManager.renew()
-                                    expect(newCredentials.accessToken) == NewAccessToken
-                                    expect(newCredentials.idToken) == NewIdToken
-                                    expect(newCredentials.refreshToken) == NewRefreshToken
-                                    done()
-                            }
-                        }
-                        #else
-                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                            Task.init {
-                                let newCredentials = try await credentialsManager.renew()
-                                expect(newCredentials.accessToken) == NewAccessToken
-                                expect(newCredentials.idToken) == NewIdToken
-                                expect(newCredentials.refreshToken) == NewRefreshToken
-                                done()
-                            }
-                        } else {
+                        Task.init {
+                            let newCredentials = try await credentialsManager.renew()
+                            expect(newCredentials.accessToken) == NewAccessToken
+                            expect(newCredentials.idToken) == NewIdToken
+                            expect(newCredentials.refreshToken) == NewRefreshToken
                             done()
                         }
-                        #endif
                     }
                 }
 
@@ -1363,29 +1300,13 @@ class CredentialsManagerSpec: QuickSpec {
                         return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
                     }
                     await waitUntil(timeout: Timeout) { done in
-                        #if compiler(>=5.5.2)
-                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                            Task.init {
-                                let newCredentials = try await credentialsManager.renew(parameters: [key: value], headers: [key: value])
-                                expect(newCredentials.accessToken) == NewAccessToken
-                                expect(newCredentials.idToken) == NewIdToken
-                                expect(newCredentials.refreshToken) == NewRefreshToken
-                                done()
-                            }
-                        }
-                        #else
-                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                            Task.init {
-                                let newCredentials = try await credentialsManager.renew(parameters: [key: value], headers: [key: value])
-                                expect(newCredentials.accessToken) == NewAccessToken
-                                expect(newCredentials.idToken) == NewIdToken
-                                expect(newCredentials.refreshToken) == NewRefreshToken
-                                done()
-                            }
-                        } else {
+                        Task.init {
+                            let newCredentials = try await credentialsManager.renew(parameters: [key: value], headers: [key: value])
+                            expect(newCredentials.accessToken) == NewAccessToken
+                            expect(newCredentials.idToken) == NewIdToken
+                            expect(newCredentials.refreshToken) == NewRefreshToken
                             done()
                         }
-                        #endif
                     }
                 }
 
@@ -1395,29 +1316,13 @@ class CredentialsManagerSpec: QuickSpec {
                         return authFailure(code: "invalid_request", description: "missing_params")
                     }.name = "renewal failed"
                     await waitUntil(timeout: Timeout) { done in
-                        #if compiler(>=5.5.2)
-                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                            Task.init {
-                                do {
-                                    _ = try await credentialsManager.renew()
-                                } catch {
-                                    done()
-                                }
+                        Task.init {
+                            do {
+                                _ = try await credentialsManager.renew()
+                            } catch {
+                                done()
                             }
                         }
-                        #else
-                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                            Task.init {
-                                do {
-                                    _ = try await credentialsManager.renew()
-                                } catch {
-                                    done()
-                                }
-                            }
-                        } else {
-                            done()
-                        }
-                        #endif
                     }
                 }
 
@@ -1432,23 +1337,10 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                     _ = credentialsManager.store(credentials: credentials)
                     await waitUntil(timeout: Timeout) { done in
-                        #if compiler(>=5.5.2)
-                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                            Task.init {
-                                _ = try await credentialsManager.revoke()
-                                done()
-                            }
-                        }
-                        #else
-                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                            Task.init {
-                                _ = try await credentialsManager.revoke()
-                                done()
-                            }
-                        } else {
+                        Task.init {
+                            _ = try await credentialsManager.revoke()
                             done()
                         }
-                        #endif
                     }
                 }
 
@@ -1461,23 +1353,10 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                     _ = credentialsManager.store(credentials: credentials)
                     await waitUntil(timeout: Timeout) { done in
-                        #if compiler(>=5.5.2)
-                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                            Task.init {
-                                _ = try await credentialsManager.revoke(headers: [key: value])
-                                done()
-                            }
-                        }
-                        #else
-                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                            Task.init {
-                                _ = try await credentialsManager.revoke(headers: [key: value])
-                                done()
-                            }
-                        } else {
+                        Task.init {
+                            _ = try await credentialsManager.revoke(headers: [key: value])
                             done()
                         }
-                        #endif
                     }
                 }
 
@@ -1488,29 +1367,13 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                     _ = credentialsManager.store(credentials: credentials)
                     await waitUntil(timeout: Timeout) { done in
-                        #if compiler(>=5.5.2)
-                        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
-                            Task.init {
-                                do {
-                                    _ = try await credentialsManager.revoke()
-                                } catch {
-                                    done()
-                                }
+                        Task.init {
+                            do {
+                                _ = try await credentialsManager.revoke()
+                            } catch {
+                                done()
                             }
                         }
-                        #else
-                        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *) {
-                            Task.init {
-                                do {
-                                    _ = try await credentialsManager.revoke()
-                                } catch {
-                                    done()
-                                }
-                            }
-                        } else {
-                            done()
-                        }
-                        #endif
                     }
                 }
 

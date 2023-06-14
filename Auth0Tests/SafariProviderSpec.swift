@@ -54,11 +54,11 @@ class SafariProviderSpec: QuickSpec {
 
             beforeEach {
                 root = SpyViewController()
-                UIApplication.shared.keyWindow?.rootViewController = root
+                UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = root
             }
 
             it("should return nil when root is nil") {
-                UIApplication.shared.keyWindow?.rootViewController = nil
+                UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = nil
                 expect(safari.topViewController).to(beNil())
             }
 
@@ -131,7 +131,7 @@ class SafariProviderSpec: QuickSpec {
 
             it("should present the safari view controller") {
                 let root = SpyViewController()
-                UIApplication.shared.keyWindow?.rootViewController = root
+                UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = root
                 let safari = SpySafariViewController(url: Url)
                 userAgent = SafariUserAgent(controller: safari, callback: { _ in })
                 root.presented = safari

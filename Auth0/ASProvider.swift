@@ -19,9 +19,7 @@ extension WebAuthentication {
                 _ = TransactionStore.shared.resume(callbackURL)
             }
 
-            if #available(iOS 13.0, *) {
-                session.prefersEphemeralWebBrowserSession = ephemeralSession
-            }
+            session.prefersEphemeralWebBrowserSession = ephemeralSession
 
             return ASUserAgent(session: session, callback: callback)
         }
@@ -39,9 +37,7 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
         self.callback = callback
         super.init()
 
-        if #available(iOS 13.0, *) {
-            session.presentationContextProvider = self
-        }
+        session.presentationContextProvider = self
     }
 
     func start() {

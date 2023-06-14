@@ -33,7 +33,7 @@ struct BioAuthentication {
     func validateBiometric(callback: @escaping (Error?) -> Void) {
         self.authContext.evaluatePolicy(evaluationPolicy, localizedReason: self.title) {
             guard $1 == nil else { return callback($1) }
-            callback($0 ? nil : LAError(LAError.authenticationFailed))
+            callback($0 ? nil : LAError(.authenticationFailed))
         }
     }
 

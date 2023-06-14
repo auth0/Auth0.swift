@@ -1,8 +1,6 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
-#if canImport(Combine)
 import Combine
-#endif
 
 final class Auth0WebAuth: WebAuth {
 
@@ -279,7 +277,6 @@ final class Auth0WebAuth: WebAuth {
 
 // MARK: - Combine
 
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 extension Auth0WebAuth {
 
     public func start() -> AnyPublisher<Credentials, WebAuthError> {
@@ -303,8 +300,6 @@ extension Auth0WebAuth {
 #if canImport(_Concurrency)
 extension Auth0WebAuth {
 
-    #if compiler(>=5.5.2)
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func start() async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.main.async {
@@ -312,19 +307,7 @@ extension Auth0WebAuth {
             }
         }
     }
-    #else
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func start() async throws -> Credentials {
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.main.async {
-                self.start(continuation.resume)
-            }
-        }
-    }
-    #endif
 
-    #if compiler(>=5.5.2)
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func clearSession(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.main.async {
@@ -334,18 +317,6 @@ extension Auth0WebAuth {
             }
         }
     }
-    #else
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    func clearSession(federated: Bool) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.main.async {
-                self.clearSession(federated: federated) { result in
-                    continuation.resume(with: result)
-                }
-            }
-        }
-    }
-    #endif
 
 }
 #endif

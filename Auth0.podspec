@@ -41,22 +41,22 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/auth0/Auth0.swift.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/auth0'
   s.source_files     = 'Auth0/*.swift'
-  s.swift_versions   = ['5.5', '5.6', '5.7']
+  s.swift_versions   = ['5.7', '5.8']
 
   s.dependency 'SimpleKeychain', '~> 1.0'
   s.dependency 'JWTDecode', '~> 3.0'
 
-  s.ios.deployment_target   = '12.0'
+  s.ios.deployment_target   = '13.0'
   s.ios.exclude_files       = macos_files
   s.ios.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
 
-  s.osx.deployment_target   = '10.15'
+  s.osx.deployment_target   = '11.0'
   s.osx.exclude_files       = ios_files
   s.osx.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
 
-  s.tvos.deployment_target = '12.0'
+  s.tvos.deployment_target = '13.0'
   s.tvos.exclude_files     = excluded_files
 
-  s.watchos.deployment_target = '6.2'
+  s.watchos.deployment_target = '7.0'
   s.watchos.exclude_files     = excluded_files
 end

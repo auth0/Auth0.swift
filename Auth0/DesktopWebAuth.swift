@@ -13,7 +13,7 @@ extension NSApplication {
 extension ASUserAgent: ASWebAuthenticationPresentationContextProviding {
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return NSApplication.shared()?.windows.filter({ $0.isKeyWindow }).last ?? ASPresentationAnchor()
+        return NSApplication.shared()?.windows.last(where: \.isKeyWindow) ?? ASPresentationAnchor()
     }
 
 }

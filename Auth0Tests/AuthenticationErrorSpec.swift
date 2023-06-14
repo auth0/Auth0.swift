@@ -169,7 +169,7 @@ class AuthenticationErrorSpec: QuickSpec {
         describe("unknown error structure") {
 
             itBehavesLike(UnknownErrorExample) { return [ExampleValuesKey: ["key": "value"]] }
-            itBehavesLike(UnknownErrorExample) { return [ExampleValuesKey: [:]] }
+            itBehavesLike(UnknownErrorExample) { return [ExampleValuesKey: [String: String]()] }
 
         }
 
