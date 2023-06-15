@@ -1,5 +1,21 @@
 # Change Log
 
+## [2.4.0](https://github.com/auth0/Auth0.swift/tree/2.4.0) (2023-06-15)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.3.2...2.4.0)
+
+**Added**
+- Add `renew()` to Credentials Manager [SDK-4300] [\#772](https://github.com/auth0/Auth0.swift/pull/772) ([Widcket](https://github.com/Widcket))
+- Add hook for web view closing [\#754](https://github.com/auth0/Auth0.swift/pull/754) ([xavierLowmiller](https://github.com/xavierLowmiller))
+
+**Changed**
+- Bump the minimum versions of JWTDecode.swift and SimpleKeychain [\#777](https://github.com/auth0/Auth0.swift/pull/777) ([Widcket](https://github.com/Widcket))
+
+**Fixed**
+- Fix unhandled dismissal of `SFSafariViewController` [\#758](https://github.com/auth0/Auth0.swift/pull/758) ([Widcket](https://github.com/Widcket))
+
+**Removed**
+- Drop support for iOS 12, tvOS 12, macOS 10.15, watch0S < 7, and Xcode 13 [\#775](https://github.com/auth0/Auth0.swift/pull/775) ([Widcket](https://github.com/Widcket))
+
 ## [2.3.2](https://github.com/auth0/Auth0.swift/tree/2.3.2) (2022-10-28)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.3.1...2.3.2)
 
