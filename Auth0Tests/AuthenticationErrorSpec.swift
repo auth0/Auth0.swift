@@ -283,7 +283,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isMultifactorEnrollRequired) == true
             }
 
-            it("should detect mfa invalid code") {
+            it("should detect mfa invalid otp code") {
                 let values = [
                     "error": "a0.mfa_invalid_code",
                     "error_description": "Wrong or expired code."
@@ -292,10 +292,28 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isMultifactorCodeInvalid) == true
             }
 
-            it("should detect mfa invalid code oidc") {
+            it("should detect mfa invalid otp code oidc") {
                 let values = [
                     "error": "invalid_grant",
                     "error_description": "Invalid otp_code."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isMultifactorCodeInvalid) == true
+            }
+
+            it("should detect mfa invalid binding code") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Invalid binding_code."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 401)
+                expect(error.isMultifactorCodeInvalid) == true
+            }
+
+            it("should detect mfa invalid recovery code") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "MFA Authorization rejected."
                 ]
                 let error = AuthenticationError(info: values, statusCode: 401)
                 expect(error.isMultifactorCodeInvalid) == true

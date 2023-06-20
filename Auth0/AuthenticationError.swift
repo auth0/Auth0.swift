@@ -59,12 +59,16 @@ public struct AuthenticationError: Auth0APIError {
 
     /// When the MFA code sent is invalid or expired.
     public var isMultifactorCodeInvalid: Bool {
-        return self.code == "a0.mfa_invalid_code" || self.code == "invalid_grant" && self.localizedDescription == "Invalid otp_code."
+        return self.code == "a0.mfa_invalid_code"
+            || self.code == "invalid_grant" && self.localizedDescription == "Invalid otp_code."
+            || self.code == "invalid_grant" && self.localizedDescription == "Invalid binding_code."
+            || self.code == "invalid_grant" && self.localizedDescription == "MFA Authorization rejected."
     }
 
     /// When the MFA token is invalid or expired.
     public var isMultifactorTokenInvalid: Bool {
-        return self.code == "expired_token" && self.localizedDescription == "mfa_token is expired" || self.code == "invalid_grant" && self.localizedDescription == "Malformed mfa_token"
+        return self.code == "expired_token" && self.localizedDescription == "mfa_token is expired"
+            || self.code == "invalid_grant" && self.localizedDescription == "Malformed mfa_token"
     }
 
     /// When the password used for signup does not match the strength requirements of the connection.
