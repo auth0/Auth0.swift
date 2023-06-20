@@ -99,6 +99,6 @@ body:
         - Swift Package Manager
         - Cocoapods
         - Carthage
-        - None
+        - Other
     validations:
       required: true
