@@ -67,7 +67,11 @@ func validate(idToken: String,
         claimValidators.append(IDTokenAuthTimeValidator(leeway: context.leeway, maxAge: maxAge))
     }
     if let organization = context.organization {
-        claimValidators.append(IDTokenOrgIdValidator(organization: organization))
+        if organization.starts(with: "org_") {
+            claimValidators.append(IDTokenOrgIDValidator(orgID: organization))
+        } else {
+            claimValidators.append(IDTokenOrgNameValidator(orgName: organization))
+        }
     }
     let validator = IDTokenValidator(signatureValidator: signatureValidator ?? IDTokenSignatureValidator(context: context),
                                      claimsValidator: claimsValidator ?? IDTokenClaimsValidator(validators: claimValidators),

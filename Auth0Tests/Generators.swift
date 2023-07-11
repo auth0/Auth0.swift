@@ -45,7 +45,8 @@ private func generateJWTPayload(iss: String?,
                                 nonce: String?,
                                 maxAge: Int?,
                                 authTime: Date?,
-                                organization: String?) -> String {
+                                orgID: String?,
+                                orgName: String?) -> String {
     var bodyDict: [String: Any] = [:]
     
     if let iss = iss {
@@ -84,10 +85,14 @@ private func generateJWTPayload(iss: String?,
         bodyDict["nonce"] = nonce
     }
     
-    if let organization = organization {
-        bodyDict["org_id"] = organization
+    if let orgID = orgID {
+        bodyDict["org_id"] = orgID
     }
-    
+
+    if let orgName = orgName {
+        bodyDict["org_name"] = orgName
+    }
+
     return encodeJWTPart(from: bodyDict)
 }
 
@@ -102,7 +107,8 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                  nonce: String? = "a1b2c3d4e5",
                  maxAge: Int? = nil,
                  authTime: Date? = nil,
-                 organization: String? = nil,
+                 orgID: String? = nil,
+                 orgName: String? = nil,
                  signature: String? = nil) -> JWT {
     let header = generateJWTHeader(alg: alg, kid: kid)
     let body = generateJWTPayload(iss: iss,
@@ -114,7 +120,8 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
                                   nonce: nonce,
                                   maxAge: maxAge,
                                   authTime: authTime,
-                                  organization: organization)
+                                  orgID: orgID,
+                                  orgName: orgName)
     
     let signableParts = "\(header).\(body)"
     var signaturePart = ""
@@ -128,7 +135,6 @@ func generateJWT(alg: String = JWTAlgorithm.rs256.rawValue,
         signaturePart = (data! as Data).a0_encodeBase64URLSafe()!
     }
 
-    
     return try! decode(jwt: "\(signableParts).\(signaturePart)")
 }
 

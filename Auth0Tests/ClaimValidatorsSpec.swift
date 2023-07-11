@@ -414,26 +414,26 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
             
         }
 
-        describe("organization validation") {
+        describe("organization id validation") {
             
-            var organizationValidator: IDTokenOrgIdValidator!
-            let expectedOrganization = "abc1234"
+            var orgIDValidator: IDTokenOrgIDValidator!
+            let expectedOrgID = "org_abc1234"
             
             beforeEach {
-                organizationValidator = IDTokenOrgIdValidator(organization: expectedOrganization)
+                orgIDValidator = IDTokenOrgIDValidator(orgID: expectedOrgID)
             }
             
             context("missing org_id") {
                 it("should return nil if org_id is present") {
-                    let jwt = generateJWT(organization: expectedOrganization)
+                    let jwt = generateJWT(orgID: expectedOrgID)
                     
-                    expect(organizationValidator.validate(jwt)).to(beNil())
+                    expect(orgIDValidator.validate(jwt)).to(beNil())
                 }
                 
                 it("should return an error if org_id is missing") {
-                    let jwt = generateJWT(organization: nil)
-                    let expectedError = IDTokenOrgIdValidator.ValidationError.missingOrgId
-                    let result = organizationValidator.validate(jwt)
+                    let jwt = generateJWT(orgID: nil)
+                    let expectedError = IDTokenOrgIDValidator.ValidationError.missingOrgId
+                    let result = orgIDValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
                     expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -441,12 +441,12 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
             }
             
             context("mismatched org_id") {
-                it("should return an error if org_id does not match the request organization") {
-                    let organization = "xyz6789"
-                    let jwt = generateJWT(organization: organization)
-                    let expectedError = IDTokenOrgIdValidator.ValidationError.mismatchedOrgId(actual: organization,
-                                                                                              expected: expectedOrganization)
-                    let result = organizationValidator.validate(jwt)
+                it("should return an error if org_id does not match the request organization id") {
+                    let orgID = "org_xyz6789"
+                    let jwt = generateJWT(orgID: orgID)
+                    let expectedError = IDTokenOrgIDValidator.ValidationError.mismatchedOrgId(actual: orgID,
+                                                                                              expected: expectedOrgID)
+                    let result = orgIDValidator.validate(jwt)
                     
                     expect(result).to(matchError(expectedError))
                     expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -454,7 +454,47 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
             }
             
         }
-        
+
+        describe("organization name validation") {
+            
+            var orgNameValidator: IDTokenOrgNameValidator!
+            let expectedOrgName = "abc1234"
+            
+            beforeEach {
+                orgNameValidator = IDTokenOrgNameValidator(orgName: expectedOrgName)
+            }
+            
+            context("missing org_name") {
+                it("should return nil if org_name is present") {
+                    let jwt = generateJWT(orgName: expectedOrgName)
+                    
+                    expect(orgNameValidator.validate(jwt)).to(beNil())
+                }
+                
+                it("should return an error if org_name is missing") {
+                    let jwt = generateJWT(orgName: nil)
+                    let expectedError = IDTokenOrgNameValidator.ValidationError.missingOrgName
+                    let result = orgNameValidator.validate(jwt)
+                    
+                    expect(result).to(matchError(expectedError))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
+                }
+            }
+            
+            context("mismatched org_name") {
+                it("should return an error if org_name does not match the request organization name") {
+                    let orgName = "xyz6789"
+                    let jwt = generateJWT(orgName: orgName)
+                    let expectedError = IDTokenOrgNameValidator.ValidationError.mismatchedOrgName(actual: orgName,
+                                                                                                  expected: expectedOrgName)
+                    let result = orgNameValidator.validate(jwt)
+                    
+                    expect(result).to(matchError(expectedError))
+                    expect(result?.localizedDescription).to(equal(expectedError.localizedDescription))
+                }
+            }
+            
+        }
     }
     
 }

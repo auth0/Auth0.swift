@@ -216,22 +216,87 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     }
                 }
                 
-                it("should validate a token with an organization") {
-                    let organization = "abc1234"
-                    let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: nil, authTime: nil, organization: organization)
+                it("should validate a token with an organization ID") {
+                    let orgID = "org_abc1234"
+                    let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: nil, authTime: nil, orgID: orgID)
                     let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
                                                           audience: aud[0],
                                                           jwksRequest: validatorContext.jwksRequest,
                                                           leeway: validatorContext.leeway,
                                                           maxAge: nil,
                                                           nonce: nil,
-                                                          organization: organization)
+                                                          organization: orgID)
                     
                     await waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: context,
                                  signatureValidator: mockSignatureValidator) { error in
                             expect(error).to(beNil())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should validate a token with an organization name") {
+                    let orgName = "abc1234"
+                    let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: nil, authTime: nil, orgName: orgName)
+                    let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
+                                                          audience: aud[0],
+                                                          jwksRequest: validatorContext.jwksRequest,
+                                                          leeway: validatorContext.leeway,
+                                                          maxAge: nil,
+                                                          nonce: nil,
+                                                          organization: orgName)
+                    
+                    await waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 with: context,
+                                 signatureValidator: mockSignatureValidator) { error in
+                            expect(error).to(beNil())
+                            done()
+                        }
+                    }
+                }
+                
+                it("should expect an organization ID instead of an organization name") {
+                    let orgID = "org_abc1234"
+                    let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: nil, authTime: nil, orgName: orgID)
+                    let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
+                                                          audience: aud[0],
+                                                          jwksRequest: validatorContext.jwksRequest,
+                                                          leeway: validatorContext.leeway,
+                                                          maxAge: nil,
+                                                          nonce: nil,
+                                                          organization: orgID)
+                    let expectedError = IDTokenOrgIDValidator.ValidationError.missingOrgId
+                    
+                    await waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 with: context,
+                                 signatureValidator: mockSignatureValidator) { error in
+                            expect(error).to(matchError(expectedError))
+                            done()
+                        }
+                    }
+                }
+                
+                it("should expect an organization name instead of an organization ID") {
+                    let orgName = "abc1234"
+                    let jwt = generateJWT(aud: aud, azp: nil, nonce: nil, maxAge: nil, authTime: nil, orgID: orgName)
+                    let context = IDTokenValidatorContext(issuer: validatorContext.issuer,
+                                                          audience: aud[0],
+                                                          jwksRequest: validatorContext.jwksRequest,
+                                                          leeway: validatorContext.leeway,
+                                                          maxAge: nil,
+                                                          nonce: nil,
+                                                          organization: orgName)
+                    let expectedError = IDTokenOrgNameValidator.ValidationError.missingOrgName
+                    
+                    await waitUntil { done in
+                        validate(idToken: jwt.string,
+                                 with: context,
+                                 signatureValidator: mockSignatureValidator) { error in
+                            expect(error).to(matchError(expectedError))
                             done()
                         }
                     }
