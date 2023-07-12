@@ -497,10 +497,8 @@ class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
             it("should perform a case insensitive compare") {
                 let orgName = "aBc1234"
                 let expectedOrgName = "AbC1234"
-                orgNameValidator = IDTokenOrgNameValidator(orgName: expectedOrgName)
                 let jwt = generateJWT(orgName: orgName)
-                let expectedError = IDTokenOrgNameValidator.ValidationError.mismatchedOrgName(actual: orgName,
-                                                                                              expected: expectedOrgName)
+                orgNameValidator = IDTokenOrgNameValidator(orgName: expectedOrgName)
                 
                 expect(orgNameValidator.validate(jwt)).to(beNil())
             }
