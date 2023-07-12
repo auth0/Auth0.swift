@@ -1212,7 +1212,7 @@ Auth0
 ```swift
 Auth0
     .webAuth()
-    .organization("YOUR_AUTH0_ORGANIZATION_ID")
+    .organization("YOUR_AUTH0_ORGANIZATION_NAME_OR_ID")
     .start { result in
         switch result {
         case .success(let credentials):
@@ -1230,7 +1230,7 @@ Auth0
 do {
     let credentials = try await Auth0
         .webAuth()
-        .organization("YOUR_AUTH0_ORGANIZATION_ID")
+        .organization("YOUR_AUTH0_ORGANIZATION_NAME_OR_ID")
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -1245,7 +1245,7 @@ do {
 ```swift
 Auth0
     .webAuth()
-    .organization("YOUR_AUTH0_ORGANIZATION_ID")
+    .organization("YOUR_AUTH0_ORGANIZATION_NAME_OR_ID")
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
