@@ -249,7 +249,7 @@ struct IDTokenAuthTimeValidator: JWTValidator {
     }
 }
 
-struct IDTokenOrgIdValidator: JWTValidator {
+struct IDTokenOrgIDValidator: JWTValidator {
     enum ValidationError: Auth0Error {
         case missingOrgId
         case mismatchedOrgId(actual: String, expected: String)
@@ -263,16 +263,45 @@ struct IDTokenOrgIdValidator: JWTValidator {
         }
     }
 
-    private let expectedOrganization: String
+    private let expectedOrgID: String
 
-    init(organization: String) {
-        self.expectedOrganization = organization
+    init(orgID: String) {
+        self.expectedOrgID = orgID
     }
 
     func validate(_ jwt: JWT) -> Auth0Error? {
-        guard let actualOrganization = jwt.claim(name: "org_id").string else { return ValidationError.missingOrgId }
-        guard actualOrganization == expectedOrganization else {
-            return ValidationError.mismatchedOrgId(actual: actualOrganization, expected: expectedOrganization)
+        guard let actualOrgID = jwt.claim(name: "org_id").string else { return ValidationError.missingOrgId }
+        guard actualOrgID == expectedOrgID else {
+            return ValidationError.mismatchedOrgId(actual: actualOrgID, expected: expectedOrgID)
+        }
+        return nil
+    }
+}
+
+struct IDTokenOrgNameValidator: JWTValidator {
+    enum ValidationError: Auth0Error {
+        case missingOrgName
+        case mismatchedOrgName(actual: String, expected: String)
+
+        var debugDescription: String {
+            switch self {
+            case .missingOrgName: return "Organization Name (org_name) claim must be a string present in the ID token"
+            case .mismatchedOrgName(let actual, let expected):
+                return "Organization Name (org_name) claim value mismatch in the ID token; expected (\(expected)), found (\(actual))"
+            }
+        }
+    }
+
+    private let expectedOrgName: String
+
+    init(orgName: String) {
+        self.expectedOrgName = orgName
+    }
+
+    func validate(_ jwt: JWT) -> Auth0Error? {
+        guard let actualOrgName = jwt.claim(name: "org_name").string else { return ValidationError.missingOrgName }
+        guard actualOrgName.caseInsensitiveCompare(expectedOrgName) == .orderedSame else {
+            return ValidationError.mismatchedOrgName(actual: actualOrgName, expected: expectedOrgName)
         }
         return nil
     }
