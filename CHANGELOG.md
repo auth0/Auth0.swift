@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.5.0](https://github.com/auth0/Auth0.swift/tree/2.5.0) (2023-07-18)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.4.0...2.5.0)
+
+**Added**
+- Add support for validating the  `org_name` claim [SDK-4414] [\#782](https://github.com/auth0/Auth0.swift/pull/782) ([Widcket](https://github.com/Widcket))
+- Add more error pairs to `isMultifactorCodeInvalid` [SDK-4195] [\#779](https://github.com/auth0/Auth0.swift/pull/779) ([Widcket](https://github.com/Widcket))
+
 ## [2.4.0](https://github.com/auth0/Auth0.swift/tree/2.4.0) (2023-06-15)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.3.2...2.4.0)
 
