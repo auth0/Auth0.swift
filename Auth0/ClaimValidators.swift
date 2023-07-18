@@ -300,7 +300,7 @@ struct IDTokenOrgNameValidator: JWTValidator {
 
     func validate(_ jwt: JWT) -> Auth0Error? {
         guard let actualOrgName = jwt.claim(name: "org_name").string else { return ValidationError.missingOrgName }
-        guard actualOrgName.caseInsensitiveCompare(expectedOrgName) == .orderedSame else {
+        guard actualOrgName == expectedOrgName.lowercased() else {
             return ValidationError.mismatchedOrgName(actual: actualOrgName, expected: expectedOrgName)
         }
         return nil
