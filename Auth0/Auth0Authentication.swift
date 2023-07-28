@@ -120,6 +120,18 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
+    func multifactorAuthenticators(mfaToken: String) -> Request<[Authenticator], AuthenticationError> {
+        let url = URL(string: "mfa/authenticators", relativeTo: self.url)!
+
+        return Request(session: session,
+                       url: url,
+                       method: "GET",
+                       handle: codable,
+                       headers: ["Authorization": "Bearer \(mfaToken)"],
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError> {
         let url = URL(string: "mfa/challenge", relativeTo: self.url)!
         var payload: [String: String] = [

@@ -178,6 +178,39 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
         }
+        
+        // MARK:- MFA Authenticators
+
+        describe("MFA authenticators") {
+
+            it("should fetch MFA authenticators") {
+                stub(condition: isMultifactorAuthenticators(Domain)) { _ in
+                    return multifactorAuthenticatorResponse(authenticators: [
+                        Authenticator(id: "id1", type: "type", active: true, name: nil, oobChannel: nil),
+                        Authenticator(id: "id2", type: "type", active: false, name: "name", oobChannel: "sms")
+                    ])
+                }
+
+                await waitUntil(timeout: Timeout) { done in
+                    auth.multifactorAuthenticators(mfaToken: MFAToken).start { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to fetch MFA authenticators") {
+                stub(condition: isMultifactorAuthenticators(Domain)) { _ in apiFailureResponse() }
+
+                await waitUntil(timeout: Timeout) { done in
+                    auth.multifactorAuthenticators(mfaToken: MFAToken).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+
+        }
 
         // MARK:- MFA Challenge
 
@@ -237,6 +270,17 @@ class AuthenticationSpec: QuickSpec {
                 await waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes, authenticatorId: AuthenticatorId).start { result in
                         expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to request MFA challenge") {
+                stub(condition: isMultifactorChallenge(Domain)) { _ in apiFailureResponse() }
+
+                await waitUntil(timeout: Timeout) { done in
+                    auth.multifactorChallenge(mfaToken: MFAToken).start { result in
+                        expect(result).to(beUnsuccessful())
                         done()
                     }
                 }
@@ -1168,7 +1212,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
 
-            it("should produce an error") {
+            it("should fail to fetch the jwks") {
                 stub(condition: isJWKSPath(Domain)) { _ in apiFailureResponse() }
                 
                 await waitUntil { done in

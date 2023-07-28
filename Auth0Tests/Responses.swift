@@ -132,6 +132,20 @@ func jwksResponse(kid: String? = Kid) -> HTTPStubsResponse {
     return apiSuccessResponse(json: jwks)
 }
 
+func multifactorAuthenticatorResponse(authenticators: [Authenticator]) -> HTTPStubsResponse {
+    let jsonArray = authenticators.map { authenticator in
+        var json: [String: Any] = [
+            "id": authenticator.id,
+            "authenticator_type": authenticator.type,
+            "active": authenticator.active
+        ]
+        json["name"] = authenticator.name
+        json["oob_channel"] = authenticator.oobChannel
+        return json
+    }
+    return apiSuccessResponse(jsonArray: jsonArray)
+}
+
 func multifactorChallengeResponse(challengeType: String, oobCode: String? = nil, bindingMethod: String? = nil) -> HTTPStubsResponse {
     var json: [String: Any] = ["challenge_type": challengeType]
     json["oob_code"] = oobCode

@@ -106,6 +106,10 @@ func isJWKSPath(_ domain: String) -> HTTPStubsTestBlock {
     return isHost(domain) && isPath("/.well-known/jwks.json")
 }
 
+func isMultifactorAuthenticators(_ domain: String) -> HTTPStubsTestBlock {
+    return isMethodGET() && isHost(domain) && isPath("/mfa/authenticators")
+}
+
 func isMultifactorChallenge(_ domain: String) -> HTTPStubsTestBlock {
     return isMethodPOST() && isHost(domain) && isPath("/mfa/challenge")
 }

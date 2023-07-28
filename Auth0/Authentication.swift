@@ -263,6 +263,32 @@ public protocol Authentication: Trackable, Loggable {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-recovery-code)
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
+    /// Returns the list of multi-factor authenticators for the user.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .multifactorAuthenticators(mfaToken: mfaToken)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticators):
+    ///             print("Obtained authenticators: \(authenticators)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameter mfaToken: Token returned when authentication fails with an ``AuthenticationError/isMultifactorRequired`` error due to MFA requirement.
+    /// - Returns: A request that will yield an array of multi-factor authenticators.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#list-authenticators)
+    func multifactorAuthenticators(mfaToken: String) -> Request<[Authenticator], AuthenticationError>
+
     /// Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
     /// application and user.
     ///
