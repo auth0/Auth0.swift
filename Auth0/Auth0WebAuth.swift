@@ -35,10 +35,13 @@ final class Auth0WebAuth: WebAuth {
     }
 
     lazy var redirectURL: URL? = {
-        guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
-        var components = URLComponents(url: self.url, resolvingAgainstBaseURL: true)
-        components?.scheme = bundleIdentifier
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier,
+              let domain = self.url.host,
+              let baseURL = URL(string: "\(bundleIdentifier)://\(domain)") else { return nil }
+
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
         return components?.url?
+            .appendingPathComponent(self.url.path)
             .appendingPathComponent(self.platform)
             .appendingPathComponent(bundleIdentifier)
             .appendingPathComponent("callback")
