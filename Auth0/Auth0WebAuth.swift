@@ -41,6 +41,7 @@ final class Auth0WebAuth: WebAuth {
 
         var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
         return components?.url?
+            .appendingPathComponent(self.url.path)
             .appendingPathComponent(self.platform)
             .appendingPathComponent(bundleIdentifier)
             .appendingPathComponent("callback")
