@@ -103,7 +103,7 @@ class WebAuthErrorSpec: QuickSpec {
             it("should return message for PKCE not allowed") {
                 let message = "Unable to perform authentication with PKCE."
                 + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
-                + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
+                + " 'Application Type' to 'Native'."
                 let error = WebAuthError(code: .pkceNotAllowed)
                 expect(error.localizedDescription) == message
             }

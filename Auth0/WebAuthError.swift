@@ -49,7 +49,7 @@ public struct WebAuthError: Auth0Error {
 
     /// The Auth0 application does not support authentication with Proof Key for Code Exchange (PKCE).
     /// PKCE support needs to be enabled in the settings page of the [Auth0 application](https://manage.auth0.com/#/applications/),
-    /// by setting the **Application Type** to 'Native' and the **Token Endpoint Authentication Method** to 'None'.
+    /// by setting the **Application Type** to 'Native'.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
 
@@ -84,7 +84,7 @@ extension WebAuthError {
         case .userCancelled: return "The user cancelled the Web Auth operation."
         case .pkceNotAllowed: return "Unable to perform authentication with PKCE."
             + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
-            + " 'Application Type' to 'Native' and the 'Token Endpoint Authentication Method' to 'None'."
+            + " 'Application Type' to 'Native'."
         case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
             + " query parameters (\(values))."
         case .idTokenValidationFailed: return "The ID token validation performed after authentication failed."
