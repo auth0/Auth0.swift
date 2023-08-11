@@ -77,7 +77,7 @@ Head to the [Auth0 Dashboard](https://manage.auth0.com/#/applications/) and crea
 Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details in the settings page of your Auth0 application. If you have a [custom domain](https://auth0.com/docs/customize/custom-domains), use your custom domain instead of the value from the settings page.
 
 > **Warning**
-> Make sure that the Auth0 application type is **Native**, not **Single Page Application** nor **Regular Web Application**. Otherwise, you might run into errors due to the different configuration of other application types.
+> Make sure that the Auth0 application type is **Native**. Otherwise, you might run into errors due to the different configuration of other application types.
 
 #### Configure Client ID and Domain with a plist
 
