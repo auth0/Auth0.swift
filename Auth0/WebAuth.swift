@@ -1,5 +1,3 @@
-// swiftlint:disable file_length
-
 #if WEB_AUTH_PLATFORM
 import Foundation
 import Combine
