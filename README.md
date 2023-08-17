@@ -1,7 +1,7 @@
 ![Auth0.swift](https://cdn.auth0.com/website/sdks/banners/swift-banner.png)
 
 ![Version](https://img.shields.io/cocoapods/v/Auth0.svg?style=flat)
-[![CircleCI](https://img.shields.io/circleci/project/github/auth0/Auth0.swift.svg?style=flat)](https://circleci.com/gh/auth0/Auth0.swift/tree/master)
+![Build Status](https://img.shields.io/github/actions/workflow/status/auth0/Auth0.swift/main.yml?style=flat)
 [![Coverage Status](https://img.shields.io/codecov/c/github/auth0/Auth0.swift/master.svg?style=flat)](https://codecov.io/github/auth0/Auth0.swift)
 ![License](https://img.shields.io/github/license/auth0/Auth0.swift.svg?style=flat)
 
