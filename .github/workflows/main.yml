@@ -97,14 +97,14 @@ jobs:
               if: ${{ failure() }}
 
     swiftlint:
-        name: Lint code with Swiftlint
+        name: Lint code with SwiftLint
         runs-on: macos-latest
 
         steps:
             - name: Checkout
               uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
 
-            - name: Run Swiftlint
+            - name: Run SwiftLint
               run: swiftlint lint --reporter github-actions-logging
 
             - name: Cancel wokflow on failure
