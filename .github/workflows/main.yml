@@ -1,6 +1,8 @@
 name: CI
 on: push
 
+permissions: {}
+
 jobs:
     test:
         name: Test on ${{ matrix.platform.os }} using Xcode ${{ matrix.xcode }}
