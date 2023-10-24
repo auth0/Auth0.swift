@@ -94,6 +94,7 @@ class RequestSpec: QuickSpec {
                     expect(body["foo"] as? String) == "bar"
                 }
 
+                // See https://forums.swift.org/t/url-string-behavior-changed-with-xcode-15-0-beta-5/66570/4
                 #if swift(<5.9)
                 it("should not add the parameters as query parameters when the URL is malformed") {
                     let request = Request(url: URL(string: "//:invalid/url")!, parameters: ["foo": "bar"])
