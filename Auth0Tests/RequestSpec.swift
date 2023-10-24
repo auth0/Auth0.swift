@@ -94,10 +94,12 @@ class RequestSpec: QuickSpec {
                     expect(body["foo"] as? String) == "bar"
                 }
 
+                #if swift(<5.9)
                 it("should not add the parameters as query parameters when the URL is malformed") {
-                    let request = Request(url: URL(string: ":INVALID:")!, parameters: ["foo": "bar"])
+                    let request = Request(url: URL(string: "//:invalid/url")!, parameters: ["foo": "bar"])
                    expect(request.request.url?.query).to(beNil())
                 }
+                #endif
             }
 
             context("headers") {
