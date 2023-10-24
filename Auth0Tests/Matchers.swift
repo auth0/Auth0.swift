@@ -120,7 +120,7 @@ func hasBearerToken(_ token: String) -> HTTPStubsTestBlock {
     return hasHeader("Authorization", value: "Bearer \(token)")
 }
 
-func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQueryItem]> {
+func containItem(withName name: String, value: String? = nil) -> Nimble.Predicate<[URLQueryItem]> {
     return Predicate<[URLQueryItem]>.define("contain item with name <\(name)>") { expression, failureMessage -> PredicateResult in
         guard let items = try expression.evaluate() else { return PredicateResult(status: .doesNotMatch, message: failureMessage) }
         let outcome = items.contains { item -> Bool in
@@ -130,7 +130,7 @@ func containItem(withName name: String, value: String? = nil) -> Predicate<[URLQ
     }
 }
 
-func haveAuthenticationError<T>(code: String, description: String) -> Predicate<AuthenticationResult<T>> {
+func haveAuthenticationError<T>(code: String, description: String) -> Nimble.Predicate<AuthenticationResult<T>> {
     return Predicate<AuthenticationResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         return try beUnsuccessful(expression, failureMessage) { (error: AuthenticationError) -> Bool in
             return code == error.code && description == error.localizedDescription
@@ -139,7 +139,7 @@ func haveAuthenticationError<T>(code: String, description: String) -> Predicate<
 }
 
 #if WEB_AUTH_PLATFORM
-func haveAuthenticationError<T>(code: String, description: String) -> Predicate<WebAuthResult<T>> {
+func haveAuthenticationError<T>(code: String, description: String) -> Nimble.Predicate<WebAuthResult<T>> {
     return Predicate<WebAuthResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         return try beUnsuccessful(expression, failureMessage) { (error: WebAuthError) -> Bool in
             guard let cause = error.cause as? AuthenticationError else { return false }
@@ -149,7 +149,7 @@ func haveAuthenticationError<T>(code: String, description: String) -> Predicate<
 }
 #endif
 
-func haveManagementError<T>(_ errorString: String, description: String, code: String, statusCode: Int) -> Predicate<ManagementResult<T>> {
+func haveManagementError<T>(_ errorString: String, description: String, code: String, statusCode: Int) -> Nimble.Predicate<ManagementResult<T>> {
     return Predicate<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         return try beUnsuccessful(expression, failureMessage) { (error: ManagementError) -> Bool in
             return errorString == error.info["error"] as? String
@@ -160,7 +160,7 @@ func haveManagementError<T>(_ errorString: String, description: String, code: St
     }
 }
 
-func haveManagementError<T>(description: String, code: String, statusCode: Int = 0, cause: Error? = nil) -> Predicate<ManagementResult<T>> {
+func haveManagementError<T>(description: String, code: String, statusCode: Int = 0, cause: Error? = nil) -> Nimble.Predicate<ManagementResult<T>> {
     return Predicate<ManagementResult<T>>.define("be an error response with code <\(code)> and description <\(description)") { expression, failureMessage -> PredicateResult in
         return try beUnsuccessful(expression, failureMessage) { (error: ManagementError) -> Bool in
             return code == error.code
@@ -171,7 +171,7 @@ func haveManagementError<T>(description: String, code: String, statusCode: Int =
     }
 }
 
-func haveManagementError<T>(description: String, statusCode: Int) -> Predicate<ManagementResult<T>> {
+func haveManagementError<T>(description: String, statusCode: Int) -> Nimble.Predicate<ManagementResult<T>> {
     return Predicate<ManagementResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
         return try beUnsuccessful(expression, failureMessage) { (error: ManagementError) -> Bool in
             return error.localizedDescription == description && error.statusCode == statusCode
@@ -180,7 +180,7 @@ func haveManagementError<T>(description: String, statusCode: Int) -> Predicate<M
 }
 
 #if WEB_AUTH_PLATFORM
-func haveWebAuthError<T>(_ expected: WebAuthError) -> Predicate<WebAuthResult<T>> {
+func haveWebAuthError<T>(_ expected: WebAuthError) -> Nimble.Predicate<WebAuthResult<T>> {
     return Predicate<WebAuthResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
         return try beUnsuccessful(expression, failureMessage) { (error: WebAuthError) -> Bool in
             return error == expected
@@ -190,7 +190,7 @@ func haveWebAuthError<T>(_ expected: WebAuthError) -> Predicate<WebAuthResult<T>
 }
 #endif
 
-func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError) -> Predicate<CredentialsManagerResult<T>> {
+func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError) -> Nimble.Predicate<CredentialsManagerResult<T>> {
     return Predicate<CredentialsManagerResult<T>>.define("be an error result") { expression, failureMessage -> PredicateResult in
         return try beUnsuccessful(expression, failureMessage) { (error: CredentialsManagerError) -> Bool in
             return error == expected
@@ -199,7 +199,7 @@ func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError) -> Pred
     }
 }
 
-func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Predicate<AuthenticationResult<Credentials>> {
+func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Nimble.Predicate<AuthenticationResult<Credentials>> {
     return Predicate<AuthenticationResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> PredicateResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
@@ -210,7 +210,7 @@ func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> 
 }
 
 #if WEB_AUTH_PLATFORM
-func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Predicate<WebAuthResult<Credentials>> {
+func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Nimble.Predicate<WebAuthResult<Credentials>> {
     return Predicate<WebAuthResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> PredicateResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
@@ -221,7 +221,7 @@ func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> 
 }
 #endif
 
-func haveCredentials(_ accessToken: String, _ idToken: String? = nil, _ refreshToken: String? = nil) -> Predicate<CredentialsManagerResult<Credentials>> {
+func haveCredentials(_ accessToken: String, _ idToken: String? = nil, _ refreshToken: String? = nil) -> Nimble.Predicate<CredentialsManagerResult<Credentials>> {
     return Predicate<CredentialsManagerResult<Credentials>>.define("be a successful credentials retrieval") { expression, failureMessage -> PredicateResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
@@ -231,13 +231,13 @@ func haveCredentials(_ accessToken: String, _ idToken: String? = nil, _ refreshT
     }
 }
 
-func haveCredentials() -> Predicate<CredentialsManagerResult<Credentials>> {
+func haveCredentials() -> Nimble.Predicate<CredentialsManagerResult<Credentials>> {
     return Predicate<CredentialsManagerResult<Credentials>>.define("be a successful credentials retrieval") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage)
     }
 }
 
-func haveCreatedUser(_ email: String, username: String? = nil) -> Predicate<AuthenticationResult<DatabaseUser>> {
+func haveCreatedUser(_ email: String, username: String? = nil) -> Nimble.Predicate<AuthenticationResult<DatabaseUser>> {
     return Predicate<AuthenticationResult<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage) { (created: DatabaseUser) -> Bool in
             return created.email == email && (username == nil || created.username == username)
@@ -245,33 +245,33 @@ func haveCreatedUser(_ email: String, username: String? = nil) -> Predicate<Auth
     }
 }
 
-func beSuccessful<T>() -> Predicate<AuthenticationResult<T>> {
+func beSuccessful<T>() -> Nimble.Predicate<AuthenticationResult<T>> {
     return Predicate<AuthenticationResult<T>>.define("be a successful result") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage)
     }
 }
 
-func beSuccessful<T>() -> Predicate<ManagementResult<T>> {
+func beSuccessful<T>() -> Nimble.Predicate<ManagementResult<T>> {
     return Predicate<ManagementResult<T>>.define("be a successful result") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage)
     }
 }
 
 #if WEB_AUTH_PLATFORM
-func beSuccessful<T>() -> Predicate<WebAuthResult<T>> {
+func beSuccessful<T>() -> Nimble.Predicate<WebAuthResult<T>> {
     return Predicate<WebAuthResult<T>>.define("be a successful result") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage)
     }
 }
 #endif
 
-func beSuccessful<T>() -> Predicate<CredentialsManagerResult<T>> {
+func beSuccessful<T>() -> Nimble.Predicate<CredentialsManagerResult<T>> {
     return Predicate<CredentialsManagerResult<T>>.define("be a successful result") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage)
     }
 }
 
-func beUnsuccessful<T>(_ cause: String? = nil) -> Predicate<AuthenticationResult<T>> {
+func beUnsuccessful<T>(_ cause: String? = nil) -> Nimble.Predicate<AuthenticationResult<T>> {
     return Predicate<AuthenticationResult<T>>.define("be a failure result") { expression, failureMessage -> PredicateResult in
         if let cause = cause {
             _ = failureMessage.appended(message: " with cause \(cause)")
@@ -283,7 +283,7 @@ func beUnsuccessful<T>(_ cause: String? = nil) -> Predicate<AuthenticationResult
 }
 
 #if WEB_AUTH_PLATFORM
-func beUnsuccessful<T>(_ cause: String? = nil) -> Predicate<WebAuthResult<T>> {
+func beUnsuccessful<T>(_ cause: String? = nil) -> Nimble.Predicate<WebAuthResult<T>> {
     return Predicate<WebAuthResult<T>>.define("be a failure result") { expression, failureMessage -> PredicateResult in
         if let cause = cause {
             _ = failureMessage.appended(message: " with cause \(cause)")
@@ -295,20 +295,20 @@ func beUnsuccessful<T>(_ cause: String? = nil) -> Predicate<WebAuthResult<T>> {
 }
 #endif
 
-func beUnsuccessful<T>() -> Predicate<CredentialsManagerResult<T>> {
+func beUnsuccessful<T>() -> Nimble.Predicate<CredentialsManagerResult<T>> {
     return Predicate<CredentialsManagerResult<T>>.define("be a failure result") { expression, failureMessage -> PredicateResult in
         _ = failureMessage.appended(message: " from credentials manager")
         return try beUnsuccessful(expression, failureMessage)
     }
 }
 
-func haveProfile(_ sub: String) -> Predicate<AuthenticationResult<UserInfo>> {
+func haveProfile(_ sub: String) -> Nimble.Predicate<AuthenticationResult<UserInfo>> {
     return Predicate<AuthenticationResult<UserInfo>>.define("have userInfo for sub: <\(sub)>") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage) { (userInfo: UserInfo) -> Bool in userInfo.sub == sub }
     }
 }
 
-func haveObjectWithAttributes(_ attributes: [String]) -> Predicate<ManagementResult<[String: Any]>> {
+func haveObjectWithAttributes(_ attributes: [String]) -> Nimble.Predicate<ManagementResult<[String: Any]>> {
     return Predicate<ManagementResult<[String: Any]>>.define("have attributes \(attributes)") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage) { (value: [String: Any]) -> Bool in
             return Array(value.keys).reduce(true, { (initial, value) -> Bool in
@@ -318,13 +318,13 @@ func haveObjectWithAttributes(_ attributes: [String]) -> Predicate<ManagementRes
     }
 }
 
-func haveJWKS() -> Predicate<AuthenticationResult<JWKS>> {
+func haveJWKS() -> Nimble.Predicate<AuthenticationResult<JWKS>> {
     return Predicate<AuthenticationResult<JWKS>>.define("have a JWKS object with at least one key") { expression, failureMessage -> PredicateResult in
         return try beSuccessful(expression, failureMessage) { (jwks: JWKS) -> Bool in !jwks.keys.isEmpty }
     }
 }
 
-func beURLSafeBase64() -> Predicate<String> {
+func beURLSafeBase64() -> Nimble.Predicate<String> {
     return Predicate<String>.define("be url safe base64") { expression, failureMessage -> PredicateResult in
         var set = CharacterSet()
         set.formUnion(.alphanumerics)

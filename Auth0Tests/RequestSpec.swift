@@ -95,7 +95,7 @@ class RequestSpec: QuickSpec {
                 }
 
                 it("should not add the parameters as query parameters when the URL is malformed") {
-                    let request = Request(url: URL(string: "//:foo/bar")!, parameters: ["foo": "bar"])
+                    let request = Request(url: URL(string: ":INVALID:")!, parameters: ["foo": "bar"])
                    expect(request.request.url?.query).to(beNil())
                 }
             }
