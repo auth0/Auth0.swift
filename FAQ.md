@@ -1,11 +1,11 @@
 # Frequently Asked Questions
 
-1. [How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box)
-    - [Use ephemeral sessions](#use-ephemeral-sessions)
-    - [Use `SFSafariViewController`](#use-sfsafariviewcontroller)
-2. [How can I disable the _logout_ alert box?](#2-how-can-i-disable-the-logout-alert-box)
-3. [How can I change the message in the alert box?](#3-how-can-i-change-the-message-in-the-alert-box)
-4. [How can I programmatically close the alert box?](#4-how-can-i-programmatically-close-the-alert-box)
+- [1. How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box)
+  - [Use ephemeral sessions](#use-ephemeral-sessions)
+  - [Use `SFSafariViewController`](#use-sfsafariviewcontroller)
+- [2. How can I disable the _logout_ alert box?](#2-how-can-i-disable-the-logout-alert-box)
+- [3. How can I change the message in the alert box?](#3-how-can-i-change-the-message-in-the-alert-box)
+- [4. How can I programmatically close the alert box?](#4-how-can-i-programmatically-close-the-alert-box)
 
 ---
 
@@ -36,7 +36,7 @@ Auth0
 Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
 
 > **Note**
-> `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`. This option is only available on [iOS 13+ and macOS](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio), so `useEphemeralSession()` will have no effect on iOS 12. To improve the experience for iOS 12 users, see the approach described below.
+> `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`.
 
 ### Use `SFSafariViewController`
 
