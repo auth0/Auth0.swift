@@ -131,7 +131,6 @@ public protocol WebAuth: Trackable, Loggable {
     /// Using this method will disable single sign-on (SSO).
     ///
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    /// - Requires: iOS 13+ or macOS. Has no effect on iOS 12.
     /// - Important: You don't need to call ``WebAuth/clearSession(federated:callback:)-9yv61`` if you are using this
     /// method on login, because there will be no shared cookie to remove.
     /// - Note: Don't use this method along with ``provider(_:)``. Use either one or the other, because this
