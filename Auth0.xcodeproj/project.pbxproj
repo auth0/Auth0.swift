@@ -109,6 +109,10 @@
 		5C809D9A275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */; };
 		5C809D9B275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */; };
 		5C809D9C275FA3F000F15A67 /* ManagementErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */; };
+		5CA541CD2B1A81A700E4284D /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = 5CA541CC2B1A81A700E4284D /* Documentation.docc */; };
+		5CA541CE2B1A81A700E4284D /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = 5CA541CC2B1A81A700E4284D /* Documentation.docc */; };
+		5CA541CF2B1A81A700E4284D /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = 5CA541CC2B1A81A700E4284D /* Documentation.docc */; };
+		5CA541D02B1A81A700E4284D /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = 5CA541CC2B1A81A700E4284D /* Documentation.docc */; };
 		5CB41D4023D0BA2C00074024 /* IDTokenValidatorContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3C23D0BA2C00074024 /* IDTokenValidatorContext.swift */; };
 		5CB41D4423D0BA2C00074024 /* IDTokenSignatureValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3D23D0BA2C00074024 /* IDTokenSignatureValidator.swift */; };
 		5CB41D4823D0BA2C00074024 /* IDTokenValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3E23D0BA2C00074024 /* IDTokenValidator.swift */; };
@@ -497,6 +501,7 @@
 		5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialsStorage.swift; sourceTree = "<group>"; };
 		5C809D95275F878E00F15A67 /* CredentialsManagerErrorSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialsManagerErrorSpec.swift; sourceTree = "<group>"; };
 		5C809D99275FA3EF00F15A67 /* ManagementErrorSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagementErrorSpec.swift; sourceTree = "<group>"; };
+		5CA541CC2B1A81A700E4284D /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
 		5CB41D3C23D0BA2C00074024 /* IDTokenValidatorContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IDTokenValidatorContext.swift; sourceTree = "<group>"; };
 		5CB41D3D23D0BA2C00074024 /* IDTokenSignatureValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IDTokenSignatureValidator.swift; sourceTree = "<group>"; };
 		5CB41D3E23D0BA2C00074024 /* IDTokenValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IDTokenValidator.swift; sourceTree = "<group>"; };
@@ -802,6 +807,7 @@
 		5F049B5F1CB42C29006F6C05 = {
 			isa = PBXGroup;
 			children = (
+				5CA541CC2B1A81A700E4284D /* Documentation.docc */,
 				5F049B6B1CB42C29006F6C05 /* Auth0 */,
 				5F06DD921CC451430011842B /* Auth0Tests */,
 				5F3965C81CF67DD800CDE7C0 /* App */,
@@ -1669,6 +1675,7 @@
 				5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */,
 				5FAE9C911D8878D400A871CE /* Auth0WebAuth.swift in Sources */,
 				5B5E93F91EC45C22002A37F9 /* CredentialsManagerError.swift in Sources */,
+				5CA541CD2B1A81A700E4284D /* Documentation.docc in Sources */,
 				5C41F6AA244DCAFB00252548 /* ClearSessionTransaction.swift in Sources */,
 				5FDE875D1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				5FADB6061CED27FB00D4BB50 /* Users.swift in Sources */,
@@ -1731,6 +1738,7 @@
 				5FCAB1741D09009600331C84 /* NSData+URLSafe.swift in Sources */,
 				970BC36C25C27095007A7745 /* Challenge.swift in Sources */,
 				5C41F6DD244F982700252548 /* DesktopWebAuth.swift in Sources */,
+				5CA541CE2B1A81A700E4284D /* Documentation.docc in Sources */,
 				5FCAB17A1D09124D00331C84 /* NSURL+Auth0.swift in Sources */,
 				5FDE87561D8A424700EA27DC /* Auth0Authentication.swift in Sources */,
 				5FADB6071CED27FB00D4BB50 /* Users.swift in Sources */,
@@ -1851,6 +1859,7 @@
 				5FDE875B1D8A424700EA27DC /* Authentication.swift in Sources */,
 				5F23E6E21D4ACD7F00C3F2D9 /* Users.swift in Sources */,
 				5FDE876B1D8A424700EA27DC /* Credentials.swift in Sources */,
+				5CA541D02B1A81A700E4284D /* Documentation.docc in Sources */,
 				5FE1182A1D8A4A2B00A374BF /* Telemetry.swift in Sources */,
 				5CC9940324ED9EC50027DC74 /* CredentialsManager.swift in Sources */,
 				5F23E6E41D4ACD8500C3F2D9 /* JSONObjectPayload.swift in Sources */,
@@ -1889,6 +1898,7 @@
 				5C29743223FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */,
 				5F23E70B1D4B88F600C3F2D9 /* Users.swift in Sources */,
 				5FDE876C1D8A424700EA27DC /* Credentials.swift in Sources */,
+				5CA541CF2B1A81A700E4284D /* Documentation.docc in Sources */,
 				5FE118291D8A4A2A00A374BF /* Telemetry.swift in Sources */,
 				5F23E70D1D4B88FC00C3F2D9 /* JSONObjectPayload.swift in Sources */,
 				5C4F552623C8FBA100C89615 /* JWKS.swift in Sources */,
