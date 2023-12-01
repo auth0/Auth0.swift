@@ -307,11 +307,11 @@ The minimum supported Swift minor version is the one released with the oldest-su
 
 Only the last 4 major platform versions are supported, starting from:
 
-- iOS **12**
+- iOS **13**
 - macOS **10.15**
 - macCatalyst **13**
-- tvOS **12**
-- watchOS **6.2**
+- tvOS **13**
+- watchOS **7**
 
 Once a platform version becomes unsupported, dropping it from Auth0.swift **will not be considered a breaking change**, and will be done in a **minor** release. For example, iOS 13 will cease to be supported when iOS 17 gets released, and Auth0.swift will be able to drop it in a minor release.
 
