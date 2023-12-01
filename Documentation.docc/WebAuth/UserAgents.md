@@ -1,4 +1,4 @@
-# ASWebAuthenticationSession vs SafariViewController
+# ASWebAuthenticationSession vs SFSafariViewController
 
 ## Overview
 
