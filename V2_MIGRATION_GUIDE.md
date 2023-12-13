@@ -307,7 +307,7 @@ The `useUniversalLink()` method was removed as well, as Universal Links [cannot 
 
 #### `useLegacyAuthentication()`
 
-`useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were removed. You should use `WebAuthentication.safariProvider()` instead.
+`useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were removed. You should use `WebAuthentication.safariProvider()` instead (requires Auth0.swift [2.10+](https://github.com/auth0/Auth0.swift/releases/tag/2.1.0)).
 
 <details>
   <summary>Before / After</summary>
