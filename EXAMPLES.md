@@ -144,17 +144,6 @@ Note that this custom `URLSession` instance will be used when communicating with
 
 Auth0.swift automatically [validates](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) the ID token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID token have not been tampered with and can be safely used.
 
-#### Custom Domains
-
-Users of Auth0 Private Cloud with custom domains still on the [legacy behavior](https://auth0.com/docs/migrate-private-cloud-custom-domains) need to specify a custom issuer to match the Auth0 Domain when performing Web Auth login. Otherwise, the ID token validation will fail.
-
-```swift
-Auth0
-    .webAuth()
-    .issuer("https://YOUR_AUTH0_DOMAIN/")
-    // ...
-```
-
 ### Web Auth errors
 
 Web Auth will only produce `WebAuthError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `WebAuthError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/webautherror) to learn more about the error cases you need to handle, and which ones include a `cause` value.
