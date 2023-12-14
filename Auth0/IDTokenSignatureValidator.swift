@@ -46,8 +46,8 @@ struct IDTokenSignatureValidator: JWTAsyncValidator {
                     }
                     algorithm.verify(jwt, using: jwk) ? callback(nil) : callback(ValidationError.invalidSignature)
                 case .failure: callback(ValidationError.missingPublicKey(kid: kid))
+                }
             }
-        }
     }
 
     private func validateAlg(_ jwt: JWT) -> Auth0Error? {
