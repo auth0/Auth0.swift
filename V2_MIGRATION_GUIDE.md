@@ -302,10 +302,36 @@ Auth0.swift now only supports the [authorization code flow with PKCE](https://au
 
 The `useUniversalLink()` method was removed as well, as Universal Links [cannot be used](https://openradar.appspot.com/51091611) for OAuth redirections without user interaction since iOS 10.
 
-`useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were also removed. Auth0.swift now only uses `ASWebAuthenticationSession` to perform web-based authentication.
-
-> **Note**
+> [!IMPORTANT]
 > Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
+
+#### `useLegacyAuthentication()`
+
+`useLegacyAuthentication()` and `useLegacyAuthentication(withStyle:)` were removed. You should use `WebAuthentication.safariProvider()` instead (requires Auth0.swift [2.10+](https://github.com/auth0/Auth0.swift/releases/tag/2.1.0)).
+
+<details>
+  <summary>Before / After</summary>
+
+```swift
+// Before
+Auth0
+    .webAuth()
+    .useLegacyAuthentication()
+    .start { result in
+        // ...
+    }
+}
+
+// After
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.safariProvider())
+    .start { result in
+        // ...
+    }
+}
+```
+</details>
 
 ### Credentials Manager
 
