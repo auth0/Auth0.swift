@@ -90,8 +90,8 @@ struct PKCE: OAuth2Grant {
                         }
                         callback(.success(credentials))
                     }
+                }
             }
-        }
     }
 
     func values(fromComponents components: URLComponents) -> [String: String] {

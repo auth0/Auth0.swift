@@ -17,7 +17,7 @@ Under the hood, Auth0.swift uses `ASWebAuthenticationSession` by default to perf
 
 That alert box is displayed and managed by `ASWebAuthenticationSession`, not by Auth0.swift, because by default this API will store the session cookie in the shared Safari cookie jar. This makes single sign-on (SSO) possible. According to Apple, that requires user consent.
 
-> **Note**
+> [!NOTE]
 > See [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of SSO on iOS.
 
 ### Use ephemeral sessions
@@ -35,7 +35,7 @@ Auth0
 
 Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
 
-> **Note**
+> [!NOTE]
 > `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`.
 
 ### Use `SFSafariViewController`
@@ -51,8 +51,8 @@ Auth0
     }
 ```
 
-> **Note**
-> Since `SFSafariViewController` does not share cookies with the Safari app, SSO will not work either. But it will keep its own cookies, so you can use it to perform SSO between your app and your website as long as you open it inside your app using `SFSafariViewController`. This also means that any feature that relies on the persistence of cookies will work as expected.
+> [!IMPORTANT]
+> Since `SFSafariViewController` does not share cookies with the Safari app, SSO will not work either. But it will keep its own cookies, so you can use it to perform SSO between your app and your website as long as you open it inside your app using `SFSafariViewController`. This also means that any feature that relies on the persistence of cookies –like "Remember this device"– will work as expected.
 
 If you choose to use the `SFSafariViewController` Web Auth provider, you need to perform an additional bit of setup. Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the callback URL when Auth0 redirects back to your app, so it's necessary to manually resume the Web Auth operation.
 
@@ -114,7 +114,7 @@ Auth0
 
 Otherwise, the browser modal will close right away and the user will be automatically logged in again, as the cookie will still be there.
 
-> **Warning**
+> [!WARNING]
 > Keeping the shared session cookie may not be an option if you have strong privacy and/or security requirements, for example in the case of a banking app.
 
 ## 3. How can I change the message in the alert box?

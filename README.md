@@ -28,10 +28,10 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 ### Requirements
 
 - iOS 13.0+ / macOS 11.0+ / tvOS 13.0+ / watchOS 7.0+
-- Xcode 14.x
+- Xcode 14.x / 15.x
 - Swift 5.7+
 
-> **Note**
+> [!IMPORTANT]
 > Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
 
 ### Installation
@@ -76,7 +76,7 @@ Head to the [Auth0 Dashboard](https://manage.auth0.com/#/applications/) and crea
 
 Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to communicate with Auth0. You can find these details in the settings page of your Auth0 application. If you have a [custom domain](https://auth0.com/docs/customize/custom-domains), use your custom domain instead of the value from the settings page.
 
-> **Warning**
+> [!IMPORTANT]
 > Make sure that the Auth0 application type is **Native**. Otherwise, you might run into errors due to the different configuration of other application types.
 
 #### Configure Client ID and Domain with a plist
@@ -278,7 +278,7 @@ Auth0
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
-> **Note**
+> [!NOTE]
 > See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of single sign-on (SSO) on iOS.
 
 ### Next steps
@@ -337,6 +337,6 @@ Please do not report security vulnerabilities on the public GitHub issue tracker
   </picture>
 </p>
 
-<p align="center">Auth0 is an easy to implement, adaptable authentication and authorization platform. To learn more checkout <a href="https://auth0.com/why-auth0">Why Auth0?</a></p>
+<p align="center">Auth0 is an easy-to-implement, adaptable authentication and authorization platform. To learn more check out <a href="https://auth0.com/why-auth0">Why Auth0?</a></p>
 
 <p align="center">This project is licensed under the MIT license. See the <a href="./LICENSE"> LICENSE</a> file for more info.</p>
