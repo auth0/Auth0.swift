@@ -93,10 +93,10 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
  Auth0.users(token: credentials.accessToken)
  ```
 
- Currently you can only perform the following operations:
+ You can only perform the following operations:
 
  * Get a user by ID
- * Update an user, for example by adding `user_metadata`
+ * Update the user's `user_metadata`
  * Link users
  * Unlink users
 
@@ -137,10 +137,10 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
  Auth0.users(token: credentials.accessToken, domain: "samples.us.auth0.com")
  ```
 
- Currently you can only perform the following operations:
+ You can only perform the following operations:
  
  * Get a user by ID
- * Update an user, for example by adding `user_metadata`
+ * Update the user's `user_metadata`
  * Link users
  * Unlink users
 

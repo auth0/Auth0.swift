@@ -1295,10 +1295,8 @@ Auth0
                     .webAuth()
                     .connection(connection)
                     .scope(scope)
-                    .useEphemeralSession()
-                    // ☝🏼 Otherwise a session cookie will remain
-                    .parameters(["login_hint": email])
-                    // ☝🏼 So the user doesn't have to type it again
+                    .useEphemeralSession() // Otherwise a session cookie will remain
+                    .parameters(["login_hint": email]) // So the user doesn't have to type it again
                     .start { result in
                         // ...
                     }
