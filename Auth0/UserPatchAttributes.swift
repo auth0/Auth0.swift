@@ -20,6 +20,7 @@ final public class UserPatchAttributes {
      - Parameter blocked: If the user is blocked.
      - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
+    @available(*, deprecated, message: "This attribute can no longer be updated from native apps for security reasons")
     public func blocked(_ blocked: Bool) -> UserPatchAttributes {
         dictionary["blocked"] = blocked
         return self
@@ -36,6 +37,7 @@ final public class UserPatchAttributes {
        - clientId:   Auth0 Client ID.
      - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
+    @available(*, deprecated, message: "This attribute can no longer be updated from native apps for security reasons")
     public func email(_ email: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
         dictionary["email"] = email
         dictionary["verify_email"] = verify
@@ -53,6 +55,7 @@ final public class UserPatchAttributes {
        - connection: Name of the connection.
      - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
+    @available(*, deprecated, message: "This attribute can no longer be updated from native apps for security reasons")
     public func emailVerified(_ verified: Bool, connection: String) -> UserPatchAttributes {
         dictionary["email_verified"] = verified
         dictionary["connection"] = connection
@@ -70,6 +73,7 @@ final public class UserPatchAttributes {
        - clientId:    Auth0 Client ID.
      - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
+    @available(*, deprecated, message: "This attribute can no longer be updated from native apps for security reasons")
     public func phoneNumber(_ phoneNumber: String, verified: Bool? = nil, verify: Bool? = nil, connection: String, clientId: String) -> UserPatchAttributes {
         dictionary["phone_number"] = phoneNumber
         dictionary["verify_phone_number"] = verify
@@ -87,6 +91,7 @@ final public class UserPatchAttributes {
        - connection: Name of the connection.
      - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
+    @available(*, deprecated, message: "This attribute can no longer be updated from native apps for security reasons")
     public func phoneVerified(_ verified: Bool, connection: String) -> UserPatchAttributes {
         dictionary["phone_verified"] = verified
         dictionary["connection"] = connection
@@ -102,6 +107,7 @@ final public class UserPatchAttributes {
        - connection: Name of the connection.
      - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
+    @available(*, deprecated, message: "This attribute can no longer be updated from native apps for security reasons")
     public func password(_ password: String, verify: Bool? = nil, connection: String) -> UserPatchAttributes {
         dictionary["password"] = password
         dictionary["connection"] = connection
@@ -117,6 +123,7 @@ final public class UserPatchAttributes {
        - connection: Name of the connection.
      - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
+    @available(*, deprecated, message: "This attribute can no longer be updated from native apps for security reasons")
     public func username(_ username: String, connection: String) -> UserPatchAttributes {
         dictionary["username"] = username
         dictionary["connection"] = connection
@@ -140,6 +147,7 @@ final public class UserPatchAttributes {
      - Parameter metadata: New app metadata values.
      - Returns: The same `UserPatchAttributes` instance to allow method chaining.
      */
+    @available(*, deprecated, message: "This attribute can no longer be updated from native apps for security reasons")
     public func appMetadata(_ metadata: [String: Any]) -> UserPatchAttributes {
         dictionary["app_metadata"] = metadata
         return self

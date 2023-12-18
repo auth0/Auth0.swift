@@ -124,6 +124,7 @@ public protocol Users: Trackable, Loggable {
      - ``UserPatchAttributes``
      - [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      */
+    @available(*, deprecated, message: "This operation can no longer be performed from native apps for security reasons")
     func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError>
 
     /**
@@ -142,7 +143,7 @@ public protocol Users: Trackable, Loggable {
        - identifier:   ID of the user to update. You can get this value from the `sub` claim of the user's ID token, or from the `sub` property of a ``UserInfo`` instance.
        - userMetadata: Metadata to update.
      - Returns: A request that will yield the updated user.
-     - Requires: The token must have one of the following scopes: `update:users`, `update:users_app_metadata`.
+     - Requires: The token must have the `update:current_user_metadata` scope.
 
      ## See Also
 
