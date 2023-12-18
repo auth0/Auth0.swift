@@ -44,8 +44,9 @@ public final class Credentials: NSObject {
     ///
     /// - Important: The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their
     /// contents have not been tampered with. **This is not the case for the ID tokens obtained from the Authentication API
-    /// client.** You must [validate](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) any ID
-    /// Tokens received from the Authentication API client before using the information they contain.
+    /// client**, including the ones received when renewing the credentials using the refresh token. You must
+    /// [validate](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) any ID tokens received from the
+    /// Authentication API client before using the information they contain.
     ///
     /// ## See Also
     ///

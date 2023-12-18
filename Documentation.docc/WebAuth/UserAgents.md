@@ -1,8 +1,8 @@
-# ASWebAuthenticationSession vs SFSafariViewController
+# ASWebAuthenticationSession vs SFSafariViewController (iOS)
 
 ## Overview
 
-Web-based authentication needs a browser. Auth0.swift offers the choice of two system-provided browser APIs: [`ASWebAuthenticationSession`](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) and [`SFSafariViewController`](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller).
+Web-based authentication needs an in-app browser. Auth0.swift offers the choice of two system-provided browser APIs: [`ASWebAuthenticationSession`](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) and [`SFSafariViewController`](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller).
 
 ## When to use ASWebAuthenticationSession
 
@@ -64,7 +64,7 @@ Auth0
     }
 ```
 
-`SFSafariViewController` is a general purpose in-app browser that can also be used to perform web-based authentication. When used for this purpose, it acts as a middle ground between `ASWebAuthenticationSession` with/without ephemeral sessions. It persists cookies, but won't share them outside of your app. This means that:
+`SFSafariViewController` is a general purpose in-app browser that can also be used to perform web-based authentication. When used for this purpose, it acts as a middle ground between `ASWebAuthenticationSession` with and without ephemeral sessions. It persists cookies, but won't share them outside of your app. This means that:
 
 - All the `SFSafariViewController` instances used in your app will have access to the persisted session cookie.
 - No consent alert box will be shown, as the session cookie won't be placed in a shared cookie jar.

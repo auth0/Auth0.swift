@@ -17,7 +17,7 @@ public extension WebAuthentication {
     /// }
     /// ```
     ///
-    /// If you need specify a custom `UIModalPresentationStyle`:
+    /// If you need to specify a custom `UIModalPresentationStyle`:
     ///
     /// ```swift
     /// Auth0
@@ -30,6 +30,10 @@ public extension WebAuthentication {
     ///
     /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
     /// - Returns: A ``WebAuthProvider`` instance.
+    ///
+    /// ## See Also
+    ///
+    /// - <doc:UserAgents>
     static func safariProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
         return { url, callback in
             let safari = SFSafariViewController(url: url)

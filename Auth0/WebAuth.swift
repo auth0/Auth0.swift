@@ -138,6 +138,7 @@ public protocol WebAuth: Trackable, Loggable {
     ///
     /// ## See Also
     ///
+    /// - <doc:UserAgents>
     /// - [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md)
     /// - [prefersEphemeralWebBrowserSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio)
     func useEphemeralSession() -> Self
@@ -163,6 +164,7 @@ public protocol WebAuth: Trackable, Loggable {
     ///
     /// ## See Also
     ///
+    /// - <doc:UserAgents>
     /// - ``WebAuthProvider``
     func provider(_ provider: @escaping WebAuthProvider) -> Self
 
