@@ -108,7 +108,7 @@ public struct AuthenticationError: Auth0APIError {
     public var isInvalidRefreshToken: Bool {
         return self.code == "invalid_grant"
             && self.localizedDescription == "Unknown or invalid refresh token."
-
+    }
     /// When Auth0 denies access due to some misconfiguration or an error in an Action or Rule.
     public var isAccessDenied: Bool {
         return self.code == "access_denied"
