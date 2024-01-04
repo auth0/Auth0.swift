@@ -477,7 +477,8 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
                 expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
                 expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
-                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
+                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match refresh token deleted")
+                expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
                 expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
                 expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
             }
@@ -543,7 +544,8 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
                 expect(error.isAccessDenied).to(beFalse(), description: "should not match access denied")
                 expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
-                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
+                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match refresh token deleted")
+                expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
                 expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
                 expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
             }
