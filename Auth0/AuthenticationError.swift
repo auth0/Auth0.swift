@@ -102,7 +102,6 @@ public struct AuthenticationError: Auth0APIError {
     public var isRefreshTokenDeleted: Bool {
         return self.code == "invalid_grant"
             && self.localizedDescription == "The refresh_token was generated for a user who doesn't exist anymore."
-
     }
 
     // When the provided refresh token is invalid or expired
