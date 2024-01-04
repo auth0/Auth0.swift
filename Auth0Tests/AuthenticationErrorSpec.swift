@@ -355,13 +355,22 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isInvalidCredentials) == true
             }
 
-            it("should detect invalid refresh token") {
+            it("should detect refresh token deleted") {
                 let values = [
                     "error": "invalid_grant",
                     "error_description": "The refresh_token was generated for a user who doesn't exist anymore."
                 ]
                 let error = AuthenticationError(info: values, statusCode: 403)
                 expect(error.isRefreshTokenDeleted) == true
+            }
+
+            it("should detect invalid refresh token") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Unknown or invalid refresh token."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                expect(error.isInvalidRefreshToken) == true
             }
 
             it("should detect invalid mfa token") {
@@ -468,7 +477,8 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
                 expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
                 expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
-                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
+                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match refresh token deleted")
+                expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
                 expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
                 expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
             }
@@ -534,7 +544,8 @@ class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
                 expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
                 expect(error.isAccessDenied).to(beFalse(), description: "should not match access denied")
                 expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
-                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match invalid refresh token")
+                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match refresh token deleted")
+                expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
                 expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
                 expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
             }
