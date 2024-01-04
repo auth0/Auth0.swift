@@ -355,13 +355,22 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.isInvalidCredentials) == true
             }
 
-            it("should detect invalid refresh token") {
+            it("should detect refresh token deleted") {
                 let values = [
                     "error": "invalid_grant",
                     "error_description": "The refresh_token was generated for a user who doesn't exist anymore."
                 ]
                 let error = AuthenticationError(info: values, statusCode: 403)
                 expect(error.isRefreshTokenDeleted) == true
+            }
+
+            it("should detect invalid refresh token") {
+                let values = [
+                    "error": "invalid_grant",
+                    "error_description": "Unknown or invalid refresh token."
+                ]
+                let error = AuthenticationError(info: values, statusCode: 403)
+                expect(error.isInvalidRefreshToken) == true
             }
 
             it("should detect invalid mfa token") {
