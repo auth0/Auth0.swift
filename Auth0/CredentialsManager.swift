@@ -18,6 +18,7 @@ import LocalAuthentication
 /// ## See Also
 ///
 /// - ``CredentialsManagerError``
+/// - <doc:RefreshTokens>
 public struct CredentialsManager {
 
     private let storage: CredentialsStorage
@@ -280,6 +281,7 @@ public struct CredentialsManager {
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
     public func credentials(withScope scope: String? = nil,
                             minTTL: Int = 0,
                             parameters: [String: Any] = [:],
@@ -351,6 +353,7 @@ public struct CredentialsManager {
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
     public func renew(parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
                       callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
@@ -568,6 +571,7 @@ public extension CredentialsManager {
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
     func credentials(withScope scope: String? = nil,
                      minTTL: Int = 0,
                      parameters: [String: Any] = [:],
@@ -627,6 +631,7 @@ public extension CredentialsManager {
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
     func renew(parameters: [String: Any] = [:],
                headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
@@ -734,6 +739,7 @@ public extension CredentialsManager {
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
     func credentials(withScope scope: String? = nil,
                      minTTL: Int = 0,
                      parameters: [String: Any] = [:],
@@ -783,6 +789,7 @@ public extension CredentialsManager {
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
     func renew(parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
             self.renew(parameters: parameters, headers: headers, callback: continuation.resume)

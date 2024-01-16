@@ -24,8 +24,8 @@ You can make users land directly on the Signup page instead of the Login page by
 
 | Parameters                                     | No existing session   | Existing session              |
 |:-----------------------------------------------|:----------------------|:------------------------------|
-| No extra parameters                            | Shows the login page  | Redirects to the callback url |
-| `"screen_hint": "signup"`                      | Shows the signup page | Redirects to the callback url |
+| No extra parameters                            | Shows the login page  | Redirects to the callback URL |
+| `"screen_hint": "signup"`                      | Shows the signup page | Redirects to the callback URL |
 | `"prompt": "login"`                            | Shows the login page  | Shows the login page          |
 | `"prompt": "login", "screen_hint": "signup"`   | Shows the signup page | Shows the signup page         |
 
@@ -44,7 +44,7 @@ Auth0
 ```
 
 > [!NOTE]
-> The `screen_hint` parameter will work with the **New Universal Login Experience** without any further configuration. If you are using the **Classic Universal Login Experience**, you need to customize the [login template](https://manage.auth0.com/#/login_page) to look for this parameter and set the `initialScreen` [option](https://github.com/auth0/lock#database-options) of the `Auth0Lock` constructor.
+> The `screen_hint` parameter will work with the **New Universal Login Experience** without any further configuration. If you are using the **Classic Universal Login Experience**, you need to customize the [login template](https://manage.auth0.com/#/login_page) to look for this parameter and set the `initialScreen` [option](https://github.com/auth0/lock/blob/master/EXAMPLES.md#database-options) of the `Auth0Lock` constructor.
 
 <details>
   <summary>Using async/await</summary>
