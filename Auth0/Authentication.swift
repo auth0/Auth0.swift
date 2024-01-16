@@ -685,7 +685,9 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
+     - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+     - <doc:RefreshTokens>
      */
     func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
 
