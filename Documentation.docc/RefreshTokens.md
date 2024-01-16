@@ -1,4 +1,4 @@
-# Refresh tokens: common errors
+# Refresh Tokens: Common Errors
 
 ## Overview
 
