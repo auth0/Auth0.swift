@@ -20,6 +20,7 @@ final class Auth0WebAuth: WebAuth {
     private let responseType = "code"
 
     private(set) var parameters: [String: String] = [:]
+    private(set) var https = false
     private(set) var ephemeralSession = false
     private(set) var issuer: String
     private(set) var leeway: Int = 60 * 1000 // Default leeway is 60 seconds
@@ -35,15 +36,22 @@ final class Auth0WebAuth: WebAuth {
     }
 
     lazy var redirectURL: URL? = {
-        guard let bundleIdentifier = Bundle.main.bundleIdentifier,
-              let domain = self.url.host,
-              let baseURL = URL(string: "\(bundleIdentifier)://\(domain)") else { return nil }
+        guard let bundleID = Bundle.main.bundleIdentifier, let domain = self.url.host else { return nil }
+        let scheme: String
 
+        if #available(iOS 17.4, macOS 14.4, *) {
+            scheme = https ? "https" : bundleID
+        } else {
+            scheme = bundleID
+        }
+
+        guard let baseURL = URL(string: "\(scheme)://\(domain)") else { return nil }
         var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
+
         return components?.url?
             .appendingPathComponent(self.url.path)
             .appendingPathComponent(self.platform)
-            .appendingPathComponent(bundleIdentifier)
+            .appendingPathComponent(bundleID)
             .appendingPathComponent("callback")
     }()
 
@@ -115,6 +123,11 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
+    func useHTTPS() -> Self {
+        self.https = true
+        return self
+    }
+
     func useEphemeralSession() -> Self {
         self.ephemeralSession = true
         return self
@@ -141,7 +154,7 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
-        guard let redirectURL = self.redirectURL, let urlScheme = redirectURL.scheme else {
+        guard let redirectURL = self.redirectURL else {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
@@ -166,7 +179,7 @@ final class Auth0WebAuth: WebAuth {
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
-        let provider = self.provider ?? WebAuthentication.asProvider(urlScheme: urlScheme,
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      ephemeralSession: ephemeralSession)
         let userAgent = provider(authorizeURL) { [storage, onCloseCallback] result in
             storage.clear()
@@ -199,13 +212,11 @@ final class Auth0WebAuth: WebAuth {
         let queryItems = components?.queryItems ?? []
         components?.queryItems = queryItems + [returnTo, clientId]
 
-        guard let logoutURL = components?.url,
-              let redirectURL = self.redirectURL,
-              let urlScheme = redirectURL.scheme else {
+        guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
-        let provider = self.provider ?? WebAuthentication.asProvider(urlScheme: urlScheme)
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL)
         let userAgent = provider(logoutURL) { [storage] result in
             storage.clear()
             callback(result)

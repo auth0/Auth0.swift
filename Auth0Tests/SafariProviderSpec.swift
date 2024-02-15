@@ -7,10 +7,9 @@ import Nimble
 
 @testable import Auth0
 
-private let Url = URL(string: "https://auth0.com")!
+private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
 private let Timeout: NimbleTimeInterval = .seconds(2)
 
-@MainActor
 class SafariProviderSpec: QuickSpec {
 
     override func spec() {
@@ -18,31 +17,34 @@ class SafariProviderSpec: QuickSpec {
         var safari: SFSafariViewController!
         var userAgent: SafariUserAgent!
 
-        beforeEach {
-            safari = SFSafariViewController(url: Url)
+        beforeEach { @MainActor in
+            safari = SFSafariViewController(url: RedirectURL)
             userAgent = SafariUserAgent(controller: safari, callback: { _ in })
         }
 
         describe("WebAuthentication extension") {
 
-            it("should create a safari provider") {
+            it("should create a safari provider") { @MainActor in
                 let provider = WebAuthentication.safariProvider()
-                expect(provider(Url, {_ in })).to(beAKindOf(SafariUserAgent.self))
+                expect(provider(RedirectURL, { _ in })).to(beAKindOf(SafariUserAgent.self))
             }
 
-            it("should use the fullscreen presentation style by default") {
-                let userAgent = WebAuthentication.safariProvider()(Url, {_ in }) as! SafariUserAgent
+            it("should use the fullscreen presentation style by default") { @MainActor in
+                let provider = WebAuthentication.safariProvider()
+                let userAgent = provider(RedirectURL, { _ in }) as! SafariUserAgent
                 expect(userAgent.controller.modalPresentationStyle) == .fullScreen
             }
 
-            it("should set a custom presentation style") {
+            it("should set a custom presentation style") { @MainActor in
                 let style = UIModalPresentationStyle.formSheet
-                let userAgent = WebAuthentication.safariProvider(style: style)(Url, {_ in }) as! SafariUserAgent
+                let provider = WebAuthentication.safariProvider(style: style)
+                let userAgent = provider(RedirectURL, { _ in }) as! SafariUserAgent
                 expect(userAgent.controller.modalPresentationStyle) == style
             }
 
-            it("should use the cancel dismiss button style") {
-                let userAgent = WebAuthentication.safariProvider()(Url, {_ in }) as! SafariUserAgent
+            it("should use the cancel dismiss button style") { @MainActor in
+                let provider = WebAuthentication.safariProvider()
+                let userAgent = provider(RedirectURL, { _ in }) as! SafariUserAgent
                 expect(userAgent.controller.dismissButtonStyle) == .cancel
             }
 
@@ -52,33 +54,33 @@ class SafariProviderSpec: QuickSpec {
 
             var root: SpyViewController!
 
-            beforeEach {
+            beforeEach { @MainActor in
                 root = SpyViewController()
                 UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = root
             }
 
-            it("should return nil when root is nil") {
+            it("should return nil when root is nil") { @MainActor in
                 UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = nil
                 expect(safari.topViewController).to(beNil())
             }
 
-            it("should return root when is top controller") {
+            it("should return root when is top controller") { @MainActor in
                 expect(safari.topViewController) == root
             }
 
-            it("should return presented controller") {
+            it("should return presented controller") { @MainActor in
                 let presented = UIViewController()
                 root.presented = presented
                 expect(safari.topViewController) == presented
             }
 
-            it("should return split view controller if contains nothing") {
+            it("should return split view controller if contains nothing") { @MainActor in
                 let split = UISplitViewController()
                 root.presented = split
                 expect(safari.topViewController) == split
             }
 
-            it("should return last controller from split view controller") {
+            it("should return last controller from split view controller") { @MainActor in
                 let split = UISplitViewController()
                 let last = UIViewController()
                 split.viewControllers = [UIViewController(), last]
@@ -86,26 +88,26 @@ class SafariProviderSpec: QuickSpec {
                 expect(safari.topViewController) == last
             }
 
-            it("should return navigation controller if contains nothing") {
+            it("should return navigation controller if contains nothing") { @MainActor in
                 let navigation = UINavigationController()
                 root.presented = navigation
                 expect(safari.topViewController) == navigation
             }
 
-            it("should return top from navigation controller") {
+            it("should return top from navigation controller") { @MainActor in
                 let top = UIViewController()
                 let navigation = UINavigationController(rootViewController: top)
                 root.presented = navigation
                 expect(safari.topViewController) == top
             }
 
-            it("should return tab bar controller if contains nothing") {
+            it("should return tab bar controller if contains nothing") { @MainActor in
                 let tabs = UITabBarController()
                 root.presented = tabs
                 expect(safari.topViewController) == tabs
             }
 
-            it("should return top from tab bar controller") {
+            it("should return top from tab bar controller") { @MainActor in
                 let top = UIViewController()
                 let tabs = UITabBarController()
                 tabs.viewControllers = [top]
@@ -116,23 +118,24 @@ class SafariProviderSpec: QuickSpec {
 
         describe("user agent") {
 
-            it("should have a custom description") {
-                let userAgent = SafariUserAgent(controller: SFSafariViewController(url: Url), callback: { _ in })
+            it("should have a custom description") { @MainActor in
+                let safari = SFSafariViewController(url: RedirectURL)
+                let userAgent = SafariUserAgent(controller: safari, callback: { _ in })
                 expect(userAgent.description) == "SFSafariViewController"
             }
 
-            it("should be the safari view controller's delegate") {
+            it("should be the safari view controller's delegate") { @MainActor in
                 expect(safari.delegate).to(be(userAgent))
             }
 
-            it("should be the safari view controller's presentation delegate") {
+            it("should be the safari view controller's presentation delegate") { @MainActor in
                 expect(safari.presentationController?.delegate).to(be(userAgent))
             }
 
-            it("should present the safari view controller") {
+            it("should present the safari view controller") { @MainActor in
                 let root = SpyViewController()
                 UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = root
-                let safari = SpySafariViewController(url: Url)
+                let safari = SpySafariViewController(url: RedirectURL)
                 userAgent = SafariUserAgent(controller: safari, callback: { _ in })
                 root.presented = safari
                 userAgent.start()
@@ -141,8 +144,8 @@ class SafariProviderSpec: QuickSpec {
 
             it("should call the callback with an error when the user cancels the operation") {
                 await waitUntil(timeout: Timeout) { done in
-                    DispatchQueue.main.sync {
-                        userAgent = SafariUserAgent(controller: safari, callback: { result in
+                    DispatchQueue.main.async { [safari] in
+                        let userAgent = SafariUserAgent(controller: safari!, callback: { result in
                             expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                             done()
                         })
@@ -155,8 +158,8 @@ class SafariProviderSpec: QuickSpec {
                 let expectedError = WebAuthError(code: .unknown("Cannot dismiss SFSafariViewController"))
 
                 await waitUntil(timeout: Timeout) { done in
-                    DispatchQueue.main.sync {
-                        userAgent = SafariUserAgent(controller: safari, callback: { result in
+                    DispatchQueue.main.async { [safari] in
+                        let userAgent = SafariUserAgent(controller: safari!, callback: { result in
                             expect(result).to(haveWebAuthError(expectedError))
                             done()
                         })
@@ -165,7 +168,7 @@ class SafariProviderSpec: QuickSpec {
                 }
             }
 
-            it("should call the callback with success") {
+            it("should call the callback with success") { @MainActor in
                 let root = UIViewController()
                 let window = UIWindow(frame: CGRect())
                 window.rootViewController = root
@@ -173,8 +176,8 @@ class SafariProviderSpec: QuickSpec {
                 root.present(safari, animated: false)
 
                 await waitUntil(timeout: Timeout) { done in
-                    DispatchQueue.main.sync {
-                        userAgent = SafariUserAgent(controller: safari, callback: { result in
+                    DispatchQueue.main.async { [safari] in
+                        let userAgent = SafariUserAgent(controller: safari!, callback: { result in
                             expect(result).to(beSuccessful())
                             done()
                         })
@@ -183,19 +186,20 @@ class SafariProviderSpec: QuickSpec {
                 }
             }
 
-            it("should cancel the transaction when the user cancels the operation") {
+            it("should cancel the transaction when the user cancels the operation") { @MainActor in
                 let transaction = SpyTransaction()
                 TransactionStore.shared.store(transaction)
                 userAgent.safariViewControllerDidFinish(safari)
                 expect(transaction.isCancelled) == true
             }
 
-            it("should cancel the transaction when the user dismisses the safari view controller") {
+            it("should cancel the transaction when the user dismisses the safari view controller") { @MainActor in
                 let transaction = SpyTransaction()
                 TransactionStore.shared.store(transaction)
                 userAgent.presentationControllerDidDismiss(safari.presentationController!)
                 expect(transaction.isCancelled) == true
             }
+
         }
 
     }
