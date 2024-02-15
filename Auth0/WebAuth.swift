@@ -1,6 +1,11 @@
+// swiftlint:disable file_length
+
 #if WEB_AUTH_PLATFORM
 import Foundation
 import Combine
+
+/// Callback invoked by the ``WebAuthUserAgent`` when the web-based operation concludes.
+public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
 
 /// Thunk that returns a function that creates and returns a ``WebAuthUserAgent`` to perform a web-based operation.
 /// The ``WebAuthUserAgent`` opens the URL in an external user agent and then invokes the callback when done.
@@ -8,7 +13,7 @@ import Combine
 /// ## See Also
 ///
 /// - [Example](https://github.com/auth0/Auth0.swift/blob/master/Auth0/SafariProvider.swift)
-public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping (WebAuthResult<Void>) -> Void) -> WebAuthUserAgent
+public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent
 
 /// Web-based authentication using Auth0.
 ///
@@ -126,6 +131,17 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Parameter maxAge: Number of milliseconds.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     func maxAge(_ maxAge: Int) -> Self
+
+    /// Use `https` as the scheme for the redirect URL on iOS 17.4+ and macOS 14.4+. On older versions of iOS and
+    /// macOS, the bundle identifier of the app will be used as a custom scheme.
+    ///
+    /// - Returns: The same `WebAuth` instance to allow method chaining.
+    /// - Requires: An Associated Domain configured with the `webcredentials` service type. For example,
+    /// `webcredentials:example.com`. If you're using a custom domain on your Auth0 tenant, use this domain as the
+    /// Associated Domain. Otherwise, use the domain of your Auth0 tenant.
+    /// - Note: Don't use this method along with ``provider(_:)``. Use either one or the other, because this
+    /// method will only work with the default `ASWebAuthenticationSession` implementation.
+    func useHTTPS() -> Self
 
     /// Use a private browser session to avoid storing the session cookie in the shared cookie jar.
     /// Using this method will disable single sign-on (SSO).
