@@ -5,7 +5,7 @@ import Nimble
 
 @testable import Auth0
 
-private let AutorizeURL = URL(string: "https://auth0.com")!
+private let AuthorizeURL = URL(string: "https://auth0.com")!
 private let HTTPSRedirectURL = URL(string: "https://auth0.com/callback")!
 private let CustomSchemeRedirectURL = URL(string: "com.auth0.example://samples.auth0.com/callback")!
 private let Timeout: NimbleTimeInterval = .seconds(2)
@@ -18,7 +18,7 @@ class ASProviderSpec: QuickSpec {
         var userAgent: ASUserAgent!
 
         beforeEach {
-            session = ASWebAuthenticationSession(url: AutorizeURL, callbackURLScheme: nil, completionHandler: { _, _ in })
+            session = ASWebAuthenticationSession(url: AuthorizeURL, callbackURLScheme: nil, completionHandler: { _, _ in })
             userAgent = ASUserAgent(session: session, callback: { _ in })
         }
 
@@ -30,18 +30,18 @@ class ASProviderSpec: QuickSpec {
 
             it("should create a web authentication session provider") {
                 let provider = WebAuthentication.asProvider(redirectURL: HTTPSRedirectURL)
-                expect(provider(AutorizeURL, {_ in })).to(beAKindOf(ASUserAgent.self))
+                expect(provider(AuthorizeURL, {_ in })).to(beAKindOf(ASUserAgent.self))
             }
 
             it("should not use an ephemeral session by default") {
                 let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL)
-                userAgent = provider(AutorizeURL, { _ in }) as? ASUserAgent
+                userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
                 expect(userAgent.session.prefersEphemeralWebBrowserSession) == false
             }
 
             it("should use an ephemeral session") {
                 let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL, ephemeralSession: true)
-                userAgent = provider(AutorizeURL, { _ in }) as? ASUserAgent
+                userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
                 expect(userAgent.session.prefersEphemeralWebBrowserSession) == true
             }
 
