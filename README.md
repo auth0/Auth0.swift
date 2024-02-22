@@ -173,11 +173,15 @@ com.example.MyApp://example.us.auth0.com/ios/com.example.MyApp/callback
 
 Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/), scroll to the end, and open **Advanced Settings > Device Settings**. In the **iOS** section, set **Team ID** to [your Apple Team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/), and **App ID** to your app's bundle identifier.
 
+![device-settings](https://github.com/auth0/Auth0.swift/assets/5055789/7eb5f6a2-7cc7-4c70-acf3-633fd72dc506)
+
 This will add your app to your Auth0 tenant's `apple-app-site-association` file.
 
 ##### Add the associated domain capability
 
 In Xcode, go to the **Signing and Capabilities** [tab](https://developer.apple.com/documentation/xcode/adding-capabilities-to-your-app#Add-a-capability) of your app target settings, and press the **+ Capability** button. Then select **Associated Domains**.
+
+![capabilities](https://github.com/auth0/Auth0.swift/assets/5055789/3f7b0a70-c36c-46bf-9441-29f98724204a)
 
 Next, add the following [entry](https://developer.apple.com/documentation/xcode/configuring-an-associated-domain#Define-a-service-and-its-associated-domain) under **Associated Domains**:
 
