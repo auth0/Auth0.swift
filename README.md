@@ -36,7 +36,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 ### Installation
 
-#### Swift Package Manager
+#### Using Swift Package Manager
 
 Open the following menu item in Xcode:
 
@@ -50,7 +50,7 @@ https://github.com/auth0/Auth0.swift
 
 Then, select the dependency rule and press **Add Package**.
 
-#### Cocoapods
+#### Using Cocoapods
 
 Add the following line to your `Podfile`:
 
@@ -60,7 +60,7 @@ pod 'Auth0', '~> 2.5'
 
 Then, run `pod install`.
 
-#### Carthage
+#### Using Carthage
 
 Add the following line to your `Cartfile`:
 
@@ -79,7 +79,7 @@ Auth0.swift needs the **Client ID** and **Domain** of the Auth0 application to c
 > [!IMPORTANT]
 > Make sure that the Auth0 application type is **Native**. Otherwise, you might run into errors due to the different configuration of other application types.
 
-#### Configure Client ID and Domain with a plist
+#### Configure the Client ID and Domain with a plist
 
 Create a `plist` file named `Auth0.plist` in your app bundle with the following content:
 
@@ -96,7 +96,7 @@ Create a `plist` file named `Auth0.plist` in your app bundle with the following 
 </plist>
 ```
 
-#### Configure Client ID and Domain programmatically
+#### Configure the Client ID and Domain programmatically
 
 <details>
   <summary>For Web Auth</summary>
@@ -130,39 +130,72 @@ Auth0
 
 ### Configure Web Auth (iOS / macOS)
 
-#### Configure callback and logout URLs
+#### Configure the callback and logout URLs
 
 The callback and logout URLs are the URLs that Auth0 invokes to redirect back to your app. Auth0 invokes the callback URL after authenticating the user, and the logout URL after removing the session cookie.
 
 Since callback and logout URLs can be manipulated, you will need to add your URLs to the **Allowed Callback URLs** and **Allowed Logout URLs** fields in the settings page of your Auth0 application. This will enable Auth0 to recognize these URLs as valid. If the callback and logout URLs are not set, users will be unable to log in and out of the app and will get an error.
 
-Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URL to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your app. If you have a [custom domain](https://auth0.com/docs/customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with your custom domain instead of the value from the settings page.
+Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URLs to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your app. If you have a [custom domain](https://auth0.com/docs/customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with your custom domain instead of the value from the settings page.
+
+> [!NOTE]
+> On iOS 17.4+ and macOS 14.4+ it's possible to use Universal Links as callback and logout URLs. When enabled, Auth0.swift will fall back to using custom scheme URLs on older iOS / macOS versions.
+> This feature requires Xcode 15.3+.
 
 ##### iOS
 
 ```text
+https://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback,
 YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_BUNDLE_IDENTIFIER/callback
 ```
 
 ##### macOS
 
 ```text
+https://YOUR_AUTH0_DOMAIN/macos/YOUR_BUNDLE_IDENTIFIER/callback,
 YOUR_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/macos/YOUR_BUNDLE_IDENTIFIER/callback
 ```
 
-For example, if your iOS bundle identifier was `com.example.MyApp` and your Auth0 Domain was `example.us.auth0.com`, then this value would be:
+<details>
+  <summary>Example</summary>
+
+If your iOS bundle identifier were `com.example.MyApp` and your Auth0 Domain were `example.us.auth0.com`, then this value would be:
 
 ```text
+https://example.us.auth0.com/ios/com.example.MyApp/callback,
 com.example.MyApp://example.us.auth0.com/ios/com.example.MyApp/callback
 ```
+</details>
 
-#### Configure custom URL scheme
+#### Configure an associated domain
 
-Back in Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
+##### Configure the Team ID and bundle identifier
 
-![url-scheme](https://user-images.githubusercontent.com/5055789/198689930-15f12179-15df-437e-ba50-dec26dbfb21f.png)
+Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/), scroll to the end, and open **Advanced Settings > Device Settings**. In the **iOS** section, set **Team ID** to [your Apple Team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/), and **App ID** to your app's bundle identifier.
 
-This registers your bundle identifier as a custom URL scheme, so the callback and logout URLs can reach your app.
+This will add your app to your Auth0 tenant's `apple-app-site-association` file.
+
+##### Add the associated domain capability
+
+In Xcode, go to the **Signing and Capabilities** [tab](https://developer.apple.com/documentation/xcode/adding-capabilities-to-your-app#Add-a-capability) of your app target settings, and press the **+ Capability** button. Then select **Associated Domains**.
+
+Next, add the following [entry](https://developer.apple.com/documentation/xcode/configuring-an-associated-domain#Define-a-service-and-its-associated-domain) under **Associated Domains**:
+
+```text
+webcredentials:YOUR_AUTH0_DOMAIN
+```
+
+<details>
+  <summary>Example</summary>
+
+If your Auth0 Domain were `example.us.auth0.com`, then this value would be:
+
+```text
+webcredentials:example.us.auth0.com
+```
+</details>
+
+If you have a [custom domain](https://auth0.com/docs/customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with your custom domain.
 
 ### Web Auth login (iOS / macOS)
 
@@ -177,6 +210,7 @@ Then, present the [Universal Login](https://auth0.com/docs/authenticate/login/au
 ```swift
 Auth0
     .webAuth()
+    .useHTTPS() // Use a Universal Link callback URL (iOS 17.4+ / macOS 14.4+)
     .start { result in
         switch result {
         case .success(let credentials):
@@ -192,7 +226,7 @@ Auth0
 
 ```swift
 do {
-    let credentials = try await Auth0.webAuth().start()
+    let credentials = try await Auth0.webAuth().useHTTPS().start()
     print("Obtained credentials: \(credentials)")
 } catch {
     print("Failed with: \(error)")
@@ -206,6 +240,7 @@ do {
 ```swift
 Auth0
     .webAuth()
+    .useHTTPS() // Use a Universal Link callback URL (iOS 17.4+ / macOS 14.4+)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -227,6 +262,7 @@ Call the `clearSession()` method in the action of your **Logout** button. Once t
 ```swift
 Auth0
     .webAuth()
+    .useHTTPS() // Use a Universal Link logout URL (iOS 17.4+ / macOS 14.4+)
     .clearSession { result in
         switch result {
         case .success:
@@ -243,7 +279,7 @@ Auth0
 
 ```swift
 do {
-    try await Auth0.webAuth().clearSession()
+    try await Auth0.webAuth().useHTTPS().clearSession()
     print("Session cookie cleared")
     // Delete credentials
 } catch {
@@ -258,6 +294,7 @@ do {
 ```swift
 Auth0
     .webAuth()
+    .useHTTPS() // Use a Universal Link logout URL (iOS 17.4+ / macOS 14.4+)
     .clearSession()
     .sink(receiveCompletion: { completion in
         switch completion {

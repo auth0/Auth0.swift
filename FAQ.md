@@ -3,6 +3,8 @@
 - [1. How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box)
   - [Use ephemeral sessions](#use-ephemeral-sessions)
   - [Use `SFSafariViewController`](#use-sfsafariviewcontroller)
+    - [1. Configure a custom URL scheme](#1-configure-a-custom-url-scheme)
+    - [2. Capture the callback URL](#2-capture-the-callback-url)
 - [2. How can I disable the _logout_ alert box?](#2-how-can-i-disable-the-logout-alert-box)
 - [3. How can I change the message in the alert box?](#3-how-can-i-change-the-message-in-the-alert-box)
 - [4. How can I programmatically close the alert box?](#4-how-can-i-programmatically-close-the-alert-box)
@@ -54,7 +56,20 @@ Auth0
 > [!IMPORTANT]
 > Since `SFSafariViewController` does not share cookies with the Safari app, SSO will not work either. But it will keep its own cookies, so you can use it to perform SSO between your app and your website as long as you open it inside your app using `SFSafariViewController`. This also means that any feature that relies on the persistence of cookies –like "Remember this device"– will work as expected.
 
+> [!NOTE]
+> `SFSafariViewController` does not support using Universal Links as callback URLs.
+
 If you choose to use the `SFSafariViewController` Web Auth provider, you need to perform an additional bit of setup. Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the callback URL when Auth0 redirects back to your app, so it's necessary to manually resume the Web Auth operation.
+
+#### 1. Configure a custom URL scheme
+
+In Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
+
+![url-scheme](https://user-images.githubusercontent.com/5055789/198689930-15f12179-15df-437e-ba50-dec26dbfb21f.png)
+
+This registers your bundle identifier as a custom URL scheme, so the callback URL can reach your app.
+
+#### 2. Capture the callback URL
 
 <details>
   <summary>Using the UIKit app lifecycle</summary>

@@ -1293,6 +1293,7 @@ Auth0
             DispatchQueue.main.async {
                 Auth0
                     .webAuth()
+                    .useHTTPS() // Use a Universal Link callback URL (iOS 17.4+ / macOS 14.4+)
                     .connection(connection)
                     .scope(scope)
                     .useEphemeralSession() // Otherwise a session cookie will remain
