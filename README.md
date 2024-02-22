@@ -139,7 +139,7 @@ Since callback and logout URLs can be manipulated, you will need to add your URL
 Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/applications/) and add the corresponding URLs to **Allowed Callback URLs** and **Allowed Logout URLs**, according to the platform of your app. If you have a [custom domain](https://auth0.com/docs/customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with your custom domain instead of the value from the settings page.
 
 > [!NOTE]
-> On iOS 17.4+ and macOS 14.4+ it's possible to use Universal Links as callback and logout URLs. When enabled, Auth0.swift will fall back to using custom scheme URLs on older iOS / macOS versions.
+> On iOS 17.4+ and macOS 14.4+ it's possible to use Universal Links as callback and logout URLs. When enabled, Auth0.swift will fall back to using a custom URL scheme on older iOS / macOS versions.
 > This feature requires Xcode 15.3+.
 
 ##### iOS
