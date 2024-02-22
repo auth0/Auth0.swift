@@ -39,11 +39,15 @@ final class Auth0WebAuth: WebAuth {
         guard let bundleID = Bundle.main.bundleIdentifier, let domain = self.url.host else { return nil }
         let scheme: String
 
+        #if compiler(>=5.10)
         if #available(iOS 17.4, macOS 14.4, *) {
             scheme = https ? "https" : bundleID
         } else {
             scheme = bundleID
         }
+        #else
+        scheme = bundleID
+        #endif
 
         guard let baseURL = URL(string: "\(scheme)://\(domain)") else { return nil }
         var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
