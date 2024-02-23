@@ -180,7 +180,7 @@ This will add your app to your Auth0 tenant's `apple-app-site-association` file.
 
 ##### Add the associated domain capability
 
-In Xcode, go to the **Signing and Capabilities** [tab](https://developer.apple.com/documentation/xcode/adding-capabilities-to-your-app#Add-a-capability) of your app target settings, and press the **+ Capability** button. Then select **Associated Domains**.
+In Xcode, go to the **Signing and Capabilities** [tab](https://developer.apple.com/documentation/xcode/adding-capabilities-to-your-app#Add-a-capability) of your app's target settings, and press the **+ Capability** button. Then select **Associated Domains**.
 
 ![Screenshot of the capabilities library inside Xcode](https://github.com/auth0/Auth0.swift/assets/5055789/3f7b0a70-c36c-46bf-9441-29f98724204a)
 
