@@ -140,6 +140,7 @@ Go to the settings page of your [Auth0 application](https://manage.auth0.com/#/a
 
 > [!NOTE]
 > On iOS 17.4+ and macOS 14.4+ it is possible to use Universal Links as callback and logout URLs. When enabled, Auth0.swift will fall back to using a custom URL scheme on older iOS / macOS versions.
+>
 > **This feature requires Xcode 15.3+**.
 
 ##### iOS
