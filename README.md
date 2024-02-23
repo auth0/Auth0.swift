@@ -36,7 +36,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 ### Installation
 
-#### Using Swift Package Manager
+#### Using the Swift Package Manager
 
 Open the following menu item in Xcode:
 
