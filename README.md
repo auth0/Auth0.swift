@@ -214,7 +214,7 @@ Then, present the [Universal Login](https://auth0.com/docs/authenticate/login/au
 ```swift
 Auth0
     .webAuth()
-    .useHTTPS() // Use a Universal Link callback URL (iOS 17.4+ / macOS 14.4+)
+    .useHTTPS() // Use a Universal Link callback URL on iOS 17.4+ / macOS 14.4+
     .start { result in
         switch result {
         case .success(let credentials):
@@ -244,7 +244,7 @@ do {
 ```swift
 Auth0
     .webAuth()
-    .useHTTPS() // Use a Universal Link callback URL (iOS 17.4+ / macOS 14.4+)
+    .useHTTPS() // Use a Universal Link callback URL on iOS 17.4+ / macOS 14.4+
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -266,7 +266,7 @@ Call the `clearSession()` method in the action of your **Logout** button. Once t
 ```swift
 Auth0
     .webAuth()
-    .useHTTPS() // Use a Universal Link logout URL (iOS 17.4+ / macOS 14.4+)
+    .useHTTPS() // Use a Universal Link logout URL on iOS 17.4+ / macOS 14.4+
     .clearSession { result in
         switch result {
         case .success:
@@ -298,7 +298,7 @@ do {
 ```swift
 Auth0
     .webAuth()
-    .useHTTPS() // Use a Universal Link logout URL (iOS 17.4+ / macOS 14.4+)
+    .useHTTPS() // Use a Universal Link logout URL on iOS 17.4+ / macOS 14.4+
     .clearSession()
     .sink(receiveCompletion: { completion in
         switch completion {
