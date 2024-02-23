@@ -23,7 +23,7 @@ Auth0
 By default, Auth0.swift uses `ASWebAuthenticationSession` with `prefersEphemeralWebBrowserSession` set to `false`. This means that:
 
 - The session cookie will be shared with the Safari app.
-- An alert box will be shown when logging in –and logging out– asking for consent, as the session cookie will be placed in a shared jar. This alert box is displayed and managed by `ASWebAuthenticationSession`, not Auth0.swift, and unfortunately it's not customizable.
+- An alert box will be shown when logging in –and logging out– asking for consent, as the session cookie will be placed in a shared jar. This alert box is displayed and managed by `ASWebAuthenticationSession`, not Auth0.swift, and unfortunately it is not customizable.
 
 #### You want this if...
 
