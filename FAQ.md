@@ -59,7 +59,7 @@ Auth0
 > [!NOTE]
 > `SFSafariViewController` does not support using Universal Links as callback URLs.
 
-If you choose to use the `SFSafariViewController` Web Auth provider, you need to perform an additional bit of setup. Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the callback URL when Auth0 redirects back to your app, so it's necessary to manually resume the Web Auth operation.
+If you choose to use the `SFSafariViewController` Web Auth provider, you need to perform an additional bit of setup. Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the callback URL when Auth0 redirects back to your app, so it is necessary to manually resume the Web Auth operation.
 
 #### 1. Configure a custom URL scheme
 
@@ -134,11 +134,11 @@ Otherwise, the browser modal will close right away and the user will be automati
 
 ## 3. How can I change the message in the alert box?
 
-Auth0.swift has no control whatsoever over the alert box. Its contents cannot be changed. Unfortunately, that's a limitation of `ASWebAuthenticationSession`.
+Auth0.swift has no control whatsoever over the alert box. Its contents cannot be changed. Unfortunately, that is a limitation of `ASWebAuthenticationSession`.
 
 ## 4. How can I programmatically close the alert box?
 
-Auth0.swift has no control whatsoever over the alert box. It cannot be closed programmatically. Unfortunately, that's a limitation of `ASWebAuthenticationSession`. 
+Auth0.swift has no control whatsoever over the alert box. It cannot be closed programmatically. Unfortunately, that is a limitation of `ASWebAuthenticationSession`. 
 
 ---
 
