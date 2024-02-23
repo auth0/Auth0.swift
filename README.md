@@ -40,7 +40,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 Open the following menu item in Xcode:
 
-**File > Add Packages...**
+**File > Add Package Dependencies...**
 
 In the **Search or Enter Package URL** search box enter this URL: 
 
