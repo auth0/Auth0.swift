@@ -13,7 +13,7 @@
 
 ## 1. How can I disable the _login_ alert box?
 
-![sso-alert](https://user-images.githubusercontent.com/5055789/198689762-8f3459a7-fdde-4c14-a13b-68933ef675e6.png)
+![Screenshot of the SSO alert box](https://user-images.githubusercontent.com/5055789/198689762-8f3459a7-fdde-4c14-a13b-68933ef675e6.png)
 
 Under the hood, Auth0.swift uses `ASWebAuthenticationSession` by default to perform web-based authentication, which is the [API provided by Apple](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) for such purpose.
 
@@ -65,7 +65,7 @@ If you choose to use the `SFSafariViewController` Web Auth provider, you need to
 
 In Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
 
-![url-scheme](https://user-images.githubusercontent.com/5055789/198689930-15f12179-15df-437e-ba50-dec26dbfb21f.png)
+![Screenshot of the URL Types section inside the app target settings](https://user-images.githubusercontent.com/5055789/198689930-15f12179-15df-437e-ba50-dec26dbfb21f.png)
 
 This registers your bundle identifier as a custom URL scheme, so the callback URL can reach your app.
 
@@ -111,7 +111,7 @@ SomeView()
 
 ## 2. How can I disable the _logout_ alert box?
 
-![sso-alert](https://user-images.githubusercontent.com/5055789/198689762-8f3459a7-fdde-4c14-a13b-68933ef675e6.png)
+![Screenshot of the SSO alert box](https://user-images.githubusercontent.com/5055789/198689762-8f3459a7-fdde-4c14-a13b-68933ef675e6.png)
 
 Since `clearSession(federated:)` needs to use `ASWebAuthenticationSession` as well to clear the shared session cookie, the same alert box will be displayed. 
 

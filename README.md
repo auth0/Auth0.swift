@@ -173,7 +173,7 @@ com.example.MyApp://example.us.auth0.com/ios/com.example.MyApp/callback
 
 Scroll to the end of the settings page of your Auth0 application and open **Advanced Settings > Device Settings**. In the **iOS** section, set **Team ID** to [your Apple Team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/), and **App ID** to your app's bundle identifier.
 
-![device-settings](https://github.com/auth0/Auth0.swift/assets/5055789/7eb5f6a2-7cc7-4c70-acf3-633fd72dc506)
+![Screenshot of the iOS section inside the Auth0 application settings](https://github.com/auth0/Auth0.swift/assets/5055789/7eb5f6a2-7cc7-4c70-acf3-633fd72dc506)
 
 This will add your app to your Auth0 tenant's `apple-app-site-association` file.
 
@@ -181,7 +181,7 @@ This will add your app to your Auth0 tenant's `apple-app-site-association` file.
 
 In Xcode, go to the **Signing and Capabilities** [tab](https://developer.apple.com/documentation/xcode/adding-capabilities-to-your-app#Add-a-capability) of your app target settings, and press the **+ Capability** button. Then select **Associated Domains**.
 
-![capabilities](https://github.com/auth0/Auth0.swift/assets/5055789/3f7b0a70-c36c-46bf-9441-29f98724204a)
+![Screenshot of the capabilities library inside Xcode](https://github.com/auth0/Auth0.swift/assets/5055789/3f7b0a70-c36c-46bf-9441-29f98724204a)
 
 Next, add the following [entry](https://developer.apple.com/documentation/xcode/configuring-an-associated-domain#Define-a-service-and-its-associated-domain) under **Associated Domains**:
 
@@ -315,7 +315,7 @@ Auth0
 
 ### SSO alert box (iOS / macOS)
 
-![sso-alert](https://user-images.githubusercontent.com/5055789/198689762-8f3459a7-fdde-4c14-a13b-68933ef675e6.png)
+![Screenshot of the SSO alert box](https://user-images.githubusercontent.com/5055789/198689762-8f3459a7-fdde-4c14-a13b-68933ef675e6.png)
 
 Check the [FAQ](FAQ.md) for more information about the alert box that pops up **by default** when using Web Auth.
 
