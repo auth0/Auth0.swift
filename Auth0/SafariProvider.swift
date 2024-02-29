@@ -81,9 +81,9 @@ extension SFSafariViewController {
 class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     let controller: SFSafariViewController
-    let callback: ((WebAuthResult<Void>) -> Void)
+    let callback: WebAuthProviderCallback
 
-    init(controller: SFSafariViewController, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    init(controller: SFSafariViewController, callback: @escaping WebAuthProviderCallback) {
         self.controller = controller
         self.callback = callback
         super.init()
