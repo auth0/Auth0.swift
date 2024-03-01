@@ -30,7 +30,7 @@ excluded_files = [*web_auth_files, *ios_files, *macos_files]
 
 Pod::Spec.new do |s|
   s.name             = 'Auth0'
-  s.version          = '2.5.0'
+  s.version          = '2.6.0'
   s.summary          = "Auth0 SDK for Apple platforms"
   s.description      = <<-DESC
                         Auth0 SDK for iOS, macOS, tvOS, and watchOS apps.

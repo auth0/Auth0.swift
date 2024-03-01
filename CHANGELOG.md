@@ -1,5 +1,21 @@
 # Change Log
 
+## [2.6.0](https://github.com/auth0/Auth0.swift/tree/2.6.0) (2024-03-01)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.5.0...2.6.0)
+
+**Added**
+- Add support for HTTPS callbacks [SDK-4749] [\#832](https://github.com/auth0/Auth0.swift/pull/832) ([Widcket](https://github.com/Widcket))
+- Add new error type to AuthenticationError [\#820](https://github.com/auth0/Auth0.swift/pull/820) ([lordzsolt](https://github.com/lordzsolt))
+
+**Changed**
+- Update PKCE-related messaging [\#789](https://github.com/auth0/Auth0.swift/pull/789) ([Widcket](https://github.com/Widcket))
+
+**Deprecated**
+- Deprecate methods related to updating user attributes using the Management API [\#815](https://github.com/auth0/Auth0.swift/pull/815) ([Widcket](https://github.com/Widcket))
+
+**Fixed**
+- Fix crash when the bundle ID contains characters not allowed in URL schemes [\#786](https://github.com/auth0/Auth0.swift/pull/786) ([Widcket](https://github.com/Widcket))
+
 ## [2.5.0](https://github.com/auth0/Auth0.swift/tree/2.5.0) (2023-07-18)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.4.0...2.5.0)
 
