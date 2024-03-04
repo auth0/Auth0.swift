@@ -170,6 +170,10 @@ com.example.MyApp://example.us.auth0.com/ios/com.example.MyApp/callback
 
 #### Configure an associated domain
 
+> [!IMPORTANT]
+> This step requires a paid Apple Developer account. It is needed to use Universal Links as callback and logout URLs.
+> Skip this step to use a custom URL scheme instead.
+
 ##### Configure the Team ID and bundle identifier
 
 Scroll to the end of the settings page of your Auth0 application and open **Advanced Settings > Device Settings**. In the **iOS** section, set **Team ID** to your [Apple Team ID](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/), and **App ID** to your app's bundle identifier.
@@ -201,6 +205,9 @@ webcredentials:example.us.auth0.com
 </details>
 
 If you have a [custom domain](https://auth0.com/docs/customize/custom-domains), replace `YOUR_AUTH0_DOMAIN` with your custom domain.
+
+> [!NOTE]
+> For the associated domain to work, your app must be signed with your team certificate **even when building for the iOS simulator**. Make sure you are using the Apple Team whose Team ID is configured in the settings page of your Auth0 application.
 
 ### Web Auth login (iOS / macOS)
 
