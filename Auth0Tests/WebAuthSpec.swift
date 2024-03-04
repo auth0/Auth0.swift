@@ -63,7 +63,6 @@ private func defaultQuery(withParameters parameters: [String: String] = [:]) -> 
 
 private let defaults = ["response_type": "code"]
 
-@MainActor
 class WebAuthSpec: QuickSpec {
 
     override func spec() {
@@ -298,15 +297,40 @@ class WebAuthSpec: QuickSpec {
         }
 
         describe("redirect uri") {
+            let bundleId = Bundle.main.bundleIdentifier!
+            let platform: String
+
             #if os(iOS)
-            let platform = "ios"
+            platform = "ios"
             #else
-            let platform = "macos"
+            platform = "macos"
+            #endif
+
+            #if compiler(>=5.10)
+            if #available(iOS 17.4, macOS 14.4, *) {
+                context("https") {
+                    it("should build with the domain") {
+                        expect(newWebAuth().redirectURL?.absoluteString) == "https://\(Domain)/\(platform)/\(bundleId)/callback"
+                    }
+
+                    it("should build with the domain and a subpath") {
+                        let subpath = "foo"
+                        let uri = "https://\(Domain)/\(subpath)/\(platform)/\(bundleId)/callback"
+                        let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpath))
+                        expect(webAuth.redirectURL?.absoluteString) == uri
+                    }
+
+                    it("should build with the domain and subpaths") {
+                        let subpaths = "foo/bar"
+                        let uri = "https://\(Domain)/\(subpaths)/\(platform)/\(bundleId)/callback"
+                        let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpaths))
+                        expect(webAuth.redirectURL?.absoluteString) == uri
+                    }
+                }
+            }
             #endif
 
             context("custom scheme") {
-
-                let bundleId = Bundle.main.bundleIdentifier!
 
                 it("should build with the domain") {
                     expect(newWebAuth().redirectURL?.absoluteString) == "\(bundleId)://\(Domain)/\(platform)/\(bundleId)/callback"
@@ -335,6 +359,18 @@ class WebAuthSpec: QuickSpec {
         }
 
         describe("other builder methods") {
+
+            context("https") {
+
+                it("should not use https callbacks by default") {
+                    expect(newWebAuth().https).to(beFalse())
+                }
+
+                it("should use https callbacks") {
+                    expect(newWebAuth().useHTTPS().https).to(beTrue())
+                }
+
+            }
 
             context("ephemeral session") {
 
@@ -413,7 +449,7 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should use a custom provider") {
-                    expect(newWebAuth().provider(WebAuthentication.asProvider(urlScheme: "")).provider).toNot(beNil())
+                    expect(newWebAuth().provider(WebAuthentication.asProvider(redirectURL: RedirectURL)).provider).toNot(beNil())
                 }
 
             }
@@ -452,11 +488,13 @@ class WebAuthSpec: QuickSpec {
             }
 
             it("should generate a state") {
+                _ = auth.provider({ url, _ in SpyUserAgent() })
                 auth.start { _ in }
                 expect(auth.state).toNot(beNil())
             }
 
             it("should generate different state on every start") {
+                _ = auth.provider({ url, _ in SpyUserAgent() })
                 auth.start { _ in }
                 let state = auth.state
                 auth.start { _ in }
@@ -464,12 +502,14 @@ class WebAuthSpec: QuickSpec {
             }
 
             it("should use the supplied state") {
+                _ = auth.provider({ url, _ in SpyUserAgent() })
                 let state = UUID().uuidString
                 auth.state(state).start { _ in }
                 expect(auth.state) == state
             }
 
             it("should use the state supplied via parameters") {
+                _ = auth.provider({ url, _ in SpyUserAgent() })
                 let state = UUID().uuidString
                 auth.parameters(["state": state]).start { _ in }
                 expect(auth.state) == state
@@ -536,13 +576,13 @@ class WebAuthSpec: QuickSpec {
                     TransactionStore.shared.clear()
                 }
 
-                it("should store a new transaction") {
+                it("should store a new transaction") { @MainActor in
                     auth.start { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                     TransactionStore.shared.cancel()
                 }
 
-                it("should cancel the current transaction") {
+                it("should cancel the current transaction") { @MainActor in
                     var result: WebAuthResult<Credentials>?
                     auth.start { result = $0 }
                     TransactionStore.shared.cancel()
@@ -608,19 +648,19 @@ class WebAuthSpec: QuickSpec {
                     TransactionStore.shared.clear()
                 }
 
-                it("should store a new transaction") {
+                it("should store a new transaction") { @MainActor in
                     auth.clearSession() { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
-                it("should cancel the current transaction") {
+                it("should cancel the current transaction") { @MainActor in
                     auth.clearSession() { result = $0 }
                     TransactionStore.shared.cancel()
                     expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
-                it("should resume the current transaction") {
+                it("should resume the current transaction") { @MainActor in
                     auth.clearSession() { result = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(result).to(beSuccessful())
