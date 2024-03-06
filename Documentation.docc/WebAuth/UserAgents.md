@@ -8,6 +8,8 @@ Web-based authentication needs an in-app browser. Auth0.swift offers the choice 
 
 `ASWebAuthenticationSession` is an API provided specifically for performing web-based authentication. It is not meant for general-purpose browsing, and exposes a pretty limited API. `ASWebAuthenticationSession` can be used with or without ephemeral sessions enabled –through the [`prefersEphemeralWebBrowserSession`](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio) option.
 
+> Note: `ASWebAuthenticationSession` supports using Universal Links as callback and logout URLs on iOS 174+ and macOS 14.4+.
+
 ### Without ephemeral sessions (the default)
 
 ```swift
@@ -21,7 +23,7 @@ Auth0
 By default, Auth0.swift uses `ASWebAuthenticationSession` with `prefersEphemeralWebBrowserSession` set to `false`. This means that:
 
 - The session cookie will be shared with the Safari app.
-- An alert box will be shown when logging in –and logging out– asking for consent, as the session cookie will be placed in a shared jar. This alert box is displayed and managed by `ASWebAuthenticationSession`, not Auth0.swift, and unfortunately it's not customizable.
+- An alert box will be shown when logging in –and logging out– asking for consent, as the session cookie will be placed in a shared jar. This alert box is displayed and managed by `ASWebAuthenticationSession`, not Auth0.swift, and unfortunately it is not customizable.
 
 #### You want this if...
 
@@ -69,6 +71,8 @@ Auth0
 - All the `SFSafariViewController` instances used in your app will have access to the persisted session cookie.
 - No consent alert box will be shown, as the session cookie won't be placed in a shared cookie jar.
 - All the features that rely on the persistence of cookies –like "Remember this device"– **will work** as expected.
+
+> Note: `SFSafariViewController` does not support using Universal Links as callback URLs.
 
 #### You want this if...
 

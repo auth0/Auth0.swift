@@ -683,7 +683,7 @@ Auth0
 
 ### Renew credentials
 
-Use a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) to renew the user's credentials. It's recommended that you read and understand the refresh token process beforehand.
+Use a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) to renew the user's credentials. It is recommended that you read and understand the refresh token process beforehand.
 
 ```swift
 Auth0
@@ -1035,7 +1035,7 @@ Auth0
 > [!CAUTION]
 > Set this flag only when **DEBUGGING** to avoid leaking user's credentials in the device log.
 
-With a successful authentication you'll see something similar to the following:
+With a successful authentication you should see something similar to the following:
 
 ```text
 ASWebAuthenticationSession: https://example.us.auth0.com/authorize?.....
@@ -1293,6 +1293,7 @@ Auth0
             DispatchQueue.main.async {
                 Auth0
                     .webAuth()
+                    .useHTTPS() // Use a Universal Link callback URL on iOS 17.4+ / macOS 14.4+
                     .connection(connection)
                     .scope(scope)
                     .useEphemeralSession() // Otherwise a session cookie will remain
