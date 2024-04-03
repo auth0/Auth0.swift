@@ -38,7 +38,11 @@ class LoginTransaction: NSObject, AuthTransaction {
     }
 
     private func handleURL(_ url: URL) -> Bool {
-        guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()),
+        let isMatchingURL = url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased())
+        let isMatchingBundleID = url.scheme == Bundle.main.bundleIdentifier?.appending(".auth0")
+        
+        guard isMatchingURL || isMatchingBundleID,
+
               let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               case let items = self.handler.values(fromComponents: components),
               has(state: self.state, inItems: items) else {
