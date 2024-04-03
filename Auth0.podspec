@@ -49,14 +49,30 @@ Pod::Spec.new do |s|
   s.ios.deployment_target   = '13.0'
   s.ios.exclude_files       = macos_files
   s.ios.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
+  s.resource_bundles = {
+  'Auth0' => ['Auth0/PrivacyInfo.xcprivacy']
+}
+
 
   s.osx.deployment_target   = '11.0'
   s.osx.exclude_files       = ios_files
   s.osx.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
+  s.osx.resource_bundles = {
+    'Auth0' => ['Auth0/PrivacyInfo.xcprivacy']
+  }
+
 
   s.tvos.deployment_target = '13.0'
   s.tvos.exclude_files     = excluded_files
+  s.tvos.resource_bundles = {
+  'Auth0' => ['Auth0/PrivacyInfo.xcprivacy']
+  }
+
 
   s.watchos.deployment_target = '7.0'
   s.watchos.exclude_files     = excluded_files
+  s.watchos.resource_bundles = {
+    'Auth0' => ['Auth0/PrivacyInfo.xcprivacy']
+  }
+
 end
