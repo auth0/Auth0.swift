@@ -41,6 +41,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/auth0/Auth0.swift.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/auth0'
   s.source_files     = 'Auth0/*.swift'
+  s.resources        = "Auth0/PrivacyInfo.xcprivacy"
   s.swift_versions   = ['5.7', '5.8']
 
   s.dependency 'SimpleKeychain', '~> 1.1'
