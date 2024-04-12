@@ -25,7 +25,7 @@ let package = Package(
             ],
             path: "Auth0",
             exclude: ["Info.plist"],
-            resources: [.copy("Resources/PrivacyInfo.xcprivacy")],
+            resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: swiftSettings),
         .testTarget(
             name: "Auth0Tests",
