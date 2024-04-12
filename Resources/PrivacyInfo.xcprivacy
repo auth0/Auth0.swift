@@ -15,6 +15,10 @@
 			<array>
 				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
 			</array>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/> 
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+			<true/> 
 			<key>NSPrivacyCollectedDataType</key>
 			<string>NSPrivacyCollectedDataTypeUserID</string>
 		</dict>
