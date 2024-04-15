@@ -30,7 +30,7 @@ excluded_files = [*web_auth_files, *ios_files, *macos_files]
 
 Pod::Spec.new do |s|
   s.name             = 'Auth0'
-  s.version          = '2.6.0'
+  s.version          = '2.7.0'
   s.summary          = "Auth0 SDK for Apple platforms"
   s.description      = <<-DESC
                         Auth0 SDK for iOS, macOS, tvOS, and watchOS apps.
@@ -41,6 +41,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/auth0/Auth0.swift.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/auth0'
   s.source_files     = 'Auth0/*.swift'
+  s.resources        = "Auth0/PrivacyInfo.xcprivacy"
   s.swift_versions   = ['5.7', '5.8']
 
   s.dependency 'SimpleKeychain', '~> 1.1'

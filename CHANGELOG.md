@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.7.0](https://github.com/auth0/Auth0.swift/tree/2.7.0) (2024-04-12)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.6.0...2.7.0)
+
+**Added**
+- chore: Add privacy manifest to Auth0.Swift [\#841](https://github.com/auth0/Auth0.swift/pull/841) ([poovamraj](https://github.com/poovamraj))
+
 ## [2.6.0](https://github.com/auth0/Auth0.swift/tree/2.6.0) (2024-03-01)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.5.0...2.6.0)
 
