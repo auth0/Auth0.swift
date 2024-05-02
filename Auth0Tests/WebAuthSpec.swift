@@ -310,20 +310,20 @@ class WebAuthSpec: QuickSpec {
             if #available(iOS 17.4, macOS 14.4, *) {
                 context("https") {
                     it("should build with the domain") {
-                        expect(newWebAuth().redirectURL?.absoluteString) == "https://\(Domain)/\(platform)/\(bundleId)/callback"
+                        expect(newWebAuth().useHTTPS().redirectURL?.absoluteString) == "https://\(Domain)/\(platform)/\(bundleId)/callback"
                     }
 
                     it("should build with the domain and a subpath") {
                         let subpath = "foo"
                         let uri = "https://\(Domain)/\(subpath)/\(platform)/\(bundleId)/callback"
-                        let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpath))
+                        let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpath)).useHTTPS()
                         expect(webAuth.redirectURL?.absoluteString) == uri
                     }
 
                     it("should build with the domain and subpaths") {
                         let subpaths = "foo/bar"
                         let uri = "https://\(Domain)/\(subpaths)/\(platform)/\(bundleId)/callback"
-                        let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpaths))
+                        let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL.appendingPathComponent(subpaths)).useHTTPS()
                         expect(webAuth.redirectURL?.absoluteString) == uri
                     }
                 }
