@@ -420,6 +420,7 @@ class AuthenticationErrorSpec: QuickSpec {
 
             it("should detect network error") {
                 let networkErrorCodes: [URLError.Code] = [
+                    .dataNotAllowed,
                     .notConnectedToInternet,
                     .networkConnectionLost,
                     .dnsLookupFailed,
