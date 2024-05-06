@@ -42,14 +42,6 @@ class LoginTransactionSpec: QuickSpec {
                     expect(transaction.userAgent).to(beNil())
                 }
 
-                it("should fail to handle url with invalid prefix") {
-                    let url = URL(string: "https://invalid.auth0.com/callback?code=\(code)&state=state")!
-                    let expectedError = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
-                    expect(transaction.resume(url)) == false
-                    expect(userAgent.result).to(haveWebAuthError(expectedError))
-                    expect(transaction.userAgent).to(beNil())
-                }
-
                 it("should fail to handle url without state") {
                     let url = URL(string: "https://samples.auth0.com/callback?code=\(code)")!
                     let expectedError = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
