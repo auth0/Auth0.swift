@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.7.1](https://github.com/auth0/Auth0.swift/tree/2.7.1) (2024-05-03)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.7.0...2.7.1)
+
+**Fixed**
+- fix: fixed the declaration of the privacy manifest in Auth0.podspec [\#846](https://github.com/auth0/Auth0.swift/pull/846) ([desusai7](https://github.com/desusai7))
+
 ## [2.7.0](https://github.com/auth0/Auth0.swift/tree/2.7.0) (2024-04-12)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.6.0...2.7.0)
 
