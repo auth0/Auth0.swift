@@ -29,10 +29,10 @@ class TransactionStoreSpec: QuickSpec {
                 expect(storage.current).to(beNil())
             }
 
-            it("should not cancel current transaction") {
+            it("should cancel previous transaction when new transaction is added to store") {
                 storage.store(transaction)
                 storage.store(SpyTransaction())
-                expect(transaction.isCancelled) == false
+                expect(transaction.isCancelled) == true
             }
         }
 
