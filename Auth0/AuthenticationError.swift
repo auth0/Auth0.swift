@@ -154,6 +154,7 @@ public struct AuthenticationError: Auth0APIError {
         }
 
         let networkErrorCodes: [URLError.Code] = [
+            .dataNotAllowed,
             .notConnectedToInternet,
             .networkConnectionLost,
             .dnsLookupFailed,
@@ -183,7 +184,7 @@ extension AuthenticationError {
 
         return "Received error with code \(self.code)."
     }
-
+    
 }
 
 // MARK: - Equatable
