@@ -38,8 +38,7 @@ class LoginTransaction: NSObject, AuthTransaction {
     }
 
     private func handleURL(_ url: URL) -> Bool {
-        guard url.absoluteString.lowercased().hasPrefix(self.redirectURL.absoluteString.lowercased()),
-              let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               case let items = self.handler.values(fromComponents: components),
               has(state: self.state, inItems: items) else {
             let error = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
