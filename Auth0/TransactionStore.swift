@@ -14,10 +14,7 @@ class TransactionStore {
         return isResumed
     }
 
-
-    /// Calling store would cancel existing transactions if any, and then would set the supplied transaction as the current one.
     func store(_ transaction: AuthTransaction) {
-        self.cancel()
         self.current = transaction
     }
 
