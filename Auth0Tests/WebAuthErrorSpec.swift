@@ -86,6 +86,13 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for transaction active already") {
+                let message = "Failed to start this transaction, as there is an active transaction at the"
+                + " moment."
+                let error = WebAuthError(code: .transactionActiveAlready)
+                expect(error.localizedDescription) == message
+            }
+
             it("should return message for invalid invitation URL") {
                 let url = "https://samples.auth0.com"
                 let message = "The invitation URL (\(url)) is missing the 'invitation' and/or"
