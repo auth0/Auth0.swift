@@ -184,7 +184,7 @@ extension AuthenticationError {
 
         return "Received error with code \(self.code)."
     }
-    
+
 }
 
 // MARK: - Equatable

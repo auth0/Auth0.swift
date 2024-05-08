@@ -158,6 +158,11 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+
+        if self.storage.current != nil {
+            return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
+        }
+
         guard let redirectURL = self.redirectURL else {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
@@ -207,6 +212,11 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
+
+        if self.storage.current != nil {
+            return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
+        }
+
         let endpoint = federated ?
             URL(string: "v2/logout?federated", relativeTo: self.url)! :
             URL(string: "v2/logout", relativeTo: self.url)!

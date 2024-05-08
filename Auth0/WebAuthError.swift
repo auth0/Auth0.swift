@@ -6,6 +6,7 @@ public struct WebAuthError: Auth0Error {
 
     enum Code: Equatable {
         case noBundleIdentifier
+        case transactionActiveAlready
         case invalidInvitationURL(String)
         case userCancelled
         case noAuthorizationCode([String: String])
@@ -79,6 +80,8 @@ extension WebAuthError {
         switch self.code {
         case .noBundleIdentifier: return "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
             + " or it could not be used to build a valid URL."
+        case .transactionActiveAlready: return "Failed to start this transaction, as there is an active transaction at the"
+            + " moment."
         case .invalidInvitationURL(let url): return "The invitation URL (\(url)) is missing the 'invitation' and/or"
             + " the 'organization' query parameters."
         case .userCancelled: return "The user cancelled the Web Auth operation."
