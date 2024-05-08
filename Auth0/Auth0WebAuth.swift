@@ -158,8 +158,8 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
-
-        if let currentTransaction = self.storage.current {
+        
+        if self.storage.current != nil {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
@@ -212,8 +212,8 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
-
-        if let currentTransaction = self.storage.current {
+        
+        if self.storage.current != nil {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
