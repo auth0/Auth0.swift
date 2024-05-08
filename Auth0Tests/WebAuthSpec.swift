@@ -475,6 +475,7 @@ class WebAuthSpec: QuickSpec {
 
             beforeEach {
                 auth = newWebAuth()
+                TransactionStore.shared.clear()
             }
 
             it("should start the supplied provider") {
@@ -600,6 +601,7 @@ class WebAuthSpec: QuickSpec {
 
             beforeEach {
                 auth = newWebAuth()
+                TransactionStore.shared.clear()
             }
 
             it("should start the supplied provider") {
