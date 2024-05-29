@@ -93,6 +93,12 @@ public protocol WebAuth: Trackable, Loggable {
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     func redirectURL(_ redirectURL: URL) -> Self
 
+    /// Specify a custom authorize URL to be used.
+    ///
+    /// - Parameter authorizeURL: Custom authorize URL.
+    /// - Returns: The same `WebAuth` instance to allow method chaining.
+    func authorizeURL(_ authorizeURL: URL) -> Self
+
     /// Specify an audience name for the API that your application will call using the access token returned after
     /// authentication.
     /// This value must match the **API Identifier** displayed in the APIs section of the [Auth0 Dashboard](https://manage.auth0.com/#/apis).
