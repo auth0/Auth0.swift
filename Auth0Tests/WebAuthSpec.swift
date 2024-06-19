@@ -283,6 +283,16 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
+            itBehavesLike(ValidAuthorizeURLExample) {
+                return [
+                    "url": newWebAuth()
+                        .authorizeURL(URL(string: "https://example.com/authorize")!)
+                        .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
+                    "domain": "example.com",
+                    "query": defaultQuery(),
+                ]
+            }
+
             context("encoding") {
                 
                 it("should encode + as %2B"){
@@ -294,6 +304,10 @@ class WebAuthSpec: QuickSpec {
                 
             }
 
+            it("should build with a custom authorize url") {
+                let url = URL(string: "https://example.com/authorize")!
+                expect(newWebAuth().authorizeURL(url).overrideAuthorizeURL) == url
+            }
         }
 
         describe("redirect uri") {
