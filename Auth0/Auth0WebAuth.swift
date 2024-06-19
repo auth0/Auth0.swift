@@ -28,6 +28,7 @@ final class Auth0WebAuth: WebAuth {
     private(set) var maxAge: Int?
     private(set) var organization: String?
     private(set) var invitationURL: URL?
+    private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
     private(set) var onCloseCallback: (() -> Void)?
 
@@ -99,6 +100,11 @@ final class Auth0WebAuth: WebAuth {
 
     func redirectURL(_ redirectURL: URL) -> Self {
         self.redirectURL = redirectURL
+        return self
+    }
+
+    func authorizeURL(_ authorizeURL: URL) -> Self {
+        self.overrideAuthorizeURL = authorizeURL
         return self
     }
 
@@ -245,7 +251,7 @@ final class Auth0WebAuth: WebAuth {
                            state: String?,
                            organization: String?,
                            invitation: String?) -> URL {
-        let authorize = URL(string: "authorize", relativeTo: self.url)!
+        let authorize = self.overrideAuthorizeURL ?? URL(string: "authorize", relativeTo: self.url)!
         var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true)!
         var items: [URLQueryItem] = []
         var entries = defaults
