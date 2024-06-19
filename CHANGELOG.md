@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.8.0](https://github.com/auth0/Auth0.swift/tree/2.8.0) (2024-06-19)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.7.2...2.8.0)
+
+**Added**
+- Add support for an authorize URL override [\#854](https://github.com/auth0/Auth0.swift/pull/854) ([erichoracek](https://github.com/erichoracek))
+
 ## [2.7.2](https://github.com/auth0/Auth0.swift/tree/2.7.2) (2024-05-08)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.7.1...2.7.2)
 
