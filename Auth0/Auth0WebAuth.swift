@@ -14,8 +14,10 @@ final class Auth0WebAuth: WebAuth {
 
     #if os(macOS)
     private let platform = "macos"
-    #else
+    #elseif os(iOS)
     private let platform = "ios"
+    #else
+    private let platform = "visionos"
     #endif
     private let responseType = "code"
 

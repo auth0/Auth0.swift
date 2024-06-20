@@ -60,4 +60,8 @@ Pod::Spec.new do |s|
 
   s.watchos.deployment_target = '7.0'
   s.watchos.exclude_files     = excluded_files
+
+  s.visionos.deployment_target = '1.0'
+  s.visionos.exclude_files = macos_files
+  s.visionos.pod_target_xcconfig =  { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
 end
