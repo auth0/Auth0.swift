@@ -6,7 +6,7 @@ import Nimble
 
 class LoginTransactionSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
         var transaction: LoginTransaction!
         let userAgent = SpyUserAgent()
         let handler = SpyGrant()

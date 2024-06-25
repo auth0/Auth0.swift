@@ -6,7 +6,7 @@ import Nimble
 
 class WebAuthErrorSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         describe("init") {
 

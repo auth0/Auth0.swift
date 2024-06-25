@@ -9,7 +9,7 @@ private let Password = "PASSWORD RANDOM"
 
 class UserPatchAttributesSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
         var attributes: UserPatchAttributes!
 
         beforeEach {

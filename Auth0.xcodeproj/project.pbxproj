@@ -327,6 +327,9 @@
 		A7DDDF6D2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		A7DDDF6E2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		A7DDDF702BC9A93F0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
+		C177D6C72C2ADEB60094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */; };
+		C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6D32C2B0DCB0094C657 /* CwlPreconditionTesting */; };
+		C177D6D62C2B11A70094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6D52C2B11A70094C657 /* CwlPreconditionTesting */; };
 		C1B3B9AF2C24B297004A32A4 /* OAuth2VisionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B3B9AE2C24B297004A32A4 /* OAuth2VisionApp.swift */; };
 		C1B3B9B12C24B297004A32A4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B3B9B02C24B297004A32A4 /* ContentView.swift */; };
 		C1B3B9D32C24B39E004A32A4 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1B3B9C02C24B39E004A32A4 /* Auth0.framework */; };
@@ -435,8 +438,6 @@
 		C1B3BA4E2C24BA37004A32A4 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
 		C1B3BA4F2C24BA37004A32A4 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		C1B3BA502C24BA37004A32A4 /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
-		C1B3BA512C24C3DA004A32A4 /* OHHTTPStubs.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */; };
-		C1B3BA522C24C3DA004A32A4 /* OHHTTPStubs.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D581CF772757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF782757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF792757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
@@ -600,7 +601,6 @@
 			files = (
 				C1B3B9EB2C24B65D004A32A4 /* Quick.xcframework in Copy Files */,
 				C1B3B9E62C24B65B004A32A4 /* Nimble.xcframework in Copy Files */,
-				C1B3BA522C24C3DA004A32A4 /* OHHTTPStubs.xcframework in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -798,6 +798,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C177D6C72C2ADEB60094C657 /* CwlPreconditionTesting in Frameworks */,
 				5CD9FC6E26FE30A6009C2B27 /* Nimble.xcframework in Frameworks */,
 				5CD9FC7026FE30A6009C2B27 /* OHHTTPStubs.xcframework in Frameworks */,
 				5CD9FC6F26FE30A6009C2B27 /* Quick.xcframework in Frameworks */,
@@ -808,6 +809,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */,
 				5CD9FC7526FE30C3009C2B27 /* Nimble.xcframework in Frameworks */,
 				5CD9FC7626FE30C3009C2B27 /* OHHTTPStubs.xcframework in Frameworks */,
 				5CD9FC7726FE30C3009C2B27 /* Quick.xcframework in Frameworks */,
@@ -871,7 +873,7 @@
 			files = (
 				C1B3B9EA2C24B65D004A32A4 /* Quick.xcframework in Frameworks */,
 				C1B3B9E52C24B65B004A32A4 /* Nimble.xcframework in Frameworks */,
-				C1B3BA512C24C3DA004A32A4 /* OHHTTPStubs.xcframework in Frameworks */,
+				C177D6D62C2B11A70094C657 /* CwlPreconditionTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1430,6 +1432,9 @@
 				5FCAB1651D07ABC000331C84 /* PBXTargetDependency */,
 			);
 			name = Auth0Tests.iOS;
+			packageProductDependencies = (
+				C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */,
+			);
 			productName = Auth0Tests.iOS;
 			productReference = 5F06DDA01CC451540011842B /* Auth0Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -1450,6 +1455,9 @@
 				5B7EE48A20FCA0A600367724 /* PBXTargetDependency */,
 			);
 			name = Auth0Tests.macOS;
+			packageProductDependencies = (
+				C177D6D32C2B0DCB0094C657 /* CwlPreconditionTesting */,
+			);
 			productName = Auth0Tests.OSX;
 			productReference = 5F06DDAF1CC451700011842B /* Auth0Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -1587,6 +1595,9 @@
 				C1B3B9CC2C24B39E004A32A4 /* PBXTargetDependency */,
 			);
 			name = Auth0Tests.visionOS;
+			packageProductDependencies = (
+				C177D6D52C2B11A70094C657 /* CwlPreconditionTesting */,
+			);
 			productName = Auth0Tests.visionOS;
 			productReference = C1B3B9C72C24B39E004A32A4 /* Auth0Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -1672,6 +1683,9 @@
 				Base,
 			);
 			mainGroup = 5F049B5F1CB42C29006F6C05;
+			packageReferences = (
+				C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */,
+			);
 			productRefGroup = 5F049B6A1CB42C29006F6C05 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -3570,6 +3584,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mattgallagher/CwlPreconditionTesting.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
+			productName = CwlPreconditionTesting;
+		};
+		C177D6D32C2B0DCB0094C657 /* CwlPreconditionTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
+			productName = CwlPreconditionTesting;
+		};
+		C177D6D52C2B11A70094C657 /* CwlPreconditionTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
+			productName = CwlPreconditionTesting;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5F049B601CB42C29006F6C05 /* Project object */;
 }

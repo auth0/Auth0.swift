@@ -6,7 +6,7 @@ import Nimble
 
 class ClearSessionTransactionSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
         var transaction: ClearSessionTransaction!
 
         beforeEach {

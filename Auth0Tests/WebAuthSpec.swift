@@ -65,7 +65,7 @@ private let defaults = ["response_type": "code"]
 
 class WebAuthSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         describe("init") {
 
@@ -499,7 +499,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                await expect(isStarted).toEventually(beTrue())
+                expect(isStarted).toEventually(beTrue())
             }
 
             it("should generate a state") {
@@ -538,8 +538,8 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                await expect(redirectURL?.query).toEventually(contain("organization=foo"))
-                await expect(redirectURL?.query).toEventually(contain("invitation=bar"))
+                expect(redirectURL?.query).toEventually(contain("organization=foo"))
+                expect(redirectURL?.query).toEventually(contain("invitation=bar"))
             }
 
             it("should produce an invalid invitation URL error when the organization is missing") {
@@ -548,7 +548,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce an invalid invitation URL error when the invitation is missing") {
@@ -557,7 +557,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce an invalid invitation URL error when the organization and invitation are missing") {
@@ -566,7 +566,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce an invalid invitation URL error when the query parameters are missing") {
@@ -574,7 +574,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(DomainURL)
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
@@ -582,7 +582,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 auth.redirectURL = nil
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             context("transaction") {
@@ -591,13 +591,13 @@ class WebAuthSpec: QuickSpec {
                     TransactionStore.shared.clear()
                 }
 
-                it("should store a new transaction") { @MainActor in
+                it("should store a new transaction") {
                     auth.start { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                     TransactionStore.shared.cancel()
                 }
 
-                it("should cancel the current transaction") { @MainActor in
+                it("should cancel the current transaction") {
                     var result: WebAuthResult<Credentials>?
                     auth.start { result = $0 }
                     TransactionStore.shared.cancel()
@@ -625,7 +625,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                await expect(isStarted).toEventually(beTrue())
+                expect(isStarted).toEventually(beTrue())
             }
 
             it("should not include the federated parameter by default") {
@@ -635,7 +635,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.clearSession() { _ in }
-                await expect(redirectURL?.query?.contains("federated")).toEventually(beFalse())
+                expect(redirectURL?.query?.contains("federated")).toEventually(beFalse())
             }
 
             it("should include the federated parameter") {
@@ -645,7 +645,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.clearSession(federated: true) { _ in }
-                await expect(redirectURL?.query?.contains("federated")).toEventually(beTrue())
+                expect(redirectURL?.query?.contains("federated")).toEventually(beTrue())
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
@@ -664,19 +664,19 @@ class WebAuthSpec: QuickSpec {
                     TransactionStore.shared.clear()
                 }
 
-                it("should store a new transaction") { @MainActor in
+                it("should store a new transaction") {
                     auth.clearSession() { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
-                it("should cancel the current transaction") { @MainActor in
+                it("should cancel the current transaction") {
                     auth.clearSession() { result = $0 }
                     TransactionStore.shared.cancel()
                     expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
-                it("should resume the current transaction") { @MainActor in
+                it("should resume the current transaction") {
                     auth.clearSession() { result = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(result).to(beSuccessful())

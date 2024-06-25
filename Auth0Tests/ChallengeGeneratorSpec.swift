@@ -6,7 +6,7 @@ import Nimble
 
 class ChallengeGeneratorSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         describe("test vector") {
             let seed: [UInt8] = [116, 24, 223, 180, 151, 153, 224, 37, 79, 250, 96, 125, 216, 173,

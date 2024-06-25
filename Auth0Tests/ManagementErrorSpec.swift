@@ -6,7 +6,7 @@ import Nimble
 
 class ManagementErrorSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         describe("init") {
 

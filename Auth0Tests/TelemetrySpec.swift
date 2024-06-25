@@ -6,7 +6,7 @@ import Nimble
 
 class TelemetrySpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         var telemetry: Telemetry!
 

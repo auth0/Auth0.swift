@@ -32,7 +32,7 @@ fileprivate extension Request where T == [String: Any], E == AuthenticationError
 }
 
 class RequestSpec: QuickSpec {
-    override func spec() {
+    override class func spec() {
 
         beforeEach {
             stub(condition: isHost(Url.host!)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
@@ -148,7 +148,7 @@ class RequestSpec: QuickSpec {
                     return apiSuccessResponse()
                 }
                 let request = Request()
-                await waitUntil(timeout: Timeout) { done in
+                waitUntil(timeout: Timeout) { done in
                     request
                         .start()
                         .assertNoFailure()
@@ -166,7 +166,7 @@ class RequestSpec: QuickSpec {
                     return apiSuccessResponse(json: ["foo": "bar"])
                 }
                 let request = Request()
-                await waitUntil(timeout: Timeout) { done in
+                waitUntil(timeout: Timeout) { done in
                     request
                         .start()
                         .sink(receiveCompletion: { completion in
@@ -184,7 +184,7 @@ class RequestSpec: QuickSpec {
                     return apiFailureResponse()
                 }
                 let request = Request()
-                await waitUntil(timeout: Timeout) { done in
+                waitUntil(timeout: Timeout) { done in
                     request
                         .start()
                         .ignoreOutput()
@@ -206,7 +206,7 @@ class RequestSpec: QuickSpec {
                     return apiSuccessResponse(json: ["foo": "bar"])
                 }
                 let request = Request()
-                await waitUntil(timeout: Timeout) { done in
+                waitUntil(timeout: Timeout) { done in
                     Task.init {
                         let response = try await request.start()
                         expect(response).toNot(beEmpty())
@@ -220,7 +220,7 @@ class RequestSpec: QuickSpec {
                     return apiFailureResponse()
                 }
                 let request = Request()
-                await waitUntil(timeout: Timeout) { done in
+                waitUntil(timeout: Timeout) { done in
                     Task.init {
                         do {
                             _ = try await request.start()

@@ -13,7 +13,7 @@ private let ExpiresInDate = Date(timeIntervalSinceNow: ExpiresIn)
 private let Scope = "openid"
 
 class CredentialsSpec: QuickSpec {
-    override func spec() {
+    override class func spec() {
 
         describe("decode from json") {
 

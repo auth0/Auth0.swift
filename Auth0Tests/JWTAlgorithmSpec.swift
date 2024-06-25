@@ -6,7 +6,7 @@ import Nimble
 
 class JWTAlgorithmSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
         let jwk = generateRSAJWK()
         
         describe("signature validation") {

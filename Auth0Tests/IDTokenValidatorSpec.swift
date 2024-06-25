@@ -10,7 +10,7 @@ import OHHTTPStubsSwift
 
 class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
 
-    override func spec() {
+    override class func spec() {
         let domain = self.domain
         let validatorContext = self.validatorContext
         let mockSignatureValidator = MockSuccessfulIDTokenSignatureValidator()
@@ -30,7 +30,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 let expectedError = IDTokenDecodingError.cannotDecode
                 
                 it("should fail to decode an empty id token") {
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: "",
                                  with: validatorContext,
                                  signatureValidator: mockSignatureValidator,
@@ -43,7 +43,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should fail to decode a malformed id token") {
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: "a.b.c.d.e",
                                  with: validatorContext,
                                  signatureValidator: mockSignatureValidator,
@@ -56,7 +56,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should fail to decode an id token with an empty signature") {
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: "a.b.", // alg == none, not supported by us
                                  with: validatorContext,
                                  signatureValidator: mockSignatureValidator,
@@ -70,7 +70,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should fail to decode an id token with no signature") {
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: "a.b",
                                  with: validatorContext,
                                  signatureValidator: mockSignatureValidator,
@@ -91,7 +91,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should validate a token signed with RS256") {
                     let jwt = generateJWT(alg: "RS256")
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: validatorContext,
                                  claimsValidator: mockClaimsValidator) { error in
@@ -104,7 +104,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should not validate a token signed with an unsupported algorithm") {
                     let jwt = generateJWT(alg: "HS256")
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: validatorContext,
                                  claimsValidator: mockClaimsValidator) { error in
@@ -117,7 +117,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                 it("should not validate an unsigned token") {
                     let jwt = generateJWT(alg: "none")
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: validatorContext,
                                  claimsValidator: mockClaimsValidator) { error in
@@ -141,7 +141,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           nonce: nil,
                                                           organization: nil)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: context,
                                  signatureValidator: mockSignatureValidator) { error in
@@ -163,7 +163,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           nonce: nil,
                                                           organization: nil)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: context,
                                  signatureValidator: mockSignatureValidator) { error in
@@ -184,7 +184,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           nonce: nonce,
                                                           organization: nil)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: context,
                                  signatureValidator: mockSignatureValidator) { error in
@@ -206,7 +206,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           nonce: nil,
                                                           organization: nil)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: context,
                                  signatureValidator: mockSignatureValidator) { error in
@@ -227,7 +227,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           nonce: nil,
                                                           organization: orgID)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: context,
                                  signatureValidator: mockSignatureValidator) { error in
@@ -248,7 +248,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           nonce: nil,
                                                           organization: orgName)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: context,
                                  signatureValidator: mockSignatureValidator) { error in
@@ -270,7 +270,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           organization: orgID)
                     let expectedError = IDTokenOrgIDValidator.ValidationError.missingOrgId
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: context,
                                  signatureValidator: mockSignatureValidator) { error in
@@ -292,7 +292,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                           organization: orgName)
                     let expectedError = IDTokenOrgNameValidator.ValidationError.missingOrgName
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validate(idToken: jwt.string,
                                  with: context,
                                  signatureValidator: mockSignatureValidator) { error in
@@ -315,7 +315,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     let validator = IDTokenValidator(signatureValidator: spySignatureValidator,
                                                      claimsValidator: mockClaimsValidator,
                                                      context: validatorContext)
-                    await waitUntil { done in
+                    waitUntil { done in
                         validator.validate(jwt) { _ in
                             expect(spySignatureValidator.didExecuteInWorkerThread).to(beTrue())
                             done()
@@ -328,7 +328,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                     let validator = IDTokenValidator(signatureValidator: mockSignatureValidator,
                                                      claimsValidator: spyClaimsValidator,
                                                      context: validatorContext)
-                    await waitUntil { done in
+                    waitUntil { done in
                         validator.validate(jwt) { _ in
                             expect(spyClaimsValidator.didExecuteInWorkerThread).to(beTrue())
                             done()
@@ -341,7 +341,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                      claimsValidator: mockClaimsValidator,
                                                      context: validatorContext)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validator.validate(jwt) { _ in
                             expect(Thread.isMainThread).to(beTrue())
                             done()
@@ -356,7 +356,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                      claimsValidator: mockClaimsValidator,
                                                      context: validatorContext)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validator.validate(jwt) { error in
                             expect(error).to(beNil())
                             done()
@@ -370,7 +370,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                      claimsValidator: MockUnsuccessfulIDTokenClaimValidator(),
                                                      context: validatorContext)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             done()
@@ -384,7 +384,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                      claimsValidator: mockClaimsValidator,
                                                      context: validatorContext)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             done()
@@ -399,7 +399,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
                                                      claimsValidator: spyClaimsValidator,
                                                      context: validatorContext)
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         validator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(spyClaimsValidator.didExecuteValidation).to(beFalse())
