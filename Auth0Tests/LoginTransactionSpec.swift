@@ -21,6 +21,10 @@ class LoginTransactionSpec: QuickSpec {
                                            logger: DefaultLogger(output: loggerOutput),
                                            callback: { _ in })
         }
+        
+        afterEach {
+            loggerOutput.messages.removeAll()
+        }
 
         describe("code exchange") {
             context("resume") {

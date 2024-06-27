@@ -2,10 +2,6 @@ import Foundation
 import Combine
 import Quick
 import Nimble
-import OHHTTPStubs
-#if SWIFT_PACKAGE
-import OHHTTPStubsSwift
-#endif
 
 @testable import Auth0
 
@@ -35,11 +31,12 @@ class RequestSpec: QuickSpec {
     override class func spec() {
 
         beforeEach {
-            stub(condition: isHost(Url.host!)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
+            URLProtocol.registerClass(StubURLProtocol.self)
         }
 
         afterEach {
-            HTTPStubs.removeAllStubs()
+            NetworkStub.clearStubs()
+            URLProtocol.unregisterClass(StubURLProtocol.self)
         }
 
         describe("create and update request") {
@@ -144,9 +141,9 @@ class RequestSpec: QuickSpec {
             }
 
             it("should emit only one value") {
-                stub(condition: isHost(Url.host!)) { _ in
-                    return apiSuccessResponse()
-                }
+                NetworkStub.addStub(condition: {
+                    $0.isHost(Url.host!)
+                }, response: apiSuccessResponse())
                 let request = Request()
                 waitUntil(timeout: Timeout) { done in
                     request
@@ -162,9 +159,9 @@ class RequestSpec: QuickSpec {
             }
 
             it("should complete with the response") {
-                stub(condition: isHost(Url.host!)) { _ in
-                    return apiSuccessResponse(json: ["foo": "bar"])
-                }
+                NetworkStub.addStub(condition: {
+                    $0.isHost(Url.host!)
+                }, response: apiSuccessResponse(json: ["foo": "bar"]))
                 let request = Request()
                 waitUntil(timeout: Timeout) { done in
                     request
@@ -180,9 +177,9 @@ class RequestSpec: QuickSpec {
             }
 
             it("should complete with an error") {
-                stub(condition: isHost(Url.host!)) { _ in
-                    return apiFailureResponse()
-                }
+                NetworkStub.addStub(condition: {
+                    $0.isHost(Url.host!)
+                }, response: apiFailureResponse())
                 let request = Request()
                 waitUntil(timeout: Timeout) { done in
                     request
@@ -202,9 +199,9 @@ class RequestSpec: QuickSpec {
         describe("async await") {
 
             it("should return the response") {
-                stub(condition: isHost(Url.host!)) { _ in
-                    return apiSuccessResponse(json: ["foo": "bar"])
-                }
+                NetworkStub.addStub(condition: {
+                    $0.isHost(Url.host!)
+                }, response: apiSuccessResponse(json: ["foo": "bar"]))
                 let request = Request()
                 waitUntil(timeout: Timeout) { done in
                     Task.init {
@@ -216,9 +213,9 @@ class RequestSpec: QuickSpec {
             }
 
             it("should throw an error") {
-                stub(condition: isHost(Url.host!)) { _ in
-                    return apiFailureResponse()
-                }
+                NetworkStub.addStub(condition: {
+                    $0.isHost(Url.host!)
+                }, response: apiFailureResponse())
                 let request = Request()
                 waitUntil(timeout: Timeout) { done in
                     Task.init {

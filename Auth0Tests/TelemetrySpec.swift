@@ -113,15 +113,15 @@ class TelemetrySpec: QuickSpec {
 
         describe("telemetry header") {
 
-            var telemetry = Telemetry()
-
             it("should set telemetry header") {
+                var telemetry = Telemetry()
                 let request = NSMutableURLRequest()
                 telemetry.addTelemetryHeader(request: request)
                 expect(request.value(forHTTPHeaderField: "Auth0-Client")) == telemetry.value
             }
 
             it("should not set telemetry header when disabled") {
+                var telemetry = Telemetry()
                 let request = NSMutableURLRequest()
                 telemetry.enabled = false
                 telemetry.addTelemetryHeader(request: request)

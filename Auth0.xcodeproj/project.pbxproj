@@ -327,9 +327,17 @@
 		A7DDDF6D2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		A7DDDF6E2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		A7DDDF702BC9A93F0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
+		C177D6C32C2ADDEB0094C657 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
 		C177D6C72C2ADEB60094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */; };
+		C177D6CD2C2AFBEA0094C657 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
 		C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6D32C2B0DCB0094C657 /* CwlPreconditionTesting */; };
 		C177D6D62C2B11A70094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6D52C2B11A70094C657 /* CwlPreconditionTesting */; };
+		C177D7702C2BDFE40094C657 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D76F2C2BDFE40094C657 /* NetworkStub.swift */; };
+		C177D7712C2BDFE40094C657 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D76F2C2BDFE40094C657 /* NetworkStub.swift */; };
+		C177D7722C2BDFE40094C657 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D76F2C2BDFE40094C657 /* NetworkStub.swift */; };
+		C177D7752C2BE00D0094C657 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
+		C177D7762C2BE00D0094C657 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
+		C177D7772C2BE00D0094C657 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
 		C1B3B9AF2C24B297004A32A4 /* OAuth2VisionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B3B9AE2C24B297004A32A4 /* OAuth2VisionApp.swift */; };
 		C1B3B9B12C24B297004A32A4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B3B9B02C24B297004A32A4 /* ContentView.swift */; };
 		C1B3B9D32C24B39E004A32A4 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1B3B9C02C24B39E004A32A4 /* Auth0.framework */; };
@@ -628,7 +636,6 @@
 		5B7EE48420FCA0A200367724 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BioAuthentication.swift; sourceTree = "<group>"; };
 		5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BioAuthenticationSpec.swift; path = Auth0Tests/BioAuthenticationSpec.swift; sourceTree = SOURCE_ROOT; };
-		5B9A54411E49E3AE004B5454 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = SOURCE_ROOT; };
 		5BA58D33209081A700782DD1 /* Cartfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
 		5BEDE1891EC21B040007300D /* CredentialsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManager.swift; sourceTree = "<group>"; };
 		5BEDE1931EC3331A0007300D /* CredentialsManagerSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = CredentialsManagerSpec.swift; path = Auth0Tests/CredentialsManagerSpec.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -749,6 +756,9 @@
 		5FF465BB1CE2AC4500F7ED8C /* Management.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Management.swift; path = Auth0/Management.swift; sourceTree = SOURCE_ROOT; };
 		970BC36A25C27095007A7745 /* Challenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Challenge.swift; sourceTree = "<group>"; };
 		A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C177D6C22C2ADDEB0094C657 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
+		C177D76F2C2BDFE40094C657 /* NetworkStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStub.swift; sourceTree = "<group>"; };
+		C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubURLProtocol.swift; sourceTree = "<group>"; };
 		C1B3B9A82C24B297004A32A4 /* OAuth2Vision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2Vision.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B3B9AE2C24B297004A32A4 /* OAuth2VisionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuth2VisionApp.swift; sourceTree = "<group>"; };
 		C1B3B9B02C24B297004A32A4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -1053,6 +1063,7 @@
 		5F06DD921CC451430011842B /* Auth0Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C177D76E2C2BDF9D0094C657 /* StubNetworking */,
 				5F28B4651D8300BB0000EB23 /* Logger */,
 				5FE686A81D1894990075874C /* Telemetry */,
 				5FBBF0411CCA901B0024D2AF /* Authentication */,
@@ -1114,8 +1125,8 @@
 				5F3965D01CF67DD800CDE7C0 /* Assets.xcassets */,
 				5F3965D21CF67DD800CDE7C0 /* LaunchScreen.storyboard */,
 				5F3965CD1CF67DD800CDE7C0 /* Main.storyboard */,
+				C177D6C22C2ADDEB0094C657 /* Auth0.plist */,
 				5F3965D51CF67DD800CDE7C0 /* Info.plist */,
-				5B9A54411E49E3AE004B5454 /* Auth0.plist */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -1287,6 +1298,15 @@
 				5FD255B31D14DD2600387ECB /* ManagementError.swift */,
 			);
 			name = Management;
+			sourceTree = "<group>";
+		};
+		C177D76E2C2BDF9D0094C657 /* StubNetworking */ = {
+			isa = PBXGroup;
+			children = (
+				C177D76F2C2BDFE40094C657 /* NetworkStub.swift */,
+				C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */,
+			);
+			name = StubNetworking;
 			sourceTree = "<group>";
 		};
 		C1B3B9A92C24B297004A32A4 /* OAuth2Vision */ = {
@@ -1789,6 +1809,7 @@
 				5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */,
 				5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */,
 				5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */,
+				C177D6CD2C2AFBEA0094C657 /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1796,6 +1817,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C177D6C32C2ADDEB0094C657 /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2131,9 +2153,11 @@
 				5CB41D7623D0C15000074024 /* IDTokenValidatorBaseSpec.swift in Sources */,
 				5B9262C31ECF0CC200F4F6D3 /* BioAuthenticationSpec.swift in Sources */,
 				5C809D96275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */,
+				C177D7752C2BE00D0094C657 /* StubURLProtocol.swift in Sources */,
 				5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */,
 				5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
 				5FE2F8A61CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
+				C177D7702C2BDFE40094C657 /* NetworkStub.swift in Sources */,
 				5CF539242836DCC10073F623 /* SafariProviderSpec.swift in Sources */,
 				5FADB6091CED500900D4BB50 /* ManagementSpec.swift in Sources */,
 				5FCAB16D1D07AC3500331C84 /* WebAuthSpec.swift in Sources */,
@@ -2176,9 +2200,11 @@
 				5FE2F8A71CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
 				5CE775A2244FCF2000D054A0 /* Generators.swift in Sources */,
 				5C809D97275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */,
+				C177D7762C2BE00D0094C657 /* StubURLProtocol.swift in Sources */,
 				5CE775AF244FD66D00D054A0 /* OAuth2GrantSpec.swift in Sources */,
 				5FD255B21D14A9E000387ECB /* AuthenticationErrorSpec.swift in Sources */,
 				5C53A7E92703A23200A7C0A3 /* UserInfoSpec.swift in Sources */,
+				C177D7712C2BDFE40094C657 /* NetworkStub.swift in Sources */,
 				5CF539252836DCC10073F623 /* SafariProviderSpec.swift in Sources */,
 				5FADB60A1CED500900D4BB50 /* ManagementSpec.swift in Sources */,
 				5F28B4681D8300D50000EB23 /* LoggerSpec.swift in Sources */,
@@ -2404,9 +2430,11 @@
 				C1B3BA3B2C24BA36004A32A4 /* ASProviderSpec.swift in Sources */,
 				C1B3BA3C2C24BA36004A32A4 /* SafariProviderSpec.swift in Sources */,
 				C1B3BA3D2C24BA36004A32A4 /* WebAuthErrorSpec.swift in Sources */,
+				C177D7772C2BE00D0094C657 /* StubURLProtocol.swift in Sources */,
 				C1B3BA3E2C24BA36004A32A4 /* ChallengeGeneratorSpec.swift in Sources */,
 				C1B3BA3F2C24BA36004A32A4 /* OAuth2GrantSpec.swift in Sources */,
 				C1B3BA402C24BA36004A32A4 /* WebAuthSpec.swift in Sources */,
+				C177D7722C2BDFE40094C657 /* NetworkStub.swift in Sources */,
 				C1B3BA412C24BA36004A32A4 /* TransactionStoreSpec.swift in Sources */,
 				C1B3BA422C24BA36004A32A4 /* WebAuthenticationSpec.swift in Sources */,
 				C1B3BA432C24BA36004A32A4 /* WebAuthSpies.swift in Sources */,

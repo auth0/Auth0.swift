@@ -1,10 +1,6 @@
 import Foundation
 import Quick
 import Nimble
-import OHHTTPStubs
-#if SWIFT_PACKAGE
-import OHHTTPStubsSwift
-#endif
 
 @testable import Auth0
 
@@ -17,11 +13,12 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
         let mockClaimsValidator = MockSuccessfulIDTokenClaimsValidator()
 
         beforeEach {
-            stub(condition: isHost(self.domain)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
+            URLProtocol.registerClass(StubURLProtocol.self)
         }
 
         afterEach {
-            HTTPStubs.removeAllStubs()
+            NetworkStub.clearStubs()
+            URLProtocol.unregisterClass(StubURLProtocol.self)
         }
 
         describe("top level validation api") {
@@ -85,7 +82,7 @@ class IDTokenValidatorSpec: IDTokenValidatorBaseSpec {
             
             context("signature validation") {
                 beforeEach {
-                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse() }
+                    NetworkStub.addStub(condition: { $0.isJWKSPath(domain)}, response: jwksResponse())
                 }
                 
                 it("should validate a token signed with RS256") {

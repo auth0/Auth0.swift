@@ -1,9 +1,5 @@
 import Quick
 import Nimble
-import OHHTTPStubs
-#if SWIFT_PACKAGE
-import OHHTTPStubsSwift
-#endif
 
 @testable import Auth0
 
@@ -19,11 +15,12 @@ class OAuth2GrantSpec: QuickSpec {
         let leeway = 60 * 1000
 
         beforeEach {
-            stub(condition: isHost(domain.host!)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
+            URLProtocol.registerClass(StubURLProtocol.self)
         }
 
         afterEach {
-            HTTPStubs.removeAllStubs()
+            NetworkStub.clearStubs()
+            URLProtocol.unregisterClass(StubURLProtocol.self)
         }
 
         describe("Authorization Code w/PKCE") {
@@ -45,10 +42,12 @@ class OAuth2GrantSpec: QuickSpec {
                 let token = UUID().uuidString
                 let code = UUID().uuidString
                 let values = ["code": code]
-                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
-                    return authResponse(accessToken: token, idToken: idToken)
-                }.name = "Code Exchange Auth"
-                stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
+                NetworkStub.addStub(condition: {
+                    $0.isToken(domain.host!) && $0.hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])
+                }, response: authResponse(accessToken: token, idToken: idToken))
+                NetworkStub.addStub(condition: {
+                    $0.isJWKSPath(domain.host!)
+                }, response: jwksResponse())
                 waitUntil { done in
                     pkce.credentials(from: values) {
                         expect($0).to(haveCredentials(token))
@@ -111,8 +110,12 @@ class OAuth2GrantSpec: QuickSpec {
                 let token = UUID().uuidString
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
-                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
-                stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
+                NetworkStub.addStub(condition: {
+                    $0.isToken(domain.host!) && $0.hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])
+                }, response: authResponse(accessToken: token, idToken: idToken))
+                NetworkStub.addStub(condition: {
+                    $0.isJWKSPath(domain.host!)
+                }, response: jwksResponse())
                 waitUntil { done in
                     pkce.credentials(from: values) {
                         expect($0).to(haveCredentials(token))
@@ -128,8 +131,12 @@ class OAuth2GrantSpec: QuickSpec {
                 let values = ["code": code, "nonce": nonce]
                 let idToken = generateJWT(iss: nil, nonce: nonce).string
                 let expectedError = WebAuthError(code: .idTokenValidationFailed, cause: IDTokenIssValidator.ValidationError.missingIss)
-                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in return authResponse(accessToken: token, idToken: idToken) }.name = "Code Exchange Auth"
-                stub(condition: isJWKSPath(domain.host!)) { _ in jwksResponse() }
+                NetworkStub.addStub(condition: {
+                    $0.isToken(domain.host!) && $0.hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])
+                }, response: authResponse(accessToken: token, idToken: idToken))
+                NetworkStub.addStub(condition: {
+                    $0.isJWKSPath(domain.host!)
+                }, response: jwksResponse())
                 waitUntil { done in
                     pkce.credentials(from: values) {
                         expect($0).to(haveWebAuthError(expectedError))
@@ -143,9 +150,9 @@ class OAuth2GrantSpec: QuickSpec {
                 let code = UUID().uuidString
                 let values = ["code": code, "nonce": nonce]
                 let expectedError = WebAuthError(code: .pkceNotAllowed)
-                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
-                    return authFailure(error: "foo", description: "Unauthorized")
-                }.name = "Failed Code Exchange Auth"
+                NetworkStub.addStub(condition: {
+                    $0.isToken(domain.host!) && $0.hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])
+                }, response: authFailure(error: "foo", description: "Unauthorized"))
                 waitUntil { done in
                     pkce.credentials(from: values) {
                         expect($0).to(haveWebAuthError(expectedError))
@@ -162,9 +169,9 @@ class OAuth2GrantSpec: QuickSpec {
                 let errorDescription = "bar"
                 let cause = AuthenticationError(info: ["error": errorCode, "error_description": errorDescription])
                 let expectedError = WebAuthError(code: .other, cause: cause)
-                stub(condition: isToken(domain.host!) && hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])) { _ in
-                    return authFailure(error: errorCode, description: errorDescription)
-                }.name = "Failed Code Exchange Auth"
+                NetworkStub.addStub(condition: {
+                    $0.isToken(domain.host!) && $0.hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])
+                }, response: authFailure(error: errorCode, description: errorDescription))
                 waitUntil { done in
                     pkce.credentials(from: values) {
                         expect($0).to(haveWebAuthError(expectedError))

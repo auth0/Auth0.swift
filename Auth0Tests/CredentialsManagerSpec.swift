@@ -2,10 +2,6 @@ import Combine
 import Quick
 import Nimble
 import SimpleKeychain
-import OHHTTPStubs
-#if SWIFT_PACKAGE
-import OHHTTPStubsSwift
-#endif
 #if WEB_AUTH_PLATFORM
 import LocalAuthentication
 #endif
@@ -39,11 +35,12 @@ class CredentialsManagerSpec: QuickSpec {
         beforeEach {
             credentialsManager = CredentialsManager(authentication: authentication)
             credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
-            stub(condition: isHost(Domain)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
+            URLProtocol.registerClass(StubURLProtocol.self)
         }
 
         afterEach {
-            HTTPStubs.removeAllStubs()
+            NetworkStub.clearStubs()
+            URLProtocol.unregisterClass(StubURLProtocol.self)
         }
 
         describe("storage") {
@@ -124,8 +121,7 @@ class CredentialsManagerSpec: QuickSpec {
             
             beforeEach {
                 _ = credentialsManager.store(credentials: credentials)
-                
-                stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in return revokeTokenResponse() }.name = "revoke success"
+                NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: revokeTokenResponse())
             }
             
             afterEach {
@@ -173,9 +169,8 @@ class CredentialsManagerSpec: QuickSpec {
             it("should return the failure if the token could not be revoked, and not clear credentials") {
                 let cause = AuthenticationError(description: "Revoke failed", statusCode: 400)
                 let expectedError = CredentialsManagerError(code: .revokeFailed, cause: cause)
-                stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                    return authFailure(code: "400", description: "Revoke failed")
-                }
+                NetworkStub.clearStubs()
+                NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: authFailure(code: "400", description: "Revoke failed"))
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke { result in
                         expect(result).to(haveCredentialsManagerError(expectedError))
@@ -188,7 +183,7 @@ class CredentialsManagerSpec: QuickSpec {
             it("should include custom headers") {
                 let key = "foo"
                 let value = "bar"
-                stub(condition: hasHeader(key, value: value)) { _ in return revokeTokenResponse() }.name = "revoke success"
+                NetworkStub.addStub(condition: { $0.hasHeader(key, value: value)}, response: revokeTokenResponse())
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke(headers: [key: value], { result in
                         expect(result).to(beSuccessful())
@@ -406,9 +401,7 @@ class CredentialsManagerSpec: QuickSpec {
         describe("retrieval") {
 
             beforeEach {
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                    return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn * 2)
-                }.name = "renewal succeeded"
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn * 2))
             }
 
             afterEach {
@@ -504,6 +497,10 @@ class CredentialsManagerSpec: QuickSpec {
 
             context("renewal") {
 
+                beforeEach {
+                    
+                }
+
                 it("should yield new credentials without refresh token rotation") {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
@@ -516,9 +513,8 @@ class CredentialsManagerSpec: QuickSpec {
                 }
                 
                 it("should yield new credentials with refresh token rotation") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) {
-                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
@@ -547,11 +543,10 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should yield error on failed renewal") {
+                    NetworkStub.clearStubs()
                     let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
                     let expectedError = CredentialsManagerError(code: .renewFailed, cause: cause)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                        return authFailure(code: "invalid_request", description: "missing_params")
-                    }.name = "renewal failed"
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authFailure(code: "invalid_request", description: "missing_params"))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
@@ -593,9 +588,8 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("renewal request should include custom parameters") {
                     let someId = UUID().uuidString
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])) {
-                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
@@ -609,9 +603,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("renewal request should include custom headers") {
                     let key = "foo"
                     let value = "bar"
-                    stub(condition: hasHeader(key, value: value)) {
-                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.hasHeader(key, value: value)}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
@@ -690,12 +682,11 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should fail to yield a renewed access token with a min ttl greater than its expiry") {
+                    NetworkStub.clearStubs()
                     let minTTL = 100_000
                     // The dates are not mocked, so they won't match exactly
                     let expectedError = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: Int(ExpiresIn - 1)))
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) {
-                        _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials(withScope: nil, minTTL: minTTL) { result in
                             expect(result).to(haveCredentialsManagerError(expectedError))
@@ -709,11 +700,10 @@ class CredentialsManagerSpec: QuickSpec {
             context("serial renewal from same thread") {
 
                 it("should yield the stored credentials after the previous renewal operation succeeded") {
+                    NetworkStub.clearStubs()
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
                             expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
@@ -726,15 +716,15 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should renew the credentials after the previous renewal operation failed") {
+                    NetworkStub.clearStubs()
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in return apiFailureResponse() }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: apiFailureResponse())
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
                             expect(result).to(beUnsuccessful())
-                            stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                                return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                            }
+                            NetworkStub.clearStubs()
+                            NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                         }
                         credentialsManager.credentials { result in
                             expect(result).to(haveCredentials())
@@ -748,11 +738,10 @@ class CredentialsManagerSpec: QuickSpec {
             context("serial renewal from different threads") {
 
                 it("should yield the stored credentials after the previous renewal operation succeeded") {
+                    NetworkStub.clearStubs()
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "request": "first"])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     waitUntil(timeout: Timeout) { [credentialsManager] done in
                         DispatchQueue.global(qos: .utility).sync {
                             credentialsManager?.credentials(parameters: ["request": "first"]) { result in
@@ -769,14 +758,12 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should renew the credentials after the previous renewal operation failed") {
+                    NetworkStub.clearStubs()
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
-                        return apiFailureResponse()
-                    }
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "second"])) { request in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "request": "first"])}, response: apiFailureResponse())
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "request": "second"])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+
                     waitUntil(timeout: Timeout) { [credentialsManager] done in
                         DispatchQueue.global(qos: .utility).sync {
                             credentialsManager?.credentials(parameters: ["request": "first"]) { result in
@@ -798,9 +785,7 @@ class CredentialsManagerSpec: QuickSpec {
         describe("renew") {
 
             beforeEach {
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                    return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
-                }.name = "renewal succeeded"
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2))
             }
 
             afterEach {
@@ -831,9 +816,8 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             it("should yield new credentials without refresh token rotation") {
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                    return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn * 2)
-                }.name = "renewal succeeded"
+                NetworkStub.clearStubs()
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: nil, expiresIn: ExpiresIn * 2))
                 _ = credentialsManager.store(credentials: credentials)
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew { result in
@@ -870,11 +854,10 @@ class CredentialsManagerSpec: QuickSpec {
             }
 
             it("should yield error on failed renewal") {
+                NetworkStub.clearStubs()
                 let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
                 let expectedError = CredentialsManagerError(code: .renewFailed, cause: cause)
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                    return authFailure(code: "invalid_request", description: "missing_params")
-                }.name = "renewal failed"
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authFailure(code: "invalid_request", description: "missing_params"))
                 _ = credentialsManager.store(credentials: credentials)
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew { result in
@@ -911,9 +894,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("renewal request should include custom parameters") {
                 let someId = UUID().uuidString
-                stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])) {
-                    _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                }
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew(parameters: ["some_id": someId]) { result in
@@ -926,9 +907,7 @@ class CredentialsManagerSpec: QuickSpec {
             it("renewal request should include custom headers") {
                 let key = "foo"
                 let value = "bar"
-                stub(condition: hasHeader(key, value: value)) {
-                    _ in return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                }
+                NetworkStub.addStub(condition: { $0.hasHeader(key, value: value)}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew(headers: [key: value]) { result in
@@ -945,18 +924,18 @@ class CredentialsManagerSpec: QuickSpec {
                 let newAccessToken2 = "new-access-token-2"
                 let newIDToken2 = "new-id-token-2"
                 let newRefreshToken2 = "new-refresh-token-2"
+                
+                beforeEach {
+                    NetworkStub.clearStubs()
+                }
 
                 it("should renew the credentials serially from the same thread") {
                     _ = credentialsManager.store(credentials: credentials)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
-                        return authResponse(accessToken: newAccessToken1, idToken: newIDToken1, refreshToken: newRefreshToken1, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "request": "first"])}, response: authResponse(accessToken: newAccessToken1, idToken: newIDToken1, refreshToken: newRefreshToken1, expiresIn: ExpiresIn))
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.renew(parameters: ["request": "first"]) { result in
                             expect(result).to(haveCredentials(newAccessToken1, newIDToken1, newRefreshToken1))
-                            stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": newRefreshToken1, "request": "second"])) { request in
-                                return authResponse(accessToken: newAccessToken2, idToken: newIDToken2, refreshToken: newRefreshToken2, expiresIn: ExpiresIn)
-                            }
+                            NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": newRefreshToken1, "request": "second"])}, response: authResponse(accessToken: newAccessToken2, idToken: newIDToken2, refreshToken: newRefreshToken2, expiresIn: ExpiresIn))
                         }
                         credentialsManager.renew(parameters: ["request": "second"]) { result in
                             expect(result).to(haveCredentials(newAccessToken2, newIDToken2, newRefreshToken2))
@@ -967,12 +946,8 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should renew the credentials serially from different threads") {
                     _ = credentialsManager.store(credentials: credentials)
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, "request": "first"])) { request in
-                        return authResponse(accessToken: newAccessToken1, idToken: newIDToken1, refreshToken: newRefreshToken1, expiresIn: ExpiresIn)
-                    }
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": newRefreshToken1, "request": "second"])) { request in
-                        return authResponse(accessToken: newAccessToken2, idToken: newIDToken2, refreshToken: newRefreshToken2, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "request": "first"])}, response: authResponse(accessToken: newAccessToken1, idToken: newIDToken1, refreshToken: newRefreshToken1, expiresIn: ExpiresIn))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": newRefreshToken1, "request": "second"])}, response: authResponse(accessToken: newAccessToken2, idToken: newIDToken2, refreshToken: newRefreshToken2, expiresIn: ExpiresIn))
                     waitUntil(timeout: Timeout) { [credentialsManager] done in
                         DispatchQueue.global(qos: .utility).sync {
                             credentialsManager?.renew(parameters: ["request": "first"]) { result in
@@ -1033,9 +1008,8 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should complete using custom parameter values") {
                     let key = "foo"
                     let value = "bar"
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: value)) { _ in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, key: value]) && $0.hasHeader(key, value: value)}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
@@ -1074,9 +1048,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should emit only one value") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
-                    }.name = "renewal succeeded"
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2))
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
                             .renew()
@@ -1091,9 +1063,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should complete using the default parameter values") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
-                    }.name = "renewal succeeded"
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2))
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
                             .renew()
@@ -1108,9 +1078,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should complete using custom parameter values") {
                     let key = "foo"
                     let value = "bar"
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: value)) { _ in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, key: value])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
                             .renew(parameters: [key: value], headers: [key: value])
@@ -1123,9 +1091,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should complete with an error") {
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                        return authFailure(code: "invalid_request", description: "missing_params")
-                    }.name = "renewal failed"
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authFailure(code: "invalid_request", description: "missing_params"))
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
                             .renew()
@@ -1143,9 +1109,7 @@ class CredentialsManagerSpec: QuickSpec {
             context("revoke") {
 
                 it("should emit only one value") {
-                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                        return revokeTokenResponse()
-                    }
+                    NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: revokeTokenResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
@@ -1161,9 +1125,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should complete using the default parameter values") {
-                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                        return revokeTokenResponse()
-                    }
+                    NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: revokeTokenResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
@@ -1179,9 +1141,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should complete using custom parameter values") {
                     let key = "foo"
                     let value = "bar"
-                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader(key, value: value)) { _ in
-                        return revokeTokenResponse()
-                    }
+                    NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken]) && $0.hasHeader(key, value: value)}, response: revokeTokenResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
@@ -1195,9 +1155,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
 
                 it("should complete with an error") {
-                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                        return apiFailureResponse()
-                    }
+                    NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: apiFailureResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
@@ -1239,9 +1197,7 @@ class CredentialsManagerSpec: QuickSpec {
                     let key = "foo"
                     let value = "bar"
                     let credentialsManager = credentialsManager!
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: "bar")) { _ in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, key: value])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
@@ -1278,9 +1234,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should renew the credentials using the default parameter values") {
                     let credentialsManager = credentialsManager!
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2)
-                    }.name = "renewal succeeded"
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2))
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
                             let newCredentials = try await credentialsManager.renew()
@@ -1296,9 +1250,7 @@ class CredentialsManagerSpec: QuickSpec {
                     let key = "foo"
                     let value = "bar"
                     let credentialsManager = credentialsManager!
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken, key: value]) && hasHeader(key, value: "bar")) { _ in
-                        return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)
-                    }
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, key: value]) && $0.hasHeader(key, value: "bar")}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
                             let newCredentials = try await credentialsManager.renew(parameters: [key: value], headers: [key: value])
@@ -1312,9 +1264,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should throw an error") {
                     let credentialsManager = credentialsManager!
-                    stub(condition: isToken(Domain) && hasAtLeast(["refresh_token": RefreshToken])) { _ in
-                        return authFailure(code: "invalid_request", description: "missing_params")
-                    }.name = "renewal failed"
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authFailure(code: "invalid_request", description: "missing_params"))
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
                             do {
@@ -1332,9 +1282,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should revoke using the default parameter values") {
                     let credentialsManager = credentialsManager!
-                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                        return revokeTokenResponse()
-                    }
+                    NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: revokeTokenResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
@@ -1348,9 +1296,7 @@ class CredentialsManagerSpec: QuickSpec {
                     let key = "foo"
                     let value = "bar"
                     let credentialsManager = credentialsManager!
-                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken]) && hasHeader(key, value: value)) { _ in
-                        return revokeTokenResponse()
-                    }
+                    NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken]) && $0.hasHeader(key, value: value)}, response: revokeTokenResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
@@ -1362,9 +1308,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should throw an error") {
                     let credentialsManager = credentialsManager!
-                    stub(condition: isRevokeToken(Domain) && hasAtLeast(["token": RefreshToken])) { _ in
-                        return apiFailureResponse()
-                    }
+                    NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: apiFailureResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
