@@ -6,7 +6,7 @@ import Nimble
 
 class ClaimValidatorsSpec: IDTokenValidatorBaseSpec {
     
-    override func spec() {
+    override class func spec() {
         
         describe("claims validation") {
             

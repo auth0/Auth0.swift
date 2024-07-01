@@ -6,7 +6,7 @@ import Nimble
 
 class LoginTransactionSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
         var transaction: LoginTransaction!
         let userAgent = SpyUserAgent()
         let handler = SpyGrant()
@@ -20,6 +20,10 @@ class LoginTransactionSpec: QuickSpec {
                                            handler: handler,
                                            logger: DefaultLogger(output: loggerOutput),
                                            callback: { _ in })
+        }
+        
+        afterEach {
+            loggerOutput.messages.removeAll()
         }
 
         describe("code exchange") {

@@ -17,7 +17,7 @@ private let Auth0ErrorExample = "com.auth0.authentication.example.auth0"
 private let OAuthErrorExample = "com.auth0.authentication.example.oauth"
 
 class AuthenticationErrorSpec: QuickSpec {
-    override func spec() {
+    override class func spec() {
 
         describe("init") {
 

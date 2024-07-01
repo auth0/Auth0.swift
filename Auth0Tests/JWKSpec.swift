@@ -6,7 +6,7 @@ import Nimble
 
 class JWKSpec: QuickSpec {
     
-    override func spec() {
+    override class func spec() {
         
         describe("public key generation") {
             

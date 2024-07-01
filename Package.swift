@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst]
+let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst, .visionOS]
 let swiftSettings: [SwiftSetting] = [.define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms))]
 
 let package = Package(

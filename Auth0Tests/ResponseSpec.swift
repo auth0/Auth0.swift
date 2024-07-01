@@ -12,7 +12,7 @@ private func http(_ statusCode: Int, url: Foundation.URL = URL) -> HTTPURLRespon
 }
 
 class ResponseSpec: QuickSpec {
-    override func spec() {
+    override class func spec() {
 
         describe("successful response") {
 

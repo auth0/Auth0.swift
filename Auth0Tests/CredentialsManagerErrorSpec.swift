@@ -6,7 +6,7 @@ import Nimble
 
 class CredentialsManagerErrorSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         describe("init") {
 

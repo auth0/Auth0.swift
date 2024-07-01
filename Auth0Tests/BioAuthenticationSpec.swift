@@ -6,7 +6,7 @@ import LocalAuthentication
 
 class BioAuthenticationSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
         var evaluationPolicy: LAPolicy!
         var mockContext: MockLAContext!
         var bioAuthentication: BioAuthentication!
@@ -72,21 +72,21 @@ class BioAuthenticationSpec: QuickSpec {
 
             it("should authenticate") {
                 bioAuthentication.validateBiometric { error = $0 }
-                await expect(error).toEventually(beNil())
+                expect(error).toEventually(beNil())
             }
 
             it("should return error on touch authentication") {
                 let touchError = LAError(.appCancel)
                 mockContext.replyError = touchError
                 bioAuthentication.validateBiometric { error = $0 }
-                await expect(error).toEventually(matchError(touchError))
+                expect(error).toEventually(matchError(touchError))
             }
 
             it("should return authenticationFailed error if no policy success") {
                 let touchError = LAError(.authenticationFailed)
                 mockContext.replySuccess = false
                 bioAuthentication.validateBiometric { error = $0 }
-                await expect(error).toEventually(matchError(touchError))
+                expect(error).toEventually(matchError(touchError))
             }
             
             it("should evaluate passed policy") {

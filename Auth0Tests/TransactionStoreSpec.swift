@@ -6,7 +6,7 @@ import Nimble
 
 class TransactionStoreSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         var storage: TransactionStore!
         var transaction: SpyTransaction!

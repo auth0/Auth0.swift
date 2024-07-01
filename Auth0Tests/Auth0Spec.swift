@@ -10,7 +10,7 @@ private let Token = "TOKEN"
 
 class Auth0Spec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         describe("global functions") {
 
