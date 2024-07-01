@@ -316,6 +316,8 @@ class WebAuthSpec: QuickSpec {
 
             #if os(iOS)
             platform = "ios"
+            #elseif os(visionOS)
+            platform = "visionos"
             #else
             platform = "macos"
             #endif
