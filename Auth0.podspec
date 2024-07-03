@@ -42,12 +42,12 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://twitter.com/auth0'
   s.source_files     = 'Auth0/*.swift'
   s.resource_bundles = { s.name => 'Auth0/PrivacyInfo.xcprivacy' }
-  s.swift_versions   = ['5.7', '5.8']
+  s.swift_versions   = ['5.9']
 
   s.dependency 'SimpleKeychain', '~> 1.1'
   s.dependency 'JWTDecode', '~> 3.1'
 
-  s.ios.deployment_target   = '13.0'
+  s.ios.deployment_target   = '14.0'
   s.ios.exclude_files       = macos_files
   s.ios.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
 
@@ -55,7 +55,7 @@ Pod::Spec.new do |s|
   s.osx.exclude_files       = ios_files
   s.osx.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
 
-  s.tvos.deployment_target = '13.0'
+  s.tvos.deployment_target = '14.0'
   s.tvos.exclude_files     = excluded_files
 
   s.watchos.deployment_target = '7.0'
