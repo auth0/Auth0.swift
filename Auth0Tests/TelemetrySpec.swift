@@ -114,7 +114,7 @@ class TelemetrySpec: QuickSpec {
         describe("telemetry header") {
 
             it("should set telemetry header") {
-                var telemetry = Telemetry()
+                let telemetry = Telemetry()
                 let request = NSMutableURLRequest()
                 telemetry.addTelemetryHeader(request: request)
                 expect(request.value(forHTTPHeaderField: "Auth0-Client")) == telemetry.value

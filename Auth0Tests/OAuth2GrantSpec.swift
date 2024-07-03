@@ -1,5 +1,6 @@
 import Quick
 import Nimble
+import Foundation
 
 @testable import Auth0
 
