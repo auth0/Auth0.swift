@@ -128,21 +128,15 @@
 		5CC9940424ED9EC90027DC74 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5CD9FC6E26FE30A6009C2B27 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
 		5CD9FC6F26FE30A6009C2B27 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
-		5CD9FC7026FE30A6009C2B27 /* OHHTTPStubs.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */; };
 		5CD9FC7226FE30BA009C2B27 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC7326FE30BA009C2B27 /* OHHTTPStubs.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC7426FE30BA009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC7526FE30C3009C2B27 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
-		5CD9FC7626FE30C3009C2B27 /* OHHTTPStubs.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */; };
 		5CD9FC7726FE30C3009C2B27 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
 		5CD9FC7826FE30C8009C2B27 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC7926FE30C8009C2B27 /* OHHTTPStubs.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC7A26FE30C8009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC7B26FE30CF009C2B27 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
-		5CD9FC7C26FE30CF009C2B27 /* OHHTTPStubs.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */; };
 		5CD9FC7D26FE30CF009C2B27 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
 		5CD9FC7E26FE30D4009C2B27 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC7F26FE30D4009C2B27 /* OHHTTPStubs.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC8026FE30D4009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC8626FE30EB009C2B27 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
 		5CD9FC8726FE30EB009C2B27 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
@@ -559,7 +553,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				5CD9FC7226FE30BA009C2B27 /* Nimble.xcframework in CopyFiles */,
-				5CD9FC7326FE30BA009C2B27 /* OHHTTPStubs.xcframework in CopyFiles */,
 				5CD9FC7426FE30BA009C2B27 /* Quick.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -571,7 +564,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				5CD9FC7826FE30C8009C2B27 /* Nimble.xcframework in CopyFiles */,
-				5CD9FC7926FE30C8009C2B27 /* OHHTTPStubs.xcframework in CopyFiles */,
 				5CD9FC7A26FE30C8009C2B27 /* Quick.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -583,7 +575,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				5CD9FC7E26FE30D4009C2B27 /* Nimble.xcframework in CopyFiles */,
-				5CD9FC7F26FE30D4009C2B27 /* OHHTTPStubs.xcframework in CopyFiles */,
 				5CD9FC8026FE30D4009C2B27 /* Quick.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -676,7 +667,6 @@
 		5CB41D8123D611AE00074024 /* ClaimValidatorsSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClaimValidatorsSpec.swift; sourceTree = "<group>"; };
 		5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Nimble.xcframework; path = Carthage/Build/Nimble.xcframework; sourceTree = "<group>"; };
 		5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Quick.xcframework; path = Carthage/Build/Quick.xcframework; sourceTree = "<group>"; };
-		5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = OHHTTPStubs.xcframework; path = Carthage/Build/OHHTTPStubs.xcframework; sourceTree = "<group>"; };
 		5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = JWTDecode.xcframework; path = Carthage/Build/JWTDecode.xcframework; sourceTree = "<group>"; };
 		5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SimpleKeychain.xcframework; path = Carthage/Build/SimpleKeychain.xcframework; sourceTree = "<group>"; };
 		5CF5391C2836CEC00073F623 /* WebAuthenticationSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthenticationSpec.swift; sourceTree = "<group>"; };
@@ -810,7 +800,6 @@
 			files = (
 				C177D6C72C2ADEB60094C657 /* CwlPreconditionTesting in Frameworks */,
 				5CD9FC6E26FE30A6009C2B27 /* Nimble.xcframework in Frameworks */,
-				5CD9FC7026FE30A6009C2B27 /* OHHTTPStubs.xcframework in Frameworks */,
 				5CD9FC6F26FE30A6009C2B27 /* Quick.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -821,7 +810,6 @@
 			files = (
 				C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */,
 				5CD9FC7526FE30C3009C2B27 /* Nimble.xcframework in Frameworks */,
-				5CD9FC7626FE30C3009C2B27 /* OHHTTPStubs.xcframework in Frameworks */,
 				5CD9FC7726FE30C3009C2B27 /* Quick.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -846,7 +834,6 @@
 			files = (
 				C196EB072C35D0C700D108AA /* CwlPreconditionTesting in Frameworks */,
 				5CD9FC7B26FE30CF009C2B27 /* Nimble.xcframework in Frameworks */,
-				5CD9FC7C26FE30CF009C2B27 /* OHHTTPStubs.xcframework in Frameworks */,
 				5CD9FC7D26FE30CF009C2B27 /* Quick.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1086,7 +1073,6 @@
 				5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */,
 				5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */,
 				5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */,
-				5CD9FC6D26FE30A6009C2B27 /* OHHTTPStubs.xcframework */,
 				5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */,
 			);
 			name = Frameworks;

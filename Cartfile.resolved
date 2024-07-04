@@ -1,5 +1,4 @@
 github "Quick/Nimble" "v13.3.0"
 github "Quick/Quick" "v7.6.0"
-github "asana/OHHTTPStubs" "9.1.0-asana"
 github "auth0/JWTDecode.swift" "a312827f9470854f383bdd83a0a57e6fe98f3396"
 github "auth0/SimpleKeychain" "f66b39dd2e5cc0bd52276d274db7e949043b4ec2"

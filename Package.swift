@@ -13,8 +13,7 @@ let package = Package(
         .package(url: "https://github.com/auth0/SimpleKeychain.git", .upToNextMajor(from: "1.1.0")),
         .package(url: "https://github.com/auth0/JWTDecode.swift.git", .upToNextMajor(from: "3.1.0")),
         .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "7.0.0")),
-        .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "13.0.0")),
-        .package(url: "https://github.com/AliSoftware/OHHTTPStubs.git", .upToNextMajor(from: "9.0.0"))
+        .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "13.0.0"))
     ],
     targets: [
         .target(
@@ -32,8 +31,7 @@ let package = Package(
             dependencies: [
                 "Auth0",
                 .product(name: "Quick", package: "Quick"),
-                .product(name: "Nimble", package: "Nimble"),
-                .product(name: "OHHTTPStubsSwift", package: "OHHTTPStubs")
+                .product(name: "Nimble", package: "Nimble")
             ],
             path: "Auth0Tests",
             exclude: ["Info.plist", "Auth0.plist"],

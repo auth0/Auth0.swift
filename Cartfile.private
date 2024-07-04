@@ -1,3 +1,2 @@
 github "Quick/Quick" ~> 7.0
 github "Quick/Nimble" ~> 13.0
-github "asana/OHHTTPStubs" "9.1.0-asana"
