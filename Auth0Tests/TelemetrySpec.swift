@@ -57,6 +57,8 @@ class TelemetrySpec: QuickSpec {
                 expect(env["tvOS"]).toNot(beNil())
                 #elseif os(watchOS)
                 expect(env["watchOS"]).toNot(beNil())
+                #elseif os(visionOS)
+                expect(env["visionOS"]).toNot(beNil())
                 #else
                 expect(env["unknown"]).toNot(beNil())
                 #endif
@@ -104,6 +106,8 @@ class TelemetrySpec: QuickSpec {
                 expect(env["tvOS"]).toNot(beNil())
                 #elseif os(watchOS)
                 expect(env["watchOS"]).toNot(beNil())
+                #elseif os(visionOS)
+                expect(env["visionOS"]).toNot(beNil())
                 #else
                 expect(env["unknown"]).toNot(beNil())
                 #endif

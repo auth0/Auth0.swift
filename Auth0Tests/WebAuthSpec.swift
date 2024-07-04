@@ -324,7 +324,7 @@ class WebAuthSpec: QuickSpec {
             #endif
 
             #if compiler(>=5.10)
-            if #available(iOS 17.4, macOS 14.4, *) {
+            if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
                 context("https") {
                     it("should build with the domain") {
                         expect(newWebAuth().useHTTPS().redirectURL?.absoluteString) == "https://\(Domain)/\(platform)/\(bundleId)/callback"
@@ -485,7 +485,7 @@ class WebAuthSpec: QuickSpec {
 
         }
 
-        #if os(iOS)
+        #if os(iOS) || os(visionOS)
         describe("login") {
 
             var auth: Auth0WebAuth!

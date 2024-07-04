@@ -441,8 +441,8 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
             }
-
-            #if os(iOS)
+nti
+            #if os(iOS) || os(visionOS)
             context("require biometrics") {
 
                 it("should error when biometrics are unavailable") {

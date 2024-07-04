@@ -33,7 +33,7 @@ Pod::Spec.new do |s|
   s.version          = '2.8.0'
   s.summary          = "Auth0 SDK for Apple platforms"
   s.description      = <<-DESC
-                        Auth0 SDK for iOS, macOS, tvOS, and watchOS apps.
+                        Auth0 SDK for iOS, macOS, tvOS, watchOS and visionOS apps.
                         DESC
   s.homepage         = 'https://github.com/auth0/Auth0.swift'
   s.license          = 'MIT'
