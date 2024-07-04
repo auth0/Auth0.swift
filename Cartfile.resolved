@@ -1,4 +1,4 @@
 github "Quick/Nimble" "v13.3.0"
-github "Quick/Quick" "v7.6.0"
-github "auth0/JWTDecode.swift" "a312827f9470854f383bdd83a0a57e6fe98f3396"
-github "auth0/SimpleKeychain" "f66b39dd2e5cc0bd52276d274db7e949043b4ec2"
+github "Quick/Quick" "v7.6.1"
+github "auth0/JWTDecode.swift" "3.2.0-beta.0"
+github "auth0/SimpleKeychain" "1.2.0-beta.0"
