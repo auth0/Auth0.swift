@@ -16,31 +16,32 @@ extension URL {
     }
 }
 
-private let ValidAuthorizeURLExample = "valid authorize url"
-
-class WebAuthSharedExamplesConfiguration: QuickConfiguration {
-    override class func configure(_ configuration: QCKConfiguration) {
-        sharedExamples(ValidAuthorizeURLExample) { (context: SharedExampleContext) in
-            let attrs = context()
-            let url = attrs["url"] as! URL
-            let params = attrs["query"] as! [String: String]
-            let domain = attrs["domain"] as! String
-            let components = url.a0_components
-
-            it("should use domain \(domain)") {
-                expect(components?.scheme) == "https"
-                expect(components?.host) == String(domain.split(separator: "/").first!)
-                expect(components?.path).to(endWith("/authorize"))
-            }
-
-            it("should have state parameter") {
-                expect(components?.queryItems).to(containItem(withName:"state"))
-            }
-
+class ValidAuthorizeURLBehavior: Behavior<[String:Any]> {
+    override class func spec(_ aContext: @escaping () -> [String : Any]) {
+        var context: [String:Any]!
+        var components: URLComponents!
+        
+        beforeEach {
+            context = aContext()
+            let url = context["url"] as! URL
+            components = url.a0_components
+        }
+        
+        it("should use domain") {
+            expect(components?.scheme) == "https"
+            let domain = context["domain"] as! String
+            expect(components?.host) == String(domain.split(separator: "/").first!)
+            expect(components?.path).to(endWith("/authorize"))
+        }
+        
+        it("should have state parameter") {
+            expect(components?.queryItems).to(containItem(withName:"state"))
+        }
+        
+        it("should have query parameters") {
+            let params = context["query"] as! [String: String]
             params.forEach { key, value in
-                it("should have query parameter \(key)") {
-                    expect(components?.queryItems).to(containItem(withName: key, value: value))
-                }
+                expect(components?.queryItems).to(containItem(withName: key, value: value))
             }
         }
     }
@@ -99,7 +100,7 @@ class WebAuthSpec: QuickSpec {
 
         describe("authorize URL") {
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -108,7 +109,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -117,7 +118,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -126,7 +127,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -135,7 +136,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -144,7 +145,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .connection("facebook")
@@ -154,7 +155,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 let state = UUID().uuidString
                 return [
                     "url": newWebAuth()
@@ -165,7 +166,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 let scope = "openid email phone"
                 return [
                     "url": newWebAuth()
@@ -176,7 +177,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 let scope = "email phone"
                 return [
                     "url": newWebAuth()
@@ -187,7 +188,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .maxAge(10000) // 1 second
@@ -197,7 +198,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: "abc1234", invitation: nil),
@@ -206,7 +207,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: "abc1234", invitation: "xyz6789"),
@@ -215,7 +216,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 var newDefaults = defaults
                 newDefaults["audience"] = "https://wwww.google.com"
                 return [
@@ -226,7 +227,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 var newDefaults = defaults
                 newDefaults["audience"] = "https://wwww.google.com"
                 return [
@@ -238,7 +239,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .audience("https://domain.auth0.com")
@@ -248,7 +249,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .connectionScope("user_friends,email")
@@ -258,7 +259,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 var newDefaults = defaults
                 newDefaults["connection_scope"] = "email"
                 return [
@@ -270,7 +271,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 let organization = "foo"
                 let invitation = "bar"
                 let url = URL(string: "https://example.com?organization=\(organization)&invitation=\(invitation)")!
@@ -283,7 +284,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .authorizeURL(URL(string: "https://example.com/authorize")!)
