@@ -339,6 +339,7 @@
 		C177D7762C2BE00D0094C657 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
 		C177D7772C2BE00D0094C657 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
 		C19413DC2C2D792200FE88F7 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C19413DB2C2D792200FE88F7 /* CwlPreconditionTesting */; };
+		C196EB072C35D0C700D108AA /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C196EB062C35D0C700D108AA /* CwlPreconditionTesting */; };
 		C1B3B9AF2C24B297004A32A4 /* OAuth2VisionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B3B9AE2C24B297004A32A4 /* OAuth2VisionApp.swift */; };
 		C1B3B9B12C24B297004A32A4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B3B9B02C24B297004A32A4 /* ContentView.swift */; };
 		C1B3B9D32C24B39E004A32A4 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1B3B9C02C24B39E004A32A4 /* Auth0.framework */; };
@@ -843,6 +844,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C196EB072C35D0C700D108AA /* CwlPreconditionTesting in Frameworks */,
 				5CD9FC7B26FE30CF009C2B27 /* Nimble.xcframework in Frameworks */,
 				5CD9FC7C26FE30CF009C2B27 /* OHHTTPStubs.xcframework in Frameworks */,
 				5CD9FC7D26FE30CF009C2B27 /* Quick.xcframework in Frameworks */,
@@ -1535,6 +1537,9 @@
 				5B7EE47120FC9FFE00367724 /* PBXTargetDependency */,
 			);
 			name = Auth0Tests.tvOS;
+			packageProductDependencies = (
+				C196EB062C35D0C700D108AA /* CwlPreconditionTesting */,
+			);
 			productName = Auth0Tests.tvOS;
 			productReference = 5F331AF91D4BB24C00AE4382 /* Auth0Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -3639,6 +3644,11 @@
 			productName = CwlPreconditionTesting;
 		};
 		C19413DB2C2D792200FE88F7 /* CwlPreconditionTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
+			productName = CwlPreconditionTesting;
+		};
+		C196EB062C35D0C700D108AA /* CwlPreconditionTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
 			productName = CwlPreconditionTesting;
