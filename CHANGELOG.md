@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.9.0-beta.0](https://github.com/auth0/Auth0.swift/tree/2.9.0-beta.0) (2024-07-05)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.8.0...2.9.0-beta.0)
+
+**Added**
+- feat: added support for visionOS platform [\#859](https://github.com/auth0/Auth0.swift/pull/859) ([desusai7](https://github.com/desusai7))
+
 ## [2.8.0](https://github.com/auth0/Auth0.swift/tree/2.8.0) (2024-06-19)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.7.2...2.8.0)
 
