@@ -12,7 +12,7 @@ typealias RequestCondition = (URLRequest) -> Bool
 typealias RequestResponse = (URLRequest) -> (Data?, URLResponse?, Error?)
 
 struct NetworkStub {
-    static var stubs: [(condition: RequestCondition, response: RequestResponse)] = []
+    static private(set) var stubs: [(condition: RequestCondition, response: RequestResponse)] = []
 
     static func addStub(condition: @escaping RequestCondition, response: @escaping RequestResponse) {
         stubs.append((condition, response))

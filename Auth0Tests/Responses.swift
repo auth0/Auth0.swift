@@ -40,7 +40,7 @@ func catchAllResponse() -> RequestResponse {
 func apiSuccessResponse(json: [AnyHashable: Any] = [:]) -> RequestResponse {
     return { request in
         let data = try! JSONSerialization.data(withJSONObject: json, options: [])
-        let response = HTTPURLResponse(url: request.url!, statusCode: APISuccessStatusCode, httpVersion: nil, headerFields: APIResponseHeaders)
+        let response = HTTPURLResponse(url: request.url!, statusCode: APISuccessStatusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
         return (data, response, nil)
     }
 }

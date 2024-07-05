@@ -12,8 +12,8 @@ class IDTokenValidatorBaseSpec: QuickSpec {
     static let organization = "abc1234"
     
     // Can't override the initWithInvocation: initializer, because NSInvocation is not available in Swift
-    static var authentication = Auth0.authentication(clientId: clientId, domain: domain)
-    static var validatorContext = IDTokenValidatorContext(issuer: URL.httpsURL(from: domain).absoluteString,
+    static let authentication = Auth0.authentication(clientId: clientId, domain: domain)
+    static let validatorContext = IDTokenValidatorContext(issuer: URL.httpsURL(from: domain).absoluteString,
                                                         audience: clientId,
                                                         jwksRequest: authentication.jwks(),
                                                         leeway: leeway,

@@ -22,9 +22,8 @@ extension ASUserAgent: ASWebAuthenticationPresentationContextProviding {
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         if let windowScene = UIApplication.shared()?.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
             return windowScene.windows.last(where: \.isKeyWindow) ?? ASPresentationAnchor()
-        } else {
-            return ASPresentationAnchor()
         }
+        return ASPresentationAnchor()
     }
 #endif
     
