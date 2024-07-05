@@ -49,7 +49,7 @@ class SpyTransaction: AuthTransaction {
 
 }
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 import UIKit
 import SafariServices
 
@@ -66,7 +66,9 @@ class SpyViewController: UIViewController {
     }
 
 }
+#endif
 
+#if os(iOS)
 class SpySafariViewController: SFSafariViewController {
 
     var isPresented = false

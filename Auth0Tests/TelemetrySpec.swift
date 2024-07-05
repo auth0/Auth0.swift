@@ -6,7 +6,7 @@ import Nimble
 
 class TelemetrySpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         var telemetry: Telemetry!
 
@@ -57,6 +57,8 @@ class TelemetrySpec: QuickSpec {
                 expect(env["tvOS"]).toNot(beNil())
                 #elseif os(watchOS)
                 expect(env["watchOS"]).toNot(beNil())
+                #elseif os(visionOS)
+                expect(env["visionOS"]).toNot(beNil())
                 #else
                 expect(env["unknown"]).toNot(beNil())
                 #endif
@@ -104,6 +106,8 @@ class TelemetrySpec: QuickSpec {
                 expect(env["tvOS"]).toNot(beNil())
                 #elseif os(watchOS)
                 expect(env["watchOS"]).toNot(beNil())
+                #elseif os(visionOS)
+                expect(env["visionOS"]).toNot(beNil())
                 #else
                 expect(env["unknown"]).toNot(beNil())
                 #endif
@@ -113,15 +117,15 @@ class TelemetrySpec: QuickSpec {
 
         describe("telemetry header") {
 
-            var telemetry = Telemetry()
-
             it("should set telemetry header") {
+                let telemetry = Telemetry()
                 let request = NSMutableURLRequest()
                 telemetry.addTelemetryHeader(request: request)
                 expect(request.value(forHTTPHeaderField: "Auth0-Client")) == telemetry.value
             }
 
             it("should not set telemetry header when disabled") {
+                var telemetry = Telemetry()
                 let request = NSMutableURLRequest()
                 telemetry.enabled = false
                 telemetry.addTelemetryHeader(request: request)

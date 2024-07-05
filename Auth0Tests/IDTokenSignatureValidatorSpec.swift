@@ -2,24 +2,21 @@ import Foundation
 import Quick
 import Nimble
 import JWTDecode
-import OHHTTPStubs
-#if SWIFT_PACKAGE
-import OHHTTPStubsSwift
-#endif
 
 @testable import Auth0
 
 class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
     
-    override func spec() {
+    override class func spec() {
         let domain = self.domain
 
         beforeEach {
-            stub(condition: isHost(domain)) { _ in catchAllResponse() }.name = "YOU SHALL NOT PASS!"
+            URLProtocol.registerClass(StubURLProtocol.self)
         }
 
         afterEach {
-            HTTPStubs.removeAllStubs()
+            NetworkStub.clearStubs()
+            URLProtocol.unregisterClass(StubURLProtocol.self)
         }
 
         describe("signature validation") {
@@ -27,11 +24,11 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
             
             context("algorithm support") {
                 it("should support RS256") {
-                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse() }
+                    NetworkStub.addStub(condition: { $0.isJWKSPath(domain) }, response: jwksResponse())
                     
                     let jwt = generateJWT(alg: "RS256")
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(beNil())
                             done()
@@ -44,7 +41,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     let jwt = generateJWT(alg: alg)
                     let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: alg, expected: "RS256")
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -58,7 +55,7 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                     let jwt = generateJWT(alg: alg)
                     let expectedError = IDTokenSignatureValidator.ValidationError.invalidAlgorithm(actual: alg, expected: "RS256")
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -68,12 +65,12 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 }
 
                 it("should fail with an incorrect signature") {
-                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse() }
+                    NetworkStub.addStub(condition: { $0.isJWKSPath(domain) }, response: jwksResponse())
                     
                     let jwt = generateJWT(alg: "RS256", signature: "foo")
                     let expectedError = IDTokenSignatureValidator.ValidationError.invalidSignature
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -88,9 +85,9 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 let expectedError = IDTokenSignatureValidator.ValidationError.missingPublicKey(kid: Kid)
                 
                 it("should fail if the jwk has no kid") {
-                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse(kid: nil) }
+                    NetworkStub.addStub(condition: { $0.isJWKSPath(domain) }, response: jwksResponse(kid: nil))
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -100,9 +97,9 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should fail if the jwk kid does not match the jwt kid") {
-                    stub(condition: isJWKSPath(domain)) { _ in jwksResponse(kid: "abc123") }
+                    NetworkStub.addStub(condition: { $0.isJWKSPath(domain) }, response: jwksResponse(kid: "abc123"))
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))
@@ -112,9 +109,9 @@ class IDTokenSignatureValidatorSpec: IDTokenValidatorBaseSpec {
                 }
                 
                 it("should fail if the keys cannot be retrieved") {
-                    stub(condition: isJWKSPath(domain)) { _ in apiFailureResponse() }
+                    NetworkStub.addStub(condition: { $0.isJWKSPath(domain) }, response: apiFailureResponse())
                     
-                    await waitUntil { done in
+                    waitUntil { done in
                         signatureValidator.validate(jwt) { error in
                             expect(error).to(matchError(expectedError))
                             expect(error?.localizedDescription).to(equal(expectedError.localizedDescription))

@@ -11,13 +11,9 @@ private let ExampleValuesKey = "com.auth0.authentication.example.values.key"
 private let ExamplePlainValueKey = "com.auth0.authentication.example.value.key"
 private let ExamplePlainStatusKey = "com.auth0.authentication.example.status.key"
 
-private let UnknownErrorExample = "com.auth0.authentication.example.unknown"
-private let PlainErrorExample = "com.auth0.authentication.example.plain"
-private let Auth0ErrorExample = "com.auth0.authentication.example.auth0"
-private let OAuthErrorExample = "com.auth0.authentication.example.oauth"
 
 class AuthenticationErrorSpec: QuickSpec {
-    override func spec() {
+    override class func spec() {
 
         describe("init") {
 
@@ -146,14 +142,14 @@ class AuthenticationErrorSpec: QuickSpec {
 
         describe("oauth spec error") {
 
-            itBehavesLike(OAuthErrorExample) {
+            itBehavesLike(OAuthErrorBehavior.self) {
                 return [
                     ExampleCodeKey: "invalid_request",
                     ExampleDescriptionKey: "missing client_id",
                 ]
             }
 
-            itBehavesLike(OAuthErrorExample) {
+            itBehavesLike(OAuthErrorBehavior.self) {
                 return [
                     ExampleCodeKey: "invalid_request",
                 ]
@@ -168,21 +164,21 @@ class AuthenticationErrorSpec: QuickSpec {
 
         describe("unknown error structure") {
 
-            itBehavesLike(UnknownErrorExample) { return [ExampleValuesKey: ["key": "value"]] }
-            itBehavesLike(UnknownErrorExample) { return [ExampleValuesKey: [String: String]()] }
+            itBehavesLike(UnknownErrorBehavior.self) { return [ExampleValuesKey: ["key": "value"]] }
+            itBehavesLike(UnknownErrorBehavior.self) { return [ExampleValuesKey: [String: String]()] }
 
         }
 
         describe("non json") {
 
-            itBehavesLike(PlainErrorExample) { return [ExamplePlainValueKey: "random string"] }
-            itBehavesLike(PlainErrorExample) { return [ExamplePlainStatusKey: 200] }
+            itBehavesLike(PlainErrorBehavior.self) { return [ExamplePlainValueKey: "random string"] }
+            itBehavesLike(PlainErrorBehavior.self) { return [ExamplePlainStatusKey: 200] }
 
         }
 
         describe("auth0 error") {
 
-            itBehavesLike(Auth0ErrorExample) { return [
+            itBehavesLike(Auth0ErrorBehavior.self) { return [
                     ExampleCodeKey: "invalid_password",
                     ExampleDescriptionKey: "You may not reuse any of the last 2 passwords. This password was used a day ago.",
                     ExampleExtraKey: [
@@ -442,133 +438,160 @@ class AuthenticationErrorSpec: QuickSpec {
 
 }
 
-class AuthenticationErrorSpecSharedExamplesConfiguration: QuickConfiguration {
-    override class func configure(_ configuration: QCKConfiguration) {
-        sharedExamples(OAuthErrorExample) { (context: SharedExampleContext) in
-            let code = context()[ExampleCodeKey] as! String
-            let description = context()[ExampleDescriptionKey] as? String
-            var values = [
-                "error": code,
-            ]
-            values["error_description"] = description
-            let error = AuthenticationError(info: values, statusCode: 401)
-
-            it("should have code \(code)") {
-                expect(error.code) == code
-            }
-
-            if let description = description {
-                it("should have description \(description)") {
-                    expect(error.localizedDescription) == description
-                }
-            } else {
-                it("should have a description") {
-                    expect(error.localizedDescription).toNot(beNil())
-                }
-            }
-
-            values.forEach { key, value in
-                it("should contain \(key)") {
-                    expect(error.info[key] as? String) == value
-                }
-            }
-
-            it("should not match any custom error") {
-                expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
-                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
-                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
-                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
-                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match refresh token deleted")
-                expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
-                expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
-                expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
-            }
-
+class OAuthErrorBehavior: Behavior<[String:Any]> {
+    override class func spec(_ aContext: @escaping () -> [String : Any]) {
+        var context: [String:Any]!
+        var error: AuthenticationError!
+        
+        beforeEach {
+            context = aContext()
+            error = AuthenticationError(info: getValuesFromBehaviourContext(context), statusCode: 401)
         }
-
-        sharedExamples(Auth0ErrorExample) { (context: SharedExampleContext) in
-            let code = context()[ExampleCodeKey] as! String
-            let description = context()[ExampleDescriptionKey] as! String
-            let extras = context()[ExampleExtraKey] as? [String: String]
-            var values = [
-                "code": code,
-                "description": description,
-            ]
-            extras?.forEach { values[$0] = $1 }
-            let error = AuthenticationError(info: values, statusCode: 401)
-
-            it("should have code \(code)") {
-                expect(error.code) == code
-            }
-
-            it("should have localized description \(description)") {
+        
+        it("should have code") {
+            expect(error.code) == context[ExampleCodeKey] as! String
+        }
+        
+        it("should have description") {
+            if let description = context[ExampleDescriptionKey] as? String {
                 expect(error.localizedDescription) == description
-            }
-
-            values.forEach { key, value in
-                it("should contain \(key)") {
-                    expect(error.info[key] as? String) == value
-                }
-            }
-
-            extras?.forEach { key, value in
-                it("should have key \(key) with value \(value)") {
-                    expect(error.info[key] as? String) == value
-                }
-            }
-        }
-
-        sharedExamples(UnknownErrorExample) { (context: SharedExampleContext) in
-            let values = context()[ExampleValuesKey] as! [String: Any]
-            let error = AuthenticationError(info: values, statusCode: 401)
-            it("should have unknown error code") {
-                expect(error.code) == unknownError
-            }
-
-            it("should have localized description") {
+            } else {
                 expect(error.localizedDescription).toNot(beNil())
             }
-
+        }
+        
+        it("should contain info key value pairs") {
+            let values = getValuesFromBehaviourContext(context)
             values.forEach { key, value in
-                it("should contain \(key)") {
-                    expect(error.info[key]).toNot(beNil())
-                }
-            }
-
-            it("should not match any known error") {
-                expect(error.isMultifactorCodeInvalid).to(beFalse(), description: "should not match mfa otp invalid")
-                expect(error.isMultifactorEnrollRequired).to(beFalse(), description: "should not match mfa enroll")
-                expect(error.isMultifactorTokenInvalid).to(beFalse(), description: "should not match mfa token invalid")
-                expect(error.isMultifactorRequired).to(beFalse(), description: "should not match mfa missing")
-                expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
-                expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
-                expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
-                expect(error.isAccessDenied).to(beFalse(), description: "should not match access denied")
-                expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
-                expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match refresh token deleted")
-                expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
-                expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
-                expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
+                expect(error.info[key] as? String) == value
             }
         }
-
-        sharedExamples(PlainErrorExample) { (context: SharedExampleContext) in
-            let value = context()[ExamplePlainValueKey] as? String ?? ""
-            let status = context()[ExamplePlainStatusKey] as? Int ?? 0
-            let error = AuthenticationError(description: value, statusCode: status)
-
-            it("should have plain error code") {
-                expect(error.code) == nonJSONError
-            }
-
-            it("should have localized description") {
-                expect(error.localizedDescription) == value
-            }
-
-            it("should return status code") {
-                expect(error.info["statusCode"] as? Int).toNot(beNil())
-            }
+        
+        it("should not match any custom error") {
+            expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
+            expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
+            expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
+            expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
+            expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match refresh token deleted")
+            expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
+            expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
+            expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
         }
-
     }
+}
+
+class Auth0ErrorBehavior: Behavior<[String:Any]> {
+    override class func spec(_ aContext: @escaping () -> [String : Any]) {
+        var context: [String:Any]!
+        var error: AuthenticationError!
+        
+        beforeEach {
+            context = aContext()
+            error = AuthenticationError(info: getValuesFromBehaviourContext(context), statusCode: 401)
+        }
+        
+        it("should have code") {
+            expect(error.code) == context[ExampleCodeKey] as! String
+        }
+        
+        it("should have localized description") {
+            expect(error.localizedDescription) == context[ExampleDescriptionKey] as! String
+        }
+        
+        it("should contain info key value pairs") {
+            let values = getValuesFromBehaviourContext(context)
+            values.forEach { key, value in
+                expect(error.info[key] as? String) == value
+            }
+        }
+        
+        it("should contain the extras key value pairs") {
+            let extras = context[ExampleExtraKey] as? [String: String]
+            extras?.forEach { key, value in
+                expect(error.info[key] as? String) == value
+            }
+        }
+    }
+}
+
+class UnknownErrorBehavior: Behavior<[String:Any]> {
+    override class func spec(_ aContext: @escaping () -> [String : Any]) {
+        var context: [String:Any]!
+        var error: AuthenticationError!
+        
+        beforeEach {
+            context = aContext()
+            error = AuthenticationError(info: getValuesFromBehaviourContext(context), statusCode: 401)
+        }
+        
+        it("should have unknown error code") {
+            expect(error.code) == unknownError
+        }
+        
+        it("should have localized description") {
+            expect(error.localizedDescription).toNot(beNil())
+        }
+        
+        it("should contain info key value pairs") {
+            let values = getValuesFromBehaviourContext(context)
+            values.forEach { key, value in
+                expect(error.info[key] as? String) == value
+            }
+        }
+        
+        it("should not match any known error") {
+            expect(error.isMultifactorCodeInvalid).to(beFalse(), description: "should not match mfa otp invalid")
+            expect(error.isMultifactorEnrollRequired).to(beFalse(), description: "should not match mfa enroll")
+            expect(error.isMultifactorTokenInvalid).to(beFalse(), description: "should not match mfa token invalid")
+            expect(error.isMultifactorRequired).to(beFalse(), description: "should not match mfa missing")
+            expect(error.isRuleError).to(beFalse(), description: "should not match rule error")
+            expect(error.isPasswordNotStrongEnough).to(beFalse(), description: "should not match password strength")
+            expect(error.isPasswordAlreadyUsed).to(beFalse(), description: "should not match password history")
+            expect(error.isAccessDenied).to(beFalse(), description: "should not match access denied")
+            expect(error.isInvalidCredentials).to(beFalse(), description: "should not match invalid credentials")
+            expect(error.isRefreshTokenDeleted).to(beFalse(), description: "should not match refresh token deleted")
+            expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
+            expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
+            expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
+        }
+    }
+}
+
+class PlainErrorBehavior: Behavior<[String:Any]> {
+    override class func spec(_ aContext: @escaping () -> [String : Any]) {
+        var context: [String:Any]!
+        var error: AuthenticationError!
+        
+        beforeEach {
+            context = aContext()
+            let value = context[ExamplePlainValueKey] as? String ?? ""
+            let status = context[ExamplePlainStatusKey] as? Int ?? 0
+            error = AuthenticationError(description:value , statusCode: status)
+        }
+        
+        it("should have plain error code") {
+            expect(error.code) == nonJSONError
+        }
+        
+        it("should have localized description") {
+            expect(error.localizedDescription) == context[ExamplePlainValueKey] as? String ?? ""
+        }
+        
+        it("should return status code") {
+            expect(error.info["statusCode"] as? Int).toNot(beNil())
+        }
+    }
+}
+
+func getValuesFromBehaviourContext(_ context: [String : Any]) -> [String : String] {
+    var values: [String:String] = [:]
+    if let code = context[ExampleCodeKey] as? String {
+        values["error"] = code
+    }
+    if let description = context[ExampleDescriptionKey] as? String {
+        values["error_description"] = description
+    }
+    let extras = context[ExampleExtraKey] as? [String: String]
+    extras?.forEach { values[$0] = $1 }
+    return values
 }

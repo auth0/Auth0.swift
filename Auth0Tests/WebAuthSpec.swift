@@ -16,31 +16,32 @@ extension URL {
     }
 }
 
-private let ValidAuthorizeURLExample = "valid authorize url"
-
-class WebAuthSharedExamplesConfiguration: QuickConfiguration {
-    override class func configure(_ configuration: QCKConfiguration) {
-        sharedExamples(ValidAuthorizeURLExample) { (context: SharedExampleContext) in
-            let attrs = context()
-            let url = attrs["url"] as! URL
-            let params = attrs["query"] as! [String: String]
-            let domain = attrs["domain"] as! String
-            let components = url.a0_components
-
-            it("should use domain \(domain)") {
-                expect(components?.scheme) == "https"
-                expect(components?.host) == String(domain.split(separator: "/").first!)
-                expect(components?.path).to(endWith("/authorize"))
-            }
-
-            it("should have state parameter") {
-                expect(components?.queryItems).to(containItem(withName:"state"))
-            }
-
+class ValidAuthorizeURLBehavior: Behavior<[String:Any]> {
+    override class func spec(_ aContext: @escaping () -> [String : Any]) {
+        var context: [String:Any]!
+        var components: URLComponents!
+        
+        beforeEach {
+            context = aContext()
+            let url = context["url"] as! URL
+            components = url.a0_components
+        }
+        
+        it("should use domain") {
+            expect(components?.scheme) == "https"
+            let domain = context["domain"] as! String
+            expect(components?.host) == String(domain.split(separator: "/").first!)
+            expect(components?.path).to(endWith("/authorize"))
+        }
+        
+        it("should have state parameter") {
+            expect(components?.queryItems).to(containItem(withName:"state"))
+        }
+        
+        it("should have query parameters") {
+            let params = context["query"] as! [String: String]
             params.forEach { key, value in
-                it("should have query parameter \(key)") {
-                    expect(components?.queryItems).to(containItem(withName: key, value: value))
-                }
+                expect(components?.queryItems).to(containItem(withName: key, value: value))
             }
         }
     }
@@ -65,7 +66,7 @@ private let defaults = ["response_type": "code"]
 
 class WebAuthSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         describe("init") {
 
@@ -99,7 +100,7 @@ class WebAuthSpec: QuickSpec {
 
         describe("authorize URL") {
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -108,7 +109,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -117,7 +118,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -126,7 +127,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -135,7 +136,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: nil, invitation: nil),
@@ -144,7 +145,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .connection("facebook")
@@ -154,7 +155,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 let state = UUID().uuidString
                 return [
                     "url": newWebAuth()
@@ -165,7 +166,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 let scope = "openid email phone"
                 return [
                     "url": newWebAuth()
@@ -176,7 +177,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 let scope = "email phone"
                 return [
                     "url": newWebAuth()
@@ -187,7 +188,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .maxAge(10000) // 1 second
@@ -197,7 +198,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: "abc1234", invitation: nil),
@@ -206,7 +207,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State, organization: "abc1234", invitation: "xyz6789"),
@@ -215,7 +216,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 var newDefaults = defaults
                 newDefaults["audience"] = "https://wwww.google.com"
                 return [
@@ -226,7 +227,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 var newDefaults = defaults
                 newDefaults["audience"] = "https://wwww.google.com"
                 return [
@@ -238,7 +239,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .audience("https://domain.auth0.com")
@@ -248,7 +249,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .connectionScope("user_friends,email")
@@ -258,7 +259,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 var newDefaults = defaults
                 newDefaults["connection_scope"] = "email"
                 return [
@@ -270,7 +271,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 let organization = "foo"
                 let invitation = "bar"
                 let url = URL(string: "https://example.com?organization=\(organization)&invitation=\(invitation)")!
@@ -283,7 +284,7 @@ class WebAuthSpec: QuickSpec {
                 ]
             }
 
-            itBehavesLike(ValidAuthorizeURLExample) {
+            itBehavesLike(ValidAuthorizeURLBehavior.self) {
                 return [
                     "url": newWebAuth()
                         .authorizeURL(URL(string: "https://example.com/authorize")!)
@@ -316,12 +317,14 @@ class WebAuthSpec: QuickSpec {
 
             #if os(iOS)
             platform = "ios"
+            #elseif os(visionOS)
+            platform = "visionos"
             #else
             platform = "macos"
             #endif
 
             #if compiler(>=5.10)
-            if #available(iOS 17.4, macOS 14.4, *) {
+            if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
                 context("https") {
                     it("should build with the domain") {
                         expect(newWebAuth().useHTTPS().redirectURL?.absoluteString) == "https://\(Domain)/\(platform)/\(bundleId)/callback"
@@ -482,7 +485,7 @@ class WebAuthSpec: QuickSpec {
 
         }
 
-        #if os(iOS)
+        #if os(iOS) || os(visionOS)
         describe("login") {
 
             var auth: Auth0WebAuth!
@@ -499,7 +502,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                await expect(isStarted).toEventually(beTrue())
+                expect(isStarted).toEventually(beTrue())
             }
 
             it("should generate a state") {
@@ -538,8 +541,8 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                await expect(redirectURL?.query).toEventually(contain("organization=foo"))
-                await expect(redirectURL?.query).toEventually(contain("invitation=bar"))
+                expect(redirectURL?.query).toEventually(contain("organization=foo"))
+                expect(redirectURL?.query).toEventually(contain("invitation=bar"))
             }
 
             it("should produce an invalid invitation URL error when the organization is missing") {
@@ -548,7 +551,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce an invalid invitation URL error when the invitation is missing") {
@@ -557,7 +560,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce an invalid invitation URL error when the organization and invitation are missing") {
@@ -566,7 +569,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce an invalid invitation URL error when the query parameters are missing") {
@@ -574,7 +577,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(DomainURL)
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
@@ -582,7 +585,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Credentials>?
                 auth.redirectURL = nil
                 auth.start { result = $0 }
-                await expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveWebAuthError(expectedError))
             }
 
             context("transaction") {
@@ -591,13 +594,13 @@ class WebAuthSpec: QuickSpec {
                     TransactionStore.shared.clear()
                 }
 
-                it("should store a new transaction") { @MainActor in
+                it("should store a new transaction") {
                     auth.start { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                     TransactionStore.shared.cancel()
                 }
 
-                it("should cancel the current transaction") { @MainActor in
+                it("should cancel the current transaction") {
                     var result: WebAuthResult<Credentials>?
                     auth.start { result = $0 }
                     TransactionStore.shared.cancel()
@@ -625,7 +628,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.start { _ in }
-                await expect(isStarted).toEventually(beTrue())
+                expect(isStarted).toEventually(beTrue())
             }
 
             it("should not include the federated parameter by default") {
@@ -635,7 +638,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.clearSession() { _ in }
-                await expect(redirectURL?.query?.contains("federated")).toEventually(beFalse())
+                expect(redirectURL?.query?.contains("federated")).toEventually(beFalse())
             }
 
             it("should include the federated parameter") {
@@ -645,7 +648,7 @@ class WebAuthSpec: QuickSpec {
                     return SpyUserAgent()
                 })
                 auth.clearSession(federated: true) { _ in }
-                await expect(redirectURL?.query?.contains("federated")).toEventually(beTrue())
+                expect(redirectURL?.query?.contains("federated")).toEventually(beTrue())
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
@@ -664,19 +667,19 @@ class WebAuthSpec: QuickSpec {
                     TransactionStore.shared.clear()
                 }
 
-                it("should store a new transaction") { @MainActor in
+                it("should store a new transaction") {
                     auth.clearSession() { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
-                it("should cancel the current transaction") { @MainActor in
+                it("should cancel the current transaction") {
                     auth.clearSession() { result = $0 }
                     TransactionStore.shared.cancel()
                     expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
-                it("should resume the current transaction") { @MainActor in
+                it("should resume the current transaction") {
                     auth.clearSession() { result = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
                     expect(result).to(beSuccessful())

@@ -6,7 +6,7 @@ import Nimble
 
 class LoggerSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         it("should build with default output") {
             let logger = DefaultLogger()

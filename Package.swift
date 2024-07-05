@@ -1,20 +1,19 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 
 import PackageDescription
 
-let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst]
+let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst, .visionOS]
 let swiftSettings: [SwiftSetting] = [.define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms))]
 
 let package = Package(
     name: "Auth0",
-    platforms: [.iOS(.v13), .macOS(.v11), .tvOS(.v13), .watchOS(.v7)],
+    platforms: [.iOS(.v14), .macOS(.v11), .tvOS(.v14), .watchOS(.v7), .visionOS(.v1)],
     products: [.library(name: "Auth0", targets: ["Auth0"])],
     dependencies: [
-        .package(url: "https://github.com/auth0/SimpleKeychain.git", .upToNextMajor(from: "1.1.0")),
-        .package(url: "https://github.com/auth0/JWTDecode.swift.git", .upToNextMajor(from: "3.1.0")),
-        .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "6.0.0")),
-        .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "12.0.0")),
-        .package(url: "https://github.com/AliSoftware/OHHTTPStubs.git", .upToNextMajor(from: "9.0.0"))
+        .package(url: "https://github.com/auth0/SimpleKeychain.git", exact:"1.2.0-beta.0"),
+        .package(url: "https://github.com/auth0/JWTDecode.swift.git", exact:"3.2.0-beta.0"),
+        .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "7.0.0")),
+        .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "13.0.0"))
     ],
     targets: [
         .target(
@@ -32,8 +31,7 @@ let package = Package(
             dependencies: [
                 "Auth0",
                 .product(name: "Quick", package: "Quick"),
-                .product(name: "Nimble", package: "Nimble"),
-                .product(name: "OHHTTPStubsSwift", package: "OHHTTPStubs")
+                .product(name: "Nimble", package: "Nimble")
             ],
             path: "Auth0Tests",
             exclude: ["Info.plist", "Auth0.plist"],

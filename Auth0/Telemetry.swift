@@ -85,6 +85,8 @@ public struct Telemetry {
         return "tvOS"
         #elseif os(watchOS)
         return "watchOS"
+        #elseif os(visionOS)
+        return "visionOS"
         #else
         return "unknown"
         #endif

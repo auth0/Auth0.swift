@@ -6,7 +6,7 @@ import Nimble
 
 class WebAuthenticationSpec: QuickSpec {
 
-    override func spec() {
+    override class func spec() {
 
         let storage = TransactionStore.shared
         var transaction: SpyTransaction!

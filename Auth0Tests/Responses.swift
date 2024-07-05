@@ -1,5 +1,4 @@
 import Foundation
-import OHHTTPStubs
 
 @testable import Auth0
 
@@ -28,34 +27,57 @@ let RecoveryCode = "162534"
 let MFAToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 let AuthenticatorId = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 let ChallengeTypes = ["oob", "otp"]
-let APISuccessStatusCode = Int32(200)
+let APISuccessStatusCode = 200
 let APIResponseHeaders = ["Content-Type": "application/json"]
 
-func catchAllResponse() -> HTTPStubsResponse {
-    return HTTPStubsResponse(error: NSError(domain: "com.auth0", code: -99999, userInfo: nil))
+func catchAllResponse() -> RequestResponse {
+    return { request in
+        let error = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+        return (nil, nil, error)
+    }
 }
 
-func apiSuccessResponse(json: [AnyHashable: Any] = [:]) -> HTTPStubsResponse {
-    return HTTPStubsResponse(jsonObject: json, statusCode: APISuccessStatusCode, headers: APIResponseHeaders)
+func apiSuccessResponse(json: [AnyHashable: Any] = [:]) -> RequestResponse {
+    return { request in
+        let data = try! JSONSerialization.data(withJSONObject: json, options: [])
+        let response = HTTPURLResponse(url: request.url!, statusCode: APISuccessStatusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        return (data, response, nil)
+    }
 }
 
-func apiSuccessResponse(jsonArray: [Any]) -> HTTPStubsResponse {
-    return HTTPStubsResponse(jsonObject: jsonArray, statusCode: APISuccessStatusCode, headers: APIResponseHeaders)
+func apiSuccessResponse(jsonArray: [Any]) -> RequestResponse {
+    return { request in
+        let data = try! JSONSerialization.data(withJSONObject: jsonArray, options: [])
+        let response = HTTPURLResponse(url: request.url!, statusCode: APISuccessStatusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        return (data, response, nil)
+    }
 }
 
-func apiSuccessResponse(string: String) -> HTTPStubsResponse {
-    return HTTPStubsResponse(data: string.data(using: .utf8)!, statusCode: APISuccessStatusCode, headers: APIResponseHeaders)
+func apiSuccessResponse(string: String) -> RequestResponse {
+    return { request in
+        let data = string.data(using: .utf8)
+        let response = HTTPURLResponse(url: request.url!, statusCode: APISuccessStatusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        return (data, response, nil)
+    }
 }
 
-func apiFailureResponse(json: [AnyHashable: Any] = [:], statusCode: Int = 400) -> HTTPStubsResponse {
-    return HTTPStubsResponse(jsonObject: json, statusCode: Int32(statusCode), headers: APIResponseHeaders)
+func apiFailureResponse(json: [AnyHashable: Any] = [:], statusCode: Int = 400) -> RequestResponse {
+    return { request in
+        let data = try! JSONSerialization.data(withJSONObject: json, options: [])
+        let response = HTTPURLResponse(url: request.url!, statusCode: statusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        return (data, response, nil)
+    }
 }
 
-func apiFailureResponse(string: String, statusCode: Int) -> HTTPStubsResponse {
-    return HTTPStubsResponse(data: string.data(using: .utf8)!, statusCode: Int32(statusCode), headers: APIResponseHeaders)
+func apiFailureResponse(string: String, statusCode: Int) -> RequestResponse {
+    return { request in
+        let data = string.data(using: .utf8)
+        let response = HTTPURLResponse(url: request.url!, statusCode: statusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        return (data, response, nil)
+    }
 }
 
-func authResponse(accessToken: String, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Double? = nil) -> HTTPStubsResponse {
+func authResponse(accessToken: String, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Double? = nil) -> RequestResponse {
     var json = [
         "access_token": accessToken,
         "token_type": "bearer",
@@ -75,15 +97,15 @@ func authResponse(accessToken: String, idToken: String? = nil, refreshToken: Str
     return apiSuccessResponse(json: json)
 }
 
-func authFailure(code: String, description: String, name: String? = nil) -> HTTPStubsResponse {
+func authFailure(code: String, description: String, name: String? = nil) -> RequestResponse {
     return apiFailureResponse(json: ["code": code, "description": description, "statusCode": 400, "name": name ?? code])
 }
 
-func authFailure(error: String, description: String) -> HTTPStubsResponse {
+func authFailure(error: String, description: String) -> RequestResponse {
     return apiFailureResponse(json: ["error": error, "error_description": description])
 }
 
-func createdUser(email: String, username: String? = nil, verified: Bool = true) -> HTTPStubsResponse {
+func createdUser(email: String, username: String? = nil, verified: Bool = true) -> RequestResponse {
     var json: [String: Any] = [
         "email": email,
         "email_verified": verified ? "true" : "false",
@@ -95,23 +117,23 @@ func createdUser(email: String, username: String? = nil, verified: Bool = true) 
     return apiSuccessResponse(json: json)
 }
 
-func resetPasswordResponse() -> HTTPStubsResponse {
+func resetPasswordResponse() -> RequestResponse {
     return apiSuccessResponse(string: "We've just sent you an email to reset your password.")
 }
 
-func revokeTokenResponse() -> HTTPStubsResponse {
+func revokeTokenResponse() -> RequestResponse {
     return apiSuccessResponse(string: "")
 }
 
-func passwordless(_ email: String, verified: Bool) -> HTTPStubsResponse {
+func passwordless(_ email: String, verified: Bool) -> RequestResponse {
     return apiSuccessResponse(json: ["email": email, "verified": "\(verified)"])
 }
 
-func managementErrorResponse(error: String, description: String, code: String, statusCode: Int = 400) -> HTTPStubsResponse {
+func managementErrorResponse(error: String, description: String, code: String, statusCode: Int = 400) -> RequestResponse {
     return apiFailureResponse(json: ["code": code, "description": description, "statusCode": statusCode, "error": error], statusCode: statusCode)
 }
 
-func jwksResponse(kid: String? = Kid) -> HTTPStubsResponse {
+func jwksResponse(kid: String? = Kid) -> RequestResponse {
     var jwks: [String: Any] = ["keys": [["alg": "RS256",
                                          "kty": "RSA",
                                          "use": "sig",
@@ -132,7 +154,7 @@ func jwksResponse(kid: String? = Kid) -> HTTPStubsResponse {
     return apiSuccessResponse(json: jwks)
 }
 
-func multifactorChallengeResponse(challengeType: String, oobCode: String? = nil, bindingMethod: String? = nil) -> HTTPStubsResponse {
+func multifactorChallengeResponse(challengeType: String, oobCode: String? = nil, bindingMethod: String? = nil) -> RequestResponse {
     var json: [String: Any] = ["challenge_type": challengeType]
     json["oob_code"] = oobCode
     json["binding_method"] = bindingMethod
