@@ -9,7 +9,7 @@
 
 Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
-## Documentation
+## Documentations
 
 - [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift/interactive)
  - shows how to integrate Auth0.swift into an iOS / macOS app from scratch.
