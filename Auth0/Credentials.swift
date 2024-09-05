@@ -116,32 +116,32 @@ extension Credentials: Codable {
     }
 
     /// `Decodable` initializer.
-    public convenience init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        let accessToken = try values.decodeIfPresent(String.self, forKey: .accessToken)
-        let tokenType = try values.decodeIfPresent(String.self, forKey: .tokenType)
-        let idToken = try values.decodeIfPresent(String.self, forKey: .idToken)
-        let refreshToken = try values.decodeIfPresent(String.self, forKey: .refreshToken)
-        let scope = try values.decodeIfPresent(String.self, forKey: .scope)
-        let recoveryCode = try values.decodeIfPresent(String.self, forKey: .recoveryCode)
-
-        var expiresIn: Date?
-        if let string = try? values.decode(String.self, forKey: .expiresIn), let double = Double(string) {
-            expiresIn = Date(timeIntervalSinceNow: double)
-        } else if let double = try? values.decode(Double.self, forKey: .expiresIn) {
-            expiresIn = Date(timeIntervalSinceNow: double)
-        } else if let date = try? values.decode(Date.self, forKey: .expiresIn) {
-            expiresIn = date
-        }
-
-        self.init(accessToken: accessToken ?? "",
-                  tokenType: tokenType ?? "",
-                  idToken: idToken ?? "",
-                  refreshToken: refreshToken,
-                  expiresIn: expiresIn ?? Date(),
-                  scope: scope,
-                  recoveryCode: recoveryCode)
-    }
+//    public convenience init(from decoder: Decoder) throws {
+//        let values = try decoder.container(keyedBy: CodingKeys.self)
+//        let accessToken = try values.decodeIfPresent(String.self, forKey: .accessToken)
+//        let tokenType = try values.decodeIfPresent(String.self, forKey: .tokenType)
+//        let idToken = try values.decodeIfPresent(String.self, forKey: .idToken)
+//        let refreshToken = try values.decodeIfPresent(String.self, forKey: .refreshToken)
+//        let scope = try values.decodeIfPresent(String.self, forKey: .scope)
+//        let recoveryCode = try values.decodeIfPresent(String.self, forKey: .recoveryCode)
+//
+//        var expiresIn: Date?
+//        if let string = try? values.decode(String.self, forKey: .expiresIn), let double = Double(string) {
+//            expiresIn = Date(timeIntervalSinceNow: double)
+//        } else if let double = try? values.decode(Double.self, forKey: .expiresIn) {
+//            expiresIn = Date(timeIntervalSinceNow: double)
+//        } else if let date = try? values.decode(Date.self, forKey: .expiresIn) {
+//            expiresIn = date
+//        }
+//
+//        self.init(accessToken: accessToken ?? "",
+//                  tokenType: tokenType ?? "",
+//                  idToken: idToken ?? "",
+//                  refreshToken: refreshToken,
+//                  expiresIn: expiresIn ?? Date(),
+//                  scope: scope,
+//                  recoveryCode: recoveryCode)
+//    }
 
 }
 

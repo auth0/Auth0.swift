@@ -34,7 +34,14 @@ extension SimpleKeychain: CredentialsStorage {
     /// - Parameter key: The key to get from the Keychain.
     /// - Returns: The stored data.
     public func getEntry(forKey key: String) -> Data? {
-        return try? self.data(forKey: key)
+        do {
+            return try self.data(forKey: key)
+        } catch {
+            print(error.localizedDescription
+            )
+            return nil
+        }
+        
     }
 
     /// Sets a storage entry.

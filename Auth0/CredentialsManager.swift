@@ -103,7 +103,7 @@ public struct CredentialsManager {
     /// - Parameter credentials: Credentials instance to store.
     /// - Returns: If the credentials were stored.
     public func store(credentials: Credentials) -> Bool {
-        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true) else {
+        guard let data = try? JSONEncoder().encode(credentials) else {
             return false
         }
 
@@ -160,7 +160,7 @@ public struct CredentialsManager {
     public func revoke(headers: [String: String] = [:],
                        _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
         guard let data = self.storage.getEntry(forKey: self.storeKey),
-              let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
+              let credentials = try? JSONDecoder().decode(Credentials.self, from: data),
               let refreshToken = credentials.refreshToken else {
                   _ = self.clear()
                   return callback(.success(()))
@@ -362,7 +362,12 @@ public struct CredentialsManager {
 
     private func retrieveCredentials() -> Credentials? {
         guard let data = self.storage.getEntry(forKey: self.storeKey) else { return nil }
-        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
+        do {
+            return try JSONDecoder().decode(Credentials.self, from: data)
+        } catch {
+            print(error.localizedDescription)
+            return nil
+        }
     }
 
     // swiftlint:disable:next function_body_length
