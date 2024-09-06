@@ -362,12 +362,7 @@ public struct CredentialsManager {
 
     private func retrieveCredentials() -> Credentials? {
         guard let data = self.storage.getEntry(forKey: self.storeKey) else { return nil }
-        do {
-            return try JSONDecoder().decode(Credentials.self, from: data)
-        } catch {
-            print(error.localizedDescription)
-            return nil
-        }
+        return try? JSONDecoder().decode(Credentials.self, from: data)
     }
 
     // swiftlint:disable:next function_body_length
