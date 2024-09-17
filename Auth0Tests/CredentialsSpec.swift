@@ -130,8 +130,8 @@ class CredentialsSpec: QuickSpec {
                                            expiresIn: ExpiresInDate,
                                            scope: Scope,
                                            recoveryCode: RecoveryCode)
-                let data = try NSKeyedArchiver.archivedData(withRootObject: original, requiringSecureCoding: true)
-                let credentials = try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)!
+                let data = try JSONEncoder().encode(original)
+                let credentials = try JSONDecoder().decode(Credentials.self, from: data)
                 expect(credentials).toNot(beNil())
             }
 
@@ -143,8 +143,8 @@ class CredentialsSpec: QuickSpec {
                                            expiresIn: ExpiresInDate,
                                            scope: Scope,
                                            recoveryCode: RecoveryCode)
-                let data = try NSKeyedArchiver.archivedData(withRootObject: original, requiringSecureCoding: true)
-                let credentials = try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)!
+                let data = try JSONEncoder().encode(original)
+                let credentials = try JSONDecoder().decode(Credentials.self, from: data)
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == Bearer
                 expect(credentials.idToken) == IdToken
@@ -158,8 +158,8 @@ class CredentialsSpec: QuickSpec {
                                            tokenType: Bearer,
                                            idToken: IdToken,
                                            expiresIn: ExpiresInDate)
-                let data = try NSKeyedArchiver.archivedData(withRootObject: original, requiringSecureCoding: true)
-                let credentials = try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)!
+                let data = try JSONEncoder().encode(original)
+                let credentials = try JSONDecoder().decode(Credentials.self, from: data)
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == Bearer
                 expect(credentials.idToken) == IdToken
@@ -171,8 +171,8 @@ class CredentialsSpec: QuickSpec {
 
             it("should have only the default values") {
                 let original = Credentials()
-                let data = try NSKeyedArchiver.archivedData(withRootObject: original, requiringSecureCoding: true)
-                let credentials = try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)!
+                let data = try JSONEncoder().encode(original)
+                let credentials = try JSONDecoder().decode(Credentials.self, from: data)
                 expect(credentials.accessToken) == ""
                 expect(credentials.tokenType) == ""
                 expect(credentials.idToken) == ""

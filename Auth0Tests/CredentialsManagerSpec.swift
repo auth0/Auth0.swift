@@ -529,7 +529,7 @@ class CredentialsManagerSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
                             expect(result).to(beSuccessful())
-                            let storedCredentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: store.data(forKey: "credentials"))
+                            let storedCredentials = try? JSONDecoder().decode(Credentials.self, from: store.data(forKey: "credentials"))
                             expect(storedCredentials?.accessToken) == NewAccessToken
                             expect(storedCredentials?.idToken) == NewIdToken
                             expect(storedCredentials?.refreshToken) == RefreshToken
@@ -561,8 +561,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                           idToken: IdToken,
                                                           refreshToken: RefreshToken,
                                                           expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                            let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
-                                                                         requiringSecureCoding: true)
+                            let data = try? JSONEncoder().encode(credentials)
                             return data
                         }
                         func setEntry(_ data: Data, forKey: String) -> Bool {
@@ -840,7 +839,7 @@ class CredentialsManagerSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew { result in
                         expect(result).to(beSuccessful())
-                        let storedCredentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: store.data(forKey: "credentials"))
+                        let storedCredentials = try? JSONDecoder().decode(Credentials.self, from: store.data(forKey: "credentials"))
                         expect(storedCredentials?.accessToken) == NewAccessToken
                         expect(storedCredentials?.idToken) == NewIdToken
                         expect(storedCredentials?.refreshToken) == NewRefreshToken
@@ -867,8 +866,7 @@ class CredentialsManagerSpec: QuickSpec {
                 class MockStore: CredentialsStorage {
                     func getEntry(forKey: String) -> Data? {
                         let credentials = Credentials(accessToken: AccessToken, idToken: IdToken, refreshToken: RefreshToken)
-                        let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
-                                                                     requiringSecureCoding: true)
+                        let data = try? JSONEncoder().encode(credentials)
                         return data
                     }
                     func setEntry(_ data: Data, forKey: String) -> Bool {
