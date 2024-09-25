@@ -1,4 +1,3 @@
-import Foundation
 import Nimble
 
 @testable import Auth0

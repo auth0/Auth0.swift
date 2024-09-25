@@ -125,7 +125,6 @@ extension SafariUserAgent: SFSafariViewControllerDelegate {
         // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead
         // TransactionStore is internal
         TransactionStore.shared.cancel()
-
     }
 
 }

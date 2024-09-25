@@ -321,6 +321,9 @@
 		A7DDDF6D2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		A7DDDF6E2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		A7DDDF702BC9A93F0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
+		C107B51D2C9AC4D8006B6BEA /* WebViewProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C107B51B2C9AC4D3006B6BEA /* WebViewProvider.swift */; };
+		C107B51F2C9AF8C9006B6BEA /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
+		C107B5222CA27F7C006B6BEA /* WebViewProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C107B5202CA27F76006B6BEA /* WebViewProviderSpec.swift */; };
 		C12BFE432C352DD400D1CC00 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D76F2C2BDFE40094C657 /* NetworkStub.swift */; };
 		C12BFE442C352DD700D1CC00 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
 		C177D6C32C2ADDEB0094C657 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
@@ -746,6 +749,8 @@
 		5FF465BB1CE2AC4500F7ED8C /* Management.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Management.swift; path = Auth0/Management.swift; sourceTree = SOURCE_ROOT; };
 		970BC36A25C27095007A7745 /* Challenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Challenge.swift; sourceTree = "<group>"; };
 		A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C107B51B2C9AC4D3006B6BEA /* WebViewProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewProvider.swift; sourceTree = "<group>"; };
+		C107B5202CA27F76006B6BEA /* WebViewProviderSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewProviderSpec.swift; sourceTree = "<group>"; };
 		C177D6C22C2ADDEB0094C657 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
 		C177D76F2C2BDFE40094C657 /* NetworkStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStub.swift; sourceTree = "<group>"; };
 		C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubURLProtocol.swift; sourceTree = "<group>"; };
@@ -928,6 +933,7 @@
 		5C0AF09828330CA000162044 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
+				C107B51B2C9AC4D3006B6BEA /* WebViewProvider.swift */,
 				5B16D88C1F7141A0009476A5 /* ASProvider.swift */,
 				5C0AF09928330CBA00162044 /* SafariProvider.swift */,
 			);
@@ -977,6 +983,7 @@
 		5CF539222836DC360073F623 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
+				C107B5202CA27F76006B6BEA /* WebViewProviderSpec.swift */,
 				5CF5392A283835460073F623 /* ASProviderSpec.swift */,
 				5CF539232836DCC10073F623 /* SafariProviderSpec.swift */,
 			);
@@ -1799,6 +1806,7 @@
 				5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */,
 				5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */,
 				5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */,
+				C107B51F2C9AF8C9006B6BEA /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2046,6 +2054,7 @@
 				5F3965C21CF67CF000CDE7C0 /* WebAuth.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* TransactionStore.swift in Sources */,
 				5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */,
+				C107B51D2C9AC4D8006B6BEA /* WebViewProvider.swift in Sources */,
 				5FAE9C911D8878D400A871CE /* Auth0WebAuth.swift in Sources */,
 				5B5E93F91EC45C22002A37F9 /* CredentialsManagerError.swift in Sources */,
 				5CA541CD2B1A81A700E4284D /* Documentation.docc in Sources */,
@@ -2151,6 +2160,7 @@
 				5FADB6091CED500900D4BB50 /* ManagementSpec.swift in Sources */,
 				5FCAB16D1D07AC3500331C84 /* WebAuthSpec.swift in Sources */,
 				5F28B4671D8300D50000EB23 /* LoggerSpec.swift in Sources */,
+				C107B5222CA27F7C006B6BEA /* WebViewProviderSpec.swift in Sources */,
 				5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5B2860D61EEF210A00C75D54 /* UserInfoSpec.swift in Sources */,
 				5C809D9A275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */,

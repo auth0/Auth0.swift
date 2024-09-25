@@ -5,6 +5,10 @@ import Foundation
 public struct WebAuthError: Auth0Error {
 
     enum Code: Equatable {
+        case webViewNavigationFailed
+        case webViewProvisionalNavigationFailed
+        case webViewContentProcessTerminated
+        case webViewResourceLoadingStopped
         case noBundleIdentifier
         case transactionActiveAlready
         case invalidInvitationURL(String)
@@ -82,6 +86,10 @@ extension WebAuthError {
 
     var message: String {
         switch self.code {
+        case .webViewNavigationFailed: return "An error occured during a committed main frame navigation of WebView"
+        case .webViewProvisionalNavigationFailed: return "An error occured while starting to load data for the main frame of WebView"
+        case .webViewContentProcessTerminated: return "WebView's content process is terminated."
+        case .webViewResourceLoadingStopped: return "WebView's resource loading has been stopped"
         case .noBundleIdentifier: return "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
             + " or it could not be used to build a valid URL."
         case .transactionActiveAlready: return "Failed to start this transaction, as there is an active transaction at the"
