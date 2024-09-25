@@ -1,4 +1,5 @@
 import Nimble
+import Foundation
 
 @testable import Auth0
 
@@ -221,7 +222,7 @@ func beURLSafeBase64() -> Nimble.Matcher<String> {
 
 // MARK: - Private Functions
 
-private func beSuccessful<T, E>(_ expression: Expression<Result<T, E>>,
+private func beSuccessful<T, E>(_ expression: Nimble.Expression<Result<T, E>>,
                                 _ message: ExpectationMessage,
                                 predicate: @escaping (T) -> Bool = { _ in true }) throws -> MatcherResult {
     if let actual = try expression.evaluate(), case .success(let value) = actual {
@@ -230,7 +231,7 @@ private func beSuccessful<T, E>(_ expression: Expression<Result<T, E>>,
     return MatcherResult(status: .doesNotMatch, message: message)
 }
 
-private func beUnsuccessful<T, E>(_ expression: Expression<Result<T, E>>,
+private func beUnsuccessful<T, E>(_ expression: Nimble.Expression<Result<T, E>>,
                                   _ message: ExpectationMessage,
                                   predicate: @escaping (E) -> Bool = { _ in true }) throws -> MatcherResult {
     if let actual = try expression.evaluate(), case .failure(let error) = actual {
@@ -242,7 +243,7 @@ private func beUnsuccessful<T, E>(_ expression: Expression<Result<T, E>>,
 private func haveCredentials<E>(accessToken: String?,
                                 idToken: String?,
                                 refreshToken: String?,
-                                _ expression: Expression<Result<Credentials, E>>,
+                                _ expression: Nimble.Expression<Result<Credentials, E>>,
                                 _ message: ExpectationMessage) throws -> MatcherResult {
     if let accessToken = accessToken {
         _ = message.appended(message: " <access_token: \(accessToken)>")
