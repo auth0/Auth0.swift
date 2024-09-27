@@ -322,7 +322,6 @@
 		A7DDDF6E2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		A7DDDF702BC9A93F0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		C107B51D2C9AC4D8006B6BEA /* WebViewProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C107B51B2C9AC4D3006B6BEA /* WebViewProvider.swift */; };
-		C107B51F2C9AF8C9006B6BEA /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
 		C107B5222CA27F7C006B6BEA /* WebViewProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C107B5202CA27F76006B6BEA /* WebViewProviderSpec.swift */; };
 		C12BFE432C352DD400D1CC00 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D76F2C2BDFE40094C657 /* NetworkStub.swift */; };
 		C12BFE442C352DD700D1CC00 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
@@ -1806,7 +1805,6 @@
 				5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */,
 				5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */,
 				5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */,
-				C107B51F2C9AF8C9006B6BEA /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
