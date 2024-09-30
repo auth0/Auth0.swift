@@ -451,7 +451,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
 
-                    waitUntil(timeout: Timeout) { done in
+                    waitUntil(timeout: .seconds(5)) { done in
                         credentialsManager.credentials { result in
                             expect(result).to(haveCredentialsManagerError(expectedError))
                             done()

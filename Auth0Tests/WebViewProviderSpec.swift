@@ -176,7 +176,7 @@ class WebViewProviderSpec: QuickSpec {
                 UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = root
                 root.present(mockViewController, animated: false)
                 
-                waitUntil(timeout: Timeout) { done in
+                waitUntil(timeout: .seconds(5)) { done in
                     callback = { result in
                         expect(root.presentedViewController).to(beNil())
                         expect(mockViewController.view.subviews.contains(webViewUserAgent.webview)).to(beFalse())
