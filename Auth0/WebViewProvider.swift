@@ -19,33 +19,6 @@ extension WebAuthentication {
     }
 }
 
-extension WebViewUserAgent {
-    var topViewController: UIViewController? {
-        guard let root = UIApplication.shared()?.windows.last(where: \.isKeyWindow)?.rootViewController else {
-            return nil
-        }
-        return self.findTopViewController(from: root)
-    }
-    
-    private func findTopViewController(from root: UIViewController) -> UIViewController? {
-        if let presented = root.presentedViewController { return self.findTopViewController(from: presented) }
-        
-        switch root {
-        case let split as UISplitViewController:
-            guard let last = split.viewControllers.last else { return split }
-            return self.findTopViewController(from: last)
-        case let navigation as UINavigationController:
-            guard let top = navigation.topViewController else { return navigation }
-            return self.findTopViewController(from: top)
-        case let tab as UITabBarController:
-            guard let selected = tab.selectedViewController else { return tab }
-            return self.findTopViewController(from: selected)
-        default:
-            return root
-        }
-    }
-}
-
 class WebViewUserAgent: NSObject, WebAuthUserAgent {
     
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
@@ -90,7 +63,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     
     func start() {
         self.webview.load(self.request)
-        self.topViewController?.present(self.viewController, animated: true)
+        UIWindow.topViewController?.present(self.viewController, animated: true)
     }
 
     func finish(with result: WebAuthResult<Void>) {

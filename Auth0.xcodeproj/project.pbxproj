@@ -325,6 +325,10 @@
 		C107B5222CA27F7C006B6BEA /* WebViewProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C107B5202CA27F76006B6BEA /* WebViewProviderSpec.swift */; };
 		C12BFE432C352DD400D1CC00 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D76F2C2BDFE40094C657 /* NetworkStub.swift */; };
 		C12BFE442C352DD700D1CC00 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
+		C160EE332CABD0E5005ACE8E /* UIWindow+TopViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE302CABD0DA005ACE8E /* UIWindow+TopViewController.swift */; };
+		C160EE352CABD0E5005ACE8E /* UIWindow+TopViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE302CABD0DA005ACE8E /* UIWindow+TopViewController.swift */; };
+		C160EE382CABD35A005ACE8E /* UIWindow+TopViewControllerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE372CABD358005ACE8E /* UIWindow+TopViewControllerSpec.swift */; };
+		C160EE3B2CABD35A005ACE8E /* UIWindow+TopViewControllerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE372CABD358005ACE8E /* UIWindow+TopViewControllerSpec.swift */; };
 		C177D6C32C2ADDEB0094C657 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
 		C177D6C72C2ADEB60094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */; };
 		C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6D32C2B0DCB0094C657 /* CwlPreconditionTesting */; };
@@ -750,6 +754,8 @@
 		A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		C107B51B2C9AC4D3006B6BEA /* WebViewProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewProvider.swift; sourceTree = "<group>"; };
 		C107B5202CA27F76006B6BEA /* WebViewProviderSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewProviderSpec.swift; sourceTree = "<group>"; };
+		C160EE302CABD0DA005ACE8E /* UIWindow+TopViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIWindow+TopViewController.swift"; sourceTree = "<group>"; };
+		C160EE372CABD358005ACE8E /* UIWindow+TopViewControllerSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIWindow+TopViewControllerSpec.swift"; sourceTree = "<group>"; };
 		C177D6C22C2ADDEB0094C657 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
 		C177D76F2C2BDFE40094C657 /* NetworkStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStub.swift; sourceTree = "<group>"; };
 		C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubURLProtocol.swift; sourceTree = "<group>"; };
@@ -1057,6 +1063,7 @@
 		5F06DD921CC451430011842B /* Auth0Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C160EE362CABD352005ACE8E /* Extensions */,
 				C177D76E2C2BDF9D0094C657 /* StubNetworking */,
 				5F28B4651D8300BB0000EB23 /* Logger */,
 				5FE686A81D1894990075874C /* Telemetry */,
@@ -1209,6 +1216,7 @@
 		5FCAB16E1D08FFE900331C84 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				C160EE302CABD0DA005ACE8E /* UIWindow+TopViewController.swift */,
 				5C4F551923C8FB8E00C89615 /* Array+Encode.swift */,
 				5C4F551823C8FB8E00C89615 /* String+URLSafe.swift */,
 				5FCAB1721D09009600331C84 /* NSData+URLSafe.swift */,
@@ -1291,6 +1299,14 @@
 				5FD255B31D14DD2600387ECB /* ManagementError.swift */,
 			);
 			name = Management;
+			sourceTree = "<group>";
+		};
+		C160EE362CABD352005ACE8E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				C160EE372CABD358005ACE8E /* UIWindow+TopViewControllerSpec.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		C177D76E2C2BDF9D0094C657 /* StubNetworking */ = {
@@ -2055,6 +2071,7 @@
 				C107B51D2C9AC4D8006B6BEA /* WebViewProvider.swift in Sources */,
 				5FAE9C911D8878D400A871CE /* Auth0WebAuth.swift in Sources */,
 				5B5E93F91EC45C22002A37F9 /* CredentialsManagerError.swift in Sources */,
+				C160EE352CABD0E5005ACE8E /* UIWindow+TopViewController.swift in Sources */,
 				5CA541CD2B1A81A700E4284D /* Documentation.docc in Sources */,
 				5C41F6AA244DCAFB00252548 /* ClearSessionTransaction.swift in Sources */,
 				5FDE875D1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
@@ -2078,6 +2095,7 @@
 				5C41F6D5244F974B00252548 /* ClearSessionTransaction.swift in Sources */,
 				5C29743423FDBD5500BC18FA /* Optional+DebugDescription.swift in Sources */,
 				5C41F6C6244F968100252548 /* WebAuthUserAgent.swift in Sources */,
+				C160EE332CABD0E5005ACE8E /* UIWindow+TopViewController.swift in Sources */,
 				5B1748751EF2D3A70060E653 /* Helpers.swift in Sources */,
 				5F6FAC641D09E98000D5B4EA /* Logger.swift in Sources */,
 				D5E9E318273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */,
@@ -2160,6 +2178,7 @@
 				5F28B4671D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				C107B5222CA27F7C006B6BEA /* WebViewProviderSpec.swift in Sources */,
 				5FBBF0431CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
+				C160EE382CABD35A005ACE8E /* UIWindow+TopViewControllerSpec.swift in Sources */,
 				5B2860D61EEF210A00C75D54 /* UserInfoSpec.swift in Sources */,
 				5C809D9A275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */,
 				5FCAB16B1D07AC3500331C84 /* OAuth2GrantSpec.swift in Sources */,
@@ -2208,6 +2227,7 @@
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5CE775B2244FD70B00D054A0 /* TransactionStoreSpec.swift in Sources */,
 				5CE775A9244FCF4900D054A0 /* ClaimValidatorsSpec.swift in Sources */,
+				C160EE3B2CABD35A005ACE8E /* UIWindow+TopViewControllerSpec.swift in Sources */,
 				5C809D9B275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */,
 				5CE775A3244FCF3600D054A0 /* CryptoExtensions.swift in Sources */,
 				5CE775B3244FD71000D054A0 /* WebAuthSpec.swift in Sources */,
