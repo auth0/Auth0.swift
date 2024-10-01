@@ -86,10 +86,10 @@ extension WebAuthError {
 
     var message: String {
         switch self.code {
-        case .webViewNavigationFailed: return "An error occured during a committed main frame navigation of WebView"
-        case .webViewProvisionalNavigationFailed: return "An error occured while starting to load data for the main frame of WebView"
-        case .webViewContentProcessTerminated: return "WebView's content process is terminated."
-        case .webViewResourceLoadingStopped: return "WebView's resource loading has been stopped"
+        case .webViewNavigationFailed: return "An error occurred during a committed main frame navigation of the WebView."
+        case .webViewProvisionalNavigationFailed: return "An error occurred while starting to load data for the main frame of the WebView."
+        case .webViewContentProcessTerminated: return "The WebView's content process was terminated."
+        case .webViewResourceLoadingStopped: return "The WebView's resource loading was stopped."
         case .noBundleIdentifier: return "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
             + " or it could not be used to build a valid URL."
         case .transactionActiveAlready: return "Failed to start this transaction, as there is an active transaction at the"
