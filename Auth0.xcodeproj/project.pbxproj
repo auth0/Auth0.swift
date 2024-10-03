@@ -327,7 +327,6 @@
 		C12BFE442C352DD700D1CC00 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
 		C160EE352CABD0E5005ACE8E /* UIWindow+TopViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE302CABD0DA005ACE8E /* UIWindow+TopViewController.swift */; };
 		C160EE382CABD35A005ACE8E /* UIWindow+TopViewControllerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE372CABD358005ACE8E /* UIWindow+TopViewControllerSpec.swift */; };
-		C160EE3C2CAE6324005ACE8E /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
 		C177D6C32C2ADDEB0094C657 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
 		C177D6C72C2ADEB60094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */; };
 		C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6D32C2B0DCB0094C657 /* CwlPreconditionTesting */; };
@@ -1820,7 +1819,6 @@
 				5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */,
 				5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */,
 				5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */,
-				C160EE3C2CAE6324005ACE8E /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
