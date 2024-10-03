@@ -100,7 +100,7 @@ extension WebViewUserAgent: WKURLSchemeHandler {
             NSLocalizedDescriptionKey: "WebViewProvider: WKURLSchemeHandler: Webview Resource Loading has been stopped"
         ])
         urlSchemeTask.didFailWithError(error)
-        self.finish(with: .failure(WebAuthError(code: .userCancelled)))
+        self.finish(with: .failure(WebAuthError(code: .webViewFailure("The WebView's resource loading was stopped."))))
     }
 }
 
@@ -119,18 +119,18 @@ extension WebViewUserAgent: WKNavigationDelegate {
         if (error as NSError).domain == WebViewUserAgent.customSchemeRedirectionSuccessMessage {
             return
         }
-        self.finish(with: .failure(WebAuthError(code: .webViewNavigationFailed, cause: error)))
+        self.finish(with: .failure(WebAuthError(code: .webViewFailure("An error occurred during a committed main frame navigation of the WebView."), cause: error)))
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {
         if (error as NSError).domain == WebViewUserAgent.customSchemeRedirectionSuccessMessage {
             return
         }
-        self.finish(with: .failure(WebAuthError(code: .webViewProvisionalNavigationFailed, cause: error)))
+        self.finish(with: .failure(WebAuthError(code: .webViewFailure("An error occurred while starting to load data for the main frame of the WebView."), cause: error)))
     }
     
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        self.finish(with: .failure(WebAuthError(code: .webViewContentProcessTerminated)))
+        self.finish(with: .failure(WebAuthError(code: .webViewFailure("The WebView's content process was terminated."))))
     }
 }
 

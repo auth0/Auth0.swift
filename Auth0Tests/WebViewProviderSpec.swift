@@ -130,12 +130,12 @@ class WebViewProviderSpec: QuickSpec {
                     callback = { result in
                         expect(root.presentedViewController).to(beNil())
                         expect(mockViewController.view.subviews.contains(webViewUserAgent.webview)).to(beFalse())
-                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewProvisionalNavigationFailed)))
+                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewFailure("An error occurred while starting to load data for the main frame of the WebView."))))
                         done()
                     }
                     
                     webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
-                    webViewUserAgent.finish(with: .failure(WebAuthError(code: .webViewProvisionalNavigationFailed)))
+                    webViewUserAgent.finish(with: .failure(WebAuthError(code: .webViewFailure("An error occurred while starting to load data for the main frame of the WebView."))))
                 }
             }
             
@@ -149,7 +149,7 @@ class WebViewProviderSpec: QuickSpec {
                     }
                     
                     webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
-                    webViewUserAgent.finish(with: .failure(WebAuthError(code: .webViewProvisionalNavigationFailed)))
+                    webViewUserAgent.finish(with: .failure(WebAuthError(code: .webViewFailure("An error occurred while starting to load data for the main frame of the WebView."))))
                 }
             }
         }
@@ -173,7 +173,7 @@ class WebViewProviderSpec: QuickSpec {
                 
                 waitUntil(timeout: Timeout) { done in
                     callback = { result in
-                        expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
+                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewFailure("The WebView's resource loading was stopped."))))
                         done()
                     }
                     webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: customSchemeRedirectURL, viewController: mockViewController, callback: callback)
@@ -221,7 +221,7 @@ class WebViewProviderSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     let error = NSError(domain: "WKWebViewNavigationFailure", code: 400)
                     callback = { result in
-                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewNavigationFailed, cause: error)))
+                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewFailure("An error occurred during a committed main frame navigation of the WebView."), cause: error)))
                         done()
                     }
                     webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
@@ -233,7 +233,7 @@ class WebViewProviderSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     let error = NSError(domain: "WKWebViewNavigationFailure", code: 400)
                     callback = { result in
-                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewProvisionalNavigationFailed, cause: error)))
+                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewFailure("An error occurred while starting to load data for the main frame of the WebView."), cause: error)))
                         done()
                     }
                     webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
@@ -244,7 +244,7 @@ class WebViewProviderSpec: QuickSpec {
             it("should handle webview failures correctly when content process terminated") {
                 waitUntil(timeout: Timeout) { done in
                     callback = { result in
-                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewContentProcessTerminated)))
+                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewFailure("The WebView's content process was terminated."))))
                         done()
                     }
                     webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
