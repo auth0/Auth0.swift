@@ -7,6 +7,7 @@
 //
 
 
+#if os(iOS)
 import Quick
 import Nimble
 @testable import Auth0
@@ -83,3 +84,4 @@ class UIWindow_TopViewControllerSpec: QuickSpec {
         
     }
 }
+#endif

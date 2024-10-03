@@ -325,10 +325,9 @@
 		C107B5222CA27F7C006B6BEA /* WebViewProviderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C107B5202CA27F76006B6BEA /* WebViewProviderSpec.swift */; };
 		C12BFE432C352DD400D1CC00 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D76F2C2BDFE40094C657 /* NetworkStub.swift */; };
 		C12BFE442C352DD700D1CC00 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
-		C160EE332CABD0E5005ACE8E /* UIWindow+TopViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE302CABD0DA005ACE8E /* UIWindow+TopViewController.swift */; };
 		C160EE352CABD0E5005ACE8E /* UIWindow+TopViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE302CABD0DA005ACE8E /* UIWindow+TopViewController.swift */; };
 		C160EE382CABD35A005ACE8E /* UIWindow+TopViewControllerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE372CABD358005ACE8E /* UIWindow+TopViewControllerSpec.swift */; };
-		C160EE3B2CABD35A005ACE8E /* UIWindow+TopViewControllerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE372CABD358005ACE8E /* UIWindow+TopViewControllerSpec.swift */; };
+		C160EE3C2CAE6324005ACE8E /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
 		C177D6C32C2ADDEB0094C657 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
 		C177D6C72C2ADEB60094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */; };
 		C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6D32C2B0DCB0094C657 /* CwlPreconditionTesting */; };
@@ -1821,6 +1820,7 @@
 				5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */,
 				5F3965D11CF67DD800CDE7C0 /* Assets.xcassets in Resources */,
 				5F3965CF1CF67DD800CDE7C0 /* Main.storyboard in Resources */,
+				C160EE3C2CAE6324005ACE8E /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2095,7 +2095,6 @@
 				5C41F6D5244F974B00252548 /* ClearSessionTransaction.swift in Sources */,
 				5C29743423FDBD5500BC18FA /* Optional+DebugDescription.swift in Sources */,
 				5C41F6C6244F968100252548 /* WebAuthUserAgent.swift in Sources */,
-				C160EE332CABD0E5005ACE8E /* UIWindow+TopViewController.swift in Sources */,
 				5B1748751EF2D3A70060E653 /* Helpers.swift in Sources */,
 				5F6FAC641D09E98000D5B4EA /* Logger.swift in Sources */,
 				D5E9E318273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */,
@@ -2227,7 +2226,6 @@
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5CE775B2244FD70B00D054A0 /* TransactionStoreSpec.swift in Sources */,
 				5CE775A9244FCF4900D054A0 /* ClaimValidatorsSpec.swift in Sources */,
-				C160EE3B2CABD35A005ACE8E /* UIWindow+TopViewControllerSpec.swift in Sources */,
 				5C809D9B275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */,
 				5CE775A3244FCF3600D054A0 /* CryptoExtensions.swift in Sources */,
 				5CE775B3244FD71000D054A0 /* WebAuthSpec.swift in Sources */,

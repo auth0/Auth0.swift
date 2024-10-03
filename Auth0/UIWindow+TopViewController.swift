@@ -6,6 +6,7 @@
 //  Copyright © 2024 Auth0. All rights reserved.
 //
 
+#if os(iOS)
 import UIKit
 
 extension UIWindow {
@@ -34,3 +35,4 @@ extension UIWindow {
         }
     }
 }
+#endif
