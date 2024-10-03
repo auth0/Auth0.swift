@@ -16,7 +16,7 @@ class WebViewProviderSpec: QuickSpec {
         var mockViewController: UIViewController!
         var mockWebView: WKWebView!
         
-        let authorizeURL = URL(string: "https://auth0.com/authorize")!
+        let authorizeURL = URL(string: "https://auth0.com/authorize?redirect_uri=https://auth0.com/callback")!
         let redirectURL = URL(string: "https://auth0.com/callback")!
         let customSchemeRedirectURL = URL(string: "customscheme://auth0.com/callback")!
         let code = "abc123"
@@ -30,19 +30,19 @@ class WebViewProviderSpec: QuickSpec {
         
         describe("WebAuthentication extension") {
             it("should create a WebView provider") {
-                let provider = WebAuthentication.webViewProvider(redirectionURL: redirectURL)
+                let provider = WebAuthentication.webViewProvider()
                 expect(provider(authorizeURL, { _ in })).to(beAKindOf(WebViewUserAgent.self))
             }
 
             it("should use the fullscreen presentation style by default") {
-                let provider = WebAuthentication.webViewProvider(redirectionURL: redirectURL)
+                let provider = WebAuthentication.webViewProvider()
                 let userAgent = provider(authorizeURL, { _ in }) as! WebViewUserAgent
                 expect(userAgent.viewController.modalPresentationStyle) == .fullScreen
             }
 
             it("should set a custom presentation style") {
                 let style = UIModalPresentationStyle.formSheet
-                let provider = WebAuthentication.webViewProvider(redirectionURL: redirectURL, style: style)
+                let provider = WebAuthentication.webViewProvider(style: style)
                 let userAgent = provider(authorizeURL, { _ in }) as! WebViewUserAgent
                 expect(userAgent.viewController.modalPresentationStyle) == .formSheet
             }
@@ -50,7 +50,7 @@ class WebViewProviderSpec: QuickSpec {
         
         describe("initialization") {
             it("should initialize with correct parameters") {
-                let authorizeURL = URL(string: "https://auth0.com/authorize")!
+                let authorizeURL = URL(string: "https://auth0.com/authorize?redirect_uri=https://auth0.com/callback")!
                 let redirectURL = URL(string: "https://auth0.com/callback")!
                 webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
                 
@@ -65,7 +65,7 @@ class WebViewProviderSpec: QuickSpec {
             }
             
             it("should initialize with custom scheme URLs and supply WKURLSchemeHandler") {
-                let authorizeURL = URL(string: "customscheme://auth0.com/authorize")!
+                let authorizeURL = URL(string: "customscheme://auth0.com/authorize?redirect_uri=customscheme://auth0.com/callback")!
                 let redirectURL = URL(string: "customscheme://auth0.com/callback")!
                 webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: redirectURL, viewController: mockViewController, callback: callback)
                 
@@ -173,7 +173,7 @@ class WebViewProviderSpec: QuickSpec {
                 
                 waitUntil(timeout: Timeout) { done in
                     callback = { result in
-                        expect(result).to(haveWebAuthError(WebAuthError(code: .webViewResourceLoadingStopped)))
+                        expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
                         done()
                     }
                     webViewUserAgent = WebViewUserAgent(authorizeURL: authorizeURL, redirectURL: customSchemeRedirectURL, viewController: mockViewController, callback: callback)

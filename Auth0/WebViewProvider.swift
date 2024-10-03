@@ -11,10 +11,11 @@
 @preconcurrency import WebKit
 
 
-extension WebAuthentication {
-    static func webViewProvider(redirectionURL: URL, style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
+public extension WebAuthentication {
+    static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
         return { url, callback  in
-            WebViewUserAgent(authorizeURL: url, redirectURL: redirectionURL, modalPresentationStyle: style, callback: callback)
+            let redirectURL = extractRedirectURL(from: url)!
+            return WebViewUserAgent(authorizeURL: url, redirectURL: redirectURL, modalPresentationStyle: style, callback: callback)
         }
     }
 }
@@ -23,7 +24,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
     static let customSchemeRedirectionFailureMessage = "com.auth0.webview.redirection_failure"
-    let defaultSchemesSupportedByWKWebview = ["http", "https"]
+    let defaultSchemesSupportedByWKWebview = ["https"]
     
     let request: URLRequest
     var webview: WKWebView!
@@ -99,7 +100,7 @@ extension WebViewUserAgent: WKURLSchemeHandler {
             NSLocalizedDescriptionKey: "WebViewProvider: WKURLSchemeHandler: Webview Resource Loading has been stopped"
         ])
         urlSchemeTask.didFailWithError(error)
-        self.finish(with: .failure(WebAuthError(code: .webViewResourceLoadingStopped)))
+        self.finish(with: .failure(WebAuthError(code: .userCancelled)))
     }
 }
 

@@ -4,10 +4,6 @@
 import Foundation
 import Combine
 
-#if os(iOS)
-import UIKit
-#endif
-
 /// Callback invoked by the ``WebAuthUserAgent`` when the web-based operation concludes.
 public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
 
@@ -168,10 +164,6 @@ public protocol WebAuth: Trackable, Loggable {
     /// - [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md)
     /// - [prefersEphemeralWebBrowserSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio)
     func useEphemeralSession() -> Self
-    
-#if os(iOS)
-    func useWebViewProvider(style: UIModalPresentationStyle) -> Self
-#endif
 
     /// Specify an invitation URL to join an organization.
     ///
@@ -419,12 +411,6 @@ public extension WebAuth {
     #if canImport(_Concurrency)
     func clearSession(federated: Bool = false) async throws {
         return try await self.clearSession(federated: federated)
-    }
-    #endif
-    
-    #if os(iOS)
-    func useWebViewProvider(style: UIModalPresentationStyle = .fullScreen) -> Self {
-        return self.useWebViewProvider(style: style)
     }
     #endif
 }

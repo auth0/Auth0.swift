@@ -1,9 +1,6 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 import Combine
-#if os(iOS)
-import UIKit
-#endif
 
 final class Auth0WebAuth: WebAuth {
 
@@ -36,11 +33,6 @@ final class Auth0WebAuth: WebAuth {
     private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
     private(set) var onCloseCallback: (() -> Void)?
-    
-    #if os(iOS)
-    private(set) var useWebViewProvider = false
-    private(set) var webViewProviderPresentationStyle: UIModalPresentationStyle = .fullScreen
-    #endif
 
     var state: String {
         return self.parameters["state"] ?? self.generateDefaultState()
@@ -152,14 +144,6 @@ final class Auth0WebAuth: WebAuth {
         self.ephemeralSession = true
         return self
     }
-    
-    #if os(iOS)
-    func useWebViewProvider(style: UIModalPresentationStyle = .fullScreen) -> Self {
-        self.useWebViewProvider = true
-        self.webViewProviderPresentationStyle = style
-        return self
-    }
-    #endif
 
     func invitationURL(_ invitationURL: URL) -> Self {
         self.invitationURL = invitationURL
@@ -212,12 +196,8 @@ final class Auth0WebAuth: WebAuth {
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
-        
-        #if os(iOS)
-        let provider = useWebViewProvider ? WebAuthentication.webViewProvider(redirectionURL: redirectURL, style: webViewProviderPresentationStyle) : (self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, ephemeralSession: ephemeralSession))
-        #else
+
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, ephemeralSession: ephemeralSession)
-        #endif
         let userAgent = provider(authorizeURL) { [storage, onCloseCallback] result in
             storage.clear()
 
@@ -258,11 +238,7 @@ final class Auth0WebAuth: WebAuth {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
-        #if os(iOS)
-        let provider = useWebViewProvider ? WebAuthentication.webViewProvider(redirectionURL: redirectURL, style: webViewProviderPresentationStyle) : (self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL))
-        #else
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL)
-        #endif
         let userAgent = provider(logoutURL) { [storage] result in
             storage.clear()
             callback(result)

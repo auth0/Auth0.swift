@@ -27,7 +27,7 @@ class ViewController: UIViewController {
     @IBAction func login(_ sender: Any) {
         Auth0
             .webAuth()
-            .useWebViewProvider()
+            .provider(WebAuthentication.webViewProvider())
             .logging(enabled: true)
             .start(onAuth)
     }
@@ -35,7 +35,7 @@ class ViewController: UIViewController {
     @IBAction func logout(_ sender: Any) {
         Auth0
             .webAuth()
-            .useWebViewProvider()
+            .provider(WebAuthentication.webViewProvider())
             .logging(enabled: true)
             .clearSession(federated: false) { result in
                 switch result {
