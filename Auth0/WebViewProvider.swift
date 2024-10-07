@@ -107,7 +107,7 @@ extension WebViewUserAgent: WKURLSchemeHandler {
 /// Handling HTTPS Callbacks
 extension WebViewUserAgent: WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString) {
+        if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString), let scheme = callbackUrl.scheme, scheme == "https" {
             _ = TransactionStore.shared.resume(callbackUrl)
             decisionHandler(.cancel)
         } else {
