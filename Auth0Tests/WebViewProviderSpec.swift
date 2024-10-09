@@ -17,6 +17,7 @@ class WebViewProviderSpec: QuickSpec {
         var mockWebView: WKWebView!
         
         let authorizeURL = URL(string: "https://auth0.com/authorize?redirect_uri=https://auth0.com/callback")!
+        let logoutURL = URL(string: "https://auth0.com/authorize?returnTo=https://auth0.com/callback")!
         let redirectURL = URL(string: "https://auth0.com/callback")!
         let customSchemeRedirectURL = URL(string: "customscheme://auth0.com/callback")!
         let code = "abc123"
@@ -45,6 +46,18 @@ class WebViewProviderSpec: QuickSpec {
                 let provider = WebAuthentication.webViewProvider(style: style)
                 let userAgent = provider(authorizeURL, { _ in }) as! WebViewUserAgent
                 expect(userAgent.viewController.modalPresentationStyle) == .formSheet
+            }
+            
+            it("should set the redirectURL correctly when using redirect_uri") {
+                let provider = WebAuthentication.webViewProvider()
+                let userAgent = provider(authorizeURL, { _ in }) as! WebViewUserAgent
+                expect(userAgent.redirectURL).to(equal(redirectURL))
+            }
+            
+            it("should set the redirectURL correctly when using returnTo") {
+                let provider = WebAuthentication.webViewProvider()
+                let userAgent = provider(logoutURL, { _ in }) as! WebViewUserAgent
+                expect(userAgent.redirectURL).to(equal(redirectURL))
             }
         }
         
