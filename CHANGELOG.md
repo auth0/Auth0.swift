@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.8.1](https://github.com/auth0/Auth0.swift/tree/2.8.1) (2024-10-09)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.8.1...2.8.0)
+
+**Fixed**
+- fixed the versions of dependencies being used
+
 ## [2.8.0](https://github.com/auth0/Auth0.swift/tree/2.8.0) (2024-06-19)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.7.2...2.8.0)
 
