@@ -44,8 +44,8 @@ Pod::Spec.new do |s|
   s.resource_bundles = { s.name => 'Auth0/PrivacyInfo.xcprivacy' }
   s.swift_versions   = ['5.7', '5.8']
 
-  s.dependency 'SimpleKeychain', '~> 1.1'
-  s.dependency 'JWTDecode', '~> 3.1'
+  s.dependency 'SimpleKeychain', '1.1.0'
+  s.dependency 'JWTDecode', '3.1.0'
 
   s.ios.deployment_target   = '13.0'
   s.ios.exclude_files       = macos_files
