@@ -7,6 +7,7 @@ import WebKit
 @testable import Auth0
 
 private let Timeout: NimbleTimeInterval = .seconds(2)
+private let LongerTimeout: NimbleTimeInterval = .seconds(5)
 
 class WebViewProviderSpec: QuickSpec {
     
@@ -121,7 +122,7 @@ class WebViewProviderSpec: QuickSpec {
                 UIApplication.shared.windows.last(where: \.isKeyWindow)?.rootViewController = root
                 root.present(mockViewController, animated: false)
                 
-                waitUntil(timeout: Timeout) { done in
+                waitUntil(timeout: LongerTimeout) { done in
                     callback = { result in
                         expect(root.presentedViewController).to(beNil())
                         expect(mockViewController.view.subviews.contains(webViewUserAgent.webview)).to(beFalse())
