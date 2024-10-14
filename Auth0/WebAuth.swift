@@ -413,6 +413,5 @@ public extension WebAuth {
         return try await self.clearSession(federated: federated)
     }
     #endif
-
 }
 #endif

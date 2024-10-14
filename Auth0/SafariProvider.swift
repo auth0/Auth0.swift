@@ -45,39 +45,6 @@ public extension WebAuthentication {
 
 }
 
-extension SFSafariViewController {
-
-    var topViewController: UIViewController? {
-        guard let root = UIApplication.shared()?.windows.last(where: \.isKeyWindow)?.rootViewController else {
-            return nil
-        }
-        return self.findTopViewController(from: root)
-    }
-
-    func present() {
-        self.topViewController?.present(self, animated: true, completion: nil)
-    }
-
-    private func findTopViewController(from root: UIViewController) -> UIViewController? {
-        if let presented = root.presentedViewController { return self.findTopViewController(from: presented) }
-
-        switch root {
-        case let split as UISplitViewController:
-            guard let last = split.viewControllers.last else { return split }
-            return self.findTopViewController(from: last)
-        case let navigation as UINavigationController:
-            guard let top = navigation.topViewController else { return navigation }
-            return self.findTopViewController(from: top)
-        case let tab as UITabBarController:
-            guard let selected = tab.selectedViewController else { return tab }
-            return self.findTopViewController(from: selected)
-        default:
-            return root
-        }
-    }
-
-}
-
 class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     let controller: SFSafariViewController
@@ -92,7 +59,7 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func start() {
-        self.controller.present()
+        UIWindow.topViewController?.present(controller, animated: true, completion: nil)
     }
 
     func finish(with result: WebAuthResult<Void>) {
@@ -125,7 +92,6 @@ extension SafariUserAgent: SFSafariViewControllerDelegate {
         // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead
         // TransactionStore is internal
         TransactionStore.shared.cancel()
-
     }
 
 }

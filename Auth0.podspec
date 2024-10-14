@@ -21,7 +21,9 @@ web_auth_files = [
   'Auth0/WebAuth.swift',
   'Auth0/WebAuthentication.swift',
   'Auth0/WebAuthError.swift',
-  'Auth0/WebAuthUserAgent.swift'
+  'Auth0/WebAuthUserAgent.swift',
+  'Auth0/UIWindow+TopViewController.swift',
+  'Auth0/WebViewProvider.swift'
 ]
 
 ios_files = ['Auth0/MobileWebAuth.swift']

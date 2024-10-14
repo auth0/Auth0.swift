@@ -5,6 +5,7 @@ import Foundation
 public struct WebAuthError: Auth0Error {
 
     enum Code: Equatable {
+        case webViewFailure(String)
         case noBundleIdentifier
         case transactionActiveAlready
         case invalidInvitationURL(String)
@@ -82,6 +83,7 @@ extension WebAuthError {
 
     var message: String {
         switch self.code {
+        case .webViewFailure(let webViewFailureMessage): return webViewFailureMessage
         case .noBundleIdentifier: return "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
             + " or it could not be used to build a valid URL."
         case .transactionActiveAlready: return "Failed to start this transaction, as there is an active transaction at the"

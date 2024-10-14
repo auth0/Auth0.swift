@@ -196,8 +196,8 @@ final class Auth0WebAuth: WebAuth {
                                                   state: state,
                                                   organization: organization,
                                                   invitation: invitation)
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
-                                                                     ephemeralSession: ephemeralSession)
+
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, ephemeralSession: ephemeralSession)
         let userAgent = provider(authorizeURL) { [storage, onCloseCallback] result in
             storage.clear()
 
