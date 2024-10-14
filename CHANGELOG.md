@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.10.0](https://github.com/auth0/Auth0.swift/tree/2.10.0) (2024-10-14)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.9.0...2.10.0)
+
+**Added**
+- feat: added support for webview as a provider for webauth [\#875](https://github.com/auth0/Auth0.swift/pull/875) ([desusai7](https://github.com/desusai7))
+
 ## [2.9.0](https://github.com/auth0/Auth0.swift/tree/2.9.0) (2024-09-06)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.8.0...2.9.0)
 
