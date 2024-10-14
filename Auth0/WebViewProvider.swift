@@ -11,7 +11,7 @@
 @preconcurrency import WebKit
 
 
-/// WARNING: The use of `webViewProvider` is not recommended and contravenes the guidelines of the OAuth Protocol, which advises against using `WKWebView` for WebAuth.
+/// WARNING: The use of `webViewProvider` [is not recommended](https://auth0.com/blog/oauth-2-best-practices-for-native-apps) and contravenes the guidelines of the OAuth Protocol, which advises against using web views for WebAuth.
 /// The recommended approach is to utilize `ASWebAuthenticationSession`. Employ the provider below only if you fully understand the associated risks and are confident in your decision.
 public extension WebAuthentication {
     static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
