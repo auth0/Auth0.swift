@@ -3,6 +3,9 @@ run-name: rl-security-scanner
 
 
 on:
+  push:
+    branches:
+      - 'reversing_labs'
   pull_request:
     types:
       - closed
