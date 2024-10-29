@@ -25,6 +25,12 @@ jobs:
     outputs:
       scan-status: ${{ steps.rl-scan-conclusion.outcome }}
 
+    
+    strategy:
+          matrix:
+            xcode: 
+              - '15.0.1'  
+
 
     steps:
       - name: Checkout code
@@ -33,7 +39,9 @@ jobs:
           fetch-depth: 0
 
       - name: Set up
-        uses: ./.github/actions/setup  
+        uses: ./.github/actions/setup
+        with:
+          xcode: ${{ matrix.xcode }}
 
       - name: Build package
         shell: bash
