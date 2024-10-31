@@ -37,11 +37,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up
-        uses: ./.github/actions/setup
-        with:
-          xcode: ${{ matrix.xcode }}
-
       - name: Build package
         shell: bash
         run: |
