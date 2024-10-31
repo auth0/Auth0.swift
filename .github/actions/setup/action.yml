@@ -21,10 +21,4 @@ runs:
       uses: mxcl/xcodebuild@6e60022a0cbe8c89278be2dd1773a2f68e7c5c87
       with:
         xcode: ${{ inputs.xcode }}
-        action: none
-
-    - name: Add x86_64-linux platform to Gemfile.lock
-      run: bundle lock --add-platform x86_64-linux
-
-    - name: Install dependencies
-      run: bundle install --jobs 4    
+        action: none   
