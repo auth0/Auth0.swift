@@ -22,3 +22,9 @@ runs:
       with:
         xcode: ${{ inputs.xcode }}
         action: none
+
+    - name: Add x86_64-linux platform to Gemfile.lock
+      run: bundle lock --add-platform x86_64-linux
+
+    - name: Install dependencies
+      run: bundle install --jobs 4    
