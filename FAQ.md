@@ -8,6 +8,7 @@
 - [2. How can I disable the _logout_ alert box?](#2-how-can-i-disable-the-logout-alert-box)
 - [3. How can I change the message in the alert box?](#3-how-can-i-change-the-message-in-the-alert-box)
 - [4. How can I programmatically close the alert box?](#4-how-can-i-programmatically-close-the-alert-box)
+- [5. How to resolve the _Failed to start this transaction, as there is an active transaction at the moment_ error ?](#-5-how-to-resolve-the-failed-to-start-this-transaction-as-there-is-an-active-transaction-at-the-moment-error)
 
 ---
 
@@ -140,6 +141,14 @@ Auth0.swift has no control whatsoever over the alert box. Its contents cannot be
 
 Auth0.swift has no control whatsoever over the alert box. It cannot be closed programmatically. Unfortunately, that is a limitation of `ASWebAuthenticationSession`. 
 
+## 5. How to resolve the _Failed to start this transaction, as there is an active transaction at the moment_ error ?
+
+Users might encounter this error when the login/logout alert box is displayed and the user locks the device and unlocks it again. The alert box would have been dismissed but when the user tries to log in again, the error is shown.
+This is a known issue with `ASWebAuthenticationSession` and it is not specific to Auth0.swift . We have already raised an issue with Apple and are waiting for a response from them.
+Meanwhile , as a workaround, developers can invoke `WebAuthentication.cancel()` to manually clear the current login transaction when encountering this error. 
+Please ensure to not cancel a valid login attempt (eg: the login page is open, and the user switches briefly to another app and then returns) .
+
 ---
+
 
 [Go up ⤴](#frequently-asked-questions)
