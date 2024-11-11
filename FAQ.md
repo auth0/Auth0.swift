@@ -141,13 +141,25 @@ Auth0.swift has no control whatsoever over the alert box. Its contents cannot be
 
 Auth0.swift has no control whatsoever over the alert box. It cannot be closed programmatically. Unfortunately, that is a limitation of `ASWebAuthenticationSession`. 
 
-## 5. How to resolve the _Failed to start this transaction, as there is an active transaction at the moment_ error ?
+## 5. How to resolve the _Failed to start this transaction, as there is an active transaction at the moment_ error?
 
-Users might encounter this error when the login/logout alert box is displayed and the user locks the device and unlocks it again. The alert box would have been dismissed but when the user tries to log in again, the error is shown.
-This is a known issue with `ASWebAuthenticationSession` and it is not specific to Auth0.swift . We have already raised an issue with Apple and are waiting for a response from them.
-Meanwhile , as a workaround, developers can invoke `WebAuthentication.cancel()` to manually clear the current login transaction when encountering this error. 
-Please ensure to not cancel a valid login attempt (eg: the login page is open, and the user switches briefly to another app and then returns) .
+Users might encounter this error when the app moves to the background and then back to the foreground while the login/logout alert box is displayed, for example by locking and unlocking the device. The alert box would get dismissed but when the user tries to log in again, the Web Auth operation fails with the `transactionActiveAlready` error.
 
+This is a known issue with `ASWebAuthenticationSession` and it is not specific to Auth0.swift. We have already filed a bug report with Apple and are awaiting for a response from them.
+
+### Workarounds
+
+#### Clear the login transaction when handling the `transactionActiveAlready` error
+
+You can invoke `WebAuthentication.cancel()` to manually clear the current login transaction upon encountering this error. Then, you can retry login. For example:
+
+```swift
+switch error {
+case .failure(let error) where error == .transactionActiveAlready:
+    WebAuthentication.cancel()
+    // ... retry login
+// ...
+}
 ---
 
 
