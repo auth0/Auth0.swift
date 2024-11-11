@@ -160,7 +160,6 @@ case .failure(let error) where error == .transactionActiveAlready:
     // ... retry login
 // ...
 }
----
 ```
 
 [Go up ⤴](#frequently-asked-questions)
