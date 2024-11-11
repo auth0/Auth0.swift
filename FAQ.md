@@ -1,14 +1,14 @@
 # Frequently Asked Questions
 
-- [1. How can I disable the _login_ alert box?](#1-how-can-i-disable-the-_login_-alert-box)
+- [1. How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box)
   - [Use ephemeral sessions](#use-ephemeral-sessions)
   - [Use `SFSafariViewController`](#use-sfsafariviewcontroller)
     - [1. Configure a custom URL scheme](#1-configure-a-custom-url-scheme)
     - [2. Capture the callback URL](#2-capture-the-callback-url)
-- [2. How can I disable the _logout_ alert box?](#2-how-can-i-disable-the-_logout_-alert-box)
+- [2. How can I disable the _logout_ alert box?](#2-how-can-i-disable-the-logout-alert-box)
 - [3. How can I change the message in the alert box?](#3-how-can-i-change-the-message-in-the-alert-box)
 - [4. How can I programmatically close the alert box?](#4-how-can-i-programmatically-close-the-alert-box)
-- [5. How to resolve the _Failed to start this transaction, as there is an active transaction at the moment_ error?](#5-how-to-resolve-the-_failed-to-start-this-transaction-as-there-is-an-active-transaction-at-the-moment_-error)
+- [5. How to resolve the _Failed to start this transaction, as there is an active transaction at the moment_ error?](#5-how-to-resolve-the-failed-to-start-this-transaction-as-there-is-an-active-transaction-at-the-moment-error)
 
 ---
 
