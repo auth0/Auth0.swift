@@ -162,4 +162,10 @@ case .failure(let error) where error == .transactionActiveAlready:
 }
 ```
 
+#### Clear the login transaction when the app moves to the background/foreground
+You can invoke `WebAuthentication.cancel()` to manually clear the current login transaction when the app moves to the background or back to the foreground. However, you need to make sure to not cancel valid login attempts –for example, when the user switches briefly to another app while the login page is open.
+
+#### Avoid the login/logout alert box
+If you don't need SSO, consider using `ephemeral sessions` or `SFSafariViewController` instead of `ASWebAuthenticationSession`. See [1. How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box) for more information.
+
 [Go up ⤴](#frequently-asked-questions)
