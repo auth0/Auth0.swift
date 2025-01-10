@@ -21,4 +21,4 @@ runs:
       uses: mxcl/xcodebuild@6e60022a0cbe8c89278be2dd1773a2f68e7c5c87
       with:
         xcode: ${{ inputs.xcode }}
-        action: none
+        action: none   
