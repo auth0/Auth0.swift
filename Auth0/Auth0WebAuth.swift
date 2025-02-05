@@ -338,15 +338,17 @@ extension Auth0WebAuth {
 
     func start() async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.main.async {
-                self.start(continuation.resume)
+            Task { @MainActor in
+                self.start { result in
+                    continuation.resume(with: result)
+                }
             }
         }
     }
 
     func clearSession(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.clearSession(federated: federated) { result in
                     continuation.resume(with: result)
                 }
