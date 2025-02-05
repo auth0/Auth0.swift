@@ -5,7 +5,7 @@ import Foundation
 /// ## See Also
 ///
 /// - [JSON Web Key Sets](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-key-sets)
-public struct JWKS: Codable {
+public struct JWKS: Codable, Sendable {
 
     /// The keys in the key set.
     public let keys: [JWK]
@@ -26,7 +26,7 @@ public extension JWKS {
 /// ## See Also
 ///
 /// - ``JWKS``
-public struct JWK: Codable {
+public struct JWK: Codable, Sendable {
 
     /// The type of key.
     public let keyType: String

@@ -1,10 +1,10 @@
 import Foundation
 
 /// Represents an error during a request to the Auth0 Management API v2.
-public struct ManagementError: Auth0APIError {
+public struct ManagementError: Auth0APIError, Sendable {
 
     /// Additional information about the error.
-    public let info: [String: Any]
+    nonisolated(unsafe) public let info: [String: Any]
 
     /// Creates an error from a JSON response.
     ///
