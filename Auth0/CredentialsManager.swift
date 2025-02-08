@@ -55,7 +55,7 @@ public struct CredentialsManager {
     ///
     /// - Important: Access to this property will not be protected by biometric authentication.
     public var user: UserInfo? {
-        guard let credentials = retrieveCredentials(),
+        guard let credentials = retrieveCredentials(forKey: storeKey),
               let jwt = try? decode(jwt: credentials.idToken) else { return nil }
 
         return UserInfo(json: jwt.body)
@@ -102,12 +102,13 @@ public struct CredentialsManager {
     ///
     /// - Parameter credentials: Credentials instance to store.
     /// - Returns: If the credentials were stored.
-    public func store(credentials: Credentials) -> Bool {
-        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true) else {
+    public func store(credentials: Credentials, forKey audience: String? = nil) -> Bool {
+        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
+                                                           requiringSecureCoding: true) else {
             return false
         }
 
-        return self.storage.setEntry(data, forKey: storeKey)
+        return self.storage.setEntry(data, forKey: audience ?? storeKey)
     }
 
     /// Clears credentials stored in the Keychain.
@@ -119,8 +120,8 @@ public struct CredentialsManager {
     /// ```
     ///
     /// - Returns: If the credentials were removed.
-    public func clear() -> Bool {
-        return self.storage.deleteEntry(forKey: storeKey)
+    public func clear(forKey audience: String? = nil) -> Bool {
+        return self.storage.deleteEntry(forKey: audience ?? storeKey)
     }
 
     /// Calls the `/oauth/revoke` endpoint to revoke the refresh token and then clears the credentials if the request
@@ -157,12 +158,14 @@ public struct CredentialsManager {
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
-    public func revoke(headers: [String: String] = [:],
+    public func revoke(forKey audience: String? = nil,
+                       headers: [String: String] = [:],
                        _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
-        guard let data = self.storage.getEntry(forKey: self.storeKey),
-              let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
+        let key = audience ?? storeKey
+
+        guard let credentials = self.retrieveCredentials(forKey: key),
               let refreshToken = credentials.refreshToken else {
-                  _ = self.clear()
+                  _ = self.clear(forKey: key)
                   return callback(.success(()))
         }
 
@@ -174,7 +177,7 @@ public struct CredentialsManager {
                 case .failure(let error):
                     callback(.failure(CredentialsManagerError(code: .revokeFailed, cause: error)))
                 case .success:
-                    _ = self.clear()
+                    _ = self.clear(forKey: key)
                     callback(.success(()))
                 }
             }
@@ -199,8 +202,8 @@ public struct CredentialsManager {
     /// ## See Also
     ///
     /// - ``Credentials/expiresIn``
-    public func hasValid(minTTL: Int = 0) -> Bool {
-        guard let credentials = self.retrieveCredentials() else { return false }
+    public func hasValid(forKey audience: String? = nil, minTTL: Int = 0) -> Bool {
+        guard let credentials = self.retrieveCredentials(forKey: audience ?? storeKey) else { return false }
         return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
     }
 
@@ -218,8 +221,8 @@ public struct CredentialsManager {
     /// ```
     ///
     /// - Returns: If there are credentials stored containing a refresh token.
-    public func canRenew() -> Bool {
-        guard let credentials = self.retrieveCredentials() else { return false }
+    public func canRenew(forKey audience: String? = nil) -> Bool {
+        guard let credentials = self.retrieveCredentials(forKey: audience ?? storeKey) else { return false }
         return credentials.refreshToken != nil
     }
 
@@ -282,11 +285,14 @@ public struct CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
-    public func credentials(withScope scope: String? = nil,
+    public func credentials(forKey audience: String? = nil,
+                            withScope scope: String? = nil,
                             minTTL: Int = 0,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        let key = audience ?? storeKey
+
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
                 let error = CredentialsManagerError(code: .biometricsFailed,
@@ -299,19 +305,25 @@ public struct CredentialsManager {
                     return callback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: $0!)))
                 }
 
-                self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
+                self.retrieveCredentials(forKey: key, withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
             }
         } else {
-            self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
+            self.retrieveCredentials(forKey: key, withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
         }
     }
     #else
-    public func credentials(withScope scope: String? = nil,
+    public func credentials(forKey audience: String? = nil,
+                            withScope scope: String? = nil,
                             minTTL: Int = 0,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
-        self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
+        self.retrieveCredentials(forKey: audience ?? storeKey,
+                                 withScope: scope,
+                                 minTTL: minTTL,
+                                 parameters: parameters,
+                                 headers: headers,
+                                 callback: callback)
     }
     #endif
 
@@ -354,19 +366,25 @@ public struct CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
-    public func renew(parameters: [String: Any] = [:],
+    public func renew(forKey audience: String? = nil,
+                      parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
                       callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
-        self.retrieveCredentials(parameters: parameters, headers: headers, forceRenewal: true, callback: callback)
+        self.retrieveCredentials(forKey: audience ?? storeKey,
+                                 parameters: parameters,
+                                 headers: headers,
+                                 forceRenewal: true,
+                                 callback: callback)
     }
 
-    private func retrieveCredentials() -> Credentials? {
-        guard let data = self.storage.getEntry(forKey: self.storeKey) else { return nil }
+    private func retrieveCredentials(forKey key: String) -> Credentials? {
+        guard let data = self.storage.getEntry(forKey: key) else { return nil }
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
     // swiftlint:disable:next function_body_length
-    private func retrieveCredentials(withScope scope: String? = nil,
+    private func retrieveCredentials(forKey key: String,
+                                     withScope scope: String? = nil,
                                      minTTL: Int = 0,
                                      parameters: [String: Any],
                                      headers: [String: String],
@@ -376,7 +394,7 @@ public struct CredentialsManager {
             self.dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
-                guard let credentials = retrieveCredentials() else {
+                guard let credentials = retrieveCredentials(forKey: key) else {
                     self.dispatchGroup.leave()
                     return callback(.failure(.noCredentials))
                 }
@@ -410,7 +428,7 @@ public struct CredentialsManager {
                                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
                                 self.dispatchGroup.leave()
                                 callback(.failure(error))
-                            } else if !self.store(credentials: newCredentials) {
+                            } else if !self.store(credentials: newCredentials, forKey: key) {
                                 self.dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
@@ -492,10 +510,11 @@ public extension CredentialsManager {
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
-    func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
+    func revoke(forKey audience: String? = nil,
+                headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {
             Future { callback in
-                return self.revoke(headers: headers, callback)
+                return self.revoke(forKey: audience, headers: headers, callback)
             }
         }.eraseToAnyPublisher()
     }
@@ -572,13 +591,15 @@ public extension CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
-    func credentials(withScope scope: String? = nil,
+    func credentials(forKey audience: String? = nil,
+                     withScope scope: String? = nil,
                      minTTL: Int = 0,
                      parameters: [String: Any] = [:],
                      headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
             Future { callback in
-                return self.credentials(withScope: scope,
+                return self.credentials(forKey: audience,
+                                        withScope: scope,
                                         minTTL: minTTL,
                                         parameters: parameters,
                                         headers: headers,
@@ -632,11 +653,15 @@ public extension CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
-    func renew(parameters: [String: Any] = [:],
+    func renew(forKey audience: String? = nil,
+               parameters: [String: Any] = [:],
                headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
             Future { callback in
-                return self.renew(parameters: parameters, headers: headers, callback: callback)
+                return self.renew(forKey: audience,
+                                  parameters: parameters,
+                                  headers: headers,
+                                  callback: callback)
             }
         }.eraseToAnyPublisher()
     }
@@ -677,9 +702,10 @@ public extension CredentialsManager {
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
-    func revoke(headers: [String: String] = [:]) async throws {
+    func revoke(forKey audience: String? = nil,
+                headers: [String: String] = [:]) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            self.revoke(headers: headers, continuation.resume)
+            self.revoke(forKey: audience, headers: headers, continuation.resume)
         }
     }
 
@@ -740,12 +766,14 @@ public extension CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
-    func credentials(withScope scope: String? = nil,
+    func credentials(forKey audience: String? = nil,
+                     withScope scope: String? = nil,
                      minTTL: Int = 0,
                      parameters: [String: Any] = [:],
                      headers: [String: String] = [:]) async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            self.credentials(withScope: scope,
+            self.credentials(forKey: audience,
+                             withScope: scope,
                              minTTL: minTTL,
                              parameters: parameters,
                              headers: headers,
@@ -790,9 +818,14 @@ public extension CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
-    func renew(parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {
+    func renew(forKey audience: String? = nil,
+               parameters: [String: Any] = [:],
+               headers: [String: String] = [:]) async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            self.renew(parameters: parameters, headers: headers, callback: continuation.resume)
+            self.renew(forKey: audience,
+                       parameters: parameters,
+                       headers: headers,
+                       callback: continuation.resume)
         }
     }
 

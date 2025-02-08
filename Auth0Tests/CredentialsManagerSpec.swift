@@ -23,6 +23,7 @@ private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 private let ExpiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NzE4NTI0NjMsImV4cCI6MTU0MDIzMDA2MywiYXVkIjoiYXVkaWVuY2UiLCJzdWIiOiIxMjM0NSJ9.Lcz79P1AFAZDI4Yr1teFapFVAmBbdfhGBGbj9dQVeRM"
 private let ValidToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZXN0IiwiaWF0IjoxNTcxOTExNTkyLCJleHAiOjE5MTg5ODAzOTIsImF1ZCI6ImF1ZGllbmNlIiwic3ViIjoic3VifDEyMyJ9.uLNF8IpY6cJTY-RyO3CcqLpCaKGaVekR-DTDoQTlnPk" // Token is valid until 2030
+private let Keys = ["key1", "key2"]
 
 class CredentialsManagerSpec: QuickSpec {
 
@@ -43,7 +44,7 @@ class CredentialsManagerSpec: QuickSpec {
             URLProtocol.unregisterClass(StubURLProtocol.self)
         }
 
-        describe("storage") {
+        describe("storage under the default key") {
 
             afterEach {
                 _ = credentialsManager.clear()
@@ -60,6 +61,38 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should fail to clear credentials") {
                 expect(credentialsManager.clear()).to(beFalse())
+            }
+
+        }
+
+        describe("storage under multiple keys") {
+            afterEach {
+                Keys.forEach { key in
+                    _ = credentialsManager.clear(forKey: key)
+                }
+            }
+
+            it("should store credentials in keychain") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                Keys.forEach { key in
+                    expect(credentialsManager.store(credentials: credentials, forKey: key)).to(beTrue())
+                    expect(fetchCredentials(from: store)).to(beNil())
+                }
+            }
+
+            it("should clear credentials in keychain") {
+                Keys.forEach { key in
+                    expect(credentialsManager.store(credentials: credentials, forKey: key)).to(beTrue())
+                    expect(credentialsManager.clear(forKey: key)).to(beTrue())
+                }
+            }
+
+            it("should fail to clear credentials") {
+                Keys.forEach { key in
+                    expect(credentialsManager.clear(forKey: key)).to(beFalse())
+                }
             }
 
         }
@@ -118,17 +151,21 @@ class CredentialsManagerSpec: QuickSpec {
         }
 
         describe("clearing and revoking refresh token") {
-            
+
             beforeEach {
                 _ = credentialsManager.store(credentials: credentials)
                 NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: revokeTokenResponse())
             }
-            
+
             afterEach {
                 _ = credentialsManager.clear()
+
+                Keys.forEach { key in
+                    _ = credentialsManager.clear(forKey: key)
+                }
             }
-            
-            it("should clear credentials and revoke the refresh token") {
+
+            it("should clear credentials under the default key and revoke the refresh token") {
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.revoke { result in
                         expect(result).to(beSuccessful())
@@ -137,8 +174,23 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
             }
-            
-            it("should not return an error if there were no credentials stored") {
+
+            it("should clear credentials under multiple keys and revoke the refresh token") {
+                Keys.forEach { key in
+                    _ = credentialsManager.store(credentials: credentials, forKey: key)
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.revoke(forKey: key) { result in
+                            expect(result).to(beSuccessful())
+                            expect(credentialsManager.hasValid(forKey: key)).to(beFalse())
+                            expect(credentialsManager.hasValid()).to(beTrue())
+                            done()
+                        }
+                    }
+                }
+            }
+
+            it("should not return an error when there are no credentials stored") {
                 _ = credentialsManager.clear()
                 
                 waitUntil(timeout: Timeout) { done in
@@ -150,7 +202,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
             
-            it("should not return an error if there is no refresh token, and clear credentials anyway") {
+            it("should not return an error when there is no refresh token, and clear credentials anyway") {
                 let credentials = Credentials(accessToken: AccessToken,
                                               idToken: IdToken,
                                               expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
@@ -166,7 +218,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
             
-            it("should return the failure if the token could not be revoked, and not clear credentials") {
+            it("should return the failure when the token could not be revoked, and not clear credentials") {
                 let cause = AuthenticationError(description: "Revoke failed", statusCode: 400)
                 let expectedError = CredentialsManagerError(code: .revokeFailed, cause: cause)
                 NetworkStub.clearStubs()
@@ -228,7 +280,7 @@ class CredentialsManagerSpec: QuickSpec {
                 _ = credentialsManager.store(credentials: credentials)
             }
             
-            it("should share a space in the keychain if using the same store key") {
+            it("should share a space in the keychain when using the same store key") {
                 
                 credentialsManager = CredentialsManager(authentication: authentication, storeKey: "secondary_store")
                 
@@ -285,11 +337,23 @@ class CredentialsManagerSpec: QuickSpec {
 
             afterEach {
                 _ = credentialsManager.clear()
+
+                Keys.forEach { key in
+                    _ = credentialsManager.clear(forKey: key)
+                }
             }
 
-            it("should have valid credentials when stored and not expired") {
+            it("should have valid credentials when stored under the default key and not expired") {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.hasValid()).to(beTrue())
+            }
+
+            it("should have valid credentials when stored under multiple keys and not expired") {
+                Keys.forEach { key in
+                    expect(credentialsManager.store(credentials: credentials, forKey: key)).to(beTrue())
+                    expect(credentialsManager.hasValid(forKey: key)).to(beTrue())
+                    expect(credentialsManager.hasValid()).to(beFalse())
+                }
             }
 
             it("should not have valid credentials when keychain is empty") {
@@ -350,11 +414,23 @@ class CredentialsManagerSpec: QuickSpec {
 
             afterEach {
                 _ = credentialsManager.clear()
+
+                Keys.forEach { key in
+                    _ = credentialsManager.clear(forKey: key)
+                }
             }
 
-            it("should have renewable credentials when stored and have a refresh token") {
+            it("should have renewable credentials when stored under the default key and have a refresh token") {
                 expect(credentialsManager.store(credentials: credentials)).to(beTrue())
                 expect(credentialsManager.canRenew()).to(beTrue())
+            }
+
+            it("should have renewable credentials when stored under multiple keys and have a refresh token") {
+                Keys.forEach { key in
+                    expect(credentialsManager.store(credentials: credentials, forKey: key)).to(beTrue())
+                    expect(credentialsManager.canRenew(forKey: key)).to(beTrue())
+                    expect(credentialsManager.canRenew()).to(beFalse())
+                }
             }
 
             it("should not have renewable credentials when keychain is empty") {
@@ -406,9 +482,13 @@ class CredentialsManagerSpec: QuickSpec {
 
             afterEach {
                 _ = credentialsManager.clear()
+
+                Keys.forEach { key in
+                    _ = credentialsManager.clear(forKey: key)
+                }
             }
 
-            it("should error when no credentials stored") {
+            it("should error when there are no credentials stored under the default key") {
                 _ = credentialsManager.clear()
 
                 waitUntil(timeout: Timeout) { done in
@@ -419,7 +499,20 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should error when no refresh token") {
+            it("should error when there are no credentials stored under multiple keys") {
+                Keys.forEach { key in
+                    _ = credentialsManager.clear(forKey: key)
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.credentials(forKey: key) { result in
+                            expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                            done()
+                        }
+                    }
+                }
+            }
+
+            it("should error when there is no refresh token") {
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
 
@@ -521,7 +614,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
-                it("should store new credentials") {
+                it("should store new credentials under the default key") {
                     let store = SimpleKeychain()
                     credentialsManager = CredentialsManager(authentication: authentication, storage: store)
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
@@ -529,11 +622,33 @@ class CredentialsManagerSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials { result in
                             expect(result).to(beSuccessful())
-                            let storedCredentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: store.data(forKey: "credentials"))
+                            let storedCredentials = fetchCredentials(from: store)
                             expect(storedCredentials?.accessToken) == NewAccessToken
                             expect(storedCredentials?.idToken) == NewIdToken
                             expect(storedCredentials?.refreshToken) == RefreshToken
                             done()
+                        }
+                    }
+                }
+
+                it("should store new credentials under multiple keys") {
+                    let store = SimpleKeychain()
+                    credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+
+                    Keys.forEach { key in
+                        _ = credentialsManager.store(credentials: credentials, forKey: key)
+
+                        waitUntil(timeout: Timeout) { done in
+                            credentialsManager.credentials(forKey: key) { result in
+                                expect(result).to(beSuccessful())
+                                let storedCredentials = fetchCredentials(forKey: key, from: store)
+                                expect(storedCredentials?.accessToken) == NewAccessToken
+                                expect(storedCredentials?.idToken) == NewIdToken
+                                expect(storedCredentials?.refreshToken) == RefreshToken
+                                expect(fetchCredentials(from: store)) == nil
+                                done()
+                            }
                         }
                     }
                 }
@@ -786,9 +901,13 @@ class CredentialsManagerSpec: QuickSpec {
 
             afterEach {
                 _ = credentialsManager.clear()
+
+                Keys.forEach { key in
+                    _ = credentialsManager.clear(forKey: key)
+                }
             }
 
-            it("should error when no credentials stored") {
+            it("should error when there are no credentials stored") {
                 _ = credentialsManager.clear()
 
                 waitUntil(timeout: Timeout) { done in
@@ -799,7 +918,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should error when no refresh token") {
+            it("should error when there is no refresh token") {
                 credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil)
                 _ = credentialsManager.store(credentials: credentials)
 
@@ -833,18 +952,38 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
 
-            it("should store new credentials") {
+            it("should store new credentials under the default key") {
                 let store = SimpleKeychain()
                 credentialsManager = CredentialsManager(authentication: authentication, storage: store)
                 _ = credentialsManager.store(credentials: credentials)
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew { result in
                         expect(result).to(beSuccessful())
-                        let storedCredentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: store.data(forKey: "credentials"))
+                        let storedCredentials = fetchCredentials(from: store)
                         expect(storedCredentials?.accessToken) == NewAccessToken
                         expect(storedCredentials?.idToken) == NewIdToken
                         expect(storedCredentials?.refreshToken) == NewRefreshToken
                         done()
+                    }
+                }
+            }
+
+            it("should store new credentials under multiple keys") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                Keys.forEach { key in
+                    _ = credentialsManager.store(credentials: credentials, forKey: key)
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.renew(forKey: key) { result in
+                            expect(result).to(beSuccessful())
+                            let storedCredentials = fetchCredentials(forKey: key, from: store)
+                            expect(storedCredentials?.accessToken) == NewAccessToken
+                            expect(storedCredentials?.idToken) == NewIdToken
+                            expect(storedCredentials?.refreshToken) == NewRefreshToken
+                            expect(fetchCredentials(from: store)) == nil
+                            done()
+                        }
                     }
                 }
             }
@@ -945,17 +1084,20 @@ class CredentialsManagerSpec: QuickSpec {
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "request": "first"])}, response: authResponse(accessToken: newAccessToken1, idToken: newIDToken1, refreshToken: newRefreshToken1, expiresIn: ExpiresIn))
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": newRefreshToken1, "request": "second"])}, response: authResponse(accessToken: newAccessToken2, idToken: newIDToken2, refreshToken: newRefreshToken2, expiresIn: ExpiresIn))
                     waitUntil(timeout: Timeout) { [credentialsManager] done in
-                        DispatchQueue.global(qos: .utility).sync {
+                        let thread1 = Thread {
                             credentialsManager?.renew(parameters: ["request": "first"]) { result in
                                 expect(result).to(haveCredentials(newAccessToken1, newIDToken1, newRefreshToken1))
                             }
                         }
-                        DispatchQueue.global(qos: .background).sync {
+                        thread1.start()
+
+                        let thread2 = Thread {
                             credentialsManager?.renew(parameters: ["request": "second"]) { result in
                                 expect(result).to(haveCredentials(newAccessToken2, newIDToken2, newRefreshToken2))
                                 done()
                             }
                         }
+                        thread2.start()
                     }
                 }
 
@@ -968,6 +1110,11 @@ class CredentialsManagerSpec: QuickSpec {
 
             afterEach {
                 _ = credentialsManager.clear()
+
+                Keys.forEach { key in
+                    _ = credentialsManager.clear(forKey: key)
+                }
+
                 cancellables.removeAll()
             }
 
@@ -1004,13 +1151,14 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should complete using custom parameter values") {
                     let key = "foo"
                     let value = "bar"
-                    
+
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, key: value]) && $0.hasHeader(key, value: value)}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                    _ = credentialsManager.store(credentials: credentials)
+                    _ = credentialsManager.store(credentials: credentials, forKey: key)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
-                            .credentials(withScope: "openid profile offline_access",
+                            .credentials(forKey: key,
+                                         withScope: "openid profile offline_access",
                                          minTTL: ValidTTL,
                                          parameters: [key: value],
                                          headers: [key: value])
@@ -1075,9 +1223,10 @@ class CredentialsManagerSpec: QuickSpec {
                     let key = "foo"
                     let value = "bar"
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, key: value])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials, forKey: key)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
-                            .renew(parameters: [key: value], headers: [key: value])
+                            .renew(forKey: key, parameters: [key: value], headers: [key: value])
                             .sink(receiveCompletion: { completion in
                                 guard case .finished = completion else { return }
                                 done()
@@ -1138,10 +1287,10 @@ class CredentialsManagerSpec: QuickSpec {
                     let key = "foo"
                     let value = "bar"
                     NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken]) && $0.hasHeader(key, value: value)}, response: revokeTokenResponse())
-                    _ = credentialsManager.store(credentials: credentials)
+                    _ = credentialsManager.store(credentials: credentials, forKey: key)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
-                            .revoke(headers: [key: value])
+                            .revoke(forKey: key, headers: [key: value])
                             .sink(receiveCompletion: { completion in
                                 guard case .finished = completion else { return }
                                 done()
@@ -1174,6 +1323,10 @@ class CredentialsManagerSpec: QuickSpec {
 
             afterEach {
                 _ = credentialsManager.clear()
+
+                Keys.forEach { key in
+                    _ = credentialsManager.clear(forKey: key)
+                }
             }
 
             context("credentials") {
@@ -1195,10 +1348,11 @@ class CredentialsManagerSpec: QuickSpec {
                     let credentialsManager = credentialsManager!
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, key: value]) && $0.hasHeader(key, value: value)}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                    _ = credentialsManager.store(credentials: credentials)
+                    _ = credentialsManager.store(credentials: credentials, forKey: key)
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
-                            _ = try await credentialsManager.credentials(withScope: "openid profile offline_access",
+                            _ = try await credentialsManager.credentials(forKey: key,
+                                                                         withScope: "openid profile offline_access",
                                                                          minTTL: ValidTTL,
                                                                          parameters: [key: value],
                                                                          headers: [key: value])
@@ -1247,9 +1401,12 @@ class CredentialsManagerSpec: QuickSpec {
                     let value = "bar"
                     let credentialsManager = credentialsManager!
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, key: value]) && $0.hasHeader(key, value: "bar")}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials, forKey: key)
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
-                            let newCredentials = try await credentialsManager.renew(parameters: [key: value], headers: [key: value])
+                            let newCredentials = try await credentialsManager.renew(forKey: key,
+                                                                                    parameters: [key: value],
+                                                                                    headers: [key: value])
                             expect(newCredentials.accessToken) == NewAccessToken
                             expect(newCredentials.idToken) == NewIdToken
                             expect(newCredentials.refreshToken) == NewRefreshToken
@@ -1293,10 +1450,10 @@ class CredentialsManagerSpec: QuickSpec {
                     let value = "bar"
                     let credentialsManager = credentialsManager!
                     NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken]) && $0.hasHeader(key, value: value)}, response: revokeTokenResponse())
-                    _ = credentialsManager.store(credentials: credentials)
+                    _ = credentialsManager.store(credentials: credentials, forKey: key)
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
-                            _ = try await credentialsManager.revoke(headers: [key: value])
+                            _ = try await credentialsManager.revoke(forKey: key, headers: [key: value])
                             done()
                         }
                     }
@@ -1323,4 +1480,9 @@ class CredentialsManagerSpec: QuickSpec {
         #endif
 
     }
+}
+
+private func fetchCredentials(forKey key: String = "credentials", from store: CredentialsStorage) -> Credentials? {
+    guard let data = store.getEntry(forKey: key) else { return nil }
+    return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
 }
