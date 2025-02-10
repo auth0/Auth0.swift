@@ -10,7 +10,6 @@
 
 @preconcurrency import WebKit
 
-
 /// WARNING: The use of `webViewProvider` [is not recommended](https://auth0.com/blog/oauth-2-best-practices-for-native-apps) and contravenes the guidelines of the OAuth Protocol, which advises against using web views for WebAuth.
 /// The recommended approach is to utilize `ASWebAuthenticationSession`. Employ the provider below only if you fully understand the associated risks and are confident in your decision.
 public extension WebAuthentication {
@@ -23,25 +22,24 @@ public extension WebAuthentication {
 }
 
 class WebViewUserAgent: NSObject, WebAuthUserAgent {
-    
+
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
     static let customSchemeRedirectionFailureMessage = "com.auth0.webview.redirection_failure"
     let defaultSchemesSupportedByWKWebview = ["https"]
-    
+
     let request: URLRequest
     var webview: WKWebView!
     let viewController: UIViewController
     let redirectURL: URL
     let callback: WebAuthProviderCallback
-    
-    
+
     init(authorizeURL: URL, redirectURL: URL, viewController: UIViewController = UIViewController(), modalPresentationStyle: UIModalPresentationStyle = .fullScreen, callback: @escaping WebAuthProviderCallback) {
         self.request = URLRequest(url: authorizeURL)
         self.redirectURL = redirectURL
         self.callback = callback
         self.viewController = viewController
         self.viewController.modalPresentationStyle = modalPresentationStyle
-        
+
         super.init()
         if !defaultSchemesSupportedByWKWebview.contains(redirectURL.scheme!) {
             self.setupWebViewWithCustomScheme()
@@ -63,7 +61,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         self.viewController.view = webview
         webview.navigationDelegate = self
     }
-    
+
     func start() {
         self.webview.load(self.request)
         UIWindow.topViewController?.present(self.viewController, animated: true)
@@ -81,7 +79,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
             }
         }
     }
-    
+
     public override var description: String {
         return String(describing: WKWebView.self)
     }
@@ -96,7 +94,7 @@ extension WebViewUserAgent: WKURLSchemeHandler {
         ])
         urlSchemeTask.didFailWithError(error)
     }
-    
+
     func webView(_ webView: WKWebView, stop urlSchemeTask: any WKURLSchemeTask) {
         let error = NSError(domain: WebViewUserAgent.customSchemeRedirectionFailureMessage, code: 400, userInfo: [
             NSLocalizedDescriptionKey: "WebViewProvider: WKURLSchemeHandler: Webview Resource Loading has been stopped"
@@ -116,21 +114,21 @@ extension WebViewUserAgent: WKNavigationDelegate {
             decisionHandler(.allow)
         }
     }
-    
+
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {
         if (error as NSError).domain == WebViewUserAgent.customSchemeRedirectionSuccessMessage {
             return
         }
         self.finish(with: .failure(WebAuthError(code: .webViewFailure("An error occurred during a committed main frame navigation of the WebView."), cause: error)))
     }
-    
+
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {
         if (error as NSError).domain == WebViewUserAgent.customSchemeRedirectionSuccessMessage {
             return
         }
         self.finish(with: .failure(WebAuthError(code: .webViewFailure("An error occurred while starting to load data for the main frame of the WebView."), cause: error)))
     }
-    
+
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         self.finish(with: .failure(WebAuthError(code: .webViewFailure("The WebView's content process was terminated."))))
     }
