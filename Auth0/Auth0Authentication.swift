@@ -293,6 +293,24 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
+    func exchange(withRefreshToken refreshToken: String, audience: String, scope: String? = nil) -> Request<APICredentials, AuthenticationError> {
+        var payload: [String: Any] = [
+            "refresh_token": refreshToken,
+            "audience": audience,
+            "grant_type": "refresh_token",
+            "client_id": self.clientId
+        ]
+        payload["scope"] = scope
+        let oauthToken = URL(string: "oauth/token", relativeTo: self.url)!
+        return Request(session: session,
+                       url: oauthToken,
+                       method: "POST",
+                       handle: codable,
+                       parameters: payload, // Initializer does not enforce 'openid' scope
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError> {
         let payload: [String: Any] = [
             "token": refreshToken,

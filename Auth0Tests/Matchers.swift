@@ -120,6 +120,24 @@ func haveCredentials() -> Nimble.Matcher<CredentialsManagerResult<Credentials>> 
     }
 }
 
+func haveAPICredentials(_ accessToken: String) -> Nimble.Matcher<CredentialsManagerResult<APICredentials>> {
+    return Matcher<CredentialsManagerResult<APICredentials>>.define("be a successful api credentials retrieval") { expression, failureMessage -> MatcherResult in
+        return try haveAPICredentials(accessToken: accessToken, expression, failureMessage)
+    }
+}
+
+func haveAPICredentials() -> Nimble.Matcher<AuthenticationResult<APICredentials>> {
+    return Matcher<AuthenticationResult<APICredentials>>.define("be a successful api credentials retrieval") { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage)
+    }
+}
+
+func haveAPICredentials() -> Nimble.Matcher<CredentialsManagerResult<APICredentials>> {
+    return Matcher<CredentialsManagerResult<APICredentials>>.define("be a successful api credentials retrieval") { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage)
+    }
+}
+
 func haveCreatedUser(_ email: String, username: String? = nil) -> Nimble.Matcher<AuthenticationResult<DatabaseUser>> {
     return Matcher<AuthenticationResult<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: DatabaseUser) -> Bool in
@@ -258,6 +276,15 @@ private func haveCredentials<E>(accessToken: String?,
         return (accessToken == nil || credentials.accessToken == accessToken)
         && (idToken == nil || credentials.idToken == idToken)
         && (refreshToken == nil || credentials.refreshToken == refreshToken)
+    }
+}
+
+private func haveAPICredentials<E>(accessToken: String,
+                                    _ expression: Nimble.Expression<Result<APICredentials, E>>,
+                                    _ message: ExpectationMessage) throws -> MatcherResult {
+    _ = message.appended(message: " <access_token: \(accessToken)>")
+    return try beSuccessful(expression, message) { (apiCredentials: APICredentials) -> Bool in
+        return apiCredentials.accessToken == accessToken
     }
 }
 

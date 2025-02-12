@@ -691,6 +691,8 @@ public protocol Authentication: Trackable, Loggable {
      */
     func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
 
+    func exchange(withRefreshToken refreshToken: String, audience: String, scope: String?) -> Request<APICredentials, AuthenticationError>
+
     /**
      Revokes a user's refresh token by performing a request to the `/oauth/revoke` endpoint.
 
@@ -790,6 +792,10 @@ public extension Authentication {
 
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.renew(withRefreshToken: refreshToken, scope: scope)
+    }
+
+    func exchange(withRefreshToken refreshToken: String, audience: String, scope: String? = nil) -> Request<APICredentials, AuthenticationError> {
+        return self.exchange(withRefreshToken: refreshToken, audience: audience, scope: scope)
     }
 
 }
