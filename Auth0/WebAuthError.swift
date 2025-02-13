@@ -40,7 +40,7 @@ public struct WebAuthError: Auth0Error {
     /// build a valid URL.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let noBundleIdentifier: WebAuthError = .init(code: .noBundleIdentifier)
-    
+
     /// There is already an active transaction at the moment; therefore, this newly initiated transaction is canceled.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let transactionActiveAlready: WebAuthError = .init(code: .transactionActiveAlready)

@@ -20,11 +20,11 @@ func extractRedirectURL(from url: URL) -> URL? {
     guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
         return nil
     }
-    
+
     if let redirectURIString = components.queryItems?.first(where: { $0.name == "redirect_uri" || $0.name == "returnTo" })?.value,
        let redirectURI = URL(string: redirectURIString) {
         return redirectURI
     }
-    
+
     return nil
 }
