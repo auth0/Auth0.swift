@@ -112,7 +112,7 @@ class AuthenticationSpec: QuickSpec {
                 }, response: authFailure(code: "invalid_grant", description: "Malformed mfa_token"))
             }
             
-            it("should login with oob code and mfa tokens") {
+            it("should login with oob code and mfa tokens with default parameters") {
                 waitUntil(timeout: Timeout) { done in
                     auth.login(withOOBCode: OOB, mfaToken: MFAToken).start { result in
                         expect(result).to(haveCredentials())
@@ -121,7 +121,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
             
-            it("should login with oob code and mfa tokens when sending binding code") {
+            it("should login with oob code and mfa tokens with binding code") {
                 waitUntil(timeout: Timeout) { done in
                     auth.login(withOOBCode: OOB, mfaToken: MFAToken, bindingCode: BindingCode).start { result in
                         expect(result).to(haveCredentials())
@@ -187,7 +187,7 @@ class AuthenticationSpec: QuickSpec {
         
         // MARK:- MFA Challenge
         
-        describe("mfa challenge") {
+        describe("MFA challenge") {
             
             beforeEach {
                 NetworkStub.addStub(condition: {
@@ -223,7 +223,7 @@ class AuthenticationSpec: QuickSpec {
                 }, response: multifactorChallengeResponse(challengeType: "oob"))
             }
             
-            it("should request mfa challenge") {
+            it("should request MFA challenge with default parameters") {
                 waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken).start { result in
                         expect(result).to(beSuccessful())
@@ -232,7 +232,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
             
-            it("should request mfa challenge when sending challenge types") {
+            it("should request MFA challenge with challenge types") {
                 waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes).start { result in
                         expect(result).to(beSuccessful())
@@ -241,7 +241,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
             
-            it("should request mfa challenge when sending authenticator id") {
+            it("should request MFA challenge with authenticator id") {
                 waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken, authenticatorId: AuthenticatorId).start { result in
                         expect(result).to(beSuccessful())
@@ -250,7 +250,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
             
-            it("should request mfa challenge when sending challenge types and authenticator id") {
+            it("should request MFA challenge with all parameters") {
                 waitUntil(timeout: Timeout) { done in
                     auth.multifactorChallenge(mfaToken: MFAToken, types: ChallengeTypes, authenticatorId: AuthenticatorId).start { result in
                         expect(result).to(beSuccessful())
@@ -269,11 +269,24 @@ class AuthenticationSpec: QuickSpec {
             it("should receive credentials") {
                 NetworkStub.addStub(condition: {
                     $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken]) && $0.hasNoneOf(["scope"])
-                }, response: authResponse(accessToken: AccessToken))
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken)
                         .start { result in
-                            expect(result).to(haveCredentials())
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                    }
+                }
+            }
+
+            it("should receive credentials when sending audience") {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "audience": Audience])
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                waitUntil(timeout: Timeout) { done in
+                    auth.renew(withRefreshToken: refreshToken, audience: Audience)
+                        .start { result in
+                            expect(result).to(beSuccessful())
                             done()
                     }
                 }
@@ -282,11 +295,11 @@ class AuthenticationSpec: QuickSpec {
             it("should receive credentials when sending scope") {
                 NetworkStub.addStub(condition: {
                     $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "scope": "openid email"])
-                }, response: authResponse(accessToken: AccessToken))
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken, scope: "openid email")
                         .start { result in
-                            expect(result).to(haveCredentials())
+                            expect(result).to(beSuccessful())
                             done()
                     }
                 }
@@ -294,16 +307,40 @@ class AuthenticationSpec: QuickSpec {
             
             it("should receive credentials when sending scope without enforcing openid scope") {
                 NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "scope": "email phone"]) }, response: authResponse(accessToken: AccessToken))
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "scope": "email phone"]) }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken, scope: "email phone")
                         .start { result in
-                            expect(result).to(haveCredentials())
+                            expect(result).to(beSuccessful())
                             done()
                     }
                 }
             }
-            
+
+            it("should receive credentials when sending audience and scope") {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "audience": Audience, "scope": "openid email"])
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                waitUntil(timeout: Timeout) { done in
+                    auth.renew(withRefreshToken: refreshToken, audience: Audience, scope: "openid email")
+                        .start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                    }
+                }
+            }
+
+            it("should receive credentials when sending audience and scope enforcing openid scope") {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "audience": Audience, "scope": "openid email phone"]) }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                waitUntil(timeout: Timeout) { done in
+                    auth.renew(withRefreshToken: refreshToken, audience: Audience, scope: "email phone")
+                        .start { result in
+                            expect(result).to(beSuccessful())
+                            done()
+                    }
+                }
+            }
         }
         
         it("should fail to receive credentials") {
@@ -320,51 +357,6 @@ class AuthenticationSpec: QuickSpec {
                         done()
                 }
             }
-        }
-        
-        describe("exchange refresh token for api credentials") {
-            
-            let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-            
-            it("should receive api credentials") {
-                NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "audience": Audience]) && $0.hasNoneOf(["scope"])
-                }, response: authResponse(accessToken: AccessToken, expiresIn: ExpiresIn))
-                waitUntil(timeout: Timeout) { done in
-                    auth.exchange(withRefreshToken: refreshToken, audience: Audience, scope: nil)
-                        .start { result in
-                            expect(result).to(haveAPICredentials())
-                            done()
-                    }
-                }
-            }
-            
-            it("should receive api credentials when sending scope") {
-                NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "audience": Audience, "scope": "openid email"])
-                }, response: authResponse(accessToken: AccessToken, expiresIn: ExpiresIn))
-                waitUntil(timeout: Timeout) { done in
-                    auth.exchange(withRefreshToken: refreshToken, audience: Audience, scope: "openid email")
-                        .start { result in
-                            expect(result).to(haveAPICredentials())
-                            done()
-                    }
-                }
-            }
-            
-            it("should receive api credentials when sending scope without enforcing openid scope") {
-                NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "audience": Audience, "scope": "email phone"])
-                }, response: authResponse(accessToken: AccessToken, expiresIn: ExpiresIn))
-                waitUntil(timeout: Timeout) { done in
-                    auth.exchange(withRefreshToken: refreshToken, audience: Audience, scope: "email phone")
-                        .start { result in
-                            expect(result).to(haveAPICredentials())
-                            done()
-                    }
-                }
-            }
-            
         }
         
         it("should fail to receive credentials") {
@@ -701,10 +693,10 @@ class AuthenticationSpec: QuickSpec {
         describe("authenticating with credentials and a realm/connection") {
             
             it("should receive token with username and password") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm").start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
                     }
                 }
@@ -721,50 +713,50 @@ class AuthenticationSpec: QuickSpec {
             }
             
             it("should specify scope in request") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", scope: "openid").start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
             }
             
             it("should specify scope in request enforcing openid scope") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid email phone", "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid email phone", "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", scope: "email phone").start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
             }
             
             it("should specify audience in request") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : Audience, "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : Audience, "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", audience: Audience).start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
             }
             
             it("should specify audience and scope in request") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : Audience, "scope": "openid", "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : Audience, "scope": "openid", "realm": "myrealm"])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm", audience: Audience, scope: "openid").start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
             }
             
             it("should specify audience, scope and realm/connection in request") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : Audience, "scope": "openid", "realm": "customconnection"])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : Audience, "scope": "openid", "realm": "customconnection"])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "customconnection", audience: Audience, scope: "openid").start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
@@ -777,10 +769,10 @@ class AuthenticationSpec: QuickSpec {
         describe("authenticating with credentials in a default directory") {
             
             it("should receive token with username and password") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword).start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
                         done()
                     }
                 }
@@ -797,40 +789,40 @@ class AuthenticationSpec: QuickSpec {
             }
             
             it("should specify scope in request") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid"])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid"])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword,  scope: "openid").start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
             }
             
             it("should specify scope in request enforcing openid scope") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid email phone"])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid email phone"])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword,  scope: "email phone").start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
             }
             
             it("should specify audience in request") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : Audience])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : Audience])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: Audience).start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
             }
             
             it("should specify audience and scope in request") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : Audience])} , response: authResponse(accessToken: AccessToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : Audience])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: Audience, scope: "openid").start { result in
-                        expect(result).to(haveCredentials())
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
@@ -981,17 +973,17 @@ class AuthenticationSpec: QuickSpec {
             context("passwordless login") {
                 
                 it("should login with email code") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "otp": OTP, "realm": "email", "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "otp": OTP, "realm": "email", "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP).start { result in
-                            expect(result).to(haveCredentials(AccessToken))
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
                             done()
                         }
                     }
                 }
                 
                 it("should include custom scope") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["scope": "openid email"])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["scope": "openid email"])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP, scope: "openid email").start { result in
                             expect(result).to(beSuccessful())
@@ -1001,7 +993,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should include custom scope enforcing openid scope") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["scope": "openid email phone"])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["scope": "openid email phone"])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP, scope: "email phone").start { result in
                             expect(result).to(beSuccessful())
@@ -1011,7 +1003,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should include audience if it is not nil") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["audience": Audience])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["audience": Audience])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP, audience: Audience).start { result in
                             expect(result).to(beSuccessful())
@@ -1021,7 +1013,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should not include audience if it is nil") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasNoneOf(["audience"])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasNoneOf(["audience"])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP, audience: nil).start { result in
                             expect(result).to(beSuccessful())
@@ -1031,7 +1023,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should not include audience by default") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasNoneOf(["audience"])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasNoneOf(["audience"])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(email: SupportAtAuth0, code: OTP).start { result in
                             expect(result).to(beSuccessful())
@@ -1081,17 +1073,17 @@ class AuthenticationSpec: QuickSpec {
                 let smsRealm = "sms"
                 
                 it("should login with sms code") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": Phone, "otp": OTP, "realm": smsRealm, "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": Phone, "otp": OTP, "realm": smsRealm, "scope": defaultScope, "grant_type": PasswordlessGrantType, "client_id": ClientId])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP).start { result in
-                            expect(result).to(haveCredentials(AccessToken))
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
                             done()
                         }
                     }
                 }
                 
                 it("should include custom scope") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["scope": "openid email"])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["scope": "openid email"])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP, scope: "openid email").start { result in
                             expect(result).to(beSuccessful())
@@ -1101,7 +1093,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should include custom scope enforcing openid scope") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["scope": "openid email phone"])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["scope": "openid email phone"])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP, scope: "email phone").start { result in
                             expect(result).to(beSuccessful())
@@ -1111,7 +1103,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should include audience if it is not nil") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["audience": Audience])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["audience": Audience])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP, audience: Audience).start { result in
                             expect(result).to(beSuccessful())
@@ -1121,7 +1113,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should not include audience if it is nil") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasNoneOf(["audience"])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasNoneOf(["audience"])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP, audience: nil).start { result in
                             expect(result).to(beSuccessful())
@@ -1131,7 +1123,7 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
                 it("should not include audience by default") {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasNoneOf(["audience"])}, response: authResponse(accessToken: AccessToken))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasNoneOf(["audience"])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     waitUntil(timeout: Timeout) { done in
                         auth.login(phoneNumber: Phone, code: OTP).start { result in
                             expect(result).to(beSuccessful())

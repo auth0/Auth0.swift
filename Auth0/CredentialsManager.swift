@@ -341,7 +341,7 @@ public struct CredentialsManager {
     #endif
 
     public func apiCredentials(forAudience audience: String,
-                               scope: String? = nil,
+                               scope: String,
                                minTTL: Int = 0,
                                parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
@@ -456,8 +456,8 @@ public struct CredentialsManager {
                                                              expiresIn: credentials.expiresIn,
                                                              scope: credentials.scope)
                             if self.willExpire(newCredentials.expiresIn, within: minTTL) {
-                                let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
-                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
+                                let tokenTTL = Int(newCredentials.expiresIn.timeIntervalSinceNow)
+                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
                                 self.dispatchGroup.leave()
                                 callback(.failure(error))
                             } else if !self.store(credentials: newCredentials) {
@@ -478,9 +478,9 @@ public struct CredentialsManager {
         }
     }
 
-    // swiftlint:disable:next function_parameter_count
+    // swiftlint:disable:next function_body_length function_parameter_count
     private func retrieveAPICredentials(audience: String,
-                                        scope: String?,
+                                        scope: String,
                                         minTTL: Int,
                                         parameters: [String: Any],
                                         headers: [String: String],
@@ -490,36 +490,50 @@ public struct CredentialsManager {
             self.dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
-                guard let credentials = self.retrieveAPICredentials(audience: audience) else {
+                guard let apiCredentials = self.retrieveAPICredentials(audience: audience) else {
+                    let error = CredentialsManagerError(code: .noAPICredentials(audience: audience))
+                    self.dispatchGroup.leave()
+                    return callback(.failure(error))
+                }
+                guard self.hasExpired(apiCredentials.expiresIn) ||
+                      self.willExpire(apiCredentials.expiresIn, within: minTTL) else {
+                    self.dispatchGroup.leave()
+                    return callback(.success(apiCredentials))
+                }
+                guard let currentCredentials = self.retrieveCredentials() else {
                     self.dispatchGroup.leave()
                     return callback(.failure(.noCredentials))
                 }
-                guard self.hasExpired(credentials.expiresIn) ||
-                      self.willExpire(credentials.expiresIn, within: minTTL) else {
-                    self.dispatchGroup.leave()
-                    return callback(.success(credentials))
-                }
-                guard let refreshToken = self.retrieveCredentials()?.refreshToken else {
+                guard let refreshToken = currentCredentials.refreshToken else {
                     self.dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
 
                 self.authentication
-                    .exchange(withRefreshToken: refreshToken, audience: audience, scope: scope)
+                    .renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
                     .parameters(parameters)
                     .headers(headers)
                     .start { result in
                         switch result {
                         case .success(let credentials):
+                            let newCredentials = Credentials(accessToken: currentCredentials.accessToken,
+                                                             tokenType: currentCredentials.tokenType,
+                                                             idToken: credentials.idToken,
+                                                             refreshToken: credentials.refreshToken ?? refreshToken,
+                                                             expiresIn: currentCredentials.expiresIn,
+                                                             scope: currentCredentials.scope)
                             let newAPICredentials = APICredentials(accessToken: credentials.accessToken,
-                                                                tokenType: credentials.tokenType,
-                                                                expiresIn: credentials.expiresIn,
-                                                                scope: credentials.scope)
+                                                                   tokenType: credentials.tokenType,
+                                                                   expiresIn: credentials.expiresIn,
+                                                                   scope: credentials.scope)
                             if self.willExpire(newAPICredentials.expiresIn, within: minTTL) {
-                                let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
-                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
+                                let tokenTTL = Int(newAPICredentials.expiresIn.timeIntervalSinceNow)
+                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
                                 self.dispatchGroup.leave()
                                 callback(.failure(error))
+                            } else if !self.store(credentials: newCredentials) {
+                                self.dispatchGroup.leave()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else if !self.store(apiCredentials: newAPICredentials, forAudience: audience) {
                                 self.dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
@@ -697,6 +711,23 @@ public extension CredentialsManager {
         }.eraseToAnyPublisher()
     }
 
+    func apiCredentials(forAudience audience: String,
+                        scope: String,
+                        minTTL: Int = 0,
+                        parameters: [String: Any] = [:],
+                        headers: [String: String] = [:]) -> AnyPublisher<APICredentials, CredentialsManagerError> {
+        return Deferred {
+            Future { callback in
+                return self.apiCredentials(forAudience: audience,
+                                           scope: scope,
+                                           minTTL: minTTL,
+                                           parameters: parameters,
+                                           headers: headers,
+                                           callback: callback)
+            }
+        }.eraseToAnyPublisher()
+    }
+
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
@@ -862,6 +893,21 @@ public extension CredentialsManager {
                              parameters: parameters,
                              headers: headers,
                              callback: continuation.resume)
+        }
+    }
+
+    func apiCredentials(forAudience audience: String,
+                        scope: String,
+                        minTTL: Int = 0,
+                        parameters: [String: Any] = [:],
+                        headers: [String: String] = [:]) async throws -> APICredentials {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.apiCredentials(forAudience: audience,
+                                scope: scope,
+                                minTTL: minTTL,
+                                parameters: parameters,
+                                headers: headers,
+                                callback: continuation.resume)
         }
     }
 
