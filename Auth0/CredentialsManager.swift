@@ -128,8 +128,12 @@ public struct CredentialsManager {
     /// ```
     ///
     /// - Returns: If the credentials were removed.
-    public func clear(forAudience audience: String? = nil) -> Bool {
-        return self.storage.deleteEntry(forKey: audience ?? storeKey)
+    public func clear() -> Bool {
+        return self.storage.deleteEntry(forKey: storeKey)
+    }
+
+    public func clear(forAudience audience: String) -> Bool {
+        return self.storage.deleteEntry(forKey: audience)
     }
 
     /// Calls the `/oauth/revoke` endpoint to revoke the refresh token and then clears the credentials if the request
@@ -543,7 +547,7 @@ public struct CredentialsManager {
                             }
                         case .failure(let error):
                             self.dispatchGroup.leave()
-                            callback(.failure(CredentialsManagerError(code: .exchangeFailed, cause: error)))
+                            callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
                         }
                     }
             }

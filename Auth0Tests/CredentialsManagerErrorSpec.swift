@@ -104,12 +104,6 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
-            it("should return message for exchange failed") {
-                let message = "The exchange of the refresh token for new API credentials failed."
-                let error = CredentialsManagerError(code: .exchangeFailed)
-                expect(error.localizedDescription) == message
-            }
-
             it("should return message for store failed") {
                 let message = "Storing the renewed credentials failed."
                 let error = CredentialsManagerError(code: .storeFailed)

@@ -1022,7 +1022,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }, response: authFailure(code: "invalid_request", description: "missing_params"))
                     
                     let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
-                    let expectedError = CredentialsManagerError(code: .exchangeFailed, cause: cause)
+                    let expectedError = CredentialsManagerError(code: .renewFailed, cause: cause)
                     
                     _ = credentialsManager.store(credentials: credentials)
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
