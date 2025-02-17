@@ -25,7 +25,6 @@ public struct CredentialsManager {
     private let storeKey: String
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
-    private let dispatchGroup = DispatchGroup()
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     #endif
@@ -365,66 +364,52 @@ public struct CredentialsManager {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
-    // swiftlint:disable:next function_body_length
     private func retrieveCredentials(withScope scope: String? = nil,
                                      minTTL: Int = 0,
                                      parameters: [String: Any],
                                      headers: [String: String],
                                      forceRenewal: Bool = false,
                                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
-        self.dispatchQueue.async {
-            self.dispatchGroup.enter()
-
-            DispatchQueue.global(qos: .userInitiated).async {
-                guard let credentials = retrieveCredentials() else {
-                    self.dispatchGroup.leave()
-                    return callback(.failure(.noCredentials))
-                }
-                guard forceRenewal ||
-                      self.hasExpired(credentials) ||
-                      self.willExpire(credentials, within: minTTL) ||
-                      self.hasScopeChanged(credentials, from: scope) else {
-                    self.dispatchGroup.leave()
-                    return callback(.success(credentials))
-                }
-                guard let refreshToken = credentials.refreshToken else {
-                    self.dispatchGroup.leave()
-                    return callback(.failure(.noRefreshToken))
-                }
-
-                self.authentication
-                    .renew(withRefreshToken: refreshToken, scope: scope)
-                    .parameters(parameters)
-                    .headers(headers)
-                    .start { result in
-                        switch result {
-                        case .success(let credentials):
-                            let newCredentials = Credentials(accessToken: credentials.accessToken,
-                                                             tokenType: credentials.tokenType,
-                                                             idToken: credentials.idToken,
-                                                             refreshToken: credentials.refreshToken ?? refreshToken,
-                                                             expiresIn: credentials.expiresIn,
-                                                             scope: credentials.scope)
-                            if self.willExpire(newCredentials, within: minTTL) {
-                                let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
-                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
-                                self.dispatchGroup.leave()
-                                callback(.failure(error))
-                            } else if !self.store(credentials: newCredentials) {
-                                self.dispatchGroup.leave()
-                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
-                            } else {
-                                self.dispatchGroup.leave()
-                                callback(.success(newCredentials))
-                            }
-                        case .failure(let error):
-                            self.dispatchGroup.leave()
-                            callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
-                        }
-                    }
+        self.dispatchQueue.sync {
+            guard let credentials = retrieveCredentials() else {
+                return callback(.failure(.noCredentials))
             }
-
-            self.dispatchGroup.wait()
+            guard forceRenewal ||
+                    self.hasExpired(credentials) ||
+                    self.willExpire(credentials, within: minTTL) ||
+                    self.hasScopeChanged(credentials, from: scope) else {
+                return callback(.success(credentials))
+            }
+            guard let refreshToken = credentials.refreshToken else {
+                return callback(.failure(.noRefreshToken))
+            }
+            self.authentication
+                .renew(withRefreshToken: refreshToken, scope: scope)
+                .parameters(parameters)
+                .headers(headers)
+                .start { result in
+                    switch result {
+                    case .success(let credentials):
+                        let newCredentials = Credentials(accessToken: credentials.accessToken,
+                                                         tokenType: credentials.tokenType,
+                                                         idToken: credentials.idToken,
+                                                         refreshToken: credentials.refreshToken ?? refreshToken,
+                                                         expiresIn: credentials.expiresIn,
+                                                         scope: credentials.scope)
+                        if self.willExpire(newCredentials, within: minTTL) {
+                            let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
+                            let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
+                            callback(.failure(error))
+                        } else if !self.store(credentials: newCredentials) {
+                            callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                        } else {
+                            callback(.success(newCredentials))
+                        }
+                    case .failure(let error):
+                        self.dispatchGroup.leave()
+                        callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
+                    }
+                }
         }
     }
 
