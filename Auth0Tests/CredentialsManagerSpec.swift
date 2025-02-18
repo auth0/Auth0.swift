@@ -433,13 +433,13 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should return true when the scope has changed") {
                 let credentials = Credentials(scope: "openid email profile")
-                expect(credentialsManager.hasScopeChanged(credentials, from: "openid email")).to(beTrue())
+                expect(credentialsManager.hasScopeChanged(from: "openid email", to: credentials.scope)).to(beTrue())
             }
 
             it("should return false when the scope has not changed") {
                 let credentials = Credentials(scope: "openid email")
-                expect(credentialsManager.hasScopeChanged(credentials, from: "openid email")).to(beFalse())
-                expect(credentialsManager.hasScopeChanged(credentials, from: "email openid")).to(beFalse())
+                expect(credentialsManager.hasScopeChanged(from: "openid email", to: credentials.scope)).to(beFalse())
+                expect(credentialsManager.hasScopeChanged(from: "email openid", to: credentials.scope)).to(beFalse())
             }
 
         }
@@ -955,7 +955,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
                 
-                it("should update existing credentials without refresh token rotation") {
+                it("should update existing api credentials without refresh token rotation") {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
@@ -985,7 +985,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
                 
-                it("should update existing credentials with refresh token rotation") {
+                it("should update existing api credentials with refresh token rotation") {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
@@ -1110,7 +1110,92 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            context("forced renewal of api credentials") {
+
+                beforeEach {
+                    apiCredentials = APICredentials(accessToken: AccessToken,
+                                                    tokenType: TokenType,
+                                                    expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
+                                                    scope: Scope)
+                    _ = credentialsManager.store(credentials: credentials)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                }
+
+                it("should not yield new api credentials with the same scope") {
+                    apiCredentials = APICredentials(accessToken: AccessToken,
+                                                    tokenType: TokenType,
+                                                    expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
+                                                    scope: "openid phone")
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience, scope: "openid phone") { result in
+                            expect(result).to(haveAPICredentials(AccessToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should yield new api credentials with a new scope") {
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": "openid email"])
+                    }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
+                    apiCredentials = APICredentials(accessToken: AccessToken,
+                                                    tokenType: TokenType,
+                                                    expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
+                                                    scope: "openid phone")
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience, scope: "openid email") { result in
+                            expect(result).to(haveAPICredentials(NewAccessToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should not yield new api credentials with a min ttl less than its expiry") {
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience,
+                                                          scope: Scope,
+                                                          minTTL: ValidTTL) { result in
+                            expect(result).to(haveAPICredentials(AccessToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should yield new api credentials with a min ttl greater than its expiry") {
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                    }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn * 2))
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience,
+                                                          scope: Scope,
+                                                          minTTL: InvalidTTL) { result in
+                            expect(result).to(haveAPICredentials(NewAccessToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should fail to yield new api credentials with a min ttl greater than its expiry") {
+                    let minTTL = 100_000
+                    // The dates are not mocked, so they won't match exactly
+                    let expectedError = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: Int(ExpiresIn - 1)))
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience,
+                                                          scope: Scope,
+                                                          minTTL: minTTL) { result in
+                            expect(result).to(haveCredentialsManagerError(expectedError))
+                            done()
+                        }
+                    }
+                }
+
+            }
+
             context("serial renewal of api credentials from same thread") {
                 
                 it("should yield the stored api credentials after the previous renewal operation succeeded") {

@@ -355,7 +355,6 @@ public struct CredentialsManager {
                                     minTTL: minTTL,
                                     parameters: parameters,
                                     headers: headers,
-                                    forceRenewal: false,
                                     callback: callback)
     }
 
@@ -437,7 +436,7 @@ public struct CredentialsManager {
                 guard forceRenewal ||
                       self.hasExpired(credentials.expiresIn) ||
                       self.willExpire(credentials.expiresIn, within: minTTL) ||
-                      self.hasScopeChanged(credentials, from: scope) else {
+                      self.hasScopeChanged(from: credentials.scope, to: scope) else {
                     self.dispatchGroup.leave()
                     return callback(.success(credentials))
                 }
@@ -488,7 +487,6 @@ public struct CredentialsManager {
                                         minTTL: Int,
                                         parameters: [String: Any],
                                         headers: [String: String],
-                                        forceRenewal: Bool,
                                         callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
         self.dispatchQueue.async {
             self.dispatchGroup.enter()
@@ -500,7 +498,8 @@ public struct CredentialsManager {
                     return callback(.failure(error))
                 }
                 guard self.hasExpired(apiCredentials.expiresIn) ||
-                      self.willExpire(apiCredentials.expiresIn, within: minTTL) else {
+                      self.willExpire(apiCredentials.expiresIn, within: minTTL) ||
+                      self.hasScopeChanged(from: apiCredentials.scope, to: scope) else {
                     self.dispatchGroup.leave()
                     return callback(.success(apiCredentials))
                 }
@@ -564,12 +563,12 @@ public struct CredentialsManager {
         return expiresIn < Date()
     }
 
-    func hasScopeChanged(_ credentials: Credentials, from scope: String?) -> Bool {
-        if let newScope = scope, let lastScope = credentials.scope {
-            let newScopeList = newScope.lowercased().split(separator: " ").sorted()
+    func hasScopeChanged(from lastScope: String?, to newScope: String?) -> Bool {
+        if let lastScope = lastScope, let newScope = newScope {
             let lastScopeList = lastScope.lowercased().split(separator: " ").sorted()
+            let newScopeList = newScope.lowercased().split(separator: " ").sorted()
 
-            return newScopeList != lastScopeList
+            return lastScopeList != newScopeList
         }
 
         return false
