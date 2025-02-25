@@ -11,9 +11,9 @@ runs:
 
   steps:
     - name: Set up Ruby
-      uses: ruby/setup-ruby@52753b7da854d5c07df37391a986c76ab4615999 # pinned to version v1.191.0
+      uses: ruby/setup-ruby@32110d4e311bd8996b2a82bf2a43b714ccc91777 # pin@v1.221.0
       with:
-        ruby-version: '3.1.0'
+        ruby-version: '3.3.0'
         bundler-cache: true
         cache-version: 1
 
@@ -21,4 +21,4 @@ runs:
       uses: mxcl/xcodebuild@6e60022a0cbe8c89278be2dd1773a2f68e7c5c87
       with:
         xcode: ${{ inputs.xcode }}
-        action: none   
+        action: none

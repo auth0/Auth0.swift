@@ -16,10 +16,6 @@ runs:
   using: composite
 
   steps:
-    - name: Install xcpretty
-      run: gem install xcpretty
-      shell: bash
-
     - name: Save Xcode version
       run: xcodebuild -version | tee .xcode-version
       shell: bash
