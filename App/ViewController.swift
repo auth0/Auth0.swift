@@ -2,33 +2,25 @@ import UIKit
 import Auth0
 
 class ViewController: UIViewController {
-    
-    var onAuth: ((WebAuthResult<Credentials>) -> ())!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        self.onAuth = {
-            switch $0 {
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.alert(title: "Error", message: "\(error)")
-                }
-            case .success(let credentials):
-                DispatchQueue.main.async {
-                    self.alert(title: "Success",
-                               message: "Authorized and got a token \(credentials.accessToken)")
-                }
-            }
-            print($0)
-        }
-    }
-    
+
     @IBAction func login(_ sender: Any) {
         Auth0
             .webAuth()
             .logging(enabled: true)
-            .start(onAuth)
+            .start {
+                switch $0 {
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        self.alert(title: "Error", message: "\(error)")
+                    }
+                case .success(let credentials):
+                    DispatchQueue.main.async {
+                        self.alert(title: "Success",
+                                   message: "Authorized and got a token \(credentials.accessToken)")
+                    }
+                }
+                print($0)
+            }
     }
 
     @IBAction func logout(_ sender: Any) {
