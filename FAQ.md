@@ -154,7 +154,7 @@ This is a known issue with `ASWebAuthenticationSession` and it is not specific t
 You can invoke `WebAuthentication.cancel()` to manually clear the current login transaction upon encountering this error. Then, you can retry login. For example:
 
 ```swift
-switch error {
+switch result {
 case .failure(let error) where error == .transactionActiveAlready:
     WebAuthentication.cancel()
     // ... retry login
