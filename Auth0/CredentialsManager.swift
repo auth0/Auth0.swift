@@ -315,6 +315,12 @@ public struct CredentialsManager {
     }
     #endif
 
+    public func ssoCredentials(parameters: [String: Any] = [:],
+                               headers: [String: String] = [:],
+                               callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+        self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: callback)
+    }
+
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
@@ -365,7 +371,6 @@ public struct CredentialsManager {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
-    // swiftlint:disable:next function_body_length
     private func retrieveCredentials(withScope scope: String? = nil,
                                      minTTL: Int = 0,
                                      parameters: [String: Any],
@@ -399,12 +404,7 @@ public struct CredentialsManager {
                     .start { result in
                         switch result {
                         case .success(let credentials):
-                            let newCredentials = Credentials(accessToken: credentials.accessToken,
-                                                             tokenType: credentials.tokenType,
-                                                             idToken: credentials.idToken,
-                                                             refreshToken: credentials.refreshToken ?? refreshToken,
-                                                             expiresIn: credentials.expiresIn,
-                                                             scope: credentials.scope)
+                            let newCredentials = credentials.copy(withRefreshToken: credentials.refreshToken ?? refreshToken)
                             if self.willExpire(newCredentials, within: minTTL) {
                                 let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
                                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
@@ -420,6 +420,48 @@ public struct CredentialsManager {
                         case .failure(let error):
                             self.dispatchGroup.leave()
                             callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
+                        }
+                    }
+            }
+
+            self.dispatchGroup.wait()
+        }
+    }
+
+    private func retrieveSSOCredentials(parameters: [String: Any],
+                                        headers: [String: String],
+                                        callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+        self.dispatchQueue.async {
+            self.dispatchGroup.enter()
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                guard let credentials = retrieveCredentials() else {
+                    self.dispatchGroup.leave()
+                    return callback(.failure(.noCredentials))
+                }
+                guard let refreshToken = credentials.refreshToken else {
+                    self.dispatchGroup.leave()
+                    return callback(.failure(.noRefreshToken))
+                }
+
+                self.authentication
+                    .ssoExchange(withRefreshToken: refreshToken)
+                    .parameters(parameters)
+                    .headers(headers)
+                    .start { result in
+                        switch result {
+                        case .success(let ssoCredentials):
+                            let newCredentials = credentials.copy(withRefreshToken: ssoCredentials.refreshToken ?? refreshToken)
+                            if !self.store(credentials: newCredentials) {
+                                self.dispatchGroup.leave()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                            } else {
+                                self.dispatchGroup.leave()
+                                callback(.success(ssoCredentials))
+                            }
+                        case .failure(let error):
+                            self.dispatchGroup.leave()
+                            callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: error)))
                         }
                     }
             }

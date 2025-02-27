@@ -276,6 +276,17 @@ struct Auth0Authentication: Authentication {
         ])
     }
 
+    func ssoExchange(withRefreshToken refreshToken: String) -> Request<SSOCredentials, AuthenticationError> {
+        let payload: [String: Any] = [
+            "requested_token_type": "urn:auth0:params:oauth:token-type:session_token"
+        ]
+        return self.tokenExchange(subjectToken: refreshToken,
+                                  subjectTokenType: "urn:ietf:params:oauth:token-type:refresh_token",
+                                  scope: nil,
+                                  audience: nil,
+                                  parameters: payload)
+    }
+
     func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         var payload: [String: Any] = [
             "refresh_token": refreshToken,
@@ -344,7 +355,7 @@ private extension Auth0Authentication {
                        telemetry: self.telemetry)
     }
 
-    func token() -> Request<Credentials, AuthenticationError> {
+    func token<T: Codable>() -> Request<T, AuthenticationError> {
         let payload: [String: Any] = [
             "client_id": self.clientId
         ]
@@ -358,7 +369,11 @@ private extension Auth0Authentication {
                        telemetry: self.telemetry)
     }
 
-    func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
+    func tokenExchange<T: Codable>(subjectToken: String,
+                                   subjectTokenType: String,
+                                   scope: String?,
+                                   audience: String?,
+                                   parameters: [String: Any] = [:]) -> Request<T, AuthenticationError> {
         var parameters: [String: Any] = parameters
         parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
         parameters["subject_token"] = subjectToken

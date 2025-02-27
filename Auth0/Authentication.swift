@@ -649,6 +649,8 @@ public protocol Authentication: Trackable, Loggable {
      */
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
+    func ssoExchange(withRefreshToken: String) -> Request<SSOCredentials, AuthenticationError>
+
     /**
      Renews the user's credentials using a refresh token.
 

@@ -22,7 +22,7 @@ public final class Credentials: NSObject {
     /// - [Audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)
     public let accessToken: String
 
-    /// Type of the access token.
+    /// Indicates how the access token should be used. For example, as a bearer token.
     public let tokenType: String
 
     /// When the access token expires.
@@ -181,5 +181,21 @@ extension Credentials: NSSecureCoding {
 
     /// Property that enables secure coding. Equals to `true`.
     public static var supportsSecureCoding: Bool { return true }
+
+}
+
+// MARK: - Internal Copy
+
+extension Credentials {
+
+    func copy(withRefreshToken newRefreshToken: String) -> Credentials {
+        return Credentials(accessToken: self.accessToken,
+                           tokenType: self.tokenType,
+                           idToken: self.idToken,
+                           refreshToken: newRefreshToken,
+                           expiresIn: self.expiresIn,
+                           scope: self.scope,
+                           recoveryCode: self.recoveryCode)
+    }
 
 }
