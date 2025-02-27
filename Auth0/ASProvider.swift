@@ -59,23 +59,23 @@ extension WebAuthentication {
 
 class ASUserAgent: NSObject, WebAuthUserAgent {
 
-    let session: ASWebAuthenticationSession
+    private(set) static var currentSession: ASWebAuthenticationSession?
     let callback: WebAuthProviderCallback
 
     init(session: ASWebAuthenticationSession, callback: @escaping WebAuthProviderCallback) {
-        self.session = session
         self.callback = callback
         super.init()
 
         session.presentationContextProvider = self
+        ASUserAgent.currentSession = session
     }
 
     func start() {
-        _ = self.session.start()
+        _ = ASUserAgent.currentSession?.start()
     }
 
     func finish(with result: WebAuthResult<Void>) {
-        self.session.cancel()
+        ASUserAgent.currentSession?.cancel()
         self.callback(result)
     }
 
