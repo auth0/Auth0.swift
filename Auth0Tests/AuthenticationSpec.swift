@@ -263,12 +263,12 @@ class AuthenticationSpec: QuickSpec {
         // MARK:- Refresh Tokens
         
         describe("renew auth with refresh token") {
-            
+
             let refreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-            
+
             it("should receive credentials") {
                 NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken]) && $0.hasNoneOf(["scope"])
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken]) && $0.hasNoneOf(["audience", "scope"])
                 }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken)
@@ -281,7 +281,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should receive credentials when sending audience") {
                 NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "audience": Audience])
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "audience": Audience]) && $0.hasNoneOf(["scope"])
                 }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken, audience: Audience)
@@ -294,7 +294,7 @@ class AuthenticationSpec: QuickSpec {
 
             it("should receive credentials when sending scope") {
                 NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "scope": "openid email"])
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "scope": "openid email"]) && $0.hasNoneOf(["audience"])
                 }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken, scope: "openid email")
@@ -304,10 +304,11 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
             it("should receive credentials when sending scope without enforcing openid scope") {
                 NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "scope": "email phone"]) }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": refreshToken, "scope": "email phone"]) && $0.hasNoneOf(["audience"])
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.renew(withRefreshToken: refreshToken, scope: "email phone")
                         .start { result in
