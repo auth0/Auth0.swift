@@ -345,7 +345,7 @@ public struct CredentialsManager {
     #endif
 
     public func apiCredentials(forAudience audience: String,
-                               scope: String,
+                               scope: String? = nil,
                                minTTL: Int = 0,
                                parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
@@ -483,7 +483,7 @@ public struct CredentialsManager {
 
     // swiftlint:disable:next function_body_length function_parameter_count
     private func retrieveAPICredentials(audience: String,
-                                        scope: String,
+                                        scope: String?,
                                         minTTL: Int,
                                         parameters: [String: Any],
                                         headers: [String: String],
@@ -715,7 +715,7 @@ public extension CredentialsManager {
     }
 
     func apiCredentials(forAudience audience: String,
-                        scope: String,
+                        scope: String? = nil,
                         minTTL: Int = 0,
                         parameters: [String: Any] = [:],
                         headers: [String: String] = [:]) -> AnyPublisher<APICredentials, CredentialsManagerError> {
@@ -900,7 +900,7 @@ public extension CredentialsManager {
     }
 
     func apiCredentials(forAudience audience: String,
-                        scope: String,
+                        scope: String? = nil,
                         minTTL: Int = 0,
                         parameters: [String: Any] = [:],
                         headers: [String: String] = [:]) async throws -> APICredentials {

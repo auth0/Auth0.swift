@@ -641,7 +641,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("renewal request should include custom parameters") {
                     let someId = UUID().uuidString
                     NetworkStub.clearStubs()
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "some_id": someId]) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
@@ -655,7 +655,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("renewal request should include custom headers") {
                     let key = "foo"
                     let value = "bar"
-                    NetworkStub.addStub(condition: { $0.hasHeader(key, value: value)}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasHeader(key, value: value) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
@@ -740,7 +740,7 @@ class CredentialsManagerSpec: QuickSpec {
                     let expectedError = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: Int(ExpiresIn - 1)))
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.credentials(withScope: nil, minTTL: minTTL) { result in
+                        credentialsManager.credentials(minTTL: minTTL) { result in
                             expect(result).to(haveCredentialsManagerError(expectedError))
                             done()
                         }
@@ -862,7 +862,7 @@ class CredentialsManagerSpec: QuickSpec {
             
             beforeEach {
                 NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                 }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
             }
             
@@ -878,7 +878,7 @@ class CredentialsManagerSpec: QuickSpec {
                 _ = credentialsManager.store(credentials: credentials)
                 
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                    credentialsManager.apiCredentials(forAudience: Audience) { result in
                         expect(result).to(haveCredentialsManagerError(expectedError))
                         done()
                     }
@@ -890,7 +890,7 @@ class CredentialsManagerSpec: QuickSpec {
                 _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                 
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                    credentialsManager.apiCredentials(forAudience: Audience) { result in
                         expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
                         done()
                     }
@@ -904,7 +904,7 @@ class CredentialsManagerSpec: QuickSpec {
                 _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                 
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                    credentialsManager.apiCredentials(forAudience: Audience) { result in
                         expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noRefreshToken)))
                         done()
                     }
@@ -918,7 +918,7 @@ class CredentialsManagerSpec: QuickSpec {
                 _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                 
                 waitUntil(timeout: Timeout) { done in
-                    credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                    credentialsManager.apiCredentials(forAudience: Audience) { result in
                         expect(result).to(haveAPICredentials())
                         done()
                     }
@@ -932,7 +932,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
                             expect(result).to(haveAPICredentials(NewAccessToken))
                             done()
                         }
@@ -946,7 +946,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
                             expect(result).to(beSuccessful())
                             let storedCredentials = fetchAPICredentials(from: store)
                             expect(storedCredentials?.accessToken) == NewAccessToken
@@ -958,7 +958,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should update existing api credentials without refresh token rotation") {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               tokenType: NewTokenType,
                                               idToken: NewIdToken,
@@ -972,7 +972,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
                             expect(result).to(haveAPICredentials(NewAccessToken, NewTokenType, NewScope))
                             let storedCredentials = fetchCredentials(from: store)
                             expect(storedCredentials?.accessToken) == AccessToken
@@ -988,7 +988,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should update existing api credentials with refresh token rotation") {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               tokenType: NewTokenType,
                                               idToken: NewIdToken,
@@ -1002,7 +1002,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
                             expect(result).to(haveAPICredentials(NewAccessToken, NewTokenType, NewScope))
                             let storedCredentials = fetchCredentials(from: store)
                             expect(storedCredentials?.accessToken) == AccessToken
@@ -1018,7 +1018,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should yield error on failed renewal") {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: authFailure(code: "invalid_request", description: "missing_params"))
                     
                     let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
@@ -1028,7 +1028,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
                             expect(result).to(haveCredentialsManagerError(expectedError))
                             done()
                         }
@@ -1062,7 +1062,7 @@ class CredentialsManagerSpec: QuickSpec {
                     credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
                     
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
                             expect(result).to(haveCredentialsManagerError(.storeFailed))
                             done()
                         }
@@ -1070,19 +1070,19 @@ class CredentialsManagerSpec: QuickSpec {
                 }
                 
                 it("renewal request should include custom parameters") {
-                    let someId = UUID().uuidString
+                    let key = "foo"
+                    let value = "bar"
+
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope, "some_id": someId])
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, key: value])
                     }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
                     
                     _ = credentialsManager.store(credentials: credentials)
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience,
-                                                          scope: Scope,
-                                                          parameters: ["some_id": someId]) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience, parameters: [key: value]) { result in
                             expect(result).to(haveAPICredentials(NewAccessToken))
                             done()
                         }
@@ -1092,6 +1092,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("renewal request should include custom headers") {
                     let key = "foo"
                     let value = "bar"
+
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) && $0.hasHeader(key, value: value)
@@ -1101,9 +1102,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience,
-                                                          scope: Scope,
-                                                          headers: [key: value]) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience, headers: [key: value]) { result in
                             expect(result).to(beSuccessful())
                             done()
                         }
@@ -1120,6 +1119,15 @@ class CredentialsManagerSpec: QuickSpec {
                                                     scope: Scope)
                     _ = credentialsManager.store(credentials: credentials)
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                }
+
+                it("should not yield new api credentials by default") {
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
+                            expect(result).to(haveAPICredentials(AccessToken))
+                            done()
+                        }
+                    }
                 }
 
                 it("should not yield new api credentials with the same scope") {
@@ -1156,9 +1164,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should not yield new api credentials with a min ttl less than its expiry") {
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience,
-                                                          scope: Scope,
-                                                          minTTL: ValidTTL) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience, minTTL: ValidTTL) { result in
                             expect(result).to(haveAPICredentials(AccessToken))
                             done()
                         }
@@ -1168,12 +1174,10 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should yield new api credentials with a min ttl greater than its expiry") {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn * 2))
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience,
-                                                          scope: Scope,
-                                                          minTTL: InvalidTTL) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience, minTTL: InvalidTTL) { result in
                             expect(result).to(haveAPICredentials(NewAccessToken))
                             done()
                         }
@@ -1185,9 +1189,7 @@ class CredentialsManagerSpec: QuickSpec {
                     // The dates are not mocked, so they won't match exactly
                     let expectedError = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: Int(ExpiresIn - 1)))
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience,
-                                                          scope: Scope,
-                                                          minTTL: minTTL) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience, minTTL: minTTL) { result in
                             expect(result).to(haveCredentialsManagerError(expectedError))
                             done()
                         }
@@ -1201,20 +1203,20 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should yield the stored api credentials after the previous renewal operation succeeded") {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
                     
                     _ = credentialsManager.store(credentials: credentials)
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
                             expect(result).to(haveAPICredentials(NewAccessToken))
                             
                             NetworkStub.clearStubs()
                         }
                         
-                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
                             expect(result).to(haveAPICredentials(NewAccessToken))
                             done()
                         }
@@ -1225,25 +1227,23 @@ class CredentialsManagerSpec: QuickSpec {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) &&
-                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: apiFailureResponse())
 
                     _ = credentialsManager.store(credentials: credentials)
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
 
                     waitUntil(timeout: Timeout) { done in
-                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience) { result in
                             expect(result).to(beUnsuccessful())
 
                             NetworkStub.clearStubs()
                             NetworkStub.addStub(condition: {
                                 $0.isToken(Domain) &&
-                                $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope, "request": "second"])
+                                $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "request": "second"])
                             }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
                         }
-                        credentialsManager.apiCredentials(forAudience: Audience,
-                                                          scope: Scope,
-                                                          parameters: ["request": "second"]) { result in
+                        credentialsManager.apiCredentials(forAudience: Audience, parameters: ["request": "second"]) { result in
                             expect(result).to(haveAPICredentials())
                             done()
                         }
@@ -1257,7 +1257,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should yield the stored api credentials after the previous renewal operation succeeded") {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope, "request": "first"])
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "request": "first"])
                     }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
                     
                     _ = credentialsManager.store(credentials: credentials)
@@ -1266,14 +1266,13 @@ class CredentialsManagerSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         DispatchQueue.global(qos: .userInitiated).sync {
                             credentialsManager.apiCredentials(forAudience: Audience,
-                                                              scope: Scope,
                                                               parameters: ["request": "first"]) { result in
                                 expect(result).to(haveAPICredentials(NewAccessToken))
                             }
                         }
                         
                         DispatchQueue.global(qos: .background).sync {
-                            credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                            credentialsManager.apiCredentials(forAudience: Audience) { result in
                                 expect(result).to(haveAPICredentials(NewAccessToken))
                                 done()
                             }
@@ -1285,7 +1284,7 @@ class CredentialsManagerSpec: QuickSpec {
                     NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) &&
-                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: apiFailureResponse())
 
                     _ = credentialsManager.store(credentials: credentials)
@@ -1293,20 +1292,19 @@ class CredentialsManagerSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         DispatchQueue.global(qos: .userInitiated).sync {
-                            credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                            credentialsManager.apiCredentials(forAudience: Audience) { result in
                                 expect(result).to(beUnsuccessful())
 
                                 NetworkStub.clearStubs()
                                 NetworkStub.addStub(condition: {
                                     $0.isToken(Domain) &&
-                                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope, "request": "second"])
+                                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "request": "second"])
                                 }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
                             }
                         }
 
                         DispatchQueue.global(qos: .background).sync {
                             credentialsManager.apiCredentials(forAudience: Audience,
-                                                              scope: Scope,
                                                               parameters: ["request": "second"]) { result in
                                 expect(result).to(haveAPICredentials(NewAccessToken))
                                 done()
@@ -1429,7 +1427,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("renewal request should include custom parameters") {
                 let someId = UUID().uuidString
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "some_id": someId])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "some_id": someId]) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew(parameters: ["some_id": someId]) { result in
@@ -1442,7 +1440,7 @@ class CredentialsManagerSpec: QuickSpec {
             it("renewal request should include custom headers") {
                 let key = "foo"
                 let value = "bar"
-                NetworkStub.addStub(condition: { $0.hasHeader(key, value: value)}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasHeader(key, value: value) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                 _ = credentialsManager.store(credentials: credentials)
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew(headers: [key: value]) { result in
@@ -1592,7 +1590,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
-                            .apiCredentials(forAudience: Audience, scope: Scope)
+                            .apiCredentials(forAudience: Audience)
                             .assertNoFailure()
                             .count()
                             .sink(receiveValue: { count in
@@ -1606,7 +1604,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should complete using the default parameter values") {
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) &&
-                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               idToken: NewIdToken,
                                               refreshToken: NewRefreshToken,
@@ -1615,7 +1613,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
-                            .apiCredentials(forAudience: Audience, scope: Scope)
+                            .apiCredentials(forAudience: Audience)
                             .sink(receiveCompletion: { completion in
                                 guard case .finished = completion else { return }
                                 done()
@@ -1655,7 +1653,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should complete with an error") {
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager
-                            .apiCredentials(forAudience: Audience, scope: Scope)
+                            .apiCredentials(forAudience: Audience)
                             .ignoreOutput()
                             .sink(receiveCompletion: { completion in
                                 guard case .failure = completion else { return }
@@ -1856,7 +1854,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should return the credentials using the default parameter values") {
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) && 
-                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience, "scope": Scope])
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               idToken: NewIdToken,
                                               refreshToken: NewRefreshToken,
@@ -1865,7 +1863,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
-                            _ = try await credentialsManager.apiCredentials(forAudience: Audience, scope: Scope)
+                            _ = try await credentialsManager.apiCredentials(forAudience: Audience)
                             done()
                         }
                     }
@@ -1900,7 +1898,7 @@ class CredentialsManagerSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         Task.init {
                             do {
-                                _ = try await credentialsManager.apiCredentials(forAudience: Audience, scope: Scope)
+                                _ = try await credentialsManager.apiCredentials(forAudience: Audience)
                             } catch {
                                 done()
                             }
