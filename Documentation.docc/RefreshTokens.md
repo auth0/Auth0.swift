@@ -50,7 +50,7 @@ If you are using the Credentials Manager to renew the credentials -either throug
 
 This can happen, for example, by using a computed property to get a Credentials Manager instance:
 
-```
+``` swift
 struct Services {
     // ❌ This will return a new instance every time
     var credentialsManager: CredentialsManager {
