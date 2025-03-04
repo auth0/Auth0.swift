@@ -85,6 +85,13 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for no api credentials") {
+                let audience = "https://example.com/api"
+                let message = "No API credentials were found in the store for the specified audience value (\(audience))."
+                let error = CredentialsManagerError(code: .noAPICredentials(audience: audience))
+                expect(error.localizedDescription) == message
+            }
+
             it("should return message for no refresh token") {
                 let message = "The stored credentials instance does not contain a refresh token."
                 let error = CredentialsManagerError(code: .noRefreshToken)

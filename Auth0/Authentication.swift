@@ -689,7 +689,7 @@ public protocol Authentication: Trackable, Loggable {
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
      - <doc:RefreshTokens>
      */
-    func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
+    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Revokes a user's refresh token by performing a request to the `/oauth/revoke` endpoint.
@@ -788,8 +788,8 @@ public extension Authentication {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
     }
 
-    func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.renew(withRefreshToken: refreshToken, scope: scope)
+    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
     }
 
 }
