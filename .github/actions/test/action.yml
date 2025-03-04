@@ -5,9 +5,11 @@ inputs:
   xcode:
     description: The version of Xcode to use
     required: true
+
   scheme:
     description: The Xcode scheme to use
     required: true
+
   platform:
     description: The platform to build for
     required: true
@@ -22,7 +24,7 @@ runs:
 
     - id: restore-carthage-cache
       name: Restore Carthage cache
-      uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
+      uses: actions/cache@v4
       with:
         path: Carthage
         key: carthage-${{ inputs.platform }}-${{ hashFiles('Cartfile.resolved') }}-${{ hashFiles('.xcode-version') }}-v1
@@ -33,7 +35,7 @@ runs:
       shell: bash
 
     - name: Run tests
-      uses: mxcl/xcodebuild@2cf0ec52b855fa777531c5c89b714caa7a3abd5e # pin@v3.4.0
+      uses: mxcl/xcodebuild@75cd1d21e22129934f9ca289757708d8af9155f5 # pin@v3.4.0
       with:
         xcode: ${{ inputs.xcode }}
         scheme: ${{ inputs.scheme }}
