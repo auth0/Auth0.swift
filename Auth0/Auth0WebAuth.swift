@@ -10,6 +10,7 @@ final class Auth0WebAuth: WebAuth {
     let storage: TransactionStore
 
     var telemetry: Telemetry
+    var barrier: Barrier
     var logger: Logger?
 
     #if os(macOS)
@@ -66,12 +67,14 @@ final class Auth0WebAuth: WebAuth {
          url: URL,
          session: URLSession = URLSession.shared,
          storage: TransactionStore = TransactionStore.shared,
-         telemetry: Telemetry = Telemetry()) {
+         telemetry: Telemetry = Telemetry(),
+         barrier: Barrier = QueueBarrier.shared) {
         self.clientId = clientId
         self.url = url
         self.session = session
         self.storage = storage
         self.telemetry = telemetry
+        self.barrier = barrier
         self.issuer = url.absoluteString
     }
 
@@ -166,8 +169,7 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
-
-        if self.storage.current != nil {
+        guard barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
@@ -198,8 +200,9 @@ final class Auth0WebAuth: WebAuth {
                                                   invitation: invitation)
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, ephemeralSession: ephemeralSession)
-        let userAgent = provider(authorizeURL) { [storage, onCloseCallback] result in
+        let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
             storage.clear()
+            barrier.lower()
 
             switch result {
             case .success:
@@ -220,8 +223,7 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
-
-        if self.storage.current != nil {
+        guard barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
@@ -239,8 +241,9 @@ final class Auth0WebAuth: WebAuth {
         }
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL)
-        let userAgent = provider(logoutURL) { [storage] result in
+        let userAgent = provider(logoutURL) { [storage, barrier] result in
             storage.clear()
+            barrier.lower()
             callback(result)
         }
         let transaction = ClearSessionTransaction(userAgent: userAgent)
