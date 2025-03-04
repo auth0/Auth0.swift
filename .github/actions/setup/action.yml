@@ -2,6 +2,10 @@ name: Set up environment
 description: Set up the environment for building and testing the library on a given platform
 
 inputs:
+  ruby:
+    description: The version of Ruby to use
+    required: true
+
   xcode:
     description: The version of Xcode to use
     required: true
@@ -13,7 +17,7 @@ runs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@32110d4e311bd8996b2a82bf2a43b714ccc91777 # pin@v1.221.0
       with:
-        ruby-version: '3.3.0'
+        ruby-version: ${{ inputs.ruby }}
         bundler-cache: true
         cache-version: 1
 
