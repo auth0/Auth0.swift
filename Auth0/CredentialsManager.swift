@@ -667,7 +667,7 @@ public struct CredentialsManager {
                             }
                         case .failure(let error):
                             dispatchGroup.leave()
-                            callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
+                            callback(.failure(CredentialsManagerError(code: .apiExchangeFailed, cause: error)))
                         }
                     }
             }
