@@ -124,7 +124,7 @@ public struct CredentialsManager {
         return self.storage.deleteEntry(forKey: storeKey)
     }
 
-    /// Clears API credentials stored in the Keychain under a specific audience value.
+    /// Clears API credentials stored in the Keychain.
     ///
     /// ## Usage
     ///
