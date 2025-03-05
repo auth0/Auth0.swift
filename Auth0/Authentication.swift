@@ -669,7 +669,7 @@ public protocol Authentication: Trackable, Loggable {
      ```
 
      You can request credentials for a specific API by passing its audience value. The default scopes configured for
-     your API will be granted if you don't request any specific scopes.
+     the API will be granted if you don't request any specific scopes.
 
      ```swift
      Auth0

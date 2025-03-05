@@ -26,7 +26,6 @@ public struct CredentialsManager {
     private let storeKey: String
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
-    private let dispatchGroup = DispatchGroup()
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     #endif
@@ -110,27 +109,6 @@ public struct CredentialsManager {
         }
 
         return self.storage.setEntry(data, forKey: storeKey)
-    }
-
-    /// Stores an ``APICredentials`` instance in the Keychain, using the corresponding audience value as the key.
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// let didStore = credentialsManager.store(apiCredentials: apiCredentials,
-    ///                                         forAudience: "http://example.com/api")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - apiCredentials: ``APICredentials`` instance to store.
-    ///   - audience:       Identifier of the of the API these API credentials are for.
-    /// - Returns: If the API credentials were stored.
-    public func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
-        guard let data = try? JSONEncoder().encode(apiCredentials) else {
-            return false
-        }
-
-        return self.storage.setEntry(data, forKey: audience)
     }
 
     /// Clears credentials stored in the Keychain.
@@ -443,7 +421,7 @@ public struct CredentialsManager {
     /// }
     /// ```
     ///
-    /// The default scopes configured for your API will be granted if you don't request any specific scopes. If you
+    /// The default scopes configured for the API will be granted if you don't request any specific scopes. If you
     /// request different scopes than the ones that were granted last time, the API credentials will be renewed
     /// immediately, regardless of whether they are expired or not.
     ///
@@ -553,6 +531,14 @@ public struct CredentialsManager {
                                  callback: callback)
     }
 
+    func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
+        guard let data = try? JSONEncoder().encode(apiCredentials) else {
+            return false
+        }
+
+        return self.storage.setEntry(data, forKey: audience)
+    }
+
     private func retrieveCredentials() -> Credentials? {
         guard let data = self.storage.getEntry(forKey: storeKey) else { return nil }
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
@@ -570,23 +556,25 @@ public struct CredentialsManager {
                                      headers: [String: String],
                                      forceRenewal: Bool,
                                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+
         self.dispatchQueue.async {
-            self.dispatchGroup.enter()
+            dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
                 guard let credentials = self.retrieveCredentials() else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noCredentials))
                 }
                 guard forceRenewal ||
                       self.hasExpired(credentials.expiresIn) ||
                       self.willExpire(credentials.expiresIn, within: minTTL) ||
                       self.hasScopeChanged(from: credentials.scope, to: scope) else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.success(credentials))
                 }
                 guard let refreshToken = credentials.refreshToken else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
 
@@ -602,23 +590,23 @@ public struct CredentialsManager {
                             if self.willExpire(newCredentials.expiresIn, within: minTTL) {
                                 let tokenTTL = Int(newCredentials.expiresIn.timeIntervalSinceNow)
                                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(error))
                             } else if !self.store(credentials: newCredentials) {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.success(newCredentials))
                             }
                         case .failure(let error):
-                            self.dispatchGroup.leave()
+                            dispatchGroup.leave()
                             callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
                         }
                     }
             }
 
-            self.dispatchGroup.wait()
+            dispatchGroup.wait()
         }
     }
 
@@ -629,27 +617,25 @@ public struct CredentialsManager {
                                         parameters: [String: Any],
                                         headers: [String: String],
                                         callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+
         self.dispatchQueue.async {
-            self.dispatchGroup.enter()
+            dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
-                guard let apiCredentials = self.retrieveAPICredentials(audience: audience) else {
-                    let error = CredentialsManagerError(code: .noAPICredentials(audience: audience))
-                    self.dispatchGroup.leave()
-                    return callback(.failure(error))
-                }
-                guard self.hasExpired(apiCredentials.expiresIn) ||
-                      self.willExpire(apiCredentials.expiresIn, within: minTTL) ||
-                      self.hasScopeChanged(from: apiCredentials.scope, to: scope) else {
-                    self.dispatchGroup.leave()
+                if let apiCredentials = self.retrieveAPICredentials(audience: audience),
+                      !self.hasExpired(apiCredentials.expiresIn),
+                      !self.willExpire(apiCredentials.expiresIn, within: minTTL),
+                      !self.hasScopeChanged(from: apiCredentials.scope, to: scope) {
+                    dispatchGroup.leave()
                     return callback(.success(apiCredentials))
                 }
                 guard let currentCredentials = self.retrieveCredentials() else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noCredentials))
                 }
                 guard let refreshToken = currentCredentials.refreshToken else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
 
@@ -667,26 +653,26 @@ public struct CredentialsManager {
                             if self.willExpire(newAPICredentials.expiresIn, within: minTTL) {
                                 let tokenTTL = Int(newAPICredentials.expiresIn.timeIntervalSinceNow)
                                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(error))
                             } else if !self.store(credentials: newCredentials) {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else if !self.store(apiCredentials: newAPICredentials, forAudience: audience) {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.success(newAPICredentials))
                             }
                         case .failure(let error):
-                            self.dispatchGroup.leave()
+                            dispatchGroup.leave()
                             callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
                         }
                     }
             }
 
-            self.dispatchGroup.wait()
+            dispatchGroup.wait()
         }
     }
 
@@ -868,7 +854,7 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// The default scopes configured for your API will be granted if you don't request any specific scopes. If you
+    /// The default scopes configured for the API will be granted if you don't request any specific scopes. If you
     /// request different scopes than the ones that were granted last time, the API credentials will be renewed
     /// immediately, regardless of whether they are expired or not.
     ///
@@ -1125,7 +1111,7 @@ public extension CredentialsManager {
     /// }
     /// ```
     ///
-    /// The default scopes configured for your API will be granted if you don't request any specific scopes. If you
+    /// The default scopes configured for the API will be granted if you don't request any specific scopes. If you
     /// request different scopes than the ones that were granted last time, the API credentials will be renewed
     /// immediately, regardless of whether they are expired or not.
     ///

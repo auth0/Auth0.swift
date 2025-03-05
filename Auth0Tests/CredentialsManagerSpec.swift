@@ -871,20 +871,6 @@ class CredentialsManagerSpec: QuickSpec {
                 _ = credentialsManager.clear(forAudience: Audience)
             }
             
-            it("should error when there are no api credentials stored") {
-                let expectedError = CredentialsManagerError(code: .noAPICredentials(audience: Audience))
-                
-                _ = credentialsManager.clear(forAudience: Audience)
-                _ = credentialsManager.store(credentials: credentials)
-                
-                waitUntil(timeout: Timeout) { done in
-                    credentialsManager.apiCredentials(forAudience: Audience) { result in
-                        expect(result).to(haveCredentialsManagerError(expectedError))
-                        done()
-                    }
-                }
-            }
-            
             it("should error when there are no credentials stored") {
                 _ = credentialsManager.clear()
                 _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
