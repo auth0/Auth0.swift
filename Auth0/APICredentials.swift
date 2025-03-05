@@ -10,14 +10,14 @@ private struct _A0APICredentials {
 /// User's credentials obtained from Auth0 for a specific API as the resulf of exchaging a refresh token.
 public struct APICredentials: CustomStringConvertible {
 
-    /// Token that can be used to make authenticated requests to the API..
+    /// Token that can be used to make authenticated requests to the API.
     ///
     /// ## See Also
     ///
     /// - [Access Tokens](https://auth0.com/docs/secure/tokens/access-tokens)
     public let accessToken: String
 
-    /// Type of the access token.
+    /// Indicates how the access token should be used. For example, as a bearer token.
     public let tokenType: String
 
     /// When the access token expires.
@@ -94,6 +94,19 @@ extension APICredentials: Codable {
                                                    in: values,
                                                    debugDescription: "Format of expires_in is not recognized.")
         }
+    }
+
+}
+
+// MARK: - Internal Initializer
+
+extension APICredentials {
+
+    init(from credentials: Credentials) {
+        self.accessToken = credentials.accessToken
+        self.tokenType = credentials.tokenType
+        self.expiresIn = credentials.expiresIn
+        self.scope = credentials.scope
     }
 
 }

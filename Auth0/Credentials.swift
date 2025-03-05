@@ -183,3 +183,18 @@ extension Credentials: NSSecureCoding {
     public static var supportsSecureCoding: Bool { return true }
 
 }
+
+// MARK: - Internal Initializer
+
+extension Credentials {
+
+    convenience init(from credentials: Credentials, idToken: String? = nil, refreshToken: String? = nil) {
+        self.init(accessToken: credentials.accessToken,
+                  tokenType: credentials.tokenType,
+                  idToken: idToken ?? credentials.idToken,
+                  refreshToken: refreshToken ?? credentials.refreshToken,
+                  expiresIn: credentials.expiresIn,
+                  scope: credentials.scope)
+    }
+
+}

@@ -5,9 +5,9 @@ public struct CredentialsManagerError: Auth0Error {
 
     enum Code: Equatable {
         case noCredentials
-        case noAPICredentials(audience: String)
         case noRefreshToken
         case renewFailed
+        case apiExchangeFailed
         case storeFailed
         case biometricsFailed
         case revokeFailed
@@ -37,10 +37,6 @@ public struct CredentialsManagerError: Auth0Error {
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let noCredentials: CredentialsManagerError = .init(code: .noCredentials)
 
-    /// No API credentials were found in the store for the specified `audience` value.
-    /// This error does not include a ``Auth0Error/cause-9wuyi``.
-    public static let noAPICredentials: CredentialsManagerError = .init(code: .noAPICredentials(audience: ""))
-
     /// The stored ``Credentials`` instance does not contain a refresh token.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let noRefreshToken: CredentialsManagerError = .init(code: .noRefreshToken)
@@ -48,6 +44,10 @@ public struct CredentialsManagerError: Auth0Error {
     /// The credentials renewal failed.
     /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let renewFailed: CredentialsManagerError = .init(code: .renewFailed)
+
+    /// The exchange of the refresh token for API credentials failed.
+    /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let apiExchangeFailed: CredentialsManagerError = .init(code: .apiExchangeFailed)
 
     /// Storing the renewed credentials failed.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
@@ -61,7 +61,7 @@ public struct CredentialsManagerError: Auth0Error {
     /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let revokeFailed: CredentialsManagerError = .init(code: .revokeFailed)
 
-    /// The `minTTL` requested is greater than the lifetime of the renewed access token. Request a lower `minTTL` or 
+    /// The `minTTL` requested is greater than the lifetime of the renewed access token. Request a lower `minTTL` or
     /// increase the **Token Expiration** value in the settings page of your [Auth0 API](https://manage.auth0.com/#/apis/).
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let largeMinTTL: CredentialsManagerError = .init(code: .largeMinTTL(minTTL: 0, lifetime: 0))
@@ -75,9 +75,9 @@ extension CredentialsManagerError {
     var message: String {
         switch self.code {
         case .noCredentials: return "No credentials were found in the store."
-        case .noAPICredentials(let audience): return "No API credentials were found in the store for the specified audience value (\(audience))."
         case .noRefreshToken: return "The stored credentials instance does not contain a refresh token."
         case .renewFailed: return "The credentials renewal failed."
+        case .apiExchangeFailed: return "The exchange of the refresh token for API credentials failed."
         case .storeFailed: return "Storing the renewed credentials failed."
         case .biometricsFailed: return "The biometric authentication failed."
         case .revokeFailed: return "The revocation of the refresh token failed."

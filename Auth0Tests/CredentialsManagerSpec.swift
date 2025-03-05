@@ -871,20 +871,6 @@ class CredentialsManagerSpec: QuickSpec {
                 _ = credentialsManager.clear(forAudience: Audience)
             }
             
-            it("should error when there are no api credentials stored") {
-                let expectedError = CredentialsManagerError(code: .noAPICredentials(audience: Audience))
-                
-                _ = credentialsManager.clear(forAudience: Audience)
-                _ = credentialsManager.store(credentials: credentials)
-                
-                waitUntil(timeout: Timeout) { done in
-                    credentialsManager.apiCredentials(forAudience: Audience) { result in
-                        expect(result).to(haveCredentialsManagerError(expectedError))
-                        done()
-                    }
-                }
-            }
-            
             it("should error when there are no credentials stored") {
                 _ = credentialsManager.clear()
                 _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
@@ -1022,7 +1008,7 @@ class CredentialsManagerSpec: QuickSpec {
                     }, response: authFailure(code: "invalid_request", description: "missing_params"))
                     
                     let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
-                    let expectedError = CredentialsManagerError(code: .renewFailed, cause: cause)
+                    let expectedError = CredentialsManagerError(code: .apiExchangeFailed, cause: cause)
                     
                     _ = credentialsManager.store(credentials: credentials)
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
@@ -1853,7 +1839,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should return the credentials using the default parameter values") {
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && 
+                        $0.isToken(Domain) &&
                         $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               idToken: NewIdToken,
