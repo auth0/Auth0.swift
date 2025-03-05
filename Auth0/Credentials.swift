@@ -184,18 +184,17 @@ extension Credentials: NSSecureCoding {
 
 }
 
-// MARK: - Internal Copy
+// MARK: - Internal Initializer
 
 extension Credentials {
 
-    func copy(withRefreshToken newRefreshToken: String) -> Credentials {
-        return Credentials(accessToken: self.accessToken,
-                           tokenType: self.tokenType,
-                           idToken: self.idToken,
-                           refreshToken: newRefreshToken,
-                           expiresIn: self.expiresIn,
-                           scope: self.scope,
-                           recoveryCode: self.recoveryCode)
+    convenience init(from credentials: Credentials, idToken: String? = nil, refreshToken: String? = nil) {
+        self.init(accessToken: credentials.accessToken,
+                  tokenType: credentials.tokenType,
+                  idToken: idToken ?? credentials.idToken,
+                  refreshToken: refreshToken ?? credentials.refreshToken,
+                  expiresIn: credentials.expiresIn,
+                  scope: credentials.scope)
     }
 
 }

@@ -25,7 +25,6 @@ public struct CredentialsManager {
     private let storeKey: String
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
-    private let dispatchGroup = DispatchGroup()
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     #endif
@@ -377,23 +376,25 @@ public struct CredentialsManager {
                                      headers: [String: String],
                                      forceRenewal: Bool = false,
                                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+
         self.dispatchQueue.async {
-            self.dispatchGroup.enter()
+            dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
                 guard let credentials = retrieveCredentials() else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noCredentials))
                 }
                 guard forceRenewal ||
                       self.hasExpired(credentials) ||
                       self.willExpire(credentials, within: minTTL) ||
                       self.hasScopeChanged(credentials, from: scope) else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.success(credentials))
                 }
                 guard let refreshToken = credentials.refreshToken else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
 
@@ -404,43 +405,46 @@ public struct CredentialsManager {
                     .start { result in
                         switch result {
                         case .success(let credentials):
-                            let newCredentials = credentials.copy(withRefreshToken: credentials.refreshToken ?? refreshToken)
+                            let newCredentials = Credentials(from: credentials,
+                                                            refreshToken: credentials.refreshToken ?? refreshToken)
                             if self.willExpire(newCredentials, within: minTTL) {
                                 let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
                                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(error))
                             } else if !self.store(credentials: newCredentials) {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.success(newCredentials))
                             }
                         case .failure(let error):
-                            self.dispatchGroup.leave()
+                            dispatchGroup.leave()
                             callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
                         }
                     }
             }
 
-            self.dispatchGroup.wait()
+            dispatchGroup.wait()
         }
     }
 
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
                                         callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+
         self.dispatchQueue.async {
-            self.dispatchGroup.enter()
+            dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
                 guard let credentials = retrieveCredentials() else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noCredentials))
                 }
                 guard let refreshToken = credentials.refreshToken else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
 
@@ -451,22 +455,23 @@ public struct CredentialsManager {
                     .start { result in
                         switch result {
                         case .success(let ssoCredentials):
-                            let newCredentials = credentials.copy(withRefreshToken: ssoCredentials.refreshToken ?? refreshToken)
+                            let newCredentials = Credentials(from: credentials,
+                                                             refreshToken: ssoCredentials.refreshToken ?? refreshToken)
                             if !self.store(credentials: newCredentials) {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.success(ssoCredentials))
                             }
                         case .failure(let error):
-                            self.dispatchGroup.leave()
+                            dispatchGroup.leave()
                             callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: error)))
                         }
                     }
             }
 
-            self.dispatchGroup.wait()
+            dispatchGroup.wait()
         }
     }
 
