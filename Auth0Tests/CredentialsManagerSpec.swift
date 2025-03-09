@@ -101,6 +101,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 audiences.forEach { audience in
                     expect(credentialsManager.store(apiCredentials: apiCredentials, forAudience: audience)).to(beTrue())
+                    expect(fetchAPICredentials(forAudience: audience, from: store)).toNot(beNil())
                     expect(fetchCredentials(from: store)).to(beNil())
                 }
             }
