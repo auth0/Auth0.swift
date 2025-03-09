@@ -1231,7 +1231,7 @@ class CredentialsManagerSpec: QuickSpec {
                             }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn))
                         }
                         credentialsManager.apiCredentials(forAudience: Audience, parameters: ["request": "second"]) { result in
-                            expect(result).to(haveAPICredentials())
+                            expect(result).to(haveAPICredentials(NewAccessToken))
                             done()
                         }
                     }
