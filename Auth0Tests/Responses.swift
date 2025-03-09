@@ -92,7 +92,7 @@ func authResponse(accessToken: String,
 
     json["refresh_token"] = refreshToken
     json["scope"] = scope
-    json["recovery_code"] = refreshToken
+    json["recovery_code"] = recoveryCode
 
     if let expiresIn = expiresIn {
         json["expires_in"] = String(expiresIn)
