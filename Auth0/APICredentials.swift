@@ -7,7 +7,7 @@ private struct _A0APICredentials {
     let scope: String?
 }
 
-/// User's credentials obtained from Auth0 for a specific API as the resulf of exchaging a refresh token.
+/// User's credentials obtained from Auth0 for a specific API as the result of exchanging a refresh token.
 public struct APICredentials: CustomStringConvertible {
 
     /// Token that can be used to make authenticated requests to the API.
