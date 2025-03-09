@@ -906,7 +906,7 @@ class CredentialsManagerSpec: QuickSpec {
                 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.apiCredentials(forAudience: Audience) { result in
-                        expect(result).to(haveAPICredentials())
+                        expect(result).to(haveAPICredentials(AccessToken))
                         done()
                     }
                 }
