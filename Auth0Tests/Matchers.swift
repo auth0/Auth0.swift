@@ -136,12 +136,6 @@ func haveAPICredentials(_ accessToken: String, _ tokenType: String? = nil, _ sco
     }
 }
 
-func haveAPICredentials() -> Nimble.Matcher<CredentialsManagerResult<APICredentials>> {
-    return Matcher<CredentialsManagerResult<APICredentials>>.define("be a successful api credentials retrieval") { expression, failureMessage -> MatcherResult in
-        return try beSuccessful(expression, failureMessage)
-    }
-}
-
 func haveCreatedUser(_ email: String, username: String? = nil) -> Nimble.Matcher<AuthenticationResult<DatabaseUser>> {
     return Matcher<AuthenticationResult<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: DatabaseUser) -> Bool in
