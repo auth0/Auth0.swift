@@ -440,7 +440,7 @@ public struct CredentialsManager {
     ///                                   minTTL: 60) { print($0) }
     /// ```
     ///
-    /// You can specify custom parameters or headers for the renewal request:
+    /// You can specify custom parameters or headers for the exchange request:
     ///
     /// ```swift
     /// credentialsManager.apiCredentials(forAudience: "http://example.com/api",
@@ -532,7 +532,7 @@ public struct CredentialsManager {
     }
 
     func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
-        guard let data = try? APICredentials.jsonEncoder.encode(apiCredentials) else {
+        guard let data = try? apiCredentials.encode() else {
             return false
         }
 
@@ -546,7 +546,7 @@ public struct CredentialsManager {
 
     private func retrieveAPICredentials(audience: String) -> APICredentials? {
         guard let data = self.storage.getEntry(forKey: audience) else { return nil }
-        return try? APICredentials.jsonDecoder.decode(APICredentials.self, from: data)
+        return try? APICredentials(from: data)
     }
 
     // swiftlint:disable:next function_parameter_count
@@ -881,7 +881,7 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// You can specify custom parameters or headers for the renewal request:
+    /// You can specify custom parameters or headers for the exchange request:
     ///
     /// ```swift
     /// credentialsManager
@@ -1129,7 +1129,7 @@ public extension CredentialsManager {
     ///                                                                  minTTL: 60)
     /// ```
     ///
-    /// You can specify custom parameters or headers for the renewal request:
+    /// You can specify custom parameters or headers for the exchange request:
     ///
     /// ```swift
     /// let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "http://example.com/api",

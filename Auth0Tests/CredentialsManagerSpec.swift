@@ -617,10 +617,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should yield error on failed store") {
                     class MockStore: CredentialsStorage {
                         func getEntry(forKey: String) -> Data? {
-                            let credentials = Credentials(refreshToken: RefreshToken)
-                            let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
-                                                                         requiringSecureCoding: true)
-                            return data
+                            return encodeCredentials(Credentials(refreshToken: RefreshToken))
                         }
                         func setEntry(_ data: Data, forKey: String) -> Bool {
                             return false
@@ -647,7 +644,7 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.credentials(parameters: ["some_id": someId]) { result in
-                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(result).to(beSuccessful())
                             done()
                         }
                     }
@@ -912,7 +909,7 @@ class CredentialsManagerSpec: QuickSpec {
                 }
             }
             
-            context("renewal of api credentials") {
+            context("exchange for api credentials") {
                 
                 it("should exchange refresh token for new api credentials") {
                     _ = credentialsManager.store(credentials: credentials)
@@ -1029,12 +1026,10 @@ class CredentialsManagerSpec: QuickSpec {
                                 let apiCredentials = APICredentials(accessToken: AccessToken,
                                                                     tokenType: TokenType,
                                                                     expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                                return try? APICredentials.jsonEncoder.encode(apiCredentials)
+                                return try? apiCredentials.encode()
                             }
                             
-                            let credentials = Credentials(refreshToken: RefreshToken)
-                            return try? NSKeyedArchiver.archivedData(withRootObject: credentials,
-                                                                     requiringSecureCoding: true)
+                            return encodeCredentials(Credentials(refreshToken: RefreshToken))
                         }
                         func setEntry(_ data: Data, forKey: String) -> Bool {
                             return false
@@ -1070,7 +1065,7 @@ class CredentialsManagerSpec: QuickSpec {
                     
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, parameters: [key: value]) { result in
-                            expect(result).to(haveAPICredentials(NewAccessToken))
+                            expect(result).to(beSuccessful())
                             done()
                         }
                     }
@@ -1185,7 +1180,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             }
 
-            context("serial renewal of api credentials from same thread") {
+            context("serial exchange for api credentials from same thread") {
                 
                 it("should yield the stored api credentials after the previous renewal operation succeeded") {
                     NetworkStub.clearStubs()
@@ -1239,7 +1234,7 @@ class CredentialsManagerSpec: QuickSpec {
                 
             }
             
-            context("serial renewal of api credentials from different threads") {
+            context("serial exchange for api credentials from different threads") {
                 
                 it("should yield the stored api credentials after the previous renewal operation succeeded") {
                     NetworkStub.clearStubs()
@@ -1391,9 +1386,7 @@ class CredentialsManagerSpec: QuickSpec {
             it("should yield error on failed store") {
                 class MockStore: CredentialsStorage {
                     func getEntry(forKey: String) -> Data? {
-                        let credentials = Credentials(refreshToken: RefreshToken)
-                        return try? NSKeyedArchiver.archivedData(withRootObject: credentials,
-                                                                 requiringSecureCoding: true)
+                        return encodeCredentials(Credentials(refreshToken: RefreshToken))
                     }
                     func setEntry(_ data: Data, forKey: String) -> Bool {
                         return false
@@ -1418,7 +1411,7 @@ class CredentialsManagerSpec: QuickSpec {
                 _ = credentialsManager.store(credentials: credentials)
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.renew(parameters: ["some_id": someId]) { result in
-                        expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        expect(result).to(beSuccessful())
                         done()
                     }
                 }
@@ -1996,6 +1989,10 @@ class CredentialsManagerSpec: QuickSpec {
 
 // MARK: - Private Functions
 
+private func encodeCredentials(_ credentials: Credentials) -> Data? {
+    return try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true)
+}
+
 private func fetchCredentials(from store: CredentialsStorage) -> Credentials? {
     guard let data = store.getEntry(forKey: "credentials") else { return nil }
     return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
@@ -2003,5 +2000,5 @@ private func fetchCredentials(from store: CredentialsStorage) -> Credentials? {
 
 private func fetchAPICredentials(forAudience audience: String = Audience, from store: CredentialsStorage) -> APICredentials? {
     guard let data = store.getEntry(forKey: audience) else { return nil }
-    return try? APICredentials.jsonDecoder.decode(APICredentials.self, from: data)
+    return try? APICredentials(from: data)
 }

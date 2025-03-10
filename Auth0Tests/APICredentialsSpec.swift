@@ -26,7 +26,7 @@ class APICredentialsSpec: QuickSpec {
                         "scope": "\(Scope)"
                     }
                 """.data(using: .utf8)!
-                let credentials = try APICredentials.jsonDecoder.decode(APICredentials.self, from: json)
+                let credentials = try APICredentials(from: json)
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == Bearer
                 expect(credentials.expiresIn) == ExpiresInDate
@@ -41,7 +41,7 @@ class APICredentialsSpec: QuickSpec {
                         "expires_in": \(ExpiresIn)
                     }
                 """.data(using: .utf8)!
-                let credentials = try APICredentials.jsonDecoder.decode(APICredentials.self, from: json)
+                let credentials = try APICredentials(from: json)
                 expect(credentials.accessToken) == AccessToken
                 expect(credentials.tokenType) == Bearer
                 expect(credentials.expiresIn) == ExpiresInDate

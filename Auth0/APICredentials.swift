@@ -65,17 +65,25 @@ extension APICredentials: Codable {
         case scope
     }
 
-    internal static let jsonEncoder: JSONEncoder = {
+    private static let jsonEncoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .secondsSince1970
         return encoder
     }()
 
-    internal static let jsonDecoder: JSONDecoder = {
+    private static let jsonDecoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .secondsSince1970
         return decoder
     }()
+
+    internal func encode() throws -> Data {
+        return try Self.jsonEncoder.encode(self)
+    }
+
+    internal init(from data: Data) throws {
+        self = try Self.jsonDecoder.decode(Self.self, from: data)
+    }
 
     /// `Encodable` initializer.
     public func encode(to encoder: Encoder) throws {
