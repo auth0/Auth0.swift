@@ -682,7 +682,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - Parameters:
        - refreshToken: The refresh token.
-       - audience:     API identifier that your application is requesting access to. Defaults to `nil`.
+       - audience:     Identifier of the API that your application is requesting access to. Defaults to `nil`.
        - scope:        Space-separated list of scope values to request. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
 

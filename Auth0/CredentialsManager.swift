@@ -108,7 +108,7 @@ public struct CredentialsManager {
             return false
         }
 
-        return self.storage.setEntry(data, forKey: storeKey)
+        return self.storage.setEntry(data, forKey: self.storeKey)
     }
 
     /// Clears credentials stored in the Keychain.
@@ -121,10 +121,10 @@ public struct CredentialsManager {
     ///
     /// - Returns: If the credentials were removed.
     public func clear() -> Bool {
-        return self.storage.deleteEntry(forKey: storeKey)
+        return self.storage.deleteEntry(forKey: self.storeKey)
     }
 
-    /// Clears API credentials stored in the Keychain.
+    /// Clears API credentials stored in the Keychain for a given audience value.
     ///
     /// ## Usage
     ///
@@ -132,7 +132,7 @@ public struct CredentialsManager {
     /// let didClear = credentialsManager.clear(forAudience: "http://example.com/api")
     /// ```
     ///
-    /// - Parameter audience: API identifier used as the key to store the API credentials.
+    /// - Parameter audience: Identifier of the API the stored API credentials are for.
     /// - Returns: If the API credentials were removed.
     public func clear(forAudience audience: String) -> Bool {
         return self.storage.deleteEntry(forKey: audience)
@@ -406,7 +406,10 @@ public struct CredentialsManager {
 
     /// Retrieves API credentials from the Keychain and automatically renews them using the refresh token if the access
     /// token is expired. Otherwise, the retrieved API credentials will be returned via the success case as they are
-    /// still valid. Renewed API credentials will be stored in the Keychain. **This method is thread-safe**.
+    /// still valid.
+    ///
+    /// If there are no stored API credentials, the refresh token will be exchaged for a new set of API credentials.
+    /// New or renewed API credentials will be automatically stored in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
     ///
@@ -446,16 +449,16 @@ public struct CredentialsManager {
     /// ```
     ///
     /// - Parameters:
-    ///   - audience:   API identifier that your application is requesting access to.
-    ///   - scope:      Space-separated list of scope values to request when renewing API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
+    ///   - audience:   Identifier of the API that your application is requesting access to.
+    ///   - scope:      Space-separated list of scope values to request when exchanging a refresh token for API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
     ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
-    ///   - parameters: Additional parameters to use when renewing API credentials.
-    ///   - headers:    Additional headers to use when renewing API credentials.
+    ///   - parameters: Additional parameters to use when exchanging a refresh token for API credentials.
+    ///   - headers:    Additional headers to use when exchanging a refresh token for API credentials.
     ///   - callback:   Callback that receives a `Result` containing either the API credentials or an error.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// the API credentials are expired and there is no refresh token, the callback will be called with a
     /// ``CredentialsManagerError/noRefreshToken`` error.
-    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// - Important: To ensure that no concurrent exchange requests get made, do not call this method from multiple
     /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
     ///
     /// ## See Also
@@ -537,7 +540,7 @@ public struct CredentialsManager {
     }
 
     private func retrieveCredentials() -> Credentials? {
-        guard let data = self.storage.getEntry(forKey: storeKey) else { return nil }
+        guard let data = self.storage.getEntry(forKey: self.storeKey) else { return nil }
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
@@ -746,7 +749,7 @@ public extension CredentialsManager {
     }
 
     /// Retrieves credentials from the Keychain and automatically renews them using the refresh token if the access
-    /// token is expired. Otherwise, the retrieved credentials will be returned via the success case as they are still
+    /// token is expired. Otherwise, the subscription will complete with the retrieved credentials as they are still
     /// valid. Renewed credentials will be stored in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
@@ -833,8 +836,11 @@ public extension CredentialsManager {
     }
 
     /// Retrieves API credentials from the Keychain and automatically renews them using the refresh token if the access
-    /// token is expired. Otherwise, the retrieved API credentials will be returned via the success case as they are
-    /// still valid. Renewed API credentials will be stored in the Keychain. **This method is thread-safe**.
+    /// token is expired. Otherwise, the subscription will complete with the retrieved API credentials as they are
+    /// still valid.
+    ///
+    /// If there are no stored API credentials, the refresh token will be exchaged for a new set of API credentials.
+    /// New or renewed API credentials will be automatically stored in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
     ///
@@ -888,15 +894,15 @@ public extension CredentialsManager {
     /// ```
     ///
     /// - Parameters:
-    ///   - audience:   API identifier that your application is requesting access to.
-    ///   - scope:      Space-separated list of scope values to request when renewing API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
+    ///   - audience:   Identifier of the API that your application is requesting access to.
+    ///   - scope:      Space-separated list of scope values to request when exchanging a refresh token for API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
     ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
-    ///   - parameters: Additional parameters to use when renewing API credentials.
-    ///   - headers:    Additional headers to use when renewing API credentials.
+    ///   - parameters: Additional parameters to use when exchanging a refresh token for API credentials.
+    ///   - headers:    Additional headers to use when exchanging a refresh token for API credentials.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// the API credentials are expired and there is no refresh token, the callback will be called with a
     /// ``CredentialsManagerError/noRefreshToken`` error.
-    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// - Important: To ensure that no concurrent exchange requests get made, do not call this method from multiple
     /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
     ///
     /// ## See Also
@@ -1021,8 +1027,8 @@ public extension CredentialsManager {
     }
 
     /// Retrieves credentials from the Keychain and automatically renews them using the refresh token if the access
-    /// token is expired. Otherwise, the retrieved credentials will be returned via the success case as they are still
-    /// valid. Renewed credentials will be stored in the Keychain. **This method is thread-safe**.
+    /// token is expired. Otherwise, it returns the retrieved credentials as they are still valid. Renewed credentials
+    /// will be stored in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
     ///
@@ -1091,8 +1097,10 @@ public extension CredentialsManager {
     }
 
     /// Retrieves API credentials from the Keychain and automatically renews them using the refresh token if the access
-    /// token is expired. Otherwise, the retrieved API credentials will be returned via the success case as they are
-    /// still valid. Renewed API credentials will be stored in the Keychain. **This method is thread-safe**.
+    /// token is expired. Otherwise, it returns the retrieved API credentials as they are still valid.
+    ///
+    /// If there are no stored API credentials, the refresh token will be exchaged for a new set of API credentials.
+    /// New or renewed API credentials will be automatically stored in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
     ///
@@ -1130,15 +1138,15 @@ public extension CredentialsManager {
     /// ```
     ///
     /// - Parameters:
-    ///   - audience:   API identifier that your application is requesting access to.
-    ///   - scope:      Space-separated list of scope values to request when renewing API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
+    ///   - audience:   Identifier of the API that your application is requesting access to.
+    ///   - scope:      Space-separated list of scope values to request when exchanging a refresh token for API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
     ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
-    ///   - parameters: Additional parameters to use when renewing API credentials.
-    ///   - headers:    Additional headers to use when renewing API credentials.
+    ///   - parameters: Additional parameters to use when exchanging a refresh token for API credentials.
+    ///   - headers:    Additional headers to use when exchanging a refresh token for API credentials.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// the API credentials are expired and there is no refresh token, the callback will be called with a
     /// ``CredentialsManagerError/noRefreshToken`` error.
-    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// - Important: To ensure that no concurrent exchange requests get made, do not call this method from multiple
     /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
     ///
     /// ## See Also
