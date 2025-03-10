@@ -1029,7 +1029,7 @@ class CredentialsManagerSpec: QuickSpec {
                                 let apiCredentials = APICredentials(accessToken: AccessToken,
                                                                     tokenType: TokenType,
                                                                     expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
-                                return try? JSONEncoder().encode(apiCredentials)
+                                return try? APICredentials.jsonEncoder.encode(apiCredentials)
                             }
                             
                             let credentials = Credentials(refreshToken: RefreshToken)
@@ -2003,5 +2003,5 @@ private func fetchCredentials(from store: CredentialsStorage) -> Credentials? {
 
 private func fetchAPICredentials(forAudience audience: String = Audience, from store: CredentialsStorage) -> APICredentials? {
     guard let data = store.getEntry(forKey: audience) else { return nil }
-    return try? JSONDecoder().decode(APICredentials.self, from: data)
+    return try? APICredentials.jsonDecoder.decode(APICredentials.self, from: data)
 }

@@ -455,9 +455,6 @@ public struct CredentialsManager {
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// the API credentials are expired and there is no refresh token, the callback will be called with a
     /// ``CredentialsManagerError/noRefreshToken`` error.
-    /// - Warning: Do not call `store(apiCredentials:)` afterward. The Credentials Manager automatically persists the
-    /// renewed API credentials. Since this method is thread-safe and ``store(apiCredentials:)`` is not, calling it anyway can
-    /// cause concurrency issues.
     /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
     /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
     ///
@@ -532,7 +529,7 @@ public struct CredentialsManager {
     }
 
     func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
-        guard let data = try? JSONEncoder().encode(apiCredentials) else {
+        guard let data = try? APICredentials.jsonEncoder.encode(apiCredentials) else {
             return false
         }
 
@@ -546,7 +543,7 @@ public struct CredentialsManager {
 
     private func retrieveAPICredentials(audience: String) -> APICredentials? {
         guard let data = self.storage.getEntry(forKey: audience) else { return nil }
-        return try? JSONDecoder().decode(APICredentials.self, from: data)
+        return try? APICredentials.jsonDecoder.decode(APICredentials.self, from: data)
     }
 
     // swiftlint:disable:next function_parameter_count
@@ -899,9 +896,6 @@ public extension CredentialsManager {
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// the API credentials are expired and there is no refresh token, the callback will be called with a
     /// ``CredentialsManagerError/noRefreshToken`` error.
-    /// - Warning: Do not call `store(apiCredentials:)` afterward. The Credentials Manager automatically persists the
-    /// renewed API credentials. Since this method is thread-safe and ``store(apiCredentials:)`` is not, calling it anyway can
-    /// cause concurrency issues.
     /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
     /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
     ///
@@ -1144,9 +1138,6 @@ public extension CredentialsManager {
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// the API credentials are expired and there is no refresh token, the callback will be called with a
     /// ``CredentialsManagerError/noRefreshToken`` error.
-    /// - Warning: Do not call `store(apiCredentials:)` afterward. The Credentials Manager automatically persists the
-    /// renewed API credentials. Since this method is thread-safe and ``store(apiCredentials:)`` is not, calling it anyway can
-    /// cause concurrency issues.
     /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
     /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
     ///

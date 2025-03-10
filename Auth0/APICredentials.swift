@@ -65,13 +65,25 @@ extension APICredentials: Codable {
         case scope
     }
 
+    internal static let jsonEncoder: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .secondsSince1970
+        return encoder
+    }()
+
+    internal static let jsonDecoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        return decoder
+    }()
+
     /// `Encodable` initializer.
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(accessToken, forKey: .accessToken)
         try container.encode(tokenType, forKey: .tokenType)
-        try container.encode(expiresIn.timeIntervalSinceNow, forKey: .expiresIn)
+        try container.encode(expiresIn, forKey: .expiresIn)
         try container.encodeIfPresent(scope, forKey: .scope)
     }
 
@@ -81,19 +93,8 @@ extension APICredentials: Codable {
 
         accessToken = try values.decode(String.self, forKey: .accessToken)
         tokenType = try values.decode(String.self, forKey: .tokenType)
+        expiresIn = try values.decode(Date.self, forKey: .expiresIn)
         scope = try values.decodeIfPresent(String.self, forKey: .scope)
-
-        if let string = try? values.decode(String.self, forKey: .expiresIn), let double = Double(string) {
-            expiresIn = Date(timeIntervalSinceNow: double)
-        } else if let double = try? values.decode(Double.self, forKey: .expiresIn) {
-            expiresIn = Date(timeIntervalSinceNow: double)
-        } else if let date = try? values.decode(Date.self, forKey: .expiresIn) {
-            expiresIn = date
-        } else {
-            throw DecodingError.dataCorruptedError(forKey: .expiresIn,
-                                                   in: values,
-                                                   debugDescription: "Format of expires_in is not recognized.")
-        }
     }
 
 }
