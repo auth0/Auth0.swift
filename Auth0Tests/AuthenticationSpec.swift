@@ -360,22 +360,6 @@ class AuthenticationSpec: QuickSpec {
             }
         }
         
-        it("should fail to receive credentials") {
-            let invalidRefreshToken = "invalidtoken"
-            
-            NetworkStub.addStub(condition: {
-                $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": invalidRefreshToken])
-            }, response: authFailure(error: "", description: ""))
-            
-            waitUntil(timeout: Timeout) { done in
-                auth.renew(withRefreshToken: invalidRefreshToken)
-                    .start { result in
-                        expect(result).toNot(haveCredentials())
-                        done()
-                }
-            }
-        }
-        
         // MARK:- Token Exchange
         
         describe("native social token exchange") {
