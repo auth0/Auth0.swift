@@ -6,7 +6,7 @@ import SimpleKeychain
 import LocalAuthentication
 #endif
 
-@testable @preconcurrency import Auth0
+@testable import Auth0
 
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let NewAccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -1791,8 +1791,8 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should return the credentials using the default parameter values") {
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
-                            _ = try await credentialsManager.credentials()
+                        Task.init { [credentialsManager] in
+                            _ = try await credentialsManager!.credentials()
                             done()
                         }
                     }
@@ -1805,11 +1805,11 @@ class CredentialsManagerSpec: QuickSpec {
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
-                            _ = try await credentialsManager.credentials(withScope: "openid profile offline_access",
-                                                                         minTTL: ValidTTL,
-                                                                         parameters: [key: value],
-                                                                         headers: [key: value])
+                        Task.init { [credentialsManager] in
+                            _ = try await credentialsManager!.credentials(withScope: "openid profile offline_access",
+                                                                          minTTL: ValidTTL,
+                                                                          parameters: [key: value],
+                                                                          headers: [key: value])
                             done()
                         }
                     }
@@ -1817,9 +1817,9 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should throw an error") {
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
+                        Task.init { [credentialsManager] in
                             do {
-                                _ = try await credentialsManager.credentials()
+                                _ = try await credentialsManager!.credentials()
                             } catch {
                                 done()
                             }
@@ -1842,8 +1842,8 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
-                            _ = try await credentialsManager.apiCredentials(forAudience: Audience)
+                        Task.init { [credentialsManager] in
+                            _ = try await credentialsManager!.apiCredentials(forAudience: Audience)
                             done()
                         }
                     }
@@ -1863,12 +1863,12 @@ class CredentialsManagerSpec: QuickSpec {
                     _ = credentialsManager.store(credentials: credentials)
                     _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
-                            _ = try await credentialsManager.apiCredentials(forAudience: Audience,
-                                                                            scope: Scope,
-                                                                            minTTL: ValidTTL,
-                                                                            parameters: [key: value],
-                                                                            headers: [key: value])
+                        Task.init { [credentialsManager] in
+                            _ = try await credentialsManager!.apiCredentials(forAudience: Audience,
+                                                                             scope: Scope,
+                                                                             minTTL: ValidTTL,
+                                                                             parameters: [key: value],
+                                                                             headers: [key: value])
                             done()
                         }
                     }
@@ -1876,9 +1876,9 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should throw an error") {
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
+                        Task.init { [credentialsManager] in
                             do {
-                                _ = try await credentialsManager.apiCredentials(forAudience: Audience)
+                                _ = try await credentialsManager!.apiCredentials(forAudience: Audience)
                             } catch {
                                 done()
                             }
@@ -1897,8 +1897,8 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should renew the credentials using the default parameter values") {
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn * 2))
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
-                            let newCredentials = try await credentialsManager.renew()
+                        Task.init { [credentialsManager] in
+                            let newCredentials = try await credentialsManager!.renew()
                             expect(newCredentials.accessToken) == NewAccessToken
                             expect(newCredentials.idToken) == NewIdToken
                             expect(newCredentials.refreshToken) == NewRefreshToken
@@ -1913,9 +1913,9 @@ class CredentialsManagerSpec: QuickSpec {
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, key: value]) && $0.hasHeader(key, value: value)}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
-                            let newCredentials = try await credentialsManager.renew(parameters: [key: value],
-                                                                                    headers: [key: value])
+                        Task.init { [credentialsManager] in
+                            let newCredentials = try await credentialsManager!.renew(parameters: [key: value],
+                                                                                     headers: [key: value])
                             expect(newCredentials.accessToken) == NewAccessToken
                             expect(newCredentials.idToken) == NewIdToken
                             expect(newCredentials.refreshToken) == NewRefreshToken
@@ -1927,9 +1927,9 @@ class CredentialsManagerSpec: QuickSpec {
                 it("should throw an error") {
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authFailure(code: "invalid_request", description: "missing_params"))
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
+                        Task.init { [credentialsManager] in
                             do {
-                                _ = try await credentialsManager.renew()
+                                _ = try await credentialsManager!.renew()
                             } catch {
                                 done()
                             }
@@ -1945,8 +1945,8 @@ class CredentialsManagerSpec: QuickSpec {
                     NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: revokeTokenResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
-                            _ = try await credentialsManager.revoke()
+                        Task.init { [credentialsManager] in
+                            _ = try await credentialsManager!.revoke()
                             done()
                         }
                     }
@@ -1958,8 +1958,8 @@ class CredentialsManagerSpec: QuickSpec {
                     NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken]) && $0.hasHeader(key, value: value)}, response: revokeTokenResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
-                            _ = try await credentialsManager.revoke(headers: [key: value])
+                        Task.init { [credentialsManager] in
+                            _ = try await credentialsManager!.revoke(headers: [key: value])
                             done()
                         }
                     }
@@ -1969,9 +1969,9 @@ class CredentialsManagerSpec: QuickSpec {
                     NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken])}, response: apiFailureResponse())
                     _ = credentialsManager.store(credentials: credentials)
                     waitUntil(timeout: Timeout) { done in
-                        Task.init {
+                        Task.init { [credentialsManager] in
                             do {
-                                _ = try await credentialsManager.revoke()
+                                _ = try await credentialsManager!.revoke()
                             } catch {
                                 done()
                             }
