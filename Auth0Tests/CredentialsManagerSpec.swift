@@ -6,7 +6,7 @@ import SimpleKeychain
 import LocalAuthentication
 #endif
 
-@testable import Auth0
+@testable @preconcurrency import Auth0
 
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let NewAccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
