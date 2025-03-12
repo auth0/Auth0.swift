@@ -278,7 +278,7 @@ struct Auth0Authentication: Authentication {
 
     func ssoExchange(withRefreshToken refreshToken: String) -> Request<SSOCredentials, AuthenticationError> {
         let payload: [String: Any] = [
-            "requested_token_type": "urn:auth0:params:oauth:token-type:session_token"
+            "requested_token_type": "urn:auth0:params:oauth:token-type:session_transfer_token"
         ]
         return self.tokenExchange(subjectToken: refreshToken,
                                   subjectTokenType: "urn:ietf:params:oauth:token-type:refresh_token",

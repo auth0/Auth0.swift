@@ -1,7 +1,7 @@
 import Foundation
 
 private struct _A0SSOCredentials {
-    let sessionToken: String
+    let sessionTransferToken: String
     let tokenType: String
     let issuedTokenType: String
     let expiresIn: Date
@@ -12,15 +12,15 @@ private struct _A0SSOCredentials {
 public struct SSOCredentials: CustomStringConvertible {
 
     /// Token that can be used to request a web session.
-    public let sessionToken: String
+    public let sessionTransferToken: String
 
     /// Indicates how the access token should be used. For example, as a bearer token.
     public let tokenType: String
 
-    /// Type of the session token.
+    /// Type of the session transfer token.
     public let issuedTokenType: String
 
-    /// When the session token expires.
+    /// When the session transfer token expires.
     public let expiresIn: Date
 
     /// Rotated refresh token. Only available when Refresh Token Rotation is enabled.
@@ -36,7 +36,7 @@ public struct SSOCredentials: CustomStringConvertible {
     /// Custom description that redacts the session and refresh tokens with `<REDACTED>`.
     public var description: String {
         let redacted = "<REDACTED>"
-        let values = _A0SSOCredentials(sessionToken: redacted,
+        let values = _A0SSOCredentials(sessionTransferToken: redacted,
                                        tokenType: self.tokenType,
                                        issuedTokenType: self.issuedTokenType,
                                        expiresIn: self.expiresIn,
@@ -47,12 +47,12 @@ public struct SSOCredentials: CustomStringConvertible {
     // MARK: - Initializer
 
     /// Default initializer.
-    public init(sessionToken: String,
+    public init(sessionTransferToken: String,
                 tokenType: String,
                 issuedTokenType: String,
                 expiresIn: Date,
                 refreshToken: String? = nil) {
-        self.sessionToken = sessionToken
+        self.sessionTransferToken = sessionTransferToken
         self.tokenType = tokenType
         self.issuedTokenType = issuedTokenType
         self.expiresIn = expiresIn
@@ -65,7 +65,7 @@ public struct SSOCredentials: CustomStringConvertible {
 extension SSOCredentials: Codable {
 
     enum CodingKeys: String, CodingKey {
-        case sessionToken = "access_token"
+        case sessionTransferToken = "access_token"
         case tokenType = "token_type"
         case issuedTokenType = "issued_token_type"
         case expiresIn = "expires_in"
@@ -76,7 +76,7 @@ extension SSOCredentials: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encode(sessionToken, forKey: .sessionToken)
+        try container.encode(sessionTransferToken, forKey: .sessionTransferToken)
         try container.encode(tokenType, forKey: .tokenType)
         try container.encode(issuedTokenType, forKey: .issuedTokenType)
         try container.encode(expiresIn.timeIntervalSinceNow, forKey: .expiresIn)
@@ -87,7 +87,7 @@ extension SSOCredentials: Codable {
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
 
-        sessionToken = try values.decode(String.self, forKey: .sessionToken)
+        sessionTransferToken = try values.decode(String.self, forKey: .sessionTransferToken)
         tokenType = try values.decode(String.self, forKey: .tokenType)
         issuedTokenType = try values.decode(String.self, forKey: .issuedTokenType)
         refreshToken = try values.decodeIfPresent(String.self, forKey: .refreshToken)

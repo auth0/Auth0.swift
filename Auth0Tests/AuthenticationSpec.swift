@@ -15,14 +15,14 @@ private let ConnectionName = "Username-Password-Authentication"
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-private let SessionToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let SessionTransferToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let Timeout: NimbleTimeInterval = .seconds(2)
 private let PasswordlessGrantType = "http://auth0.com/oauth/grant-type/passwordless/otp"
 private let TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange"
 private let RefreshTokenTokenType = "urn:ietf:params:oauth:token-type:refresh_token"
-private let SessionTokenTokenType = "urn:auth0:params:oauth:token-type:session_token"
+private let SessionTransferTokenTokenType = "urn:auth0:params:oauth:token-type:session_transfer_token"
 
 class AuthenticationSpec: QuickSpec {
     override class func spec() {
@@ -1148,28 +1148,28 @@ class AuthenticationSpec: QuickSpec {
         
         describe("sso exchange") {
                         
-            it("should exchange the refresh token for a session token") {
+            it("should exchange the refresh token for a session transfer token") {
                 NetworkStub.addStub(condition: {
                     $0.isToken(Domain) &&
                     $0.hasAllOf([
                         "grant_type": TokenExchangeGrantType,
                         "subject_token": RefreshToken,
                         "subject_token_type": RefreshTokenTokenType,
-                        "requested_token_type": SessionTokenTokenType,
+                        "requested_token_type": SessionTransferTokenTokenType,
                         "client_id": ClientId
                     ])
-                }, response: authResponse(accessToken: SessionToken, issuedTokenType: SessionTokenTokenType))
+                }, response: authResponse(accessToken: SessionTransferToken, issuedTokenType: SessionTransferTokenTokenType))
                 waitUntil(timeout: Timeout) { done in
                     auth
                         .ssoExchange(withRefreshToken: RefreshToken)
                         .start { result in
-                            expect(result).to(haveSSOCredentials(SessionToken))
+                            expect(result).to(haveSSOCredentials(SessionTransferToken))
                             done()
                     }
                 }
             }
             
-            it("should fail to exchange the refresh token for a session token") {
+            it("should fail to exchange the refresh token for a session transfer token") {
                 waitUntil(timeout: Timeout) { done in
                     let code = "invalid_request"
                     let description = "missing params"
@@ -1179,7 +1179,7 @@ class AuthenticationSpec: QuickSpec {
                             "grant_type": TokenExchangeGrantType,
                             "subject_token": RefreshToken,
                             "subject_token_type": RefreshTokenTokenType,
-                            "requested_token_type": SessionTokenTokenType,
+                            "requested_token_type": SessionTransferTokenTokenType,
                             "client_id": ClientId
                         ])
                     }, response:authFailure(code: code, description: description))

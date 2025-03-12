@@ -11,7 +11,7 @@ import LocalAuthentication
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let NewAccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let TokenType = "bearer"
-private let IssuedTokenType = "urn:auth0:params:oauth:token-type:session_token"
+private let IssuedTokenType = "urn:auth0:params:oauth:token-type:session_transfer_token"
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let NewIdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")

@@ -120,20 +120,20 @@ func haveCredentials() -> Nimble.Matcher<CredentialsManagerResult<Credentials>> 
     }
 }
 
-func haveSSOCredentials(_ sessionToken: String,
+func haveSSOCredentials(_ sessionTransferToken: String,
                         _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<SSOCredentials>> {
     return Matcher<AuthenticationResult<SSOCredentials>>.define("be a successful SSO token exchange result") { expression, failureMessage -> MatcherResult in
-        return try haveSSOCredentials(sessionToken: sessionToken,
+        return try haveSSOCredentials(sessionTransferToken: sessionTransferToken,
                                       refreshToken: refreshToken,
                                       expression,
                                       failureMessage)
     }
 }
 
-func haveSSOCredentials(_ sessionToken: String,
+func haveSSOCredentials(_ sessionTransferToken: String,
                         _ refreshToken: String? = nil) -> Nimble.Matcher<CredentialsManagerResult<SSOCredentials>> {
     return Matcher<CredentialsManagerResult<SSOCredentials>>.define("be a successful SSO credentials retrieval") { expression, failureMessage -> MatcherResult in
-        return try haveSSOCredentials(sessionToken: sessionToken,
+        return try haveSSOCredentials(sessionTransferToken: sessionTransferToken,
                                       refreshToken: refreshToken,
                                       expression,
                                       failureMessage)
@@ -281,16 +281,16 @@ private func haveCredentials<E>(accessToken: String?,
     }
 }
 
-private func haveSSOCredentials<E>(sessionToken: String,
+private func haveSSOCredentials<E>(sessionTransferToken: String,
                                    refreshToken: String?,
                                    _ expression: Nimble.Expression<Result<SSOCredentials, E>>,
                                    _ message: ExpectationMessage) throws -> MatcherResult {
-    _ = message.appended(message: " <session_token: \(sessionToken)>")
+    _ = message.appended(message: " <session_transfer_token: \(sessionTransferToken)>")
     if let refreshToken = refreshToken {
         _ = message.appended(message: " <refresh_token: \(refreshToken)>")
     }
     return try beSuccessful(expression, message) { (credentials: SSOCredentials) -> Bool in
-        return (credentials.sessionToken == sessionToken)
+        return (credentials.sessionTransferToken == sessionTransferToken)
         && (refreshToken == nil || credentials.refreshToken == refreshToken)
     }
 }
