@@ -616,7 +616,7 @@ public protocol Authentication: Trackable, Loggable {
 
     /**
      Performs the last step of Proof Key for Code Exchange (PKCE).
-     This will request the user's tokens using the code and its verifier after a request to `/oauth/authorize`.
+     This will request the user's credentials using the code and its verifier after a request to `/oauth/authorize`.
 
      ## Usage
 
@@ -649,6 +649,55 @@ public protocol Authentication: Trackable, Loggable {
      */
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
+    /**
+     Exchanges a user's refresh token for a session transfer token that can be used to perform web Single Sign On
+     (SSO).
+
+     ## Usage
+
+     ```swift
+     Auth0
+         .authentication()
+         .ssoExchange(refreshToken: credentials.refreshToken)
+         .start { result in
+             switch result {
+             case .success(let ssoCredentials):
+                 print("Obtained new SSO credentials: \(ssoCredentials)")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
+     When opening your website on any browser or web view, add the session transfer token to the URL as a query
+     parameter. Then your website can redirect the user to Auth0's `/authorize` endpoint, passing along the query
+     parameter with the session transfer token. For example,
+     `https://example.com/login?session_transfer_token=THE_TOKEN`.
+
+     If you're using `WKWebView` to open your website, you can place the session transfer token inside a cookie
+     instead. It will be automatically sent to the `/authorize` endpoint.
+
+     ```swift
+     let cookie = HTTPCookie(properties: [
+         .domain: "YOUR_AUTH0_DOMAIN", // Or your custom domain, if you're using one
+         .path: "/",
+         .name: "session_transfer_token",
+         .value: ssoCredentials.sessionTransferToken,
+         .expires: ssoCredentials.expiresIn,
+         .secure: true
+     ])!
+
+     webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+     ```
+
+     - Parameter refreshToken: The refresh token.
+     - Returns: A request that will yield SSO credentials.
+
+     ## See Also
+
+     - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+     */
     func ssoExchange(withRefreshToken: String) -> Request<SSOCredentials, AuthenticationError>
 
     /**
