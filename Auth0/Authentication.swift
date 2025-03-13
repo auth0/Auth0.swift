@@ -650,7 +650,7 @@ public protocol Authentication: Trackable, Loggable {
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Exchanges a user's refresh token for a session transfer token that can be used to perform web Single Sign On
+     Exchanges a user's refresh token for a session transfer token that can be used to perform web single sign-on
      (SSO).
 
      ## Usage

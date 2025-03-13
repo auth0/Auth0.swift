@@ -8,7 +8,7 @@ private struct _A0SSOCredentials {
     let refreshToken: String?
 }
 
-/// Credentials obtained from Auth0 to perform web Single Sign On (SSO).
+/// Credentials obtained from Auth0 to perform web single sign-on (SSO).
 public struct SSOCredentials: CustomStringConvertible {
 
     /// Token that can be used to request a web session.

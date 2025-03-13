@@ -12,8 +12,8 @@ import LocalAuthentication
 ///
 /// - Warning: The Credentials Manager is not thread-safe, except for its
 /// ``CredentialsManager/credentials(withScope:minTTL:parameters:headers:callback:)``,
-/// ``CredentialsManager/renew(parameters:headers:callback:)``, and
-/// ``CredentialsManager/ssoCredentials(parameters:headers:callback:)`` methods. To avoid concurrency issues, do not
+/// ``CredentialsManager/ssoCredentials(parameters:headers:callback:)``, and
+/// ``CredentialsManager/renew(parameters:headers:callback:)`` methods. To avoid concurrency issues, do not
 /// call its non thread-safe methods and properties from different threads without proper synchronization.
 ///
 /// ## See Also
@@ -315,7 +315,7 @@ public struct CredentialsManager {
     }
     #endif
 
-    /// Exchanges the refresh token for a session transfer token that can be used to perform web Single Sign On (SSO).
+    /// Exchanges the refresh token for a session transfer token that can be used to perform web single sign-on (SSO).
     /// **This method is thread-safe**.
     ///
     /// ## Usage
@@ -693,7 +693,7 @@ public extension CredentialsManager {
         }.eraseToAnyPublisher()
     }
 
-    /// Exchanges the refresh token for a session transfer token that can be used to perform web Single Sign On (SSO).
+    /// Exchanges the refresh token for a session transfer token that can be used to perform web single sign-on (SSO).
     /// **This method is thread-safe**.
     ///
     /// ## Usage
@@ -931,7 +931,7 @@ public extension CredentialsManager {
         }
     }
 
-    /// Exchanges the refresh token for a session transfer token that can be used to perform web Single Sign On (SSO).
+    /// Exchanges the refresh token for a session transfer token that can be used to perform web single sign-on (SSO).
     /// **This method is thread-safe**.
     ///
     /// ## Usage
