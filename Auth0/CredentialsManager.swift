@@ -324,7 +324,7 @@ public struct CredentialsManager {
     /// credentialsManager.ssoCredentials { result in
     ///     switch result {
     ///     case .success(let ssoCredentials):
-    ///         print("Renewed SSO credentials: \(ssoCredentials)")
+    ///         print("Obtained SSO credentials: \(ssoCredentials)")
     ///     case .failure(let error):
     ///         print("Failed with: \(error)")
     ///     }
