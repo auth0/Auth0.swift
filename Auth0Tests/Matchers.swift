@@ -122,7 +122,7 @@ func haveCredentials() -> Nimble.Matcher<CredentialsManagerResult<Credentials>> 
 
 func haveSSOCredentials(_ sessionTransferToken: String,
                         _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<SSOCredentials>> {
-    return Matcher<AuthenticationResult<SSOCredentials>>.define("be a successful SSO token exchange result") { expression, failureMessage -> MatcherResult in
+    return Matcher<AuthenticationResult<SSOCredentials>>.define("be a successful SSO credentials retrieval") { expression, failureMessage -> MatcherResult in
         return try haveSSOCredentials(sessionTransferToken: sessionTransferToken,
                                       refreshToken: refreshToken,
                                       expression,
