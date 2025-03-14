@@ -97,9 +97,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     public func parameters(_ extraParameters: [String: Any]) -> Self {
         var parameters = extraParameters.merging(self.parameters) {(current, _) in current}
 
-        if let scope = parameters["scope"] as? String {
-            parameters["scope"] = includeRequiredScope(in: scope)
-        }
+        parameters["scope"] = includeRequiredScope(in: parameters["scope"] as? String)
 
         return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, parameters: parameters, headers: self.headers, logger: self.logger, telemetry: self.telemetry)
     }

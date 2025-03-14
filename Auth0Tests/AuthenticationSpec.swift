@@ -1147,8 +1147,8 @@ class AuthenticationSpec: QuickSpec {
         }
         
         describe("sso exchange") {
-                        
-            it("should exchange the refresh token for a session transfer token") {
+            
+            it("should exchange the refresh token for a session transfer token without refresh token rotation") {
                 NetworkStub.addStub(condition: {
                     $0.isToken(Domain) &&
                     $0.hasAllOf([
@@ -1157,13 +1157,38 @@ class AuthenticationSpec: QuickSpec {
                         "subject_token_type": RefreshTokenTokenType,
                         "requested_token_type": SessionTransferTokenTokenType,
                         "client_id": ClientId
-                    ])
+                    ]) &&
+                    $0.hasNoneOf(["audience", "scope"])
                 }, response: authResponse(accessToken: SessionTransferToken, issuedTokenType: SessionTransferTokenTokenType))
                 waitUntil(timeout: Timeout) { done in
                     auth
                         .ssoExchange(withRefreshToken: RefreshToken)
                         .start { result in
                             expect(result).to(haveSSOCredentials(SessionTransferToken))
+                            done()
+                    }
+                }
+            }
+            
+            it("should exchange the refresh token for a session transfer token with refresh token rotation") {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": RefreshToken,
+                        "subject_token_type": RefreshTokenTokenType,
+                        "requested_token_type": SessionTransferTokenTokenType,
+                        "client_id": ClientId
+                    ]) &&
+                    $0.hasNoneOf(["audience", "scope"])
+                }, response: authResponse(accessToken: SessionTransferToken,
+                                          issuedTokenType: SessionTransferTokenTokenType,
+                                          refreshToken: RefreshToken))
+                waitUntil(timeout: Timeout) { done in
+                    auth
+                        .ssoExchange(withRefreshToken: RefreshToken)
+                        .start { result in
+                            expect(result).to(haveSSOCredentials(SessionTransferToken, RefreshToken))
                             done()
                     }
                 }
@@ -1181,7 +1206,8 @@ class AuthenticationSpec: QuickSpec {
                             "subject_token_type": RefreshTokenTokenType,
                             "requested_token_type": SessionTransferTokenTokenType,
                             "client_id": ClientId
-                        ])
+                        ]) &&
+                        $0.hasNoneOf(["audience", "scope"])
                     }, response:authFailure(code: code, description: description))
                     auth
                         .ssoExchange(withRefreshToken: RefreshToken)
