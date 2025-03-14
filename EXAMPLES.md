@@ -417,7 +417,7 @@ If you're using `WKWebView` to open your website, you can place the session tran
 
 ```swift
 let cookie = HTTPCookie(properties: [
-    .domain: "YOUR_AUTH0_DOMAIN", // Or your custom domain, if you're using one
+    .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
     .path: "/",
     .name: "session_transfer_token",
     .value: ssoCredentials.sessionTransferToken,
@@ -875,7 +875,7 @@ Auth0
 > You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
 
 > [!IMPORTANT]
-> You do not need to store the SSO credentials. The session transfer token is single-use and short-lived. However, if you're using [refresh token rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation), you will get a new refresh token with the SSO credentials. You should store the new refresh token, replacing the previous one that is now invalid.
+> You don't need to store the SSO credentials. The session transfer token is single-use and short-lived. However, if you're using [refresh token rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation), you will get a new refresh token with the SSO credentials. You should store the new refresh token, replacing the previous one that is now invalid.
 >
 > If you're using the Credentials Manager to store the user's credentials, you should use its `ssoCredentials()` method to perform the exchange. It will automatically handle the refresh tokens for you. And it's also thread-safe, whereas this method is not.
 
@@ -886,7 +886,7 @@ If you're using `WKWebView` to open your website, you can place the session tran
 
 ```swift
 let cookie = HTTPCookie(properties: [
-    .domain: "YOUR_AUTH0_DOMAIN", // Or your custom domain, if you're using one
+    .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
     .path: "/",
     .name: "session_transfer_token",
     .value: ssoCredentials.sessionTransferToken,
