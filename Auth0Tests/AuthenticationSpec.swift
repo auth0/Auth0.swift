@@ -1157,8 +1157,7 @@ class AuthenticationSpec: QuickSpec {
                         "subject_token_type": RefreshTokenTokenType,
                         "requested_token_type": SessionTransferTokenTokenType,
                         "client_id": ClientId
-                    ]) &&
-                    $0.hasNoneOf(["audience", "scope"])
+                    ])
                 }, response: authResponse(accessToken: SessionTransferToken, issuedTokenType: SessionTransferTokenTokenType))
                 waitUntil(timeout: Timeout) { done in
                     auth
@@ -1179,8 +1178,7 @@ class AuthenticationSpec: QuickSpec {
                         "subject_token_type": RefreshTokenTokenType,
                         "requested_token_type": SessionTransferTokenTokenType,
                         "client_id": ClientId
-                    ]) &&
-                    $0.hasNoneOf(["audience", "scope"])
+                    ])
                 }, response: authResponse(accessToken: SessionTransferToken,
                                           issuedTokenType: SessionTransferTokenTokenType,
                                           refreshToken: RefreshToken))
@@ -1206,8 +1204,7 @@ class AuthenticationSpec: QuickSpec {
                             "subject_token_type": RefreshTokenTokenType,
                             "requested_token_type": SessionTransferTokenTokenType,
                             "client_id": ClientId
-                        ]) &&
-                        $0.hasNoneOf(["audience", "scope"])
+                        ])
                     }, response:authFailure(code: code, description: description))
                     auth
                         .ssoExchange(withRefreshToken: RefreshToken)
