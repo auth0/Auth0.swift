@@ -5,7 +5,6 @@ import Nimble
 @testable import Auth0
 
 private let SessionTransferToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-private let TokenType = "bearer"
 private let IssuedTokenType = "urn:auth0:params:oauth:token-type:session_transfer_token"
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let ExpiresIn: TimeInterval = 3600
@@ -22,7 +21,6 @@ class SSOCredentialsSpec: QuickSpec {
                 let json = """
                     {
                         "access_token": "\(SessionTransferToken)",
-                        "token_type": "\(TokenType)",
                         "issued_token_type": "\(IssuedTokenType)",
                         "expires_in": "\(ExpiresIn)",
                         "refresh_token": "\(RefreshToken)"
@@ -31,7 +29,6 @@ class SSOCredentialsSpec: QuickSpec {
                 let ssoCredentials = try decoder.decode(SSOCredentials.self, from: json)
 
                 expect(ssoCredentials.sessionTransferToken) == SessionTransferToken
-                expect(ssoCredentials.tokenType) == TokenType
                 expect(ssoCredentials.issuedTokenType) == IssuedTokenType
                 expect(ssoCredentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
                 expect(ssoCredentials.refreshToken) == RefreshToken
@@ -41,7 +38,6 @@ class SSOCredentialsSpec: QuickSpec {
                 let json = """
                     {
                         "access_token": "\(SessionTransferToken)",
-                        "token_type": "\(TokenType)",
                         "issued_token_type": "\(IssuedTokenType)",
                         "expires_in": "\(ExpiresIn)"
                     }
@@ -49,7 +45,6 @@ class SSOCredentialsSpec: QuickSpec {
                 let ssoCredentials = try decoder.decode(SSOCredentials.self, from: json)
 
                 expect(ssoCredentials.sessionTransferToken) == SessionTransferToken
-                expect(ssoCredentials.tokenType) == TokenType
                 expect(ssoCredentials.issuedTokenType) == IssuedTokenType
                 expect(ssoCredentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
                 expect(ssoCredentials.refreshToken).to(beNil())
@@ -61,7 +56,6 @@ class SSOCredentialsSpec: QuickSpec {
                     let json = """
                         {
                             "access_token": "\(SessionTransferToken)",
-                            "token_type": "\(TokenType)",
                             "issued_token_type": "\(IssuedTokenType)",
                             "expires_in": "\(ExpiresIn)"
                         }
@@ -75,7 +69,6 @@ class SSOCredentialsSpec: QuickSpec {
                     let json = """
                         {
                             "access_token": "\(SessionTransferToken)",
-                            "token_type": "\(TokenType)",
                             "issued_token_type": "\(IssuedTokenType)",
                             "expires_in": \(Int(ExpiresIn))
                         }
@@ -89,7 +82,6 @@ class SSOCredentialsSpec: QuickSpec {
                     let json = """
                         {
                             "access_token": "\(SessionTransferToken)",
-                            "token_type": "\(TokenType)",
                             "issued_token_type": "\(IssuedTokenType)",
                             "expires_in": \(ExpiresIn)
                         }
@@ -104,7 +96,6 @@ class SSOCredentialsSpec: QuickSpec {
                     let json = """
                             {
                                 "access_token": "\(SessionTransferToken)",
-                                "token_type": "\(TokenType)",
                                 "issued_token_type": "\(IssuedTokenType)",
                                 "expires_in": "\(formatter.string(from: ExpiresInDate))"
                             }
@@ -120,7 +111,6 @@ class SSOCredentialsSpec: QuickSpec {
                     let json = """
                             {
                                 "access_token": "\(SessionTransferToken)",
-                                "token_type": "\(TokenType)",
                                 "issued_token_type": "\(IssuedTokenType)",
                                 "expires_in": "INVALID"
                             }
@@ -139,11 +129,10 @@ class SSOCredentialsSpec: QuickSpec {
 
             it("should have all unredacted properties") {
                 let ssoCredentials = SSOCredentials(sessionTransferToken: SessionTransferToken,
-                                                    tokenType: TokenType,
                                                     issuedTokenType: IssuedTokenType,
                                                     expiresIn: ExpiresInDate,
                                                     refreshToken: RefreshToken)
-                let description = "SSOCredentials(sessionTransferToken: \"<REDACTED>\", tokenType: \"\(TokenType)\", issuedTokenType:"
+                let description = "SSOCredentials(sessionTransferToken: \"<REDACTED>\", issuedTokenType:"
                 + " \"\(IssuedTokenType)\", expiresIn: \(ExpiresInDate), refreshToken: Optional(\"<REDACTED>\"))"
 
                 expect(ssoCredentials.description) == description
@@ -153,10 +142,9 @@ class SSOCredentialsSpec: QuickSpec {
 
             it("should have only the non-optional unredacted properties") {
                 let ssoCredentials = SSOCredentials(sessionTransferToken: SessionTransferToken,
-                                                    tokenType: TokenType,
                                                     issuedTokenType: IssuedTokenType,
                                                     expiresIn: ExpiresInDate)
-                let description = "SSOCredentials(sessionTransferToken: \"<REDACTED>\", tokenType: \"\(TokenType)\", issuedTokenType:"
+                let description = "SSOCredentials(sessionTransferToken: \"<REDACTED>\", issuedTokenType:"
                 + " \"\(IssuedTokenType)\", expiresIn: \(ExpiresInDate), refreshToken: nil)"
 
                 expect(ssoCredentials.description) == description

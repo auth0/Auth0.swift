@@ -2,7 +2,6 @@ import Foundation
 
 private struct _A0SSOCredentials {
     let sessionTransferToken: String
-    let tokenType: String
     let issuedTokenType: String
     let expiresIn: Date
     let refreshToken: String?
@@ -13,9 +12,6 @@ public struct SSOCredentials: CustomStringConvertible {
 
     /// Token that can be used to request a web session.
     public let sessionTransferToken: String
-
-    /// Indicates how the access token should be used. For example, as a bearer token.
-    public let tokenType: String
 
     /// Type of the session transfer token.
     public let issuedTokenType: String
@@ -37,7 +33,6 @@ public struct SSOCredentials: CustomStringConvertible {
     public var description: String {
         let redacted = "<REDACTED>"
         let values = _A0SSOCredentials(sessionTransferToken: redacted,
-                                       tokenType: self.tokenType,
                                        issuedTokenType: self.issuedTokenType,
                                        expiresIn: self.expiresIn,
                                        refreshToken: (self.refreshToken != nil) ? redacted : nil)
@@ -48,12 +43,10 @@ public struct SSOCredentials: CustomStringConvertible {
 
     /// Default initializer.
     public init(sessionTransferToken: String,
-                tokenType: String,
                 issuedTokenType: String,
                 expiresIn: Date,
                 refreshToken: String? = nil) {
         self.sessionTransferToken = sessionTransferToken
-        self.tokenType = tokenType
         self.issuedTokenType = issuedTokenType
         self.expiresIn = expiresIn
         self.refreshToken = refreshToken
@@ -66,7 +59,6 @@ extension SSOCredentials: Codable {
 
     enum CodingKeys: String, CodingKey {
         case sessionTransferToken = "access_token"
-        case tokenType = "token_type"
         case issuedTokenType = "issued_token_type"
         case expiresIn = "expires_in"
         case refreshToken = "refresh_token"
@@ -77,7 +69,6 @@ extension SSOCredentials: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(sessionTransferToken, forKey: .sessionTransferToken)
-        try container.encode(tokenType, forKey: .tokenType)
         try container.encode(issuedTokenType, forKey: .issuedTokenType)
         try container.encode(expiresIn.timeIntervalSinceNow, forKey: .expiresIn)
         try container.encodeIfPresent(refreshToken, forKey: .refreshToken)
@@ -88,7 +79,6 @@ extension SSOCredentials: Codable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
 
         sessionTransferToken = try values.decode(String.self, forKey: .sessionTransferToken)
-        tokenType = try values.decode(String.self, forKey: .tokenType)
         issuedTokenType = try values.decode(String.self, forKey: .issuedTokenType)
         refreshToken = try values.decodeIfPresent(String.self, forKey: .refreshToken)
 
