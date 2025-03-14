@@ -679,7 +679,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ```swift
      let cookie = HTTPCookie(properties: [
-         .domain: "YOUR_AUTH0_DOMAIN", // Or your custom domain, if you're using one
+         .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
          .path: "/",
          .name: "session_transfer_token",
          .value: ssoCredentials.sessionTransferToken,
