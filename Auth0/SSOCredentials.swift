@@ -33,7 +33,7 @@ public struct SSOCredentials: CustomStringConvertible {
     /// - [Refresh Token Rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation)
     public let refreshToken: String?
 
-    /// Custom description that redacts the session and refresh tokens with `<REDACTED>`.
+    /// Custom description that redacts the session transfer and refresh tokens with `<REDACTED>`.
     public var description: String {
         let redacted = "<REDACTED>"
         let values = _A0SSOCredentials(sessionTransferToken: redacted,
