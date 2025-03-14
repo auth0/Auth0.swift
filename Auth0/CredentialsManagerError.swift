@@ -45,11 +45,13 @@ public struct CredentialsManagerError: Auth0Error {
     /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let renewFailed: CredentialsManagerError = .init(code: .renewFailed)
 
+    /// The exchange of the refresh token for SSO credentials failed.
+    /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let ssoExchangeFailed: CredentialsManagerError = .init(code: .ssoExchangeFailed)
+
     /// Storing the renewed credentials failed.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let storeFailed: CredentialsManagerError = .init(code: .storeFailed)
-
-    public static let ssoExchangeFailed: CredentialsManagerError = .init(code: .ssoExchangeFailed)
 
     /// The biometric authentication failed.
     /// The underlying `LAError` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
