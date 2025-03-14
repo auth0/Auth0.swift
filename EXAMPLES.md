@@ -173,7 +173,7 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 ```
 
 > [!CAUTION]
-> The Credentials Manager is not thread-safe, except for its `credentials()` and `renew()` methods. To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
+> The Credentials Manager is not thread-safe, except for its `credentials()`, `apiCredentials()`, and `renew()` methods. To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
 
 ### Store credentials
 

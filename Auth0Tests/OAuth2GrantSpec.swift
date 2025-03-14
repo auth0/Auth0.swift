@@ -51,7 +51,7 @@ class OAuth2GrantSpec: QuickSpec {
                 }, response: jwksResponse())
                 waitUntil { done in
                     pkce.credentials(from: values) {
-                        expect($0).to(haveCredentials(token))
+                        expect($0).to(haveCredentials(token, idToken))
                         done()
                     }
                 }
@@ -119,7 +119,7 @@ class OAuth2GrantSpec: QuickSpec {
                 }, response: jwksResponse())
                 waitUntil { done in
                     pkce.credentials(from: values) {
-                        expect($0).to(haveCredentials(token))
+                        expect($0).to(haveCredentials(token, idToken))
                         done()
                     }
                 }
