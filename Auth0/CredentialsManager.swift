@@ -11,7 +11,8 @@ import LocalAuthentication
 /// Credentials management utility for securely storing and retrieving the user's credentials from the Keychain.
 ///
 /// - Warning: The Credentials Manager is not thread-safe, except for its
-/// ``CredentialsManager/credentials(withScope:minTTL:parameters:headers:callback:)`` and
+/// ``CredentialsManager/credentials(withScope:minTTL:parameters:headers:callback:)``,
+/// ``CredentialsManager/apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)``, and
 /// ``CredentialsManager/renew(parameters:headers:callback:)`` methods. To avoid concurrency issues, do not call its
 /// non thread-safe methods and properties from different threads without proper synchronization.
 ///
@@ -25,7 +26,6 @@ public struct CredentialsManager {
     private let storeKey: String
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
-    private let dispatchGroup = DispatchGroup()
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     #endif
@@ -55,7 +55,7 @@ public struct CredentialsManager {
     ///
     /// - Important: Access to this property will not be protected by biometric authentication.
     public var user: UserInfo? {
-        guard let credentials = retrieveCredentials(),
+        guard let credentials = self.retrieveCredentials(),
               let jwt = try? decode(jwt: credentials.idToken) else { return nil }
 
         return UserInfo(json: jwt.body)
@@ -92,7 +92,7 @@ public struct CredentialsManager {
     }
     #endif
 
-    /// Stores a credentials instance in the Keychain.
+    /// Stores a ``Credentials`` instance in the Keychain.
     ///
     /// ## Usage
     ///
@@ -100,14 +100,15 @@ public struct CredentialsManager {
     /// let didStore = credentialsManager.store(credentials: credentials)
     /// ```
     ///
-    /// - Parameter credentials: Credentials instance to store.
+    /// - Parameter credentials: ``Credentials`` instance to store.
     /// - Returns: If the credentials were stored.
     public func store(credentials: Credentials) -> Bool {
-        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials, requiringSecureCoding: true) else {
+        guard let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
+                                                           requiringSecureCoding: true) else {
             return false
         }
 
-        return self.storage.setEntry(data, forKey: storeKey)
+        return self.storage.setEntry(data, forKey: self.storeKey)
     }
 
     /// Clears credentials stored in the Keychain.
@@ -120,7 +121,21 @@ public struct CredentialsManager {
     ///
     /// - Returns: If the credentials were removed.
     public func clear() -> Bool {
-        return self.storage.deleteEntry(forKey: storeKey)
+        return self.storage.deleteEntry(forKey: self.storeKey)
+    }
+
+    /// Clears API credentials stored in the Keychain for a given audience value.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// let didClear = credentialsManager.clear(forAudience: "http://example.com/api")
+    /// ```
+    ///
+    /// - Parameter audience: Identifier of the API the stored API credentials are for.
+    /// - Returns: If the API credentials were removed.
+    public func clear(forAudience audience: String) -> Bool {
+        return self.storage.deleteEntry(forKey: audience)
     }
 
     /// Calls the `/oauth/revoke` endpoint to revoke the refresh token and then clears the credentials if the request
@@ -140,7 +155,7 @@ public struct CredentialsManager {
     /// }
     /// ```
     ///
-    /// If you need to specify custom headers for the refresh token revocation:
+    /// You can specify custom headers for the refresh token revocation:
     ///
     /// ```swift
     /// credentialsManager.revoke(headers: ["key": "value"]) { print($0) }
@@ -159,10 +174,10 @@ public struct CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
     public func revoke(headers: [String: String] = [:],
                        _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
-        guard let data = self.storage.getEntry(forKey: self.storeKey),
-              let credentials = try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data),
+        guard let credentials = self.retrieveCredentials(),
               let refreshToken = credentials.refreshToken else {
                   _ = self.clear()
+
                   return callback(.success(()))
         }
 
@@ -175,6 +190,7 @@ public struct CredentialsManager {
                     callback(.failure(CredentialsManagerError(code: .revokeFailed, cause: error)))
                 case .success:
                     _ = self.clear()
+
                     callback(.success(()))
                 }
             }
@@ -201,7 +217,7 @@ public struct CredentialsManager {
     /// - ``Credentials/expiresIn``
     public func hasValid(minTTL: Int = 0) -> Bool {
         guard let credentials = self.retrieveCredentials() else { return false }
-        return !self.hasExpired(credentials) && !self.willExpire(credentials, within: minTTL)
+        return !self.hasExpired(credentials.expiresIn) && !self.willExpire(credentials.expiresIn, within: minTTL)
     }
 
     /// Checks that there are credentials stored, and that the credentials contain a refresh token. If you are using
@@ -224,9 +240,9 @@ public struct CredentialsManager {
     }
 
     #if WEB_AUTH_PLATFORM
-    /// Retrieves credentials from the Keychain and yields new credentials using the refresh token if the access token
-    /// is expired. Otherwise, the retrieved credentials will be returned via the success case as they are not expired.
-    /// Renewed credentials will be stored in the Keychain. **This method is thread-safe**.
+    /// Retrieves credentials from the Keychain and automatically renews them using the refresh token if the access
+    /// token is expired. Otherwise, the retrieved credentials will be returned via the success case as they are still
+    /// valid. Renewed credentials will be stored in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
     ///
@@ -241,13 +257,13 @@ public struct CredentialsManager {
     /// }
     /// ```
     ///
-    /// To avoid retrieving access tokens with too little time left, you can enforce a minimum TTL:
+    /// To avoid retrieving access tokens with too little time left, enforce a minimum TTL (in seconds):
     ///
     /// ```swift
     /// credentialsManager.credentials(minTTL: 60) { print($0) }
     /// ```
     ///
-    /// If you need to specify custom parameters or headers for the credentials renewal:
+    /// You can specify custom parameters or headers for the renewal request:
     ///
     /// ```swift
     /// credentialsManager.credentials(parameters: ["key": "value"],
@@ -294,26 +310,176 @@ public struct CredentialsManager {
                 return callback(.failure(error))
             }
 
-            bioAuth.validateBiometric {
-                guard $0 == nil else {
-                    return callback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: $0!)))
+            bioAuth.validateBiometric { error in
+                guard error == nil else {
+                    return callback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: error!)))
                 }
 
-                self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
+                self.retrieveCredentials(scope: scope,
+                                         minTTL: minTTL,
+                                         parameters: parameters,
+                                         headers: headers,
+                                         forceRenewal: false,
+                                         callback: callback)
             }
         } else {
-            self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
+            self.retrieveCredentials(scope: scope,
+                                     minTTL: minTTL,
+                                     parameters: parameters,
+                                     headers: headers,
+                                     forceRenewal: false,
+                                     callback: callback)
         }
     }
     #else
+    /// Retrieves credentials from the Keychain and automatically renews them using the refresh token if the access
+    /// token is expired. Otherwise, the retrieved credentials will be returned via the success case as they are still
+    /// valid. Renewed credentials will be stored in the Keychain. **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// credentialsManager.credentials { result in
+    ///     switch result {
+    ///     case .success(let credentials):
+    ///         print("Obtained credentials: \(credentials)")
+    ///     case .failure(let error):
+    ///         print("Failed with: \(error)")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// To avoid retrieving access tokens with too little time left, enforce a minimum TTL (in seconds):
+    ///
+    /// ```swift
+    /// credentialsManager.credentials(minTTL: 60) { print($0) }
+    /// ```
+    ///
+    /// You can specify custom parameters or headers for the renewal request:
+    ///
+    /// ```swift
+    /// credentialsManager.credentials(parameters: ["key": "value"],
+    ///                                headers: ["key": "value"]) { print($0) }
+    /// ```
+    ///
+    /// When renewing credentials you can get a downscoped access token by requesting fewer scopes than were requested
+    /// on login. If you specify fewer scopes, the credentials will be renewed immediately, regardless of whether they
+    /// are expired or not.
+    ///
+    /// ```swift
+    /// credentialsManager.credentials(scope: "openid offline_access") { print($0) }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - scope:      Space-separated list of scope values to request when renewing credentials. Defaults to `nil`, which will ask for the same scopes that were requested on login.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - parameters: Additional parameters to use when renewing credentials.
+    ///   - headers:    Additional headers to use when renewing credentials.
+    ///   - callback:   Callback that receives a `Result` containing either the user's credentials or an error.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// the credentials are expired and there is no refresh token, the callback will be called with a
+    /// ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Warning: Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the
+    /// renewed credentials. Since this method is thread-safe and ``store(credentials:)`` is not, calling it anyway can
+    /// cause concurrency issues.
+    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
     public func credentials(withScope scope: String? = nil,
                             minTTL: Int = 0,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
-        self.retrieveCredentials(withScope: scope, minTTL: minTTL, parameters: parameters, headers: headers, callback: callback)
+        self.retrieveCredentials(scope: scope,
+                                 minTTL: minTTL,
+                                 parameters: parameters,
+                                 headers: headers,
+                                 forceRenewal: false,
+                                 callback: callback)
     }
     #endif
+
+    /// Retrieves API credentials from the Keychain and automatically renews them using the refresh token if the access
+    /// token is expired. Otherwise, the retrieved API credentials will be returned via the success case as they are
+    /// still valid.
+    ///
+    /// If there are no stored API credentials, the refresh token will be exchaged for a new set of API credentials.
+    /// New or renewed API credentials will be automatically stored in the Keychain. **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// credentialsManager.apiCredentials(forAudience: "http://example.com/api") { result in
+    ///     switch result {
+    ///     case .success(let apiCredentials):
+    ///         print("Obtained API credentials: \(apiCredentials)")
+    ///     case .failure(let error):
+    ///         print("Failed with: \(error)")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// The default scopes configured for the API will be granted if you don't request any specific scopes. If you
+    /// request different scopes than the ones that were granted last time, the API credentials will be renewed
+    /// immediately, regardless of whether they are expired or not.
+    ///
+    /// ```swift
+    /// credentialsManager.apiCredentials(forAudience: "http://example.com/api",
+    ///                                   scope: "read:todos update:todos") { print($0) }
+    /// ```
+    ///
+    /// To avoid retrieving access tokens with too little time left, enforce a minimum TTL (in seconds):
+    ///
+    /// ```swift
+    /// credentialsManager.apiCredentials(forAudience: "http://example.com/api",
+    ///                                   minTTL: 60) { print($0) }
+    /// ```
+    ///
+    /// You can specify custom parameters or headers for the exchange request:
+    ///
+    /// ```swift
+    /// credentialsManager.apiCredentials(forAudience: "http://example.com/api",
+    ///                                   parameters: ["key": "value"],
+    ///                                   headers: ["key": "value"]) { print($0) }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - audience:   Identifier of the API that your application is requesting access to.
+    ///   - scope:      Space-separated list of scope values to request when exchanging a refresh token for API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - parameters: Additional parameters to use when exchanging a refresh token for API credentials.
+    ///   - headers:    Additional headers to use when exchanging a refresh token for API credentials.
+    ///   - callback:   Callback that receives a `Result` containing either the API credentials or an error.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// the API credentials are expired and there is no refresh token, the callback will be called with a
+    /// ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Important: To ensure that no concurrent exchange requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Scopes](https://auth0.com/docs/get-started/apis/scopes)
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
+    public func apiCredentials(forAudience audience: String,
+                               scope: String? = nil,
+                               minTTL: Int = 0,
+                               parameters: [String: Any] = [:],
+                               headers: [String: String] = [:],
+                               callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
+        self.retrieveAPICredentials(audience: audience,
+                                    scope: scope,
+                                    minTTL: minTTL,
+                                    parameters: parameters,
+                                    headers: headers,
+                                    callback: callback)
+    }
 
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
     ///
@@ -330,7 +496,7 @@ public struct CredentialsManager {
     /// }
     /// ```
     ///
-    /// If you need to specify custom parameters or headers:
+    /// You can specify custom parameters or headers for the renewal request:
     ///
     /// ```swift
     /// credentialsManager.renew(parameters: ["key": "value"],
@@ -357,7 +523,20 @@ public struct CredentialsManager {
     public func renew(parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
                       callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
-        self.retrieveCredentials(parameters: parameters, headers: headers, forceRenewal: true, callback: callback)
+        self.retrieveCredentials(scope: nil,
+                                 minTTL: 0,
+                                 parameters: parameters,
+                                 headers: headers,
+                                 forceRenewal: true,
+                                 callback: callback)
+    }
+
+    func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
+        guard let data = try? apiCredentials.encode() else {
+            return false
+        }
+
+        return self.storage.setEntry(data, forKey: audience)
     }
 
     private func retrieveCredentials() -> Credentials? {
@@ -365,30 +544,37 @@ public struct CredentialsManager {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
-    // swiftlint:disable:next function_body_length
-    private func retrieveCredentials(withScope scope: String? = nil,
-                                     minTTL: Int = 0,
+    private func retrieveAPICredentials(audience: String) -> APICredentials? {
+        guard let data = self.storage.getEntry(forKey: audience) else { return nil }
+        return try? APICredentials(from: data)
+    }
+
+    // swiftlint:disable:next function_parameter_count
+    private func retrieveCredentials(scope: String?,
+                                     minTTL: Int,
                                      parameters: [String: Any],
                                      headers: [String: String],
-                                     forceRenewal: Bool = false,
+                                     forceRenewal: Bool,
                                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+
         self.dispatchQueue.async {
-            self.dispatchGroup.enter()
+            dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
-                guard let credentials = retrieveCredentials() else {
-                    self.dispatchGroup.leave()
+                guard let credentials = self.retrieveCredentials() else {
+                    dispatchGroup.leave()
                     return callback(.failure(.noCredentials))
                 }
                 guard forceRenewal ||
-                      self.hasExpired(credentials) ||
-                      self.willExpire(credentials, within: minTTL) ||
-                      self.hasScopeChanged(credentials, from: scope) else {
-                    self.dispatchGroup.leave()
+                      self.hasExpired(credentials.expiresIn) ||
+                      self.willExpire(credentials.expiresIn, within: minTTL) ||
+                      self.hasScopeChanged(from: credentials.scope, to: scope) else {
+                    dispatchGroup.leave()
                     return callback(.success(credentials))
                 }
                 guard let refreshToken = credentials.refreshToken else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
 
@@ -399,49 +585,111 @@ public struct CredentialsManager {
                     .start { result in
                         switch result {
                         case .success(let credentials):
-                            let newCredentials = Credentials(accessToken: credentials.accessToken,
-                                                             tokenType: credentials.tokenType,
-                                                             idToken: credentials.idToken,
-                                                             refreshToken: credentials.refreshToken ?? refreshToken,
-                                                             expiresIn: credentials.expiresIn,
-                                                             scope: credentials.scope)
-                            if self.willExpire(newCredentials, within: minTTL) {
-                                let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
-                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
-                                self.dispatchGroup.leave()
+                            let newCredentials = Credentials(from: credentials,
+                                                             refreshToken: credentials.refreshToken ?? refreshToken)
+                            if self.willExpire(newCredentials.expiresIn, within: minTTL) {
+                                let tokenTTL = Int(newCredentials.expiresIn.timeIntervalSinceNow)
+                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
+                                dispatchGroup.leave()
                                 callback(.failure(error))
                             } else if !self.store(credentials: newCredentials) {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.success(newCredentials))
                             }
                         case .failure(let error):
-                            self.dispatchGroup.leave()
+                            dispatchGroup.leave()
                             callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
                         }
                     }
             }
 
-            self.dispatchGroup.wait()
+            dispatchGroup.wait()
         }
     }
 
-    func willExpire(_ credentials: Credentials, within ttl: Int) -> Bool {
-        return credentials.expiresIn < Date(timeIntervalSinceNow: TimeInterval(ttl))
+    // swiftlint:disable:next function_body_length function_parameter_count
+    private func retrieveAPICredentials(audience: String,
+                                        scope: String?,
+                                        minTTL: Int,
+                                        parameters: [String: Any],
+                                        headers: [String: String],
+                                        callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+
+        self.dispatchQueue.async {
+            dispatchGroup.enter()
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                if let apiCredentials = self.retrieveAPICredentials(audience: audience),
+                      !self.hasExpired(apiCredentials.expiresIn),
+                      !self.willExpire(apiCredentials.expiresIn, within: minTTL),
+                      !self.hasScopeChanged(from: apiCredentials.scope, to: scope) {
+                    dispatchGroup.leave()
+                    return callback(.success(apiCredentials))
+                }
+                guard let currentCredentials = self.retrieveCredentials() else {
+                    dispatchGroup.leave()
+                    return callback(.failure(.noCredentials))
+                }
+                guard let refreshToken = currentCredentials.refreshToken else {
+                    dispatchGroup.leave()
+                    return callback(.failure(.noRefreshToken))
+                }
+
+                self.authentication
+                    .renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
+                    .parameters(parameters)
+                    .headers(headers)
+                    .start { result in
+                        switch result {
+                        case .success(let credentials):
+                            let newCredentials = Credentials(from: currentCredentials,
+                                                             idToken: credentials.idToken,
+                                                             refreshToken: credentials.refreshToken ?? refreshToken)
+                            let newAPICredentials = APICredentials(from: credentials)
+                            if self.willExpire(newAPICredentials.expiresIn, within: minTTL) {
+                                let tokenTTL = Int(newAPICredentials.expiresIn.timeIntervalSinceNow)
+                                let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenTTL))
+                                dispatchGroup.leave()
+                                callback(.failure(error))
+                            } else if !self.store(credentials: newCredentials) {
+                                dispatchGroup.leave()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                            } else if !self.store(apiCredentials: newAPICredentials, forAudience: audience) {
+                                dispatchGroup.leave()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                            } else {
+                                dispatchGroup.leave()
+                                callback(.success(newAPICredentials))
+                            }
+                        case .failure(let error):
+                            dispatchGroup.leave()
+                            callback(.failure(CredentialsManagerError(code: .apiExchangeFailed, cause: error)))
+                        }
+                    }
+            }
+
+            dispatchGroup.wait()
+        }
     }
 
-    func hasExpired(_ credentials: Credentials) -> Bool {
-        return credentials.expiresIn < Date()
+    func willExpire(_ expiresIn: Date, within ttl: Int) -> Bool {
+        return expiresIn < Date(timeIntervalSinceNow: TimeInterval(ttl))
     }
 
-    func hasScopeChanged(_ credentials: Credentials, from scope: String?) -> Bool {
-        if let newScope = scope, let lastScope = credentials.scope {
-            let newScopeList = newScope.lowercased().split(separator: " ").sorted()
+    func hasExpired(_ expiresIn: Date) -> Bool {
+        return expiresIn < Date()
+    }
+
+    func hasScopeChanged(from lastScope: String?, to newScope: String?) -> Bool {
+        if let lastScope = lastScope, let newScope = newScope {
             let lastScopeList = lastScope.lowercased().split(separator: " ").sorted()
+            let newScopeList = newScope.lowercased().split(separator: " ").sorted()
 
-            return newScopeList != lastScopeList
+            return lastScopeList != newScopeList
         }
 
         return false
@@ -472,7 +720,7 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// If you need to specify custom headers for the refresh token revocation:
+    /// You can specify custom headers for the refresh token revocation:
     ///
     /// ```swift
     /// credentialsManager
@@ -500,9 +748,9 @@ public extension CredentialsManager {
         }.eraseToAnyPublisher()
     }
 
-    /// Retrieves credentials from the Keychain and yields new credentials using the refresh token if the access token
-    /// is expired. Otherwise, the subscription will complete with the retrieved credentials as they are not expired.
-    /// Renewed credentials will be stored in the Keychain. **This method is thread-safe**.
+    /// Retrieves credentials from the Keychain and automatically renews them using the refresh token if the access
+    /// token is expired. Otherwise, the subscription will complete with the retrieved credentials as they are still
+    /// valid. Renewed credentials will be stored in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
     ///
@@ -519,7 +767,7 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// To avoid retrieving access tokens with too little time left, you can enforce a minimum TTL:
+    /// To avoid retrieving access tokens with too little time left, enforce a minimum TTL (in seconds):
     ///
     /// ```swift
     /// credentialsManager
@@ -529,7 +777,7 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// If you need to specify custom parameters or headers for the credentials renewal:
+    /// You can specify custom parameters or headers for the renewal request:
     ///
     /// ```swift
     /// credentialsManager
@@ -587,6 +835,99 @@ public extension CredentialsManager {
         }.eraseToAnyPublisher()
     }
 
+    /// Retrieves API credentials from the Keychain and automatically renews them using the refresh token if the access
+    /// token is expired. Otherwise, the subscription will complete with the retrieved API credentials as they are
+    /// still valid.
+    ///
+    /// If there are no stored API credentials, the refresh token will be exchaged for a new set of API credentials.
+    /// New or renewed API credentials will be automatically stored in the Keychain. **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// credentialsManager
+    ///     .apiCredentials(forAudience: "http://example.com/api")
+    ///     .sink(receiveCompletion: { completion in
+    ///         if case .failure(let error) = completion {
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }, receiveValue: { apiCredentials in
+    ///         print("Obtained API credentials: \(apiCredentials)")
+    ///     })
+    ///     .store(in: &cancellables)
+    /// ```
+    ///
+    /// The default scopes configured for the API will be granted if you don't request any specific scopes. If you
+    /// request different scopes than the ones that were granted last time, the API credentials will be renewed
+    /// immediately, regardless of whether they are expired or not.
+    ///
+    /// ```swift
+    /// credentialsManager
+    ///     .apiCredentials(forAudience: "http://example.com/api",
+    ///                     scopes: "read:todos update:todos")
+    ///     .sink(receiveCompletion: { print($0) },
+    ///           receiveValue: { print($0) })
+    ///     .store(in: &cancellables)
+    /// ```
+    ///
+    /// To avoid retrieving access tokens with too little time left, enforce a minimum TTL (in seconds):
+    ///
+    /// ```swift
+    /// credentialsManager
+    ///     .apiCredentials(forAudience: "http://example.com/api",
+    ///                     minTTL: 60)
+    ///     .sink(receiveCompletion: { print($0) },
+    ///           receiveValue: { print($0) })
+    ///     .store(in: &cancellables)
+    /// ```
+    ///
+    /// You can specify custom parameters or headers for the exchange request:
+    ///
+    /// ```swift
+    /// credentialsManager
+    ///     .apiCredentials(forAudience: "http://example.com/api",
+    ///                     parameters: ["key": "value"],
+    ///                     headers: ["key": "value"])
+    ///     .sink(receiveCompletion: { print($0) },
+    ///           receiveValue: { print($0) })
+    ///     .store(in: &cancellables)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - audience:   Identifier of the API that your application is requesting access to.
+    ///   - scope:      Space-separated list of scope values to request when exchanging a refresh token for API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - parameters: Additional parameters to use when exchanging a refresh token for API credentials.
+    ///   - headers:    Additional headers to use when exchanging a refresh token for API credentials.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// the API credentials are expired and there is no refresh token, the callback will be called with a
+    /// ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Important: To ensure that no concurrent exchange requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Scopes](https://auth0.com/docs/get-started/apis/scopes)
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
+    func apiCredentials(forAudience audience: String,
+                        scope: String? = nil,
+                        minTTL: Int = 0,
+                        parameters: [String: Any] = [:],
+                        headers: [String: String] = [:]) -> AnyPublisher<APICredentials, CredentialsManagerError> {
+        return Deferred {
+            Future { callback in
+                return self.apiCredentials(forAudience: audience,
+                                           scope: scope,
+                                           minTTL: minTTL,
+                                           parameters: parameters,
+                                           headers: headers,
+                                           callback: callback)
+            }
+        }.eraseToAnyPublisher()
+    }
+
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
@@ -604,7 +945,7 @@ public extension CredentialsManager {
     ///     .store(in: &cancellables)
     /// ```
     ///
-    /// If you need to specify custom parameters or headers:
+    /// You can specify custom parameters or headers for the renewal request:
     ///
     /// ```swift
     /// credentialsManager
@@ -636,7 +977,9 @@ public extension CredentialsManager {
                headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
             Future { callback in
-                return self.renew(parameters: parameters, headers: headers, callback: callback)
+                return self.renew(parameters: parameters,
+                                  headers: headers,
+                                  callback: callback)
             }
         }.eraseToAnyPublisher()
     }
@@ -662,7 +1005,7 @@ public extension CredentialsManager {
     /// }
     /// ```
     ///
-    /// If you need to specify custom headers for the refresh token revocation:
+    /// You can specify custom headers for the refresh token revocation:
     ///
     /// ```swift
     /// try await credentialsManager.revoke(headers: ["key": "value"])
@@ -683,9 +1026,9 @@ public extension CredentialsManager {
         }
     }
 
-    /// Retrieves credentials from the Keychain and yields new credentials using the refresh token if the access token
-    /// is expired. Otherwise, return the retrieved credentials as they are not expired. Renewed credentials will be
-    /// stored in the Keychain. **This method is thread-safe**.
+    /// Retrieves credentials from the Keychain and automatically renews them using the refresh token if the access
+    /// token is expired. Otherwise, it returns the retrieved credentials as they are still valid. Renewed credentials
+    /// will be stored in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
     ///
@@ -698,13 +1041,13 @@ public extension CredentialsManager {
     /// }
     /// ```
     ///
-    /// To avoid retrieving access tokens with too little time left, you can enforce a minimum TTL:
+    /// To avoid retrieving access tokens with too little time left, enforce a minimum TTL (in seconds):
     ///
     /// ```swift
     /// let credentials = try await credentialsManager.credentials(minTTL: 60)
     /// ```
     ///
-    /// If you need to specify custom parameters or headers for the credentials renewal:
+    /// You can specify custom parameters or headers for the renewal request:
     ///
     /// ```swift
     /// let credentials = try await credentialsManager.credentials(parameters: ["key": "value"],
@@ -753,6 +1096,80 @@ public extension CredentialsManager {
         }
     }
 
+    /// Retrieves API credentials from the Keychain and automatically renews them using the refresh token if the access
+    /// token is expired. Otherwise, it returns the retrieved API credentials as they are still valid.
+    ///
+    /// If there are no stored API credentials, the refresh token will be exchaged for a new set of API credentials.
+    /// New or renewed API credentials will be automatically stored in the Keychain. **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// do {
+    ///     let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "http://example.com/api")
+    ///     print("Obtained API credentials: \(apiCredentials)")
+    /// } catch {
+    ///     print("Failed with: \(error)")
+    /// }
+    /// ```
+    ///
+    /// The default scopes configured for the API will be granted if you don't request any specific scopes. If you
+    /// request different scopes than the ones that were granted last time, the API credentials will be renewed
+    /// immediately, regardless of whether they are expired or not.
+    ///
+    /// ```swift
+    /// let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "http://example.com/api",
+    ///                                                                  scope: "read:todos update:todos")
+    /// ```
+    ///
+    /// To avoid retrieving access tokens with too little time left, enforce a minimum TTL (in seconds):
+    ///
+    /// ```swift
+    /// let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "http://example.com/api",
+    ///                                                                  minTTL: 60)
+    /// ```
+    ///
+    /// You can specify custom parameters or headers for the exchange request:
+    ///
+    /// ```swift
+    /// let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "http://example.com/api",
+    ///                                                                  parameters: ["key": "value"],
+    ///                                                                  headers: ["key": "value"])
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - audience:   Identifier of the API that your application is requesting access to.
+    ///   - scope:      Space-separated list of scope values to request when exchanging a refresh token for API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - parameters: Additional parameters to use when exchanging a refresh token for API credentials.
+    ///   - headers:    Additional headers to use when exchanging a refresh token for API credentials.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// the API credentials are expired and there is no refresh token, the callback will be called with a
+    /// ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Important: To ensure that no concurrent exchange requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Scopes](https://auth0.com/docs/get-started/apis/scopes)
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
+    func apiCredentials(forAudience audience: String,
+                        scope: String? = nil,
+                        minTTL: Int = 0,
+                        parameters: [String: Any] = [:],
+                        headers: [String: String] = [:]) async throws -> APICredentials {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.apiCredentials(forAudience: audience,
+                                scope: scope,
+                                minTTL: minTTL,
+                                parameters: parameters,
+                                headers: headers,
+                                callback: continuation.resume)
+        }
+    }
+
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
@@ -766,7 +1183,7 @@ public extension CredentialsManager {
     /// }
     /// ```
     ///
-    /// If you need to specify custom parameters or headers:
+    /// You can specify custom parameters or headers for the renewal request:
     ///
     /// ```swift
     /// let credentials = try await credentialsManager.renew(parameters: ["key": "value"],
@@ -790,9 +1207,12 @@ public extension CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
-    func renew(parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {
+    func renew(parameters: [String: Any] = [:],
+               headers: [String: String] = [:]) async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            self.renew(parameters: parameters, headers: headers, callback: continuation.resume)
+            self.renew(parameters: parameters,
+                       headers: headers,
+                       callback: continuation.resume)
         }
     }
 

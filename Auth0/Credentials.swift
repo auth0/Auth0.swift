@@ -1,6 +1,6 @@
 import Foundation
 
-private struct _StructCredentials {
+private struct _A0Credentials {
     let accessToken: String
     let tokenType: String
     let idToken: String
@@ -70,14 +70,14 @@ public final class Credentials: NSObject {
     /// Custom description that redacts the tokens with `<REDACTED>`.
     public override var description: String {
         let redacted = "<REDACTED>"
-        let values = _StructCredentials(accessToken: redacted,
-                                       tokenType: self.tokenType,
-                                       idToken: redacted,
-                                       refreshToken: (self.refreshToken != nil) ? redacted : nil,
-                                       expiresIn: self.expiresIn,
-                                       scope: self.scope,
-                                       recoveryCode: (self.recoveryCode != nil) ? redacted : nil)
-        return String(describing: values).replacingOccurrences(of: "_StructCredentials", with: "Credentials")
+        let values = _A0Credentials(accessToken: redacted,
+                                    tokenType: self.tokenType,
+                                    idToken: redacted,
+                                    refreshToken: (self.refreshToken != nil) ? redacted : nil,
+                                    expiresIn: self.expiresIn,
+                                    scope: self.scope,
+                                    recoveryCode: (self.recoveryCode != nil) ? redacted : nil)
+        return String(describing: values).replacingOccurrences(of: "_A0Credentials", with: "Credentials")
     }
 
     // MARK: - Initializer
@@ -181,5 +181,20 @@ extension Credentials: NSSecureCoding {
 
     /// Property that enables secure coding. Equals to `true`.
     public static var supportsSecureCoding: Bool { return true }
+
+}
+
+// MARK: - Internal Initializer
+
+extension Credentials {
+
+    convenience init(from credentials: Credentials, idToken: String? = nil, refreshToken: String? = nil) {
+        self.init(accessToken: credentials.accessToken,
+                  tokenType: credentials.tokenType,
+                  idToken: idToken ?? credentials.idToken,
+                  refreshToken: refreshToken ?? credentials.refreshToken,
+                  expiresIn: credentials.expiresIn,
+                  scope: credentials.scope)
+    }
 
 }
