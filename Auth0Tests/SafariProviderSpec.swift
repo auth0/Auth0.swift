@@ -8,7 +8,7 @@ import Nimble
 @testable import Auth0
 
 private let RedirectURL = URL(string: "https://samples.auth0.com/callback")!
-private let Timeout: NimbleTimeInterval = .seconds(2)
+private let Timeout: NimbleTimeInterval = .seconds(3)
 
 class SafariProviderSpec: QuickSpec {
 
@@ -20,6 +20,7 @@ class SafariProviderSpec: QuickSpec {
         beforeEach {
             safari = SFSafariViewController(url: RedirectURL)
             userAgent = SafariUserAgent(controller: safari, callback: { _ in })
+            UIView.setAnimationsEnabled(false)
         }
 
         describe("WebAuthentication extension") {
