@@ -21,7 +21,6 @@ private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-
 private let Timeout: NimbleTimeInterval = .seconds(2)
 private let PasswordlessGrantType = "http://auth0.com/oauth/grant-type/passwordless/otp"
 private let TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange"
-private let RefreshTokenTokenType = "urn:ietf:params:oauth:token-type:refresh_token"
 private let SessionTransferTokenTokenType = "urn:auth0:params:oauth:token-type:session_transfer_token"
 
 class AuthenticationSpec: QuickSpec {
@@ -1147,15 +1146,16 @@ class AuthenticationSpec: QuickSpec {
         }
         
         describe("sso exchange") {
+            let grantType = "refresh_token"
+            let audience = "urn:\(Domain):session_transfer"
             
             it("should exchange the refresh token for a session transfer token without refresh token rotation") {
                 NetworkStub.addStub(condition: {
                     $0.isToken(Domain) &&
                     $0.hasAllOf([
-                        "grant_type": TokenExchangeGrantType,
-                        "subject_token": RefreshToken,
-                        "subject_token_type": RefreshTokenTokenType,
-                        "requested_token_type": SessionTransferTokenTokenType,
+                        "refresh_token": RefreshToken,
+                        "grant_type": grantType,
+                        "audience": audience,
                         "client_id": ClientId
                     ])
                 }, response: authResponse(accessToken: SessionTransferToken, issuedTokenType: SessionTransferTokenTokenType))
@@ -1173,10 +1173,9 @@ class AuthenticationSpec: QuickSpec {
                 NetworkStub.addStub(condition: {
                     $0.isToken(Domain) &&
                     $0.hasAllOf([
-                        "grant_type": TokenExchangeGrantType,
-                        "subject_token": RefreshToken,
-                        "subject_token_type": RefreshTokenTokenType,
-                        "requested_token_type": SessionTransferTokenTokenType,
+                        "refresh_token": RefreshToken,
+                        "grant_type": grantType,
+                        "audience": audience,
                         "client_id": ClientId
                     ])
                 }, response: authResponse(accessToken: SessionTransferToken,
@@ -1199,10 +1198,9 @@ class AuthenticationSpec: QuickSpec {
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) &&
                         $0.hasAllOf([
-                            "grant_type": TokenExchangeGrantType,
-                            "subject_token": RefreshToken,
-                            "subject_token_type": RefreshTokenTokenType,
-                            "requested_token_type": SessionTransferTokenTokenType,
+                            "refresh_token": RefreshToken,
+                            "grant_type": grantType,
+                            "audience": audience,
                             "client_id": ClientId
                         ])
                     }, response:authFailure(code: code, description: description))

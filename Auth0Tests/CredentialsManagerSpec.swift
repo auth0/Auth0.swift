@@ -22,6 +22,7 @@ private let InvalidTTL = Int(ExpiresIn + 1000)
 private let Timeout: NimbleTimeInterval = .seconds(2)
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
+private let SessionTransferAudience = "urn:\(Domain):session_transfer"
 private let ExpiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NzE4NTI0NjMsImV4cCI6MTU0MDIzMDA2MywiYXVkIjoiYXVkaWVuY2UiLCJzdWIiOiIxMjM0NSJ9.Lcz79P1AFAZDI4Yr1teFapFVAmBbdfhGBGbj9dQVeRM"
 private let ValidToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZXN0IiwiaWF0IjoxNTcxOTExNTkyLCJleHAiOjE5MTg5ODAzOTIsImF1ZCI6ImF1ZGllbmNlIiwic3ViIjoic3VifDEyMyJ9.uLNF8IpY6cJTY-RyO3CcqLpCaKGaVekR-DTDoQTlnPk" // Token is valid until 2030
 
@@ -783,11 +784,13 @@ class CredentialsManagerSpec: QuickSpec {
         describe("SSO credentials") {
 
             beforeEach {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["subject_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken,
-                                                           issuedTokenType: IssuedTokenType,
-                                                           refreshToken: NewRefreshToken,
-                                                           expiresIn: ExpiresIn * 2))
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                }, response: authResponse(accessToken: NewAccessToken,
+                                          issuedTokenType: IssuedTokenType,
+                                          refreshToken: NewRefreshToken,
+                                          expiresIn: ExpiresIn * 2))
                 _ = credentialsManager.store(credentials: credentials)
             }
 
@@ -820,11 +823,13 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should yield new SSO credentials without refresh token rotation") {
                 NetworkStub.clearStubs()
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["subject_token": RefreshToken]) },
-                                    response: authResponse(accessToken: NewAccessToken,
-                                                           issuedTokenType: IssuedTokenType,
-                                                           refreshToken: nil,
-                                                           expiresIn: ExpiresIn * 2))
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                }, response: authResponse(accessToken: NewAccessToken,
+                                          issuedTokenType: IssuedTokenType,
+                                          refreshToken: nil,
+                                          expiresIn: ExpiresIn * 2))
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.ssoCredentials { result in
@@ -869,8 +874,10 @@ class CredentialsManagerSpec: QuickSpec {
                 let errorDescription = "missing_params"
 
                 NetworkStub.clearStubs()
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["subject_token": RefreshToken]) },
-                                    response: authFailure(code: errorCode, description: errorDescription))
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                }, response: authFailure(code: errorCode, description: errorDescription))
 
                 let cause = AuthenticationError(info: ["error": errorCode, "error_description": errorDescription])
                 let expectedError = CredentialsManagerError(code: .ssoExchangeFailed, cause: cause)
@@ -917,7 +924,8 @@ class CredentialsManagerSpec: QuickSpec {
 
                 NetworkStub.clearStubs()
                 NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAtLeast(["subject_token": RefreshToken, key: value])
+                    $0.isToken(Domain) &&
+                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience, key: value])
                 }, response: authResponse(accessToken: NewAccessToken,
                                           issuedTokenType: IssuedTokenType,
                                           refreshToken: NewRefreshToken,
@@ -962,7 +970,12 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should perform the SSO exchange serially from the same thread") {
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["subject_token": RefreshToken, "request": "first"])
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "refresh_token": RefreshToken,
+                            "audience": SessionTransferAudience,
+                            "request": "first"
+                        ])
                     }, response: authResponse(accessToken: newAccessToken1,
                                               issuedTokenType: IssuedTokenType,
                                               refreshToken: newRefreshToken1,
@@ -973,7 +986,11 @@ class CredentialsManagerSpec: QuickSpec {
                             expect(result).to(haveSSOCredentials(newAccessToken1, newRefreshToken1))
 
                             NetworkStub.addStub(condition: {
-                                $0.isToken(Domain) && $0.hasAtLeast(["subject_token": newRefreshToken1, "request": "second"])
+                                $0.isToken(Domain) &&
+                                $0.hasAtLeast([
+                                    "refresh_token": newRefreshToken1,
+                                    "audience": SessionTransferAudience,
+                                    "request": "second"])
                             }, response: authResponse(accessToken: newAccessToken2,
                                                       issuedTokenType: IssuedTokenType,
                                                       refreshToken: newRefreshToken2,
@@ -989,13 +1006,22 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should perform the SSO exchange serially from different threads") {
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["subject_token": RefreshToken, "request": "first"])
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "refresh_token": RefreshToken,
+                            "audience": SessionTransferAudience,
+                            "request": "first"
+                        ])
                     }, response: authResponse(accessToken: newAccessToken1,
                                               issuedTokenType: IssuedTokenType,
                                               refreshToken: newRefreshToken1,
                                               expiresIn: ExpiresIn))
                     NetworkStub.addStub(condition: {
-                        $0.isToken(Domain) && $0.hasAtLeast(["subject_token": newRefreshToken1, "request": "second"])
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "refresh_token": newRefreshToken1,
+                            "audience": SessionTransferAudience,
+                            "request": "second"])
                     }, response: authResponse(accessToken: newAccessToken2,
                                               issuedTokenType: IssuedTokenType,
                                               refreshToken: newRefreshToken2,
@@ -1283,11 +1309,13 @@ class CredentialsManagerSpec: QuickSpec {
             context("SSO credentials") {
 
                 beforeEach {
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["subject_token": RefreshToken]) },
-                                        response: authResponse(accessToken: NewAccessToken,
-                                                               issuedTokenType: IssuedTokenType,
-                                                               refreshToken: NewRefreshToken,
-                                                               expiresIn: ExpiresIn))
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                    }, response: authResponse(accessToken: NewAccessToken,
+                                              issuedTokenType: IssuedTokenType,
+                                              refreshToken: NewRefreshToken,
+                                              expiresIn: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
                 }
 
@@ -1329,7 +1357,7 @@ class CredentialsManagerSpec: QuickSpec {
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) &&
                         $0.hasHeader(key, value: value) &&
-                        $0.hasAtLeast(["subject_token": RefreshToken, key: value])
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience, key: value])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               issuedTokenType: IssuedTokenType,
                                               refreshToken: NewRefreshToken,
@@ -1558,8 +1586,10 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should exchange the refresh token for SSO credentials using the default parameter values") {
                     NetworkStub.clearStubs()
-                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["subject_token": RefreshToken]) },
-                                        response: authResponse(accessToken: NewAccessToken,
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                    }, response: authResponse(accessToken: NewAccessToken,
                                                                issuedTokenType: IssuedTokenType,
                                                                refreshToken: NewRefreshToken,
                                                                expiresIn: ExpiresIn))
@@ -1582,7 +1612,7 @@ class CredentialsManagerSpec: QuickSpec {
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) &&
                         $0.hasHeader(key, value: value) &&
-                        $0.hasAtLeast(["subject_token": RefreshToken, key: value])
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience, key: value])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               issuedTokenType: IssuedTokenType,
                                               refreshToken: NewRefreshToken,
