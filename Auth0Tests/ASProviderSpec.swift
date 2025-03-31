@@ -36,13 +36,13 @@ class ASProviderSpec: QuickSpec {
             it("should not use an ephemeral session by default") {
                 let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL)
                 userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
-                expect(userAgent.session.prefersEphemeralWebBrowserSession) == false
+                expect(ASUserAgent.currentSession?.prefersEphemeralWebBrowserSession) == false
             }
             
             it("should use an ephemeral session") {
                 let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL, ephemeralSession: true)
                 userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
-                expect(userAgent.session.prefersEphemeralWebBrowserSession) == true
+                expect(ASUserAgent.currentSession?.prefersEphemeralWebBrowserSession) == true
             }
             
         }
