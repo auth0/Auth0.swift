@@ -5,10 +5,10 @@ import Foundation
 /// ## See Also
 ///
 /// - [Standard Error Responses](https://auth0.com/docs/api/authentication#standard-error-responses)
-public struct AuthenticationError: Auth0APIError, Sendable {
+public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
 
     /// Additional information about the error.
-    nonisolated(unsafe) public let info: [String: Any]
+    public let info: [String: Any]
 
     /// Creates an error from a JSON response.
     ///
