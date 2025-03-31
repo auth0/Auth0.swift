@@ -2,6 +2,10 @@ name: Set up environment
 description: Set up the environment for building and testing the library on a given platform
 
 inputs:
+  ruby:
+    description: The version of Ruby to use
+    required: true
+
   xcode:
     description: The version of Xcode to use
     required: true
@@ -11,14 +15,15 @@ runs:
 
   steps:
     - name: Set up Ruby
-      uses: ruby/setup-ruby@52753b7da854d5c07df37391a986c76ab4615999 # pinned to version v1.191.0
+      uses: ruby/setup-ruby@354a1ad156761f5ee2b7b13fa8e09943a5e8d252 # pin@v1.229.0
       with:
-        ruby-version: '3.1.0'
+        ruby-version: ${{ inputs.ruby }}
         bundler-cache: true
         cache-version: 1
 
     - name: Setup Xcode
-      uses: mxcl/xcodebuild@6e60022a0cbe8c89278be2dd1773a2f68e7c5c87
+      uses: mxcl/xcodebuild@75cd1d21e22129934f9ca289757708d8af9155f5 # pin@v3.4.0
       with:
         xcode: ${{ inputs.xcode }}
-        action: none   
+        action: none
+        verbosity: xcbeautify
