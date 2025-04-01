@@ -97,7 +97,7 @@ class WebAuthSpec: QuickSpec {
             }
 
             it("should init with client id, url & barrier") {
-                var barrier = QueueBarrier.shared
+                let barrier = QueueBarrier.shared
                 let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, barrier: barrier)
                 expect(webAuth.barrier).to(be(barrier))
             }
