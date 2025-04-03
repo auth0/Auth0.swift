@@ -87,6 +87,19 @@ public protocol WebAuth: Trackable, Loggable {
      */
     func parameters(_ parameters: [String: String]) -> Self
 
+    /// Specify additional headers for `ASWebAuthenticationSession`.
+    ///
+    /// - Parameter headers: Additional headers.
+    /// - Returns: The same `WebAuth` instance to allow method chaining.
+    /// - Note: Don't use this method along with ``provider(_:)``. Use either one or the other, because this
+    /// method will only work with the default `ASWebAuthenticationSession` implementation.
+    ///
+    /// ## See Also
+    ///
+    /// - [additionalHeaderFields](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/additionalheaderfields)
+    @available(iOS 17.4, macOS 14.4, visionOS 1.2, *)
+    func headers(_ headers: [String: String]) -> Self
+
     /// Specify a custom redirect URL to be used.
     ///
     /// - Parameter redirectURL: Custom redirect URL.

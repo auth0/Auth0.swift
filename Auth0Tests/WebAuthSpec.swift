@@ -383,6 +383,21 @@ class WebAuthSpec: QuickSpec {
 
         describe("other builder methods") {
 
+            if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
+                context("custom headers") {
+
+                    it("should not add custom headers by default") {
+                        expect(newWebAuth().headers).to(beEmpty())
+                    }
+
+                    it("should add custom headers") {
+                        let headers = ["X-Foo": "Bar", "X-Baz": "Qux"]
+                        expect(newWebAuth().headers(headers).headers).to(equal(headers))
+                    }
+
+                }
+            }
+
             context("https") {
 
                 it("should not use https callbacks by default") {
@@ -408,6 +423,10 @@ class WebAuthSpec: QuickSpec {
             }
 
             context("nonce") {
+
+                it("should not use a custom nonce value by default") {
+                    expect(newWebAuth().nonce).to(beNil())
+                }
 
                 it("should use a custom nonce value") {
                     let nonce = "foo"

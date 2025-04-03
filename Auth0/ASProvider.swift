@@ -5,7 +5,9 @@ typealias ASHandler = ASWebAuthenticationSession.CompletionHandler
 
 extension WebAuthentication {
 
-    static func asProvider(redirectURL: URL, ephemeralSession: Bool = false) -> WebAuthProvider {
+    static func asProvider(redirectURL: URL,
+                           ephemeralSession: Bool = false,
+                           headers: [String: String]? = nil) -> WebAuthProvider {
         return { url, callback in
             let session: ASWebAuthenticationSession
 
@@ -21,6 +23,8 @@ extension WebAuthentication {
                                                          callback: .customScheme(redirectURL.scheme!),
                                                          completionHandler: completionHandler(callback))
                 }
+
+                session.additionalHeaderFields = headers
             } else {
                 session = ASWebAuthenticationSession(url: url,
                                                      callbackURLScheme: redirectURL.scheme,

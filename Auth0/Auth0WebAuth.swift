@@ -23,6 +23,7 @@ final class Auth0WebAuth: WebAuth {
     private let responseType = "code"
 
     private(set) var parameters: [String: String] = [:]
+    private(set) var headers: [String: String] = [:]
     private(set) var https = false
     private(set) var ephemeralSession = false
     private(set) var issuer: String
@@ -100,6 +101,12 @@ final class Auth0WebAuth: WebAuth {
 
     func parameters(_ parameters: [String: String]) -> Self {
         parameters.forEach { self.parameters[$0] = $1 }
+        return self
+    }
+
+    @available(iOS 17.4, macOS 14.4, visionOS 1.2, *)
+    func headers(_ headers: [String: String]) -> Self {
+        headers.forEach { self.headers[$0] = $1 }
         return self
     }
 
@@ -199,7 +206,9 @@ final class Auth0WebAuth: WebAuth {
                                                   organization: organization,
                                                   invitation: invitation)
 
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, ephemeralSession: ephemeralSession)
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
+                                                                     ephemeralSession: ephemeralSession,
+                                                                     headers: headers)
         let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
             storage.clear()
             barrier.lower()
@@ -240,7 +249,7 @@ final class Auth0WebAuth: WebAuth {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL)
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, headers: headers)
         let userAgent = provider(logoutURL) { [storage, barrier] result in
             storage.clear()
             barrier.lower()
@@ -266,7 +275,7 @@ final class Auth0WebAuth: WebAuth {
         entries["response_type"] = self.responseType
         entries["redirect_uri"] = redirectURL.absoluteString
         entries["state"] = state
-        entries["nonce"] = nonce
+        entries["nonce"] = self.nonce
         entries["organization"] = organization
         entries["invitation"] = invitation
 
