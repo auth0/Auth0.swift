@@ -32,7 +32,8 @@ class ASProviderSpec: QuickSpec {
                 let provider = WebAuthentication.asProvider(redirectURL: HTTPSRedirectURL)
                 expect(provider(AuthorizeURL, {_ in })).to(beAKindOf(ASUserAgent.self))
             }
-            
+
+            #if compiler(>=5.10)
             if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
                 context("custom headers when using an HTTPS redirect URL") {
 
@@ -68,7 +69,8 @@ class ASProviderSpec: QuickSpec {
 
                 }
             }
-            
+            #endif
+
             context("ephemeral sesssions") {
 
                 it("should not use an ephemeral session by default") {

@@ -104,11 +104,13 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
+    #if compiler(>=5.10)
     @available(iOS 17.4, macOS 14.4, visionOS 1.2, *)
     func headers(_ headers: [String: String]) -> Self {
         headers.forEach { self.headers[$0] = $1 }
         return self
     }
+    #endif
 
     func redirectURL(_ redirectURL: URL) -> Self {
         self.redirectURL = redirectURL
