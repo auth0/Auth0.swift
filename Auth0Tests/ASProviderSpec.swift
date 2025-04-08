@@ -32,17 +32,59 @@ class ASProviderSpec: QuickSpec {
                 let provider = WebAuthentication.asProvider(redirectURL: HTTPSRedirectURL)
                 expect(provider(AuthorizeURL, {_ in })).to(beAKindOf(ASUserAgent.self))
             }
-            
-            it("should not use an ephemeral session by default") {
-                let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL)
-                userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
-                expect(userAgent.session.prefersEphemeralWebBrowserSession) == false
+
+            #if compiler(>=5.10)
+            if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
+                context("custom headers when using an HTTPS redirect URL") {
+
+                    it("should not use custom headers by default") {
+                        let provider = WebAuthentication.asProvider(redirectURL: HTTPSRedirectURL)
+                        userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
+                        expect(ASUserAgent.currentSession?.additionalHeaderFields).to(beNil())
+                    }
+                    
+                    it("should use custom headers") {
+                        let headers = ["X-Foo": "Bar", "X-Baz": "Qux"]
+                        let provider = WebAuthentication.asProvider(redirectURL: HTTPSRedirectURL, headers: headers)
+                        userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
+                        expect(ASUserAgent.currentSession?.additionalHeaderFields) == headers
+                    }
+
+                }
+                
+                context("custom headers when using a custom scheme redirect URL") {
+
+                    it("should not use custom headers by default") {
+                        let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL)
+                        userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
+                        expect(ASUserAgent.currentSession?.additionalHeaderFields).to(beNil())
+                    }
+                    
+                    it("should use custom headers") {
+                        let headers = ["X-Foo": "Bar", "X-Baz": "Qux"]
+                        let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL, headers: headers)
+                        userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
+                        expect(ASUserAgent.currentSession?.additionalHeaderFields) == headers
+                    }
+
+                }
             }
-            
-            it("should use an ephemeral session") {
-                let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL, ephemeralSession: true)
-                userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
-                expect(userAgent.session.prefersEphemeralWebBrowserSession) == true
+            #endif
+
+            context("ephemeral sesssions") {
+
+                it("should not use an ephemeral session by default") {
+                    let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL)
+                    userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
+                    expect(ASUserAgent.currentSession?.prefersEphemeralWebBrowserSession) == false
+                }
+                
+                it("should use an ephemeral session") {
+                    let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL, ephemeralSession: true)
+                    userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
+                    expect(ASUserAgent.currentSession?.prefersEphemeralWebBrowserSession) == true
+                }
+
             }
             
         }

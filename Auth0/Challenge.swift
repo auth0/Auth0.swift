@@ -1,5 +1,5 @@
 /// A multi-factor challenge.
-public struct Challenge: Codable {
+public struct Challenge: Codable, Sendable {
 
     /// How the user will get the challenge and prove possession. 
     public let challengeType: String

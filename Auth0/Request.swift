@@ -141,7 +141,9 @@ public extension Request {
      */
     func start() async throws -> T {
         return try await withCheckedThrowingContinuation { continuation in
-            self.start(continuation.resume)
+            self.start { result in
+                continuation.resume(with: result)
+            }
         }
     }
 

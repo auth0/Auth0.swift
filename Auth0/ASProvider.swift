@@ -5,7 +5,9 @@ typealias ASHandler = ASWebAuthenticationSession.CompletionHandler
 
 extension WebAuthentication {
 
-    static func asProvider(redirectURL: URL, ephemeralSession: Bool = false) -> WebAuthProvider {
+    static func asProvider(redirectURL: URL,
+                           ephemeralSession: Bool = false,
+                           headers: [String: String]? = nil) -> WebAuthProvider {
         return { url, callback in
             let session: ASWebAuthenticationSession
 
@@ -21,6 +23,8 @@ extension WebAuthentication {
                                                          callback: .customScheme(redirectURL.scheme!),
                                                          completionHandler: completionHandler(callback))
                 }
+
+                session.additionalHeaderFields = headers
             } else {
                 session = ASWebAuthenticationSession(url: url,
                                                      callbackURLScheme: redirectURL.scheme,
@@ -59,23 +63,23 @@ extension WebAuthentication {
 
 class ASUserAgent: NSObject, WebAuthUserAgent {
 
-    let session: ASWebAuthenticationSession
+    private(set) static var currentSession: ASWebAuthenticationSession?
     let callback: WebAuthProviderCallback
 
     init(session: ASWebAuthenticationSession, callback: @escaping WebAuthProviderCallback) {
-        self.session = session
         self.callback = callback
         super.init()
 
         session.presentationContextProvider = self
+        ASUserAgent.currentSession = session
     }
 
     func start() {
-        _ = self.session.start()
+        _ = ASUserAgent.currentSession?.start()
     }
 
     func finish(with result: WebAuthResult<Void>) {
-        self.session.cancel()
+        ASUserAgent.currentSession?.cancel()
         self.callback(result)
     }
 

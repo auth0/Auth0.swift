@@ -2,7 +2,7 @@
 import Foundation
 
 /// Represents an error during a Web Auth operation.
-public struct WebAuthError: Auth0Error {
+public struct WebAuthError: Auth0Error, Sendable {
 
     enum Code: Equatable {
         case webViewFailure(String)

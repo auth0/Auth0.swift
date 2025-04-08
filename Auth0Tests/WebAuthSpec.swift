@@ -48,7 +48,7 @@ class ValidAuthorizeURLBehavior: Behavior<[String:Any]> {
 }
 
 private func newWebAuth() -> Auth0WebAuth {
-    return Auth0WebAuth(clientId: ClientId, url: DomainURL)
+    return Auth0WebAuth(clientId: ClientId, url: DomainURL, barrier: MockBarrier())
 }
 
 private func defaultQuery(withParameters parameters: [String: String] = [:]) -> [String: String] {
@@ -94,6 +94,12 @@ class WebAuthSpec: QuickSpec {
                 telemetry.info = telemetryInfo
                 let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, telemetry: telemetry)
                 expect(webAuth.telemetry.info) == telemetryInfo
+            }
+
+            it("should init with client id, url & barrier") {
+                let barrier = QueueBarrier.shared
+                let webAuth = Auth0WebAuth(clientId: ClientId, url: DomainURL, barrier: barrier)
+                expect(webAuth.barrier).to(be(barrier))
             }
 
         }
@@ -377,6 +383,23 @@ class WebAuthSpec: QuickSpec {
 
         describe("other builder methods") {
 
+            #if compiler(>=5.10)
+            if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
+                context("custom headers") {
+
+                    it("should not add custom headers by default") {
+                        expect(newWebAuth().headers).to(beEmpty())
+                    }
+
+                    it("should add custom headers") {
+                        let headers = ["X-Foo": "Bar", "X-Baz": "Qux"]
+                        expect(newWebAuth().headers(headers).headers).to(equal(headers))
+                    }
+
+                }
+            }
+            #endif
+
             context("https") {
 
                 it("should not use https callbacks by default") {
@@ -402,6 +425,10 @@ class WebAuthSpec: QuickSpec {
             }
 
             context("nonce") {
+
+                it("should not use a custom nonce value by default") {
+                    expect(newWebAuth().nonce).to(beNil())
+                }
 
                 it("should use a custom nonce value") {
                     let nonce = "foo"
@@ -595,6 +622,7 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should store a new transaction") {
+                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.start { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                     TransactionStore.shared.cancel()
@@ -602,10 +630,40 @@ class WebAuthSpec: QuickSpec {
 
                 it("should cancel the current transaction") {
                     var result: WebAuthResult<Credentials>?
+                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.start { result = $0 }
                     TransactionStore.shared.cancel()
-                    expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
+                    expect(result).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
+                }
+
+            }
+
+            context("barrier") {
+
+                beforeEach {
+                    auth = Auth0WebAuth(clientId: ClientId, url: DomainURL, barrier: QueueBarrier.shared)
+                    QueueBarrier.shared.lower()
+                }
+
+                it("should raise the barrier") {
+                    let expectedError = WebAuthError(code: .transactionActiveAlready)
+                    var result: WebAuthResult<Credentials>?
+                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.start { _ in }
+                    auth.start { result = $0 }
+                    expect(result).toEventually(haveWebAuthError(expectedError))
+                }
+
+                it("should lower the barrier") {
+                    var firstResult: WebAuthResult<Credentials>?
+                    var secondResult: WebAuthResult<Credentials>?
+                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.start { firstResult = $0 }
+                    TransactionStore.shared.cancel()
+                    expect(firstResult).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
+                    auth.start { secondResult = $0 }
+                    expect(secondResult).toEventually(beNil())
                 }
 
             }
@@ -668,22 +726,54 @@ class WebAuthSpec: QuickSpec {
                 }
 
                 it("should store a new transaction") {
+                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.clearSession() { _ in }
                     expect(TransactionStore.shared.current).toNot(beNil())
                 }
 
                 it("should cancel the current transaction") {
+                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.clearSession() { result = $0 }
                     TransactionStore.shared.cancel()
-                    expect(result).to(haveWebAuthError(WebAuthError(code: .userCancelled)))
+                    expect(result).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
                     expect(TransactionStore.shared.current).to(beNil())
                 }
 
                 it("should resume the current transaction") {
+                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
                     auth.clearSession() { result = $0 }
                     _ = TransactionStore.shared.resume(URL(string: "http://fake.com")!)
-                    expect(result).to(beSuccessful())
+                    expect(result).toEventually(beSuccessful())
                     expect(TransactionStore.shared.current).to(beNil())
+                }
+
+            }
+
+            context("barrier") {
+
+                beforeEach {
+                    auth = Auth0WebAuth(clientId: ClientId, url: DomainURL, barrier: QueueBarrier.shared)
+                    QueueBarrier.shared.lower()
+                }
+
+                it("should raise the barrier") {
+                    let expectedError = WebAuthError(code: .transactionActiveAlready)
+                    var result: WebAuthResult<Void>?
+                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.clearSession { _ in }
+                    auth.clearSession { result = $0 }
+                    expect(result).toEventually(haveWebAuthError(expectedError))
+                }
+
+                it("should lower the barrier") {
+                    var firstResult: WebAuthResult<Void>?
+                    var secondResult: WebAuthResult<Void>?
+                    _ = auth.provider({ url, callback in MockUserAgent(callback: callback) })
+                    auth.clearSession { firstResult = $0 }
+                    TransactionStore.shared.cancel()
+                    expect(firstResult).toEventually(haveWebAuthError(WebAuthError(code: .userCancelled)))
+                    auth.clearSession { secondResult = $0 }
+                    expect(secondResult).toEventually(beNil())
                 }
 
             }
@@ -691,6 +781,34 @@ class WebAuthSpec: QuickSpec {
         }
         #endif
 
+    }
+
+}
+
+// - MARK: Mocks
+
+class MockBarrier: Barrier {
+
+    func raise() -> Bool {
+        return true
+    }
+
+    func lower() {}
+
+}
+
+class MockUserAgent: WebAuthUserAgent {
+
+    let callback: WebAuthProviderCallback
+
+    init(callback: @escaping WebAuthProviderCallback) {
+        self.callback = callback
+    }
+
+    func start() {}
+
+    func finish(with result: WebAuthResult<Void>) {
+        self.callback(result)
     }
 
 }

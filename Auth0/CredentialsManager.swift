@@ -857,7 +857,9 @@ public extension CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
     func revoke(headers: [String: String] = [:]) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            self.revoke(headers: headers, continuation.resume)
+            self.revoke(headers: headers) { result in
+                continuation.resume(with: result)
+            }
         }
     }
 
@@ -926,8 +928,9 @@ public extension CredentialsManager {
             self.credentials(withScope: scope,
                              minTTL: minTTL,
                              parameters: parameters,
-                             headers: headers,
-                             callback: continuation.resume)
+                             headers: headers) { result in
+                continuation.resume(with: result)
+            }
         }
     }
 
@@ -1034,7 +1037,9 @@ public extension CredentialsManager {
     /// - <doc:RefreshTokens>
     func renew(parameters: [String: Any] = [:], headers: [String: String] = [:]) async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            self.renew(parameters: parameters, headers: headers, callback: continuation.resume)
+            self.renew(parameters: parameters, headers: headers) { result in
+                continuation.resume(with: result)
+            }
         }
     }
 
