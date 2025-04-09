@@ -515,6 +515,7 @@ public struct CredentialsManager {
                         switch result {
                         case .success(let ssoCredentials):
                             let newCredentials = Credentials(from: credentials,
+                                                             idToken: ssoCredentials.idToken,
                                                              refreshToken: ssoCredentials.refreshToken ?? refreshToken)
                             if !self.store(credentials: newCredentials) {
                                 dispatchGroup.leave()
@@ -994,7 +995,9 @@ public extension CredentialsManager {
     func ssoCredentials(parameters: [String: Any] = [:],
                         headers: [String: String] = [:]) async throws -> SSOCredentials {
         return try await withCheckedThrowingContinuation { continuation in
-            self.ssoCredentials(parameters: parameters, headers: headers, callback: continuation.resume)
+            self.ssoCredentials(parameters: parameters, headers: headers) { result in
+                continuation.resume(with: result)
+            }
         }
     }
 

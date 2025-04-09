@@ -121,9 +121,11 @@ func haveCredentials() -> Nimble.Matcher<CredentialsManagerResult<Credentials>> 
 }
 
 func haveSSOCredentials(_ sessionTransferToken: String,
+                        _ idToken: String,
                         _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<SSOCredentials>> {
     return Matcher<AuthenticationResult<SSOCredentials>>.define("be a successful SSO credentials retrieval") { expression, failureMessage -> MatcherResult in
         return try haveSSOCredentials(sessionTransferToken: sessionTransferToken,
+                                      idToken: idToken,
                                       refreshToken: refreshToken,
                                       expression,
                                       failureMessage)
@@ -131,9 +133,11 @@ func haveSSOCredentials(_ sessionTransferToken: String,
 }
 
 func haveSSOCredentials(_ sessionTransferToken: String,
+                        _ idToken: String,
                         _ refreshToken: String? = nil) -> Nimble.Matcher<CredentialsManagerResult<SSOCredentials>> {
     return Matcher<CredentialsManagerResult<SSOCredentials>>.define("be a successful SSO credentials retrieval") { expression, failureMessage -> MatcherResult in
         return try haveSSOCredentials(sessionTransferToken: sessionTransferToken,
+                                      idToken: idToken,
                                       refreshToken: refreshToken,
                                       expression,
                                       failureMessage)
@@ -282,16 +286,19 @@ private func haveCredentials<E>(accessToken: String?,
 }
 
 private func haveSSOCredentials<E>(sessionTransferToken: String,
+                                   idToken: String,
                                    refreshToken: String?,
                                    _ expression: Nimble.Expression<Result<SSOCredentials, E>>,
                                    _ message: ExpectationMessage) throws -> MatcherResult {
     _ = message.appended(message: " <session_transfer_token: \(sessionTransferToken)>")
+    _ = message.appended(message: " <id_token: \(idToken)>")
     if let refreshToken = refreshToken {
         _ = message.appended(message: " <refresh_token: \(refreshToken)>")
     }
-    return try beSuccessful(expression, message) { (credentials: SSOCredentials) -> Bool in
-        return (credentials.sessionTransferToken == sessionTransferToken)
-        && (refreshToken == nil || credentials.refreshToken == refreshToken)
+    return try beSuccessful(expression, message) { (ssoCredentials: SSOCredentials) -> Bool in
+        return (ssoCredentials.sessionTransferToken == sessionTransferToken)
+        && (ssoCredentials.idToken == idToken)
+        && (refreshToken == nil || ssoCredentials.refreshToken == refreshToken)
     }
 }
 

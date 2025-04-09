@@ -789,6 +789,7 @@ class CredentialsManagerSpec: QuickSpec {
                     $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
                 }, response: authResponse(accessToken: NewAccessToken,
                                           issuedTokenType: IssuedTokenType,
+                                          idToken: NewIdToken,
                                           refreshToken: NewRefreshToken,
                                           expiresIn: ExpiresIn * 2))
                 _ = credentialsManager.store(credentials: credentials)
@@ -828,42 +829,56 @@ class CredentialsManagerSpec: QuickSpec {
                     $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
                 }, response: authResponse(accessToken: NewAccessToken,
                                           issuedTokenType: IssuedTokenType,
+                                          idToken: NewIdToken,
                                           refreshToken: nil,
                                           expiresIn: ExpiresIn * 2))
 
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+                _ = credentialsManager.store(credentials: credentials)
+
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.ssoCredentials { result in
-                        expect(result).to(haveSSOCredentials(NewAccessToken))
+                        expect(result).to(haveSSOCredentials(NewAccessToken, NewIdToken))
+
+                        // let storedCredentials = fetchCredentials(from: store)
+                        // TODO: replace with line above when updating the MRRR PR
+                        let data = try! store.data(forKey: "credentials")
+                        let storedCredentials = try! NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self,
+                                                                                        from: data)
+
+                        expect(storedCredentials?.accessToken) == AccessToken
+                        expect(storedCredentials?.tokenType) == TokenType
+                        expect(storedCredentials?.idToken) == NewIdToken // Gets updated
+                        expect(storedCredentials?.refreshToken) == RefreshToken // Does not get updated
+                        // expect(storedCredentials?.scope) == Scope
+                        // TODO: uncomment line above when updating the MRRR PR
                         done()
                     }
                 }
             }
 
             it("should yield new SSO credentials with refresh token rotation") {
-                waitUntil(timeout: Timeout) { done in
-                    credentialsManager.ssoCredentials { result in
-                        expect(result).to(haveSSOCredentials(NewAccessToken, NewRefreshToken))
-                        done()
-                    }
-                }
-            }
-
-            it("should store the new refresh token") {
                 let store = SimpleKeychain()
-
                 credentialsManager = CredentialsManager(authentication: authentication, storage: store)
                 _ = credentialsManager.store(credentials: credentials)
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.ssoCredentials { result in
-                        expect(result).to(beSuccessful())
+                        expect(result).to(haveSSOCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
 
+                        // let storedCredentials = fetchCredentials(from: store)
+                        // TODO: replace with line above when updating the MRRR PR
                         let data = try! store.data(forKey: "credentials")
                         let storedCredentials = try! NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self,
                                                                                         from: data)
+
                         expect(storedCredentials?.accessToken) == AccessToken
-                        expect(storedCredentials?.idToken) == IdToken
-                        expect(storedCredentials?.refreshToken) == NewRefreshToken
+                        expect(storedCredentials?.tokenType) == TokenType
+                        expect(storedCredentials?.idToken) == NewIdToken // Gets updated
+                        expect(storedCredentials?.refreshToken) == NewRefreshToken // Gets updated
+                        // expect(storedCredentials?.scope) == Scope
+                        // TODO: uncomment line above when updating the MRRR PR
                         done()
                     }
                 }
@@ -928,12 +943,13 @@ class CredentialsManagerSpec: QuickSpec {
                     $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience, key: value])
                 }, response: authResponse(accessToken: NewAccessToken,
                                           issuedTokenType: IssuedTokenType,
+                                          idToken: NewIdToken,
                                           refreshToken: NewRefreshToken,
                                           expiresIn: ExpiresIn * 2))
 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.ssoCredentials(parameters: [key: value]) { result in
-                        expect(result).to(haveSSOCredentials(NewAccessToken, NewRefreshToken))
+                        expect(result).to(haveSSOCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
                         done()
                     }
                 }
@@ -947,6 +963,7 @@ class CredentialsManagerSpec: QuickSpec {
                 NetworkStub.addStub(condition: { $0.hasHeader(key, value: value) },
                                     response: authResponse(accessToken: NewAccessToken,
                                                            issuedTokenType: IssuedTokenType,
+                                                           idToken: NewIdToken,
                                                            refreshToken: NewRefreshToken,
                                                            expiresIn: ExpiresIn))
 
@@ -960,8 +977,10 @@ class CredentialsManagerSpec: QuickSpec {
 
             context("concurrency") {
                 let newAccessToken1 = "new-access-token-1"
+                let newIDToken1 = "new-id-token-1"
                 let newRefreshToken1 = "new-refresh-token-1"
                 let newAccessToken2 = "new-access-token-2"
+                let newIDToken2 = "new-id-token-2"
                 let newRefreshToken2 = "new-refresh-token-2"
 
                 beforeEach {
@@ -978,12 +997,13 @@ class CredentialsManagerSpec: QuickSpec {
                         ])
                     }, response: authResponse(accessToken: newAccessToken1,
                                               issuedTokenType: IssuedTokenType,
+                                              idToken: newIDToken1,
                                               refreshToken: newRefreshToken1,
                                               expiresIn: ExpiresIn))
 
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.ssoCredentials(parameters: ["request": "first"]) { result in
-                            expect(result).to(haveSSOCredentials(newAccessToken1, newRefreshToken1))
+                            expect(result).to(haveSSOCredentials(newAccessToken1, newIDToken1, newRefreshToken1))
 
                             NetworkStub.addStub(condition: {
                                 $0.isToken(Domain) &&
@@ -993,12 +1013,13 @@ class CredentialsManagerSpec: QuickSpec {
                                     "request": "second"])
                             }, response: authResponse(accessToken: newAccessToken2,
                                                       issuedTokenType: IssuedTokenType,
+                                                      idToken: newIDToken2,
                                                       refreshToken: newRefreshToken2,
                                                       expiresIn: ExpiresIn))
                         }
 
                         credentialsManager.ssoCredentials(parameters: ["request": "second"]) { result in
-                            expect(result).to(haveSSOCredentials(newAccessToken2, newRefreshToken2))
+                            expect(result).to(haveSSOCredentials(newAccessToken2, newIDToken2, newRefreshToken2))
                             done()
                         }
                     }
@@ -1014,6 +1035,7 @@ class CredentialsManagerSpec: QuickSpec {
                         ])
                     }, response: authResponse(accessToken: newAccessToken1,
                                               issuedTokenType: IssuedTokenType,
+                                              idToken: newIDToken1,
                                               refreshToken: newRefreshToken1,
                                               expiresIn: ExpiresIn))
                     NetworkStub.addStub(condition: {
@@ -1024,19 +1046,20 @@ class CredentialsManagerSpec: QuickSpec {
                             "request": "second"])
                     }, response: authResponse(accessToken: newAccessToken2,
                                               issuedTokenType: IssuedTokenType,
+                                              idToken: newIDToken2,
                                               refreshToken: newRefreshToken2,
                                               expiresIn: ExpiresIn))
 
                     waitUntil(timeout: Timeout) { done in
                         DispatchQueue.global(qos: .userInitiated).sync {
                             credentialsManager.ssoCredentials(parameters: ["request": "first"]) { result in
-                                expect(result).to(haveSSOCredentials(newAccessToken1, newRefreshToken1))
+                                expect(result).to(haveSSOCredentials(newAccessToken1, newIDToken1, newRefreshToken1))
                             }
                         }
 
                         DispatchQueue.global(qos: .background).sync {
                             credentialsManager.ssoCredentials(parameters: ["request": "second"]) { result in
-                                expect(result).to(haveSSOCredentials(newAccessToken2, newRefreshToken2))
+                                expect(result).to(haveSSOCredentials(newAccessToken2, newIDToken2, newRefreshToken2))
                                 done()
                             }
                         }
@@ -1314,6 +1337,7 @@ class CredentialsManagerSpec: QuickSpec {
                         $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               issuedTokenType: IssuedTokenType,
+                                              idToken: NewIdToken,
                                               refreshToken: NewRefreshToken,
                                               expiresIn: ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
@@ -1360,6 +1384,7 @@ class CredentialsManagerSpec: QuickSpec {
                         $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience, key: value])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               issuedTokenType: IssuedTokenType,
+                                              idToken: NewIdToken,
                                               refreshToken: NewRefreshToken,
                                               expiresIn: ExpiresIn))
 
@@ -1590,9 +1615,10 @@ class CredentialsManagerSpec: QuickSpec {
                         $0.isToken(Domain) &&
                         $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
                     }, response: authResponse(accessToken: NewAccessToken,
-                                                               issuedTokenType: IssuedTokenType,
-                                                               refreshToken: NewRefreshToken,
-                                                               expiresIn: ExpiresIn))
+                                              issuedTokenType: IssuedTokenType,
+                                              idToken: NewIdToken,
+                                              refreshToken: NewRefreshToken,
+                                              expiresIn: ExpiresIn))
 
                     waitUntil(timeout: Timeout) { done in
                         Task.init { [credentialsManager] in
@@ -1615,6 +1641,7 @@ class CredentialsManagerSpec: QuickSpec {
                         $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience, key: value])
                     }, response: authResponse(accessToken: NewAccessToken,
                                               issuedTokenType: IssuedTokenType,
+                                              idToken: NewIdToken,
                                               refreshToken: NewRefreshToken,
                                               expiresIn: ExpiresIn))
 

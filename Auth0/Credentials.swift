@@ -51,6 +51,8 @@ public final class Credentials: NSObject, Sendable {
     /// ## See Also
     ///
     /// - [ID Tokens](https://auth0.com/docs/secure/tokens/id-tokens)
+    /// - [JSON Web Tokens](https://auth0.com/docs/secure/tokens/json-web-tokens)
+    /// - [jwt.io](https://jwt.io)
     public let idToken: String
 
     /// The scopes that have been granted by Auth0.

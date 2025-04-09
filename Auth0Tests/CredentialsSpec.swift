@@ -17,7 +17,11 @@ class CredentialsSpec: QuickSpec {
 
         describe("decode from json") {
 
-            let decoder = JSONDecoder()
+            var decoder: JSONDecoder!
+
+            beforeEach {
+                decoder = JSONDecoder()
+            }
 
             it("should have all properties") {
                 let json = """
