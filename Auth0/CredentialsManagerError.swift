@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents an error during a Credentials Manager operation.
-public struct CredentialsManagerError: Auth0Error {
+public struct CredentialsManagerError: Auth0Error, Sendable {
 
     enum Code: Equatable {
         case noCredentials

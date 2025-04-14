@@ -5,7 +5,7 @@ import Foundation
 /// ## See Also
 ///
 /// - [Standard Error Responses](https://auth0.com/docs/api/authentication#standard-error-responses)
-public struct AuthenticationError: Auth0APIError {
+public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
 
     /// Additional information about the error.
     public let info: [String: Any]

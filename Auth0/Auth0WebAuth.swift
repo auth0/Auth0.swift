@@ -10,6 +10,7 @@ final class Auth0WebAuth: WebAuth {
     let storage: TransactionStore
 
     var telemetry: Telemetry
+    var barrier: Barrier
     var logger: Logger?
 
     #if os(macOS)
@@ -22,6 +23,7 @@ final class Auth0WebAuth: WebAuth {
     private let responseType = "code"
 
     private(set) var parameters: [String: String] = [:]
+    private(set) var headers: [String: String] = [:]
     private(set) var https = false
     private(set) var ephemeralSession = false
     private(set) var issuer: String
@@ -66,12 +68,14 @@ final class Auth0WebAuth: WebAuth {
          url: URL,
          session: URLSession = URLSession.shared,
          storage: TransactionStore = TransactionStore.shared,
-         telemetry: Telemetry = Telemetry()) {
+         telemetry: Telemetry = Telemetry(),
+         barrier: Barrier = QueueBarrier.shared) {
         self.clientId = clientId
         self.url = url
         self.session = session
         self.storage = storage
         self.telemetry = telemetry
+        self.barrier = barrier
         self.issuer = url.absoluteString
     }
 
@@ -99,6 +103,14 @@ final class Auth0WebAuth: WebAuth {
         parameters.forEach { self.parameters[$0] = $1 }
         return self
     }
+
+    #if compiler(>=5.10)
+    @available(iOS 17.4, macOS 14.4, visionOS 1.2, *)
+    func headers(_ headers: [String: String]) -> Self {
+        headers.forEach { self.headers[$0] = $1 }
+        return self
+    }
+    #endif
 
     func redirectURL(_ redirectURL: URL) -> Self {
         self.redirectURL = redirectURL
@@ -166,8 +178,7 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
-
-        if self.storage.current != nil {
+        guard barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
@@ -197,9 +208,12 @@ final class Auth0WebAuth: WebAuth {
                                                   organization: organization,
                                                   invitation: invitation)
 
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, ephemeralSession: ephemeralSession)
-        let userAgent = provider(authorizeURL) { [storage, onCloseCallback] result in
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
+                                                                     ephemeralSession: ephemeralSession,
+                                                                     headers: headers)
+        let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
             storage.clear()
+            barrier.lower()
 
             switch result {
             case .success:
@@ -220,8 +234,7 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
-
-        if self.storage.current != nil {
+        guard barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
@@ -238,9 +251,10 @@ final class Auth0WebAuth: WebAuth {
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL)
-        let userAgent = provider(logoutURL) { [storage] result in
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, headers: headers)
+        let userAgent = provider(logoutURL) { [storage, barrier] result in
             storage.clear()
+            barrier.lower()
             callback(result)
         }
         let transaction = ClearSessionTransaction(userAgent: userAgent)
@@ -263,7 +277,7 @@ final class Auth0WebAuth: WebAuth {
         entries["response_type"] = self.responseType
         entries["redirect_uri"] = redirectURL.absoluteString
         entries["state"] = state
-        entries["nonce"] = nonce
+        entries["nonce"] = self.nonce
         entries["organization"] = organization
         entries["invitation"] = invitation
 
@@ -338,15 +352,17 @@ extension Auth0WebAuth {
 
     func start() async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.main.async {
-                self.start(continuation.resume)
+            Task { @MainActor in
+                self.start { result in
+                    continuation.resume(with: result)
+                }
             }
         }
     }
 
     func clearSession(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.clearSession(federated: federated) { result in
                     continuation.resume(with: result)
                 }

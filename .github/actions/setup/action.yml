@@ -15,14 +15,14 @@ runs:
 
   steps:
     - name: Set up Ruby
-      uses: ruby/setup-ruby@bbda85882f33075a3727c01e3c8d0de0be6146ce # pin@v1.224.0
+      uses: ruby/setup-ruby@e5ac7b085f6e63d49c8973eb0c6e04d876b881f1 # pin@v1.230.0
       with:
         ruby-version: ${{ inputs.ruby }}
         bundler-cache: true
         cache-version: 1
 
     - name: Setup Xcode
-      uses: mxcl/xcodebuild@75cd1d21e22129934f9ca289757708d8af9155f5 # pin@v3.4.0
+      uses: mxcl/xcodebuild@e366f14791346edb74397fe9a762ccee86eddc06 # pin@v3.4.0
       with:
         xcode: ${{ inputs.xcode }}
         action: none

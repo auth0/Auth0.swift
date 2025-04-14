@@ -185,6 +185,9 @@
 		5CFB82572D5E9F9B009FD237 /* APICredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFB82552D5E9F94009FD237 /* APICredentialsSpec.swift */; };
 		5CFB82582D5E9F9B009FD237 /* APICredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFB82552D5E9F94009FD237 /* APICredentialsSpec.swift */; };
 		5CFB82592D5E9F9B009FD237 /* APICredentialsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFB82552D5E9F94009FD237 /* APICredentialsSpec.swift */; };
+		5CFB82612D6D221F009FD237 /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFB82602D6D221C009FD237 /* Barrier.swift */; };
+		5CFB82622D6D221F009FD237 /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFB82602D6D221C009FD237 /* Barrier.swift */; };
+		5CFB82632D6D221F009FD237 /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFB82602D6D221C009FD237 /* Barrier.swift */; };
 		5F06DDC91CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
 		5F06DDCA1CC66B710011842B /* Auth0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F06DDC81CC66B710011842B /* Auth0.swift */; };
 		5F1FBB9A1D8A44C0006B0B85 /* ResponseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1FBB981D8A4465006B0B85 /* ResponseSpec.swift */; };
@@ -689,6 +692,7 @@
 		5CF5392A283835460073F623 /* ASProviderSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASProviderSpec.swift; sourceTree = "<group>"; };
 		5CFB824F2D5BF31D009FD237 /* APICredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICredentials.swift; sourceTree = "<group>"; };
 		5CFB82552D5E9F94009FD237 /* APICredentialsSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICredentialsSpec.swift; sourceTree = "<group>"; };
+		5CFB82602D6D221C009FD237 /* Barrier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Barrier.swift; sourceTree = "<group>"; };
 		5F049B6E1CB42C29006F6C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Auth0/Info.plist; sourceTree = "<group>"; };
 		5F06DD781CC448B10011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F06DD851CC448C90011842B /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1122,6 +1126,7 @@
 				5FAE9C901D8878D400A871CE /* Auth0WebAuth.swift */,
 				5FD255B91D14F70B00387ECB /* WebAuthError.swift */,
 				5C0AF09C2833420200162044 /* WebAuthentication.swift */,
+				5CFB82602D6D221C009FD237 /* Barrier.swift */,
 			);
 			name = WebAuth;
 			sourceTree = "<group>";
@@ -2037,6 +2042,7 @@
 				5CB41D4823D0BA2C00074024 /* IDTokenValidator.swift in Sources */,
 				5C354C04276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5FCAB1711D09005A00331C84 /* NSURLComponents+OAuth2.swift in Sources */,
+				5CFB82632D6D221F009FD237 /* Barrier.swift in Sources */,
 				5FDE876D1D8A424700EA27DC /* Handlers.swift in Sources */,
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				970BC36B25C27095007A7745 /* Challenge.swift in Sources */,
@@ -2117,6 +2123,7 @@
 				5FD255B81D14F00900387ECB /* Auth0Error.swift in Sources */,
 				5C41F6D0244F971700252548 /* JWK+RSA.swift in Sources */,
 				5C41F6C7244F968B00252548 /* AuthTransaction.swift in Sources */,
+				5CFB82612D6D221F009FD237 /* Barrier.swift in Sources */,
 				5FD255B51D14DD2600387ECB /* ManagementError.swift in Sources */,
 				5C0AF09B28330CBA00162044 /* SafariProvider.swift in Sources */,
 				5FE2F8B31CCEAED8003628F4 /* Requestable.swift in Sources */,
@@ -2407,6 +2414,7 @@
 				C1B3BA012C24B6D4004A32A4 /* Array+Encode.swift in Sources */,
 				C1B3BA022C24B6D4004A32A4 /* String+URLSafe.swift in Sources */,
 				C1B3BA032C24B6D4004A32A4 /* NSData+URLSafe.swift in Sources */,
+				5CFB82622D6D221F009FD237 /* Barrier.swift in Sources */,
 				C1B3BA042C24B6D4004A32A4 /* NSURL+Auth0.swift in Sources */,
 				C1B3BA052C24B6D4004A32A4 /* NSURLComponents+OAuth2.swift in Sources */,
 				C1B3BA062C24B6D4004A32A4 /* JWT+Header.swift in Sources */,

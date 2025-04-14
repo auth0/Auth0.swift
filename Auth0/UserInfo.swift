@@ -7,7 +7,7 @@ import Foundation
 /// ## See Also
 ///
 /// - [Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims)
-public struct UserInfo: JSONObjectPayload {
+public struct UserInfo: JSONObjectPayload, @unchecked Sendable {
 
     /// The list of public claims.
     public static let publicClaims = [
