@@ -296,7 +296,7 @@ public struct CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     public func credentials(withScope scope: String? = nil,
                             minTTL: Int = 0,
@@ -388,7 +388,7 @@ public struct CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     public func credentials(withScope scope: String? = nil,
                             minTTL: Int = 0,
@@ -465,7 +465,7 @@ public struct CredentialsManager {
     ///
     /// - [Scopes](https://auth0.com/docs/get-started/apis/scopes)
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     public func apiCredentials(forAudience audience: String,
                                scope: String? = nil,
@@ -518,7 +518,7 @@ public struct CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     public func renew(parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
@@ -818,7 +818,7 @@ public extension CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func credentials(withScope scope: String? = nil,
                      minTTL: Int = 0,
@@ -909,7 +909,7 @@ public extension CredentialsManager {
     ///
     /// - [Scopes](https://auth0.com/docs/get-started/apis/scopes)
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func apiCredentials(forAudience audience: String,
                         scope: String? = nil,
@@ -971,7 +971,7 @@ public extension CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func renew(parameters: [String: Any] = [:],
                headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
@@ -1083,7 +1083,7 @@ public extension CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func credentials(withScope scope: String? = nil,
                      minTTL: Int = 0,
@@ -1156,7 +1156,7 @@ public extension CredentialsManager {
     ///
     /// - [Scopes](https://auth0.com/docs/get-started/apis/scopes)
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func apiCredentials(forAudience audience: String,
                         scope: String? = nil,
@@ -1208,7 +1208,7 @@ public extension CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func renew(parameters: [String: Any] = [:],
                headers: [String: String] = [:]) async throws -> Credentials {
