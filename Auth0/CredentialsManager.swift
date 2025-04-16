@@ -171,7 +171,7 @@ public struct CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
     public func revoke(headers: [String: String] = [:],
                        _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
         guard let credentials = self.retrieveCredentials(),
@@ -739,7 +739,7 @@ public extension CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
     func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {
             Future { callback in
@@ -1019,7 +1019,7 @@ public extension CredentialsManager {
     /// ## See Also
     ///
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
     func revoke(headers: [String: String] = [:]) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             self.revoke(headers: headers) { result in
