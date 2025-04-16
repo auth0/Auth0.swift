@@ -419,7 +419,7 @@ If you're using `WKWebView` to open your website, you can place the session tran
 let cookie = HTTPCookie(properties: [
     .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
     .path: "/",
-    .name: "session_transfer_token",
+    .name: "auth0_session_transfer_token",
     .value: ssoCredentials.sessionTransferToken,
     .expires: ssoCredentials.expiresIn,
     .secure: true
@@ -888,7 +888,7 @@ If you're using `WKWebView` to open your website, you can place the session tran
 let cookie = HTTPCookie(properties: [
     .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
     .path: "/",
-    .name: "session_transfer_token",
+    .name: "auth0_session_transfer_token",
     .value: ssoCredentials.sessionTransferToken,
     .expires: ssoCredentials.expiresIn,
     .secure: true

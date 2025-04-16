@@ -350,7 +350,7 @@ public struct CredentialsManager {
     /// let cookie = HTTPCookie(properties: [
     ///     .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
     ///     .path: "/",
-    ///     .name: "session_transfer_token",
+    ///     .name: "auth0_session_transfer_token",
     ///     .value: ssoCredentials.sessionTransferToken,
     ///     .expires: ssoCredentials.expiresIn,
     ///     .secure: true
@@ -735,7 +735,7 @@ public extension CredentialsManager {
     /// let cookie = HTTPCookie(properties: [
     ///     .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
     ///     .path: "/",
-    ///     .name: "session_transfer_token",
+    ///     .name: "auth0_session_transfer_token",
     ///     .value: ssoCredentials.sessionTransferToken,
     ///     .expires: ssoCredentials.expiresIn,
     ///     .secure: true
@@ -968,7 +968,7 @@ public extension CredentialsManager {
     /// let cookie = HTTPCookie(properties: [
     ///     .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
     ///     .path: "/",
-    ///     .name: "session_transfer_token",
+    ///     .name: "auth0_session_transfer_token",
     ///     .value: ssoCredentials.sessionTransferToken,
     ///     .expires: ssoCredentials.expiresIn,
     ///     .secure: true
