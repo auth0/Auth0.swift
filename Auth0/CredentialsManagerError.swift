@@ -7,6 +7,7 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
         case noCredentials
         case noRefreshToken
         case renewFailed
+        case apiExchangeFailed
         case ssoExchangeFailed
         case storeFailed
         case biometricsFailed
@@ -45,6 +46,10 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
     /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let renewFailed: CredentialsManagerError = .init(code: .renewFailed)
 
+    /// The exchange of the refresh token for API credentials failed.
+    /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let apiExchangeFailed: CredentialsManagerError = .init(code: .apiExchangeFailed)
+
     /// The exchange of the refresh token for SSO credentials failed.
     /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let ssoExchangeFailed: CredentialsManagerError = .init(code: .ssoExchangeFailed)
@@ -77,6 +82,7 @@ extension CredentialsManagerError {
         case .noCredentials: return "No credentials were found in the store."
         case .noRefreshToken: return "The stored credentials instance does not contain a refresh token."
         case .renewFailed: return "The credentials renewal failed."
+        case .apiExchangeFailed: return "The exchange of the refresh token for API credentials failed."
         case .ssoExchangeFailed: return "The exchange of the refresh token for SSO credentials failed."
         case .storeFailed: return "Storing the renewed credentials failed."
         case .biometricsFailed: return "The biometric authentication failed."
