@@ -136,6 +136,30 @@ func haveAPICredentials(_ accessToken: String, _ tokenType: String? = nil, _ sco
     }
 }
 
+func haveSSOCredentials(_ sessionTransferToken: String,
+                        _ idToken: String,
+                        _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<SSOCredentials>> {
+    return Matcher<AuthenticationResult<SSOCredentials>>.define("be a successful SSO credentials retrieval") { expression, failureMessage -> MatcherResult in
+        return try haveSSOCredentials(sessionTransferToken: sessionTransferToken,
+                                      idToken: idToken,
+                                      refreshToken: refreshToken,
+                                      expression,
+                                      failureMessage)
+    }
+}
+
+func haveSSOCredentials(_ sessionTransferToken: String,
+                        _ idToken: String,
+                        _ refreshToken: String? = nil) -> Nimble.Matcher<CredentialsManagerResult<SSOCredentials>> {
+    return Matcher<CredentialsManagerResult<SSOCredentials>>.define("be a successful SSO credentials retrieval") { expression, failureMessage -> MatcherResult in
+        return try haveSSOCredentials(sessionTransferToken: sessionTransferToken,
+                                      idToken: idToken,
+                                      refreshToken: refreshToken,
+                                      expression,
+                                      failureMessage)
+    }
+}
+
 func haveCreatedUser(_ email: String, username: String? = nil) -> Nimble.Matcher<AuthenticationResult<DatabaseUser>> {
     return Matcher<AuthenticationResult<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: DatabaseUser) -> Bool in
@@ -294,6 +318,23 @@ private func haveAPICredentials<E>(accessToken: String,
         return (apiCredentials.accessToken == accessToken)
         && (tokenType == nil || apiCredentials.tokenType == tokenType)
         && (scope == nil || apiCredentials.scope == scope)
+    }
+}
+
+private func haveSSOCredentials<E>(sessionTransferToken: String,
+                                   idToken: String,
+                                   refreshToken: String?,
+                                   _ expression: Nimble.Expression<Result<SSOCredentials, E>>,
+                                   _ message: ExpectationMessage) throws -> MatcherResult {
+    _ = message.appended(message: " <session_transfer_token: \(sessionTransferToken)>")
+    _ = message.appended(message: " <id_token: \(idToken)>")
+    if let refreshToken = refreshToken {
+        _ = message.appended(message: " <refresh_token: \(refreshToken)>")
+    }
+    return try beSuccessful(expression, message) { (ssoCredentials: SSOCredentials) -> Bool in
+        return (ssoCredentials.sessionTransferToken == sessionTransferToken)
+        && (ssoCredentials.idToken == idToken)
+        && (refreshToken == nil || ssoCredentials.refreshToken == refreshToken)
     }
 }
 

@@ -6,7 +6,7 @@ import Nimble
 
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-private let Bearer = "bearer"
+private let TokenType = "bearer"
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let ExpiresIn: TimeInterval = 3600
 private let ExpiresInDate = Date(timeIntervalSinceNow: ExpiresIn)
@@ -17,13 +17,17 @@ class CredentialsSpec: QuickSpec {
 
         describe("decode from json") {
 
-            let decoder = JSONDecoder()
+            var decoder: JSONDecoder!
+
+            beforeEach {
+                decoder = JSONDecoder()
+            }
 
             it("should have all properties") {
                 let json = """
                     {
                         "access_token": "\(AccessToken)",
-                        "token_type": "\(Bearer)",
+                        "token_type": "\(TokenType)",
                         "id_token": "\(IdToken)",
                         "refresh_token": "\(RefreshToken)",
                         "expires_in": "\(ExpiresIn)",
@@ -33,7 +37,7 @@ class CredentialsSpec: QuickSpec {
                 """.data(using: .utf8)!
                 let credentials = try decoder.decode(Credentials.self, from: json)
                 expect(credentials.accessToken) == AccessToken
-                expect(credentials.tokenType) == Bearer
+                expect(credentials.tokenType) == TokenType
                 expect(credentials.idToken) == IdToken
                 expect(credentials.refreshToken) == RefreshToken
                 expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
@@ -45,14 +49,14 @@ class CredentialsSpec: QuickSpec {
                 let json = """
                     {
                         "access_token": "\(AccessToken)",
-                        "token_type": "\(Bearer)",
+                        "token_type": "\(TokenType)",
                         "id_token": "\(IdToken)",
                         "expires_in": "\(ExpiresIn)"
                     }
                 """.data(using: .utf8)!
                 let credentials = try decoder.decode(Credentials.self, from: json)
                 expect(credentials.accessToken) == AccessToken
-                expect(credentials.tokenType) == Bearer
+                expect(credentials.tokenType) == TokenType
                 expect(credentials.idToken) == IdToken
                 expect(credentials.refreshToken).to(beNil())
                 expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
@@ -124,7 +128,7 @@ class CredentialsSpec: QuickSpec {
 
             it("should unarchive as credentials type") {
                 let original = Credentials(accessToken: AccessToken,
-                                           tokenType: Bearer,
+                                           tokenType: TokenType,
                                            idToken: IdToken,
                                            refreshToken: RefreshToken,
                                            expiresIn: ExpiresInDate,
@@ -137,7 +141,7 @@ class CredentialsSpec: QuickSpec {
 
             it("should have all properties") {
                 let original = Credentials(accessToken: AccessToken,
-                                           tokenType: Bearer,
+                                           tokenType: TokenType,
                                            idToken: IdToken,
                                            refreshToken: RefreshToken,
                                            expiresIn: ExpiresInDate,
@@ -146,7 +150,7 @@ class CredentialsSpec: QuickSpec {
                 let data = try NSKeyedArchiver.archivedData(withRootObject: original, requiringSecureCoding: true)
                 let credentials = try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)!
                 expect(credentials.accessToken) == AccessToken
-                expect(credentials.tokenType) == Bearer
+                expect(credentials.tokenType) == TokenType
                 expect(credentials.idToken) == IdToken
                 expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
                 expect(credentials.scope) == Scope
@@ -155,13 +159,13 @@ class CredentialsSpec: QuickSpec {
 
             it("should have only the non-optional properties") {
                 let original = Credentials(accessToken: AccessToken,
-                                           tokenType: Bearer,
+                                           tokenType: TokenType,
                                            idToken: IdToken,
                                            expiresIn: ExpiresInDate)
                 let data = try NSKeyedArchiver.archivedData(withRootObject: original, requiringSecureCoding: true)
                 let credentials = try NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)!
                 expect(credentials.accessToken) == AccessToken
-                expect(credentials.tokenType) == Bearer
+                expect(credentials.tokenType) == TokenType
                 expect(credentials.idToken) == IdToken
                 expect(credentials.refreshToken).to(beNil())
                 expect(credentials.expiresIn).to(beCloseTo(ExpiresInDate, within: 5))
@@ -188,13 +192,13 @@ class CredentialsSpec: QuickSpec {
 
             it("should have all unredacted properties") {
                 let credentials = Credentials(accessToken: AccessToken,
-                                              tokenType: Bearer,
+                                              tokenType: TokenType,
                                               idToken: IdToken,
                                               refreshToken: RefreshToken,
                                               expiresIn: ExpiresInDate,
                                               scope: Scope,
                                               recoveryCode: RecoveryCode)
-                let description = "Credentials(accessToken: \"<REDACTED>\", tokenType: \"\(Bearer)\", idToken:"
+                let description = "Credentials(accessToken: \"<REDACTED>\", tokenType: \"\(TokenType)\", idToken:"
                     + " \"<REDACTED>\", refreshToken: Optional(\"<REDACTED>\"), expiresIn: \(ExpiresInDate), scope:"
                     + " Optional(\"\(Scope)\"), recoveryCode: Optional(\"<REDACTED>\"))"
                 expect(credentials.description) == description
@@ -206,10 +210,10 @@ class CredentialsSpec: QuickSpec {
 
             it("should have only the non-optional unredacted properties") {
                 let credentials = Credentials(accessToken: AccessToken,
-                                              tokenType: Bearer,
+                                              tokenType: TokenType,
                                               idToken: IdToken,
                                               expiresIn: ExpiresInDate)
-                let description = "Credentials(accessToken: \"<REDACTED>\", tokenType: \"\(Bearer)\", idToken:"
+                let description = "Credentials(accessToken: \"<REDACTED>\", tokenType: \"\(TokenType)\", idToken:"
                     + " \"<REDACTED>\", refreshToken: nil, expiresIn: \(ExpiresInDate), scope: nil, recoveryCode: nil)"
                 expect(credentials.description) == description
                 expect(credentials.description).toNot(contain(AccessToken))

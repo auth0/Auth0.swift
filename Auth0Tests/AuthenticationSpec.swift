@@ -16,11 +16,14 @@ private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+private let SessionTransferToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let FacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let Timeout: NimbleTimeInterval = .seconds(2)
-private let TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange"
 private let PasswordlessGrantType = "http://auth0.com/oauth/grant-type/passwordless/otp"
+private let TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange"
+private let SessionTransferTokenTokenType = "urn:auth0:params:oauth:token-type:session_transfer_token"
 
 class AuthenticationSpec: QuickSpec {
     override class func spec() {
@@ -804,7 +807,7 @@ class AuthenticationSpec: QuickSpec {
             }
             
             it("should specify audience and scope in request") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "scope": "openid", "audience" : Audience])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["username": SupportAtAuth0, "password": ValidPassword, "audience" : Audience, "scope": "openid"])} , response: authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword, audience: Audience, scope: "openid").start { result in
                         expect(result).to(beSuccessful())
@@ -1175,6 +1178,79 @@ class AuthenticationSpec: QuickSpec {
                     auth.codeExchange(withCode: invalidCode, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
                         expect(result).to(haveAuthenticationError(code: code, description: description))
                         done()
+                    }
+                }
+            }
+            
+        }
+        
+        describe("sso exchange") {
+            let grantType = "refresh_token"
+            let audience = "urn:\(Domain):session_transfer"
+            
+            it("should exchange the refresh token for a session transfer token without refresh token rotation") {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAllOf([
+                        "refresh_token": RefreshToken,
+                        "grant_type": grantType,
+                        "audience": audience,
+                        "client_id": ClientId
+                    ])
+                }, response: authResponse(accessToken: SessionTransferToken,
+                                          issuedTokenType: SessionTransferTokenTokenType,
+                                          idToken: IdToken))
+                waitUntil(timeout: Timeout) { done in
+                    auth
+                        .ssoExchange(withRefreshToken: RefreshToken)
+                        .start { result in
+                            expect(result).to(haveSSOCredentials(SessionTransferToken, IdToken))
+                            done()
+                    }
+                }
+            }
+            
+            it("should exchange the refresh token for a session transfer token with refresh token rotation") {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAllOf([
+                        "refresh_token": RefreshToken,
+                        "grant_type": grantType,
+                        "audience": audience,
+                        "client_id": ClientId
+                    ])
+                }, response: authResponse(accessToken: SessionTransferToken,
+                                          issuedTokenType: SessionTransferTokenTokenType,
+                                          idToken: IdToken,
+                                          refreshToken: RefreshToken))
+                waitUntil(timeout: Timeout) { done in
+                    auth
+                        .ssoExchange(withRefreshToken: RefreshToken)
+                        .start { result in
+                            expect(result).to(haveSSOCredentials(SessionTransferToken, IdToken, RefreshToken))
+                            done()
+                    }
+                }
+            }
+            
+            it("should fail to exchange the refresh token for a session transfer token") {
+                waitUntil(timeout: Timeout) { done in
+                    let code = "invalid_request"
+                    let description = "missing params"
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAllOf([
+                            "refresh_token": RefreshToken,
+                            "grant_type": grantType,
+                            "audience": audience,
+                            "client_id": ClientId
+                        ])
+                    }, response:authFailure(code: code, description: description))
+                    auth
+                        .ssoExchange(withRefreshToken: RefreshToken)
+                        .start { result in
+                            expect(result).to(haveAuthenticationError(code: code, description: description))
+                            done()
                     }
                 }
             }

@@ -276,6 +276,14 @@ struct Auth0Authentication: Authentication {
         ])
     }
 
+    func ssoExchange(withRefreshToken refreshToken: String) -> Request<SSOCredentials, AuthenticationError> {
+        return self.token().parameters([
+            "refresh_token": refreshToken,
+            "grant_type": "refresh_token",
+            "audience": "urn:\(self.url.host!):session_transfer"
+        ])
+    }
+
     func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         var payload: [String: Any] = [
             "refresh_token": refreshToken,
@@ -353,7 +361,7 @@ private extension Auth0Authentication {
                        telemetry: self.telemetry)
     }
 
-    func token() -> Request<Credentials, AuthenticationError> {
+    func token<T: Codable>() -> Request<T, AuthenticationError> {
         let payload: [String: Any] = [
             "client_id": self.clientId
         ]

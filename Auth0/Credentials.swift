@@ -22,7 +22,7 @@ public final class Credentials: NSObject, Sendable {
     /// - [Audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)
     public let accessToken: String
 
-    /// Type of the access token.
+    /// Indicates how the access token should be used. For example, as a bearer token.
     public let tokenType: String
 
     /// When the access token expires.
@@ -51,6 +51,8 @@ public final class Credentials: NSObject, Sendable {
     /// ## See Also
     ///
     /// - [ID Tokens](https://auth0.com/docs/secure/tokens/id-tokens)
+    /// - [JSON Web Tokens](https://auth0.com/docs/secure/tokens/json-web-tokens)
+    /// - [jwt.io](https://jwt.io)
     public let idToken: String
 
     /// The scopes that have been granted by Auth0.

@@ -12,6 +12,7 @@ private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: 
 private let NewAccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let TokenType = "bearer"
 private let NewTokenType = "DPoP"
+private let IssuedTokenType = "urn:auth0:params:oauth:token-type:session_transfer_token"
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let NewIdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -25,6 +26,7 @@ private let InvalidTTL = Int(ExpiresIn + 1000)
 private let Timeout: NimbleTimeInterval = .seconds(2)
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
+private let SessionTransferAudience = "urn:\(Domain):session_transfer"
 private let ExpiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NzE4NTI0NjMsImV4cCI6MTU0MDIzMDA2MywiYXVkIjoiYXVkaWVuY2UiLCJzdWIiOiIxMjM0NSJ9.Lcz79P1AFAZDI4Yr1teFapFVAmBbdfhGBGbj9dQVeRM"
 private let ValidToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZXN0IiwiaWF0IjoxNTcxOTExNTkyLCJleHAiOjE5MTg5ODAzOTIsImF1ZCI6ImF1ZGllbmNlIiwic3ViIjoic3VifDEyMyJ9.uLNF8IpY6cJTY-RyO3CcqLpCaKGaVekR-DTDoQTlnPk" // Token is valid until 2030
 
@@ -653,6 +655,7 @@ class CredentialsManagerSpec: QuickSpec {
                 it("renewal request should include custom headers") {
                     let key = "foo"
                     let value = "bar"
+                    NetworkStub.clearStubs()
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasHeader(key, value: value) }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
                     _ = credentialsManager.store(credentials: credentials)
@@ -1298,6 +1301,295 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
+        describe("SSO credentials") {
+
+            beforeEach {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                }, response: authResponse(accessToken: NewAccessToken,
+                                          issuedTokenType: IssuedTokenType,
+                                          idToken: NewIdToken,
+                                          refreshToken: NewRefreshToken,
+                                          expiresIn: ExpiresIn * 2))
+                _ = credentialsManager.store(credentials: credentials)
+            }
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+
+            it("should error when there are no SSO credentials stored") {
+                _ = credentialsManager.clear()
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.ssoCredentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noCredentials)))
+                        done()
+                    }
+                }
+            }
+
+            it("should error when there is no refresh token") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: nil)
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.ssoCredentials { result in
+                        expect(result).to(haveCredentialsManagerError(CredentialsManagerError(code: .noRefreshToken)))
+                        done()
+                    }
+                }
+            }
+
+            it("should yield new SSO credentials without refresh token rotation") {
+                NetworkStub.clearStubs()
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                }, response: authResponse(accessToken: NewAccessToken,
+                                          issuedTokenType: IssuedTokenType,
+                                          idToken: NewIdToken,
+                                          refreshToken: nil,
+                                          expiresIn: ExpiresIn * 2))
+
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.ssoCredentials { result in
+                        expect(result).to(haveSSOCredentials(NewAccessToken, NewIdToken))
+
+                        // let storedCredentials = fetchCredentials(from: store)
+                        // TODO: replace with line above when updating the MRRT PR
+                        let data = try! store.data(forKey: "credentials")
+                        let storedCredentials = try! NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self,
+                                                                                        from: data)
+
+                        expect(storedCredentials?.accessToken) == AccessToken
+                        expect(storedCredentials?.tokenType) == TokenType
+                        expect(storedCredentials?.idToken) == NewIdToken // Gets updated
+                        expect(storedCredentials?.refreshToken) == RefreshToken // Does not get updated
+                        // expect(storedCredentials?.scope) == Scope
+                        // TODO: uncomment line above when updating the MRRT PR
+                        done()
+                    }
+                }
+            }
+
+            it("should yield new SSO credentials with refresh token rotation") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+                _ = credentialsManager.store(credentials: credentials)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.ssoCredentials { result in
+                        expect(result).to(haveSSOCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+
+                        // let storedCredentials = fetchCredentials(from: store)
+                        // TODO: replace with line above when updating the MRRT PR
+                        let data = try! store.data(forKey: "credentials")
+                        let storedCredentials = try! NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self,
+                                                                                        from: data)
+
+                        expect(storedCredentials?.accessToken) == AccessToken
+                        expect(storedCredentials?.tokenType) == TokenType
+                        expect(storedCredentials?.idToken) == NewIdToken // Gets updated
+                        expect(storedCredentials?.refreshToken) == NewRefreshToken // Gets updated
+                        // expect(storedCredentials?.scope) == Scope
+                        // TODO: uncomment line above when updating the MRRT PR
+                        done()
+                    }
+                }
+            }
+
+            it("should yield error on failed SSO exchange") {
+                let errorCode = "invalid_request"
+                let errorDescription = "missing_params"
+
+                NetworkStub.clearStubs()
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                }, response: authFailure(code: errorCode, description: errorDescription))
+
+                let cause = AuthenticationError(info: ["error": errorCode, "error_description": errorDescription])
+                let expectedError = CredentialsManagerError(code: .ssoExchangeFailed, cause: cause)
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.ssoCredentials { result in
+                        expect(result).to(haveCredentialsManagerError(expectedError))
+                        done()
+                    }
+                }
+            }
+
+            it("should yield error on failed store") {
+                class MockStore: CredentialsStorage {
+                    func getEntry(forKey: String) -> Data? {
+                        let credentials = Credentials(accessToken: AccessToken, idToken: IdToken, refreshToken: RefreshToken)
+                        let data = try? NSKeyedArchiver.archivedData(withRootObject: credentials,
+                                                                     requiringSecureCoding: true)
+                        return data
+                    }
+
+                    func setEntry(_ data: Data, forKey: String) -> Bool {
+                        return false
+                    }
+
+                    func deleteEntry(forKey: String) -> Bool {
+                        return true
+                    }
+                }
+
+                credentialsManager = CredentialsManager(authentication: authentication, storage: MockStore())
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.ssoCredentials { result in
+                        expect(result).to(haveCredentialsManagerError(.storeFailed))
+                        done()
+                    }
+                }
+            }
+
+            it("SSO exchange request should include custom parameters") {
+                let key = "foo"
+                let value = "bar"
+
+                NetworkStub.clearStubs()
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) &&
+                    $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience, key: value])
+                }, response: authResponse(accessToken: NewAccessToken,
+                                          issuedTokenType: IssuedTokenType,
+                                          idToken: NewIdToken,
+                                          refreshToken: NewRefreshToken,
+                                          expiresIn: ExpiresIn * 2))
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.ssoCredentials(parameters: [key: value]) { result in
+                        expect(result).to(haveSSOCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        done()
+                    }
+                }
+            }
+
+            it("SSO exchange request should include custom headers") {
+                let key = "foo"
+                let value = "bar"
+
+                NetworkStub.clearStubs()
+                NetworkStub.addStub(condition: { $0.hasHeader(key, value: value) },
+                                    response: authResponse(accessToken: NewAccessToken,
+                                                           issuedTokenType: IssuedTokenType,
+                                                           idToken: NewIdToken,
+                                                           refreshToken: NewRefreshToken,
+                                                           expiresIn: ExpiresIn))
+
+                waitUntil(timeout: Timeout) { done in
+                    credentialsManager.ssoCredentials(headers: [key: value]) { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            context("concurrency") {
+                let newAccessToken1 = "new-access-token-1"
+                let newIDToken1 = "new-id-token-1"
+                let newRefreshToken1 = "new-refresh-token-1"
+                let newAccessToken2 = "new-access-token-2"
+                let newIDToken2 = "new-id-token-2"
+                let newRefreshToken2 = "new-refresh-token-2"
+
+                beforeEach {
+                    NetworkStub.clearStubs()
+                }
+
+                it("should perform the SSO exchange serially from the same thread") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "refresh_token": RefreshToken,
+                            "audience": SessionTransferAudience,
+                            "request": "first"
+                        ])
+                    }, response: authResponse(accessToken: newAccessToken1,
+                                              issuedTokenType: IssuedTokenType,
+                                              idToken: newIDToken1,
+                                              refreshToken: newRefreshToken1,
+                                              expiresIn: ExpiresIn))
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.ssoCredentials(parameters: ["request": "first"]) { result in
+                            expect(result).to(haveSSOCredentials(newAccessToken1, newIDToken1, newRefreshToken1))
+
+                            NetworkStub.addStub(condition: {
+                                $0.isToken(Domain) &&
+                                $0.hasAtLeast([
+                                    "refresh_token": newRefreshToken1,
+                                    "audience": SessionTransferAudience,
+                                    "request": "second"])
+                            }, response: authResponse(accessToken: newAccessToken2,
+                                                      issuedTokenType: IssuedTokenType,
+                                                      idToken: newIDToken2,
+                                                      refreshToken: newRefreshToken2,
+                                                      expiresIn: ExpiresIn))
+                        }
+
+                        credentialsManager.ssoCredentials(parameters: ["request": "second"]) { result in
+                            expect(result).to(haveSSOCredentials(newAccessToken2, newIDToken2, newRefreshToken2))
+                            done()
+                        }
+                    }
+                }
+
+                it("should perform the SSO exchange serially from different threads") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "refresh_token": RefreshToken,
+                            "audience": SessionTransferAudience,
+                            "request": "first"
+                        ])
+                    }, response: authResponse(accessToken: newAccessToken1,
+                                              issuedTokenType: IssuedTokenType,
+                                              idToken: newIDToken1,
+                                              refreshToken: newRefreshToken1,
+                                              expiresIn: ExpiresIn))
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "refresh_token": newRefreshToken1,
+                            "audience": SessionTransferAudience,
+                            "request": "second"])
+                    }, response: authResponse(accessToken: newAccessToken2,
+                                              issuedTokenType: IssuedTokenType,
+                                              idToken: newIDToken2,
+                                              refreshToken: newRefreshToken2,
+                                              expiresIn: ExpiresIn))
+
+                    waitUntil(timeout: Timeout) { done in
+                        DispatchQueue.global(qos: .userInitiated).sync {
+                            credentialsManager.ssoCredentials(parameters: ["request": "first"]) { result in
+                                expect(result).to(haveSSOCredentials(newAccessToken1, newIDToken1, newRefreshToken1))
+                            }
+                        }
+
+                        DispatchQueue.global(qos: .background).sync {
+                            credentialsManager.ssoCredentials(parameters: ["request": "second"]) { result in
+                                expect(result).to(haveSSOCredentials(newAccessToken2, newIDToken2, newRefreshToken2))
+                                done()
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        }
+
         describe("renew") {
 
             beforeEach {
@@ -1645,6 +1937,95 @@ class CredentialsManagerSpec: QuickSpec {
 
             }
 
+            context("SSO credentials") {
+
+                beforeEach {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                    }, response: authResponse(accessToken: NewAccessToken,
+                                              issuedTokenType: IssuedTokenType,
+                                              idToken: NewIdToken,
+                                              refreshToken: NewRefreshToken,
+                                              expiresIn: ExpiresIn))
+                    _ = credentialsManager.store(credentials: credentials)
+                }
+
+                afterEach {
+                    NetworkStub.clearStubs()
+                }
+
+                it("should emit only one value") {
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .ssoCredentials()
+                            .assertNoFailure()
+                            .count()
+                            .sink(receiveValue: { count in
+                                expect(count) == 1
+                                done()
+                            })
+                            .store(in: &cancellables)
+                    }
+                }
+
+                it("should complete using the default parameter values") {
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .ssoCredentials()
+                            .sink(receiveCompletion: { completion in
+                                guard case .finished = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
+                    }
+                }
+
+                it("should complete using custom parameter values") {
+                    let key = "foo"
+                    let value = "bar"
+
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasHeader(key, value: value) &&
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience, key: value])
+                    }, response: authResponse(accessToken: NewAccessToken,
+                                              issuedTokenType: IssuedTokenType,
+                                              idToken: NewIdToken,
+                                              refreshToken: NewRefreshToken,
+                                              expiresIn: ExpiresIn))
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .ssoCredentials(parameters: [key: value], headers: [key: value])
+                            .sink(receiveCompletion: { completion in
+                                guard case .finished = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
+                    }
+                }
+
+                it("should complete with an error") {
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) &&  $0.hasAtLeast(["subject_token": RefreshToken]) },
+                                        response: authFailure(code: "invalid_request", description: "missing_params"))
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager
+                            .ssoCredentials()
+                            .ignoreOutput()
+                            .sink(receiveCompletion: { completion in
+                                guard case .failure = completion else { return }
+                                done()
+                            }, receiveValue: { _ in })
+                            .store(in: &cancellables)
+                    }
+                }
+
+            }
+
             context("renew") {
 
                 beforeEach {
@@ -1879,6 +2260,77 @@ class CredentialsManagerSpec: QuickSpec {
                         Task.init { [credentialsManager] in
                             do {
                                 _ = try await credentialsManager!.apiCredentials(forAudience: Audience)
+                            } catch {
+                                done()
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            context("SSO credentials") {
+
+                beforeEach {
+                    _ = credentialsManager.store(credentials: credentials)
+                }
+
+                it("should exchange the refresh token for SSO credentials using the default parameter values") {
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
+                    }, response: authResponse(accessToken: NewAccessToken,
+                                              issuedTokenType: IssuedTokenType,
+                                              idToken: NewIdToken,
+                                              refreshToken: NewRefreshToken,
+                                              expiresIn: ExpiresIn))
+
+                    waitUntil(timeout: Timeout) { done in
+                        Task.init { [credentialsManager] in
+                            let newCredentials = try await credentialsManager!.ssoCredentials()
+                            expect(newCredentials.sessionTransferToken) == NewAccessToken
+                            expect(newCredentials.refreshToken) == NewRefreshToken
+                            done()
+                        }
+                    }
+                }
+
+                it("should exchange the refresh token for SSO credentials using custom parameter values") {
+                    let key = "foo"
+                    let value = "bar"
+
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasHeader(key, value: value) &&
+                        $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience, key: value])
+                    }, response: authResponse(accessToken: NewAccessToken,
+                                              issuedTokenType: IssuedTokenType,
+                                              idToken: NewIdToken,
+                                              refreshToken: NewRefreshToken,
+                                              expiresIn: ExpiresIn))
+
+                    waitUntil(timeout: Timeout) { done in
+                        Task.init { [credentialsManager] in
+                            let newCredentials = try await credentialsManager!.ssoCredentials(parameters: [key: value],
+                                                                                              headers: [key: value])
+                            expect(newCredentials.sessionTransferToken) == NewAccessToken
+                            expect(newCredentials.refreshToken) == NewRefreshToken
+                            done()
+                        }
+                    }
+                }
+
+                it("should throw an error") {
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) &&  $0.hasAtLeast(["subject_token": RefreshToken]) },
+                                        response: authFailure(code: "invalid_request", description: "missing_params"))
+
+                    waitUntil(timeout: Timeout) { done in
+                        Task.init { [credentialsManager] in
+                            do {
+                                _ = try await credentialsManager!.ssoCredentials()
                             } catch {
                                 done()
                             }
