@@ -77,23 +77,22 @@ func apiFailureResponse(string: String, statusCode: Int) -> RequestResponse {
     }
 }
 
-func authResponse(accessToken: String, idToken: String? = nil, refreshToken: String? = nil, expiresIn: Double? = nil) -> RequestResponse {
+func authResponse(accessToken: String,
+                  tokenType: String = "bearer",
+                  issuedTokenType: String? = nil,
+                  idToken: String,
+                  refreshToken: String? = nil,
+                  expiresIn: Double = 3600) -> RequestResponse {
     var json = [
         "access_token": accessToken,
-        "token_type": "bearer",
+        "token_type": tokenType,
+        "expires_in": String(expiresIn),
+        "id_token": idToken
     ]
 
-    if let idToken = idToken {
-        json["id_token"] = idToken
-    }
+    json["issued_token_type"] = issuedTokenType
+    json["refresh_token"] = refreshToken
 
-    if let refreshToken = refreshToken {
-        json["refresh_token"] = refreshToken
-    }
-
-    if let expires = expiresIn {
-        json["expires_in"] = String(expires)
-    }
     return apiSuccessResponse(json: json)
 }
 
