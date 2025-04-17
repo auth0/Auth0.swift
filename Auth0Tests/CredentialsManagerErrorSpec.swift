@@ -97,6 +97,12 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for SSO exchange failed") {
+                let message = "The exchange of the refresh token for SSO credentials failed."
+                let error = CredentialsManagerError(code: .ssoExchangeFailed)
+                expect(error.localizedDescription) == message
+            }
+
             it("should return message for store failed") {
                 let message = "Storing the renewed credentials failed."
                 let error = CredentialsManagerError(code: .storeFailed)

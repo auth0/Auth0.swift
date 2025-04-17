@@ -11,9 +11,10 @@ import LocalAuthentication
 /// Credentials management utility for securely storing and retrieving the user's credentials from the Keychain.
 ///
 /// - Warning: The Credentials Manager is not thread-safe, except for its
-/// ``CredentialsManager/credentials(withScope:minTTL:parameters:headers:callback:)`` and
-/// ``CredentialsManager/renew(parameters:headers:callback:)`` methods. To avoid concurrency issues, do not call its
-/// non thread-safe methods and properties from different threads without proper synchronization.
+/// ``CredentialsManager/credentials(withScope:minTTL:parameters:headers:callback:)``,
+/// ``CredentialsManager/ssoCredentials(parameters:headers:callback:)``, and
+/// ``CredentialsManager/renew(parameters:headers:callback:)`` methods. To avoid concurrency issues, do not
+/// call its non thread-safe methods and properties from different threads without proper synchronization.
 ///
 /// ## See Also
 ///
@@ -25,7 +26,6 @@ public struct CredentialsManager {
     private let storeKey: String
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
-    private let dispatchGroup = DispatchGroup()
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     #endif
@@ -315,6 +315,70 @@ public struct CredentialsManager {
     }
     #endif
 
+    /// Exchanges the refresh token for a session transfer token that can be used to perform web single sign-on (SSO).
+    /// **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// credentialsManager.ssoCredentials { result in
+    ///     switch result {
+    ///     case .success(let ssoCredentials):
+    ///         print("Obtained SSO credentials: \(ssoCredentials)")
+    ///     case .failure(let error):
+    ///         print("Failed with: \(error)")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// If you need to specify custom parameters or headers:
+    ///
+    /// ```swift
+    /// credentialsManager.ssoCredentials(parameters: ["key": "value"],
+    ///                                   headers: ["key": "value"]) { print($0) }
+    /// ```
+    ///
+    /// When opening your website on any browser or web view, add the session transfer token to the URL as a query
+    /// parameter. Then your website can redirect the user to Auth0's `/authorize` endpoint, passing along the query
+    /// parameter with the session transfer token. For example,
+    /// `https://example.com/login?session_transfer_token=THE_TOKEN`.
+    ///
+    /// If you're using `WKWebView` to open your website, you can place the session transfer token inside a cookie
+    /// instead. It will be automatically sent to the `/authorize` endpoint.
+    ///
+    /// ```swift
+    /// let cookie = HTTPCookie(properties: [
+    ///     .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
+    ///     .path: "/",
+    ///     .name: "auth0_session_transfer_token",
+    ///     .value: ssoCredentials.sessionTransferToken,
+    ///     .expires: ssoCredentials.expiresIn,
+    ///     .secure: true
+    /// ])!
+    ///
+    /// webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - parameters: Additional parameters to use.
+    ///   - headers:    Additional headers to use.
+    ///   - callback:   Callback that receives a `Result` containing either the SSO credentials or an error.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// there is no refresh token, the callback will be called with a ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
+    public func ssoCredentials(parameters: [String: Any] = [:],
+                               headers: [String: String] = [:],
+                               callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+        self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: callback)
+    }
+
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
     ///
     /// ## Usage
@@ -365,30 +429,31 @@ public struct CredentialsManager {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
-    // swiftlint:disable:next function_body_length
     private func retrieveCredentials(withScope scope: String? = nil,
                                      minTTL: Int = 0,
                                      parameters: [String: Any],
                                      headers: [String: String],
                                      forceRenewal: Bool = false,
                                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+
         self.dispatchQueue.async {
-            self.dispatchGroup.enter()
+            dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
                 guard let credentials = retrieveCredentials() else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noCredentials))
                 }
                 guard forceRenewal ||
                       self.hasExpired(credentials) ||
                       self.willExpire(credentials, within: minTTL) ||
                       self.hasScopeChanged(credentials, from: scope) else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.success(credentials))
                 }
                 guard let refreshToken = credentials.refreshToken else {
-                    self.dispatchGroup.leave()
+                    dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
 
@@ -399,32 +464,74 @@ public struct CredentialsManager {
                     .start { result in
                         switch result {
                         case .success(let credentials):
-                            let newCredentials = Credentials(accessToken: credentials.accessToken,
-                                                             tokenType: credentials.tokenType,
-                                                             idToken: credentials.idToken,
-                                                             refreshToken: credentials.refreshToken ?? refreshToken,
-                                                             expiresIn: credentials.expiresIn,
-                                                             scope: credentials.scope)
+                            let newCredentials = Credentials(from: credentials,
+                                                            refreshToken: credentials.refreshToken ?? refreshToken)
                             if self.willExpire(newCredentials, within: minTTL) {
                                 let tokenLifetime = Int(credentials.expiresIn.timeIntervalSinceNow)
                                 let error = CredentialsManagerError(code: .largeMinTTL(minTTL: minTTL, lifetime: tokenLifetime))
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(error))
                             } else if !self.store(credentials: newCredentials) {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
-                                self.dispatchGroup.leave()
+                                dispatchGroup.leave()
                                 callback(.success(newCredentials))
                             }
                         case .failure(let error):
-                            self.dispatchGroup.leave()
+                            dispatchGroup.leave()
                             callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
                         }
                     }
             }
 
-            self.dispatchGroup.wait()
+            dispatchGroup.wait()
+        }
+    }
+
+    private func retrieveSSOCredentials(parameters: [String: Any],
+                                        headers: [String: String],
+                                        callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+        let dispatchGroup = DispatchGroup()
+
+        self.dispatchQueue.async {
+            dispatchGroup.enter()
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                guard let credentials = retrieveCredentials() else {
+                    dispatchGroup.leave()
+                    return callback(.failure(.noCredentials))
+                }
+                guard let refreshToken = credentials.refreshToken else {
+                    dispatchGroup.leave()
+                    return callback(.failure(.noRefreshToken))
+                }
+
+                self.authentication
+                    .ssoExchange(withRefreshToken: refreshToken)
+                    .parameters(parameters)
+                    .headers(headers)
+                    .start { result in
+                        switch result {
+                        case .success(let ssoCredentials):
+                            let newCredentials = Credentials(from: credentials,
+                                                             idToken: ssoCredentials.idToken,
+                                                             refreshToken: ssoCredentials.refreshToken ?? refreshToken)
+                            if !self.store(credentials: newCredentials) {
+                                dispatchGroup.leave()
+                                callback(.failure(CredentialsManagerError(code: .storeFailed)))
+                            } else {
+                                dispatchGroup.leave()
+                                callback(.success(ssoCredentials))
+                            }
+                        case .failure(let error):
+                            dispatchGroup.leave()
+                            callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: error)))
+                        }
+                    }
+            }
+
+            dispatchGroup.wait()
         }
     }
 
@@ -583,6 +690,78 @@ public extension CredentialsManager {
                                         parameters: parameters,
                                         headers: headers,
                                         callback: callback)
+            }
+        }.eraseToAnyPublisher()
+    }
+
+    /// Exchanges the refresh token for a session transfer token that can be used to perform web single sign-on (SSO).
+    /// **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// credentialsManager
+    ///     .ssoCredentials()
+    ///     .sink(receiveCompletion: { completion in
+    ///         if case .failure(let error) = completion {
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }, receiveValue: { ssoCredentials in
+    ///         print("Obtained SSO credentials: \(ssoCredentials)")
+    ///     })
+    ///     .store(in: &cancellables)
+    /// ```
+    ///
+    /// If you need to specify custom parameters or headers:
+    ///
+    /// ```swift
+    /// credentialsManager
+    ///     .ssoCredentials(parameters: ["key": "value"],
+    ///                     headers: ["key": "value"])
+    ///     .sink(receiveCompletion: { print($0) },
+    ///           receiveValue: { print($0) })
+    ///     .store(in: &cancellables)
+    /// ```
+    ///
+    /// When opening your website on any browser or web view, add the session transfer token to the URL as a query
+    /// parameter. Then your website can redirect the user to Auth0's `/authorize` endpoint, passing along the query
+    /// parameter with the session transfer token. For example,
+    /// `https://example.com/login?session_transfer_token=THE_TOKEN`.
+    ///
+    /// If you're using `WKWebView` to open your website, you can place the session transfer token inside a cookie
+    /// instead. It will be automatically sent to the `/authorize` endpoint.
+    ///
+    /// ```swift
+    /// let cookie = HTTPCookie(properties: [
+    ///     .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
+    ///     .path: "/",
+    ///     .name: "auth0_session_transfer_token",
+    ///     .value: ssoCredentials.sessionTransferToken,
+    ///     .expires: ssoCredentials.expiresIn,
+    ///     .secure: true
+    /// ])!
+    ///
+    /// webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - parameters: Additional parameters to use.
+    ///   - headers:    Additional headers to use.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// there is no refresh token, the callback will be called with a ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
+    func ssoCredentials(parameters: [String: Any] = [:],
+                        headers: [String: String] = [:]) -> AnyPublisher<SSOCredentials, CredentialsManagerError> {
+        return Deferred {
+            Future { callback in
+                return self.ssoCredentials(parameters: parameters, headers: headers, callback: callback)
             }
         }.eraseToAnyPublisher()
     }
@@ -751,6 +930,72 @@ public extension CredentialsManager {
                              minTTL: minTTL,
                              parameters: parameters,
                              headers: headers) { result in
+                continuation.resume(with: result)
+            }
+        }
+    }
+
+    /// Exchanges the refresh token for a session transfer token that can be used to perform web single sign-on (SSO).
+    /// **This method is thread-safe**.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// do {
+    ///     let ssoCredentials = try await credentialsManager.ssoCredentials()
+    ///     print("Obtained SSO credentials: \(ssoCredentials)")
+    /// } catch {
+    ///     print("Failed with: \(error)")
+    /// }
+    /// ```
+    ///
+    /// If you need to specify custom parameters or headers:
+    ///
+    /// ```swift
+    /// let ssoCredentials = try await credentialsManager.ssoCredentials(parameters: ["key": "value"],
+    ///                                                                  headers: ["key": "value"])
+    /// ```
+    ///
+    /// When opening your website on any browser or web view, add the session transfer token to the URL as a query
+    /// parameter. Then your website can redirect the user to Auth0's `/authorize` endpoint, passing along the query
+    /// parameter with the session transfer token. For example,
+    /// `https://example.com/login?session_transfer_token=THE_TOKEN`.
+    ///
+    /// If you're using `WKWebView` to open your website, you can place the session transfer token inside a cookie
+    /// instead. It will be automatically sent to the `/authorize` endpoint.
+    ///
+    /// ```swift
+    /// let cookie = HTTPCookie(properties: [
+    ///     .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
+    ///     .path: "/",
+    ///     .name: "auth0_session_transfer_token",
+    ///     .value: ssoCredentials.sessionTransferToken,
+    ///     .expires: ssoCredentials.expiresIn,
+    ///     .secure: true
+    /// ])!
+    ///
+    /// webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - parameters: Additional parameters to use.
+    ///   - headers:    Additional headers to use.
+    /// - Returns: SSO credentials contaning a session transfer token.
+    /// - Throws: An error of type ``CredentialsManagerError``.
+    /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
+    /// there is no refresh token, the callback will be called with a ``CredentialsManagerError/noRefreshToken`` error.
+    /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
+    /// Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+    ///
+    /// ## See Also
+    ///
+    /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+    /// - <doc:RefreshTokens>
+    func ssoCredentials(parameters: [String: Any] = [:],
+                        headers: [String: String] = [:]) async throws -> SSOCredentials {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.ssoCredentials(parameters: parameters, headers: headers) { result in
                 continuation.resume(with: result)
             }
         }

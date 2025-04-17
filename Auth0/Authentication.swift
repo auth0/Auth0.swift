@@ -12,7 +12,6 @@ public typealias DatabaseUser = (email: String, username: String?, verified: Boo
  ## See Also
 
  - ``AuthenticationError``
- - [Standard Error Responses](https://auth0.com/docs/api/authentication#standard-error-responses)
  */
 public protocol Authentication: Trackable, Loggable {
 
@@ -66,8 +65,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
-     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/authenticate-user)
      */
     func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -113,8 +111,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authenticate-user)
-     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-verify)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/authenticate-user)
      */
     func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -161,6 +158,10 @@ public protocol Authentication: Trackable, Loggable {
      - Returns: Request that will yield Auth0 user's credentials.
      - Requires: The `http://auth0.com/oauth/grant-type/password-realm` grant. Check
      [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/resource-owner-password-flow/get-token)
      */
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -192,7 +193,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-one-time-password-otp-)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-mfa-with-otp)
      */
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
@@ -225,7 +226,7 @@ public protocol Authentication: Trackable, Loggable {
     ///
     /// ## See Also
     ///
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-out-of-band-oob-)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-out-of-band)
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using a recovery code.
@@ -260,7 +261,7 @@ public protocol Authentication: Trackable, Loggable {
     /// ## See Also
     ///
     /// - ``Credentials/recoveryCode``
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-recovery-code)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-recovery-code)
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
     /// Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
@@ -294,7 +295,7 @@ public protocol Authentication: Trackable, Loggable {
     ///
     /// ## See Also
     ///
-    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#challenge-request)
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/request-mfa-challenge)
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
 
     /**
@@ -338,7 +339,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#token-exchange-for-native-social)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange-for-native-social/token-exchange-native-social)
      */
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -383,7 +384,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#token-exchange-for-native-social)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange-for-native-social/token-exchange-native-social)
      */
     func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -425,6 +426,10 @@ public protocol Authentication: Trackable, Loggable {
        - audience: API Identifier that your application is requesting access to.
        - scope:    Space-separated list of requested scope values.
      - Returns: A request that will yield Auth0 user's credentials.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/resource-owner-password-flow/get-token)
      */
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
@@ -484,7 +489,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#signup)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/signup/create-a-new-user)
      */
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
@@ -508,7 +513,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#change-password)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/change-password/change-password)
      */
     func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError>
 
@@ -544,8 +549,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
-     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/get-code-or-link)
      */
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
@@ -581,8 +585,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-code-or-link)
-     - [Error Responses](https://auth0.com/docs/api/authentication#post-passwordless-start)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/get-code-or-link)
      */
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
 
@@ -610,13 +613,13 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#get-user-info)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/user-profile/get-user-info)
      */
     func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError>
 
     /**
      Performs the last step of Proof Key for Code Exchange (PKCE).
-     This will request the user's tokens using the code and its verifier after a request to `/oauth/authorize`.
+     This will request the user's credentials using the code and its verifier after a request to `/oauth/authorize`.
 
      ## Usage
 
@@ -644,10 +647,61 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#authorization-code-flow-with-pkce45)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/authorization-code-flow-with-pkce/get-token-pkce)
      - [RFC 7636](https://tools.ietf.org/html/rfc7636)
      */
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
+
+    /**
+     Exchanges a user's refresh token for a session transfer token that can be used to perform web single sign-on
+     (SSO).
+
+     ## Usage
+
+     ```swift
+     Auth0
+         .authentication()
+         .ssoExchange(refreshToken: credentials.refreshToken)
+         .start { result in
+             switch result {
+             case .success(let ssoCredentials):
+                 print("Obtained new SSO credentials: \(ssoCredentials)")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
+     When opening your website on any browser or web view, add the session transfer token to the URL as a query
+     parameter. Then your website can redirect the user to Auth0's `/authorize` endpoint, passing along the query
+     parameter with the session transfer token. For example,
+     `https://example.com/login?session_transfer_token=THE_TOKEN`.
+
+     If you're using `WKWebView` to open your website, you can place the session transfer token inside a cookie
+     instead. It will be automatically sent to the `/authorize` endpoint.
+
+     ```swift
+     let cookie = HTTPCookie(properties: [
+         .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
+         .path: "/",
+         .name: "auth0_session_transfer_token",
+         .value: ssoCredentials.sessionTransferToken,
+         .expires: ssoCredentials.expiresIn,
+         .secure: true
+     ])!
+
+     webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+     ```
+
+     - Parameter refreshToken: The refresh token.
+     - Returns: A request that will yield SSO credentials.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
+     - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
+     */
+    func ssoExchange(withRefreshToken: String) -> Request<SSOCredentials, AuthenticationError>
 
     /**
      Renews the user's credentials using a refresh token.
@@ -685,8 +739,8 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
      - <doc:RefreshTokens>
      */
     func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
@@ -708,7 +762,7 @@ public protocol Authentication: Trackable, Loggable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#revoke-refresh-token)
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
      - [Error Responses](https://auth0.com/docs/api/authentication#post-oauth-revoke)
      */
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError>

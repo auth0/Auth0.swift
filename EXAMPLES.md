@@ -164,6 +164,7 @@ Web Auth will only produce `WebAuthError` error values. You can find the underly
 - [Retrieve stored user information](#retrieve-stored-user-information)
 - [Clear stored credentials](#clear-stored-credentials)
 - [Biometric authentication](#biometric-authentication)
+- [Other credentials](#other-credentials)
 - [Credentials Manager errors](#credentials-manager-errors)
 
 The Credentials Manager utility allows you to securely store and retrieve the user's credentials from the Keychain.
@@ -173,7 +174,7 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 ```
 
 > [!CAUTION]
-> The Credentials Manager is not thread-safe, except for its `credentials()` and `renew()` methods. To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
+> The Credentials Manager is not thread-safe, except for its `credentials()`, `ssoCredentials()`, and `renew()` methods. To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
 
 ### Store credentials
 
@@ -352,6 +353,81 @@ credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID or passcode"
 > [!NOTE]
 > Retrieving the user information with `credentialsManager.user` will not be protected by biometric authentication.
 
+### Other credentials
+
+#### SSO credentials
+
+To implement single sign-on (SSO) with Universal Login, you can use either `ASWebAuthenticationSession` or `SFSafariViewController` as the in-app browser. Each [has its own advantages and disadvantages](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents), and suit different use cases.
+
+An alternative way to implement SSO is by making use of a session transfer token. This is a single-use, short-lived token you must send to your website –either via query parameter or cookie– when opening it from your app. Your website then needs to redirect the user to Auth0's `/authorize` endpoint, passing along the session transfer token. Auth0 will set the respective session cookies and then redirect the user back to your website. Now, the user will be logged in on your website too. **This solution will work with any browser and webview –even standalone browser apps**.
+
+First, you need to exchange the refresh token for a set of SSO credentials containing a session transfer token. **This method is thread-safe**.
+
+```swift
+credentialsManager.ssoCredentials { result in
+    switch result {
+    case .success(let ssoCredentials):
+        print("Obtained SSO credentials: \(ssoCredentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let ssoCredentials = try await credentialsManager.ssoCredentials()
+    print("Obtained SSO credentials: \(ssoCredentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+credentialsManager
+    .ssoCredentials()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { ssoCredentials in
+        print("Obtained SSO credentials: \(ssoCredentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+> [!NOTE]
+> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+
+> [!CAUTION]
+> To ensure that no concurrent exchange requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+
+Then, when opening your website on any browser or web view, add the session transfer token to the URL as a query parameter.
+For example, `https://example.com/login?session_transfer_token=THE_TOKEN`.
+
+If you're using `WKWebView` to open your website, you can place the session transfer token inside a cookie instead. It will be automatically sent to the `/authorize` endpoint.
+
+```swift
+let cookie = HTTPCookie(properties: [
+    .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
+    .path: "/",
+    .name: "auth0_session_transfer_token",
+    .value: ssoCredentials.sessionTransferToken,
+    .expires: ssoCredentials.expiresIn,
+    .secure: true
+])!
+
+webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+```
+
 ### Credentials Manager errors
 
 The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror) to learn more about the error cases you need to handle, and which ones include a `cause` value.
@@ -370,6 +446,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 - [Passwordless login](#passwordless-login)
 - [Retrieve user information](#retrieve-user-information)
 - [Renew credentials](#renew-credentials)
+- [Get SSO credentials](#get-sso-credentials)
 - [Authentication API client configuration](#authentication-api-client-configuration)
 - [Authentication API client errors](#authentication-api-client-errors)
 
@@ -736,6 +813,89 @@ Auth0
 
 > [!NOTE]
 > You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+
+### Get SSO credentials
+
+To implement single sign-on (SSO) with Universal Login, you can use either `ASWebAuthenticationSession` or `SFSafariViewController` as the in-app browser. Each [has its own advantages and disadvantages](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents), and suit different use cases.
+
+An alternative way to implement SSO is by making use of a session transfer token. This is a one-use, short-lived token you must send to your website –either via query parameter or cookie– when opening it from your app. Your website then needs to redirect the user to Auth0's `/authorize` endpoint, passing along the session transfer token. Auth0 will set the respective session cookies and then redirect the user back to your website. Now, the user will be logged in on your website too. **This solution will work with any browser and webview –even standalone browser apps**.
+
+First, you need to exchange the refresh token for a set of SSO credentials containing a session transfer token.
+
+```swift
+Auth0
+    .authentication()
+    .ssoExchange(withRefreshToken: credentials.refreshToken)
+    .start { result in
+        switch result {
+        case .success(let ssoCredentials):
+            print("Obtained SSO credentials: \(ssoCredentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let ssoCredentials = try await Auth0
+        .authentication()
+        .ssoExchange(withRefreshToken: credentials.refreshToken)
+        .start()
+    print("Obtained SSO credentials: \(ssoCredentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .ssoExchange(withRefreshToken: credentials.refreshToken)
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { ssoCredentials in
+        print("Obtained SSO credentials: \(ssoCredentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+> [!NOTE]
+> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+
+> [!IMPORTANT]
+> You don't need to store the SSO credentials. The session transfer token is single-use and short-lived. However, if you're using [refresh token rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation), you will get a new refresh token with the SSO credentials. You should store the new refresh token, replacing the previous one that is now invalid.
+>
+> If you're using the Credentials Manager to store the user's credentials, you should use its `ssoCredentials()` method to perform the exchange. It will automatically handle the refresh tokens for you. And it's also thread-safe, whereas this method is not.
+
+Then, when opening your website on any browser or web view, add the session transfer token to the URL as a query parameter.
+For example, `https://example.com/login?session_transfer_token=THE_TOKEN`.
+
+If you're using `WKWebView` to open your website, you can place the session transfer token inside a cookie instead. It will be automatically sent to the `/authorize` endpoint.
+
+```swift
+let cookie = HTTPCookie(properties: [
+    .domain: "YOUR_AUTH0_DOMAIN", // Or custom domain, if your website is using one
+    .path: "/",
+    .name: "auth0_session_transfer_token",
+    .value: ssoCredentials.sessionTransferToken,
+    .expires: ssoCredentials.expiresIn,
+    .secure: true
+])!
+
+webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+```
 
 ### Authentication API client configuration
 
