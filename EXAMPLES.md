@@ -355,7 +355,10 @@ credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID or passcode"
 
 ### Other credentials
 
-#### SSO credentials
+#### SSO credentials [EA]
+
+> [!NOTE]  
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
 
 To implement single sign-on (SSO) with Universal Login, you can use either `ASWebAuthenticationSession` or `SFSafariViewController` as the in-app browser. Each [has its own advantages and disadvantages](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents), and suit different use cases.
 
@@ -427,6 +430,9 @@ let cookie = HTTPCookie(properties: [
 
 webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 ```
+
+> [!IMPORTANT]
+> Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the provided Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
 
 ### Credentials Manager errors
 
