@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - "15.0.1"
+          - "16.0"
 
     steps:
       - name: Checkout code
