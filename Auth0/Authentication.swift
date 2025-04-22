@@ -656,6 +656,12 @@ public protocol Authentication: Trackable, Loggable {
      Exchanges a user's refresh token for a session transfer token that can be used to perform web single sign-on
      (SSO).
 
+     ## Availability
+
+     This feature is currently available in
+     [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+     Please reach out to Auth0 support to get it enabled for your tenant.
+
      ## Usage
 
      ```swift
@@ -692,6 +698,11 @@ public protocol Authentication: Trackable, Loggable {
 
      webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
      ```
+
+     > Important: Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the
+     one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website
+     is using the provided Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the
+     other hand, if your website is using a custom domain, use this value instead.
 
      - Parameter refreshToken: The refresh token.
      - Returns: A request that will yield SSO credentials.
