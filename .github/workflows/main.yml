@@ -30,7 +30,7 @@ jobs:
               - { os: macOS, scheme: Auth0.macOS }
               - { os: tvOS, scheme: Auth0.tvOS }
             xcode: 
-              - '15.0.1'
+              - '16.0'
 
         steps:
             - name: Checkout
