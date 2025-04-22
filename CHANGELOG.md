@@ -1,5 +1,19 @@
 # Change Log
 
+## [2.11.0](https://github.com/auth0/Auth0.swift/tree/2.11.0) (2025-04-17)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.10.0...2.11.0)
+
+**Added**
+- Added support for Native to Web SSO [SDK-5543] [\#927](https://github.com/auth0/Auth0.swift/pull/927) ([Widcket](https://github.com/Widcket))
+- Added support for custom headers when using `ASWebAuthenticationSession` [\#923](https://github.com/auth0/Auth0.swift/pull/923) ([Widcket](https://github.com/Widcket))
+- Added `Sendable` conformance [\#919](https://github.com/auth0/Auth0.swift/pull/919) ([Widcket](https://github.com/Widcket))
+
+**Changed**
+- Updated SimpleKeychain and JWTDecode.swift [\#931](https://github.com/auth0/Auth0.swift/pull/931) ([Widcket](https://github.com/Widcket))
+
+**Fixed**
+- Prevented `ASWebAuthenticationSession` crash when browser reloads due to cookies being cleared [\#904](https://github.com/auth0/Auth0.swift/pull/904) ([Widcket](https://github.com/Widcket))
+
 ## [2.10.0](https://github.com/auth0/Auth0.swift/tree/2.10.0) (2024-10-14)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.9.0...2.10.0)
 
