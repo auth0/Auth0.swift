@@ -2,6 +2,7 @@
 // swiftlint:disable function_parameter_count
 
 import Foundation
+import AuthenticationServices
 
 /// A newly created database user (just the email, username, and email verified flag).
 public typealias DatabaseUser = (email: String, username: String?, verified: Bool)
@@ -588,6 +589,39 @@ public protocol Authentication: Trackable, Loggable {
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/get-code-or-link)
      */
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
+
+    #if !os(watchOS)
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func login(signupPasskey: ASAuthorizationPlatformPublicKeyCredentialRegistration,
+               userID: String, // TODO: Needs to be Base64URL encoded
+               sessionID: String,
+               realmOrConnection: String?,
+               audience: String?,
+               scope: String?) -> Request<Credentials, AuthenticationError>
+    #endif
+
+    #if !os(watchOS)
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String,
+                                phoneNumber: String?,
+                                username: String?,
+                                name: String?,
+                                realmOrConnection: String?) -> Request<PasskeySignupChallenge, AuthenticationError>
+
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String,
+                                username: String?,
+                                name: String?,
+                                realmOrConnection: String?) -> Request<PasskeySignupChallenge, AuthenticationError>
+
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String?,
+                                username: String,
+                                name: String?,
+                                realmOrConnection: String?) -> Request<PasskeySignupChallenge, AuthenticationError>
+    #endif
 
     /**
      Returns OIDC standard claims information by performing a request to the `/userinfo` endpoint.
