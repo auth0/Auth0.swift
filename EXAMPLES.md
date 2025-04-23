@@ -355,7 +355,10 @@ credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID or passcode"
 
 ### Other credentials
 
-#### SSO credentials
+#### SSO credentials [EA]
+
+> [!NOTE]  
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
 
 To implement single sign-on (SSO) with Universal Login, you can use either `ASWebAuthenticationSession` or `SFSafariViewController` as the in-app browser. Each [has its own advantages and disadvantages](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents), and suit different use cases.
 
@@ -428,6 +431,9 @@ let cookie = HTTPCookie(properties: [
 webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 ```
 
+> [!IMPORTANT]
+> Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the provided Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
+
 ### Credentials Manager errors
 
 The Credentials Manager will only produce `CredentialsManagerError` error values. You can find the underlying error (if any) in the `cause: Error?` property of the `CredentialsManagerError`. Not all error cases will have an underlying `cause`. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanagererror) to learn more about the error cases you need to handle, and which ones include a `cause` value.
@@ -446,7 +452,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 - [Passwordless login](#passwordless-login)
 - [Retrieve user information](#retrieve-user-information)
 - [Renew credentials](#renew-credentials)
-- [Get SSO credentials](#get-sso-credentials)
+- [Get SSO credentials [EA]](#get-sso-credentials-ea)
 - [Authentication API client configuration](#authentication-api-client-configuration)
 - [Authentication API client errors](#authentication-api-client-errors)
 
@@ -814,7 +820,10 @@ Auth0
 > [!NOTE]
 > You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
 
-### Get SSO credentials
+### Get SSO credentials [EA]
+
+> [!NOTE]  
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
 
 To implement single sign-on (SSO) with Universal Login, you can use either `ASWebAuthenticationSession` or `SFSafariViewController` as the in-app browser. Each [has its own advantages and disadvantages](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents), and suit different use cases.
 
@@ -896,6 +905,9 @@ let cookie = HTTPCookie(properties: [
 
 webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 ```
+
+> [!IMPORTANT]
+> Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the provided Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
 
 ### Authentication API client configuration
 
