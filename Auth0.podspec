@@ -44,7 +44,7 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://twitter.com/auth0'
   s.source_files     = 'Auth0/*.swift'
   s.resource_bundles = { s.name => 'Auth0/PrivacyInfo.xcprivacy' }
-  s.swift_versions   = ['5.9']
+  s.swift_versions   = ['6.0', '6.1']
 
   s.dependency 'SimpleKeychain', '1.3.0'
   s.dependency 'JWTDecode', '3.3.0'
