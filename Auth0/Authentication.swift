@@ -592,10 +592,10 @@ public protocol Authentication: Trackable, Loggable {
 
     #if !os(watchOS)
     @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
-    func login(signupPasskey: ASAuthorizationPlatformPublicKeyCredentialRegistration,
-               userID: String, // TODO: Needs to be Base64URL encoded
-               sessionID: String,
-               realmOrConnection: String?,
+    func login(signupPasskey attestation: ASAuthorizationPlatformPublicKeyCredentialRegistration,
+               userId: String, // TODO: Needs to be Base64URL encoded
+               sessionId: String,
+               realmOrConnection realm: String?,
                audience: String?,
                scope: String?) -> Request<Credentials, AuthenticationError>
     #endif
@@ -862,6 +862,64 @@ public extension Authentication {
     func multifactorChallenge(mfaToken: String, types: [String]? = nil, authenticatorId: String? = nil) -> Request<Challenge, AuthenticationError> {
         return self.multifactorChallenge(mfaToken: mfaToken, types: types, authenticatorId: authenticatorId)
     }
+
+    #if !os(watchOS)
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func login(signupPasskey attestation: ASAuthorizationPlatformPublicKeyCredentialRegistration,
+               userId: String,
+               sessionId: String,
+               realmOrConnection realm: String? = nil,
+               audience: String? = nil,
+               scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+        self.login(signupPasskey: attestation,
+                   userId: userId,
+                   sessionId: sessionId,
+                   realmOrConnection: realm,
+                   audience: audience,
+                   scope: scope)
+    }
+    #endif
+
+    #if !os(watchOS)
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String,
+                                phoneNumber: String? = nil,
+                                username: String? = nil,
+                                name: String? = nil,
+                                realmOrConnection realm: String? = nil) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           realmOrConnection: realm)
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String? = nil,
+                                phoneNumber: String,
+                                username: String? = nil,
+                                name: String? = nil,
+                                realmOrConnection realm: String? = nil) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           realmOrConnection: realm)
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String? = nil,
+                                phoneNumber: String? = nil,
+                                username: String,
+                                name: String? = nil,
+                                realmOrConnection realm: String? = nil) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           realmOrConnection: realm)
+    }
+    #endif
 
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents? = nil, profile: [String: Any]? = nil, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         return self.login(appleAuthorizationCode: authorizationCode, fullName: fullName, profile: profile, audience: audience, scope: scope)
