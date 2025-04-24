@@ -592,10 +592,10 @@ public protocol Authentication: Trackable, Loggable {
 
     #if !os(watchOS)
     @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
-    func login(signupPasskey attestation: ASAuthorizationPlatformPublicKeyCredentialRegistration,
+    func login(signupPasskey: ASAuthorizationPlatformPublicKeyCredentialRegistration,
                userId: String, // TODO: Needs to be Base64URL encoded
                sessionId: String,
-               realmOrConnection realm: String?,
+               realmOrConnection: String?,
                audience: String?,
                scope: String?) -> Request<Credentials, AuthenticationError>
     #endif

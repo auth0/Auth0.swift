@@ -1,3 +1,6 @@
+// swiftlint:disable file_length
+// swiftlint:disable type_body_length
+
 import Foundation
 
 struct Auth0Authentication: Authentication {
@@ -143,6 +146,47 @@ struct Auth0Authentication: Authentication {
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
+
+    #if !os(watchOS)
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String,
+                                phoneNumber: String?,
+                                username: String?,
+                                name: String?,
+                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           realm: realm)
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String,
+                                username: String?,
+                                name: String?,
+                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           realm: realm)
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String?,
+                                username: String,
+                                name: String?,
+                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           realm: realm)
+    }
+    #endif
 
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = [:]
@@ -351,6 +395,37 @@ private extension Auth0Authentication {
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
+
+    #if !os(watchOS)
+    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String?,
+                                username: String?,
+                                name: String?,
+                                realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        let url = URL(string: "passkey/register", relativeTo: self.url)!
+
+        var userProfile: [String: Any] = [:]
+        userProfile["email"] = email
+        userProfile["phone_number"] = phoneNumber
+        userProfile["username"] = username
+        userProfile["name"] = name
+
+        var payload: [String: Any] = [
+            "client_id": self.clientId,
+            "user_profile": userProfile
+        ]
+        payload["realm"] = realm
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: codable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+    #endif
 
     func token<T: Codable>() -> Request<T, AuthenticationError> {
         let payload: [String: Any] = [
