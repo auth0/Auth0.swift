@@ -51,11 +51,12 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target   = '14.0'
   s.ios.exclude_files       = macos_files
-  s.ios.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
+  s.ios.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'}
+  s.pod_target_xcconfig = { 'SWIFT_STRICT_CONCURRENCY' => 'minimal' }
 
   s.osx.deployment_target   = '11.0'
   s.osx.exclude_files       = ios_files
-  s.osx.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
+  s.osx.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'}
 
   s.tvos.deployment_target = '14.0'
   s.tvos.exclude_files     = excluded_files
@@ -65,5 +66,5 @@ Pod::Spec.new do |s|
 
   s.visionos.deployment_target = '1.0'
   s.visionos.exclude_files = macos_files
-  s.visionos.pod_target_xcconfig =  { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM' }
+  s.visionos.pod_target_xcconfig =  { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM'}
 end
