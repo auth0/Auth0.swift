@@ -2,6 +2,7 @@
 // swiftlint:disable type_body_length
 
 import Foundation
+import AuthenticationServices
 
 struct Auth0Authentication: Authentication {
 
@@ -147,47 +148,6 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    #if !os(watchOS)
-    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
-    func passkeySignupChallenge(email: String,
-                                phoneNumber: String?,
-                                username: String?,
-                                name: String?,
-                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
-        return self.passkeySignupChallenge(email: email,
-                                           phoneNumber: phoneNumber,
-                                           username: username,
-                                           name: name,
-                                           realm: realm)
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
-    func passkeySignupChallenge(email: String?,
-                                phoneNumber: String,
-                                username: String?,
-                                name: String?,
-                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
-        return self.passkeySignupChallenge(email: email,
-                                           phoneNumber: phoneNumber,
-                                           username: username,
-                                           name: name,
-                                           realm: realm)
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
-    func passkeySignupChallenge(email: String?,
-                                phoneNumber: String?,
-                                username: String,
-                                name: String?,
-                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
-        return self.passkeySignupChallenge(email: email,
-                                           phoneNumber: phoneNumber,
-                                           username: username,
-                                           name: name,
-                                           realm: realm)
-    }
-    #endif
-
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = [:]
         var profile: [String: Any] = profile ?? [:]
@@ -248,6 +208,93 @@ struct Auth0Authentication: Authentication {
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
+
+    #if !os(watchOS)
+    @available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
+    // swiftlint:disable:next function_parameter_count
+    func login(signupPasskey attestation: ASAuthorizationPlatformPublicKeyCredentialRegistration,
+               userId: String,
+               sessionId: String,
+               realmOrConnection realm: String?,
+               audience: String?,
+               scope: String?) -> Request<Credentials, AuthenticationError> {
+        let decoded = attestation.decode()!
+        let url = URL(string: "oauth/token", relativeTo: self.url)!
+
+        var authenticatorResponse: [String: Any] = [
+            "id": decoded.id,
+            "rawId": decoded.rawId,
+            "type": "public-key",
+            "response": [
+                "clientDataJSON": decoded.clientData,
+                "attestationObject": decoded.attestationObject,
+                "authenticatorData": decoded.authenticatorData,
+                "signature": decoded.credential,
+                "userHandle": userId
+            ]
+        ]
+
+        authenticatorResponse["authenticatorAttachment"] = decoded.attachment
+
+        var payload: [String: Any] = [
+            "client_id": self.clientId,
+            "grant_type": "urn:okta:params:oauth:grant-type:webauthn",
+            "auth_session": sessionId,
+            "authn_response": authenticatorResponse
+        ]
+
+        payload["realm"] = realm
+        payload["audience"] = audience
+        payload["scope"] = includeRequiredScope(in: scope)
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: codable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
+    @available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String,
+                                phoneNumber: String?,
+                                username: String?,
+                                name: String?,
+                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           realm: realm)
+    }
+
+    @available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String,
+                                username: String?,
+                                name: String?,
+                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           realm: realm)
+    }
+
+    @available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
+    func passkeySignupChallenge(email: String?,
+                                phoneNumber: String?,
+                                username: String,
+                                name: String?,
+                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
+        return self.passkeySignupChallenge(email: email,
+                                           phoneNumber: phoneNumber,
+                                           username: username,
+                                           name: name,
+                                           realm: realm)
+    }
+    #endif
 
     func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError> {
         let payload = [
@@ -397,7 +444,7 @@ private extension Auth0Authentication {
     }
 
     #if !os(watchOS)
-    @available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+    @available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
     func passkeySignupChallenge(email: String?,
                                 phoneNumber: String?,
                                 username: String?,

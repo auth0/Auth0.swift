@@ -4,13 +4,14 @@ import AuthenticationServices
 struct PasskeyAttestation {
     let id: String
     let rawId: String
+    let attachment: String?
     let attestationObject: String
     let authenticatorData: String
     let clientData: String
     let credential: String
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 16.0, *)
+@available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
 extension ASAuthorizationPlatformPublicKeyCredentialRegistration {
 
     func decode() -> PasskeyAttestation? {
@@ -30,10 +31,27 @@ extension ASAuthorizationPlatformPublicKeyCredentialRegistration {
 
         return PasskeyAttestation(id: credentialID,
                                   rawId: credentialID,
+                                  attachment: self.attachment.stringValue,
                                   attestationObject: attestationObject,
                                   authenticatorData: authenticatorData,
                                   clientData: clientData,
                                   credential: credential)
+    }
+
+}
+
+@available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
+extension ASAuthorizationPublicKeyCredentialAttachment {
+
+    var stringValue: String? {
+        switch self {
+        case .platform:
+            return "platform"
+        case .crossPlatform:
+            return "cross-platform"
+        @unknown default:
+            return nil
+        }
     }
 
 }
