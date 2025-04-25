@@ -497,8 +497,7 @@ public protocol Authentication: Trackable, Loggable {
     #if !os(watchOS)
     @available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
     func login(signupPasskey: ASAuthorizationPlatformPublicKeyCredentialRegistration,
-               userId: String,
-               sessionId: String,
+               signupChallenge: PasskeySignupChallenge,
                realmOrConnection: String?,
                audience: String?,
                scope: String?) -> Request<Credentials, AuthenticationError>
@@ -880,14 +879,12 @@ public extension Authentication {
     #if !os(watchOS)
     @available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
     func login(signupPasskey attestation: ASAuthorizationPlatformPublicKeyCredentialRegistration,
-               userId: String,
-               sessionId: String,
+               signupChallenge challenge: PasskeySignupChallenge,
                realmOrConnection realm: String? = nil,
                audience: String? = nil,
                scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         self.login(signupPasskey: attestation,
-                   userId: userId,
-                   sessionId: sessionId,
+                   signupChallenge: challenge,
                    realmOrConnection: realm,
                    audience: audience,
                    scope: scope)

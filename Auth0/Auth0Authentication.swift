@@ -211,10 +211,8 @@ struct Auth0Authentication: Authentication {
 
     #if !os(watchOS)
     @available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
-    // swiftlint:disable:next function_parameter_count
     func login(signupPasskey attestation: ASAuthorizationPlatformPublicKeyCredentialRegistration,
-               userId: String,
-               sessionId: String,
+               signupChallenge challenge: PasskeySignupChallenge,
                realmOrConnection realm: String?,
                audience: String?,
                scope: String?) -> Request<Credentials, AuthenticationError> {
@@ -229,8 +227,8 @@ struct Auth0Authentication: Authentication {
                 "clientDataJSON": decoded.clientData,
                 "attestationObject": decoded.attestationObject,
                 "authenticatorData": decoded.authenticatorData,
-                "signature": decoded.credential,
-                "userHandle": userId
+                "signature": decoded.signature,
+                "userHandle": challenge.credentialCreationOptions.user.id.encodeBase64URLSafe()
             ]
         ]
 
@@ -239,7 +237,7 @@ struct Auth0Authentication: Authentication {
         var payload: [String: Any] = [
             "client_id": self.clientId,
             "grant_type": "urn:okta:params:oauth:grant-type:webauthn",
-            "auth_session": sessionId,
+            "auth_session": challenge.authenticationSession,
             "authn_response": authenticatorResponse
         ]
 

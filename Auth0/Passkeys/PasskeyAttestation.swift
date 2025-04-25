@@ -6,9 +6,9 @@ struct PasskeyAttestation {
     let rawId: String
     let attachment: String?
     let attestationObject: String
-    let authenticatorData: String
     let clientData: String
-    let credential: String
+    let authenticatorData: String
+    let signature: String
 }
 
 @available(iOS 16.6, macOS 12.0, tvOS 16.0, *)
@@ -19,23 +19,16 @@ extension ASAuthorizationPlatformPublicKeyCredentialRegistration {
             return nil
         }
 
-        let credentialOffset = 32 + 1 + 4 // Relying party ID hash (32) + flags (1) + counter (4)
-
-        guard let credentialID = self.credentialID.a0_encodeBase64URLSafe(),
-              let clientData = self.rawClientDataJSON.a0_encodeBase64URLSafe(),
-              let attestationObject = rawAttestationObject.a0_encodeBase64URLSafe(),
-              let authenticatorData = rawAttestationObject.prefix(credentialOffset).a0_encodeBase64URLSafe(),
-              let credential = rawAttestationObject.suffix(credentialOffset).a0_encodeBase64URLSafe() else {
-            return nil
-        }
+        let credentialID = self.credentialID.encodeBase64URLSafe()
+        let offset = 32 + 1 + 4 // Relying party ID hash (32) + flags (1) + counter (4)
 
         return PasskeyAttestation(id: credentialID,
                                   rawId: credentialID,
                                   attachment: self.attachment.stringValue,
-                                  attestationObject: attestationObject,
-                                  authenticatorData: authenticatorData,
-                                  clientData: clientData,
-                                  credential: credential)
+                                  attestationObject: rawAttestationObject.encodeBase64URLSafe(),
+                                  clientData: self.rawClientDataJSON.encodeBase64URLSafe(),
+                                  authenticatorData: rawAttestationObject.prefix(offset).encodeBase64URLSafe(),
+                                  signature: rawAttestationObject.suffix(offset).encodeBase64URLSafe())
     }
 
 }
