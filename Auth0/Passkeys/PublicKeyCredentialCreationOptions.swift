@@ -7,8 +7,8 @@ public struct PublicKeyCredentialCreationOptions {
     public let user: PublicKeyUser
     public let challengeData: Data
     public let credentialParameters: [PublicKeyCredentialParameters]
-    public let timeout: Int // ? MyAcc, AuthAPI
     public let selectionCriteria: AuthenticatorSelectionCriteria // ? MyAcc, AuthAPI
+    public let timeout: Int // ? MyAcc, AuthAPI
 
     // var excludeCredentials: [PublicKeyCredentialDescriptor]? // NOT in MyAcc/AuthAPI
     // var hints: [String]? // NOT in MyAcc/AuthAPI
@@ -61,8 +61,8 @@ extension PublicKeyCredentialCreationOptions: Codable {
         case user
         case challengeData = "challenge"
         case credentialParameters = "pubKeyCredParams"
-        case timeout
         case selectionCriteria = "authenticatorSelection"
+        case timeout
     }
 
     public init(from decoder: Decoder) throws {

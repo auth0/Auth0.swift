@@ -144,6 +144,17 @@ func haveSSOCredentials(_ sessionTransferToken: String,
     }
 }
 
+func havePasskeySignupChallenge(identifier: String,
+                                name: String? = nil) -> Nimble.Matcher<AuthenticationResult<PasskeySignupChallenge>> {
+    let definition = "have passkey signup challenge with user identifier <\(identifier)>"
+    return Matcher<AuthenticationResult<PasskeySignupChallenge>>.define(definition) { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage) { (created: PasskeySignupChallenge) -> Bool in
+            return created.credentialCreationOptions.user.name == identifier &&
+            (name == nil || created.credentialCreationOptions.user.displayName == name)
+        }
+    }
+}
+
 func haveCreatedUser(_ email: String, username: String? = nil) -> Nimble.Matcher<AuthenticationResult<DatabaseUser>> {
     return Matcher<AuthenticationResult<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: DatabaseUser) -> Bool in
@@ -386,6 +397,10 @@ extension URLRequest {
         return isMethodPOST && isHost(domain) && isPath("/mfa/challenge")
     }
     
+    func isPasskeySignupChallenge(_ domain: String) -> Bool {
+        return isMethodPOST && isHost(domain) && isPath("/passkey/register")
+    }
+    
     func hasHeader(_ name: String, value: String) -> Bool {
         return self.value(forHTTPHeaderField: name) == value
     }
@@ -401,12 +416,22 @@ extension URLRequest {
         })
     }
     
-    func hasAtLeast(_ parameters: [String: String]) -> Bool {
+    func hasAtLeast(_ parameters: [String: Any]) -> Bool {
         guard let payload = self.payload else { return false }
-        let entries = parameters.filter { (key, _) in payload.contains { (name, _) in  key == name } }
-        return entries.count == parameters.count && entries.reduce(true, { (initial, entry) -> Bool in
-            return initial && payload[entry.0] as? String == entry.1
-        })
+
+        let strParams = parameters.filter { $0.value is String } as! [String: String]
+        let strPayload = payload.filter { $0.value is String } as! [String: String]
+        if !Auth0Tests.hasAtLeast(parameters: strParams, payload: strPayload) { return false }
+
+        let dictParams = parameters.filter { $0.value is [String: String] } as! [String: [String: String]]
+        let dictPayload = payload.filter { $0.value is [String: String] } as! [String: [String: String]]
+
+        for (paramKey, paramValue) in dictParams {
+            guard let payloadValue = dictPayload[paramKey] else { return false }
+            if !Auth0Tests.hasAtLeast(parameters: paramValue, payload: payloadValue) { return false }
+        }
+
+        return true
     }
     
     func hasUserMetadata(_ metadata: [String: String]) -> Bool {
@@ -436,4 +461,11 @@ extension URLRequest {
             return initial && parameters[item.name] == item.value
         })
     }
+}
+
+func hasAtLeast(parameters: [String: String], payload: [String: String]) -> Bool {
+    let entries = parameters.filter { (key, _) in payload.contains { (name, _) in key == name } }
+    return entries.count == parameters.count && entries.reduce(true, { (initial, entry) -> Bool in
+        return initial && payload[entry.0] == entry.1
+    })
 }
