@@ -5,7 +5,7 @@ public struct PublicKeyCredentialCreationOptions {
 
     public let relyingParty: PublicKeyRelyingParty
     public let user: PublicKeyUser
-    public let challenge: Data
+    public let challengeData: Data
     public let credentialParameters: [PublicKeyCredentialParameters]
     public let timeout: Int // ? MyAcc, AuthAPI
     public let selectionCriteria: AuthenticatorSelectionCriteria // ? MyAcc, AuthAPI
@@ -59,7 +59,7 @@ extension PublicKeyCredentialCreationOptions: Codable {
     enum CodingKeys: String, CodingKey {
         case relyingParty = "rp"
         case user
-        case challenge
+        case challengeData = "challenge"
         case credentialParameters = "pubKeyCredParams"
         case timeout
         case selectionCriteria = "authenticatorSelection"
@@ -70,24 +70,24 @@ extension PublicKeyCredentialCreationOptions: Codable {
         let userValues = try values.nestedContainer(keyedBy: PublicKeyUser.CodingKeys.self, forKey: .user)
 
         guard case let userIdString = try userValues.decode(String.self, forKey: .id),
-              let userIdData = userIdString.a0_decodeBase64URLSafe() else {
+              let userId = userIdString.a0_decodeBase64URLSafe() else {
             throw DecodingError.dataCorruptedError(forKey: .user,
                                                    in: values,
                                                    debugDescription: "Format of user.id is not recognized.")
         }
 
-        user = PublicKeyUser(id: userIdData,
+        user = PublicKeyUser(id: userId,
                              name: try userValues.decode(String.self, forKey: .name),
                              displayName: try userValues.decode(String.self, forKey: .displayName))
 
-        guard case let challengeString = try values.decode(String.self, forKey: .challenge),
-              let challengeData = challengeString.a0_decodeBase64URLSafe() else {
-            throw DecodingError.dataCorruptedError(forKey: .challenge,
+        guard case let challengeString = try values.decode(String.self, forKey: .challengeData),
+              let challenge = challengeString.a0_decodeBase64URLSafe() else {
+            throw DecodingError.dataCorruptedError(forKey: .challengeData,
                                                    in: values,
                                                    debugDescription: "Format of challenge is not recognized.")
         }
 
-        challenge = challengeData
+        challengeData = challenge
         relyingParty = try values.decode(PublicKeyRelyingParty.self, forKey: .relyingParty)
         credentialParameters = try values.decode([PublicKeyCredentialParameters].self, forKey: .credentialParameters)
         timeout = try values.decode(Int.self, forKey: .timeout)
