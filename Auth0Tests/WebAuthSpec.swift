@@ -329,7 +329,6 @@ class WebAuthSpec: QuickSpec {
             platform = "macos"
             #endif
 
-            #if compiler(>=5.10)
             if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
                 context("https") {
                     it("should build with the domain") {
@@ -351,7 +350,6 @@ class WebAuthSpec: QuickSpec {
                     }
                 }
             }
-            #endif
 
             context("custom scheme") {
 
@@ -383,7 +381,6 @@ class WebAuthSpec: QuickSpec {
 
         describe("other builder methods") {
 
-            #if compiler(>=5.10)
             if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
                 context("custom headers") {
 
@@ -398,7 +395,6 @@ class WebAuthSpec: QuickSpec {
 
                 }
             }
-            #endif
 
             context("https") {
 
