@@ -82,11 +82,11 @@ func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError) -> Nimb
     }
 }
 
-func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<Credentials>> {
+func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil, _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<Credentials>> {
     return Matcher<AuthenticationResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> MatcherResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
-                                   refreshToken: nil,
+                                   refreshToken: refreshToken,
                                    expression,
                                    failureMessage)
     }
@@ -418,22 +418,28 @@ extension URLRequest {
     
     func hasAtLeast(_ parameters: [String: Any]) -> Bool {
         guard let payload = self.payload else { return false }
+        return hasAtLeast(parameters, in: payload)
+    }
 
-        let strParams = parameters.filter { $0.value is String } as! [String: String]
-        let strPayload = payload.filter { $0.value is String } as! [String: String]
-        if !Auth0Tests.hasAtLeast(parameters: strParams, payload: strPayload) { return false }
-
-        let dictParams = parameters.filter { $0.value is [String: String] } as! [String: [String: String]]
-        let dictPayload = payload.filter { $0.value is [String: String] } as! [String: [String: String]]
-
-        for (paramKey, paramValue) in dictParams {
-            guard let payloadValue = dictPayload[paramKey] else { return false }
-            if !Auth0Tests.hasAtLeast(parameters: paramValue, payload: payloadValue) { return false }
+    private func hasAtLeast(_ parameters: [String: Any], in payload: [String: Any]) -> Bool {
+        for (key, value) in parameters {
+            if let stringValue = value as? String {
+                guard let payloadValue = payload[key] as? String, payloadValue == stringValue else {
+                    return false
+                }
+            } else if let nestedParams = value as? [String: Any] {
+                guard let payloadDict = payload[key] as? [String: Any], hasAtLeast(nestedParams, in: payloadDict) else {
+                    return false
+                }
+            } else {
+                // If the value is not String or [String: Any], we can't handle it
+                return false
+            }
         }
 
         return true
     }
-    
+
     func hasUserMetadata(_ metadata: [String: String]) -> Bool {
         return hasObjectAttribute("user_metadata", value: metadata)
     }

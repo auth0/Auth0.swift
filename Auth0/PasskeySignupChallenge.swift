@@ -1,6 +1,6 @@
 import Foundation
 
-public struct PasskeySignupChallenge: Codable {
+public struct PasskeySignupChallenge: Codable, Sendable {
 
     public let authenticationSession: String
     public let credentialCreationOptions: PublicKeyCredentialCreationOptions

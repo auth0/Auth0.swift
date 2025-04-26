@@ -1,7 +1,7 @@
 #if !os(watchOS)
 import Foundation
 
-public struct PublicKeyCredentialCreationOptions {
+public struct PublicKeyCredentialCreationOptions: Sendable {
 
     public let relyingParty: PublicKeyRelyingParty
     public let user: PublicKeyUser
@@ -15,43 +15,42 @@ public struct PublicKeyCredentialCreationOptions {
     // var attestation: String = "none" // NOT in MyAcc/AuthAPI TODO: Check if this can/should be nullable, or should just default to none
     // var attestationFormats: [String]? // NOT in MyAcc/AuthAPI
 
-    public struct PublicKeyRelyingParty: Codable {
-        public let id: String // ? MyAcc, AuthAPI TODO: Check if this can actually be nil
-        public let name: String // MyAcc, AuthAPI
-    }
-
-    public struct PublicKeyUser: Codable {
-        public let id: Data // MyAcc, AuthAPI
-        public let name: String // MyAcc, AuthAPI
-        public let displayName: String // MyAcc, AuthAPI
-
-        // swiftlint:disable:next nesting
-        enum CodingKeys: String, CodingKey {
-            case id
-            case name
-            case displayName
-        }
-    }
-
-    public struct PublicKeyCredentialParameters: Codable {
-        public let alg: Int
-        public let type: String
-    }
-
-    public struct AuthenticatorSelectionCriteria: Codable {
-        public let residentKey: String // ? MyAcc, AuthAPI
-        public let userVerification: String // ? MyAcc, AuthAPI TODO: Check if should default to "preferred"
-
-        // var authenticatorAttachment: String? // Not in MyAcc/AuthAPI
-        // var requireResidentKey: Bool = false // NOT in MyAcc/AuthAPI TODO: Check if this can/should be nullable, or should just default to false
-    }
-
 //    public struct PublicKeyCredentialDescriptor: Codable {
 //        let id: String // ?
 //        let type: String
 //        var transports: [String]?
 //    }
 
+}
+
+public struct PublicKeyRelyingParty: Codable, Sendable {
+    public let id: String // ? MyAcc, AuthAPI TODO: Check if this can actually be nil
+    public let name: String // MyAcc, AuthAPI
+}
+
+public struct PublicKeyUser: Codable, Sendable {
+    public let id: Data // MyAcc, AuthAPI
+    public let name: String // MyAcc, AuthAPI
+    public let displayName: String // MyAcc, AuthAPI
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case displayName
+    }
+}
+
+public struct PublicKeyCredentialParameters: Codable, Sendable {
+    public let alg: Int
+    public let type: String
+}
+
+public struct AuthenticatorSelectionCriteria: Codable, Sendable {
+    public let residentKey: String // ? MyAcc, AuthAPI
+    public let userVerification: String // ? MyAcc, AuthAPI TODO: Check if should default to "preferred"
+
+    // var authenticatorAttachment: String? // Not in MyAcc/AuthAPI
+    // var requireResidentKey: Bool = false // NOT in MyAcc/AuthAPI TODO: Check if this can/should be nullable, or should just default to false
 }
 
 extension PublicKeyCredentialCreationOptions: Codable {

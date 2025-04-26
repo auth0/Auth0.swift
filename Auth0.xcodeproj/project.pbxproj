@@ -63,11 +63,11 @@
 		5C3D87E82DB99C5C00AACC34 /* PasskeySignupChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87E52DB99C4E00AACC34 /* PasskeySignupChallenge.swift */; };
 		5C3D87E92DB99C5C00AACC34 /* PasskeySignupChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87E52DB99C4E00AACC34 /* PasskeySignupChallenge.swift */; };
 		5C3D87EA2DB99C5C00AACC34 /* PasskeySignupChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87E52DB99C4E00AACC34 /* PasskeySignupChallenge.swift */; };
-		5C3D87F22DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* PasskeyAttestation.swift */; };
-		5C3D87F32DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* PasskeyAttestation.swift */; };
-		5C3D87F42DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* PasskeyAttestation.swift */; };
-		5C3D87F52DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* PasskeyAttestation.swift */; };
-		5C3D87F62DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* PasskeyAttestation.swift */; };
+		5C3D87F22DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */; };
+		5C3D87F32DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */; };
+		5C3D87F42DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */; };
+		5C3D87F52DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */; };
+		5C3D87F62DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */; };
 		5C41F6A4244DC94E00252548 /* LoginTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* LoginTransaction.swift */; };
 		5C41F6AA244DCAFB00252548 /* ClearSessionTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */; };
 		5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */; };
@@ -666,7 +666,7 @@
 		5C354C03276CE1A500ADBC86 /* PasswordlessType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordlessType.swift; sourceTree = "<group>"; };
 		5C3D87DF2DB8274A00AACC34 /* PublicKeyCredentialCreationOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKeyCredentialCreationOptions.swift; sourceTree = "<group>"; };
 		5C3D87E52DB99C4E00AACC34 /* PasskeySignupChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeySignupChallenge.swift; sourceTree = "<group>"; };
-		5C3D87F12DB9B3DA00AACC34 /* PasskeyAttestation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeyAttestation.swift; sourceTree = "<group>"; };
+		5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupPasskey.swift; sourceTree = "<group>"; };
 		5C41F6A3244DC94E00252548 /* LoginTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTransaction.swift; sourceTree = "<group>"; };
 		5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearSessionTransaction.swift; sourceTree = "<group>"; };
 		5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileWebAuth.swift; sourceTree = "<group>"; };
@@ -979,7 +979,7 @@
 		5C3D87DE2DB8272200AACC34 /* Passkeys */ = {
 			isa = PBXGroup;
 			children = (
-				5C3D87F12DB9B3DA00AACC34 /* PasskeyAttestation.swift */,
+				5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */,
 				5C3D87DF2DB8274A00AACC34 /* PublicKeyCredentialCreationOptions.swift */,
 			);
 			path = Passkeys;
@@ -2093,7 +2093,7 @@
 				5B16D88E1F7141A0009476A5 /* ASProvider.swift in Sources */,
 				5C80980B275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
 				5FD255BA1D14F70B00387ECB /* WebAuthError.swift in Sources */,
-				5C3D87F42DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */,
+				5C3D87F42DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */,
 				5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */,
 				5B2860CE1EEAC30500C75D54 /* UserInfo.swift in Sources */,
 				5C4F552323C8FBA100C89615 /* JWKS.swift in Sources */,
@@ -2170,7 +2170,7 @@
 				5C6513A82791CDDE004EBC22 /* Version.swift in Sources */,
 				5FDE875E1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
 				5FDE876E1D8A424700EA27DC /* Handlers.swift in Sources */,
-				5C3D87F32DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */,
+				5C3D87F32DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */,
 				5C41F6CE244F970500252548 /* IDTokenValidator.swift in Sources */,
 				5C41F6CA244F96AE00252548 /* LoginTransaction.swift in Sources */,
 				5FADB60D1CED7E0800D4BB50 /* UserPatchAttributes.swift in Sources */,
@@ -2311,7 +2311,7 @@
 				5F23E6DD1D4ACD6100C3F2D9 /* NSURL+Auth0.swift in Sources */,
 				5F23E6E71D4ACD8500C3F2D9 /* Response.swift in Sources */,
 				5B2860D11EEAC30A00C75D54 /* UserInfo.swift in Sources */,
-				5C3D87F22DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */,
+				5C3D87F22DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */,
 				5F28B4631D8216180000EB23 /* Loggable.swift in Sources */,
 				5F23E6E01D4ACD7F00C3F2D9 /* Management.swift in Sources */,
 				5C29743323FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */,
@@ -2354,7 +2354,7 @@
 				5B2860D01EEAC30A00C75D54 /* UserInfo.swift in Sources */,
 				5F28B4641D8216180000EB23 /* Loggable.swift in Sources */,
 				5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */,
-				5C3D87F62DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */,
+				5C3D87F62DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */,
 				5F23E7091D4B88F600C3F2D9 /* Management.swift in Sources */,
 				5F23E70A1D4B88F600C3F2D9 /* UserPatchAttributes.swift in Sources */,
 				5F23E71B1D4B891E00C3F2D9 /* Auth0Error.swift in Sources */,
@@ -2442,7 +2442,7 @@
 				C1B3B9F42C24B6D4004A32A4 /* UserInfo.swift in Sources */,
 				C1B3B9F52C24B6D4004A32A4 /* Credentials.swift in Sources */,
 				C1B3B9F62C24B6D4004A32A4 /* Handlers.swift in Sources */,
-				5C3D87F52DB9B3DF00AACC34 /* PasskeyAttestation.swift in Sources */,
+				5C3D87F52DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */,
 				C1B3B9F72C24B6D4004A32A4 /* Telemetry.swift in Sources */,
 				C1B3B9F82C24B6D4004A32A4 /* IDTokenValidator.swift in Sources */,
 				C1B3B9F92C24B6D4004A32A4 /* IDTokenValidatorContext.swift in Sources */,
