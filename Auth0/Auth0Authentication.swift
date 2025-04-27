@@ -225,7 +225,7 @@ struct Auth0Authentication: Authentication {
             "response": [
                 "clientDataJSON": attestation.rawClientDataJSON.encodeBase64URLSafe(),
                 "attestationObject": attestation.rawAttestationObject!.encodeBase64URLSafe(),
-                "userHandle": challenge.credentialCreationOptions.user.id.encodeBase64URLSafe()
+                "userHandle": challenge.credentialOptions.user.id.encodeBase64URLSafe()
             ]
         ]
 

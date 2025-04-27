@@ -3,11 +3,11 @@ import Foundation
 public struct PasskeySignupChallenge: Codable, Sendable {
 
     public let authenticationSession: String
-    public let credentialCreationOptions: PublicKeyCredentialCreationOptions
+    public let credentialOptions: PublicKeyCredentialCreationOptions
 
     enum CodingKeys: String, CodingKey {
         case authenticationSession = "auth_session"
-        case credentialCreationOptions = "authn_params_public_key"
+        case credentialOptions = "authn_params_public_key"
     }
 
 }

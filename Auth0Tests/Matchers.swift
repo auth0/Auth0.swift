@@ -149,8 +149,8 @@ func havePasskeySignupChallenge(identifier: String,
     let definition = "have passkey signup challenge with user identifier <\(identifier)>"
     return Matcher<AuthenticationResult<PasskeySignupChallenge>>.define(definition) { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: PasskeySignupChallenge) -> Bool in
-            return created.credentialCreationOptions.user.name == identifier &&
-            (name == nil || created.credentialCreationOptions.user.displayName == name)
+            return created.credentialOptions.user.name == identifier &&
+            (name == nil || created.credentialOptions.user.displayName == name)
         }
     }
 }

@@ -294,17 +294,17 @@ class AuthenticationSpec: QuickSpec {
             let userId = "dXNlckBleGFtcGxlLmNvbQ"
             let user = PublicKeyUser(id: userId.a0_decodeBase64URLSafe()!, name: Email, displayName: Name)
             let challengeData = "L4SaSxx8tpqrScT_hbpZX-50qfKh12_oxmSUIKSGFpM".a0_decodeBase64URLSafe()!
-            let credentialParams = PublicKeyCredentialParameters(alg: -8, type: "public-key")
-            let selectionCriteria = AuthenticatorSelectionCriteria(residentKey: "required",
-                                                                   userVerification: "preferred")
-            let creationOptions = PublicKeyCredentialCreationOptions(relyingParty: relyingParty,
+            let credentialParams = PublicKeyCredentialParameters(alg: -8)
+            let selectionCriteria = AuthenticatorSelectionCriteria(residentKey: .required,
+                                                                   userVerification: .preferred)
+            let credentialOptions = PublicKeyCredentialCreationOptions(relyingParty: relyingParty,
                                                                      user: user,
                                                                      challengeData: challengeData,
                                                                      credentialParameters: [credentialParams],
                                                                      selectionCriteria: selectionCriteria,
                                                                      timeout: 60000)
             let signupChallenge = PasskeySignupChallenge(authenticationSession: authSession,
-                                                         credentialCreationOptions: creationOptions)
+                                                         credentialOptions: credentialOptions)
 
             describe("login with signup passkey") {
 
