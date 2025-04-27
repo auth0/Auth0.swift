@@ -290,21 +290,13 @@ class AuthenticationSpec: QuickSpec {
                                                   rawClientDataJSON: clientData.a0_decodeBase64URLSafe()!)
 
             let authSession = "y1PI7ue7QX85WMxoR6Qa-9INuqA3xxKLVoDOxBOD6yYQL1Fl-zgwjFtZIQfRORhY"
-            let relyingParty = PublicKeyRelyingParty(id: Domain, name: Domain)
             let userId = "dXNlckBleGFtcGxlLmNvbQ"
-            let user = PublicKeyUser(id: userId.a0_decodeBase64URLSafe()!, name: Email, displayName: Name)
             let challengeData = "L4SaSxx8tpqrScT_hbpZX-50qfKh12_oxmSUIKSGFpM".a0_decodeBase64URLSafe()!
-            let credentialParams = PublicKeyCredentialParameters(alg: -8)
-            let selectionCriteria = AuthenticatorSelectionCriteria(residentKey: .required,
-                                                                   userVerification: .preferred)
-            let credentialOptions = PublicKeyCredentialCreationOptions(relyingParty: relyingParty,
-                                                                     user: user,
-                                                                     challengeData: challengeData,
-                                                                     credentialParameters: [credentialParams],
-                                                                     selectionCriteria: selectionCriteria,
-                                                                     timeout: 60000)
             let signupChallenge = PasskeySignupChallenge(authenticationSession: authSession,
-                                                         credentialOptions: credentialOptions)
+                                                         relyingPartyId: Domain,
+                                                         userId: userId.a0_decodeBase64URLSafe()!,
+                                                         userName: Email,
+                                                         challengeData: challengeData)
 
             describe("login with signup passkey") {
 
@@ -449,7 +441,7 @@ class AuthenticationSpec: QuickSpec {
                                                     name: Name,
                                                     realmOrConnection: ConnectionName)
                             .start { result in
-                                expect(result).to(havePasskeySignupChallenge(identifier: Email, name: Name))
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
                                 done()
                             }
                     }

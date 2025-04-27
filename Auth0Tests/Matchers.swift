@@ -144,13 +144,11 @@ func haveSSOCredentials(_ sessionTransferToken: String,
     }
 }
 
-func havePasskeySignupChallenge(identifier: String,
-                                name: String? = nil) -> Nimble.Matcher<AuthenticationResult<PasskeySignupChallenge>> {
+func havePasskeySignupChallenge(identifier: String) -> Nimble.Matcher<AuthenticationResult<PasskeySignupChallenge>> {
     let definition = "have passkey signup challenge with user identifier <\(identifier)>"
     return Matcher<AuthenticationResult<PasskeySignupChallenge>>.define(definition) { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: PasskeySignupChallenge) -> Bool in
-            return created.credentialOptions.user.name == identifier &&
-            (name == nil || created.credentialOptions.user.displayName == name)
+            return created.userName == identifier
         }
     }
 }

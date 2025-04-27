@@ -14,7 +14,8 @@ func plainJson(from response: Response<AuthenticationError>, callback: Request<[
     }
 }
 
-func codable<T: Codable>(from response: Response<AuthenticationError>, callback: Request<T, AuthenticationError>.Callback) {
+func codable<T: Decodable>(from response: Response<AuthenticationError>,
+                           callback: Request<T, AuthenticationError>.Callback) {
     do {
         if let dictionary = try response.result() as? [String: Any] {
             let data = try JSONSerialization.data(withJSONObject: dictionary)
