@@ -47,7 +47,7 @@ extension PublicKeyCredentialCreationOptions: Decodable {
               let userId = userIdString.a0_decodeBase64URLSafe() else {
             throw DecodingError.dataCorruptedError(forKey: .user,
                                                    in: values,
-                                                   debugDescription: "Format of user.id is not recognized.")
+                                                   debugDescription: "Format of user id is not recognized.")
         }
 
         user = PublicKeyUser(id: userId, name: try userValues.decode(String.self, forKey: .name))

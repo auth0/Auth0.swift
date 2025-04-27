@@ -68,6 +68,10 @@
 		5C3D87F42DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */; };
 		5C3D87F52DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */; };
 		5C3D87F62DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */; };
+		5C3D880E2DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */; };
+		5C3D880F2DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */; };
+		5C3D88102DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */; };
+		5C3D88112DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */; };
 		5C41F6A4244DC94E00252548 /* LoginTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* LoginTransaction.swift */; };
 		5C41F6AA244DCAFB00252548 /* ClearSessionTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */; };
 		5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */; };
@@ -667,6 +671,7 @@
 		5C3D87DF2DB8274A00AACC34 /* PublicKeyCredentialCreationOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKeyCredentialCreationOptions.swift; sourceTree = "<group>"; };
 		5C3D87E52DB99C4E00AACC34 /* PasskeySignupChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeySignupChallenge.swift; sourceTree = "<group>"; };
 		5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupPasskey.swift; sourceTree = "<group>"; };
+		5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeySignupChallengeSpec.swift; sourceTree = "<group>"; };
 		5C41F6A3244DC94E00252548 /* LoginTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTransaction.swift; sourceTree = "<group>"; };
 		5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearSessionTransaction.swift; sourceTree = "<group>"; };
 		5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileWebAuth.swift; sourceTree = "<group>"; };
@@ -985,13 +990,6 @@
 			path = Passkeys;
 			sourceTree = "<group>";
 		};
-		5C3D88002DBD8C0000AACC34 /* Passkeys */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Passkeys;
-			sourceTree = "<group>";
-		};
 		5C41F6AF244DCC1100252548 /* Platforms */ = {
 			isa = PBXGroup;
 			children = (
@@ -1119,7 +1117,6 @@
 				5FADB6011CEC0C1600D4BB50 /* Management */,
 				5FE2F8C11CD0FA11003628F4 /* Networking */,
 				5C4F553823C9124800C89615 /* Crypto */,
-				5C3D88002DBD8C0000AACC34 /* Passkeys */,
 				5FCAB1661D07ABEA00331C84 /* WebAuth */,
 				5FBBF0331CC95FA40024D2AF /* Utils */,
 				5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */,
@@ -1242,6 +1239,7 @@
 				5FE2F8A51CCA9C17003628F4 /* CredentialsSpec.swift */,
 				5CFB82752D6FD287009FD237 /* SSOCredentialsSpec.swift */,
 				5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */,
+				5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */,
 				5C4F553423C9124200C89615 /* JWKSpec.swift */,
 				5FD255B01D14A9E000387ECB /* AuthenticationErrorSpec.swift */,
 			);
@@ -2225,6 +2223,7 @@
 				5CFB82772D6FD28E009FD237 /* SSOCredentialsSpec.swift in Sources */,
 				5CF5391D2836CEC00073F623 /* WebAuthenticationSpec.swift in Sources */,
 				5FADB60F1CED7E5200D4BB50 /* UserPatchAttributesSpec.swift in Sources */,
+				5C3D880E2DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */,
 				5C4F553523C9124200C89615 /* JWKSpec.swift in Sources */,
 				5FA250541D4A85A200C544FA /* WebAuthErrorSpec.swift in Sources */,
 				5CB41D7623D0C15000074024 /* IDTokenValidatorBaseSpec.swift in Sources */,
@@ -2294,6 +2293,7 @@
 				5C809D9B275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */,
 				5CE775A3244FCF3600D054A0 /* CryptoExtensions.swift in Sources */,
 				5CE775B3244FD71000D054A0 /* WebAuthSpec.swift in Sources */,
+				5C3D880F2DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */,
 				5B7EE47220FCA00300367724 /* CredentialsManagerSpec.swift in Sources */,
 				5CE775A6244FCF4100D054A0 /* IDTokenValidatorMocks.swift in Sources */,
 				5CE775AC244FD66000D054A0 /* LoginTransactionSpec.swift in Sources */,
@@ -2403,6 +2403,7 @@
 				5F331B051D4BB7D400AE4382 /* AuthenticationSpec.swift in Sources */,
 				5F28B4691D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				5F1FBB9A1D8A44C0006B0B85 /* ResponseSpec.swift in Sources */,
+				5C3D88102DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */,
 				5F331B0C1D4BB7F900AE4382 /* UsersSpec.swift in Sources */,
 				C12BFE442C352DD700D1CC00 /* StubURLProtocol.swift in Sources */,
 				5F331B0E1D4BB80700AE4382 /* Matchers.swift in Sources */,
@@ -2543,6 +2544,7 @@
 				C1B3BA4B2C24BA37004A32A4 /* CredentialsManagerErrorSpec.swift in Sources */,
 				C1B3BA4C2C24BA37004A32A4 /* CryptoExtensions.swift in Sources */,
 				C1B3BA4D2C24BA37004A32A4 /* Matchers.swift in Sources */,
+				5C3D88112DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */,
 				C1B3BA4E2C24BA37004A32A4 /* Responses.swift in Sources */,
 				C1B3BA4F2C24BA37004A32A4 /* Generators.swift in Sources */,
 				C1B3BA502C24BA37004A32A4 /* Auth0Spec.swift in Sources */,
