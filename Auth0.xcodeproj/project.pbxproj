@@ -985,6 +985,13 @@
 			path = Passkeys;
 			sourceTree = "<group>";
 		};
+		5C3D88002DBD8C0000AACC34 /* Passkeys */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Passkeys;
+			sourceTree = "<group>";
+		};
 		5C41F6AF244DCC1100252548 /* Platforms */ = {
 			isa = PBXGroup;
 			children = (
@@ -1112,6 +1119,7 @@
 				5FADB6011CEC0C1600D4BB50 /* Management */,
 				5FE2F8C11CD0FA11003628F4 /* Networking */,
 				5C4F553823C9124800C89615 /* Crypto */,
+				5C3D88002DBD8C0000AACC34 /* Passkeys */,
 				5FCAB1661D07ABEA00331C84 /* WebAuth */,
 				5FBBF0331CC95FA40024D2AF /* Utils */,
 				5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */,

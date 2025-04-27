@@ -215,23 +215,21 @@ struct Auth0Authentication: Authentication {
                realmOrConnection realm: String?,
                audience: String?,
                scope: String) -> Request<Credentials, AuthenticationError> {
-        let decoded = attestation.decode()!
         let url = URL(string: "oauth/token", relativeTo: self.url)!
+        let id = attestation.credentialID.encodeBase64URLSafe()
 
         var authenticatorResponse: [String: Any] = [
-            "id": decoded.id,
-            "rawId": decoded.rawId,
+            "id": id,
+            "rawId": id,
             "type": "public-key",
             "response": [
-                "clientDataJSON": decoded.clientData,
-                "attestationObject": decoded.attestationObject,
-                "authenticatorData": decoded.authenticatorData,
-                "signature": decoded.signature,
+                "clientDataJSON": attestation.rawClientDataJSON.encodeBase64URLSafe(),
+                "attestationObject": attestation.rawAttestationObject!.encodeBase64URLSafe(),
                 "userHandle": challenge.credentialCreationOptions.user.id.encodeBase64URLSafe()
             ]
         ]
 
-        authenticatorResponse["authenticatorAttachment"] = decoded.attachment
+        authenticatorResponse["authenticatorAttachment"] = attestation.attachment.stringValue
 
         var payload: [String: Any] = [
             "client_id": self.clientId,

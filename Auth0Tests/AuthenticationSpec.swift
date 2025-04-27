@@ -2,6 +2,10 @@ import Foundation
 import Quick
 import Nimble
 
+#if !os(watchOS)
+import AuthenticationServices
+#endif
+
 @testable import Auth0
 
 private let ClientId = "CLIENT_ID"
@@ -266,11 +270,11 @@ class AuthenticationSpec: QuickSpec {
 
         // MARK:- Signup Passkey Challenge
 
-        if #available(iOS 16.6, macOS 12.0, tvOS 16.0, *) {
-
+        #if !os(watchOS)
+        if #available(iOS 16.6, macOS 12.0, visionOS 1.0, *) {
             struct MockSignupPasskey: SignupPasskey {
                 let credentialID: Data
-                let a0_attachment: SignupPasskeyAttachment?
+                let attachment: ASAuthorizationPublicKeyCredentialAttachment = .platform
                 let rawAttestationObject: Data?
                 let rawClientDataJSON: Data
             }
@@ -282,7 +286,6 @@ class AuthenticationSpec: QuickSpec {
             let clientData = "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiTDRTYVN4eDh0cHFyU2NUX2hicFpYLTUwcW" +
             "ZLaDEyX294bVNVSUtTR0ZwTSIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4ud2lkY2tldC5jb20ifQ-MN8A"
             let signupPasskey = MockSignupPasskey(credentialID: credentialId,
-                                                  a0_attachment: .platform,
                                                   rawAttestationObject: attestationObject.a0_decodeBase64URLSafe(),
                                                   rawClientDataJSON: clientData.a0_decodeBase64URLSafe()!)
 
@@ -299,7 +302,7 @@ class AuthenticationSpec: QuickSpec {
                                                                      challengeData: challengeData,
                                                                      credentialParameters: [credentialParams],
                                                                      selectionCriteria: selectionCriteria,
-                                                                     timeout: 6000)
+                                                                     timeout: 60000)
             let signupChallenge = PasskeySignupChallenge(authenticationSession: authSession,
                                                          credentialCreationOptions: creationOptions)
 
@@ -316,11 +319,9 @@ class AuthenticationSpec: QuickSpec {
                                 "response": [
                                     "attestationObject": attestationObject,
                                     "clientDataJSON": clientData,
-                                    "userHandle": userId,
-                                    "authenticatorData": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYlDH4SiOEQA",
-                                    "signature": "TpUiWCD1IVSIV0A8ysLAL5FBo0pXA2swXOxGSK7QOPP4Y-MN8A"
+                                    "userHandle": userId
                                 ],
-                                "authenticatorAttachment": SignupPasskeyAttachment.platform.rawValue,
+                                "authenticatorAttachment": "platform",
                                 "type": "public-key",
                             ]
                         ])
@@ -350,11 +351,9 @@ class AuthenticationSpec: QuickSpec {
                                 "response": [
                                     "attestationObject": attestationObject,
                                     "clientDataJSON": clientData,
-                                    "userHandle": userId,
-                                    "authenticatorData": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYlDH4SiOEQA",
-                                    "signature": "TpUiWCD1IVSIV0A8ysLAL5FBo0pXA2swXOxGSK7QOPP4Y-MN8A"
+                                    "userHandle": userId
                                 ],
-                                "authenticatorAttachment": SignupPasskeyAttachment.platform.rawValue,
+                                "authenticatorAttachment": "platform",
                                 "type": "public-key",
                             ]
                         ])
@@ -460,6 +459,7 @@ class AuthenticationSpec: QuickSpec {
             }
 
         }
+        #endif
 
         // MARK:- Refresh Tokens
         
