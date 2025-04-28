@@ -11,7 +11,6 @@ extension WebAuthentication {
         return { url, callback in
             let session: ASWebAuthenticationSession
 
-            #if compiler(>=5.10)
             if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
                 if redirectURL.scheme == "https" {
                     session = ASWebAuthenticationSession(url: url,
@@ -30,11 +29,6 @@ extension WebAuthentication {
                                                      callbackURLScheme: redirectURL.scheme,
                                                      completionHandler: completionHandler(callback))
             }
-            #else
-            session = ASWebAuthenticationSession(url: url,
-                                                 callbackURLScheme: redirectURL.scheme,
-                                                 completionHandler: completionHandler(callback))
-            #endif
 
             session.prefersEphemeralWebBrowserSession = ephemeralSession
 
