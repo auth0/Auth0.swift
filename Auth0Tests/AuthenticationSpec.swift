@@ -271,7 +271,7 @@ class AuthenticationSpec: QuickSpec {
         // MARK:- Signup Passkey Challenge
 
         #if !os(watchOS)
-        if #available(iOS 16.6, macOS 12.0, visionOS 1.0, *) {
+        if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
             struct MockSignupPasskey: SignupPasskey {
                 let credentialID: Data
                 let attachment: ASAuthorizationPublicKeyCredentialAttachment = .platform
