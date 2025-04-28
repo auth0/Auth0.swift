@@ -209,7 +209,7 @@ struct Auth0Authentication: Authentication {
     }
 
     #if !os(watchOS)
-    @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(signupPasskey attestation: SignupPasskey,
                signupChallenge challenge: PasskeySignupChallenge,
                connection: String?,
@@ -250,7 +250,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeySignupChallenge(email: String?,
                                 phoneNumber: String?,
                                 username: String?,

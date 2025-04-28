@@ -544,7 +544,7 @@ public protocol Authentication: Trackable, Loggable {
     /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-new-user)
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
-    @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(signupPasskey attestation: SignupPasskey,
                signupChallenge challenge: PasskeySignupChallenge,
                connection: String?,
@@ -620,7 +620,7 @@ public protocol Authentication: Trackable, Loggable {
     /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#request-signup-challenge)
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
-    @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeySignupChallenge(email: String?,
                                 phoneNumber: String?,
                                 username: String?,
@@ -981,7 +981,7 @@ public extension Authentication {
     }
 
     #if !os(watchOS)
-    @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(signupPasskey attestation: SignupPasskey,
                signupChallenge challenge: PasskeySignupChallenge,
                connection: String? = nil,
@@ -994,7 +994,7 @@ public extension Authentication {
                    scope: scope)
     }
 
-    @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeySignupChallenge(email: String? = nil,
                                 phoneNumber: String? = nil,
                                 username: String? = nil,
