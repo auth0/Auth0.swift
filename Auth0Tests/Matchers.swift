@@ -144,6 +144,7 @@ func haveSSOCredentials(_ sessionTransferToken: String,
     }
 }
 
+#if !os(watchOS)
 func havePasskeySignupChallenge(identifier: String) -> Nimble.Matcher<AuthenticationResult<PasskeySignupChallenge>> {
     let definition = "have passkey signup challenge with user identifier <\(identifier)>"
     return Matcher<AuthenticationResult<PasskeySignupChallenge>>.define(definition) { expression, failureMessage -> MatcherResult in
@@ -152,6 +153,7 @@ func havePasskeySignupChallenge(identifier: String) -> Nimble.Matcher<Authentica
         }
     }
 }
+#endif
 
 func haveCreatedUser(_ email: String, username: String? = nil) -> Nimble.Matcher<AuthenticationResult<DatabaseUser>> {
     return Matcher<AuthenticationResult<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> MatcherResult in
@@ -395,9 +397,11 @@ extension URLRequest {
         return isMethodPOST && isHost(domain) && isPath("/mfa/challenge")
     }
     
+    #if !os(watchOS)
     func isPasskeySignupChallenge(_ domain: String) -> Bool {
         return isMethodPOST && isHost(domain) && isPath("/passkey/register")
     }
+    #endif
     
     func hasHeader(_ name: String, value: String) -> Bool {
         return self.value(forHTTPHeaderField: name) == value
