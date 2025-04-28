@@ -290,11 +290,10 @@ class AuthenticationSpec: QuickSpec {
                                                   rawClientDataJSON: clientData.a0_decodeBase64URLSafe()!)
 
             let authSession = "y1PI7ue7QX85WMxoR6Qa-9INuqA3xxKLVoDOxBOD6yYQL1Fl-zgwjFtZIQfRORhY"
-            let userId = "dXNlckBleGFtcGxlLmNvbQ"
             let challengeData = "L4SaSxx8tpqrScT_hbpZX-50qfKh12_oxmSUIKSGFpM".a0_decodeBase64URLSafe()!
             let signupChallenge = PasskeySignupChallenge(authenticationSession: authSession,
                                                          relyingPartyId: Domain,
-                                                         userId: userId.a0_decodeBase64URLSafe()!,
+                                                         userId: "dXNlckBleGFtcGxlLmNvbQ".a0_decodeBase64URLSafe()!,
                                                          userName: Email,
                                                          challengeData: challengeData)
 
@@ -310,8 +309,7 @@ class AuthenticationSpec: QuickSpec {
                             "authn_response": [
                                 "response": [
                                     "attestationObject": attestationObject,
-                                    "clientDataJSON": clientData,
-                                    "userHandle": userId
+                                    "clientDataJSON": clientData
                                 ],
                                 "authenticatorAttachment": "platform",
                                 "type": "public-key",
@@ -342,8 +340,7 @@ class AuthenticationSpec: QuickSpec {
                             "authn_response": [
                                 "response": [
                                     "attestationObject": attestationObject,
-                                    "clientDataJSON": clientData,
-                                    "userHandle": userId
+                                    "clientDataJSON": clientData
                                 ],
                                 "authenticatorAttachment": "platform",
                                 "type": "public-key",
@@ -355,7 +352,7 @@ class AuthenticationSpec: QuickSpec {
                         auth
                             .login(signupPasskey: signupPasskey,
                                    signupChallenge: signupChallenge,
-                                   realmOrConnection: ConnectionName,
+                                   connection: ConnectionName,
                                    audience: "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
                                    scope: "openid email offline_access")
                             .start { result in
@@ -409,8 +406,8 @@ class AuthenticationSpec: QuickSpec {
                 it("should request passkey signup challenge with username and default parameters") {
                     NetworkStub.addStub(condition: {
                         $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
-                            "user_profile": ["username": Username],
-                            "client_id": ClientId
+                            "client_id": ClientId,
+                            "user_profile": ["username": Username]
                         ])
                     }, response: passkeySignupChallengeResponse(identifier: Username))
                     
@@ -427,9 +424,9 @@ class AuthenticationSpec: QuickSpec {
                 it("should request passkey signup challenge with all parameters") {
                     NetworkStub.addStub(condition: {
                         $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
-                            "user_profile": ["email": Email, "phone_number": Phone, "username": Username, "name": Name],
+                            "client_id": ClientId,
                             "realm": ConnectionName,
-                            "client_id": ClientId
+                            "user_profile": ["email": Email, "phone_number": Phone, "username": Username, "name": Name]
                         ])
                     }, response: passkeySignupChallengeResponse(identifier: Email, name: Name))
 
@@ -439,7 +436,7 @@ class AuthenticationSpec: QuickSpec {
                                                     phoneNumber: Phone,
                                                     username: Username,
                                                     name: Name,
-                                                    realmOrConnection: ConnectionName)
+                                                    connection: ConnectionName)
                             .start { result in
                                 expect(result).to(havePasskeySignupChallenge(identifier: Email))
                                 done()

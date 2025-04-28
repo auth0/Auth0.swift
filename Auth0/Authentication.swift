@@ -23,7 +23,7 @@ public protocol Authentication: Trackable, Loggable {
     // MARK: - Methods
 
     /**
-     Logs in a user using an email and an OTP code received via email. This is the last part of the passwordless login
+     Logs a user in using an email and an OTP code received via email. This is the last part of the passwordless login
      flow.
 
      ## Usage
@@ -70,7 +70,7 @@ public protocol Authentication: Trackable, Loggable {
     func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Logs in a user using a phone number and an OTP code received via SMS. This is the last part of the passwordless login flow.
+     Logs a user in using a phone number and an OTP code received via SMS. This is the last part of the passwordless login flow.
 
      ## Usage
 
@@ -116,7 +116,7 @@ public protocol Authentication: Trackable, Loggable {
     func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Logs in a user using a username and password with a realm or connection.
+     Logs a user in using a username and password with a realm or connection.
 
      ## Usage
 
@@ -150,11 +150,11 @@ public protocol Authentication: Trackable, Loggable {
      ```
 
      - Parameters:
-       - usernameOrEmail:   Username or email of the user.
-       - password:          Password of the user.
-       - realmOrConnection: Domain of the realm or connection name.
-       - audience:          API Identifier that your application is requesting access to.
-       - scope:             Space-separated list of requested scope values.
+       - username: Username or email of the user.
+       - password: Password of the user.
+       - realm:    Domain of the realm or connection name.
+       - audience: API Identifier that your application is requesting access to.
+       - scope:    Space-separated list of requested scope values.
      - Returns: Request that will yield Auth0 user's credentials.
      - Requires: The `http://auth0.com/oauth/grant-type/password-realm` grant. Check
      [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
@@ -299,7 +299,7 @@ public protocol Authentication: Trackable, Loggable {
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
 
     /**
-     Authenticates a user with their Sign In with Apple authorization code.
+     Logs a user in with their Sign In with Apple authorization code.
 
      ## Usage
 
@@ -344,7 +344,7 @@ public protocol Authentication: Trackable, Loggable {
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Authenticates a user with their Facebook [session info access token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and profile data.
+     Logs a user in with their Facebook [session info access token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and profile data.
 
      ## Usage
 
@@ -389,7 +389,7 @@ public protocol Authentication: Trackable, Loggable {
     func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
-     Logs in a user using a username and password in the default directory.
+     Logs a user in using a username and password in the default directory.
 
      ## Usage
 
@@ -482,10 +482,10 @@ public protocol Authentication: Trackable, Loggable {
        - email:          Email for the new user.
        - username:       Username for the new user (if the connection requires a username). Defaults to `nil`.
        - password:       Password for the new user.
-       - connection:     Name of the connection where the user will be created (database connection).
+       - connection:     Name of the database connection where the user will be created.
        - userMetadata:   Additional user metadata parameters that will be added to the newly created user.
        - rootAttributes: Root attributes that will be added to the newly created user. These will not overwrite existing parameters. See https://auth0.com/docs/api/authentication#signup for the full list of supported attributes.
-     - Returns: A request that will yield a newly created database user (just the email, username, and email verified flag).
+     - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
 
@@ -494,19 +494,135 @@ public protocol Authentication: Trackable, Loggable {
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
     #if !os(watchOS)
+    /// Logs a user in using a signup passkey credential and the signup challenge. This is the last part of the passkey signup flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .login(signupPasskey: signupPasskey,
+    ///            signupChallenge: signupChallenge,
+    ///            connection: "Username-Password-Authentication")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let credentials):
+    ///             print("Obtained credentials: \(credentials)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// You can also specify audience (the Auth0 API identifier) and scope values:
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .login(signupPasskey: signupPasskey,
+    ///            signupChallenge: signupChallenge,
+    ///            connection: "Username-Password-Authentication",
+    ///            audience: "https://example.com/api",
+    ///            scope: "openid profile email offline_access")
+    ///     .start { print($0) }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - attestation: The signup passkey credential obtained with [`ASAuthorizationPlatformPublicKeyCredentialProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationplatformpublickeycredentialprovider).
+    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
+    ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - audience:    API Identifier that your application is requesting access to.
+    ///   - scope:       Space-separated list of requested scope values.
+    /// - Returns: A request that will yield a passkey signup challenge.
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-new-user)
+    /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
+    /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
-    func login(signupPasskey: SignupPasskey,
-               signupChallenge: PasskeySignupChallenge,
-               realmOrConnection: String?,
+    func login(signupPasskey attestation: SignupPasskey,
+               signupChallenge challenge: PasskeySignupChallenge,
+               connection: String?,
                audience: String?,
                scope: String) -> Request<Credentials, AuthenticationError>
 
+    /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
+    ///
+    /// You need to provide at least one user identifier and an optional display `name`. By default, database
+    /// connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers)
+    /// for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These
+    /// options can be required or optional and must match your Flexible Identifier configuration.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .passkeySignupChallenge(email: "support@auth0.com",
+    ///                             name: "John Appleseed",
+    ///                             connection: "Username-Password-Authentication")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let challenge):
+    ///             print("Obtained challenge: \(challenge)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// Use the challenge with [`ASAuthorizationPlatformPublicKeyCredentialProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationplatformpublickeycredentialprovider) to generate a new
+    /// passkey credential. See [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
+    /// to learn more.
+    ///
+    /// ```swift
+    /// let credentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+    ///     relyingPartyIdentifier: challenge.relyingPartyId
+    /// )
+    ///
+    /// let registrationRequest = credentialProvider.createCredentialRegistrationRequest(
+    ///     challenge: challenge.challengeData,
+    ///     name: challenge.userName,
+    ///     userID: challenge.userId
+    /// )
+    ///
+    /// let authController = ASAuthorizationController(authorizationRequests: [registrationRequest])
+    /// // ...
+    /// ```
+    ///
+    /// Then, call ``login(signupPasskey:signupChallenge:connection:audience:scope:)`` with the resulting
+    /// passkey credential and the challenge to log the new user in.
+    ///
+    /// - Parameters:
+    ///   - email:       Email address of the user.
+    ///   - phoneNumber: Phone number of the user.
+    ///   - username:    Username of the user.
+    ///   - name:        Display name of the user.
+    ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    /// - Returns: A request that will yield a passkey signup challenge.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#request-signup-challenge)
+    /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
+    /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
     func passkeySignupChallenge(email: String?,
                                 phoneNumber: String?,
                                 username: String?,
                                 name: String?,
-                                realmOrConnection: String?) -> Request<PasskeySignupChallenge, AuthenticationError>
+                                connection: String?) -> Request<PasskeySignupChallenge, AuthenticationError>
     #endif
 
     /**
@@ -728,7 +844,7 @@ public protocol Authentication: Trackable, Loggable {
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
      */
-    func ssoExchange(withRefreshToken: String) -> Request<SSOCredentials, AuthenticationError>
+    func ssoExchange(withRefreshToken refreshToken: String) -> Request<SSOCredentials, AuthenticationError>
 
     /**
      Renews the user's credentials using a refresh token.
@@ -865,12 +981,12 @@ public extension Authentication {
     @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
     func login(signupPasskey attestation: SignupPasskey,
                signupChallenge challenge: PasskeySignupChallenge,
-               realmOrConnection realm: String? = nil,
+               connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         self.login(signupPasskey: attestation,
                    signupChallenge: challenge,
-                   realmOrConnection: realm,
+                   connection: connection,
                    audience: audience,
                    scope: scope)
     }
@@ -880,12 +996,12 @@ public extension Authentication {
                                 phoneNumber: String? = nil,
                                 username: String? = nil,
                                 name: String? = nil,
-                                realmOrConnection realm: String? = nil) -> Request<PasskeySignupChallenge, AuthenticationError> {
+                                connection: String? = nil) -> Request<PasskeySignupChallenge, AuthenticationError> {
         return self.passkeySignupChallenge(email: email,
                                            phoneNumber: phoneNumber,
                                            username: username,
                                            name: name,
-                                           realmOrConnection: realm)
+                                           connection: connection)
     }
     #endif
 

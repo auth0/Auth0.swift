@@ -212,7 +212,7 @@ struct Auth0Authentication: Authentication {
     @available(iOS 16.6, macOS 12.0, visionOS 1.0, *)
     func login(signupPasskey attestation: SignupPasskey,
                signupChallenge challenge: PasskeySignupChallenge,
-               realmOrConnection realm: String?,
+               connection: String?,
                audience: String?,
                scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
@@ -224,8 +224,7 @@ struct Auth0Authentication: Authentication {
             "type": "public-key",
             "response": [
                 "clientDataJSON": attestation.rawClientDataJSON.encodeBase64URLSafe(),
-                "attestationObject": attestation.rawAttestationObject!.encodeBase64URLSafe(),
-                "userHandle": challenge.userId.encodeBase64URLSafe()
+                "attestationObject": attestation.rawAttestationObject!.encodeBase64URLSafe()
             ]
         ]
 
@@ -238,7 +237,7 @@ struct Auth0Authentication: Authentication {
             "authn_response": authenticatorResponse
         ]
 
-        payload["realm"] = realm
+        payload["realm"] = connection
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
 
@@ -256,7 +255,7 @@ struct Auth0Authentication: Authentication {
                                 phoneNumber: String?,
                                 username: String?,
                                 name: String?,
-                                realmOrConnection realm: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
+                                connection: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
         let url = URL(string: "passkey/register", relativeTo: self.url)!
 
         var userProfile: [String: Any] = [:]
@@ -269,7 +268,7 @@ struct Auth0Authentication: Authentication {
             "client_id": self.clientId,
             "user_profile": userProfile
         ]
-        payload["realm"] = realm
+        payload["realm"] = connection
 
         return Request(session: session,
                        url: url,
