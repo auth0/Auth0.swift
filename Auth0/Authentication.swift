@@ -485,7 +485,7 @@ public protocol Authentication: Trackable, Loggable {
        - connection:     Name of the database connection where the user will be created.
        - userMetadata:   Additional user metadata parameters that will be added to the newly created user.
        - rootAttributes: Root attributes that will be added to the newly created user. These will not overwrite existing parameters. See https://auth0.com/docs/api/authentication#signup for the full list of supported attributes.
-     - Returns: A request that will yield Auth0 user's credentials.
+     - Returns: A request that will yield a newly created database user (just the email, username, and email verified flag).
 
      ## See Also
 
@@ -539,7 +539,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to.
     ///   - scope:       Space-separated list of requested scope values.
-    /// - Returns: A request that will yield a passkey signup challenge.
+    /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-new-user)
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
