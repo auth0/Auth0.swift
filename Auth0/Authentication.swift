@@ -493,7 +493,7 @@ public protocol Authentication: Trackable, Loggable {
      */
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
-    #if !os(watchOS)
+    #if !os(tvOS) && !os(watchOS)
     /// Logs a user in using a signup passkey credential and the signup challenge. This is the last part of the passkey signup flow.
     ///
     /// ## Availability
@@ -980,7 +980,7 @@ public extension Authentication {
         return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
     }
 
-    #if !os(watchOS)
+    #if !os(tvOS) && !os(watchOS)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(signupPasskey attestation: SignupPasskey,
                signupChallenge challenge: PasskeySignupChallenge,

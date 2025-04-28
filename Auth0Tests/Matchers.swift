@@ -144,7 +144,7 @@ func haveSSOCredentials(_ sessionTransferToken: String,
     }
 }
 
-#if !os(watchOS)
+#if !os(tvOS) && !os(watchOS)
 func havePasskeySignupChallenge(identifier: String) -> Nimble.Matcher<AuthenticationResult<PasskeySignupChallenge>> {
     let definition = "have passkey signup challenge with user identifier <\(identifier)>"
     return Matcher<AuthenticationResult<PasskeySignupChallenge>>.define(definition) { expression, failureMessage -> MatcherResult in
@@ -397,7 +397,7 @@ extension URLRequest {
         return isMethodPOST && isHost(domain) && isPath("/mfa/challenge")
     }
     
-    #if !os(watchOS)
+    #if !os(tvOS) && !os(watchOS)
     func isPasskeySignupChallenge(_ domain: String) -> Bool {
         return isMethodPOST && isHost(domain) && isPath("/passkey/register")
     }

@@ -1,4 +1,4 @@
-#if !os(watchOS)
+#if !os(tvOS) && !os(watchOS)
 import Foundation
 
 struct PublicKeyCredentialCreationOptions: Sendable {

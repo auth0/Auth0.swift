@@ -208,7 +208,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    #if !os(watchOS)
+    #if !os(tvOS) && !os(watchOS)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(signupPasskey attestation: SignupPasskey,
                signupChallenge challenge: PasskeySignupChallenge,
