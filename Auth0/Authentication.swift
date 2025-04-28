@@ -534,7 +534,7 @@ public protocol Authentication: Trackable, Loggable {
     /// ```
     ///
     /// - Parameters:
-    ///   - attestation: The signup passkey credential obtained with [`ASAuthorizationPlatformPublicKeyCredentialProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationplatformpublickeycredentialprovider).
+    ///   - attestation: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
     ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to.
@@ -556,7 +556,7 @@ public protocol Authentication: Trackable, Loggable {
     /// You need to provide at least one user identifier and an optional display `name`. By default, database
     /// connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers)
     /// for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These
-    /// options can be required or optional and must match your Flexible Identifier configuration.
+    /// options can be required or optional and must match your Flexible Identifiers configuration.
     ///
     /// ## Availability
     ///
@@ -574,34 +574,37 @@ public protocol Authentication: Trackable, Loggable {
     ///                             connection: "Username-Password-Authentication")
     ///     .start { result in
     ///         switch result {
-    ///         case .success(let challenge):
-    ///             print("Obtained challenge: \(challenge)")
+    ///         case .success(let signupChallenge):
+    ///             print("Obtained signup challenge: \(signupChallenge)")
     ///         case .failure(let error):
     ///             print("Failed with: \(error)")
     ///         }
     ///     }
     /// ```
     ///
-    /// Use the challenge with [`ASAuthorizationPlatformPublicKeyCredentialProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationplatformpublickeycredentialprovider) to generate a new
-    /// passkey credential. See [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
+    /// Use the challenge with [`ASAuthorizationPlatformPublicKeyCredentialProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationplatformpublickeycredentialprovider)
+    /// from the `AuthenticationServices` framework to generate a new passkey credential. It will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate)
+    /// delegate. Check out [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     /// to learn more.
     ///
     /// ```swift
     /// let credentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
-    ///     relyingPartyIdentifier: challenge.relyingPartyId
+    ///     relyingPartyIdentifier: signupChallenge.relyingPartyId
     /// )
     ///
     /// let registrationRequest = credentialProvider.createCredentialRegistrationRequest(
-    ///     challenge: challenge.challengeData,
-    ///     name: challenge.userName,
-    ///     userID: challenge.userId
+    ///     challenge: signupChallenge.challengeData,
+    ///     name: signupChallenge.userName,
+    ///     userID: signupChallenge.userId
     /// )
     ///
     /// let authController = ASAuthorizationController(authorizationRequests: [registrationRequest])
-    /// // ...
+    /// authController.delegate = self // ASAuthorizationControllerDelegate
+    /// authController.presentationContextProvider = self
+    /// authController.performRequests()
     /// ```
     ///
-    /// Then, call ``login(signupPasskey:signupChallenge:connection:audience:scope:)`` with the resulting
+    /// Then, call ``login(signupPasskey:signupChallenge:connection:audience:scope:)`` with the created
     /// passkey credential and the challenge to log the new user in.
     ///
     /// - Parameters:
