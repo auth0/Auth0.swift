@@ -145,6 +145,7 @@ func haveSSOCredentials(_ sessionTransferToken: String,
 }
 
 #if !os(tvOS) && !os(watchOS)
+@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 func havePasskeySignupChallenge(identifier: String) -> Nimble.Matcher<AuthenticationResult<PasskeySignupChallenge>> {
     let definition = "have passkey signup challenge with user identifier <\(identifier)>"
     return Matcher<AuthenticationResult<PasskeySignupChallenge>>.define(definition) { expression, failureMessage -> MatcherResult in
