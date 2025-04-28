@@ -64,7 +64,6 @@
 		5C3D87F52DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */; };
 		5C3D880E2DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */; };
 		5C3D880F2DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */; };
-		5C3D88102DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */; };
 		5C3D88112DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D880D2DBE7F3B00AACC34 /* PasskeySignupChallengeSpec.swift */; };
 		5C41F6A4244DC94E00252548 /* LoginTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* LoginTransaction.swift */; };
 		5C41F6AA244DCAFB00252548 /* ClearSessionTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */; };
@@ -2391,7 +2390,6 @@
 				5F331B051D4BB7D400AE4382 /* AuthenticationSpec.swift in Sources */,
 				5F28B4691D8300D50000EB23 /* LoggerSpec.swift in Sources */,
 				5F1FBB9A1D8A44C0006B0B85 /* ResponseSpec.swift in Sources */,
-				5C3D88102DBE7F3D00AACC34 /* PasskeySignupChallengeSpec.swift in Sources */,
 				5F331B0C1D4BB7F900AE4382 /* UsersSpec.swift in Sources */,
 				C12BFE442C352DD700D1CC00 /* StubURLProtocol.swift in Sources */,
 				5F331B0E1D4BB80700AE4382 /* Matchers.swift in Sources */,
