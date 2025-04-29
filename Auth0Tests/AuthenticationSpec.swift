@@ -2,13 +2,20 @@ import Foundation
 import Quick
 import Nimble
 
+#if !os(tvOS) && !os(watchOS)
+import AuthenticationServices
+#endif
+
 @testable import Auth0
 
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 private let DomainURL = URL(string: "https://\(Domain)")!
 
+private let Email = "user@example.com"
 private let Phone = "+144444444444"
+private let Username = "user"
+private let Name = "John Doe"
 private let ValidPassword = "I.O.U. a password"
 private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
@@ -260,7 +267,189 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
         }
-        
+
+        // MARK:- Signup Passkey
+
+        #if !os(tvOS) && !os(watchOS)
+        if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
+            struct MockSignupPasskey: SignupPasskey {
+                let credentialID: Data
+                let attachment: ASAuthorizationPublicKeyCredentialAttachment = .platform
+                let rawAttestationObject: Data?
+                let rawClientDataJSON: Data
+            }
+
+            let credentialId = "mXTk10IfDhdxZnJltERtBRyNUkE".a0_decodeBase64URLSafe()!
+            let attestationObject = "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYlDH4SiOEQFwNz4z4dy3yWLJ5CkueUJPzpqulBxP" +
+            "_X_9dAAAAAPv8MAcVTk7MjAtuAgVX170AFJl05NdCHw4XcWZyZbREbQUcjVJBpQECAyYgASFYII53hB2t9eUcxo6B4PdeSaWKQCb-sQ" +
+            "RSSJIsSl1iXE6VIlgg9SFUiFdAPMrCwC-RQaNKVwNrMFzsRkiu0Djz-GPjDfA"
+            let clientData = "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiTDRTYVN4eDh0cHFyU2NUX2hicFpYLTUwcW" +
+            "ZLaDEyX294bVNVSUtTR0ZwTSIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4ud2lkY2tldC5jb20ifQ-MN8A"
+            let signupPasskey = MockSignupPasskey(credentialID: credentialId,
+                                                  rawAttestationObject: attestationObject.a0_decodeBase64URLSafe(),
+                                                  rawClientDataJSON: clientData.a0_decodeBase64URLSafe()!)
+
+            let authSession = "y1PI7ue7QX85WMxoR6Qa-9INuqA3xxKLVoDOxBOD6yYQL1Fl-zgwjFtZIQfRORhY"
+            let challengeData = "L4SaSxx8tpqrScT_hbpZX-50qfKh12_oxmSUIKSGFpM".a0_decodeBase64URLSafe()!
+            let signupChallenge = PasskeySignupChallenge(authenticationSession: authSession,
+                                                         relyingPartyId: Domain,
+                                                         userId: "dXNlckBleGFtcGxlLmNvbQ".a0_decodeBase64URLSafe()!,
+                                                         userName: Email,
+                                                         challengeData: challengeData)
+
+            describe("login with signup passkey") {
+
+                it("should login with signup passkey and default parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": "urn:okta:params:oauth:grant-type:webauthn",
+                            "auth_session": authSession,
+                            "authn_response": [
+                                "response": [
+                                    "attestationObject": attestationObject,
+                                    "clientDataJSON": clientData
+                                ],
+                                "authenticatorAttachment": "platform",
+                                "type": "public-key",
+                            ]
+                        ])
+                    }, response:  authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(signupPasskey: signupPasskey, signupChallenge: signupChallenge)
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                            }
+                    }
+                }
+
+                it("should login with signup passkey and all parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": "urn:okta:params:oauth:grant-type:webauthn",
+                            "realm": ConnectionName,
+                            "audience": "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
+                            "scope": "openid email offline_access",
+                            "auth_session": authSession,
+                            "authn_response": [
+                                "response": [
+                                    "attestationObject": attestationObject,
+                                    "clientDataJSON": clientData
+                                ],
+                                "authenticatorAttachment": "platform",
+                                "type": "public-key",
+                            ]
+                        ])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken, refreshToken: RefreshToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(signupPasskey: signupPasskey,
+                                   signupChallenge: signupChallenge,
+                                   connection: ConnectionName,
+                                   audience: "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
+                                   scope: "openid email offline_access")
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken, RefreshToken))
+                                done()
+                            }
+                    }
+
+                }
+
+            }
+
+            describe("passkey signup challenge") {
+
+                it("should request passkey signup challenge with email and default parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                            "user_profile": ["email": Email],
+                            "client_id": ClientId
+                        ])
+                    }, response: passkeySignupChallengeResponse(identifier: Email))
+                    
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+                }
+
+                it("should request passkey signup challenge with phone number and default parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                            "user_profile": ["phone_number": Phone],
+                            "client_id": ClientId
+                        ])
+                    }, response: passkeySignupChallengeResponse(identifier: Phone))
+                    
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(phoneNumber: Phone)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Phone))
+                                done()
+                            }
+                    }
+                }
+
+                it("should request passkey signup challenge with username and default parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["username": Username]
+                        ])
+                    }, response: passkeySignupChallengeResponse(identifier: Username))
+                    
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(username: Username)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Username))
+                                done()
+                            }
+                    }
+                }
+
+                it("should request passkey signup challenge with all parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "realm": ConnectionName,
+                            "user_profile": ["email": Email, "phone_number": Phone, "username": Username, "name": Name]
+                        ])
+                    }, response: passkeySignupChallengeResponse(identifier: Email, name: Name))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(email: Email,
+                                                    phoneNumber: Phone,
+                                                    username: Username,
+                                                    name: Name,
+                                                    connection: ConnectionName)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Email))
+                                done()
+                            }
+                    }
+
+                }
+
+            }
+
+        }
+        #endif
+
         // MARK:- Refresh Tokens
         
         describe("renew auth with refresh token") {
@@ -322,8 +511,7 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
         }
-        
-        
+
         // MARK:- Token Exchange
         
         describe("native social token exchange") {
@@ -1119,9 +1307,8 @@ class AuthenticationSpec: QuickSpec {
                 codeVerifier = UUID().uuidString.replacingOccurrences(of: "-", with: "")
             }
             
-            
             it("should exchange code for tokens") {
-                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["code": code, "code_verifier": codeVerifier, "grant_type": "authorization_code", "redirect_uri": redirectURI])}, response:authResponse(accessToken: AccessToken, idToken: IdToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["code": code!, "code_verifier": codeVerifier!, "grant_type": "authorization_code", "redirect_uri": redirectURI])}, response:authResponse(accessToken: AccessToken, idToken: IdToken))
                 waitUntil(timeout: Timeout) { done in
                     auth.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI).start { result in
                         expect(result).to(haveCredentials(AccessToken, IdToken))

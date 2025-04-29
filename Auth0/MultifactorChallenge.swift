@@ -4,7 +4,7 @@ public struct Challenge: Codable, Sendable {
     /// How the user will get the challenge and prove possession. 
     public let challengeType: String
 
-    /// Out-of-Band (OOB) code.
+    /// Out-of-band (OOB) code.
     public let oobCode: String?
 
     /// When the challenge response includes a `prompt` binding method, your app needs to prompt the user for the
