@@ -38,14 +38,11 @@ extension PublicKeyCredentialCreationOptions: Decodable {
         case user
         case challengeData = "challenge"
         case selectionCriteria = "authenticatorSelection"
-        case timeout
     }
 
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         let userValues = try values.nestedContainer(keyedBy: PublicKeyUser.CodingKeys.self, forKey: .user)
-
-        relyingParty = try values.decode(PublicKeyRelyingParty.self, forKey: .relyingParty)
 
         guard case let userIdString = try userValues.decode(String.self, forKey: .id),
               let userId = userIdString.a0_decodeBase64URLSafe() else {
@@ -54,8 +51,6 @@ extension PublicKeyCredentialCreationOptions: Decodable {
                                                    debugDescription: "Format of user id is not recognized.")
         }
 
-        user = PublicKeyUser(id: userId, name: try userValues.decode(String.self, forKey: .name))
-
         guard case let challengeString = try values.decode(String.self, forKey: .challengeData),
               let challenge = challengeString.a0_decodeBase64URLSafe() else {
             throw DecodingError.dataCorruptedError(forKey: .challengeData,
@@ -63,6 +58,8 @@ extension PublicKeyCredentialCreationOptions: Decodable {
                                                    debugDescription: "Format of challenge is not recognized.")
         }
 
+        relyingParty = try values.decode(PublicKeyRelyingParty.self, forKey: .relyingParty)
+        user = PublicKeyUser(id: userId, name: try userValues.decode(String.self, forKey: .name))
         challengeData = challenge
 
     }

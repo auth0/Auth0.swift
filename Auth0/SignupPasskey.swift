@@ -9,8 +9,8 @@ public protocol SignupPasskey {
 
     var credentialID: Data { get }
     var attachment: ASAuthorizationPublicKeyCredentialAttachment { get }
-    var rawAttestationObject: Data? { get }
     var rawClientDataJSON: Data { get }
+    var rawAttestationObject: Data? { get }
 
 }
 
