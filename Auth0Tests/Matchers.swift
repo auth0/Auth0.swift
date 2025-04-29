@@ -88,11 +88,11 @@ func haveCredentials() -> Nimble.Matcher<AuthenticationResult<Credentials>> {
     }
 }
 
-func haveCredentials(_ accessToken: String, _ idToken: String) -> Nimble.Matcher<AuthenticationResult<Credentials>> {
+func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil, _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<Credentials>> {
     return Matcher<AuthenticationResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> MatcherResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
-                                   refreshToken: nil,
+                                   refreshToken: refreshToken,
                                    expression,
                                    failureMessage)
     }
@@ -159,6 +159,18 @@ func haveSSOCredentials(_ sessionTransferToken: String,
                                       failureMessage)
     }
 }
+
+#if !os(tvOS) && !os(watchOS)
+@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+func havePasskeySignupChallenge(identifier: String) -> Nimble.Matcher<AuthenticationResult<PasskeySignupChallenge>> {
+    let definition = "have passkey signup challenge with user identifier <\(identifier)>"
+    return Matcher<AuthenticationResult<PasskeySignupChallenge>>.define(definition) { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage) { (created: PasskeySignupChallenge) -> Bool in
+            return created.userName == identifier
+        }
+    }
+}
+#endif
 
 func haveCreatedUser(_ email: String, username: String? = nil) -> Nimble.Matcher<AuthenticationResult<DatabaseUser>> {
     return Matcher<AuthenticationResult<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> MatcherResult in
@@ -422,6 +434,12 @@ extension URLRequest {
         return isMethodPOST && isHost(domain) && isPath("/mfa/challenge")
     }
     
+    #if !os(tvOS) && !os(watchOS)
+    func isPasskeySignupChallenge(_ domain: String) -> Bool {
+        return isMethodPOST && isHost(domain) && isPath("/passkey/register")
+    }
+    #endif
+    
     func hasHeader(_ name: String, value: String) -> Bool {
         return self.value(forHTTPHeaderField: name) == value
     }
@@ -437,14 +455,30 @@ extension URLRequest {
         })
     }
     
-    func hasAtLeast(_ parameters: [String: String]) -> Bool {
+    func hasAtLeast(_ parameters: [String: Any]) -> Bool {
         guard let payload = self.payload else { return false }
-        let entries = parameters.filter { (key, _) in payload.contains { (name, _) in  key == name } }
-        return entries.count == parameters.count && entries.reduce(true, { (initial, entry) -> Bool in
-            return initial && payload[entry.0] as? String == entry.1
-        })
+        return hasAtLeast(parameters, in: payload)
     }
-    
+
+    private func hasAtLeast(_ parameters: [String: Any], in payload: [String: Any]) -> Bool {
+        for (key, value) in parameters {
+            if let stringValue = value as? String {
+                guard let payloadValue = payload[key] as? String, payloadValue == stringValue else {
+                    return false
+                }
+            } else if let nestedParams = value as? [String: Any] {
+                guard let payloadDict = payload[key] as? [String: Any], hasAtLeast(nestedParams, in: payloadDict) else {
+                    return false
+                }
+            } else {
+                // If the value is not String or [String: Any], we can't handle it
+                return false
+            }
+        }
+
+        return true
+    }
+
     func hasUserMetadata(_ metadata: [String: String]) -> Bool {
         return hasObjectAttribute("user_metadata", value: metadata)
     }

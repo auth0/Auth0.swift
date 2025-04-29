@@ -1480,7 +1480,6 @@ public extension CredentialsManager {
     /// - Parameters:
     ///   - parameters: Additional parameters to use.
     ///   - headers:    Additional headers to use.
-    ///   - callback:   Callback that receives a `Result` containing either the renewed user's credentials or an error.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// there is no refresh token, a ``CredentialsManagerError/noRefreshToken`` error will be thrown.
     /// - Warning: Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the
