@@ -627,13 +627,13 @@ Auth0
 
 ```swift
 do {
-    let challenge = try await Auth0
+    let signupChallenge = try await Auth0
         .authentication()
         .passkeySignupChallenge(email: "support@auth0.com",
                                 name: "John Appleseed",
                                 connection: "Username-Password-Authentication")
         .start()
-    print("Obtained challenge: \(challenge)")
+    print("Obtained signup challenge: \(signupChallenge)")
 } catch {
     print("Failed with: \(error)")
 }
@@ -654,8 +654,8 @@ Auth0
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
         }
-    }, receiveValue: { challenge in
-        print("Obtained challenge: \(challenge)")
+    }, receiveValue: { signupChallenge in
+        print("Obtained signup challenge: \(signupChallenge)")
     })
     .store(in: &cancellables)
 ```
