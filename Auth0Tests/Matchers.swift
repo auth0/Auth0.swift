@@ -471,10 +471,3 @@ extension URLRequest {
         })
     }
 }
-
-func hasAtLeast(parameters: [String: String], payload: [String: String]) -> Bool {
-    let entries = parameters.filter { (key, _) in payload.contains { (name, _) in key == name } }
-    return entries.count == parameters.count && entries.reduce(true, { (initial, entry) -> Bool in
-        return initial && payload[entry.0] == entry.1
-    })
-}
