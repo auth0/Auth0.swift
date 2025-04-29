@@ -974,13 +974,13 @@
 			name = Providers;
 			sourceTree = "<group>";
 		};
-		5C3D87DE2DB8272200AACC34 /* Passkeys */ = {
+		5C3D88172DC051CF00AACC34 /* Passkeys */ = {
 			isa = PBXGroup;
 			children = (
 				5C3D87F12DB9B3DA00AACC34 /* SignupPasskey.swift */,
 				5C3D87DF2DB8274A00AACC34 /* PublicKeyCredentialCreationOptions.swift */,
 			);
-			path = Passkeys;
+			name = Passkeys;
 			sourceTree = "<group>";
 		};
 		5C41F6AF244DCC1100252548 /* Platforms */ = {
@@ -1089,7 +1089,7 @@
 				5FF465BA1CE2AC2800F7ED8C /* Management */,
 				5FE2F8C01CD0F9AF003628F4 /* Networking */,
 				5FCAB16F1D09001100331C84 /* Crypto */,
-				5C3D87DE2DB8272200AACC34 /* Passkeys */,
+				5C3D88172DC051CF00AACC34 /* Passkeys */,
 				5F3965C01CF679B500CDE7C0 /* WebAuth */,
 				5F06DDC81CC66B710011842B /* Auth0.swift */,
 				5FD255B61D14F00900387ECB /* Auth0Error.swift */,
