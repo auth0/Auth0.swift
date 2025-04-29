@@ -268,7 +268,7 @@ class AuthenticationSpec: QuickSpec {
             }
         }
 
-        // MARK:- Signup Passkey Challenge
+        // MARK:- Signup Passkey
 
         #if !os(tvOS) && !os(watchOS)
         if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
