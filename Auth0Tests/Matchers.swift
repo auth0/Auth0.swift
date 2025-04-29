@@ -88,7 +88,7 @@ func haveCredentials() -> Nimble.Matcher<AuthenticationResult<Credentials>> {
     }
 }
 
-func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil, _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<Credentials>> {
+func haveCredentials(_ accessToken: String, _ idToken: String, _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<Credentials>> {
     return Matcher<AuthenticationResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> MatcherResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
