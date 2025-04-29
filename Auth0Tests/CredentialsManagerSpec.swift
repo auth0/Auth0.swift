@@ -901,12 +901,13 @@ class CredentialsManagerSpec: QuickSpec {
             it("should return original api credentials as not expired") {
                 apiCredentials = APICredentials(accessToken: AccessToken,
                                                 tokenType: TokenType,
-                                                expiresIn: Date(timeIntervalSinceNow: ExpiresIn))
+                                                expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
+                                                scope: Scope)
                 _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
                 
                 waitUntil(timeout: Timeout) { done in
                     credentialsManager.apiCredentials(forAudience: Audience) { result in
-                        expect(result).to(haveAPICredentials(AccessToken))
+                        expect(result).to(haveAPICredentials(AccessToken, TokenType, Scope))
                         done()
                     }
                 }
@@ -920,7 +921,7 @@ class CredentialsManagerSpec: QuickSpec {
                     
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience) { result in
-                            expect(result).to(haveAPICredentials(NewAccessToken))
+                            expect(result).to(haveAPICredentials(NewAccessToken, TokenType, ""))
                             done()
                         }
                     }
@@ -1028,7 +1029,8 @@ class CredentialsManagerSpec: QuickSpec {
                             if key == Audience {
                                 let apiCredentials = APICredentials(accessToken: AccessToken,
                                                                     tokenType: TokenType,
-                                                                    expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                                                                    expiresIn: Date(timeIntervalSinceNow: -ExpiresIn),
+                                                                    scope: Scope)
                                 return try? apiCredentials.encode()
                             }
                             

@@ -33,21 +33,6 @@ class APICredentialsSpec: QuickSpec {
                 expect(credentials.scope) == Scope
             }
 
-            it("should have only the non-optional properties") {
-                let json = """
-                    {
-                        "access_token": "\(AccessToken)",
-                        "token_type": "\(Bearer)",
-                        "expires_in": \(ExpiresIn)
-                    }
-                """.data(using: .utf8)!
-                let credentials = try APICredentials(from: json)
-                expect(credentials.accessToken) == AccessToken
-                expect(credentials.tokenType) == Bearer
-                expect(credentials.expiresIn) == ExpiresInDate
-                expect(credentials.scope).to(beNil())
-            }
-
         }
 
         describe("description") {
@@ -58,15 +43,7 @@ class APICredentialsSpec: QuickSpec {
                                                  expiresIn: ExpiresInDate,
                                                  scope: Scope)
                 let description = "APICredentials(accessToken: \"<REDACTED>\", tokenType: \"\(Bearer)\", expiresIn:"
-                    + " \(ExpiresInDate), scope: Optional(\"\(Scope)\"))"
-                expect(credentials.description) == description
-                expect(credentials.description).toNot(contain(AccessToken))
-            }
-
-            it("should have only the non-optional unredacted properties") {
-                let credentials = APICredentials(accessToken: AccessToken, tokenType: Bearer, expiresIn: ExpiresInDate)
-                let description = "APICredentials(accessToken: \"<REDACTED>\", tokenType: \"\(Bearer)\", expiresIn:"
-                    + " \(ExpiresInDate), scope: nil)"
+                    + " \(ExpiresInDate), scope: \"\(Scope)\")"
                 expect(credentials.description) == description
                 expect(credentials.description).toNot(contain(AccessToken))
             }

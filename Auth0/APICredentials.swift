@@ -4,7 +4,7 @@ private struct _A0APICredentials {
     let accessToken: String
     let tokenType: String
     let expiresIn: Date
-    let scope: String?
+    let scope: String
 }
 
 /// User's credentials obtained from Auth0 for a specific API as the result of exchanging a refresh token.
@@ -28,7 +28,7 @@ public struct APICredentials: CustomStringConvertible {
     /// ## See Also
     ///
     /// - [Scopes](https://auth0.com/docs/get-started/apis/scopes)
-    public let scope: String?
+    public let scope: String
 
     /// Custom description that redacts the access token with `<REDACTED>`.
     public var description: String {
@@ -46,7 +46,7 @@ public struct APICredentials: CustomStringConvertible {
     public init(accessToken: String,
                 tokenType: String,
                 expiresIn: Date,
-                scope: String? = nil) {
+                scope: String) {
         self.accessToken = accessToken
         self.tokenType = tokenType
         self.expiresIn = expiresIn
@@ -85,26 +85,6 @@ extension APICredentials: Codable {
         self = try Self.jsonDecoder.decode(Self.self, from: data)
     }
 
-    /// `Encodable` initializer.
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try container.encode(accessToken, forKey: .accessToken)
-        try container.encode(tokenType, forKey: .tokenType)
-        try container.encode(expiresIn, forKey: .expiresIn)
-        try container.encodeIfPresent(scope, forKey: .scope)
-    }
-
-    /// `Decodable` initializer.
-    public init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-
-        accessToken = try values.decode(String.self, forKey: .accessToken)
-        tokenType = try values.decode(String.self, forKey: .tokenType)
-        expiresIn = try values.decode(Date.self, forKey: .expiresIn)
-        scope = try values.decodeIfPresent(String.self, forKey: .scope)
-    }
-
 }
 
 // MARK: - Internal Initializer
@@ -115,7 +95,7 @@ extension APICredentials {
         self.accessToken = credentials.accessToken
         self.tokenType = credentials.tokenType
         self.expiresIn = credentials.expiresIn
-        self.scope = credentials.scope
+        self.scope = credentials.scope ?? ""
     }
 
 }
