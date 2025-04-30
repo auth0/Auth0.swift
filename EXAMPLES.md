@@ -670,13 +670,13 @@ let credentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
     relyingPartyIdentifier: signupChallenge.relyingPartyId
 )
 
-let registrationRequest = credentialProvider.createCredentialRegistrationRequest(
+let request = credentialProvider.createCredentialRegistrationRequest(
     challenge: signupChallenge.challengeData,
     name: signupChallenge.userName,
     userID: signupChallenge.userId
 )
 
-let authController = ASAuthorizationController(authorizationRequests: [registrationRequest])
+let authController = ASAuthorizationController(authorizationRequests: [request])
 authController.delegate = self // ASAuthorizationControllerDelegate
 authController.presentationContextProvider = self
 authController.performRequests()
