@@ -11,7 +11,7 @@ import AuthenticationServices
 private let ClientId = "CLIENT_ID"
 private let Domain = "samples.auth0.com"
 private let DomainURL = URL(string: "https://\(Domain)")!
-
+private let Scope = "openid email offline_access"
 private let Email = "user@example.com"
 private let Phone = "+144444444444"
 private let Username = "user"
@@ -28,6 +28,7 @@ private let InvalidFacebookToken = UUID().uuidString.replacingOccurrences(of: "-
 private let Timeout: NimbleTimeInterval = .seconds(2)
 private let PasswordlessGrantType = "http://auth0.com/oauth/grant-type/passwordless/otp"
 private let TokenExchangeGrantType = "urn:ietf:params:oauth:grant-type:token-exchange"
+private let PasskeysGrantType = "urn:okta:params:oauth:grant-type:webauthn"
 private let SessionTransferTokenTokenType = "urn:auth0:params:oauth:token-type:session_transfer_token"
 
 class AuthenticationSpec: QuickSpec {
@@ -268,10 +269,153 @@ class AuthenticationSpec: QuickSpec {
             }
         }
 
-        // MARK:- Signup Passkey
+        // MARK: - Passkeys
 
         #if PASSKEYS_PLATFORM
         if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
+            struct MockLoginPasskey: LoginPasskey {
+                var userID: Data!
+                var credentialID: Data
+                var attachment: ASAuthorizationPublicKeyCredentialAttachment = .platform
+                var rawClientDataJSON: Data
+                var rawAuthenticatorData: Data!
+                var signature: Data!
+            }
+
+            let userId = "LcICuavHdO2zbcA8zRgnTRIkzPrruI_HQqe0J3RL0ou5VSrWhRybCQqyNMXWj1LDdxOzat6KVf9xpW3qLw5qjw"
+            let credentialId = "mXTk10IfDhdxZnJltERtBRyNUkE"
+            let clientData = "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiTDRTYVN4eDh0cHFyU2NUX2hicFpYLTUwcW" +
+            "ZLaDEyX294bVNVSUtTR0ZwTSIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4ud2lkY2tldC5jb20ifQ-MN8A"
+            let authenticatorData = "lDH4SiOEQFwNz4z4dy3yWLJ5CkueUJPzpqulBxP_X_8dAAAAAA"
+            let signature = "MEUCIH6XVeR9aTIEQZJ1vRv96y2ndS4da75h9K41Gnt6ssd9AiEA0DHoeNMrPw8GBzYkagdQD6I4ySOGONSTWPV" +
+            "YA0FAwII"
+            let authSession = "y1PI7ue7QX85WMxoR6Qa-9INuqA3xxKLVoDOxBOD6yYQL1Fl-zgwjFtZIQfRORhY"
+            let challengeData = "L4SaSxx8tpqrScT_hbpZX-50qfKh12_oxmSUIKSGFpM".a0_decodeBase64URLSafe()!
+            let authenticatorAttachment = "platform"
+            let type = "public-key"
+
+            let passkey = MockLoginPasskey(userID: userId.a0_decodeBase64URLSafe(),
+                                           credentialID: credentialId.a0_decodeBase64URLSafe()!,
+                                           rawClientDataJSON: clientData.a0_decodeBase64URLSafe()!,
+                                           rawAuthenticatorData: authenticatorData.a0_decodeBase64URLSafe(),
+                                           signature: signature.a0_decodeBase64URLSafe())
+            let challenge = PasskeyLoginChallenge(authenticationSession: authSession,
+                                                  relyingPartyId: Domain,
+                                                  challengeData: challengeData)
+
+            describe("login with passkey") {
+
+                it("should login with passkey and default parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "auth_session": authSession,
+                            "authn_response": [
+                                "id": credentialId,
+                                "rawId": credentialId,
+                                "authenticatorAttachment": authenticatorAttachment,
+                                "type": type,
+                                "response": [
+                                    "userHandle": userId,
+                                    "authenticatorData": authenticatorData,
+                                    "clientDataJSON": clientData,
+                                    "signature": signature
+                                ]
+                            ]
+                        ])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: passkey, challenge: challenge)
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken))
+                                done()
+                            }
+                    }
+                }
+
+                it("should login with signup passkey and all parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) &&
+                        $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "grant_type": PasskeysGrantType,
+                            "realm": ConnectionName,
+                            "audience": "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
+                            "scope": Scope,
+                            "auth_session": authSession,
+                            "authn_response": [
+                                "id": credentialId,
+                                "rawId": credentialId,
+                                "authenticatorAttachment": authenticatorAttachment,
+                                "type": type,
+                                "response": [
+                                    "userHandle": userId,
+                                    "authenticatorData": authenticatorData,
+                                    "clientDataJSON": clientData,
+                                    "signature": signature
+                                ]
+                            ]
+                        ])
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken, refreshToken: RefreshToken))
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .login(passkey: passkey,
+                                   challenge: challenge,
+                                   connection: ConnectionName,
+                                   audience: "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
+                                   scope: Scope)
+                            .start { result in
+                                expect(result).to(haveCredentials(AccessToken, IdToken, RefreshToken))
+                                done()
+                            }
+                    }
+
+                }
+
+            }
+
+            describe("passkey login challenge") {
+
+                it("should request passkey login challenge with default parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeyLoginChallenge(Domain) && $0.hasAtLeast(["client_id": ClientId])
+                    }, response: passkeyLoginChallengeResponse())
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeyLoginChallenge()
+                            .start { result in
+                                expect(result).to(beSuccessful())
+                                done()
+                            }
+                    }
+                }
+
+                it("should request passkey login challenge with all parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeyLoginChallenge(Domain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "realm": ConnectionName
+                        ])
+                    }, response: passkeyLoginChallengeResponse())
+
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeyLoginChallenge(connection: ConnectionName)
+                            .start { result in
+                                expect(result).to(beSuccessful())
+                                done()
+                            }
+                    }
+                }
+
+            }
+
             struct MockSignupPasskey: SignupPasskey {
                 let credentialID: Data
                 let attachment: ASAuthorizationPublicKeyCredentialAttachment = .platform
@@ -279,21 +423,16 @@ class AuthenticationSpec: QuickSpec {
                 let rawClientDataJSON: Data
             }
 
-            let credentialId = "mXTk10IfDhdxZnJltERtBRyNUkE".a0_decodeBase64URLSafe()!
             let attestationObject = "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYlDH4SiOEQFwNz4z4dy3yWLJ5CkueUJPzpqulBxP" +
             "_X_9dAAAAAPv8MAcVTk7MjAtuAgVX170AFJl05NdCHw4XcWZyZbREbQUcjVJBpQECAyYgASFYII53hB2t9eUcxo6B4PdeSaWKQCb-sQ" +
             "RSSJIsSl1iXE6VIlgg9SFUiFdAPMrCwC-RQaNKVwNrMFzsRkiu0Djz-GPjDfA"
-            let clientData = "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiTDRTYVN4eDh0cHFyU2NUX2hicFpYLTUwcW" +
-            "ZLaDEyX294bVNVSUtTR0ZwTSIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4ud2lkY2tldC5jb20ifQ-MN8A"
-            let signupPasskey = MockSignupPasskey(credentialID: credentialId,
+
+            let signupPasskey = MockSignupPasskey(credentialID: credentialId.a0_decodeBase64URLSafe()!,
                                                   rawAttestationObject: attestationObject.a0_decodeBase64URLSafe(),
                                                   rawClientDataJSON: clientData.a0_decodeBase64URLSafe()!)
-
-            let authSession = "y1PI7ue7QX85WMxoR6Qa-9INuqA3xxKLVoDOxBOD6yYQL1Fl-zgwjFtZIQfRORhY"
-            let challengeData = "L4SaSxx8tpqrScT_hbpZX-50qfKh12_oxmSUIKSGFpM".a0_decodeBase64URLSafe()!
             let signupChallenge = PasskeySignupChallenge(authenticationSession: authSession,
                                                          relyingPartyId: Domain,
-                                                         userId: "dXNlckBleGFtcGxlLmNvbQ".a0_decodeBase64URLSafe()!,
+                                                         userId: userId.a0_decodeBase64URLSafe()!,
                                                          userName: Email,
                                                          challengeData: challengeData)
 
@@ -304,18 +443,18 @@ class AuthenticationSpec: QuickSpec {
                         $0.isToken(Domain) &&
                         $0.hasAtLeast([
                             "client_id": ClientId,
-                            "grant_type": "urn:okta:params:oauth:grant-type:webauthn",
+                            "grant_type": PasskeysGrantType,
                             "auth_session": authSession,
                             "authn_response": [
+                                "authenticatorAttachment": authenticatorAttachment,
+                                "type": type,
                                 "response": [
                                     "attestationObject": attestationObject,
                                     "clientDataJSON": clientData
-                                ],
-                                "authenticatorAttachment": "platform",
-                                "type": "public-key",
+                                ]
                             ]
                         ])
-                    }, response:  authResponse(accessToken: AccessToken, idToken: IdToken))
+                    }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
 
                     waitUntil(timeout: Timeout) { done in
                         auth
@@ -332,18 +471,18 @@ class AuthenticationSpec: QuickSpec {
                         $0.isToken(Domain) &&
                         $0.hasAtLeast([
                             "client_id": ClientId,
-                            "grant_type": "urn:okta:params:oauth:grant-type:webauthn",
+                            "grant_type": PasskeysGrantType,
                             "realm": ConnectionName,
                             "audience": "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
-                            "scope": "openid email offline_access",
+                            "scope": Scope,
                             "auth_session": authSession,
                             "authn_response": [
+                                "authenticatorAttachment": authenticatorAttachment,
+                                "type": type,
                                 "response": [
                                     "attestationObject": attestationObject,
                                     "clientDataJSON": clientData
-                                ],
-                                "authenticatorAttachment": "platform",
-                                "type": "public-key",
+                                ]
                             ]
                         ])
                     }, response: authResponse(accessToken: AccessToken, idToken: IdToken, refreshToken: RefreshToken))
@@ -354,7 +493,7 @@ class AuthenticationSpec: QuickSpec {
                                    signupChallenge: signupChallenge,
                                    connection: ConnectionName,
                                    audience: "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
-                                   scope: "openid email offline_access")
+                                   scope: Scope)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken, RefreshToken))
                                 done()
@@ -370,8 +509,8 @@ class AuthenticationSpec: QuickSpec {
                 it("should request passkey signup challenge with email and default parameters") {
                     NetworkStub.addStub(condition: {
                         $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
-                            "user_profile": ["email": Email],
-                            "client_id": ClientId
+                            "client_id": ClientId,
+                            "user_profile": ["email": Email]
                         ])
                     }, response: passkeySignupChallengeResponse(identifier: Email))
                     
@@ -388,8 +527,8 @@ class AuthenticationSpec: QuickSpec {
                 it("should request passkey signup challenge with phone number and default parameters") {
                     NetworkStub.addStub(condition: {
                         $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
-                            "user_profile": ["phone_number": Phone],
-                            "client_id": ClientId
+                            "client_id": ClientId,
+                            "user_profile": ["phone_number": Phone]
                         ])
                     }, response: passkeySignupChallengeResponse(identifier: Phone))
                     

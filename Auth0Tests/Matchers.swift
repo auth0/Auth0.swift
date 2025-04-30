@@ -399,6 +399,10 @@ extension URLRequest {
     }
     
     #if PASSKEYS_PLATFORM
+    func isPasskeyLoginChallenge(_ domain: String) -> Bool {
+        return isMethodPOST && isHost(domain) && isPath("/passkey/challenge")
+    }
+
     func isPasskeySignupChallenge(_ domain: String) -> Bool {
         return isMethodPOST && isHost(domain) && isPath("/passkey/register")
     }
