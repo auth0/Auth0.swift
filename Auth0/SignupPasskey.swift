@@ -1,4 +1,4 @@
-#if !os(tvOS) && !os(watchOS)
+#if PASSKEYS_PLATFORM
 import Foundation
 import AuthenticationServices
 

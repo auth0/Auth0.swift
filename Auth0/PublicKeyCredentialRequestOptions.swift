@@ -1,4 +1,4 @@
-#if !os(tvOS) && !os(watchOS)
+#if PASSKEYS_PLATFORM
 import Foundation
 
 @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)

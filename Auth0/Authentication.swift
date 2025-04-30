@@ -493,7 +493,7 @@ public protocol Authentication: Trackable, Loggable {
      */
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
-    #if !os(tvOS) && !os(watchOS)
+    #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(passkey assertion: LoginPasskey,
                challenge: PasskeyLoginChallenge,
@@ -990,7 +990,7 @@ public extension Authentication {
         return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
     }
 
-    #if !os(tvOS) && !os(watchOS)
+    #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(passkey assertion: LoginPasskey,
                challenge: PasskeyLoginChallenge,

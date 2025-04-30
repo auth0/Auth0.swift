@@ -208,7 +208,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    #if !os(tvOS) && !os(watchOS)
+    #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func login(passkey assertion: LoginPasskey,
                challenge: PasskeyLoginChallenge,

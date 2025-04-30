@@ -2,7 +2,7 @@ import Foundation
 import Quick
 import Nimble
 
-#if !os(tvOS) && !os(watchOS)
+#if PASSKEYS_PLATFORM
 import AuthenticationServices
 #endif
 
@@ -270,7 +270,7 @@ class AuthenticationSpec: QuickSpec {
 
         // MARK:- Signup Passkey
 
-        #if !os(tvOS) && !os(watchOS)
+        #if PASSKEYS_PLATFORM
         if #available(iOS 16.6, macOS 13.5, visionOS 1.0, *) {
             struct MockSignupPasskey: SignupPasskey {
                 let credentialID: Data
