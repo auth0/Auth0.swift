@@ -596,7 +596,7 @@ public protocol Authentication: Trackable, Loggable {
     /// authController.performRequests()
     /// ```
     ///
-    /// Then, call ``login(passkey:challenge:connection:audience:scope:)`` with the resulting
+    /// Then, call ``login(passkey:challenge:connection:audience:scope:)-7s3cz`` with the resulting
     /// passkey credential and the challenge to log the user in.
     ///
     /// - Parameter connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
@@ -723,7 +723,7 @@ public protocol Authentication: Trackable, Loggable {
     /// authController.performRequests()
     /// ```
     ///
-    /// Then, call ``login(passkey:challenge:connection:audience:scope:)`` with the created
+    /// Then, call ``login(passkey:challenge:connection:audience:scope:)-4q8i0`` with the created
     /// passkey credential and the challenge to log the new user in.
     ///
     /// - Parameters:
