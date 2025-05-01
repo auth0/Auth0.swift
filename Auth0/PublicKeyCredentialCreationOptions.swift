@@ -1,7 +1,6 @@
 #if PASSKEYS_PLATFORM
 import Foundation
 
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 struct PublicKeyCredentialCreationOptions: Sendable {
 
     let relyingParty: PublicKeyRelyingParty
@@ -10,14 +9,12 @@ struct PublicKeyCredentialCreationOptions: Sendable {
 
 }
 
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 struct PublicKeyRelyingParty: Decodable, Sendable {
 
     let id: String
 
 }
 
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 struct PublicKeyUser: Decodable, Sendable {
 
     let id: Data
@@ -30,7 +27,6 @@ struct PublicKeyUser: Decodable, Sendable {
 
 }
 
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 extension PublicKeyCredentialCreationOptions: Decodable {
 
     enum CodingKeys: String, CodingKey {

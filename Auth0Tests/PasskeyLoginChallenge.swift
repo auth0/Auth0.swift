@@ -8,7 +8,6 @@ private let AuthenticationSession = "u5WSCyajq719ZSkLiEH13OJpa-Jsh8YZ75-NsBXph5p
 private let RelyingPartyIdentifier = "example.com"
 private let Challenge = "4Zak2Y_UFCY4BvuE_j58ThKyUWpf9Vqp6zXZb6dl-nA"
 
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 class PasskeyLoginChallengeSpec: QuickSpec {
     override class func spec() {
 

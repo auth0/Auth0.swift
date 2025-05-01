@@ -2,7 +2,6 @@
 import Foundation
 
 /// A passkey login challenge.
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 public struct PasskeyLoginChallenge: Sendable {
 
     /// Session identifier.
@@ -16,7 +15,6 @@ public struct PasskeyLoginChallenge: Sendable {
 
 }
 
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 extension PasskeyLoginChallenge: Decodable {
 
     enum CodingKeys: String, CodingKey {

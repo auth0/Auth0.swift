@@ -1,7 +1,6 @@
 #if PASSKEYS_PLATFORM
 import Foundation
 
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 struct PublicKeyCredentialRequestOptions: Sendable {
 
     let relyingPartyId: String
@@ -9,7 +8,6 @@ struct PublicKeyCredentialRequestOptions: Sendable {
 
 }
 
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 extension PublicKeyCredentialRequestOptions: Decodable {
 
     enum CodingKeys: String, CodingKey {
