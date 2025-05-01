@@ -210,27 +210,27 @@ struct Auth0Authentication: Authentication {
 
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(passkey assertion: LoginPasskey,
+    func login(passkey: LoginPasskey,
                challenge: PasskeyLoginChallenge,
                connection: String?,
                audience: String?,
                scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
-        let id = assertion.credentialID.encodeBase64URLSafe()
+        let id = passkey.credentialID.encodeBase64URLSafe()
 
         var authenticatorResponse: [String: Any] = [
             "id": id,
             "rawId": id,
             "type": "public-key",
             "response": [
-                "clientDataJSON": assertion.rawClientDataJSON.encodeBase64URLSafe(),
-                "authenticatorData": assertion.rawAuthenticatorData!.encodeBase64URLSafe(),
-                "signature": assertion.signature!.encodeBase64URLSafe(),
-                "userHandle": assertion.userID.encodeBase64URLSafe()
+                "clientDataJSON": passkey.rawClientDataJSON.encodeBase64URLSafe(),
+                "authenticatorData": passkey.rawAuthenticatorData!.encodeBase64URLSafe(),
+                "signature": passkey.signature!.encodeBase64URLSafe(),
+                "userHandle": passkey.userID.encodeBase64URLSafe()
             ]
         ]
 
-        authenticatorResponse["authenticatorAttachment"] = assertion.attachment.stringValue
+        authenticatorResponse["authenticatorAttachment"] = passkey.attachment.stringValue
 
         var payload: [String: Any] = [
             "client_id": self.clientId,
@@ -269,25 +269,25 @@ struct Auth0Authentication: Authentication {
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(signupPasskey attestation: SignupPasskey,
-               signupChallenge challenge: PasskeySignupChallenge,
+    func login(passkey: SignupPasskey,
+               challenge: PasskeySignupChallenge,
                connection: String?,
                audience: String?,
                scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
-        let id = attestation.credentialID.encodeBase64URLSafe()
+        let id = passkey.credentialID.encodeBase64URLSafe()
 
         var authenticatorResponse: [String: Any] = [
             "id": id,
             "rawId": id,
             "type": "public-key",
             "response": [
-                "clientDataJSON": attestation.rawClientDataJSON.encodeBase64URLSafe(),
-                "attestationObject": attestation.rawAttestationObject!.encodeBase64URLSafe()
+                "clientDataJSON": passkey.rawClientDataJSON.encodeBase64URLSafe(),
+                "attestationObject": passkey.rawAttestationObject!.encodeBase64URLSafe()
             ]
         ]
 
-        authenticatorResponse["authenticatorAttachment"] = attestation.attachment.stringValue
+        authenticatorResponse["authenticatorAttachment"] = passkey.attachment.stringValue
 
         var payload: [String: Any] = [
             "client_id": self.clientId,

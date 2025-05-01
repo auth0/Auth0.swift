@@ -507,8 +507,8 @@ public protocol Authentication: Trackable, Loggable {
     /// ```swift
     /// Auth0
     ///     .authentication()
-    ///     .login(passkey: passkey,
-    ///            challenge: challenge,
+    ///     .login(passkey: loginPasskey,
+    ///            challenge: loginChallenge,
     ///            connection: "Username-Password-Authentication")
     ///     .start { result in
     ///         switch result {
@@ -525,8 +525,8 @@ public protocol Authentication: Trackable, Loggable {
     /// ```swift
     /// Auth0
     ///     .authentication()
-    ///     .login(passkey: passkey,
-    ///            challenge: challenge,
+    ///     .login(passkey: loginPasskey,
+    ///            challenge: loginChallenge,
     ///            connection: "Username-Password-Authentication",
     ///            audience: "https://example.com/api",
     ///            scope: "openid profile email offline_access")
@@ -534,7 +534,7 @@ public protocol Authentication: Trackable, Loggable {
     /// ```
     ///
     /// - Parameters:
-    ///   - assertion:  The existing passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+    ///   - passkey:  The existing passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
     ///   - challenge:  The passkey challenge obtained from ``passkeyLoginChallenge(connection:)``.
     ///   - connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:   API Identifier that your application is requesting access to. Defaults to `nil`.
@@ -545,7 +545,7 @@ public protocol Authentication: Trackable, Loggable {
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Connect-to-a-service-with-an-existing-account)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(passkey assertion: LoginPasskey,
+    func login(passkey: LoginPasskey,
                challenge: PasskeyLoginChallenge,
                connection: String?,
                audience: String?,
@@ -567,8 +567,8 @@ public protocol Authentication: Trackable, Loggable {
     ///     .passkeyLoginChallenge(connection: "Username-Password-Authentication")
     ///     .start { result in
     ///         switch result {
-    ///         case .success(let challenge):
-    ///             print("Obtained challenge: \(challenge)")
+    ///         case .success(let loginChallenge):
+    ///             print("Obtained login challenge: \(loginChallenge)")
     ///         case .failure(let error):
     ///             print("Failed with: \(error)")
     ///         }
@@ -583,11 +583,11 @@ public protocol Authentication: Trackable, Loggable {
     ///
     /// ```swift
     /// let credentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
-    ///     relyingPartyIdentifier: challenge.relyingPartyId
+    ///     relyingPartyIdentifier: loginChallenge.relyingPartyId
     /// )
     ///
     /// let request = credentialProvider.createCredentialAssertionRequest(
-    ///     challenge: challenge.challengeData
+    ///     challenge: loginChallenge.challengeData
     /// )
     ///
     /// let authController = ASAuthorizationController(authorizationRequests: [request])
@@ -623,8 +623,8 @@ public protocol Authentication: Trackable, Loggable {
     /// ```swift
     /// Auth0
     ///     .authentication()
-    ///     .login(signupPasskey: signupPasskey,
-    ///            signupChallenge: signupChallenge,
+    ///     .login(passkey: signupPasskey,
+    ///            challenge: signupChallenge,
     ///            connection: "Username-Password-Authentication")
     ///     .start { result in
     ///         switch result {
@@ -641,8 +641,8 @@ public protocol Authentication: Trackable, Loggable {
     /// ```swift
     /// Auth0
     ///     .authentication()
-    ///     .login(signupPasskey: signupPasskey,
-    ///            signupChallenge: signupChallenge,
+    ///     .login(passkey: signupPasskey,
+    ///            challenge: signupChallenge,
     ///            connection: "Username-Password-Authentication",
     ///            audience: "https://example.com/api",
     ///            scope: "openid profile email offline_access")
@@ -650,7 +650,7 @@ public protocol Authentication: Trackable, Loggable {
     /// ```
     ///
     /// - Parameters:
-    ///   - attestation: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+    ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
     ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
@@ -661,8 +661,8 @@ public protocol Authentication: Trackable, Loggable {
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(signupPasskey attestation: SignupPasskey,
-               signupChallenge challenge: PasskeySignupChallenge,
+    func login(passkey: SignupPasskey,
+               challenge: PasskeySignupChallenge,
                connection: String?,
                audience: String?,
                scope: String) -> Request<Credentials, AuthenticationError>
@@ -720,7 +720,7 @@ public protocol Authentication: Trackable, Loggable {
     /// authController.performRequests()
     /// ```
     ///
-    /// Then, call ``login(signupPasskey:signupChallenge:connection:audience:scope:)`` with the created
+    /// Then, call ``login(passkey:challenge:connection:audience:scope:)`` with the created
     /// passkey credential and the challenge to log the new user in.
     ///
     /// - Parameters:
@@ -1098,12 +1098,12 @@ public extension Authentication {
 
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(passkey assertion: LoginPasskey,
+    func login(passkey: LoginPasskey,
                challenge: PasskeyLoginChallenge,
                connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(passkey: assertion,
+        return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
                           audience: audience,
@@ -1116,13 +1116,13 @@ public extension Authentication {
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(signupPasskey attestation: SignupPasskey,
-               signupChallenge challenge: PasskeySignupChallenge,
+    func login(passkey: SignupPasskey,
+               challenge: PasskeySignupChallenge,
                connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(signupPasskey: attestation,
-                          signupChallenge: challenge,
+        return self.login(passkey: passkey,
+                          challenge: challenge,
                           connection: connection,
                           audience: audience,
                           scope: scope)

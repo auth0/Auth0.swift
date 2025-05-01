@@ -458,7 +458,7 @@ class AuthenticationSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         auth
-                            .login(signupPasskey: signupPasskey, signupChallenge: signupChallenge)
+                            .login(passkey: signupPasskey, challenge: signupChallenge)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
                                 done()
@@ -489,8 +489,8 @@ class AuthenticationSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         auth
-                            .login(signupPasskey: signupPasskey,
-                                   signupChallenge: signupChallenge,
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge,
                                    connection: ConnectionName,
                                    audience: "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
                                    scope: Scope)
