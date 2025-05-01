@@ -669,10 +669,13 @@ public protocol Authentication: Trackable, Loggable {
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
-    /// You need to provide at least one user identifier and an optional display `name`. By default, database
-    /// connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers)
-    /// for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These
-    /// options can be required or optional and must match your Flexible Identifiers configuration.
+    /// You need to provide at least one user identifier when requesting the challenge, along with an optional user
+    /// display name, and an optional database connection name. If a connection name is not specified, your tenant's
+    /// default directory will be used.
+    ///
+    /// By default, database connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers)
+    /// for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These user
+    /// identifiers can be required or optional and must match your Flexible Identifiers configuration.
     ///
     /// ## Availability
     ///
