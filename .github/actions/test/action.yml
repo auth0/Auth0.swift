@@ -25,7 +25,7 @@ runs:
     - name: Restore SPM cache
       uses: actions/cache@v4
       with:
-        path: DerivedData/SourcePackages
+        path: DerivedData/Auth0/SourcePackages
         key: spm-${{ inputs.platform }}-${{ hashFiles('*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ hashFiles('.xcode-version') }}-v1
 
     - id: restore-carthage-cache
