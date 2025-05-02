@@ -150,18 +150,6 @@
 		5CD9FC7D26FE30CF009C2B27 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
 		5CD9FC7E26FE30D4009C2B27 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC8026FE30D4009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC8626FE30EB009C2B27 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
-		5CD9FC8726FE30EB009C2B27 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
-		5CD9FC8826FE30F0009C2B27 /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC8926FE30F0009C2B27 /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC8A26FE310C009C2B27 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
-		5CD9FC8B26FE310C009C2B27 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
-		5CD9FC8C26FE3116009C2B27 /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC8D26FE3116009C2B27 /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC8E26FE311D009C2B27 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
-		5CD9FC8F26FE311D009C2B27 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
-		5CD9FC9026FE3122009C2B27 /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CD9FC9126FE3122009C2B27 /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CE775A2244FCF2000D054A0 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		5CE775A3244FCF3600D054A0 /* CryptoExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552D23C9123000C89615 /* CryptoExtensions.swift */; };
 		5CE775A4244FCF3A00D054A0 /* BioAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */; };
@@ -257,7 +245,6 @@
 		5F3965D41CF67DD800CDE7C0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F3965D21CF67DD800CDE7C0 /* LaunchScreen.storyboard */; };
 		5F4A1F961D00AABC00C72242 /* OAuth2Grant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4A1F951D00AABC00C72242 /* OAuth2Grant.swift */; };
 		5F53F5CE1CFD157300476A46 /* AuthTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F53F5CD1CFD157300476A46 /* AuthTransaction.swift */; };
-		5F53F5D11CFD19A400476A46 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		5F686A771D4AB90900412E3D /* TransactionStoreSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F686A761D4AB90900412E3D /* TransactionStoreSpec.swift */; };
 		5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6FAC621D09E98000D5B4EA /* Logger.swift */; };
 		5F6FAC641D09E98000D5B4EA /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6FAC621D09E98000D5B4EA /* Logger.swift */; };
@@ -366,10 +353,6 @@
 		C1B3B9B12C24B297004A32A4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B3B9B02C24B297004A32A4 /* ContentView.swift */; };
 		C1B3B9D32C24B39E004A32A4 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1B3B9C02C24B39E004A32A4 /* Auth0.framework */; };
 		C1B3B9D42C24B39E004A32A4 /* Auth0.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = C1B3B9C02C24B39E004A32A4 /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C1B3B9DF2C24B599004A32A4 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
-		C1B3B9E02C24B599004A32A4 /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C1B3B9E32C24B5B5004A32A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
-		C1B3B9E42C24B5B5004A32A4 /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C1B3B9E52C24B65B004A32A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
 		C1B3B9E62C24B65B004A32A4 /* Nimble.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C1B3B9EA2C24B65D004A32A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
@@ -468,6 +451,27 @@
 		C1B3BA4E2C24BA37004A32A4 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
 		C1B3BA4F2C24BA37004A32A4 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		C1B3BA502C24BA37004A32A4 /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
+		D422E72A2DC49ED30004B8A2 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
+		D422E72B2DC49ED30004B8A2 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E72D2DC49ED40004B8A2 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
+		D422E72E2DC49ED40004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E7372DC4A2260004B8A2 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
+		D422E7382DC4A2260004B8A2 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E73A2DC4A2270004B8A2 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
+		D422E73B2DC4A2270004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E73C2DC4A22A0004B8A2 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
+		D422E73D2DC4A22A0004B8A2 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E73F2DC4A22B0004B8A2 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
+		D422E7402DC4A22B0004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E7412DC4A22E0004B8A2 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
+		D422E7422DC4A22E0004B8A2 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E7442DC4A22F0004B8A2 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
+		D422E7452DC4A22F0004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E7462DC4A2320004B8A2 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
+		D422E7472DC4A2320004B8A2 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E7492DC4A2330004B8A2 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
+		D422E74A2DC4A2330004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D422E74B2DC4A24B0004B8A2 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; };
 		D581CF772757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF782757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF792757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
@@ -541,8 +545,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5CD9FC8C26FE3116009C2B27 /* JWTDecode.xcframework in Copy Files */,
-				5CD9FC8D26FE3116009C2B27 /* SimpleKeychain.xcframework in Copy Files */,
 				5B7EE46820FC9F5200367724 /* Auth0.framework in Copy Files */,
 			);
 			name = "Copy Files";
@@ -554,8 +556,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5CD9FC9026FE3122009C2B27 /* JWTDecode.xcframework in Copy Files */,
-				5CD9FC9126FE3122009C2B27 /* SimpleKeychain.xcframework in Copy Files */,
 				5B7EE48E20FCA0F400367724 /* Auth0.framework in Copy Files */,
 			);
 			name = "Copy Files";
@@ -567,8 +567,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5CD9FC8826FE30F0009C2B27 /* JWTDecode.xcframework in Copy Files */,
-				5CD9FC8926FE30F0009C2B27 /* SimpleKeychain.xcframework in Copy Files */,
 				5BE65DCA1F7270DE00CADD3B /* Auth0.framework in Copy Files */,
 			);
 			name = "Copy Files";
@@ -614,8 +612,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				C1B3B9D42C24B39E004A32A4 /* Auth0.framework in Copy Files */,
-				C1B3B9E02C24B599004A32A4 /* JWTDecode.xcframework in Copy Files */,
-				C1B3B9E42C24B5B5004A32A4 /* SimpleKeychain.xcframework in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -630,6 +626,66 @@
 				C1B3B9E62C24B65B004A32A4 /* Nimble.xcframework in Copy Files */,
 			);
 			name = "Copy Files";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D422E72C2DC49ED30004B8A2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D422E72B2DC49ED30004B8A2 /* JWTDecode.xcframework in Embed Frameworks */,
+				D422E72E2DC49ED40004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D422E7392DC4A2260004B8A2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D422E7382DC4A2260004B8A2 /* JWTDecode.xcframework in Embed Frameworks */,
+				D422E73B2DC4A2270004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D422E73E2DC4A22A0004B8A2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D422E73D2DC4A22A0004B8A2 /* JWTDecode.xcframework in Embed Frameworks */,
+				D422E7402DC4A22B0004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D422E7432DC4A22E0004B8A2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D422E7422DC4A22E0004B8A2 /* JWTDecode.xcframework in Embed Frameworks */,
+				D422E7452DC4A22F0004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D422E7482DC4A2320004B8A2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D422E7472DC4A2320004B8A2 /* JWTDecode.xcframework in Embed Frameworks */,
+				D422E74A2DC4A2330004B8A2 /* SimpleKeychain.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -803,8 +859,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5CD9FC8A26FE310C009C2B27 /* JWTDecode.xcframework in Frameworks */,
-				5CD9FC8B26FE310C009C2B27 /* SimpleKeychain.xcframework in Frameworks */,
 				5B7EE46720FC9F5200367724 /* Auth0.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -813,8 +867,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5CD9FC8E26FE311D009C2B27 /* JWTDecode.xcframework in Frameworks */,
-				5CD9FC8F26FE311D009C2B27 /* SimpleKeychain.xcframework in Frameworks */,
 				5B7EE48D20FCA0F400367724 /* Auth0.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -823,6 +875,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D422E72A2DC49ED30004B8A2 /* JWTDecode.xcframework in Frameworks */,
+				D422E72D2DC49ED40004B8A2 /* SimpleKeychain.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -830,6 +884,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D422E7462DC4A2320004B8A2 /* JWTDecode.xcframework in Frameworks */,
+				D422E7492DC4A2330004B8A2 /* SimpleKeychain.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -857,6 +913,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D422E73C2DC4A22A0004B8A2 /* JWTDecode.xcframework in Frameworks */,
+				D422E73F2DC4A22B0004B8A2 /* SimpleKeychain.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -864,6 +922,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D422E7412DC4A22E0004B8A2 /* JWTDecode.xcframework in Frameworks */,
+				D422E7442DC4A22F0004B8A2 /* SimpleKeychain.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -881,9 +941,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5CD9FC8626FE30EB009C2B27 /* JWTDecode.xcframework in Frameworks */,
-				5CD9FC8726FE30EB009C2B27 /* SimpleKeychain.xcframework in Frameworks */,
-				5F53F5D11CFD19A400476A46 /* Auth0.framework in Frameworks */,
+				D422E74B2DC4A24B0004B8A2 /* Auth0.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -892,8 +950,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1B3B9D32C24B39E004A32A4 /* Auth0.framework in Frameworks */,
-				C1B3B9DF2C24B599004A32A4 /* JWTDecode.xcframework in Frameworks */,
-				C1B3B9E32C24B5B5004A32A4 /* SimpleKeychain.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -901,6 +957,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D422E7372DC4A2260004B8A2 /* JWTDecode.xcframework in Frameworks */,
+				D422E73A2DC4A2270004B8A2 /* SimpleKeychain.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1460,6 +1518,7 @@
 				5F06DD751CC448B10011842B /* Headers */,
 				5F06DD761CC448B10011842B /* Resources */,
 				5B717B241E2E2696004A05A7 /* SwiftLint */,
+				D422E72C2DC49ED30004B8A2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1479,6 +1538,7 @@
 				5F06DD821CC448C90011842B /* Headers */,
 				5F06DD831CC448C90011842B /* Resources */,
 				5B717B251E2E26B9004A05A7 /* SwiftLint */,
+				D422E7482DC4A2320004B8A2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1544,6 +1604,7 @@
 				5F23E6B61D4ACA7100C3F2D9 /* Headers */,
 				5F23E6B71D4ACA7100C3F2D9 /* Resources */,
 				5B717B261E2E26C4004A05A7 /* SwiftLint */,
+				D422E73E2DC4A22A0004B8A2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1563,6 +1624,7 @@
 				5F23E6F31D4B87F000C3F2D9 /* Headers */,
 				5F23E6F41D4B87F000C3F2D9 /* Resources */,
 				5B717B271E2E26CE004A05A7 /* SwiftLint */,
+				D422E7432DC4A22E0004B8A2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1645,6 +1707,7 @@
 				C1B3B9BD2C24B39E004A32A4 /* Frameworks */,
 				C1B3B9BE2C24B39E004A32A4 /* Resources */,
 				C1B3B9ED2C24B699004A32A4 /* SwiftLint */,
+				D422E7392DC4A2260004B8A2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
