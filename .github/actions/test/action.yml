@@ -30,7 +30,6 @@ runs:
         key: spm-${{ inputs.platform }}-${{ hashFiles('*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ hashFiles('.xcode-version') }}-v1
 
     - name: Resolve SPM dependencies
-      if: steps.restore-spm-cache.outputs.cache-hit != 'true'
       run: xcodebuild -resolvePackageDependencies
       shell: bash
 
