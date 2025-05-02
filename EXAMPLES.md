@@ -447,8 +447,9 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)**
 
-- [Login with database connection](#login-with-database-connection)
+- [Log in with database connection](#log-in-with-database-connection)
 - [Sign up with database connection](#sign-up-with-database-connection)
+- [Log in with passkey [EA]](#log-in-with-passkey-ea)
 - [Sign up with passkey [EA]](#sign-up-with-passkey-ea)
 - [Passwordless login](#passwordless-login)
 - [Retrieve user information](#retrieve-user-information)
@@ -468,7 +469,7 @@ For login or signup with username/password, the `Password` grant type needs to b
 > [!WARNING]
 > The ID tokens obtained from Web Auth login are automatically validated by Auth0.swift, ensuring their contents have not been tampered with. **This is not the case for the ID tokens obtained from the Authentication API client**, including the ones received when renewing the credentials using the refresh token. You must [validate](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) any ID tokens received from the Authentication API client before using the information they contain.
 
-### Login with database connection
+### Log in with database connection
 
 ```swift
 Auth0
@@ -550,7 +551,7 @@ Auth0
     }
 ```
 
-You might want to log the user in after signup. See [Login with database connection](#login-with-database-connection) above for an example.
+You might want to log the user in after signup. See [Log in with database connection](#log-in-with-database-connection) above for an example.
 
 <details>
   <summary>Using async/await</summary>
@@ -593,18 +594,177 @@ Auth0
 ```
 </details>
 
+### Log in with passkey [EA]
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+Logging a user in with a passkey is a three-step process that requires the **Passkeys** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#prepare-your-application) for more information.
+
+First, you request a login challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to request an **existing passkey credential**. Finally, you use the resulting passkey credential and the original challenge to log the user in.
+
+#### 1. Request a login challenge
+
+If a database connection name is not specified, your tenant's default directory will be used.
+
+```swift
+Auth0
+    .authentication()
+    .passkeyLoginChallenge(connection: "Username-Password-Authentication")
+    .start { result in
+        switch result {
+        case .success(let loginChallenge):
+            print("Obtained login challenge: \(loginChallenge)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let loginChallenge = try await Auth0
+        .authentication()
+        .passkeyLoginChallenge(connection: "Username-Password-Authentication")
+        .start()
+    print("Obtained login challenge: \(loginChallenge)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .passkeyLoginChallenge(connection: "Username-Password-Authentication")
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { loginChallenge in
+        print("Obtained login challenge: \(loginChallenge)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+#### 2. Request an existing passkey credential
+
+Use the login challenge with [`ASAuthorizationPlatformPublicKeyCredentialProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationplatformpublickeycredentialprovider) from the `AuthenticationServices` framework to request an existing passkey credential. Check out [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Connect-to-a-service-with-an-existing-account) to learn more.
+
+```swift
+let credentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+    relyingPartyIdentifier: loginChallenge.relyingPartyId
+)
+
+let request = credentialProvider.createCredentialAssertionRequest(
+    challenge: loginChallenge.challengeData
+)
+
+let authController = ASAuthorizationController(authorizationRequests: [request])
+authController.delegate = self // ASAuthorizationControllerDelegate
+authController.presentationContextProvider = self
+authController.performRequests()
+```
+
+The resulting passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+
+```swift
+func authorizationController(controller: ASAuthorizationController,
+                             didCompleteWithAuthorization authorization: ASAuthorization) {
+    guard let loginPasskey = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion else {
+        print("Unrecognized credential: \(authorization.credential)")
+        return
+    }
+
+    // ...
+}
+```
+
+#### 3. Log the user in
+
+Use the resulting passkey credential and the login challenge to log the user in.
+
+```swift
+Auth0
+    .authentication()
+    .login(passkey: loginPasskey,
+           challenge: loginChallenge,
+           connection: "Username-Password-Authentication",
+           scope: "openid profile email offline_access")
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(passkey: loginPasskey,
+               challenge: loginChallenge,
+               connection: "Username-Password-Authentication",
+               scope: "openid profile email offline_access")
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+    .login(passkey: loginPasskey,
+           challenge: loginChallenge,
+           connection: "Username-Password-Authentication",
+           scope: "openid profile email offline_access")
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
 ### Sign up with passkey [EA]
 
 > [!NOTE]
 > This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
 
-Signing up a user with a passkey is a three-step process that requires the **Passkeys** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#prepare-your-application) for more information.
+Signing a user up with a passkey is a three-step process that requires the **Passkeys** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#prepare-your-application) for more information.
 
-First, you request a signup challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a new passkey credential. Finally, you use the created passkey credential and the original signup challenge to log the new user in.
+First, you request a signup challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a **new passkey credential**. Finally, you use the created passkey credential and the original challenge to log the new user in.
 
 #### 1. Request a signup challenge
 
-You need to provide at least one user identifier and an optional display name when requesting the challenge. By default, database connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers) for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These options can be required or optional and must match your Flexible Identifiers configuration.
+You need to provide at least one user identifier when requesting the challenge, along with an optional user display name, and an optional database connection name. If a connection name is not specified, your tenant's default directory will be used.
+
+By default, database connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers) for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These user identifiers can be required or optional and must match your Flexible Identifiers configuration.
 
 ```swift
 Auth0
@@ -670,13 +830,13 @@ let credentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
     relyingPartyIdentifier: signupChallenge.relyingPartyId
 )
 
-let registrationRequest = credentialProvider.createCredentialRegistrationRequest(
+let request = credentialProvider.createCredentialRegistrationRequest(
     challenge: signupChallenge.challengeData,
     name: signupChallenge.userName,
     userID: signupChallenge.userId
 )
 
-let authController = ASAuthorizationController(authorizationRequests: [registrationRequest])
+let authController = ASAuthorizationController(authorizationRequests: [request])
 authController.delegate = self // ASAuthorizationControllerDelegate
 authController.presentationContextProvider = self
 authController.performRequests()
@@ -703,8 +863,8 @@ Use the created passkey credential and the signup challenge to log the new user 
 ```swift
 Auth0
     .authentication()
-    .login(signupPasskey: signupPasskey,
-           signupChallenge: signupChallenge,
+    .login(passkey: signupPasskey,
+           challenge: signupChallenge,
            connection: "Username-Password-Authentication",
            scope: "openid profile email offline_access")
     .start { result in
@@ -724,8 +884,8 @@ Auth0
 do {
     let credentials = try await Auth0
         .authentication()
-        .login(signupPasskey: signupPasskey,
-               signupChallenge: signupChallenge,
+        .login(passkey: signupPasskey,
+               challenge: signupChallenge,
                connection: "Username-Password-Authentication",
                scope: "openid profile email offline_access")
         .start()
@@ -742,8 +902,8 @@ do {
 ```swift
 Auth0
     .authentication()
-    .login(signupPasskey: signupPasskey,
-           signupChallenge: signupChallenge,
+    .login(passkey: signupPasskey,
+           challenge: signupChallenge,
            connection: "Username-Password-Authentication",
            scope: "openid profile email offline_access")
     .start()

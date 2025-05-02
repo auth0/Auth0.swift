@@ -10,7 +10,6 @@ private let UserIdentifier = "LcICuavHdO2zbcA8zRgnTRIkzPrruI_HQqe0J3RL0ou5VSrWhR
 private let UserName = "user@example.com"
 private let Challenge = "wC-Pos1D-2xf9H5JjeoNJDWKhToOwrlwJ2mguvhnshw"
 
-@available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
 class PasskeySignupChallengeSpec: QuickSpec {
     override class func spec() {
 
