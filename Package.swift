@@ -3,7 +3,11 @@
 import PackageDescription
 
 let webAuthPlatforms: [Platform] = [.iOS, .macOS, .macCatalyst, .visionOS]
-let swiftSettings: [SwiftSetting] = [.define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms)), .swiftLanguageMode(.v5)]
+let swiftSettings: [SwiftSetting] = [
+    .swiftLanguageMode(.v5),
+    .define("WEB_AUTH_PLATFORM", .when(platforms: webAuthPlatforms)),
+    .define("PASSKEYS_PLATFORM", .when(platforms: webAuthPlatforms))
+]
 
 let package = Package(
     name: "Auth0",
