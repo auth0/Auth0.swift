@@ -28,7 +28,7 @@ runs:
         path: |
           .build
           ~/Library/Caches/org.swift.swiftpm
-          ~/Library/Developer/Xcode/DerivedData/Auth0/SourcePackages
+          ~/Library/Developer/Xcode/DerivedData
         key: spm-${{ inputs.platform }}-${{ hashFiles('*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ hashFiles('.xcode-version') }}-v1
 
     - id: restore-carthage-cache
