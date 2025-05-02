@@ -174,6 +174,7 @@
 		5CD9FC8F26FE311D009C2B27 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
 		5CD9FC9026FE3122009C2B27 /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC9126FE3122009C2B27 /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5CDF671F2DC55C6600A9B513 /* CwlPosixPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 5CDF671E2DC55C6600A9B513 /* CwlPosixPreconditionTesting */; };
 		5CE775A2244FCF2000D054A0 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		5CE775A3244FCF3600D054A0 /* CryptoExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552D23C9123000C89615 /* CryptoExtensions.swift */; };
 		5CE775A4244FCF3A00D054A0 /* BioAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */; };
@@ -887,6 +888,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5CDF671F2DC55C6600A9B513 /* CwlPosixPreconditionTesting in Frameworks */,
 				C196EB072C35D0C700D108AA /* CwlPreconditionTesting in Frameworks */,
 				5CD9FC7B26FE30CF009C2B27 /* Nimble.xcframework in Frameworks */,
 				5CD9FC7D26FE30CF009C2B27 /* Quick.xcframework in Frameworks */,
@@ -1611,6 +1613,7 @@
 			name = Auth0Tests.tvOS;
 			packageProductDependencies = (
 				C196EB062C35D0C700D108AA /* CwlPreconditionTesting */,
+				5CDF671E2DC55C6600A9B513 /* CwlPosixPreconditionTesting */,
 			);
 			productName = Auth0Tests.tvOS;
 			productReference = 5F331AF91D4BB24C00AE4382 /* Auth0Tests.xctest */;
@@ -3745,6 +3748,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5CDF671E2DC55C6600A9B513 /* CwlPosixPreconditionTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
+			productName = CwlPosixPreconditionTesting;
+		};
 		C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
