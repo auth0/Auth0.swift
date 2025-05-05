@@ -439,6 +439,18 @@
 		D41DECE52DC8A0E900F5B1A4 /* Nimble.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DECE72DC8A0EC00F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
 		D41DECE82DC8A0EC00F5B1A4 /* Quick.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D41DECE92DC8AE4100F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
+		D41DECEA2DC8AE4100F5B1A4 /* Nimble.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D41DECEC2DC8AE4500F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
+		D41DECED2DC8AE4500F5B1A4 /* Quick.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D41DECEE2DC8AE4E00F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
+		D41DECEF2DC8AE4E00F5B1A4 /* Quick.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D41DECF12DC8AE5200F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
+		D41DECF22DC8AE5200F5B1A4 /* Nimble.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D41DECF32DC8AE5700F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
+		D41DECF42DC8AE5700F5B1A4 /* Nimble.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D41DECF62DC8AE5A00F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
+		D41DECF72DC8AE5B00F5B1A4 /* Quick.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D422E72A2DC49ED30004B8A2 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
 		D422E72B2DC49ED30004B8A2 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D422E72D2DC49ED40004B8A2 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
@@ -579,6 +591,42 @@
 			files = (
 				D41DECE52DC8A0E900F5B1A4 /* Nimble.xcframework in Embed Frameworks */,
 				D41DECE82DC8A0EC00F5B1A4 /* Quick.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D41DECEB2DC8AE4100F5B1A4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D41DECEA2DC8AE4100F5B1A4 /* Nimble.xcframework in Embed Frameworks */,
+				D41DECED2DC8AE4500F5B1A4 /* Quick.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D41DECF02DC8AE4E00F5B1A4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D41DECF22DC8AE5200F5B1A4 /* Nimble.xcframework in Embed Frameworks */,
+				D41DECEF2DC8AE4E00F5B1A4 /* Quick.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D41DECF52DC8AE5700F5B1A4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D41DECF42DC8AE5700F5B1A4 /* Nimble.xcframework in Embed Frameworks */,
+				D41DECF72DC8AE5B00F5B1A4 /* Quick.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -858,6 +906,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D41DECEC2DC8AE4500F5B1A4 /* Quick.xcframework in Frameworks */,
+				D41DECE92DC8AE4100F5B1A4 /* Nimble.xcframework in Frameworks */,
 				C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -884,7 +934,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D41DECF12DC8AE5200F5B1A4 /* Nimble.xcframework in Frameworks */,
 				C196EB072C35D0C700D108AA /* CwlPreconditionTesting in Frameworks */,
+				D41DECEE2DC8AE4E00F5B1A4 /* Quick.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -917,6 +969,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D41DECF62DC8AE5A00F5B1A4 /* Quick.xcframework in Frameworks */,
+				D41DECF32DC8AE5700F5B1A4 /* Nimble.xcframework in Frameworks */,
 				C19413DC2C2D792200FE88F7 /* CwlPreconditionTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1528,6 +1582,7 @@
 				5F06DDAB1CC451700011842B /* Sources */,
 				5F06DDAC1CC451700011842B /* Frameworks */,
 				5F06DDAD1CC451700011842B /* Resources */,
+				D41DECEB2DC8AE4100F5B1A4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1590,6 +1645,7 @@
 				5F331AF51D4BB24C00AE4382 /* Sources */,
 				5F331AF61D4BB24C00AE4382 /* Frameworks */,
 				5F331AF71D4BB24C00AE4382 /* Resources */,
+				D41DECF02DC8AE4E00F5B1A4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1672,6 +1728,7 @@
 				C1B3B9C32C24B39E004A32A4 /* Sources */,
 				C1B3B9C42C24B39E004A32A4 /* Frameworks */,
 				C1B3B9C52C24B39E004A32A4 /* Resources */,
+				D41DECF52DC8AE5700F5B1A4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
