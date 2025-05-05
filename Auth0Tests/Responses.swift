@@ -164,6 +164,20 @@ func multifactorChallengeResponse(challengeType: String, oobCode: String? = nil,
     return apiSuccessResponse(json: json)
 }
 
+func passkeyLoginChallengeResponse() -> RequestResponse {
+    let json: [String: Any] = [
+        "auth_session": "u5WSCyajq719ZSkLiEH13OJpa-Jsh8YZ75-NsBXph5pS-_gvqA0Z1MZyXL_sellw",
+        "authn_params_public_key": [
+            "rpId": "example.com",
+            "challenge": "4Zak2Y_UFCY4BvuE_j58ThKyUWpf9Vqp6zXZb6dl-nA",
+            "userVerification": "preferred",
+            "timeout": 60000
+        ]
+    ]
+
+    return apiSuccessResponse(json: json)
+}
+
 func passkeySignupChallengeResponse(identifier: String, name: String = Support) -> RequestResponse {
     let json: [String: Any] = [
         "auth_session": "72CaO4uYxnfBz2JZ8zWfUkV2DFnC1TRZQWqEctPFJ8xIkPcTkZ82BhB6nKmj85xh",

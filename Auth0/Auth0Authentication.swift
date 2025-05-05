@@ -208,27 +208,86 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    #if !os(tvOS) && !os(watchOS)
+    #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(signupPasskey attestation: SignupPasskey,
-               signupChallenge challenge: PasskeySignupChallenge,
+    func login(passkey: LoginPasskey,
+               challenge: PasskeyLoginChallenge,
                connection: String?,
                audience: String?,
                scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
-        let id = attestation.credentialID.encodeBase64URLSafe()
+        let id = passkey.credentialID.encodeBase64URLSafe()
 
         var authenticatorResponse: [String: Any] = [
             "id": id,
             "rawId": id,
             "type": "public-key",
             "response": [
-                "clientDataJSON": attestation.rawClientDataJSON.encodeBase64URLSafe(),
-                "attestationObject": attestation.rawAttestationObject!.encodeBase64URLSafe()
+                "clientDataJSON": passkey.rawClientDataJSON.encodeBase64URLSafe(),
+                "authenticatorData": passkey.rawAuthenticatorData!.encodeBase64URLSafe(),
+                "signature": passkey.signature!.encodeBase64URLSafe(),
+                "userHandle": passkey.userID.encodeBase64URLSafe()
             ]
         ]
 
-        authenticatorResponse["authenticatorAttachment"] = attestation.attachment.stringValue
+        authenticatorResponse["authenticatorAttachment"] = passkey.attachment.stringValue
+
+        var payload: [String: Any] = [
+            "client_id": self.clientId,
+            "grant_type": "urn:okta:params:oauth:grant-type:webauthn",
+            "auth_session": challenge.authenticationSession,
+            "authn_response": authenticatorResponse
+        ]
+
+        payload["realm"] = connection
+        payload["audience"] = audience
+        payload["scope"] = includeRequiredScope(in: scope)
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: codable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeyLoginChallenge(connection: String?) -> Request<PasskeyLoginChallenge, AuthenticationError> {
+        let url = URL(string: "passkey/challenge", relativeTo: self.url)!
+
+        var payload: [String: String] = ["client_id": self.clientId]
+        payload["realm"] = connection
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: codable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: SignupPasskey,
+               challenge: PasskeySignupChallenge,
+               connection: String?,
+               audience: String?,
+               scope: String) -> Request<Credentials, AuthenticationError> {
+        let url = URL(string: "oauth/token", relativeTo: self.url)!
+        let id = passkey.credentialID.encodeBase64URLSafe()
+
+        var authenticatorResponse: [String: Any] = [
+            "id": id,
+            "rawId": id,
+            "type": "public-key",
+            "response": [
+                "clientDataJSON": passkey.rawClientDataJSON.encodeBase64URLSafe(),
+                "attestationObject": passkey.rawAttestationObject!.encodeBase64URLSafe()
+            ]
+        ]
+
+        authenticatorResponse["authenticatorAttachment"] = passkey.attachment.stringValue
 
         var payload: [String: Any] = [
             "client_id": self.clientId,
