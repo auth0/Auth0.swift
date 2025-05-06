@@ -1363,18 +1363,13 @@ class CredentialsManagerSpec: QuickSpec {
                     credentialsManager.ssoCredentials { result in
                         expect(result).to(haveSSOCredentials(NewAccessToken, NewIdToken))
 
-                        // let storedCredentials = fetchCredentials(from: store)
-                        // TODO: replace with line above when updating the MRRT PR
-                        let data = try! store.data(forKey: "credentials")
-                        let storedCredentials = try! NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self,
-                                                                                        from: data)
+                        let storedCredentials = fetchCredentials(from: store)
 
                         expect(storedCredentials?.accessToken) == AccessToken
                         expect(storedCredentials?.tokenType) == TokenType
                         expect(storedCredentials?.idToken) == NewIdToken // Gets updated
                         expect(storedCredentials?.refreshToken) == RefreshToken // Does not get updated
-                        // expect(storedCredentials?.scope) == Scope
-                        // TODO: uncomment line above when updating the MRRT PR
+                        expect(storedCredentials?.scope) == Scope
                         done()
                     }
                 }
@@ -1389,18 +1384,13 @@ class CredentialsManagerSpec: QuickSpec {
                     credentialsManager.ssoCredentials { result in
                         expect(result).to(haveSSOCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
 
-                        // let storedCredentials = fetchCredentials(from: store)
-                        // TODO: replace with line above when updating the MRRT PR
-                        let data = try! store.data(forKey: "credentials")
-                        let storedCredentials = try! NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self,
-                                                                                        from: data)
+                        let storedCredentials = fetchCredentials(from: store)
 
                         expect(storedCredentials?.accessToken) == AccessToken
                         expect(storedCredentials?.tokenType) == TokenType
                         expect(storedCredentials?.idToken) == NewIdToken // Gets updated
                         expect(storedCredentials?.refreshToken) == NewRefreshToken // Gets updated
-                        // expect(storedCredentials?.scope) == Scope
-                        // TODO: uncomment line above when updating the MRRT PR
+                        expect(storedCredentials?.scope) == Scope
                         done()
                     }
                 }

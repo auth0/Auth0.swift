@@ -346,7 +346,7 @@ class AuthenticationSpec: QuickSpec {
                             "client_id": ClientId,
                             "grant_type": PasskeysGrantType,
                             "realm": ConnectionName,
-                            "audience": "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
+                            "audience": Audience,
                             "scope": Scope,
                             "auth_session": authSession,
                             "authn_response": [
@@ -369,7 +369,7 @@ class AuthenticationSpec: QuickSpec {
                             .login(passkey: passkey,
                                    challenge: challenge,
                                    connection: ConnectionName,
-                                   audience: "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
+                                   audience: Audience,
                                    scope: Scope)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken, RefreshToken))
@@ -475,7 +475,7 @@ class AuthenticationSpec: QuickSpec {
                             "client_id": ClientId,
                             "grant_type": PasskeysGrantType,
                             "realm": ConnectionName,
-                            "audience": "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
+                            "audience": Audience,
                             "scope": Scope,
                             "auth_session": authSession,
                             "authn_response": [
@@ -494,7 +494,7 @@ class AuthenticationSpec: QuickSpec {
                             .login(passkey: signupPasskey,
                                    challenge: signupChallenge,
                                    connection: ConnectionName,
-                                   audience: "https://example.com/api", // TODO: Replace with `Audience` once MRRT PR gets updated
+                                   audience: Audience,
                                    scope: Scope)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken, RefreshToken))
