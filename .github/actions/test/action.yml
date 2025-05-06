@@ -22,6 +22,18 @@ runs:
       run: xcodebuild -version | tee .xcode-version
       shell: bash
 
+    - id: restore-spm-cache
+      name: Restore SPM cache
+      uses: actions/cache@v4
+      with:
+        path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+        key: spm-${{ inputs.platform }}-${{ hashFiles('*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ hashFiles('.xcode-version') }}-v1
+
+    - name: Resolve SPM dependencies
+      if: steps.restore-spm-cache.outputs.cache-hit != 'true'
+      run: xcodebuild -resolvePackageDependencies -skipPackageUpdates -onlyUsePackageVersionsFromResolvedFile
+      shell: bash
+
     - id: restore-carthage-cache
       name: Restore Carthage cache
       uses: actions/cache@v4

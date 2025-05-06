@@ -424,7 +424,7 @@ public protocol Authentication: Trackable, Loggable {
        - username: Username or email of the user.
        - password: Password of the user.
        - audience: API Identifier that your application is requesting access to.
-       - scope:    Space-separated list of requested scope values.
+       - scope:    Space-separated list of requested scope values. Defaults to `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
@@ -493,8 +493,8 @@ public protocol Authentication: Trackable, Loggable {
      */
     func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
 
-    #if !os(tvOS) && !os(watchOS)
-    /// Logs a user in using a signup passkey credential and the signup challenge. This is the last part of the passkey signup flow.
+    #if PASSKEYS_PLATFORM
+    /// Logs a user in using an existing passkey credential and the login challenge. This is the last part of the passkey login flow.
     ///
     /// ## Availability
     ///
@@ -507,8 +507,8 @@ public protocol Authentication: Trackable, Loggable {
     /// ```swift
     /// Auth0
     ///     .authentication()
-    ///     .login(signupPasskey: signupPasskey,
-    ///            signupChallenge: signupChallenge,
+    ///     .login(passkey: loginPasskey,
+    ///            challenge: loginChallenge,
     ///            connection: "Username-Password-Authentication")
     ///     .start { result in
     ///         switch result {
@@ -525,8 +525,8 @@ public protocol Authentication: Trackable, Loggable {
     /// ```swift
     /// Auth0
     ///     .authentication()
-    ///     .login(signupPasskey: signupPasskey,
-    ///            signupChallenge: signupChallenge,
+    ///     .login(passkey: loginPasskey,
+    ///            challenge: loginChallenge,
     ///            connection: "Username-Password-Authentication",
     ///            audience: "https://example.com/api",
     ///            scope: "openid profile email offline_access")
@@ -534,29 +534,148 @@ public protocol Authentication: Trackable, Loggable {
     /// ```
     ///
     /// - Parameters:
-    ///   - attestation: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+    ///   - passkey:  The existing passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+    ///   - challenge:  The passkey challenge obtained from ``passkeyLoginChallenge(connection:)``.
+    ///   - connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - audience:   API Identifier that your application is requesting access to. Defaults to `nil`.
+    ///   - scope:      Space-separated list of requested scope values. Defaults to `openid profile email`.
+    /// - Returns: A request that will yield Auth0 user's credentials.
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-existing-user)
+    /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
+    /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Connect-to-a-service-with-an-existing-account)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: LoginPasskey,
+               challenge: PasskeyLoginChallenge,
+               connection: String?,
+               audience: String?,
+               scope: String) -> Request<Credentials, AuthenticationError>
+
+    /// Requests a challenge for logging a user in with an existing passkey. This is the first part of the passkey login flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .passkeyLoginChallenge(connection: "Username-Password-Authentication")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let loginChallenge):
+    ///             print("Obtained login challenge: \(loginChallenge)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// Use the challenge with [`ASAuthorizationPlatformPublicKeyCredentialProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationplatformpublickeycredentialprovider)
+    /// from the `AuthenticationServices` framework to request an existing passkey credential. It will be delivered
+    /// through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate)
+    /// delegate. Check out [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Connect-to-a-service-with-an-existing-account)
+    /// to learn more.
+    ///
+    /// ```swift
+    /// let credentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+    ///     relyingPartyIdentifier: loginChallenge.relyingPartyId
+    /// )
+    ///
+    /// let request = credentialProvider.createCredentialAssertionRequest(
+    ///     challenge: loginChallenge.challengeData
+    /// )
+    ///
+    /// let authController = ASAuthorizationController(authorizationRequests: [request])
+    /// authController.delegate = self // ASAuthorizationControllerDelegate
+    /// authController.presentationContextProvider = self
+    /// authController.performRequests()
+    /// ```
+    ///
+    /// Then, call ``login(passkey:challenge:connection:audience:scope:)-7s3cz`` with the resulting
+    /// passkey credential and the challenge to log the user in.
+    ///
+    /// - Parameter connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
+    /// - Returns: A request that will yield a passkey login challenge.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#request-login-challenge)
+    /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
+    /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Connect-to-a-service-with-an-existing-account)
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeyLoginChallenge(connection: String?) -> Request<PasskeyLoginChallenge, AuthenticationError>
+
+    /// Logs a new user in using a signup passkey credential and the signup challenge. This is the last part of the passkey signup flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .login(passkey: signupPasskey,
+    ///            challenge: signupChallenge,
+    ///            connection: "Username-Password-Authentication")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let credentials):
+    ///             print("Obtained credentials: \(credentials)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// You can also specify audience (the Auth0 API identifier) and scope values:
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .login(passkey: signupPasskey,
+    ///            challenge: signupChallenge,
+    ///            connection: "Username-Password-Authentication",
+    ///            audience: "https://example.com/api",
+    ///            scope: "openid profile email offline_access")
+    ///     .start { print($0) }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
     ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
-    ///   - audience:    API Identifier that your application is requesting access to.
-    ///   - scope:       Space-separated list of requested scope values.
+    ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
+    ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-new-user)
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(signupPasskey attestation: SignupPasskey,
-               signupChallenge challenge: PasskeySignupChallenge,
+    func login(passkey: SignupPasskey,
+               challenge: PasskeySignupChallenge,
                connection: String?,
                audience: String?,
                scope: String) -> Request<Credentials, AuthenticationError>
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
-    /// You need to provide at least one user identifier and an optional display `name`. By default, database
-    /// connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers)
-    /// for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These
-    /// options can be required or optional and must match your Flexible Identifiers configuration.
+    /// You need to provide at least one user identifier when requesting the challenge, along with an optional user
+    /// display name, and an optional database connection name. If a connection name is not specified, your tenant's
+    /// default directory will be used.
+    ///
+    /// By default, database connections require a valid `email`. If you have enabled [Flexible Identifiers](https://auth0.com/docs/authenticate/database-connections/activate-and-configure-attributes-for-flexible-identifiers)
+    /// for your database connection, you may use any combination of `email`, `phoneNumber`, or `username`. These user
+    /// identifiers can be required or optional and must match your Flexible Identifiers configuration.
     ///
     /// ## Availability
     ///
@@ -592,26 +711,26 @@ public protocol Authentication: Trackable, Loggable {
     ///     relyingPartyIdentifier: signupChallenge.relyingPartyId
     /// )
     ///
-    /// let registrationRequest = credentialProvider.createCredentialRegistrationRequest(
+    /// let request = credentialProvider.createCredentialRegistrationRequest(
     ///     challenge: signupChallenge.challengeData,
     ///     name: signupChallenge.userName,
     ///     userID: signupChallenge.userId
     /// )
     ///
-    /// let authController = ASAuthorizationController(authorizationRequests: [registrationRequest])
+    /// let authController = ASAuthorizationController(authorizationRequests: [request])
     /// authController.delegate = self // ASAuthorizationControllerDelegate
     /// authController.presentationContextProvider = self
     /// authController.performRequests()
     /// ```
     ///
-    /// Then, call ``login(signupPasskey:signupChallenge:connection:audience:scope:)`` with the created
+    /// Then, call ``login(passkey:challenge:connection:audience:scope:)-4q8i0`` with the created
     /// passkey credential and the challenge to log the new user in.
     ///
     /// - Parameters:
-    ///   - email:       Email address of the user.
-    ///   - phoneNumber: Phone number of the user.
-    ///   - username:    Username of the user.
-    ///   - name:        Display name of the user.
+    ///   - email:       Email address of the user. Defaults to `nil`.
+    ///   - phoneNumber: Phone number of the user. Defaults to `nil`.
+    ///   - username:    Username of the user. Defaults to `nil`.
+    ///   - name:        Display name of the user. Defaults to `nil`.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     /// - Returns: A request that will yield a passkey signup challenge.
     ///
@@ -980,18 +1099,36 @@ public extension Authentication {
         return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
     }
 
-    #if !os(tvOS) && !os(watchOS)
+    #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(signupPasskey attestation: SignupPasskey,
-               signupChallenge challenge: PasskeySignupChallenge,
+    func login(passkey: LoginPasskey,
+               challenge: PasskeyLoginChallenge,
                connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        self.login(signupPasskey: attestation,
-                   signupChallenge: challenge,
-                   connection: connection,
-                   audience: audience,
-                   scope: scope)
+        return self.login(passkey: passkey,
+                          challenge: challenge,
+                          connection: connection,
+                          audience: audience,
+                          scope: scope)
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeyLoginChallenge(connection: String? = nil) -> Request<PasskeyLoginChallenge, AuthenticationError> {
+        return self.passkeyLoginChallenge(connection: connection)
+    }
+
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func login(passkey: SignupPasskey,
+               challenge: PasskeySignupChallenge,
+               connection: String? = nil,
+               audience: String? = nil,
+               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+        return self.login(passkey: passkey,
+                          challenge: challenge,
+                          connection: connection,
+                          audience: audience,
+                          scope: scope)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
