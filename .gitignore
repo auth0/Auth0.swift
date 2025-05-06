@@ -44,7 +44,7 @@ DerivedData/
 *.perspectivev3
 !default.perspectivev3
 xcuserdata/
-Auth0.xcodeproj/project.xcworkspace/xcshareddata/
+**/xcshareddata/*
 
 ## Other
 *.moved-aside
@@ -64,7 +64,10 @@ playground.xcworkspace
 # Packages/
 .swiftpm/
 .build/
-Package.resolved
+/Package.resolved
+!**/xcshareddata/**/
+**/xcshareddata/swiftpm/**/
+!**/xcshareddata/swiftpm/Package.resolved
 
 # CocoaPods
 #
