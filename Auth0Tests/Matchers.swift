@@ -82,7 +82,13 @@ func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError) -> Nimb
     }
 }
 
-func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil, _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<Credentials>> {
+func haveCredentials() -> Nimble.Matcher<AuthenticationResult<Credentials>> {
+    return Matcher<AuthenticationResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage)
+    }
+}
+
+func haveCredentials(_ accessToken: String, _ idToken: String, _ refreshToken: String? = nil) -> Nimble.Matcher<AuthenticationResult<Credentials>> {
     return Matcher<AuthenticationResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> MatcherResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
@@ -93,7 +99,7 @@ func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil, _ r
 }
 
 #if WEB_AUTH_PLATFORM
-func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> Nimble.Matcher<WebAuthResult<Credentials>> {
+func haveCredentials(_ accessToken: String, _ idToken: String) -> Nimble.Matcher<WebAuthResult<Credentials>> {
     return Matcher<WebAuthResult<Credentials>>.define("be a successful authentication result") { expression, failureMessage -> MatcherResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
@@ -104,7 +110,7 @@ func haveCredentials(_ accessToken: String? = nil, _ idToken: String? = nil) -> 
 }
 #endif
 
-func haveCredentials(_ accessToken: String, _ idToken: String? = nil, _ refreshToken: String? = nil) -> Nimble.Matcher<CredentialsManagerResult<Credentials>> {
+func haveCredentials(_ accessToken: String, _ idToken: String, _ refreshToken: String? = nil) -> Nimble.Matcher<CredentialsManagerResult<Credentials>> {
     return Matcher<CredentialsManagerResult<Credentials>>.define("be a successful credentials retrieval") { expression, failureMessage -> MatcherResult in
         return try haveCredentials(accessToken: accessToken,
                                    idToken: idToken,
@@ -117,6 +123,16 @@ func haveCredentials(_ accessToken: String, _ idToken: String? = nil, _ refreshT
 func haveCredentials() -> Nimble.Matcher<CredentialsManagerResult<Credentials>> {
     return Matcher<CredentialsManagerResult<Credentials>>.define("be a successful credentials retrieval") { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage)
+    }
+}
+
+func haveAPICredentials(_ accessToken: String, _ tokenType: String? = nil, _ scope: String? = nil) -> Nimble.Matcher<CredentialsManagerResult<APICredentials>> {
+    return Matcher<CredentialsManagerResult<APICredentials>>.define("be a successful api credentials retrieval") { expression, failureMessage -> MatcherResult in
+        return try haveAPICredentials(accessToken: accessToken,
+                                      tokenType: tokenType,
+                                      scope: scope,
+                                      expression,
+                                      failureMessage)
     }
 }
 
@@ -275,24 +291,44 @@ private func beUnsuccessful<T, E>(_ expression: Nimble.Expression<Result<T, E>>,
     return MatcherResult(status: .doesNotMatch, message: message)
 }
 
-private func haveCredentials<E>(accessToken: String?,
-                                idToken: String?,
+private func haveCredentials<E>(accessToken: String,
+                                idToken: String,
                                 refreshToken: String?,
                                 _ expression: Nimble.Expression<Result<Credentials, E>>,
                                 _ message: ExpectationMessage) throws -> MatcherResult {
-    if let accessToken = accessToken {
-        _ = message.appended(message: " <access_token: \(accessToken)>")
-    }
-    if let idToken = idToken {
-        _ = message.appended(message: " <id_token: \(idToken)>")
-    }
+    _ = message.appended(message: " <access_token: \(accessToken)>")
+    _ = message.appended(message: " <id_token: \(idToken)>")
+
     if let refreshToken = refreshToken {
         _ = message.appended(message: " <refresh_token: \(refreshToken)>")
     }
+
     return try beSuccessful(expression, message) { (credentials: Credentials) -> Bool in
-        return (accessToken == nil || credentials.accessToken == accessToken)
-        && (idToken == nil || credentials.idToken == idToken)
+        return (credentials.accessToken == accessToken)
+        && (credentials.idToken == idToken)
         && (refreshToken == nil || credentials.refreshToken == refreshToken)
+    }
+}
+
+private func haveAPICredentials<E>(accessToken: String,
+                                   tokenType: String?,
+                                   scope: String?,
+                                   _ expression: Nimble.Expression<Result<APICredentials, E>>,
+                                   _ message: ExpectationMessage) throws -> MatcherResult {
+    _ = message.appended(message: " <access_token: \(accessToken)>")
+
+    if let tokenType = tokenType {
+        _ = message.appended(message: " <token_type: \(tokenType)>")
+    }
+
+    if let scope = scope {
+        _ = message.appended(message: " <scope: \(scope)>")
+    }
+
+    return try beSuccessful(expression, message) { (apiCredentials: APICredentials) -> Bool in
+        return (apiCredentials.accessToken == accessToken)
+        && (tokenType == nil || apiCredentials.tokenType == tokenType)
+        && (scope == nil || apiCredentials.scope == scope)
     }
 }
 
