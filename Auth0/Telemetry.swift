@@ -73,13 +73,13 @@ public struct Telemetry {
     }
 
     static func swiftVersion() -> String {
-        return "5.x"
+        return "6.x"
     }
 
     static func osPlatform() -> String {
         #if os(iOS)
         return "iOS"
-        #elseif os(OSX)
+        #elseif os(macOS)
         return "macOS"
         #elseif os(tvOS)
         return "tvOS"
