@@ -987,19 +987,22 @@ public protocol Authentication: Trackable, Loggable {
          }
      ```
 
-     You can get a downscoped access token by requesting fewer scopes than were originally requested on login:
+     You can request credentials for a specific API by passing its audience value. The default scopes configured for
+     the API will be granted if you don't request any specific scopes.
 
      ```swift
      Auth0
          .authentication()
          .renew(withRefreshToken: credentials.refreshToken,
-                scope: "openid offline_access")
+                audience: "http://example.com/api",
+                scope: "read:todos update:todos")
          .start { print($0) }
      ```
 
      - Parameters:
        - refreshToken: The refresh token.
-       - scope:        Space-separated list of scope values to request. Defaults to `nil`, which will ask for the same scopes that were originally requested on login.
+       - audience:     Identifier of the API that your application is requesting access to. Defaults to `nil`.
+       - scope:        Space-separated list of scope values to request. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
@@ -1008,7 +1011,7 @@ public protocol Authentication: Trackable, Loggable {
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
      - <doc:RefreshTokens>
      */
-    func renew(withRefreshToken refreshToken: String, scope: String?) -> Request<Credentials, AuthenticationError>
+    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Revokes a user's refresh token by performing a request to the `/oauth/revoke` endpoint.
@@ -1153,8 +1156,8 @@ public extension Authentication {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
     }
 
-    func renew(withRefreshToken refreshToken: String, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.renew(withRefreshToken: refreshToken, scope: scope)
+    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
     }
 
 }
