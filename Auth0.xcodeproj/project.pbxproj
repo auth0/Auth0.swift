@@ -156,7 +156,6 @@
 		5CD9FC7A26FE30C8009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC7E26FE30D4009C2B27 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC8026FE30D4009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CDF671F2DC55C6600A9B513 /* CwlPosixPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 5CDF671E2DC55C6600A9B513 /* CwlPosixPreconditionTesting */; };
 		5CE775A2244FCF2000D054A0 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		5CE775A3244FCF3600D054A0 /* CryptoExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552D23C9123000C89615 /* CryptoExtensions.swift */; };
 		5CE775A4244FCF3A00D054A0 /* BioAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */; };
@@ -364,7 +363,6 @@
 		C177D7752C2BE00D0094C657 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
 		C177D7762C2BE00D0094C657 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
 		C177D7772C2BE00D0094C657 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
-		C19413DC2C2D792200FE88F7 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C19413DB2C2D792200FE88F7 /* CwlPreconditionTesting */; };
 		C1B3B9AF2C24B297004A32A4 /* OAuth2VisionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B3B9AE2C24B297004A32A4 /* OAuth2VisionApp.swift */; };
 		C1B3B9B12C24B297004A32A4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B3B9B02C24B297004A32A4 /* ContentView.swift */; };
 		C1B3B9D32C24B39E004A32A4 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1B3B9C02C24B39E004A32A4 /* Auth0.framework */; };
@@ -465,7 +463,6 @@
 		C1B3BA4E2C24BA37004A32A4 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FBBF03A1CC96AA70024D2AF /* Responses.swift */; };
 		C1B3BA4F2C24BA37004A32A4 /* Generators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552C23C9123000C89615 /* Generators.swift */; };
 		C1B3BA502C24BA37004A32A4 /* Auth0Spec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93BC0A1CC6B0DE0031519F /* Auth0Spec.swift */; };
-		D41DED152DCA07D100F5B1A4 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C196EB062C35D0C700D108AA /* CwlPreconditionTesting */; };
 		D41DED172DCA083800F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
 		D41DED182DCA083B00F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
 		D41DED192DCA084100F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
@@ -494,6 +491,8 @@
 		D41DED3E2DCA09B400F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED402DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
 		D41DED412DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D4B8E9E42DCDD2340021262D /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = D4B8E9E32DCDD2340021262D /* CwlPreconditionTesting */; };
+		D4B8E9E62DCDD23C0021262D /* CwlPosixPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = D4B8E9E52DCDD23C0021262D /* CwlPosixPreconditionTesting */; };
 		D581CF772757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF782757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF792757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
@@ -959,10 +958,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D41DED152DCA07D100F5B1A4 /* CwlPreconditionTesting in Frameworks */,
-				5CDF671F2DC55C6600A9B513 /* CwlPosixPreconditionTesting in Frameworks */,
 				D41DED1A2DCA084200F5B1A4 /* Nimble.xcframework in Frameworks */,
 				D41DED192DCA084100F5B1A4 /* Quick.xcframework in Frameworks */,
+				D4B8E9E62DCDD23C0021262D /* CwlPosixPreconditionTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -995,9 +993,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C19413DC2C2D792200FE88F7 /* CwlPreconditionTesting in Frameworks */,
 				D41DED172DCA083800F5B1A4 /* Nimble.xcframework in Frameworks */,
 				D41DED182DCA083B00F5B1A4 /* Quick.xcframework in Frameworks */,
+				D4B8E9E42DCDD2340021262D /* CwlPreconditionTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1687,8 +1685,7 @@
 			);
 			name = Auth0Tests.tvOS;
 			packageProductDependencies = (
-				C196EB062C35D0C700D108AA /* CwlPreconditionTesting */,
-				5CDF671E2DC55C6600A9B513 /* CwlPosixPreconditionTesting */,
+				D4B8E9E52DCDD23C0021262D /* CwlPosixPreconditionTesting */,
 			);
 			productName = Auth0Tests.tvOS;
 			productReference = 5F331AF91D4BB24C00AE4382 /* Auth0Tests.xctest */;
@@ -1771,7 +1768,7 @@
 			);
 			name = Auth0Tests.visionOS;
 			packageProductDependencies = (
-				C19413DB2C2D792200FE88F7 /* CwlPreconditionTesting */,
+				D4B8E9E32DCDD2340021262D /* CwlPreconditionTesting */,
 			);
 			productName = Auth0Tests.visionOS;
 			productReference = C1B3B9C72C24B39E004A32A4 /* Auth0Tests.xctest */;
@@ -3833,11 +3830,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		5CDF671E2DC55C6600A9B513 /* CwlPosixPreconditionTesting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
-			productName = CwlPosixPreconditionTesting;
-		};
 		C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
@@ -3848,15 +3840,15 @@
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
 			productName = CwlPreconditionTesting;
 		};
-		C19413DB2C2D792200FE88F7 /* CwlPreconditionTesting */ = {
+		D4B8E9E32DCDD2340021262D /* CwlPreconditionTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
 			productName = CwlPreconditionTesting;
 		};
-		C196EB062C35D0C700D108AA /* CwlPreconditionTesting */ = {
+		D4B8E9E52DCDD23C0021262D /* CwlPosixPreconditionTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C177D6C52C2ADEB60094C657 /* XCRemoteSwiftPackageReference "CwlPreconditionTesting" */;
-			productName = CwlPreconditionTesting;
+			productName = CwlPosixPreconditionTesting;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
