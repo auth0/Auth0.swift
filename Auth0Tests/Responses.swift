@@ -82,7 +82,9 @@ func authResponse(accessToken: String,
                   issuedTokenType: String? = nil,
                   idToken: String,
                   refreshToken: String? = nil,
-                  expiresIn: Double = 3600) -> RequestResponse {
+                  expiresIn: Double = 3600,
+                  scope: String? = nil,
+                  recoveryCode: String? = nil) -> RequestResponse {
     var json = [
         "access_token": accessToken,
         "token_type": tokenType,
@@ -92,6 +94,8 @@ func authResponse(accessToken: String,
 
     json["issued_token_type"] = issuedTokenType
     json["refresh_token"] = refreshToken
+    json["scope"] = scope
+    json["recovery_code"] = recoveryCode
 
     return apiSuccessResponse(json: json)
 }

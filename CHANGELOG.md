@@ -1,5 +1,19 @@
 # Change Log
 
+## [2.12.0](https://github.com/auth0/Auth0.swift/tree/2.12.0) (2025-05-08)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.11.0...2.12.0)
+
+**This release drops support for Xcode < 16.**
+
+**Added**
+- Added support for Multi-Resource Refresh Token (MRRT) [\#912](https://github.com/auth0/Auth0.swift/pull/912) ([Widcket](https://github.com/Widcket))
+- Added support for logging in with passkey [SDK-4974] [\#944](https://github.com/auth0/Auth0.swift/pull/944) ([Widcket](https://github.com/Widcket))
+- Added support for signing up with passkey [SDK-4974] [\#942](https://github.com/auth0/Auth0.swift/pull/942) ([Widcket](https://github.com/Widcket))
+
+**Changed**
+- Updated Swift version sent in `Auth0-Client` header [\#945](https://github.com/auth0/Auth0.swift/pull/945) ([Widcket](https://github.com/Widcket))
+- `>=5.10` swift compiler checks removed after updating to Xcode 16 [\#937](https://github.com/auth0/Auth0.swift/pull/937) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [2.11.0](https://github.com/auth0/Auth0.swift/tree/2.11.0) (2025-04-17)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.10.0...2.11.0)
 
