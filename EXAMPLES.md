@@ -228,7 +228,7 @@ SomeView()
 
 `SFSafariViewController` should only be used for login. According to its docs, `SFSafariViewController` must be used "to visibly present information to users":
 
-![Screenshot of SFSafariViewController's documentation](https://github.com/auth0/auth0-flutter/assets/5055789/952aa669-f229-4e6e-bb7e-527b701bdea6)
+![Screenshot of SFSafariViewController's documentation](https://github.com/user-attachments/assets/98de5937-3ca4-4779-9e3c-725d8b628870)
 
 This is the case for login, but not for logout. Instead of calling `clearSession()`, you can delete the stored credentials –using the Credentials Manager's `clear()` method– and use `"prompt": "login"` to force the login page even if the session cookie is still present. Since the cookies stored by `SFSafariViewController` are scoped to your app, this should not pose an issue.
 
