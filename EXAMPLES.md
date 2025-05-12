@@ -128,7 +128,7 @@ Auth0
     // ...
 ```
 
-#### Getting a refresh token
+#### Get a refresh token
 
 You must request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) from Auth0.
 
@@ -318,7 +318,7 @@ guard credentialsManager.canRenew() else {
 // Retrieve the stored credentials
 ```
 
-See [Getting a refresh token](#getting-a-refresh-token) to learn how to obtain a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens).
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens).
 
 #### If you are not using refresh tokens
 
@@ -333,7 +333,7 @@ guard credentialsManager.hasValid() else {
 
 The credentials will be automatically renewed (if expired) using the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens). **This method is thread-safe.**
 
-See [Getting a refresh token](#getting-a-refresh-token) to learn how to obtain a refresh token.
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 ```swift
 credentialsManager.credentials { result in 
@@ -386,7 +386,7 @@ credentialsManager
 
 The `credentials()` method automatically renews the stored credentials when needed, using the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens). However, you can also force a renewal using the `renew()` method. **This method is thread-safe**.
 
-See [Getting a refresh token](#getting-a-refresh-token) to learn how to obtain a refresh token.
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 ```swift
 credentialsManager.renew { result in
@@ -525,7 +525,7 @@ credentialsManager
 ```
 </details>
 
-See [Getting a refresh token](#getting-a-refresh-token) to learn how to obtain a refresh token.
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 > [!CAUTION]
 > To ensure that no concurrent exchange requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
@@ -1211,7 +1211,7 @@ Auth0
 
 Use a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) to renew the user's credentials. It is recommended that you read and understand the refresh token process beforehand.
 
-See [Getting a refresh token](#getting-a-refresh-token) to learn how to obtain a refresh token.
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 ```swift
 Auth0
@@ -1322,7 +1322,7 @@ Auth0
 ```
 </details>
 
-See [Getting a refresh token](#getting-a-refresh-token) to learn how to obtain a refresh token.
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 > [!IMPORTANT]
 > You don't need to store the SSO credentials. The session transfer token is single-use and short-lived. However, if you're using [refresh token rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation), you will get a new refresh token with the SSO credentials. You should store the new refresh token, replacing the previous one that is now invalid.
