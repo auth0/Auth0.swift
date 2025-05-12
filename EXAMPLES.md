@@ -128,7 +128,7 @@ Auth0
     // ...
 ```
 
-##### Getting a refresh token
+#### Getting a refresh token
 
 You must request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) from Auth0.
 
