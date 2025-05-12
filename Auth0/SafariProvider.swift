@@ -28,6 +28,13 @@ public extension WebAuthentication {
     /// }
     /// ```
     ///
+    /// > Important: Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the
+    /// callback URL when Auth0 redirects back to your app, so it is necessary to manually resume the Web Auth operation.
+    /// See [Use `SFSafariViewController` instead of `ASWebAuthenticationSession`](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#use-sfsafariviewcontroller-instead-of-aswebauthenticationsession)
+    /// for the complete setup instructions.
+    ///
+    /// > Note: `SFSafariViewController` does not support using Universal Links as callback URLs.
+    ///
     /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
     /// - Returns: A ``WebAuthProvider`` instance.
     ///

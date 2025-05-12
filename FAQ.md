@@ -1,14 +1,19 @@
 # Frequently Asked Questions
 
 - [1. How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box)
-  - [Use ephemeral sessions](#use-ephemeral-sessions)
-  - [Use `SFSafariViewController`](#use-sfsafariviewcontroller)
-    - [1. Configure a custom URL scheme](#1-configure-a-custom-url-scheme)
-    - [2. Capture the callback URL](#2-capture-the-callback-url)
+  - [If you don't need SSO](#if-you-dont-need-sso)
+    - [Use ephemeral sessions](#use-ephemeral-sessions)
+    - [Use `SFSafariViewController`](#use-sfsafariviewcontroller)
+    - [Use `WKWebview`](#use-wkwebview)
+  - [If you need SSO](#if-you-need-sso)
 - [2. How can I disable the _logout_ alert box?](#2-how-can-i-disable-the-logout-alert-box)
 - [3. How can I change the message in the alert box?](#3-how-can-i-change-the-message-in-the-alert-box)
 - [4. How can I programmatically close the alert box?](#4-how-can-i-programmatically-close-the-alert-box)
 - [5. How to resolve the _Failed to start this transaction, as there is an active transaction at the moment_ error?](#5-how-to-resolve-the-failed-to-start-this-transaction-as-there-is-an-active-transaction-at-the-moment-error)
+  - [Workarounds](#workarounds)
+    - [Clear the login transaction when handling the `transactionActiveAlready` error](#clear-the-login-transaction-when-handling-the-transactionactivealready-error)
+    - [Clear the login transaction when the app moves to the background/foreground](#clear-the-login-transaction-when-the-app-moves-to-the-backgroundforeground)
+    - [Avoid the login/logout alert box](#avoid-the-loginlogout-alert-box)
 
 ---
 
@@ -23,9 +28,11 @@ That alert box is displayed and managed by `ASWebAuthenticationSession`, not by 
 > [!NOTE]
 > See [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of SSO on iOS.
 
-### Use ephemeral sessions
+### If you don't need SSO
 
-If you don't need SSO, you can disable this behavior by adding `useEphemeralSession()` to the login call. This will configure `ASWebAuthenticationSession` to not store the session cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
+#### Use ephemeral sessions
+
+You can disable this behavior by adding `useEphemeralSession()` to the login call. This will configure `ASWebAuthenticationSession` to not store the session cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
 
 ```swift
 Auth0
@@ -41,74 +48,19 @@ Note that with `useEphemeralSession()` you don't need to call `clearSession(fede
 > [!NOTE]
 > `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`.
 
-### Use `SFSafariViewController`
+#### Use `SFSafariViewController`
 
-An alternative is to use `SFSafariViewController` instead of `ASWebAuthenticationSession`. You can do so with the built-in `SFSafariViewController` Web Auth provider:
+See [Use `SFSafariViewController` instead of `ASWebAuthenticationSession`](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#use-sfsafariviewcontroller-instead-of-aswebauthenticationsession).
 
-```swift
-Auth0
-    .webAuth()
-    .provider(WebAuthentication.safariProvider()) // Use SFSafariViewController
-    .start { result in
-        // ...
-    }
-```
+#### Use `WKWebview`
 
-> [!IMPORTANT]
-> Since `SFSafariViewController` does not share cookies with the Safari app, SSO will not work either. But it will keep its own cookies, so you can use it to perform SSO between your app and your website as long as you open it inside your app using `SFSafariViewController`. This also means that any feature that relies on the persistence of cookies –like "Remember this device"– will work as expected.
+See [Use `WKWebview` instead of `ASWebAuthenticationSession`](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#use-wkwebview-instead-of-aswebauthenticationsession).
 
-> [!NOTE]
-> `SFSafariViewController` does not support using Universal Links as callback URLs.
+### If you need SSO
 
-If you choose to use the `SFSafariViewController` Web Auth provider, you need to perform an additional bit of setup. Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the callback URL when Auth0 redirects back to your app, so it is necessary to manually resume the Web Auth operation.
-
-#### 1. Configure a custom URL scheme
-
-In Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
-
-![Screenshot of the URL Types section inside the app target settings](https://user-images.githubusercontent.com/5055789/198689930-15f12179-15df-437e-ba50-dec26dbfb21f.png)
-
-This registers your bundle identifier as a custom URL scheme, so the callback URL can reach your app.
-
-#### 2. Capture the callback URL
-
-<details>
-  <summary>Using the UIKit app lifecycle</summary>
-
-```swift
-// AppDelegate.swift
-
-func application(_ app: UIApplication,
-                 open url: URL,
-                 options: [UIApplication.OpenURLOptionsKey: Any]) -> Bool {
-    return WebAuthentication.resume(with: url)
-}
-```
-</details>
-
-<details>
-  <summary>Using the UIKit app lifecycle with Scenes</summary>
-
-```swift
-// SceneDelegate.swift
-
-func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-    guard let url = URLContexts.first?.url else { return }
-    WebAuthentication.resume(with: url)
-}
-```
-</details>
-
-<details>
-  <summary>Using the SwiftUI app lifecycle</summary>
-
-```swift
-SomeView()
-    .onOpenURL { url in
-        WebAuthentication.resume(with: url)
-    }
-```
-</details>
+See:
+- [`ASWebAuthenticationSession` vs `SFSafariViewController` (iOS)](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents) to help determine if `SFSafariViewController` suits your use case, depending on your SSO requirements.
+- [Use `SFSafariViewController` instead of `ASWebAuthenticationSession`](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#use-sfsafariviewcontroller-instead-of-aswebauthenticationsession) for the setup instructions.
 
 ## 2. How can I disable the _logout_ alert box?
 
@@ -116,7 +68,7 @@ SomeView()
 
 Since `clearSession(federated:)` needs to use `ASWebAuthenticationSession` as well to clear the shared session cookie, the same alert box will be displayed. 
 
-If you need SSO and/or are willing to tolerate the alert box on the login call, but would prefer to get rid of it when calling `clearSession(federated:)`, you can simply not call `clearSession(federated:)` and just clear the credentials from the app. This means that the shared session cookie will not be removed, so to get the user to log in again you need to add the `"prompt": "login"` parameter to the _login_ call.
+If you need SSO with `ASWebAuthenticationSession` and/or are willing to tolerate the alert box on the login call, but would prefer to do away with it when calling `clearSession(federated:)`, you can simply not call `clearSession(federated:)` and just clear the credentials from the app. This means that the shared session cookie will not be removed, so to get the user to log in again you need to add the `"prompt": "login"` parameter to the _login_ call.
 
 ```swift
 Auth0
@@ -168,6 +120,6 @@ You can invoke `WebAuthentication.cancel()` to manually clear the current login 
 
 #### Avoid the login/logout alert box
 
-If you don't need SSO, consider using `ASWebAuthenticationSession` with ephemeral sessions or `SFSafariViewController` instead. See [1. How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box) for more information.
+If you don't need SSO, consider using `ASWebAuthenticationSession` with ephemeral sessions, or using `SFSafariViewController` or `WKWebView` instead. See [1. How can I disable the _login_ alert box?](#1-how-can-i-disable-the-login-alert-box) for more information.
 
 [Go up ⤴](#frequently-asked-questions)

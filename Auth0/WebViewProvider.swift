@@ -10,15 +10,56 @@
 
 @preconcurrency import WebKit
 
-/// WARNING: The use of `webViewProvider` [is not recommended](https://auth0.com/blog/oauth-2-best-practices-for-native-apps) and contravenes the guidelines of the OAuth Protocol, which advises against using web views for WebAuth.
-/// The recommended approach is to utilize `ASWebAuthenticationSession`. Employ the provider below only if you fully understand the associated risks and are confident in your decision.
+/// Creates a Web Auth provider that uses `WKWebView` as the embedded user agent.
+/// Unlike `SFSafariViewController`, `WKWebView` supports using Universal Links as callback URLs.
+///
+/// ## Usage
+///
+/// ```swift
+/// Auth0
+///     .webAuth()
+///     .provider(WebAuthentication.webViewProvider())
+///     .start { result in
+///         // ...
+/// }
+/// ```
+///
+/// If you need to specify a custom `UIModalPresentationStyle`:
+///
+/// ```swift
+/// Auth0
+///     .webAuth()
+///     .provider(WebAuthentication.webViewProvider(style: .formSheet))
+///     .start { result in
+///         // ...
+/// }
+/// ```
+///
+/// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
+/// - Returns: A ``WebAuthProvider`` instance.
+///
+/// > Note: To use Universal Login's biometrics and passkeys with `WKWebView`, you must
+/// [set up an associated domain](https://github.com/auth0/Auth0.swift#configure-an-associated-domain).
+///
+/// > Warning: The use of `WKWebView` for performing web-based authentication [is not recommended](https://auth0.com/blog/oauth-2-best-practices-for-native-apps),
+/// and some social identity providers –such as Google– do not support it.
+///
+/// ## See Also
+///
+/// - [OAuth 2.0 Best Practices for Native Apps](https://auth0.com/blog/oauth-2-best-practices-for-native-apps)
 public extension WebAuthentication {
+
     static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
         return { url, callback  in
             let redirectURL = extractRedirectURL(from: url)!
-            return WebViewUserAgent(authorizeURL: url, redirectURL: redirectURL, modalPresentationStyle: style, callback: callback)
+
+            return WebViewUserAgent(authorizeURL: url,
+                                    redirectURL: redirectURL,
+                                    modalPresentationStyle: style,
+                                    callback: callback)
         }
     }
+
 }
 
 class WebViewUserAgent: NSObject, WebAuthUserAgent {
@@ -83,10 +124,12 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     public override var description: String {
         return String(describing: WKWebView.self)
     }
+
 }
 
-/// Handling Custom Scheme Callbacks
+/// Handling of Custom Scheme callbacks.
 extension WebViewUserAgent: WKURLSchemeHandler {
+
     func webView(_ webView: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {
         _ = TransactionStore.shared.resume(urlSchemeTask.request.url!)
         let error = NSError(domain: WebViewUserAgent.customSchemeRedirectionSuccessMessage, code: 200, userInfo: [
@@ -102,10 +145,12 @@ extension WebViewUserAgent: WKURLSchemeHandler {
         urlSchemeTask.didFailWithError(error)
         self.finish(with: .failure(WebAuthError(code: .webViewFailure("The WebView's resource loading was stopped."))))
     }
+
 }
 
-/// Handling HTTPS Callbacks
+/// Handling of HTTPS callbacks.
 extension WebViewUserAgent: WKNavigationDelegate {
+
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString), let scheme = callbackUrl.scheme, scheme == "https" {
             _ = TransactionStore.shared.resume(callbackUrl)
@@ -132,6 +177,7 @@ extension WebViewUserAgent: WKNavigationDelegate {
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         self.finish(with: .failure(WebAuthError(code: .webViewFailure("The WebView's content process was terminated."))))
     }
+
 }
 
 #endif
