@@ -114,7 +114,7 @@ Specify a [scope](https://auth0.com/docs/get-started/apis/scopes) to request per
 ```swift
 Auth0
     .webAuth()
-    .scope("openid profile email offline_access read:todos")
+    .scope("openid profile email read:todos")
     // ...
 ```
 
@@ -128,6 +128,20 @@ Auth0
     // ...
 ```
 
+#### Get a refresh token
+
+You must request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) from Auth0.
+
+```swift
+Auth0
+    .webAuth()
+    .scope("openid profile email offline_access read:todos")
+    // ...
+```
+
+> [!IMPORTANT]
+> Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+
 #### Use a custom `URLSession` instance
 
 You can specify a custom `URLSession` instance for more advanced networking configuration, such as customizing timeout values.
@@ -138,7 +152,114 @@ Auth0
     // ...
 ```
 
-Note that this custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
+> [!NOTE]
+> This custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
+
+#### Use `SFSafariViewController` instead of `ASWebAuthenticationSession`
+
+You can use the built-in `SFSafariViewController` Web Auth provider to open the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
+
+```swift
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.safariProvider()) // Use SFSafariViewController
+    .start { result in
+        // ...
+    }
+```
+
+> [!TIP]
+> See [`ASWebAuthenticationSession` vs `SFSafariViewController` (iOS)](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents) to help determine which option best suits your use case, depending on your requirements.
+
+> [!NOTE]
+> `SFSafariViewController` does not support using Universal Links as callback URLs.
+
+The `SFSafariViewController` Web Auth provider requires an additional bit of setup. Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the callback URL when Auth0 redirects back to your app, so it is necessary to manually resume the Web Auth operation.
+
+##### 1. Configure a custom URL scheme
+
+In Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
+
+![Screenshot of the URL Types section inside the app target settings](https://user-images.githubusercontent.com/5055789/198689930-15f12179-15df-437e-ba50-dec26dbfb21f.png)
+
+This registers your bundle identifier as a custom URL scheme, so the callback URL can reach your app.
+
+##### 2. Capture the callback URL
+
+<details>
+  <summary>Using the UIKit app lifecycle</summary>
+
+```swift
+// AppDelegate.swift
+
+func application(_ app: UIApplication,
+                 open url: URL,
+                 options: [UIApplication.OpenURLOptionsKey: Any]) -> Bool {
+    return WebAuthentication.resume(with: url)
+}
+```
+</details>
+
+<details>
+  <summary>Using the UIKit app lifecycle with Scenes</summary>
+
+```swift
+// SceneDelegate.swift
+
+func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    guard let url = URLContexts.first?.url else { return }
+    WebAuthentication.resume(with: url)
+}
+```
+</details>
+
+<details>
+  <summary>Using the SwiftUI app lifecycle</summary>
+
+```swift
+SomeView()
+    .onOpenURL { url in
+        WebAuthentication.resume(with: url)
+    }
+```
+</details>
+
+##### Logout
+
+`SFSafariViewController` should only be used for login. According to its docs, `SFSafariViewController` must be used "to visibly present information to users":
+
+![Screenshot of SFSafariViewController's documentation](https://github.com/user-attachments/assets/98de5937-3ca4-4779-9e3c-725d8b628870)
+
+This is the case for login, but not for logout. Instead of calling `clearSession()`, you can delete the stored credentials –using the Credentials Manager's `clear()` method– and use `"prompt": "login"` to force the login page even if the session cookie is still present. Since the cookies stored by `SFSafariViewController` are scoped to your app, this should not pose an issue.
+
+```swift
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.safariProvider())
+    .parameters(["prompt": "login"])
+    .start { result in
+        // ...
+    }
+```
+
+#### Use `WKWebView` instead of `ASWebAuthenticationSession`
+
+You can also use the built-in `WKWebView` Web Auth provider to open the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page. Unlike `SFSafariViewController`, `WKWebView` supports using Universal Links as callback URLs.
+
+```swift
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.webViewProvider()) // Use WKWebView
+    .start { result in
+        // ...
+    }
+```
+
+> [!NOTE]
+> To use Universal Login's biometrics and passkeys with `WKWebView`, you must [set up an associated domain](https://github.com/auth0/Auth0.swift#configure-an-associated-domain).
+
+> [!WARNING]
+> The use of `WKWebView` for performing web-based authentication [is not recommended](https://auth0.com/blog/oauth-2-best-practices-for-native-apps), and some social identity providers –such as Google– do not support it.
 
 ### ID token validation
 
@@ -197,8 +318,7 @@ guard credentialsManager.canRenew() else {
 // Retrieve the stored credentials
 ```
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens).
 
 #### If you are not using refresh tokens
 
@@ -209,9 +329,11 @@ guard credentialsManager.hasValid() else {
 // Retrieve the stored credentials
 ```
 
-### Retrieve stored credentials 
+### Retrieve stored credentials
 
 The credentials will be automatically renewed (if expired) using the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens). **This method is thread-safe.**
+
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 ```swift
 credentialsManager.credentials { result in 
@@ -254,9 +376,6 @@ credentialsManager
 ```
 </details>
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
-
 > [!CAUTION]
 > Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials. Since this method is thread-safe and `store(credentials:)` is not, calling it anyway can cause concurrency issues.
 
@@ -266,6 +385,8 @@ credentialsManager
 ### Renew stored credentials
 
 The `credentials()` method automatically renews the stored credentials when needed, using the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens). However, you can also force a renewal using the `renew()` method. **This method is thread-safe**.
+
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 ```swift
 credentialsManager.renew { result in
@@ -307,9 +428,6 @@ credentialsManager
     .store(in: &cancellables)
 ```
 </details>
-
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
 
 > [!CAUTION]
 > Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials. Since this method is thread-safe and `store(credentials:)` is not, calling it anyway can cause concurrency issues.
@@ -364,7 +482,7 @@ To implement single sign-on (SSO) with Universal Login, you can use either `ASWe
 
 An alternative way to implement SSO is by making use of a session transfer token. This is a single-use, short-lived token you must send to your website –either via query parameter or cookie– when opening it from your app. Your website then needs to redirect the user to Auth0's `/authorize` endpoint, passing along the session transfer token. Auth0 will set the respective session cookies and then redirect the user back to your website. Now, the user will be logged in on your website too. **This solution will work with any browser and webview –even standalone browser apps**.
 
-First, you need to exchange the refresh token for a set of SSO credentials containing a session transfer token. **This method is thread-safe**.
+First, you need to exchange the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) for a set of SSO credentials containing a session transfer token. **This method is thread-safe**.
 
 ```swift
 credentialsManager.ssoCredentials { result in
@@ -407,8 +525,7 @@ credentialsManager
 ```
 </details>
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 > [!CAUTION]
 > To ensure that no concurrent exchange requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
@@ -1094,6 +1211,8 @@ Auth0
 
 Use a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) to renew the user's credentials. It is recommended that you read and understand the refresh token process beforehand.
 
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
+
 ```swift
 Auth0
     .authentication()
@@ -1143,9 +1262,6 @@ Auth0
 ```
 </details>
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
-
 ### Get SSO credentials [EA]
 
 > [!NOTE]  
@@ -1155,7 +1271,7 @@ To implement single sign-on (SSO) with Universal Login, you can use either `ASWe
 
 An alternative way to implement SSO is by making use of a session transfer token. This is a one-use, short-lived token you must send to your website –either via query parameter or cookie– when opening it from your app. Your website then needs to redirect the user to Auth0's `/authorize` endpoint, passing along the session transfer token. Auth0 will set the respective session cookies and then redirect the user back to your website. Now, the user will be logged in on your website too. **This solution will work with any browser and webview –even standalone browser apps**.
 
-First, you need to exchange the refresh token for a set of SSO credentials containing a session transfer token.
+First, you need to exchange the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) for a set of SSO credentials containing a session transfer token.
 
 ```swift
 Auth0
@@ -1206,8 +1322,7 @@ Auth0
 ```
 </details>
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 > [!IMPORTANT]
 > You don't need to store the SSO credentials. The session transfer token is single-use and short-lived. However, if you're using [refresh token rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation), you will get a new refresh token with the SSO credentials. You should store the new refresh token, replacing the previous one that is now invalid.
@@ -1311,7 +1426,7 @@ Auth0
 
 ### Retrieve user metadata
 
-To call this method, you need to request the `read:current_user` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you must request the `read:current_user` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1367,7 +1482,7 @@ Auth0
 
 ### Update user metadata
 
-To call this method, you need to request the `update:current_user_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you must request the `update:current_user_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
