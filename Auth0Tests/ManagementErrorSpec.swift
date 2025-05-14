@@ -159,7 +159,7 @@ class ManagementErrorSpec: QuickSpec {
 
             it("should return the default message") {
                 let info: [String: Any] = ["foo": "bar", "statusCode": 0]
-                let message = "Failed with unknown error \(info)."
+                let message = "Failed with unknown error: \(info)."
                 let error = ManagementError(info: info)
                 expect(error.localizedDescription) == message
             }

@@ -41,7 +41,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -60,7 +60,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -77,7 +77,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -99,7 +99,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -117,7 +117,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -141,7 +141,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -202,7 +202,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: signup,
                        method: "POST",
-                       handle: databaseUser,
+                       handle: authenticationDatabaseUser,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -246,7 +246,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -262,7 +262,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -303,7 +303,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -332,7 +332,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -349,7 +349,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: resetPassword,
                        method: "POST",
-                       handle: noBody,
+                       handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -367,7 +367,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: start,
                        method: "POST",
-                       handle: noBody,
+                       handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -384,7 +384,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: start,
                        method: "POST",
-                       handle: noBody,
+                       handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -438,7 +438,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: oauthToken,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -453,7 +453,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: oauthToken,
                        method: "POST",
-                       handle: noBody,
+                       handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -464,7 +464,7 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: jwks,
                        method: "GET",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
@@ -489,7 +489,7 @@ private extension Auth0Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
@@ -503,7 +503,7 @@ private extension Auth0Authentication {
         return Request(session: session,
                        url: token,
                        method: "POST",
-                       handle: codable,
+                       handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)

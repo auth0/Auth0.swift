@@ -434,6 +434,24 @@ class AuthenticationErrorSpec: QuickSpec {
 
         }
 
+        describe("error message") {
+
+            it("should return the message") {
+                let description = "foo"
+                let info: [String: Any] = ["description": description]
+                let error = AuthenticationError(info: info)
+                expect(error.localizedDescription) == description
+            }
+
+            it("should return the default message") {
+                let info: [String: Any] = ["foo": "bar", "statusCode": 0]
+                let message = "Failed with unknown error: \(info)."
+                let error = AuthenticationError(info: info)
+                expect(error.localizedDescription) == message
+            }
+            
+        }
+
     }
 
 }

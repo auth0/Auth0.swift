@@ -4,7 +4,7 @@ import Foundation
 /// A passkey login challenge.
 public struct PasskeyLoginChallenge: Sendable {
 
-    /// Session identifier.
+    /// Unique identifier of the Auth0 session.
     public let authenticationSession: String
 
     /// Custom domain configured in the Auth0 tenant.
