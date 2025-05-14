@@ -119,7 +119,7 @@ class Auth0Spec: QuickSpec {
             }
 
             it("should have no logging for management by default") {
-                expect(Auth0.users(token: "token", domain: Domain).logger).to(beNil())
+                expect(Auth0.users(token: Token, domain: Domain).logger).to(beNil())
             }
 
             it("should enable default logger for auth") {
@@ -133,12 +133,12 @@ class Auth0Spec: QuickSpec {
             }
 
             it("should enable default logger for users") {
-                let users = Auth0.users(token: "token", domain: Domain)
+                let users = Auth0.users(token: Token, domain: Domain)
                 expect(users.logging(enabled: true).logger).toNot(beNil())
             }
 
             it("should not enable default logger for users") {
-                let users = Auth0.users(token: "token", domain: Domain)
+                let users = Auth0.users(token: Token, domain: Domain)
                 expect(users.logging(enabled: false).logger).to(beNil())
             }
 
@@ -150,7 +150,7 @@ class Auth0Spec: QuickSpec {
 
             it("should enable custom logger for users") {
                 let logger = MockLogger()
-                let users = Auth0.users(token: "token", domain: Domain)
+                let users = Auth0.users(token: Token, domain: Domain)
                 expect(users.using(logger: logger).logger).toNot(beNil())
             }
 
@@ -186,8 +186,7 @@ class Auth0Spec: QuickSpec {
                 }
 
                 it("should return users endpoint") {
-                    let users = Auth0.users(token: "token", domain: Domain)
-                    expect(users.token) == "token"
+                    let users = Auth0.users(token: Token, domain: Domain)
                     expect(users.url.absoluteString) == "https://\(Domain)/"
                 }
 
@@ -221,8 +220,7 @@ class Auth0Spec: QuickSpec {
                 }
 
                 it("should return users endpoint") {
-                    let users = Auth0.users(token: "token", domain: Domain)
-                    expect(users.token) == "token"
+                    let users = Auth0.users(token: Token, domain: Domain)
                     expect(users.url.absoluteString) == "https://\(Domain)/"
                 }
 
@@ -232,28 +230,4 @@ class Auth0Spec: QuickSpec {
 
     }
 
-}
-
-struct MockLogger: Logger {
-    func trace(url: URL, source: String?) {}
-
-    func trace(response: URLResponse, data: Data?) {}
-
-    func trace(request: URLRequest, session: URLSession) {}
-}
-
-struct MockError: LocalizedError, CustomStringConvertible {
-    private let message = "foo"
-
-    var description: String {
-        return self.message
-    }
-
-    var localizedDescription: String {
-        return self.message
-    }
-
-    var errorDescription: String? {
-        return self.message
-    }
 }

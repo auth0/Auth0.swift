@@ -200,3 +200,9 @@ func generateRSAJWK(from publicKey: SecKey = TestKeys.rsaPublic, keyId: String =
         return asn(unsafeRawBufferPointer.bindMemory(to: UInt8.self).baseAddress!)!
     }
 }
+
+extension SecKey {
+    func export() -> Data {
+        return SecKeyCopyExternalRepresentation(self, nil)! as Data
+    }
+}
