@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: - Factory Methods
+
 public func myAccount(token: String, domain: String, session: URLSession = .shared) -> MyAccount {
     return Auth0MyAccount(token: token, url: .httpsURL(from: domain), session: session)
 }
@@ -9,7 +11,13 @@ public func myAccount(token: String, session: URLSession = .shared, bundle: Bund
     return myAccount(token: token, domain: values.domain, session: session)
 }
 
-/// Client for the My Account API.
+// MARK: - MyAccountClient
+
+/// A client for the My Account API.
+/// Adopting types could be either the root client or a leaf sub-client.
+///
+/// ## See Also
+/// - ``MyAccountError``
 public protocol MyAccountClient: Trackable, Loggable {
 
     /// URL of the My Account API.
@@ -28,25 +36,24 @@ extension MyAccountClient {
 
 }
 
+// MARK: - MyAccount
+
+/// Root client for the My Account API.
+/// Contains other sub-clients, such as the client for authentication methods.
+///
+/// ## See Also
+/// - ``MyAccountError``
 public protocol MyAccount: MyAccountClient {
 
     var authenticationMethods: MyAccountAuthenticationMethods { get }
 
 }
 
-extension MyAccount {
+public extension MyAccount {
 
+    /// Currently supported version of the My Account API.
     static var apiVersion: String {
         return "v1"
-    }
-
-}
-
-extension CodingUserInfoKey {
-
-    static var headersKey: CodingUserInfoKey {
-        // Force-unrapping it because it's never nil. See https://github.com/swiftlang/swift/issues/49302
-        return CodingUserInfoKey(rawValue: "headers")!
     }
 
 }

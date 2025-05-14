@@ -85,7 +85,9 @@ extension MyAccountError: Equatable {
 
 }
 
-extension MyAccountError.ValidationError {
+// MARK: - Utilities
+
+private extension MyAccountError.ValidationError {
 
     init(from dict: [String: String]) {
         self.detail = dict["detail"] ?? ""

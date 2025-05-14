@@ -18,3 +18,12 @@ func myAcccountDecodable<T: Decodable>(from response: Response<MyAccountError>,
         callback(.failure(MyAccountError(cause: error)))
     }
 }
+
+extension CodingUserInfoKey {
+
+    static var headersKey: CodingUserInfoKey {
+        // Force-unrapping it because it's never nil. See https://github.com/swiftlang/swift/issues/49302
+        return CodingUserInfoKey(rawValue: "headers")!
+    }
+
+}

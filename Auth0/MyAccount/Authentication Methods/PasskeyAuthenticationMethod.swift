@@ -31,12 +31,6 @@ public struct PasskeyAuthenticationMethod: Identifiable, Equatable, Sendable {
     /// Whether the passkey was backed up.
     public let isCredentialBackedUp: Bool
 
-    /// User agent of the browser used to create the passkey.
-    public let userAgent: String? // TODO: Check if this should be included
-
-    /// How clients might communicate with the authenticator to obtain an assertion for a specific passkey.
-    public let transports: [String]?
-
 }
 
 extension PasskeyAuthenticationMethod: Decodable {
@@ -50,8 +44,6 @@ extension PasskeyAuthenticationMethod: Decodable {
         case publicKey = "public_key"
         case credentialDeviceType = "credential_device_type"
         case isCredentialBackedUp = "credential_backed_up"
-        case userAgent = "user_agent"
-        case transports
         case createdAt = "created_at"
     }
 
@@ -83,8 +75,6 @@ extension PasskeyAuthenticationMethod: Decodable {
         keyId = try values.decode(String.self, forKey: .keyId)
         credentialDeviceType = try values.decode(CredentialDeviceType.self, forKey: .credentialDeviceType)
         isCredentialBackedUp = try values.decode(Bool.self, forKey: .isCredentialBackedUp)
-        userAgent = try values.decodeIfPresent(String.self, forKey: .userAgent)
-        transports = try values.decodeIfPresent([String].self, forKey: .transports)
         createdAt = try values.decode(Date.self, forKey: .createdAt)
     }
 
