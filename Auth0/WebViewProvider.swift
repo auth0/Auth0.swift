@@ -94,13 +94,38 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         configuration.setURLSchemeHandler(self, forURLScheme: redirectURL.scheme!)
         self.webview = WKWebView(frame: .zero, configuration: configuration)
         self.viewController.view = webview
+        self.configurationSubviews()
         webview.navigationDelegate = self
     }
-
+    
     private func setupWebViewWithHTTPS() {
         self.webview = WKWebView(frame: .zero)
         self.viewController.view = webview
+        self.configurationSubviews()
         webview.navigationDelegate = self
+    }
+    
+    private func configurationSubviews()
+    {
+        let closeButton = UIButton(type: .system)
+        let config = UIImage.SymbolConfiguration(pointSize: 36, weight: .regular)
+        let closeImage = UIImage(systemName: "xmark.circle.fill", withConfiguration: config)
+        closeButton.setImage(closeImage, for: .normal)
+        closeButton.tintColor = .white
+        closeButton.addTarget(self, action: #selector(closeTapped), for: .touchUpInside)
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        self.viewController.view.addSubview(closeButton)
+        NSLayoutConstraint.activate([
+            closeButton.topAnchor.constraint(equalTo: self.viewController.view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            closeButton.trailingAnchor.constraint(equalTo: self.viewController.view.safeAreaLayoutGuide.trailingAnchor, constant: -8),
+            closeButton.widthAnchor.constraint(equalToConstant: 36),
+            closeButton.heightAnchor.constraint(equalToConstant: 36)
+        ])
+        self.viewController.isModalInPresentation = true
+    }
+    
+    @objc private func closeTapped() {
+        self.finish(with: .failure(WebAuthError(code: .userCancelled)))
     }
 
     func start() {
@@ -110,12 +135,12 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
 
     func finish(with result: WebAuthResult<Void>) {
         DispatchQueue.main.async { [weak webview, weak viewController, callback] in
-            webview?.removeFromSuperview()
             guard let presenting = viewController?.presentingViewController else {
                 let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
                 return callback(.failure(error))
             }
             presenting.dismiss(animated: true) {
+                webview?.removeFromSuperview()
                 callback(result)
             }
         }
