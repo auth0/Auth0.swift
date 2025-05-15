@@ -11,7 +11,11 @@ struct MockLogger: Logger {
 }
 
 struct MockError: LocalizedError, CustomStringConvertible {
-    private let message = "foo"
+    private let message: String
+    
+    init(message: String = "foo") {
+        self.message = message
+    }
     
     var description: String {
         return self.message

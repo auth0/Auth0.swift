@@ -86,7 +86,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.statusCode) == statusCode
             }
 
-            it("should initialize with a cause") {
+            it("should initialize with cause") {
                 let cause = MockError()
                 let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
                 let error = AuthenticationError(cause: cause)
@@ -95,7 +95,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.statusCode) == 0
             }
 
-            it("should initialize with a cause & status code") {
+            it("should initialize with cause & status code") {
                 let statusCode = 400
                 let error = AuthenticationError(cause: MockError(), statusCode: statusCode)
                 expect(error.statusCode) == statusCode
@@ -449,7 +449,25 @@ class AuthenticationErrorSpec: QuickSpec {
                 let error = AuthenticationError(info: info)
                 expect(error.localizedDescription) == message
             }
-            
+
+            it("should append the cause error message") {
+                let description = "foo."
+                let cause =  MockError(message: "bar.")
+                let info: [String: Any] = ["description": description, "cause": cause]
+                let message = "\(description) CAUSE: \(cause.localizedDescription)"
+                let error = AuthenticationError(info: info)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should append the cause error message adding periods") {
+                let description = "foo"
+                let cause =  MockError(message: "bar")
+                let info: [String: Any] = ["description": description, "cause": cause]
+                let message = "\(description). CAUSE: \(cause.localizedDescription)."
+                let error = AuthenticationError(info: info)
+                expect(error.localizedDescription) == message
+            }
+
         }
 
     }

@@ -12,6 +12,8 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
 }
 
+// MARK: - Default Parameters
+
 public extension MyAccountAuthenticationMethods {
 
     #if PASSKEYS_PLATFORM
