@@ -23,12 +23,13 @@ struct Auth0AuthenticationMethods: MyAccountAuthenticationMethods {
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
-        let url = self.url.appending("authentication-methods/\(challenge.authenticationMethodId)/verify")
-        let id = passkey.credentialID.encodeBase64URLSafe()
+        let resourceId = challenge.authenticationMethodId.removingPercentEncoding!
+        let url = self.url.appending("authentication-methods/\(resourceId)/verify")
+        let credentialId = passkey.credentialID.encodeBase64URLSafe()
 
         var authenticatorResponse: [String: Any] = [
-            "id": id,
-            "rawId": id,
+            "id": credentialId,
+            "rawId": credentialId,
             "type": "public-key",
             "response": [
                 "clientDataJSON": passkey.rawClientDataJSON.encodeBase64URLSafe(),
