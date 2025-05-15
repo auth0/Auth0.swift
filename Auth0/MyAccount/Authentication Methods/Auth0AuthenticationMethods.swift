@@ -17,17 +17,18 @@ struct Auth0AuthenticationMethods: MyAccountAuthenticationMethods {
         self.logger = logger
     }
 
+    // MARK: - Passkeys Enrollment
+
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
-        let pathId = challenge.authenticationMethodId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!
-        let url = URL(string: "authentication-methods/\(pathId)/verify", relativeTo: self.url)!
-        let credentialId = passkey.credentialID.encodeBase64URLSafe()
+        let url = self.url.appending("authentication-methods/\(challenge.authenticationMethodId)/verify")
+        let id = passkey.credentialID.encodeBase64URLSafe()
 
         var authenticatorResponse: [String: Any] = [
-            "id": credentialId,
-            "rawId": credentialId,
+            "id": id,
+            "rawId": id,
             "type": "public-key",
             "response": [
                 "clientDataJSON": passkey.rawClientDataJSON.encodeBase64URLSafe(),
@@ -55,7 +56,7 @@ struct Auth0AuthenticationMethods: MyAccountAuthenticationMethods {
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
                                     connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
-        let url = URL(string: "authentication-methods", relativeTo: self.url)!
+        let url = self.url.appending("authentication-methods")
 
         var payload: [String: Any] = ["type": "passkey"]
         payload["identity_user_id"] = userIdentityId

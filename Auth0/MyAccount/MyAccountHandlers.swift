@@ -5,7 +5,6 @@ func myAcccountDecodable<T: Decodable>(from response: Response<MyAccountError>,
     do {
         if let jsonResponse = try response.result() {
             let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
             decoder.userInfo[.headersKey] = jsonResponse.headers
             let decodedObject = try decoder.decode(T.self, from: jsonResponse.data)
             callback(.success(decodedObject))

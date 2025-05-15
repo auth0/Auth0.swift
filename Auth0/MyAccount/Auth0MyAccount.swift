@@ -9,24 +9,24 @@ struct Auth0MyAccount: MyAccount {
     var telemetry: Telemetry
     var logger: Logger?
 
-    let authenticationMethods: MyAccountAuthenticationMethods
+    var authenticationMethods: MyAccountAuthenticationMethods {
+        return Auth0AuthenticationMethods(url: self.url,
+                                          session: self.session,
+                                          token: self.token,
+                                          telemetry: self.telemetry,
+                                          logger: self.logger)
+    }
 
     init(token: String,
          url: URL,
          session: URLSession = .shared,
          telemetry: Telemetry = Telemetry(),
          logger: Logger? = nil) {
-        self.url = URL(string: "me/\(Self.apiVersion)", relativeTo: url)!
+        self.url = url.appending("me/\(Self.apiVersion)")
         self.session = session
         self.token = token
         self.telemetry = telemetry
         self.logger = logger
-
-        self.authenticationMethods = Auth0AuthenticationMethods(url: self.url,
-                                                                session: session,
-                                                                token: token,
-                                                                telemetry: telemetry,
-                                                                logger: logger)
     }
 
 }
