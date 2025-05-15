@@ -69,13 +69,24 @@ extension PasskeyAuthenticationMethod: Decodable {
 
         publicKey = publicKeyData
 
+        let createdAtFormatter = ISO8601DateFormatter()
+        createdAtFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        guard case let createdAtString = try values.decode(String.self, forKey: .createdAt),
+              let createdAtDate = createdAtFormatter.date(from: createdAtString) else {
+            throw DecodingError.dataCorruptedError(forKey: .createdAt,
+                                                   in: values,
+                                                   debugDescription: "Format of created_at is not recognized.")
+        }
+
+        createdAt = createdAtDate
+
         id = try values.decode(String.self, forKey: .id)
         type = try values.decode(String.self, forKey: .type)
         userIdentityId = try values.decode(String.self, forKey: .userIdentityId)
         keyId = try values.decode(String.self, forKey: .keyId)
         credentialDeviceType = try values.decode(CredentialDeviceType.self, forKey: .credentialDeviceType)
         isCredentialBackedUp = try values.decode(Bool.self, forKey: .isCredentialBackedUp)
-        createdAt = try values.decode(Date.self, forKey: .createdAt)
     }
 
 }
