@@ -31,13 +31,19 @@ public extension Auth0Error {
 
 extension Auth0Error {
 
-    func appendCause(to errorMessage: String) -> String {
+    func appendCause(to message: String) -> String {
         guard let cause = self.cause else {
-            return errorMessage
+            return message
         }
 
-        let separator = errorMessage.hasSuffix(".") ? "" : "."
-        return "\(errorMessage)\(separator) CAUSE: \(String(describing: cause))"
+        let errorMessage = self.appendPeriod(to: message)
+        let causeMessage = self.appendPeriod(to: String(describing: cause))
+
+        return "\(errorMessage) CAUSE: \(causeMessage)"
+    }
+
+    func appendPeriod(to message: String) -> String {
+        return message.hasSuffix(".") ? message : "\(message)."
     }
 
 }

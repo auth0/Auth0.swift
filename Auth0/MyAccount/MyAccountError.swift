@@ -67,7 +67,11 @@ extension MyAccountError {
             return "Failed with unknown error: \(self.info)."
         }
 
-        return "\(self.title): \(self.detail)."
+        if !self.detail.isEmpty {
+            return self.appendPeriod(to: "\(self.title): \(self.detail)")
+        }
+
+        return self.appendPeriod(to: "\(self.title)")
     }
 
 }
