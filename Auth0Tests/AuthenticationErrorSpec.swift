@@ -88,7 +88,7 @@ class AuthenticationErrorSpec: QuickSpec {
 
             it("should initialize with a cause") {
                 let cause = MockError()
-                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)"
+                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
                 let error = AuthenticationError(cause: cause)
                 expect(error.cause).toNot(beNil())
                 expect(error.localizedDescription) == description

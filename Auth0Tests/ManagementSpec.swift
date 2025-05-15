@@ -113,7 +113,7 @@ class ManagementSpec: QuickSpec {
 
                 it("should yield error with a cause") {
                     let cause = MockError()
-                    let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)"
+                    let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
                     let response = Response<ManagementError>(data: nil, response: nil, error: cause)
                     var actual: ManagementResult<ManagementObject>? = nil
                     management.managementObject(response: response) { actual = $0 }
