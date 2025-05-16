@@ -37,7 +37,7 @@ extension PasskeyEnrollmentChallenge: Decodable {
               let locationHeader = headers["Location"] as? String,
               let authenticationMethodId = locationHeader.components(separatedBy: "/").last else {
             let errorDescription = "Missing authentication method identifier in header 'Location'"
-            let errorContext = DecodingError.Context(codingPath: decoder.codingPath,
+            let errorContext = DecodingError.Context(codingPath: [],
                                                      debugDescription: errorDescription)
             throw DecodingError.dataCorrupted(errorContext)
         }
