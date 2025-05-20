@@ -21,9 +21,26 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
         self.logger = logger
     }
 
-    // MARK: - Passkeys Enrollment
+    // MARK: - Passkey Enrollment
 
     #if PASSKEYS_PLATFORM
+    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
+    func passkeyEnrollmentChallenge(userIdentityId: String?,
+                                    connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
+        var payload: [String: Any] = ["type": "passkey"]
+        payload["identity_user_id"] = userIdentityId
+        payload["connection"] = connection
+
+        return Request(session: session,
+                       url: self.url,
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
@@ -50,23 +67,6 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
         return Request(session: session,
                        url: self.url.appending(path),
-                       method: "POST",
-                       handle: myAcccountDecodable,
-                       parameters: payload,
-                       headers: defaultHeaders,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
-    }
-
-    @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func passkeyEnrollmentChallenge(userIdentityId: String?,
-                                    connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
-        var payload: [String: Any] = ["type": "passkey"]
-        payload["identity_user_id"] = userIdentityId
-        payload["connection"] = connection
-
-        return Request(session: session,
-                       url: self.url,
                        method: "POST",
                        handle: myAcccountDecodable,
                        parameters: payload,

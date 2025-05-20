@@ -1,5 +1,6 @@
 import Foundation
 
+/// Represents an error during a request to the Auth0 My Account API.
 public struct MyAccountError: Auth0APIError, @unchecked Sendable {
 
     /// Raw error values.

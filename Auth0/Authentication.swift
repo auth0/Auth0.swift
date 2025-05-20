@@ -541,6 +541,8 @@ public protocol Authentication: Trackable, Loggable {
     ///   - scope:      Space-separated list of requested scope values. Defaults to `openid profile email`.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
+    /// ## See Also
+    ///
     /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-existing-user)
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Connect-to-a-service-with-an-existing-account)
@@ -657,6 +659,8 @@ public protocol Authentication: Trackable, Loggable {
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
+    /// ## See Also
+    /// 
     /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-new-user)
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
