@@ -9,12 +9,14 @@ struct Auth0MyAccount: MyAccount {
     var telemetry: Telemetry
     var logger: Logger?
 
+    static let apiVersion = "v1"
+
     var authenticationMethods: MyAccountAuthenticationMethods {
-        return Auth0AuthenticationMethods(url: self.url,
-                                          session: self.session,
-                                          token: self.token,
-                                          telemetry: self.telemetry,
-                                          logger: self.logger)
+        return Auth0MyAccountAuthenticationMethods(token: self.token,
+                                                   url: self.url,
+                                                   session: self.session,
+                                                   telemetry: self.telemetry,
+                                                   logger: self.logger)
     }
 
     init(token: String,

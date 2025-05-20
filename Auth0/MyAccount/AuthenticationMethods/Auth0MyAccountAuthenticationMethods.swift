@@ -1,6 +1,6 @@
 import Foundation
 
-struct Auth0AuthenticationMethods: MyAccountAuthenticationMethods {
+struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
     let url: URL
     let session: URLSession
@@ -9,10 +9,14 @@ struct Auth0AuthenticationMethods: MyAccountAuthenticationMethods {
     var telemetry: Telemetry
     var logger: Logger?
 
-    init(url: URL, session: URLSession, token: String, telemetry: Telemetry, logger: Logger? = nil) {
-        self.url = url
-        self.session = session
+    init(token: String,
+         url: URL,
+         session: URLSession = .shared,
+         telemetry: Telemetry = Telemetry(),
+         logger: Logger? = nil) {
         self.token = token
+        self.url = url.appending("authentication-methods")
+        self.session = session
         self.telemetry = telemetry
         self.logger = logger
     }
@@ -24,7 +28,7 @@ struct Auth0AuthenticationMethods: MyAccountAuthenticationMethods {
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
         let resourceId = challenge.authenticationMethodId.removingPercentEncoding!
-        let url = self.url.appending("authentication-methods/\(resourceId)/verify")
+        let path = "\(resourceId)/verify"
         let credentialId = passkey.credentialID.encodeBase64URLSafe()
 
         var authenticatorResponse: [String: Any] = [
@@ -45,7 +49,7 @@ struct Auth0AuthenticationMethods: MyAccountAuthenticationMethods {
         ]
 
         return Request(session: session,
-                       url: url,
+                       url: self.url.appending(path),
                        method: "POST",
                        handle: myAcccountDecodable,
                        parameters: payload,
@@ -57,14 +61,12 @@ struct Auth0AuthenticationMethods: MyAccountAuthenticationMethods {
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
                                     connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
-        let url = self.url.appending("authentication-methods")
-
         var payload: [String: Any] = ["type": "passkey"]
         payload["identity_user_id"] = userIdentityId
         payload["connection"] = connection
 
         return Request(session: session,
-                       url: url,
+                       url: self.url,
                        method: "POST",
                        handle: myAcccountDecodable,
                        parameters: payload,

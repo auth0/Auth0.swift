@@ -45,15 +45,10 @@ extension MyAccountClient {
 /// - ``MyAccountError``
 public protocol MyAccount: MyAccountClient {
 
+    // TODO: Complete docs.
     var authenticationMethods: MyAccountAuthenticationMethods { get }
 
-}
-
-public extension MyAccount {
-
     /// Currently supported version of the My Account API.
-    static var apiVersion: String {
-        return "v1"
-    }
+    static var apiVersion: String { get }
 
 }

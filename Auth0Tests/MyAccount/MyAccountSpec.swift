@@ -88,10 +88,10 @@ class MyAccountSpec: QuickSpec {
             it("should return authentication methods sub-client") {
                 let session = URLSession(configuration: URLSession.shared.configuration)
                 let myAccount = Auth0.myAccount(token: Token, domain: Domain, session: session)
-                let authenticationMethods = myAccount.authenticationMethods as! Auth0AuthenticationMethods
+                let authenticationMethods = myAccount.authenticationMethods as! Auth0MyAccountAuthenticationMethods
 
                 expect(authenticationMethods.token) == Token
-                expect(authenticationMethods.url.absoluteString) == myAccount.url.absoluteString
+                expect(authenticationMethods.url) == myAccount.url.appending("authentication-methods")
                 expect(authenticationMethods.session).to(be(session))
             }
 
@@ -99,14 +99,18 @@ class MyAccountSpec: QuickSpec {
 
                 it("should return my account endpoint without trailing slash") {
                     let myAccount = Auth0.myAccount(token: Token, domain: Domain)
+                    let myAccountURL = myAccount.url.absoluteString
+                    let authenticationMethodsUrl = myAccount.authenticationMethods.url.absoluteString
 
-                    expect(myAccount.authenticationMethods.url.absoluteString) == "https://\(Domain)/me/v1"
+                    expect(authenticationMethodsUrl) == "\(myAccountURL)/authentication-methods"
                 }
 
                 it("should return my account endpoint with trailing slash") {
                     let myAccount = Auth0.myAccount(token: Token, domain: "\(Domain)/")
+                    let myAccountURL = myAccount.url.absoluteString
+                    let authenticationMethodsUrl = myAccount.authenticationMethods.url.absoluteString
 
-                    expect(myAccount.authenticationMethods.url.absoluteString) == "https://\(Domain)/me/v1"
+                    expect(authenticationMethodsUrl) == "\(myAccountURL)/authentication-methods"
                 }
 
             }
