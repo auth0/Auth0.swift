@@ -22,7 +22,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```swift
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .passkeyEnrollmentChallenge(connection: "Username-Password-Authentication")
+    ///     .passkeyEnrollmentChallenge()
     ///     .start { result in
     ///         switch result {
     ///         case .success(let enrollmentChallenge):
@@ -60,14 +60,14 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///
     /// - Parameters:
     ///   - userIdentityId: Unique identifier of the current user's identity. Defaults to `nil`.
-    ///   - connection:     Name of the database connection where the user is stored. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - connection:     Name of the database connection where the user is stored. Defaults to `nil`.
     /// - Returns: A request that will yield a passkey enrollment challenge.
     ///
     /// ## See Also
     ///
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func passkeyEnrollmentChallenge(userIdentityId: String?, // TODO: Improve docs for this
+    func passkeyEnrollmentChallenge(userIdentityId: String?,
                                     connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new passkey credential. This is the last part of the enrollment flow.
