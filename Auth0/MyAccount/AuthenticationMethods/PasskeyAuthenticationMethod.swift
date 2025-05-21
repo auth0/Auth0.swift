@@ -10,26 +10,48 @@ public struct PasskeyAuthenticationMethod: Identifiable, Equatable, Sendable {
     /// Type of the authentication method. Equals to `passkey`.
     public let type: String
 
+    /// Unique identifier of the user identity linked with the authentication method.
+    public let userIdentityId: String
+
+    /// The user agent of the browser o device used to enroll the passkey.
+    public let userAgent: String?
+
+    /// Details of the passkey credential.
+    public let credential: PasskeyCredential
+
     /// Creation date of the authentication method.
     public let createdAt: Date
 
-    /// Unique identifier of the user identity.
-    public let userIdentityId: String
+}
 
-    /// User handle associated with the passkey credential.
-    public let userHandle: Data // This comes base64url-encoded
+/// A passkey credential.
+public struct PasskeyCredential: Identifiable, Equatable, Sendable {
 
     /// Unique identifier of the passkey credential.
-    public let keyId: String
+    public let id: String
 
     /// Public key of the passkey credential.
     public let publicKey: Data // This comes base64-encoded
 
-    /// Kind of device the passkey is stored on as defined by backup eligibility.
-    public let credentialDeviceType: CredentialDeviceType
+    /// User handle associated with the passkey credential.
+    public let userHandle: Data // This comes base64url-encoded
 
-    /// Whether the passkey was backed up.
-    public let isCredentialBackedUp: Bool
+    /// Kind of device the passkey credential is stored on as defined by backup eligibility.
+    public let deviceType: PasskeyDeviceType
+
+    /// Whether the passkey credential was backed up.
+    public let isBackedUp: Bool
+
+}
+
+/// Kind of device the passkey is stored on as defined by backup eligibility.
+public enum PasskeyDeviceType: String, Sendable, Decodable {
+
+    /// Passkey that cannot be backed up and synced to another device.
+    case singleDevice = "single_device"
+
+    /// Passkey that can be backed up and synced to another device, when enabled by the user.
+    case multiDevice = "multi_device"
 
 }
 
@@ -39,12 +61,43 @@ extension PasskeyAuthenticationMethod: Decodable {
         case id
         case type
         case userIdentityId = "identity_user_id"
-        case userHandle = "user_handle"
-        case keyId = "key_id"
-        case publicKey = "public_key"
-        case credentialDeviceType = "credential_device_type"
-        case isCredentialBackedUp = "credential_backed_up"
+        case userAgent = "user_agent"
+        case credential
         case createdAt = "created_at"
+    }
+
+    /// `Decodable` initializer.
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let createdAtFormatter = ISO8601DateFormatter()
+        createdAtFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        guard case let createdAtString = try values.decode(String.self, forKey: .createdAt),
+              let createdAtDate = createdAtFormatter.date(from: createdAtString) else {
+            throw DecodingError.dataCorruptedError(forKey: .createdAt,
+                                                   in: values,
+                                                   debugDescription: "Format of created_at is not recognized.")
+        }
+
+        createdAt = createdAtDate
+
+        id = try values.decode(String.self, forKey: .id)
+        type = try values.decode(String.self, forKey: .type)
+        userIdentityId = try values.decode(String.self, forKey: .userIdentityId)
+        userAgent = try values.decodeIfPresent(String.self, forKey: .userAgent)
+        credential = try decoder.singleValueContainer().decode(PasskeyCredential.self)
+    }
+
+}
+
+extension PasskeyCredential: Decodable {
+
+    enum CodingKeys: String, CodingKey {
+        case id = "key_id"
+        case publicKey = "public_key"
+        case userHandle = "user_handle"
+        case deviceType = "credential_device_type"
+        case isBackedUp = "credential_backed_up"
     }
 
     /// `Decodable` initializer.
@@ -69,36 +122,10 @@ extension PasskeyAuthenticationMethod: Decodable {
 
         publicKey = publicKeyData
 
-        let createdAtFormatter = ISO8601DateFormatter()
-        createdAtFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        guard case let createdAtString = try values.decode(String.self, forKey: .createdAt),
-              let createdAtDate = createdAtFormatter.date(from: createdAtString) else {
-            throw DecodingError.dataCorruptedError(forKey: .createdAt,
-                                                   in: values,
-                                                   debugDescription: "Format of created_at is not recognized.")
-        }
-
-        createdAt = createdAtDate
-
         id = try values.decode(String.self, forKey: .id)
-        type = try values.decode(String.self, forKey: .type)
-        userIdentityId = try values.decode(String.self, forKey: .userIdentityId)
-        keyId = try values.decode(String.self, forKey: .keyId)
-        credentialDeviceType = try values.decode(CredentialDeviceType.self, forKey: .credentialDeviceType)
-        isCredentialBackedUp = try values.decode(Bool.self, forKey: .isCredentialBackedUp)
+        deviceType = try values.decode(PasskeyDeviceType.self, forKey: .deviceType)
+        isBackedUp = try values.decode(Bool.self, forKey: .isBackedUp)
     }
-
-}
-
-/// Kind of device the passkey is stored on as defined by backup eligibility.
-public enum CredentialDeviceType: String, Sendable, Decodable {
-
-    /// Passkey that cannot be backed up and synced to another device.
-    case singleDevice = "single_device"
-
-    /// Passkey that can be backed up and synced to another device, when enabled by the user.
-    case multiDevice = "multi_device"
 
 }
 #endif

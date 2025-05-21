@@ -136,9 +136,9 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                                 expect(result)
                                     .to(havePasskeyAuthenticationMethod(id: AuthenticationMethodId,
                                                                         userIdentityId: userIdentityId,
-                                                                        userHandle: userIdData,
-                                                                        keyId: credentialId,
-                                                                        publicKey: publicKeyData,
+                                                                        credentialId: credentialId,
+                                                                        credentialPublicKey: publicKeyData,
+                                                                        credentialUserHandle: userIdData,
                                                                         credentialDeviceType: .singleDevice,
                                                                         createdAt: createdAtDate))
                                 done()

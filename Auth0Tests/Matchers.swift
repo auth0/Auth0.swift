@@ -197,15 +197,15 @@ func havePasskeyEnrollmentChallenge(authenticationMethodId: String,
 
 func havePasskeyAuthenticationMethod(id: String,
                                      userIdentityId: String,
-                                     userHandle: Data,
-                                     keyId: String,
-                                     publicKey: Data,
-                                     credentialDeviceType: CredentialDeviceType,
+                                     credentialId: String,
+                                     credentialPublicKey: Data,
+                                     credentialUserHandle: Data,
+                                     credentialDeviceType: PasskeyDeviceType,
                                      createdAt: Date) -> Nimble.Matcher<MyAccountResult<PasskeyAuthenticationMethod>> {
     let definition = "have passkey authentication method with " +
     "identifier <\(id)>, " +
     "user identity identifier <\(userIdentityId)>, " +
-    "key identifier <\(keyId)>, " +
+    "credential identifier <\(credentialPublicKey)>, " +
     "and credential device type <\(credentialDeviceType.rawValue)>"
 
     return Matcher<MyAccountResult<PasskeyAuthenticationMethod>>.define(definition) { expression, failureMessage -> MatcherResult in
@@ -213,10 +213,10 @@ func havePasskeyAuthenticationMethod(id: String,
             return id == created.id &&
             "passkey" == created.type &&
             userIdentityId == created.userIdentityId &&
-            userHandle == created.userHandle &&
-            keyId == created.keyId &&
-            publicKey == created.publicKey &&
-            credentialDeviceType == created.credentialDeviceType &&
+            credentialId == created.credential.id &&
+            credentialPublicKey == created.credential.publicKey &&
+            credentialUserHandle == created.credential.userHandle &&
+            credentialDeviceType == created.credential.deviceType &&
             createdAt == created.createdAt
         }
     }

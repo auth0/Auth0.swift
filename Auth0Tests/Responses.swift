@@ -250,7 +250,7 @@ func passkeyAuthenticationMethodResponse(id: String,
                                          userHandle: String,
                                          keyId: String,
                                          publicKey: String,
-                                         credentialDeviceType: CredentialDeviceType,
+                                         credentialDeviceType: PasskeyDeviceType,
                                          createdAt: String) -> RequestResponse {
     let json: [String: Any] = [
         "id": id,
