@@ -1,2 +1,2 @@
-github "auth0/SimpleKeychain"  "1.3.0"
-github "auth0/JWTDecode.swift" "3.3.0"
+github "auth0/SimpleKeychain"  "feature/SDK-5914"
+github "auth0/JWTDecode.swift" "feature/SDK-5914"
