@@ -188,8 +188,6 @@
 		5CD9FC7A26FE30C8009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC7E26FE30D4009C2B27 /* Nimble.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5CD9FC8026FE30D4009C2B27 /* Quick.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5CDF67232DD3922B00A9B513 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67222DD3922300A9B513 /* PasskeyEnrollmentChallenge.swift */; };
-		5CDF67242DD3922B00A9B513 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67222DD3922300A9B513 /* PasskeyEnrollmentChallenge.swift */; };
 		5CDF67252DD3922B00A9B513 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67222DD3922300A9B513 /* PasskeyEnrollmentChallenge.swift */; };
 		5CDF67262DD3922B00A9B513 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67222DD3922300A9B513 /* PasskeyEnrollmentChallenge.swift */; };
 		5CDF67272DD3922B00A9B513 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67222DD3922300A9B513 /* PasskeyEnrollmentChallenge.swift */; };
@@ -201,10 +199,8 @@
 		5CDF67382DD3A8D600A9B513 /* Auth0APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67352DD3A8D200A9B513 /* Auth0APIError.swift */; };
 		5CDF67392DD3A8D600A9B513 /* Auth0APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67352DD3A8D200A9B513 /* Auth0APIError.swift */; };
 		5CDF673A2DD3A8D600A9B513 /* Auth0APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67352DD3A8D200A9B513 /* Auth0APIError.swift */; };
-		5CDF673C2DD3B0E400A9B513 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF673B2DD3B0DE00A9B513 /* PasskeyAuthenticationMethod.swift */; };
 		5CDF673D2DD3B0E400A9B513 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF673B2DD3B0DE00A9B513 /* PasskeyAuthenticationMethod.swift */; };
 		5CDF673E2DD3B0E400A9B513 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF673B2DD3B0DE00A9B513 /* PasskeyAuthenticationMethod.swift */; };
-		5CDF673F2DD3B0E400A9B513 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF673B2DD3B0DE00A9B513 /* PasskeyAuthenticationMethod.swift */; };
 		5CDF67402DD3B0E400A9B513 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF673B2DD3B0DE00A9B513 /* PasskeyAuthenticationMethod.swift */; };
 		5CDF67422DD3B52F00A9B513 /* Auth0MyAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67412DD3B52A00A9B513 /* Auth0MyAccount.swift */; };
 		5CDF67432DD3B52F00A9B513 /* Auth0MyAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CDF67412DD3B52A00A9B513 /* Auth0MyAccount.swift */; };
@@ -2574,7 +2570,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5CDF673C2DD3B0E400A9B513 /* PasskeyAuthenticationMethod.swift in Sources */,
 				5F23E6E91D4ACD9200C3F2D9 /* Auth0.swift in Sources */,
 				5CC9940424ED9EC90027DC74 /* CredentialsManagerError.swift in Sources */,
 				5F23E6EA1D4ACD9600C3F2D9 /* Auth0Error.swift in Sources */,
@@ -2597,7 +2592,6 @@
 				5CDF674E2DD3DB5400A9B513 /* MyAccountHandlers.swift in Sources */,
 				5F23E6DF1D4ACD7A00C3F2D9 /* Logger.swift in Sources */,
 				5FDE875B1D8A424700EA27DC /* Authentication.swift in Sources */,
-				5CDF67232DD3922B00A9B513 /* PasskeyEnrollmentChallenge.swift in Sources */,
 				5F23E6E21D4ACD7F00C3F2D9 /* Users.swift in Sources */,
 				5FDE876B1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5CA541D02B1A81A700E4284D /* Documentation.docc in Sources */,
@@ -2624,7 +2618,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5CDF673F2DD3B0E400A9B513 /* PasskeyAuthenticationMethod.swift in Sources */,
 				5F23E70E1D4B88FC00C3F2D9 /* Request.swift in Sources */,
 				5FDE87701D8A424700EA27DC /* AuthenticationHandlers.swift in Sources */,
 				5C4F551D23C8FB8E00C89615 /* String+URLSafe.swift in Sources */,
@@ -2647,7 +2640,6 @@
 				5CDF674F2DD3DB5400A9B513 /* MyAccountHandlers.swift in Sources */,
 				5F23E7081D4B88F000C3F2D9 /* Logger.swift in Sources */,
 				5C29743223FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */,
-				5CDF67242DD3922B00A9B513 /* PasskeyEnrollmentChallenge.swift in Sources */,
 				5F23E70B1D4B88F600C3F2D9 /* Users.swift in Sources */,
 				5FDE876C1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5CA541CF2B1A81A700E4284D /* Documentation.docc in Sources */,
