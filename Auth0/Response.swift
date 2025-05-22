@@ -10,7 +10,7 @@ func string(_ data: Data?) -> String? {
     return String(data: data, encoding: .utf8)
 }
 
-struct Response<E: Auth0APIError> {
+struct Response<E: Auth0APIError>: Sendable {
     let data: Data?
     let response: HTTPURLResponse?
     let error: Error?

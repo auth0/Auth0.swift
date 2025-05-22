@@ -36,7 +36,7 @@ extension WebAuthentication {
         }
     }
 
-    static let completionHandler: (_ callback: @escaping WebAuthProviderCallback) -> ASHandler = { callback in
+    static let completionHandler: @Sendable (_ callback: @escaping @Sendable WebAuthProviderCallback) -> ASHandler = { callback in
         return {
             guard let callbackURL = $0, $1 == nil else {
                 if let error = $1 as? NSError,
@@ -57,7 +57,7 @@ extension WebAuthentication {
 
 class ASUserAgent: NSObject, WebAuthUserAgent {
 
-    private(set) static var currentSession: ASWebAuthenticationSession?
+    private(set) static let currentSession: ASWebAuthenticationSession?
     let callback: WebAuthProviderCallback
 
     init(session: ASWebAuthenticationSession, callback: @escaping WebAuthProviderCallback) {
