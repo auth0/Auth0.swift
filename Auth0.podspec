@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.authors          = { 'Auth0' => 'support@auth0.com', 'Rita Zerrizuela' => 'rita.zerrizuela@auth0.com' }
   s.source           = { :git => 'https://github.com/auth0/Auth0.swift.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/auth0'
-  s.source_files     = 'Auth0/*.swift'
+  s.source_files     = 'Auth0/**/*.swift'
   s.resource_bundles = { s.name => 'Auth0/PrivacyInfo.xcprivacy' }
   s.swift_versions   = ['5.0']
 
