@@ -57,10 +57,8 @@
 		5C1574552DD7A90400BF9373 /* PasskeyEnrollmentChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574542DD7A8FD00BF9373 /* PasskeyEnrollmentChallengeSpec.swift */; };
 		5C1574562DD7A90400BF9373 /* PasskeyEnrollmentChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574542DD7A8FD00BF9373 /* PasskeyEnrollmentChallengeSpec.swift */; };
 		5C1574572DD7A90400BF9373 /* PasskeyEnrollmentChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574542DD7A8FD00BF9373 /* PasskeyEnrollmentChallengeSpec.swift */; };
-		5C1574582DD7A90400BF9373 /* PasskeyEnrollmentChallengeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574542DD7A8FD00BF9373 /* PasskeyEnrollmentChallengeSpec.swift */; };
 		5C15745A2DD7AF2400BF9373 /* PasskeyAuthenticationMethodSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574592DD7AF2100BF9373 /* PasskeyAuthenticationMethodSpec.swift */; };
 		5C15745B2DD7AF2400BF9373 /* PasskeyAuthenticationMethodSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574592DD7AF2100BF9373 /* PasskeyAuthenticationMethodSpec.swift */; };
-		5C15745C2DD7AF2400BF9373 /* PasskeyAuthenticationMethodSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574592DD7AF2100BF9373 /* PasskeyAuthenticationMethodSpec.swift */; };
 		5C15745D2DD7AF2400BF9373 /* PasskeyAuthenticationMethodSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574592DD7AF2100BF9373 /* PasskeyAuthenticationMethodSpec.swift */; };
 		5C15745F2DD7D83B00BF9373 /* MyAccountAuthenticationMethodsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C15745E2DD7D82D00BF9373 /* MyAccountAuthenticationMethodsSpec.swift */; };
 		5C1574602DD7D83B00BF9373 /* MyAccountAuthenticationMethodsSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C15745E2DD7D82D00BF9373 /* MyAccountAuthenticationMethodsSpec.swift */; };
@@ -2673,9 +2671,7 @@
 				5F1FBB9A1D8A44C0006B0B85 /* ResponseSpec.swift in Sources */,
 				5F331B0C1D4BB7F900AE4382 /* UsersSpec.swift in Sources */,
 				5CFB82572D5E9F9B009FD237 /* APICredentialsSpec.swift in Sources */,
-				5C1574582DD7A90400BF9373 /* PasskeyEnrollmentChallengeSpec.swift in Sources */,
 				C12BFE442C352DD700D1CC00 /* StubURLProtocol.swift in Sources */,
-				5C15745C2DD7AF2400BF9373 /* PasskeyAuthenticationMethodSpec.swift in Sources */,
 				5F331B0E1D4BB80700AE4382 /* Matchers.swift in Sources */,
 				5F331B0A1D4BB7F900AE4382 /* ManagementSpec.swift in Sources */,
 				5CFB82782D6FD28E009FD237 /* SSOCredentialsSpec.swift in Sources */,
