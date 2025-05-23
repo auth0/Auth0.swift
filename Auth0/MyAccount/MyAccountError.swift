@@ -1,7 +1,16 @@
-import Foundation
-
 /// Represents an error during a request to the Auth0 My Account API.
 public struct MyAccountError: Auth0APIError, @unchecked Sendable {
+
+    /// A server-side validation error.
+    public struct ValidationError: Sendable {
+
+        /// Information about the validation error.
+        let detail: String
+
+        /// The property in the request payload that failed validation.
+        let pointer: String?
+
+    }
 
     /// Raw error values.
     public let info: [String: Any]
@@ -18,6 +27,9 @@ public struct MyAccountError: Auth0APIError, @unchecked Sendable {
     /// More information about the error.
     public let detail: String
 
+    /// All the server-side validation errors.
+    public let validationErrors: [ValidationError]?
+
     /// Creates an error from a JSON response.
     ///
     /// - Parameters:
@@ -31,6 +43,12 @@ public struct MyAccountError: Auth0APIError, @unchecked Sendable {
         self.code = info["type"] as? String ?? info[apiErrorCode] as? String ?? unknownError
         self.title = info["title"] as? String ?? info[apiErrorDescription] as? String ?? ""
         self.detail = info["detail"] as? String ?? ""
+
+        if let validationErrors = info["validation_errors"] as? [[String: Any]] {
+            self.validationErrors = validationErrors.map(ValidationError.init(from:))
+        } else {
+            self.validationErrors = nil
+        }
     }
 
     /// Description of the error.
@@ -69,6 +87,17 @@ extension MyAccountError: Equatable {
         return lhs.code == rhs.code
             && lhs.statusCode == rhs.statusCode
             && lhs.localizedDescription == rhs.localizedDescription
+    }
+
+}
+
+extension MyAccountError.ValidationError {
+
+    init(from dict: [String: Any]) {
+        let pointer = dict["pointer"] as? String ?? ""
+
+        self.detail = dict["detail"] as? String ?? ""
+        self.pointer = pointer.isEmpty ? nil : pointer
     }
 
 }

@@ -1,3 +1,5 @@
+import Foundation
+
 let apiErrorCode = "code"
 let apiErrorDescription = "description"
 let apiErrorCause = "cause"
@@ -32,6 +34,28 @@ public extension Auth0APIError {
         return self.info["cause"] as? Error
     }
 
+    /// Whether the request failed due to network issues.
+    ///
+    /// Returns `true` when the `URLError` code is one of the following:
+    /// - [dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/datanotallowed)
+    /// - [notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/notconnectedtointernet)
+    /// - [networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/networkconnectionlost)
+    /// - [dnsLookupFailed](https://developer.apple.com/documentation/foundation/urlerror/dnslookupfailed)
+    /// - [cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/cannotfindhost)
+    /// - [cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/cannotconnecttohost)
+    /// - [timedOut](https://developer.apple.com/documentation/foundation/urlerror/timedout)
+    /// - [internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/internationalroamingoff)
+    /// - [callIsActive](https://developer.apple.com/documentation/foundation/urlerror/callisactive)
+    ///
+    /// The underlying `URLError` is available in the ``cause`` property.
+    var isNetworkError: Bool {
+        guard let code = (self.cause as? URLError)?.code else {
+            return false
+        }
+
+        return Self.networkErrorCodes.contains(code)
+    }
+
 }
 
 extension Auth0APIError {
@@ -59,6 +83,20 @@ extension Auth0APIError {
 
     init(from response: Response<Self>) {
         self.init(description: string(response.data), statusCode: response.response?.statusCode ?? 0)
+    }
+
+    static var networkErrorCodes: [URLError.Code] {
+        return [
+            .dataNotAllowed,
+            .notConnectedToInternet,
+            .networkConnectionLost,
+            .dnsLookupFailed,
+            .cannotFindHost,
+            .cannotConnectToHost,
+            .timedOut,
+            .internationalRoamingOff,
+            .callIsActive
+        ]
     }
 
 }

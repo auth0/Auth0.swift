@@ -181,6 +181,17 @@ class ManagementErrorSpec: QuickSpec {
                 let error = ManagementError(info: info)
                 expect(error.localizedDescription) == message
             }
+
+        }
+
+        describe("error cases") {
+
+            it("should detect network error") {
+                for errorCode in ManagementError.networkErrorCodes {
+                    expect(ManagementError(cause: URLError.init(errorCode)).isNetworkError) == true
+                }
+            }
+
         }
 
     }

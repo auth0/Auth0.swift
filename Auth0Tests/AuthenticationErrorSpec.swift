@@ -415,19 +415,7 @@ class AuthenticationErrorSpec: QuickSpec {
             }
 
             it("should detect network error") {
-                let networkErrorCodes: [URLError.Code] = [
-                    .dataNotAllowed,
-                    .notConnectedToInternet,
-                    .networkConnectionLost,
-                    .dnsLookupFailed,
-                    .cannotFindHost,
-                    .cannotConnectToHost,
-                    .timedOut,
-                    .internationalRoamingOff,
-                    .callIsActive
-                ]
-
-                for errorCode in networkErrorCodes {
+                for errorCode in AuthenticationError.networkErrorCodes {
                     expect(AuthenticationError(cause: URLError.init(errorCode)).isNetworkError) == true
                 }
             }
