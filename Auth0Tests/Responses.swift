@@ -180,6 +180,7 @@ func multifactorChallengeResponse(challengeType: String, oobCode: String? = nil,
     return apiSuccessResponse(json: json)
 }
 
+#if PASSKEYS_PLATFORM
 func passkeyLoginChallengeResponse() -> RequestResponse {
     let json: [String: Any] = [
         "auth_session": "u5WSCyajq719ZSkLiEH13OJpa-Jsh8YZ75-NsBXph5pS-_gvqA0Z1MZyXL_sellw",
@@ -266,3 +267,4 @@ func passkeyAuthenticationMethodResponse(id: String,
 
     return apiSuccessResponse(json: json)
 }
+#endif
