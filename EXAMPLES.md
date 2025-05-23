@@ -1,15 +1,16 @@
 # Examples
 
-- [Web Auth (iOS / macOS)](#web-auth-ios--macos)
-- [Credentials Manager (iOS / macOS / tvOS / watchOS)](#credentials-manager-ios--macos--tvos--watchos)
-- [Authentication API (iOS / macOS / tvOS / watchOS)](#authentication-api-ios--macos--tvos--watchos)
-- [Management API (Users) (iOS / macOS / tvOS / watchOS)](#management-api-users-ios--macos--tvos--watchos)
+- [Web Auth (iOS / macOS / visionOS)](#web-auth-ios--macos--visionos)
+- [Credentials Manager (iOS / macOS / TVOS / watchOS / visionOS)](#credentials-manager-ios--macos--tvos--watchos--visionos)
+- [Authentication API (iOS / macOS / TVOS / watchOS / visionOS)](#authentication-api-ios--macos--tvos--watchos--visionos)
+- [My Account API (iOS / macOS / tvOS / watchOS / visionOS) [EA]](#my-account-api-ios--macos--tvos--watchos--visionos-ea)
+- [Management API (Users) (iOS / macOS / TVOS / watchOS / visionOS)](#management-api-users-ios--macos--tvos--watchos--visionos)
 - [Logging](#logging)
 - [Advanced Features](#advanced-features)
 
 ---
 
-## Web Auth (iOS / macOS)
+## Web Auth (iOS / macOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)**
 
@@ -274,7 +275,7 @@ Web Auth will only produce `WebAuthError` error values. You can find the underly
 
 [Go up ⤴](#examples)
 
-## Credentials Manager (iOS / macOS / tvOS / watchOS)
+## Credentials Manager (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)**
 
@@ -295,7 +296,14 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 ```
 
 > [!CAUTION]
-> The Credentials Manager is not thread-safe, except for its `credentials()`, `apiCredentials()`, `ssoCredentials()`, and `renew()` methods. To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
+> The Credentials Manager is not thread-safe, except for the following methods: 
+> 
+> - `credentials()`
+> - `apiCredentials()`
+> - `ssoCredentials()`
+> - `renew()`
+> 
+> To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
 
 ### Store credentials
 
@@ -473,6 +481,67 @@ credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID or passcode"
 
 ### Other credentials
 
+#### API credentials [EA]
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+When the user logs in, you can request an access token for a specific API by passing its API identifier as the [audience](#add-an-audience-value) value. The access token in the resulting credentials can then be used to make authenticated requests to that API.
+
+However, if you need an access token for a different API, you can exchange the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) for credentials containing an access token specific to this other API. **This method is thread-safe**.
+
+> [!IMPORTANT]
+> Currently, only the Auth0 My Account API is supported. Support for other APIs will be added in the future.
+
+```swift
+credentialsManager.apiCredentials(forAudience: "https://samples.us.auth0.com/me",
+                                  scope: "create:me:authentication_methods") { result in
+    switch result {
+    case .success(let apiCredentials):
+        print("Obtained API credentials: \(apiCredentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "https://samples.us.auth0.com/me",
+                                                                     scope: "create:me:authentication_methods")
+    print("Obtained API credentials: \(apiCredentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+credentialsManager
+    .apiCredentials(forAudience: "https://samples.us.auth0.com/me",
+                    scope: "create:me:authentication_methods")
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { apiCredentials in
+        print("Obtained API credentials: \(apiCredentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
+
+> [!CAUTION]
+> To ensure that no concurrent exchange requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+
 #### SSO credentials [EA]
 
 > [!NOTE]  
@@ -560,7 +629,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 
 [Go up ⤴](#examples)
 
-## Authentication API (iOS / macOS / tvOS / watchOS)
+## Authentication API (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)**
 
@@ -795,11 +864,13 @@ authController.performRequests()
 The resulting passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
 
 ```swift
-func authorizationController(controller: ASAuthorizationController,
-                             didCompleteWithAuthorization authorization: ASAuthorization) {
-    guard let loginPasskey = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion else {
+public func authorizationController(controller: ASAuthorizationController,
+                                    didCompleteWithAuthorization authorization: ASAuthorization) {
+    switch authorization.credential {
+    case let loginPasskey as ASAuthorizationPlatformPublicKeyCredentialAssertion:
+        // ...
+    default:
         print("Unrecognized credential: \(authorization.credential)")
-        return
     }
 
     // ...
@@ -962,11 +1033,13 @@ authController.performRequests()
 The created passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
 
 ```swift
-func authorizationController(controller: ASAuthorizationController,
-                             didCompleteWithAuthorization authorization: ASAuthorization) {
-    guard let signupPasskey = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration else {
+public func authorizationController(controller: ASAuthorizationController,
+                                   didCompleteWithAuthorization authorization: ASAuthorization) {
+    switch authorization.credential {
+    case let signupPasskey as ASAuthorizationPlatformPublicKeyCredentialRegistration:
+        // ...
+    default:
         print("Unrecognized credential: \(authorization.credential)")
-        return
     }
 
     // ...
@@ -1388,14 +1461,204 @@ Auth0
 
 ### Authentication API client errors
 
-The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about the available `AuthenticationError` properties.
+The Authentication API client will only produce `AuthenticationError` error values.
+
+- The `cause` property contains the underlying error value –if any.
+- Use the `isNetworkError` property to check if the request failed due to networking issues.
+- Find more information about the error in the `info` dictionary.
+
+Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about the available `AuthenticationError` properties.
 
 > [!WARNING]
 > Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the [error types](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror/#topics) instead, which are part of the API.
 
 [Go up ⤴](#examples)
 
-## Management API (Users) (iOS / macOS / tvOS / watchOS)
+## My Account API (iOS / macOS / tvOS / watchOS / visionOS) [EA]
+
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/myaccount)**
+
+- [Enroll a new passkey](#enroll-a-new-passkey)
+- [My Account API client errors](#my-account-api-client-errors)
+
+> [!NOTE]
+> The My Account API is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+Use the Auth0 My Account API to manage the current user's account.
+
+To call the My Account API, you need an access token issued specifically for this API. See [API credentials [EA]](#api-credentials-ea) to learn how to obtain one.
+
+### Enroll a new passkey
+
+Enrolling a new passkey is a three-step process that requires the **Passkeys** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#prepare-your-application) for more information.
+
+First, you request an enrollment challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a new passkey credential. Finally, you use the created passkey credential and the original challenge to enroll the passkey with Auth0.
+
+#### 1. Request an enrollment challenge
+
+You can specify an optional user identity identifier and/or a database connection name to help Auth0 find the user. The user identity identifier will be needed if the user logged in with a [linked account](https://auth0.com/docs/manage-users/user-accounts/user-account-linking).
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .passkeyEnrollmentChallenge()
+    .start { result in
+        switch result {
+        case .success(let enrollmentChallenge):
+            print("Obtained enrollment challenge: \(enrollmentChallenge)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let enrollmentChallenge = try await Auth0
+        .myAccount(token: apiCredentials.accessToken)
+        .authenticationMethods
+        .passkeyEnrollmentChallenge()
+        .start()
+    print("Obtained enrollment challenge: \(enrollmentChallenge)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .passkeyEnrollmentChallenge()
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { enrollmentChallenge in
+        print("Obtained enrollment challenge: \(enrollmentChallenge)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+#### 2. Create a new passkey credential
+
+Use the enrollment challenge with [`ASAuthorizationPlatformPublicKeyCredentialProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationplatformpublickeycredentialprovider) from the `AuthenticationServices` framework to generate a new passkey credential. Check out [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service) to learn more.
+
+```swift
+let credentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+    relyingPartyIdentifier: enrollmentChallenge.relyingPartyId
+)
+
+let request = credentialProvider.createCredentialRegistrationRequest(
+    challenge: enrollmentChallenge.challengeData,
+    name: enrollmentChallenge.userName,
+    userID: enrollmentChallenge.userId
+)
+
+let authController = ASAuthorizationController(authorizationRequests: [request])
+authController.delegate = self // ASAuthorizationControllerDelegate
+authController.presentationContextProvider = self
+authController.performRequests()
+```
+
+The created passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+
+```swift
+public func authorizationController(controller: ASAuthorizationController,
+                                   didCompleteWithAuthorization authorization: ASAuthorization) {
+    switch authorization.credential {
+    case let newPasskey as ASAuthorizationPlatformPublicKeyCredentialRegistration:
+        // ...
+    default:
+        print("Unrecognized credential: \(authorization.credential)")
+    }
+
+    // ...
+}
+```
+
+#### 3. Enroll the passkey
+
+Use the created passkey credential and the enrollment challenge to enroll the passkey with Auth0.
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .enroll(passkey: newPasskey,
+            challenge: enrollmentChallenge)
+    .start { result in
+        switch result {
+        case .success(let authenticationMethod):
+            print("Enrolled passkey: \(authenticationMethod)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let authenticationMethod = try await Auth0
+        .myAccount(token: apiCredentials.accessToken)
+        .authenticationMethods
+        .enroll(passkey: newPasskey,
+                challenge: enrollmentChallenge)
+        .start()
+    print("Enrolled passkey: \(authenticationMethod)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .enroll(passkey: newPasskey,
+            challenge: enrollmentChallenge)
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { authenticationMethod in
+        print("Enrolled passkey: \(authenticationMethod)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+### My Account API client errors
+
+The My Account API client will only produce `MyAccountError` error values.
+
+- The `cause` property contains the underlying error value –if any.
+- Use the `isNetworkError` property to check if the request failed due to networking issues.
+- Find more information about the error in the `info` dictionary.
+
+See the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/myaccounterror) to learn more about the available `MyAccountError` properties.
+
+[Go up ⤴](#examples)
+
+## Management API (Users) (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/users)**
 
@@ -1630,7 +1893,13 @@ Auth0
 
 ### Management API client errors
 
-The Management API client will only produce `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/managementerror) to learn more about the available `ManagementError` properties.
+The Management API client will only produce `ManagementError` error values.
+
+- The `cause` property contains the underlying error value –if any.
+- Use the `isNetworkError` property to check if the request failed due to networking issues.
+- Find more information about the error in the `info` dictionary.
+
+Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/managementerror) to learn more about the available `ManagementError` properties.
 
 [Go up ⤴](#examples)
 

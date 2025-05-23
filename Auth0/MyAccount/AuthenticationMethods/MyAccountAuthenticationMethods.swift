@@ -59,7 +59,8 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// enrollment.
     ///
     /// - Parameters:
-    ///   - userIdentityId: Unique identifier of the current user's identity. Defaults to `nil`.
+    ///   - userIdentityId: Unique identifier of the current user's identity. Needed if the user logged in with a [linked account](https://auth0.com/docs/manage-users/user-accounts/user-account-linking).
+    ///   Defaults to `nil`.
     ///   - connection:     Name of the database connection where the user is stored. Defaults to `nil`.
     /// - Returns: A request that will yield a passkey enrollment challenge.
     ///
