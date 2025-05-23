@@ -70,7 +70,7 @@ class PasskeySignupChallengeSpec: QuickSpec {
                         }
                     }
                 """.data(using: .utf8)!
-                let context = DecodingError.Context(codingPath: [SSOCredentials.CodingKeys.expiresIn],
+                let context = DecodingError.Context(codingPath: [],
                                                     debugDescription: "Format of user id is not recognized.")
                 let expectedError = DecodingError.dataCorrupted(context)
 
@@ -97,7 +97,7 @@ class PasskeySignupChallengeSpec: QuickSpec {
                         }
                     }
                 """.data(using: .utf8)!
-                let context = DecodingError.Context(codingPath: [SSOCredentials.CodingKeys.expiresIn],
+                let context = DecodingError.Context(codingPath: [],
                                                     debugDescription: "Format of challenge is not recognized.")
                 let expectedError = DecodingError.dataCorrupted(context)
 

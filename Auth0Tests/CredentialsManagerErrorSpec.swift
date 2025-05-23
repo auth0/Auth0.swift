@@ -138,8 +138,15 @@ class CredentialsManagerErrorSpec: QuickSpec {
             }
 
             it("should append the cause error message") {
-                let cause = MockError()
+                let cause = MockError(message: "foo bar.")
                 let message = "The revocation of the refresh token failed. CAUSE: \(cause.localizedDescription)"
+                let error = CredentialsManagerError(code: .revokeFailed, cause: cause)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should append the cause error message adding a period") {
+                let cause = MockError(message: "foo bar")
+                let message = "The revocation of the refresh token failed. CAUSE: \(cause.localizedDescription)."
                 let error = CredentialsManagerError(code: .revokeFailed, cause: cause)
                 expect(error.localizedDescription) == message
             }

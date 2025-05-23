@@ -11,12 +11,14 @@ import LocalAuthentication
 
 /// Credentials management utility for securely storing and retrieving the user's credentials from the Keychain.
 ///
-/// - Warning: The Credentials Manager is not thread-safe, except for its
-/// ``CredentialsManager/credentials(withScope:minTTL:parameters:headers:callback:)``,
-/// ``CredentialsManager/apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)``, and
-/// ``CredentialsManager/ssoCredentials(parameters:headers:callback:)``, and
-/// ``CredentialsManager/renew(parameters:headers:callback:)`` methods. To avoid concurrency issues, do not
-/// call its non thread-safe methods and properties from different threads without proper synchronization.
+/// - Warning: The Credentials Manager is not thread-safe, except for the following methods:
+///   - ``CredentialsManager/credentials(withScope:minTTL:parameters:headers:callback:)``
+///   - ``CredentialsManager/apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)``
+///   - ``CredentialsManager/ssoCredentials(parameters:headers:callback:)``
+///   - ``CredentialsManager/renew(parameters:headers:callback:)``
+///
+///   To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads
+///   without proper synchronization.
 ///
 /// ## See Also
 ///

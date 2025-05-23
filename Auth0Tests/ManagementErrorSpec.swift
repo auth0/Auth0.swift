@@ -79,16 +79,16 @@ class ManagementErrorSpec: QuickSpec {
                 expect(error.statusCode) == statusCode
             }
 
-            it("should initialize with a cause") {
+            it("should initialize with cause") {
                 let cause = MockError()
-                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)"
+                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
                 let error = AuthenticationError(cause: cause)
                 expect(error.cause).toNot(beNil())
                 expect(error.localizedDescription) == description
                 expect(error.statusCode) == 0
             }
 
-            it("should initialize with a cause & status code") {
+            it("should initialize with cause & status code") {
                 let statusCode = 400
                 let error = AuthenticationError(cause: MockError(), statusCode: statusCode)
                 expect(error.statusCode) == statusCode
@@ -159,9 +159,37 @@ class ManagementErrorSpec: QuickSpec {
 
             it("should return the default message") {
                 let info: [String: Any] = ["foo": "bar", "statusCode": 0]
-                let message = "Failed with unknown error \(info)."
+                let message = "Failed with unknown error: \(info)."
                 let error = ManagementError(info: info)
                 expect(error.localizedDescription) == message
+            }
+
+            it("should append the cause error message") {
+                let description = "foo."
+                let cause =  MockError(message: "bar.")
+                let info: [String: Any] = ["description": description, "cause": cause]
+                let message = "\(description) CAUSE: \(cause.localizedDescription)"
+                let error = ManagementError(info: info)
+                expect(error.localizedDescription) == message
+            }
+
+            it("should append the cause error message adding periods") {
+                let description = "foo"
+                let cause =  MockError(message: "bar")
+                let info: [String: Any] = ["description": description, "cause": cause]
+                let message = "\(description). CAUSE: \(cause.localizedDescription)."
+                let error = ManagementError(info: info)
+                expect(error.localizedDescription) == message
+            }
+
+        }
+
+        describe("error cases") {
+
+            it("should detect network error") {
+                for errorCode in ManagementError.networkErrorCodes {
+                    expect(ManagementError(cause: URLError.init(errorCode)).isNetworkError) == true
+                }
             }
 
         }

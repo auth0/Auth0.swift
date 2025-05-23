@@ -10,12 +10,14 @@ func string(_ data: Data?) -> String? {
     return String(data: data, encoding: .utf8)
 }
 
+typealias JSONResponse = (headers: [String: Any], body: Any, data: Data)
+
 struct Response<E: Auth0APIError> {
     let data: Data?
     let response: HTTPURLResponse?
     let error: Error?
 
-    func result() throws -> Any? {
+    func result() throws(E) -> JSONResponse? {
         guard error == nil else { throw E(cause: error!, statusCode: response?.statusCode ?? 0) }
         guard let response = self.response else { throw E(description: nil) }
         guard (200...300).contains(response.statusCode) else {
@@ -32,7 +34,7 @@ struct Response<E: Auth0APIError> {
             throw E(description: nil, statusCode: response.statusCode)
         }
         if let json = json(data) {
-            return json
+            return (headers: response.allHeaderFields.stringDictionary, body: json, data: data)
         }
         // This piece of code is dedicated to our friends the backend devs :)
         if response.url?.lastPathComponent == "change_password" {
@@ -40,4 +42,18 @@ struct Response<E: Auth0APIError> {
         }
         throw E(from: self)
     }
+}
+
+private extension Dictionary where Key == AnyHashable, Value == Any {
+
+    var stringDictionary: [String: Any] {
+        var result: [String: Any] = [:]
+        for (key, value) in self {
+            if let stringKey = key as? String {
+                result[stringKey] = value
+            }
+        }
+        return result
+    }
+
 }

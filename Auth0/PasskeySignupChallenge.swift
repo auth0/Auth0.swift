@@ -4,16 +4,16 @@ import Foundation
 /// A passkey signup challenge.
 public struct PasskeySignupChallenge: Sendable {
 
-    /// Session identifier.
+    /// Unique identifier of the Auth0 session.
     public let authenticationSession: String
 
     /// Custom domain configured in the Auth0 tenant.
     public let relyingPartyId: String
 
-    /// Generated identifier.
+    /// Generated unique identifier of the user.
     public let userId: Data
 
-    /// User identifier, like the user's email.
+    /// A user identifier, like the user's email.
     public let userName: String
 
     /// Signup challenge data.

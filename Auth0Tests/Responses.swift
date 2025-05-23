@@ -37,10 +37,14 @@ func catchAllResponse() -> RequestResponse {
     }
 }
 
-func apiSuccessResponse(json: [AnyHashable: Any] = [:]) -> RequestResponse {
+func apiSuccessResponse(json: [AnyHashable: Any] = [:], headers: [String: String] = [:]) -> RequestResponse {
     return { request in
         let data = try! JSONSerialization.data(withJSONObject: json, options: [])
-        let response = HTTPURLResponse(url: request.url!, statusCode: APISuccessStatusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        let headers = headers.merging(APIResponseHeaders, uniquingKeysWith: { (_, last) in last })
+        let response = HTTPURLResponse(url: request.url!,
+                                       statusCode: APISuccessStatusCode,
+                                       httpVersion: nil,
+                                       headerFields: headers)!
         return (data, response, nil)
     }
 }
@@ -48,7 +52,10 @@ func apiSuccessResponse(json: [AnyHashable: Any] = [:]) -> RequestResponse {
 func apiSuccessResponse(jsonArray: [Any]) -> RequestResponse {
     return { request in
         let data = try! JSONSerialization.data(withJSONObject: jsonArray, options: [])
-        let response = HTTPURLResponse(url: request.url!, statusCode: APISuccessStatusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        let response = HTTPURLResponse(url: request.url!,
+                                       statusCode: APISuccessStatusCode,
+                                       httpVersion: nil,
+                                       headerFields: APIResponseHeaders)!
         return (data, response, nil)
     }
 }
@@ -56,7 +63,10 @@ func apiSuccessResponse(jsonArray: [Any]) -> RequestResponse {
 func apiSuccessResponse(string: String) -> RequestResponse {
     return { request in
         let data = string.data(using: .utf8)
-        let response = HTTPURLResponse(url: request.url!, statusCode: APISuccessStatusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        let response = HTTPURLResponse(url: request.url!,
+                                       statusCode: APISuccessStatusCode,
+                                       httpVersion: nil,
+                                       headerFields: APIResponseHeaders)!
         return (data, response, nil)
     }
 }
@@ -64,7 +74,10 @@ func apiSuccessResponse(string: String) -> RequestResponse {
 func apiFailureResponse(json: [AnyHashable: Any] = [:], statusCode: Int = 400) -> RequestResponse {
     return { request in
         let data = try! JSONSerialization.data(withJSONObject: json, options: [])
-        let response = HTTPURLResponse(url: request.url!, statusCode: statusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        let response = HTTPURLResponse(url: request.url!,
+                                       statusCode: statusCode,
+                                       httpVersion: nil,
+                                       headerFields: APIResponseHeaders)!
         return (data, response, nil)
     }
 }
@@ -72,7 +85,10 @@ func apiFailureResponse(json: [AnyHashable: Any] = [:], statusCode: Int = 400) -
 func apiFailureResponse(string: String, statusCode: Int) -> RequestResponse {
     return { request in
         let data = string.data(using: .utf8)
-        let response = HTTPURLResponse(url: request.url!, statusCode: statusCode, httpVersion: nil, headerFields: APIResponseHeaders)!
+        let response = HTTPURLResponse(url: request.url!,
+                                       statusCode: statusCode,
+                                       httpVersion: nil,
+                                       headerFields: APIResponseHeaders)!
         return (data, response, nil)
     }
 }
@@ -164,6 +180,7 @@ func multifactorChallengeResponse(challengeType: String, oobCode: String? = nil,
     return apiSuccessResponse(json: json)
 }
 
+#if PASSKEYS_PLATFORM
 func passkeyLoginChallengeResponse() -> RequestResponse {
     let json: [String: Any] = [
         "auth_session": "u5WSCyajq719ZSkLiEH13OJpa-Jsh8YZ75-NsBXph5pS-_gvqA0Z1MZyXL_sellw",
@@ -178,20 +195,41 @@ func passkeyLoginChallengeResponse() -> RequestResponse {
     return apiSuccessResponse(json: json)
 }
 
-func passkeySignupChallengeResponse(identifier: String, name: String = Support) -> RequestResponse {
+func passkeySignupChallengeResponse(authSession: String,
+                                    rpId: String,
+                                    userId: String,
+                                    userName: String,
+                                    userDisplayName: String = Support,
+                                    challenge: String) -> RequestResponse {
+    return passkeyEnrollmentChallengeResponse(authSession: authSession,
+                                              rpId: rpId,
+                                              userId: userId,
+                                              userName: userName,
+                                              userDisplayName: userDisplayName,
+                                              challenge: challenge,
+                                              headers: [:])
+}
+
+func passkeyEnrollmentChallengeResponse(authSession: String,
+                                        rpId: String,
+                                        userId: String,
+                                        userName: String,
+                                        userDisplayName: String = Support,
+                                        challenge: String,
+                                        headers: [String: String]) -> RequestResponse {
     let json: [String: Any] = [
-        "auth_session": "72CaO4uYxnfBz2JZ8zWfUkV2DFnC1TRZQWqEctPFJ8xIkPcTkZ82BhB6nKmj85xh",
+        "auth_session": authSession,
         "authn_params_public_key": [
             "rp": [
-                "id": "example.com",
-                "name": "example.com"
+                "id": rpId,
+                "name": rpId
             ],
             "user": [
-                "id": "s54lWOzf1JezfejtMqklA6xZQDAwIWIgSbEM4WeZXPMlBhk2K_Ojp3nKSy0AUo1Bph2RepN8IzbGQGQruI6ibQ",
-                "name": identifier,
-                "displayName": name
+                "id": userId,
+                "name": userName,
+                "displayName": userDisplayName
             ],
-            "challenge": "0UAd1U-liMt27la7xtyaBnzwxFSrFsWSBzZMvx3tCGI",
+            "challenge": challenge,
             "pubKeyCredParams": [
                 ["type": "public-key", "alg": -8],
                 ["type": "public-key", "alg": -7],
@@ -205,5 +243,28 @@ func passkeySignupChallengeResponse(identifier: String, name: String = Support) 
         ]
     ]
 
+    return apiSuccessResponse(json: json, headers: headers)
+}
+
+func passkeyAuthenticationMethodResponse(id: String,
+                                         userIdentityId: String,
+                                         userHandle: String,
+                                         keyId: String,
+                                         publicKey: String,
+                                         credentialDeviceType: PasskeyDeviceType,
+                                         createdAt: String) -> RequestResponse {
+    let json: [String: Any] = [
+        "id": id,
+        "type": "passkey",
+        "identity_user_id": userIdentityId,
+        "user_handle": userHandle,
+        "key_id": keyId,
+        "public_key": publicKey,
+        "credential_device_type": credentialDeviceType.rawValue,
+        "credential_backed_up": true,
+        "created_at": createdAt
+    ]
+
     return apiSuccessResponse(json: json)
 }
+#endif
