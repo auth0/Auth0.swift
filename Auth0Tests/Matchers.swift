@@ -267,6 +267,7 @@ func beUnsuccessful<T>(_ cause: String? = nil) -> Nimble.Matcher<AuthenticationR
     }
 }
 
+#if WEB_AUTH_PLATFORM
 func beUnsuccessful<T>(_ cause: String? = nil) -> Nimble.Matcher<MyAccountResult<T>> {
     return Matcher<MyAccountResult<T>>.define("be a failure result") { expression, failureMessage -> MatcherResult in
         if let cause = cause {
@@ -278,7 +279,6 @@ func beUnsuccessful<T>(_ cause: String? = nil) -> Nimble.Matcher<MyAccountResult
     }
 }
 
-#if WEB_AUTH_PLATFORM
 func beUnsuccessful<T>(_ cause: String? = nil) -> Nimble.Matcher<WebAuthResult<T>> {
     return Matcher<WebAuthResult<T>>.define("be a failure result") { expression, failureMessage -> MatcherResult in
         if let cause = cause {
