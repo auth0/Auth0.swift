@@ -1490,6 +1490,8 @@ To call the My Account API, you need an access token issued specifically for thi
 
 ### Enroll a new passkey
 
+**Scopes required:** `create:me:authentication_methods`
+
 Enrolling a new passkey is a three-step process that requires the **Passkeys** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#prepare-your-application) for more information.
 
 First, you request an enrollment challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a new passkey credential. Finally, you use the created passkey credential and the original challenge to enroll the passkey with Auth0.

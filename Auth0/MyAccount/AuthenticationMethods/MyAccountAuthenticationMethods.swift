@@ -17,6 +17,10 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
     /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
     /// ## Usage
     ///
     /// ```swift
@@ -78,6 +82,10 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// This feature is currently available in
     /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
     /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
     ///
     /// ## Usage
     ///
