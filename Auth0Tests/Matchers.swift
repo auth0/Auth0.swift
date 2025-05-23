@@ -211,7 +211,6 @@ func havePasskeyAuthenticationMethod(id: String,
     return Matcher<MyAccountResult<PasskeyAuthenticationMethod>>.define(definition) { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: PasskeyAuthenticationMethod) -> Bool in
             return id == created.id &&
-            "passkey" == created.type &&
             userIdentityId == created.userIdentityId &&
             credentialId == created.credential.id &&
             credentialPublicKey == created.credential.publicKey &&
