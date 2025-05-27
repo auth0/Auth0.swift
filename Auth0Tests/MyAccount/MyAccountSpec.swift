@@ -29,7 +29,7 @@ class MyAccountSpec: QuickSpec {
   
             #if !SWIFT_PACKAGE
             it("should return my account client with bundle") {
-                let bundle = Bundle(for: Auth0Spec.self)
+                let bundle = Bundle(for: MyAccountSpec.self)
                 let myAccount = Auth0.myAccount(token: Token, bundle: bundle)
 
                 expect(myAccount.url.absoluteString) == "https://\(Domain)/me/v1"
