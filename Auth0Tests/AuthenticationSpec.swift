@@ -304,7 +304,7 @@ class AuthenticationSpec: QuickSpec {
                                            signature: signature.a0_decodeBase64URLSafe())
             let challenge = PasskeyLoginChallenge(authenticationSession: authSession,
                                                   relyingPartyId: Domain,
-                                                  challengeData: challengeString.a0_decodeBase64URLSafe()!)
+                                                  challengeData: challengeData)
 
             describe("login with passkey") {
 

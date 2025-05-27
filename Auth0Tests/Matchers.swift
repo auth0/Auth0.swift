@@ -206,7 +206,8 @@ func havePasskeyAuthenticationMethod(id: String,
     "identifier <\(id)>, " +
     "user identity identifier <\(userIdentityId)>, " +
     "credential identifier <\(credentialPublicKey)>, " +
-    "and credential device type <\(credentialDeviceType.rawValue)>"
+    "credential device type <\(credentialDeviceType.rawValue)>, " +
+    "and creation date <\(createdAt)>"
 
     return Matcher<MyAccountResult<PasskeyAuthenticationMethod>>.define(definition) { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: PasskeyAuthenticationMethod) -> Bool in
