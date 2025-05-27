@@ -10,12 +10,12 @@ public typealias AuthenticationResult<T> = Result<T, AuthenticationError>
  */
 public typealias ManagementResult<T> = Result<T, ManagementError>
 
-#if WEB_AUTH_PLATFORM
 /**
  `Result` wrapper for My Account API operations.
  */
 public typealias MyAccountResult<T> = Result<T, MyAccountError>
 
+#if WEB_AUTH_PLATFORM
 /**
  `Result` wrapper for Web Auth operations.
  */
