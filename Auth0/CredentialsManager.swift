@@ -394,7 +394,7 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func credentials(withScope scope: String? = nil,
                             minTTL: Int = 0,
-                            parameters: [String: ParameterValue] = [:],
+                            parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: scope,
@@ -629,7 +629,7 @@ public struct CredentialsManager: Sendable {
     // swiftlint:disable:next function_parameter_count
     private func retrieveCredentials(scope: String?,
                                      minTTL: Int,
-                                     parameters: [String: ParameterValue],
+                                     parameters: [String: Any],
                                      headers: [String: String],
                                      forceRenewal: Bool,
                                      callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {

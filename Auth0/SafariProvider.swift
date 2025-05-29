@@ -35,14 +35,26 @@ public extension WebAuthentication {
     ///
     /// - <doc:UserAgents>
     static func safariProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
-        return { url, callback in
-            let safari = SFSafariViewController(url: url)
-            safari.dismissButtonStyle = .cancel
-            safari.modalPresentationStyle = style
-            return SafariUserAgent(controller: safari, callback: callback)
+        return { url, callback -> WebAuthUserAgent in
+            return await Task {
+                let safari = await SFSafariViewController(url: url)
+                await safari.setDismissButtonStyle()
+                await safari.setModelPresentationStyle(style: style)
+                return await SafariUserAgent(controller: safari, callback: callback)
+            }.value
         }
     }
 
+}
+
+extension SFSafariViewController {
+    func setDismissButtonStyle(style: DismissButtonStyle = .cancel) async {
+        dismissButtonStyle = style
+    }
+    
+    func setModelPresentationStyle(style: UIModalPresentationStyle = .fullScreen) async {
+        modalPresentationStyle = style
+    }
 }
 
 @MainActor final class SafariUserAgent: NSObject, WebAuthUserAgent {

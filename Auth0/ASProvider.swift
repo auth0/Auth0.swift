@@ -8,33 +8,35 @@ extension WebAuthentication {
     static func asProvider(redirectURL: URL,
                            ephemeralSession: Bool = false,
                            headers: [String: String]? = nil) -> WebAuthProvider {
-        return { url, callback in
-            let session: ASWebAuthenticationSession
+        return { url, callback -> WebAuthUserAgent in
+            
+            return await Task {
+                let session: ASWebAuthenticationSession
 
-            if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
-                if redirectURL.scheme == "https" {
-                    session = ASWebAuthenticationSession(url: url,
-                                                         callback: .https(host: redirectURL.host!,
-                                                                          path: redirectURL.path),
-                                                         completionHandler: completionHandler(callback))
+                if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
+                    if redirectURL.scheme == "https" {
+                        session = ASWebAuthenticationSession(url: url,
+                                                             callback: .https(host: redirectURL.host!,
+                                                                              path: redirectURL.path),
+                                                             completionHandler: completionHandler(callback))
+                    } else {
+                        session = ASWebAuthenticationSession(url: url,
+                                                             callback: .customScheme(redirectURL.scheme!),
+                                                             completionHandler: completionHandler(callback))
+                    }
+
+                    session.additionalHeaderFields = headers
                 } else {
                     session = ASWebAuthenticationSession(url: url,
-                                                         callback: .customScheme(redirectURL.scheme!),
+                                                         callbackURLScheme: redirectURL.scheme,
                                                          completionHandler: completionHandler(callback))
                 }
 
-                session.additionalHeaderFields = headers
-            } else {
-                session = ASWebAuthenticationSession(url: url,
-                                                     callbackURLScheme: redirectURL.scheme,
-                                                     completionHandler: completionHandler(callback))
-            }
+                session.prefersEphemeralWebBrowserSession = ephemeralSession
 
-            session.prefersEphemeralWebBrowserSession = ephemeralSession
-
-            Task {
-                await ASUserAgent(session: session, callback: callback)
-            }
+                return await ASUserAgent(session: session, callback: callback)
+            }.value
+            
         }
     }
 

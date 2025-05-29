@@ -205,7 +205,7 @@ actor Auth0WebAuth: @preconcurrency WebAuth {
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      ephemeralSession: ephemeralSession,
                                                                      headers: headers)
-        let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
+        let userAgent = await provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
             Task {
                 await storage.clear()
                 await barrier.lower()
@@ -248,7 +248,7 @@ actor Auth0WebAuth: @preconcurrency WebAuth {
         }
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, headers: headers)
-        let userAgent = provider(logoutURL) { [storage, barrier] result in
+        let userAgent = await provider(logoutURL) { [storage, barrier] result in
             Task {
                 await storage.clear()
                 await barrier.lower()
