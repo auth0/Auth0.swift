@@ -3,7 +3,7 @@ import Foundation
 /// Represents an error during a request to the Auth0 Management API v2.
 public struct ManagementError: Auth0APIError, @unchecked Sendable {
 
-    /// Additional information about the error.
+    /// Raw error values.
     public let info: [String: Any]
 
     /// Creates an error from a JSON response.
@@ -23,14 +23,9 @@ public struct ManagementError: Auth0APIError, @unchecked Sendable {
     /// HTTP status code of the response.
     public let statusCode: Int
 
-    /// The underlying `Error` value, if any. Defaults to `nil`.
-    public var cause: Error? {
-        return self.info["cause"] as? Error
-    }
-
-    /// The code of the error as a string.
+    /// Error code.
     public var code: String {
-        return self.info["code"] as? String ?? unknownError
+        return self.info[apiErrorCode] as? String ?? unknownError
     }
 
     /// Description of the error.
@@ -50,7 +45,7 @@ extension ManagementError {
         if let string = self.info["description"] as? String {
             return string
         }
-        return "Failed with unknown error \(self.info)."
+        return "Failed with unknown error: \(self.info)."
     }
 
 }

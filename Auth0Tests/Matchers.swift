@@ -163,9 +163,61 @@ func haveSSOCredentials(_ sessionTransferToken: String,
 #if PASSKEYS_PLATFORM
 func havePasskeySignupChallenge(identifier: String) -> Nimble.Matcher<AuthenticationResult<PasskeySignupChallenge>> {
     let definition = "have passkey signup challenge with user identifier <\(identifier)>"
+
     return Matcher<AuthenticationResult<PasskeySignupChallenge>>.define(definition) { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: PasskeySignupChallenge) -> Bool in
             return created.userName == identifier
+        }
+    }
+}
+
+func havePasskeyEnrollmentChallenge(authenticationMethodId: String,
+                                    authenticationSession: String,
+                                    relyingPartyId: String,
+                                    userId: Data,
+                                    userName: String,
+                                    challengeData: Data) -> Nimble.Matcher<MyAccountResult<PasskeyEnrollmentChallenge>> {
+    let definition = "have passkey enrollment challenge with " +
+    "authentication method identifier <\(authenticationMethodId)>, " +
+    "authentication session <\(authenticationSession)>, " +
+    "relying party identifier <\(relyingPartyId)>, " +
+    "and user name <\(userName)>"
+
+    return Matcher<MyAccountResult<PasskeyEnrollmentChallenge>>.define(definition) { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage) { (created: PasskeyEnrollmentChallenge) -> Bool in
+            return authenticationMethodId == created.authenticationMethodId &&
+            authenticationSession == created.authenticationSession &&
+            relyingPartyId == created.relyingPartyId &&
+            userId == created.userId &&
+            userName == created.userName &&
+            challengeData == created.challengeData
+        }
+    }
+}
+
+func havePasskeyAuthenticationMethod(id: String,
+                                     userIdentityId: String,
+                                     credentialId: String,
+                                     credentialPublicKey: Data,
+                                     credentialUserHandle: Data,
+                                     credentialDeviceType: PasskeyDeviceType,
+                                     createdAt: Date) -> Nimble.Matcher<MyAccountResult<PasskeyAuthenticationMethod>> {
+    let definition = "have passkey authentication method with " +
+    "identifier <\(id)>, " +
+    "user identity identifier <\(userIdentityId)>, " +
+    "credential identifier <\(credentialPublicKey)>, " +
+    "credential device type <\(credentialDeviceType.rawValue)>, " +
+    "and creation date <\(createdAt)>"
+
+    return Matcher<MyAccountResult<PasskeyAuthenticationMethod>>.define(definition) { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage) { (created: PasskeyAuthenticationMethod) -> Bool in
+            return id == created.id &&
+            userIdentityId == created.userIdentityId &&
+            credentialId == created.credential.id &&
+            credentialPublicKey == created.credential.publicKey &&
+            credentialUserHandle == created.credential.userHandle &&
+            credentialDeviceType == created.credential.deviceType &&
+            createdAt == created.createdAt
         }
     }
 }
@@ -211,6 +263,17 @@ func beUnsuccessful<T>(_ cause: String? = nil) -> Nimble.Matcher<AuthenticationR
             _ = failureMessage.appended(message: " with cause \(cause)")
         } else {
             _ = failureMessage.appended(message: " from authentication api")
+        }
+        return try beUnsuccessful(expression, failureMessage)
+    }
+}
+
+func beUnsuccessful<T>(_ cause: String? = nil) -> Nimble.Matcher<MyAccountResult<T>> {
+    return Matcher<MyAccountResult<T>>.define("be a failure result") { expression, failureMessage -> MatcherResult in
+        if let cause = cause {
+            _ = failureMessage.appended(message: " with cause \(cause)")
+        } else {
+            _ = failureMessage.appended(message: " from my account api")
         }
         return try beUnsuccessful(expression, failureMessage)
     }
@@ -416,6 +479,11 @@ extension URLRequest {
         return isHost(domain) && isPath(path)
     }
     
+    func isMyAccountAuthenticationMethods(_ domain: String, _ endpoint: String = "", token: String) -> Bool {
+        let subpath = endpoint.isEmpty ? endpoint : "/\(endpoint)"
+        let path = "/me/\(Auth0MyAccount.apiVersion)/authentication-methods\(subpath)"
+        return isHost(domain) && isPath(path) && hasBearerToken(token)
+    }
     
     func isLinkPath(_ domain: String, identifier: String) -> Bool {
         return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")

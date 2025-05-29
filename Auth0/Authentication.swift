@@ -541,6 +541,8 @@ public protocol Authentication: Trackable, Loggable {
     ///   - scope:      Space-separated list of requested scope values. Defaults to `openid profile email`.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
+    /// ## See Also
+    ///
     /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-existing-user)
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Connect-to-a-service-with-an-existing-account)
@@ -657,6 +659,8 @@ public protocol Authentication: Trackable, Loggable {
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
+    /// ## See Also
+    /// 
     /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-new-user)
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
@@ -990,18 +994,20 @@ public protocol Authentication: Trackable, Loggable {
      You can request credentials for a specific API by passing its audience value. The default scopes configured for
      the API will be granted if you don't request any specific scopes.
 
+     > Important: Currently, only the Auth0 My Account API is supported. Support for other APIs will be added in the future.
+
      ```swift
      Auth0
          .authentication()
          .renew(withRefreshToken: credentials.refreshToken,
-                audience: "http://example.com/api",
-                scope: "read:todos update:todos")
+                audience: "https://samples.us.auth0.com/me",
+                scope: "create:me:authentication_methods")
          .start { print($0) }
      ```
 
      - Parameters:
        - refreshToken: The refresh token.
-       - audience:     Identifier of the API that your application is requesting access to. Defaults to `nil`.
+       - audience:     Identifier of the API that your application is requesting access to. Currently, only the Auth0 My Account API is supported. Defaults to `nil`.
        - scope:        Space-separated list of scope values to request. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
 

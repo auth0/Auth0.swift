@@ -142,16 +142,17 @@ class WebAuthErrorSpec: QuickSpec {
             }
 
             it("should append the cause error message") {
-                let cause =  MockError()
-                let message = "An unexpected error occurred. CAUSE: \(cause.localizedDescription)"
-                let error = WebAuthError(code: .other, cause: cause)
+                let description = "foo."
+                let cause = MockError(message: "foo bar.")
+                let message = "\(description) CAUSE: \(cause.localizedDescription)"
+                let error = WebAuthError(code: .unknown(description), cause: cause)
                 expect(error.localizedDescription) == message
             }
 
-            it("should append the cause error message with a separator") {
+            it("should append the cause error message adding periods") {
                 let description = "foo"
-                let cause =  MockError()
-                let message = "\(description). CAUSE: \(cause.localizedDescription)"
+                let cause = MockError(message: "foo bar")
+                let message = "\(description). CAUSE: \(cause.localizedDescription)."
                 let error = WebAuthError(code: .unknown(description), cause: cause)
                 expect(error.localizedDescription) == message
             }
