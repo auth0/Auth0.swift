@@ -1,7 +1,7 @@
 import Foundation
 
 /// Generates and sets the `Auth0-Client` header.
-public struct Telemetry {
+public struct Telemetry: Sendable {
 
     static let NameKey = "name"
     static let VersionKey = "version"
@@ -98,7 +98,7 @@ public struct Telemetry {
 }
 
 /// A type that can send the `Auth0-Client` header on every request to Auth0.
-public protocol Trackable {
+public protocol Trackable: Sendable {
 
     /// The ``Telemetry`` instance.
     var telemetry: Telemetry { get set }

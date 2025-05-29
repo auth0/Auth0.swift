@@ -1,7 +1,7 @@
 import Foundation
 
 /// Logger for debugging purposes.
-public protocol Logger {
+public protocol Logger: Sendable {
 
     /// Log an HTTP request.
     func trace(request: URLRequest, session: URLSession)
@@ -14,7 +14,7 @@ public protocol Logger {
 
 }
 
-protocol LoggerOutput {
+protocol LoggerOutput: Sendable {
     func log(message: String)
     func newLine()
 }

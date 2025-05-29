@@ -1,9 +1,9 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-class LoginTransaction: NSObject, AuthTransaction {
+actor LoginTransaction: NSObject, AuthTransaction {
 
-    typealias FinishTransaction = (WebAuthResult<Credentials>) -> Void
+    typealias FinishTransaction = @Sendable (WebAuthResult<Credentials>) -> Void
 
     private(set) var userAgent: WebAuthUserAgent?
 
@@ -28,32 +28,32 @@ class LoginTransaction: NSObject, AuthTransaction {
         super.init()
     }
 
-    func cancel() {
-        self.finishUserAgent(with: .failure(WebAuthError(code: .userCancelled)))
+    func cancel() async {
+        await self.finishUserAgent(with: .failure(WebAuthError(code: .userCancelled)))
     }
 
-    func resume(_ url: URL) -> Bool {
+    func resume(_ url: URL) async -> Bool {
         self.logger?.trace(url: url, source: "Callback URL")
-        return self.handleURL(url)
+        return await self.handleURL(url)
     }
 
-    private func handleURL(_ url: URL) -> Bool {
+    private func handleURL(_ url: URL) async -> Bool {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               case let items = self.handler.values(fromComponents: components),
               has(state: self.state, inItems: items) else {
             let error = WebAuthError(code: .unknown("Invalid callback URL: \(url.absoluteString)"))
             // The user agent can handle the error
-            self.finishUserAgent(with: .failure(error))
+            await self.finishUserAgent(with: .failure(error))
             return false
         }
 
         if items["error"] != nil {
             let error = WebAuthError(code: .other, cause: AuthenticationError(info: items))
             // The user agent can handle the error
-            self.finishUserAgent(with: .failure(error))
+            await self.finishUserAgent(with: .failure(error))
         } else {
             // The user agent can close itself
-            self.finishUserAgent(with: .success(()))
+            await self.finishUserAgent(with: .success(()))
             // Continue with code exchange
             self.handler.credentials(from: items, callback: self.callback)
         }
@@ -61,9 +61,9 @@ class LoginTransaction: NSObject, AuthTransaction {
         return true
     }
 
-    private func finishUserAgent(with result: WebAuthResult<Void>) {
-        self.userAgent?.finish(with: result)
-        self.userAgent = nil
+    private func finishUserAgent(with result: WebAuthResult<Void>) async {
+        await userAgent?.finish(with: result)
+        userAgent = nil
     }
 
     private func has(state: String?, inItems items: [String: String]) -> Bool {

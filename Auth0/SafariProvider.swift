@@ -45,7 +45,7 @@ public extension WebAuthentication {
 
 }
 
-class SafariUserAgent: NSObject, WebAuthUserAgent {
+@MainActor final class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     let controller: SFSafariViewController
     let callback: WebAuthProviderCallback
@@ -58,11 +58,11 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
         self.controller.presentationController?.delegate = self
     }
 
-    func start() {
+    func start() async {
         UIWindow.topViewController?.present(controller, animated: true, completion: nil)
     }
 
-    func finish(with result: WebAuthResult<Void>) {
+    func finish(with result: WebAuthResult<Void>) async {
         if case .failure(let cause) = result, case .userCancelled = cause {
             DispatchQueue.main.async { [callback] in
                 callback(result)
@@ -88,20 +88,24 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 
 extension SafariUserAgent: SFSafariViewControllerDelegate {
 
-    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+    nonisolated func safariViewControllerDidFinish(_ controller: SFSafariViewController)  {
         // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead
         // TransactionStore is internal
-        TransactionStore.shared.cancel()
+        Task {
+            await TransactionStore.shared.cancel()
+        }
     }
-
+ 
 }
 
 extension SafariUserAgent: UIAdaptivePresentationControllerDelegate {
 
-    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController)  {
         // If you are developing a custom Web Auth provider, call WebAuthentication.cancel() instead
-        // TransactionStore is internal
-        TransactionStore.shared.cancel()
+        Task {
+            // TransactionStore is internal
+            await TransactionStore.shared.cancel()
+        }
     }
 
 }

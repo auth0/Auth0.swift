@@ -22,7 +22,7 @@ import LocalAuthentication
 ///
 /// - ``CredentialsManagerError``
 /// - <doc:RefreshTokens>
-public struct CredentialsManager {
+public struct CredentialsManager: Sendable {
 
     private let storage: CredentialsStorage
     private let storeKey: String
@@ -304,7 +304,7 @@ public struct CredentialsManager {
                             minTTL: Int = 0,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
-                            callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                            callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
                 let error = CredentialsManagerError(code: .biometricsFailed,
@@ -394,7 +394,7 @@ public struct CredentialsManager {
     /// - <doc:RefreshTokens>
     public func credentials(withScope scope: String? = nil,
                             minTTL: Int = 0,
-                            parameters: [String: Any] = [:],
+                            parameters: [String: ParameterValue] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: scope,
@@ -474,7 +474,7 @@ public struct CredentialsManager {
                                minTTL: Int = 0,
                                parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
-                               callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
+                               callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
         self.retrieveAPICredentials(audience: audience,
                                     scope: scope,
                                     minTTL: minTTL,
@@ -554,7 +554,7 @@ public struct CredentialsManager {
     /// - <doc:RefreshTokens>
     public func ssoCredentials(parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
-                               callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+                               callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
         self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: callback)
     }
 
@@ -599,7 +599,7 @@ public struct CredentialsManager {
     /// - <doc:RefreshTokens>
     public func renew(parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
-                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                      callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: nil,
                                  minTTL: 0,
                                  parameters: parameters,
@@ -629,10 +629,10 @@ public struct CredentialsManager {
     // swiftlint:disable:next function_parameter_count
     private func retrieveCredentials(scope: String?,
                                      minTTL: Int,
-                                     parameters: [String: Any],
+                                     parameters: [String: ParameterValue],
                                      headers: [String: String],
                                      forceRenewal: Bool,
-                                     callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                                     callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         let dispatchGroup = DispatchGroup()
 
         self.dispatchQueue.async {
@@ -689,7 +689,7 @@ public struct CredentialsManager {
 
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
-                                        callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+                                        callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
         let dispatchGroup = DispatchGroup()
 
         self.dispatchQueue.async {
@@ -739,7 +739,7 @@ public struct CredentialsManager {
                                         minTTL: Int,
                                         parameters: [String: Any],
                                         headers: [String: String],
-                                        callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
+                                        callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
         let dispatchGroup = DispatchGroup()
 
         self.dispatchQueue.async {
@@ -943,20 +943,20 @@ public extension CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
-    func credentials(withScope scope: String? = nil,
-                     minTTL: Int = 0,
-                     parameters: [String: Any] = [:],
-                     headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
-        return Deferred {
-            Future { callback in
-                return self.credentials(withScope: scope,
-                                        minTTL: minTTL,
-                                        parameters: parameters,
-                                        headers: headers,
-                                        callback: callback)
-            }
-        }.eraseToAnyPublisher()
-    }
+//    func credentials(withScope scope: String? = nil,
+//                     minTTL: Int = 0,
+//                     parameters: [String: Any] = [:],
+//                     headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
+//        return Deferred {
+//            Future { callback in
+//                return self.credentials(withScope: scope,
+//                                        minTTL: minTTL,
+//                                        parameters: parameters,
+//                                        headers: headers,
+//                                        callback: callback)
+//            }
+//        }.eraseToAnyPublisher()
+//    }
 
     /// Retrieves API credentials from the Keychain and automatically renews them using the refresh token if the access
     /// token is expired. Otherwise, the subscription will complete with the retrieved API credentials as they are
@@ -1034,22 +1034,22 @@ public extension CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
-    func apiCredentials(forAudience audience: String,
-                        scope: String? = nil,
-                        minTTL: Int = 0,
-                        parameters: [String: Any] = [:],
-                        headers: [String: String] = [:]) -> AnyPublisher<APICredentials, CredentialsManagerError> {
-        return Deferred {
-            Future { callback in
-                return self.apiCredentials(forAudience: audience,
-                                           scope: scope,
-                                           minTTL: minTTL,
-                                           parameters: parameters,
-                                           headers: headers,
-                                           callback: callback)
-            }
-        }.eraseToAnyPublisher()
-    }
+//    func apiCredentials(forAudience audience: String,
+//                        scope: String? = nil,
+//                        minTTL: Int = 0,
+//                        parameters: [String: Any] = [:],
+//                        headers: [String: String] = [:]) -> AnyPublisher<APICredentials, CredentialsManagerError> {
+//        return Deferred {
+//            Future { callback in
+//                return self.apiCredentials(forAudience: audience,
+//                                           scope: scope,
+//                                           minTTL: minTTL,
+//                                           parameters: parameters,
+//                                           headers: headers,
+//                                           callback: callback)
+//            }
+//        }.eraseToAnyPublisher()
+//    }
 
     /// Exchanges the refresh token for a session transfer token that can be used to perform web single sign-on (SSO).
     /// **This method is thread-safe**.
@@ -1125,14 +1125,14 @@ public extension CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
-    func ssoCredentials(parameters: [String: Any] = [:],
-                        headers: [String: String] = [:]) -> AnyPublisher<SSOCredentials, CredentialsManagerError> {
-        return Deferred {
-            Future { callback in
-                return self.ssoCredentials(parameters: parameters, headers: headers, callback: callback)
-            }
-        }.eraseToAnyPublisher()
-    }
+//    func ssoCredentials(parameters: [String: Any] = [:],
+//                        headers: [String: String] = [:]) -> AnyPublisher<SSOCredentials, CredentialsManagerError> {
+//        return Deferred {
+//            Future { callback in
+//                return self.ssoCredentials(parameters: parameters, headers: headers, callback: callback)
+//            }
+//        }.eraseToAnyPublisher()
+//    }
 
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
     ///
@@ -1179,16 +1179,16 @@ public extension CredentialsManager {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
-    func renew(parameters: [String: Any] = [:],
-               headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
-        return Deferred {
-            Future { callback in
-                return self.renew(parameters: parameters,
-                                  headers: headers,
-                                  callback: callback)
-            }
-        }.eraseToAnyPublisher()
-    }
+//    func renew(parameters: [String: Any] = [:],
+//               headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
+//        return Deferred {
+//            Future { callback in
+//                return self.renew(parameters: parameters,
+//                                  headers: headers,
+//                                  callback: callback)
+//            }
+//        }.eraseToAnyPublisher()
+//    }
 
 }
 

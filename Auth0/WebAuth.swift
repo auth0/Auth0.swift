@@ -5,7 +5,7 @@ import Foundation
 import Combine
 
 /// Callback invoked by the ``WebAuthUserAgent`` when the web-based operation concludes.
-public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
+public typealias WebAuthProviderCallback =  @Sendable (WebAuthResult<Void>) -> Void
 
 /// Thunk that returns a function that creates and returns a ``WebAuthUserAgent`` to perform a web-based operation.
 /// The ``WebAuthUserAgent`` opens the URL in an external user agent and then invokes the callback when done.
@@ -13,7 +13,7 @@ public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
 /// ## See Also
 ///
 /// - [Example](https://github.com/auth0/Auth0.swift/blob/master/Auth0/SafariProvider.swift)
-public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping  @Sendable WebAuthProviderCallback) -> WebAuthUserAgent
+public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping @Sendable WebAuthProviderCallback) -> WebAuthUserAgent
 
 /// Web-based authentication using Auth0.
 ///
@@ -41,7 +41,7 @@ public protocol WebAuth: Trackable, Loggable {
      - Parameter connection: Name of the connection. For example, `github`.
      - Returns: The same `WebAuth` instance to allow method chaining.
      */
-    func connection(_ connection: String) -> Self
+    func connection(_ connection: String) async -> Self
 
     /**
      Specify the scopes that will be requested during authentication.
@@ -54,7 +54,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - [Scopes](https://auth0.com/docs/get-started/apis/scopes)
      */
-    func scope(_ scope: String) -> Self
+    func scope(_ scope: String) async -> Self
 
     /**
      Specify provider scopes for OAuth2/social connections, such as GitHub or Google.
@@ -67,7 +67,7 @@ public protocol WebAuth: Trackable, Loggable {
 
      - [Connection Scopes](https://auth0.com/docs/authenticate/identity-providers/adding-scopes-for-an-external-idp)
      */
-    func connectionScope(_ connectionScope: String) -> Self
+    func connectionScope(_ connectionScope: String) async -> Self
 
     /**
      Specify a `state` parameter that will be sent back after authentication to verify that the response
@@ -77,7 +77,7 @@ public protocol WebAuth: Trackable, Loggable {
      - Parameter state: State value.
      - Returns: The same `WebAuth` instance to allow method chaining.
      */
-    func state(_ state: String) -> Self
+    func state(_ state: String) async -> Self
 
     /**
      Specify additional parameters for authentication.
@@ -85,7 +85,7 @@ public protocol WebAuth: Trackable, Loggable {
      - Parameter parameters: Additional authentication parameters.
      - Returns: The same `WebAuth` instance to allow method chaining.
      */
-    func parameters(_ parameters: [String: String]) -> Self
+    func parameters(_ parameters: [String: String]) async -> Self
 
     /// Specify additional headers for `ASWebAuthenticationSession`.
     ///
@@ -98,19 +98,19 @@ public protocol WebAuth: Trackable, Loggable {
     ///
     /// - [additionalHeaderFields](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/additionalheaderfields)
     @available(iOS 17.4, macOS 14.4, visionOS 1.2, *)
-    func headers(_ headers: [String: String]) -> Self
+    func headers(_ headers: [String: String]) async -> Self
 
     /// Specify a custom redirect URL to be used.
     ///
     /// - Parameter redirectURL: Custom redirect URL.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func redirectURL(_ redirectURL: URL) -> Self
+    func redirectURL(_ redirectURL: URL) async -> Self
 
     /// Specify a custom authorize URL to be used.
     ///
     /// - Parameter authorizeURL: Custom authorize URL.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func authorizeURL(_ authorizeURL: URL) -> Self
+    func authorizeURL(_ authorizeURL: URL) async -> Self
 
     /// Specify an audience name for the API that your application will call using the access token returned after
     /// authentication.
@@ -122,34 +122,34 @@ public protocol WebAuth: Trackable, Loggable {
     /// ## See Also
     ///
     /// - [Audience](https://auth0.com/docs/secure/tokens/access-tokens/get-access-tokens#control-access-token-audience)
-    func audience(_ audience: String) -> Self
+    func audience(_ audience: String) async -> Self
 
     /// Specify a `nonce` parameter for ID token validation.
     ///
     /// - Parameter nonce: Nonce value.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func nonce(_ nonce: String) -> Self
+    func nonce(_ nonce: String) async -> Self
 
     /// Specify a custom issuer for ID token validation.
     /// This value will be used instead of the Auth0 Domain.
     ///
     /// - Parameter issuer: Custom issuer value. For example, `https://example.com/`.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func issuer(_ issuer: String) -> Self
+    func issuer(_ issuer: String) async -> Self
 
     /// Specify a leeway amount for ID token validation.
     /// This value represents the clock skew for the validation of date claims, for example `exp`.
     ///
     /// - Parameter leeway: Number of milliseconds. Defaults to `60_000` (1 minute).
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func leeway(_ leeway: Int) -> Self
+    func leeway(_ leeway: Int) async -> Self
 
     /// Specify a `max_age` parameter for authentication.
     /// Sending this parameter will require the presence of the `auth_time` claim in the ID token.
     ///
     /// - Parameter maxAge: Number of milliseconds.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func maxAge(_ maxAge: Int) -> Self
+    func maxAge(_ maxAge: Int) async -> Self
 
     /// Use `https` as the scheme for the redirect URL on iOS 17.4+ and macOS 14.4+. On older versions of iOS and
     /// macOS, the bundle identifier of the app will be used as a custom scheme.
@@ -160,7 +160,7 @@ public protocol WebAuth: Trackable, Loggable {
     /// Associated Domain. Otherwise, use the domain of your Auth0 tenant.
     /// - Note: Don't use this method along with ``provider(_:)``. Use either one or the other, because this
     /// method will only work with the default `ASWebAuthenticationSession` implementation.
-    func useHTTPS() -> Self
+    func useHTTPS() async -> Self
 
     /// Use a private browser session to avoid storing the session cookie in the shared cookie jar.
     /// Using this method will disable single sign-on (SSO).
@@ -176,19 +176,19 @@ public protocol WebAuth: Trackable, Loggable {
     /// - <doc:UserAgents>
     /// - [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md)
     /// - [prefersEphemeralWebBrowserSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio)
-    func useEphemeralSession() -> Self
+    func useEphemeralSession() async -> Self
 
     /// Specify an invitation URL to join an organization.
     ///
     /// - Parameter invitationURL: Invitation URL for the organization.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func invitationURL(_ invitationURL: URL) -> Self
+    func invitationURL(_ invitationURL: URL) async -> Self
 
     /// Specify an organization identifier to log in to.
     ///
     /// - Parameter organization: ID of the organization.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func organization(_ organization: String) -> Self
+    func organization(_ organization: String) async -> Self
 
     /// Specify a custom Web Auth provider to use instead of the default `ASWebAuthenticationSession` implementation.
     ///
@@ -201,13 +201,13 @@ public protocol WebAuth: Trackable, Loggable {
     ///
     /// - <doc:UserAgents>
     /// - ``WebAuthProvider``
-    func provider(_ provider: @escaping WebAuthProvider) -> Self
+    func provider(_ provider: @escaping WebAuthProvider) async -> Self
 
     /// Specify a callback to be called when the ``WebAuthUserAgent`` closes, while the flow continues with the code exchange.
     ///
     /// - Parameter callback: A callback to be executed
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func onClose(_ callback: (() -> Void)?) -> Self
+    func onClose(_ callback: (@Sendable () -> Void)?) async -> Self
 
     // MARK: - Methods
 
@@ -236,7 +236,7 @@ public protocol WebAuth: Trackable, Loggable {
      - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
      application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
-    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
+    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) async
 
     #if canImport(_Concurrency)
     /**

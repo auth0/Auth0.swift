@@ -51,15 +51,15 @@ public struct WebAuthentication {
     /// - Parameter url: The URL sent by the external user agent that contains the result of the web-based operation.
     /// - Returns: If the URL was expected and properly formatted.
     @discardableResult
-    public static func resume(with url: URL) -> Bool {
-        return TransactionStore.shared.resume(url)
+    public static func resume(with url: URL) async -> Bool {
+        return await TransactionStore.shared.resume(url)
     }
 
     /// Terminates the ongoing web-based operation and reports back that it was cancelled.
     /// You need to call this method within your custom Web Auth provider implementation whenever the operation is
     /// cancelled by the user.
-    public static func cancel() {
-        TransactionStore.shared.cancel()
+    public static func cancel() async {
+        await TransactionStore.shared.cancel()
     }
 
 }

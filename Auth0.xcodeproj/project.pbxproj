@@ -494,6 +494,11 @@
 		D41DED3E2DCA09B400F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED402DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
 		D41DED412DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D4E153FB2DE5B87900FFBA69 /* ParameterValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E153FA2DE5B87200FFBA69 /* ParameterValue.swift */; };
+		D4E153FC2DE5B87900FFBA69 /* ParameterValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E153FA2DE5B87200FFBA69 /* ParameterValue.swift */; };
+		D4E153FD2DE5B87900FFBA69 /* ParameterValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E153FA2DE5B87200FFBA69 /* ParameterValue.swift */; };
+		D4E153FE2DE5B87900FFBA69 /* ParameterValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E153FA2DE5B87200FFBA69 /* ParameterValue.swift */; };
+		D4E153FF2DE5B87900FFBA69 /* ParameterValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E153FA2DE5B87200FFBA69 /* ParameterValue.swift */; };
 		D581CF772757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF782757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF792757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
@@ -878,6 +883,7 @@
 		C1B3B9B72C24B298004A32A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C1B3B9C02C24B39E004A32A4 /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B3B9C72C24B39E004A32A4 /* Auth0Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Auth0Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4E153FA2DE5B87200FFBA69 /* ParameterValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParameterValue.swift; sourceTree = "<group>"; };
 		D581CF762757D773007327D1 /* RequestSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestSpec.swift; sourceTree = "<group>"; };
 		D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1041,6 +1047,7 @@
 		5BEDE1581EC1FFE40007300D /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				D4E153FA2DE5B87200FFBA69 /* ParameterValue.swift */,
 				5CB41D3B23D0BA0300074024 /* Validators */,
 				5B1748731EF2D3A40060E653 /* Helpers.swift */,
 				5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */,
@@ -1835,7 +1842,6 @@
 					5F3965C61CF67DD800CDE7C0 = {
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 1020;
-						ProvisioningStyle = Manual;
 					};
 					C1B3B9A72C24B297004A32A4 = {
 						CreatedOnToolsVersion = 15.4;
@@ -2211,6 +2217,7 @@
 				5B9262C01ECF0CA800F4F6D3 /* BioAuthentication.swift in Sources */,
 				5CB41D7123D0BED200074024 /* ClaimValidators.swift in Sources */,
 				5FADB60C1CED7E0800D4BB50 /* UserPatchAttributes.swift in Sources */,
+				D4E153FC2DE5B87900FFBA69 /* ParameterValue.swift in Sources */,
 				5FCAB1791D09124D00331C84 /* NSURL+Auth0.swift in Sources */,
 				5F74CB401CEFD5E600226823 /* JSONObjectPayload.swift in Sources */,
 				5FD255B41D14DD2600387ECB /* ManagementError.swift in Sources */,
@@ -2243,6 +2250,7 @@
 				5FDE876A1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5C354C05276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5CFB82512D5BF324009FD237 /* APICredentials.swift in Sources */,
+				D4E153FE2DE5B87900FFBA69 /* ParameterValue.swift in Sources */,
 				5C3D88262DC1509800AACC34 /* LoginPasskey.swift in Sources */,
 				5F28B4621D8216180000EB23 /* Loggable.swift in Sources */,
 				5C41F6D4244F974100252548 /* OAuth2Grant.swift in Sources */,
@@ -2428,6 +2436,7 @@
 				5C29743323FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */,
 				5F23E6E11D4ACD7F00C3F2D9 /* UserPatchAttributes.swift in Sources */,
 				5F23E6DF1D4ACD7A00C3F2D9 /* Logger.swift in Sources */,
+				D4E153FF2DE5B87900FFBA69 /* ParameterValue.swift in Sources */,
 				5FDE875B1D8A424700EA27DC /* Authentication.swift in Sources */,
 				5F23E6E21D4ACD7F00C3F2D9 /* Users.swift in Sources */,
 				5FDE876B1D8A424700EA27DC /* Credentials.swift in Sources */,
@@ -2469,6 +2478,7 @@
 				5F23E71B1D4B891E00C3F2D9 /* Auth0Error.swift in Sources */,
 				5FDE875C1D8A424700EA27DC /* Authentication.swift in Sources */,
 				5F23E7081D4B88F000C3F2D9 /* Logger.swift in Sources */,
+				D4E153FD2DE5B87900FFBA69 /* ParameterValue.swift in Sources */,
 				5C29743223FDBD5400BC18FA /* Optional+DebugDescription.swift in Sources */,
 				5F23E70B1D4B88F600C3F2D9 /* Users.swift in Sources */,
 				5FDE876C1D8A424700EA27DC /* Credentials.swift in Sources */,
@@ -2591,6 +2601,7 @@
 				C1B3BA142C24B6D4004A32A4 /* ChallengeGenerator.swift in Sources */,
 				C1B3BA152C24B6D4004A32A4 /* ASProvider.swift in Sources */,
 				C1B3BA172C24B6D4004A32A4 /* LoginTransaction.swift in Sources */,
+				D4E153FB2DE5B87900FFBA69 /* ParameterValue.swift in Sources */,
 				C1B3BA182C24B6D4004A32A4 /* ClearSessionTransaction.swift in Sources */,
 				C1B3BA192C24B6D4004A32A4 /* MobileWebAuth.swift in Sources */,
 				C1B3BA1B2C24B6D4004A32A4 /* AuthTransaction.swift in Sources */,
@@ -2992,9 +3003,11 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3011,6 +3024,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = Auth0;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "WEB_AUTH_PLATFORM PASSKEYS_PLATFORM";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3023,9 +3037,11 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3041,6 +3057,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.Auth0;
 				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
 				PRODUCT_NAME = Auth0;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "WEB_AUTH_PLATFORM PASSKEYS_PLATFORM";
 				SWIFT_VERSION = 6.0;
@@ -3395,10 +3412,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 86WQXF56BC;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3419,10 +3435,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 86WQXF56BC;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (

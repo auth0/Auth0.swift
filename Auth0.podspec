@@ -25,6 +25,8 @@ Pod::Spec.new do |s|
   s.osx.pod_target_xcconfig = {
     'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'WEB_AUTH_PLATFORM PASSKEYS_PLATFORM'
   }
+  
+  s.swift_versions = ['6.0', '6.1']
 
   s.tvos.deployment_target = '14.0'
   s.watchos.deployment_target = '7.0'

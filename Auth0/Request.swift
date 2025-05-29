@@ -27,13 +27,13 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
     let session: URLSession
     let url: URL
     let method: String
-    let handle: (Response<E>, Callback) -> Void
+    let handle: @Sendable (Response<E>, Callback) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
 
-    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, parameters: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
+    init(session: URLSession, url: URL, method: String, handle: @escaping @Sendable (Response<E>, Callback) -> Void, parameters: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
         self.session = session
         self.url = url
         self.method = method
@@ -73,7 +73,7 @@ public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
 
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
-    public func start(_ callback: @escaping Callback) {
+    public func start(_ callback: @escaping @Sendable Callback) {
         let handler = self.handle
         let request = self.request
         let logger = self.logger
