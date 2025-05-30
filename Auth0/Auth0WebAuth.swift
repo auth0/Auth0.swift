@@ -346,9 +346,10 @@ extension Auth0WebAuth {
 
     func start() async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
+            let safeContinuation = SafeContinuation(continuation)
             Task { @MainActor in
                 self.start { result in
-                    continuation.resume(with: result)
+                    safeContinuation.resume(with: result)
                 }
             }
         }
@@ -356,14 +357,31 @@ extension Auth0WebAuth {
 
     func clearSession(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
+            let safeContinuation = SafeContinuation(continuation)
             Task { @MainActor in
                 self.clearSession(federated: federated) { result in
-                    continuation.resume(with: result)
+                    safeContinuation.resume(with: result)
                 }
             }
         }
     }
 
+}
+
+actor SafeContinuation<T> {
+    private var hasResumed = false
+    private var continuation: CheckedContinuation<T, Never>?
+
+    init(_ continuation: CheckedContinuation<T, Never>) {
+        self.continuation = continuation
+    }
+
+    func resume(returning value: T) {
+        guard !hasResumed else { return }
+        hasResumed = true
+        continuation?.resume(returning: value)
+        continuation = nil
+    }
 }
 #endif
 #endif
