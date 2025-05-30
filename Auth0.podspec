@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Auth0'
-  s.version          = '2.12.0'
+  s.version          = '2.13.0'
   s.summary          = "Auth0 SDK for Apple platforms"
   s.description      = <<-DESC
                         Auth0 SDK for iOS, macOS, tvOS, watchOS and visionOS apps.
@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.authors          = { 'Auth0' => 'support@auth0.com', 'Rita Zerrizuela' => 'rita.zerrizuela@auth0.com' }
   s.source           = { :git => 'https://github.com/auth0/Auth0.swift.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/auth0'
-  s.source_files     = 'Auth0/*.swift'
+  s.source_files     = 'Auth0/**/*.swift'
   s.resource_bundles = { s.name => 'Auth0/PrivacyInfo.xcprivacy' }
 
   s.dependency 'SimpleKeychain', '1.3.0'

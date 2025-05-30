@@ -8,7 +8,7 @@ private let URL = Foundation.URL(string: "https://samples.auth0.com")!
 private let JSONData = try! JSONSerialization.data(withJSONObject: ["attr": "value"], options: [])
 
 private func http(_ statusCode: Int, url: Foundation.URL = URL) -> HTTPURLResponse {
-    return HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: "1.0", headerFields: [:])!
+    return HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: "1.0", headerFields: ["Foo": "Bar"])!
 }
 
 class ResponseSpec: QuickSpec {
@@ -24,6 +24,11 @@ class ResponseSpec: QuickSpec {
             it("should handle valid JSON") {
                 let response = Response<AuthenticationError>(data: JSONData, response: http(200), error: nil)
                 expect(try? response.result()).toNot(beNil())
+
+                let result: JSONResponse = try response.result()!
+                expect(result.headers).toNot(beEmpty())
+                expect(result.body as? [String: Any]).toNot(beEmpty())
+                expect(result.data).toNot(beEmpty())
             }
 
             it("should handle string as json for reset password") {
@@ -68,5 +73,6 @@ class ResponseSpec: QuickSpec {
             }
 
         }
+
     }
 }

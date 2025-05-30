@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.13.0](https://github.com/auth0/Auth0.swift/tree/2.13.0) (2025-05-30)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.12.0...2.13.0)
+
+**Added**
+- Add support for enrolling passkeys with My Account API [SDK-5543] [\#962](https://github.com/auth0/Auth0.swift/pull/962) ([Widcket](https://github.com/Widcket))
+
+**Changed**
+- Link JWTDecode.swift and SimpleKeychain directly to the Auth0 framework [\#947](https://github.com/auth0/Auth0.swift/pull/947) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [2.12.0](https://github.com/auth0/Auth0.swift/tree/2.12.0) (2025-05-08)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.11.0...2.12.0)
 

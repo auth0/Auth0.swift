@@ -50,7 +50,7 @@ class PasskeyLoginChallengeSpec: QuickSpec {
                         }
                     }
                 """.data(using: .utf8)!
-                let context = DecodingError.Context(codingPath: [SSOCredentials.CodingKeys.expiresIn],
+                let context = DecodingError.Context(codingPath: [],
                                                     debugDescription: "Format of challenge is not recognized.")
                 let expectedError = DecodingError.dataCorrupted(context)
 

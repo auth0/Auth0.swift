@@ -1,15 +1,16 @@
 # Examples
 
-- [Web Auth (iOS / macOS)](#web-auth-ios--macos)
-- [Credentials Manager (iOS / macOS / tvOS / watchOS)](#credentials-manager-ios--macos--tvos--watchos)
-- [Authentication API (iOS / macOS / tvOS / watchOS)](#authentication-api-ios--macos--tvos--watchos)
-- [Management API (Users) (iOS / macOS / tvOS / watchOS)](#management-api-users-ios--macos--tvos--watchos)
+- [Web Auth (iOS / macOS / visionOS)](#web-auth-ios--macos--visionos)
+- [Credentials Manager (iOS / macOS / TVOS / watchOS / visionOS)](#credentials-manager-ios--macos--tvos--watchos--visionos)
+- [Authentication API (iOS / macOS / TVOS / watchOS / visionOS)](#authentication-api-ios--macos--tvos--watchos--visionos)
+- [My Account API (iOS / macOS / tvOS / watchOS / visionOS) [EA]](#my-account-api-ios--macos--tvos--watchos--visionos-ea)
+- [Management API (Users) (iOS / macOS / TVOS / watchOS / visionOS)](#management-api-users-ios--macos--tvos--watchos--visionos)
 - [Logging](#logging)
 - [Advanced Features](#advanced-features)
 
 ---
 
-## Web Auth (iOS / macOS)
+## Web Auth (iOS / macOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)**
 
@@ -114,7 +115,7 @@ Specify a [scope](https://auth0.com/docs/get-started/apis/scopes) to request per
 ```swift
 Auth0
     .webAuth()
-    .scope("openid profile email offline_access read:todos")
+    .scope("openid profile email read:todos")
     // ...
 ```
 
@@ -128,6 +129,20 @@ Auth0
     // ...
 ```
 
+#### Get a refresh token
+
+You must request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) from Auth0.
+
+```swift
+Auth0
+    .webAuth()
+    .scope("openid profile email offline_access read:todos")
+    // ...
+```
+
+> [!IMPORTANT]
+> Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+
 #### Use a custom `URLSession` instance
 
 You can specify a custom `URLSession` instance for more advanced networking configuration, such as customizing timeout values.
@@ -138,7 +153,114 @@ Auth0
     // ...
 ```
 
-Note that this custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
+> [!NOTE]
+> This custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
+
+#### Use `SFSafariViewController` instead of `ASWebAuthenticationSession`
+
+You can use the built-in `SFSafariViewController` Web Auth provider to open the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
+
+```swift
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.safariProvider()) // Use SFSafariViewController
+    .start { result in
+        // ...
+    }
+```
+
+> [!TIP]
+> See [`ASWebAuthenticationSession` vs `SFSafariViewController` (iOS)](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents) to help determine which option best suits your use case, depending on your requirements.
+
+> [!NOTE]
+> `SFSafariViewController` does not support using Universal Links as callback URLs.
+
+The `SFSafariViewController` Web Auth provider requires an additional bit of setup. Unlike `ASWebAuthenticationSession`, `SFSafariViewController` will not automatically capture the callback URL when Auth0 redirects back to your app, so it is necessary to manually resume the Web Auth operation.
+
+##### 1. Configure a custom URL scheme
+
+In Xcode, go to the **Info** tab of your app target settings. In the **URL Types** section, click the **＋** button to add a new entry. There, enter `auth0` into the **Identifier** field and `$(PRODUCT_BUNDLE_IDENTIFIER)` into the **URL Schemes** field.
+
+![Screenshot of the URL Types section inside the app target settings](https://user-images.githubusercontent.com/5055789/198689930-15f12179-15df-437e-ba50-dec26dbfb21f.png)
+
+This registers your bundle identifier as a custom URL scheme, so the callback URL can reach your app.
+
+##### 2. Capture the callback URL
+
+<details>
+  <summary>Using the UIKit app lifecycle</summary>
+
+```swift
+// AppDelegate.swift
+
+func application(_ app: UIApplication,
+                 open url: URL,
+                 options: [UIApplication.OpenURLOptionsKey: Any]) -> Bool {
+    return WebAuthentication.resume(with: url)
+}
+```
+</details>
+
+<details>
+  <summary>Using the UIKit app lifecycle with Scenes</summary>
+
+```swift
+// SceneDelegate.swift
+
+func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    guard let url = URLContexts.first?.url else { return }
+    WebAuthentication.resume(with: url)
+}
+```
+</details>
+
+<details>
+  <summary>Using the SwiftUI app lifecycle</summary>
+
+```swift
+SomeView()
+    .onOpenURL { url in
+        WebAuthentication.resume(with: url)
+    }
+```
+</details>
+
+##### Logout
+
+`SFSafariViewController` should only be used for login. According to its docs, `SFSafariViewController` must be used "to visibly present information to users":
+
+![Screenshot of SFSafariViewController's documentation](https://github.com/user-attachments/assets/98de5937-3ca4-4779-9e3c-725d8b628870)
+
+This is the case for login, but not for logout. Instead of calling `clearSession()`, you can delete the stored credentials –using the Credentials Manager's `clear()` method– and use `"prompt": "login"` to force the login page even if the session cookie is still present. Since the cookies stored by `SFSafariViewController` are scoped to your app, this should not pose an issue.
+
+```swift
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.safariProvider())
+    .parameters(["prompt": "login"])
+    .start { result in
+        // ...
+    }
+```
+
+#### Use `WKWebView` instead of `ASWebAuthenticationSession`
+
+You can also use the built-in `WKWebView` Web Auth provider to open the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page. Unlike `SFSafariViewController`, `WKWebView` supports using Universal Links as callback URLs.
+
+```swift
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.webViewProvider()) // Use WKWebView
+    .start { result in
+        // ...
+    }
+```
+
+> [!NOTE]
+> To use Universal Login's biometrics and passkeys with `WKWebView`, you must [set up an associated domain](https://github.com/auth0/Auth0.swift#configure-an-associated-domain).
+
+> [!WARNING]
+> The use of `WKWebView` for performing web-based authentication [is not recommended](https://auth0.com/blog/oauth-2-best-practices-for-native-apps), and some social identity providers –such as Google– do not support it.
 
 ### ID token validation
 
@@ -153,7 +275,7 @@ Web Auth will only produce `WebAuthError` error values. You can find the underly
 
 [Go up ⤴](#examples)
 
-## Credentials Manager (iOS / macOS / tvOS / watchOS)
+## Credentials Manager (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)**
 
@@ -174,7 +296,14 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 ```
 
 > [!CAUTION]
-> The Credentials Manager is not thread-safe, except for its `credentials()`, `apiCredentials()`, `ssoCredentials()`, and `renew()` methods. To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
+> The Credentials Manager is not thread-safe, except for the following methods: 
+> 
+> - `credentials()`
+> - `apiCredentials()`
+> - `ssoCredentials()`
+> - `renew()`
+> 
+> To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
 
 ### Store credentials
 
@@ -197,8 +326,7 @@ guard credentialsManager.canRenew() else {
 // Retrieve the stored credentials
 ```
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens).
 
 #### If you are not using refresh tokens
 
@@ -209,9 +337,11 @@ guard credentialsManager.hasValid() else {
 // Retrieve the stored credentials
 ```
 
-### Retrieve stored credentials 
+### Retrieve stored credentials
 
 The credentials will be automatically renewed (if expired) using the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens). **This method is thread-safe.**
+
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 ```swift
 credentialsManager.credentials { result in 
@@ -254,9 +384,6 @@ credentialsManager
 ```
 </details>
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
-
 > [!CAUTION]
 > Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials. Since this method is thread-safe and `store(credentials:)` is not, calling it anyway can cause concurrency issues.
 
@@ -266,6 +393,8 @@ credentialsManager
 ### Renew stored credentials
 
 The `credentials()` method automatically renews the stored credentials when needed, using the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens). However, you can also force a renewal using the `renew()` method. **This method is thread-safe**.
+
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 ```swift
 credentialsManager.renew { result in
@@ -307,9 +436,6 @@ credentialsManager
     .store(in: &cancellables)
 ```
 </details>
-
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
 
 > [!CAUTION]
 > Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the renewed credentials. Since this method is thread-safe and `store(credentials:)` is not, calling it anyway can cause concurrency issues.
@@ -355,6 +481,67 @@ credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID or passcode"
 
 ### Other credentials
 
+#### API credentials [EA]
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+When the user logs in, you can request an access token for a specific API by passing its API identifier as the [audience](#add-an-audience-value) value. The access token in the resulting credentials can then be used to make authenticated requests to that API.
+
+However, if you need an access token for a different API, you can exchange the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) for credentials containing an access token specific to this other API. **This method is thread-safe**.
+
+> [!IMPORTANT]
+> Currently, only the Auth0 My Account API is supported. Support for other APIs will be added in the future.
+
+```swift
+credentialsManager.apiCredentials(forAudience: "https://samples.us.auth0.com/me",
+                                  scope: "create:me:authentication_methods") { result in
+    switch result {
+    case .success(let apiCredentials):
+        print("Obtained API credentials: \(apiCredentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "https://samples.us.auth0.com/me",
+                                                                     scope: "create:me:authentication_methods")
+    print("Obtained API credentials: \(apiCredentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+credentialsManager
+    .apiCredentials(forAudience: "https://samples.us.auth0.com/me",
+                    scope: "create:me:authentication_methods")
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { apiCredentials in
+        print("Obtained API credentials: \(apiCredentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
+
+> [!CAUTION]
+> To ensure that no concurrent exchange requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+
 #### SSO credentials [EA]
 
 > [!NOTE]  
@@ -364,7 +551,7 @@ To implement single sign-on (SSO) with Universal Login, you can use either `ASWe
 
 An alternative way to implement SSO is by making use of a session transfer token. This is a single-use, short-lived token you must send to your website –either via query parameter or cookie– when opening it from your app. Your website then needs to redirect the user to Auth0's `/authorize` endpoint, passing along the session transfer token. Auth0 will set the respective session cookies and then redirect the user back to your website. Now, the user will be logged in on your website too. **This solution will work with any browser and webview –even standalone browser apps**.
 
-First, you need to exchange the refresh token for a set of SSO credentials containing a session transfer token. **This method is thread-safe**.
+First, you need to exchange the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) for a set of SSO credentials containing a session transfer token. **This method is thread-safe**.
 
 ```swift
 credentialsManager.ssoCredentials { result in
@@ -407,8 +594,7 @@ credentialsManager
 ```
 </details>
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 > [!CAUTION]
 > To ensure that no concurrent exchange requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
@@ -443,7 +629,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 
 [Go up ⤴](#examples)
 
-## Authentication API (iOS / macOS / tvOS / watchOS)
+## Authentication API (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)**
 
@@ -678,11 +864,13 @@ authController.performRequests()
 The resulting passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
 
 ```swift
-func authorizationController(controller: ASAuthorizationController,
-                             didCompleteWithAuthorization authorization: ASAuthorization) {
-    guard let loginPasskey = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion else {
+public func authorizationController(controller: ASAuthorizationController,
+                                    didCompleteWithAuthorization authorization: ASAuthorization) {
+    switch authorization.credential {
+    case let loginPasskey as ASAuthorizationPlatformPublicKeyCredentialAssertion:
+        // ...
+    default:
         print("Unrecognized credential: \(authorization.credential)")
-        return
     }
 
     // ...
@@ -845,11 +1033,13 @@ authController.performRequests()
 The created passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
 
 ```swift
-func authorizationController(controller: ASAuthorizationController,
-                             didCompleteWithAuthorization authorization: ASAuthorization) {
-    guard let signupPasskey = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration else {
+public func authorizationController(controller: ASAuthorizationController,
+                                   didCompleteWithAuthorization authorization: ASAuthorization) {
+    switch authorization.credential {
+    case let signupPasskey as ASAuthorizationPlatformPublicKeyCredentialRegistration:
+        // ...
+    default:
         print("Unrecognized credential: \(authorization.credential)")
-        return
     }
 
     // ...
@@ -1094,6 +1284,8 @@ Auth0
 
 Use a [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) to renew the user's credentials. It is recommended that you read and understand the refresh token process beforehand.
 
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
+
 ```swift
 Auth0
     .authentication()
@@ -1143,9 +1335,6 @@ Auth0
 ```
 </details>
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
-
 ### Get SSO credentials [EA]
 
 > [!NOTE]  
@@ -1155,7 +1344,7 @@ To implement single sign-on (SSO) with Universal Login, you can use either `ASWe
 
 An alternative way to implement SSO is by making use of a session transfer token. This is a one-use, short-lived token you must send to your website –either via query parameter or cookie– when opening it from your app. Your website then needs to redirect the user to Auth0's `/authorize` endpoint, passing along the session transfer token. Auth0 will set the respective session cookies and then redirect the user back to your website. Now, the user will be logged in on your website too. **This solution will work with any browser and webview –even standalone browser apps**.
 
-First, you need to exchange the refresh token for a set of SSO credentials containing a session transfer token.
+First, you need to exchange the [refresh token](https://auth0.com/docs/secure/tokens/refresh-tokens) for a set of SSO credentials containing a session transfer token.
 
 ```swift
 Auth0
@@ -1206,8 +1395,7 @@ Auth0
 ```
 </details>
 
-> [!NOTE]
-> You need to request the `offline_access` [scope](https://auth0.com/docs/get-started/apis/scopes) when logging in to get a refresh token from Auth0. Make sure that your Auth0 application has the **refresh token** [grant enabled](https://auth0.com/docs/get-started/applications/update-grant-types). If you are also specifying an audience value, make sure that the corresponding Auth0 API has the **Allow Offline Access** [setting enabled](https://auth0.com/docs/get-started/apis/api-settings#access-settings).
+See [Get a refresh token](#get-a-refresh-token) to learn how to obtain a refresh token.
 
 > [!IMPORTANT]
 > You don't need to store the SSO credentials. The session transfer token is single-use and short-lived. However, if you're using [refresh token rotation](https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation), you will get a new refresh token with the SSO credentials. You should store the new refresh token, replacing the previous one that is now invalid.
@@ -1273,14 +1461,206 @@ Auth0
 
 ### Authentication API client errors
 
-The Authentication API client will only produce `AuthenticationError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about the available `AuthenticationError` properties.
+The Authentication API client will only produce `AuthenticationError` error values.
+
+- The `cause` property contains the underlying error value –if any.
+- Use the `isNetworkError` property to check if the request failed due to networking issues.
+- Find more information about the error in the `info` dictionary.
+
+Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about the available `AuthenticationError` properties.
 
 > [!WARNING]
 > Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the [error types](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror/#topics) instead, which are part of the API.
 
 [Go up ⤴](#examples)
 
-## Management API (Users) (iOS / macOS / tvOS / watchOS)
+## My Account API (iOS / macOS / tvOS / watchOS / visionOS) [EA]
+
+**See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/myaccount)**
+
+- [Enroll a new passkey](#enroll-a-new-passkey)
+- [My Account API client errors](#my-account-api-client-errors)
+
+> [!NOTE]
+> The My Account API is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+Use the Auth0 My Account API to manage the current user's account.
+
+To call the My Account API, you need an access token issued specifically for this API. See [API credentials [EA]](#api-credentials-ea) to learn how to obtain one.
+
+### Enroll a new passkey
+
+**Scopes required:** `create:me:authentication_methods`
+
+Enrolling a new passkey is a three-step process that requires the **Passkeys** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#prepare-your-application) for more information.
+
+First, you request an enrollment challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a new passkey credential. Finally, you use the created passkey credential and the original challenge to enroll the passkey with Auth0.
+
+#### 1. Request an enrollment challenge
+
+You can specify an optional user identity identifier and/or a database connection name to help Auth0 find the user. The user identity identifier will be needed if the user logged in with a [linked account](https://auth0.com/docs/manage-users/user-accounts/user-account-linking).
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .passkeyEnrollmentChallenge()
+    .start { result in
+        switch result {
+        case .success(let enrollmentChallenge):
+            print("Obtained enrollment challenge: \(enrollmentChallenge)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let enrollmentChallenge = try await Auth0
+        .myAccount(token: apiCredentials.accessToken)
+        .authenticationMethods
+        .passkeyEnrollmentChallenge()
+        .start()
+    print("Obtained enrollment challenge: \(enrollmentChallenge)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .passkeyEnrollmentChallenge()
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { enrollmentChallenge in
+        print("Obtained enrollment challenge: \(enrollmentChallenge)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+#### 2. Create a new passkey credential
+
+Use the enrollment challenge with [`ASAuthorizationPlatformPublicKeyCredentialProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationplatformpublickeycredentialprovider) from the `AuthenticationServices` framework to generate a new passkey credential. Check out [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service) to learn more.
+
+```swift
+let credentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(
+    relyingPartyIdentifier: enrollmentChallenge.relyingPartyId
+)
+
+let request = credentialProvider.createCredentialRegistrationRequest(
+    challenge: enrollmentChallenge.challengeData,
+    name: enrollmentChallenge.userName,
+    userID: enrollmentChallenge.userId
+)
+
+let authController = ASAuthorizationController(authorizationRequests: [request])
+authController.delegate = self // ASAuthorizationControllerDelegate
+authController.presentationContextProvider = self
+authController.performRequests()
+```
+
+The created passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+
+```swift
+public func authorizationController(controller: ASAuthorizationController,
+                                   didCompleteWithAuthorization authorization: ASAuthorization) {
+    switch authorization.credential {
+    case let newPasskey as ASAuthorizationPlatformPublicKeyCredentialRegistration:
+        // ...
+    default:
+        print("Unrecognized credential: \(authorization.credential)")
+    }
+
+    // ...
+}
+```
+
+#### 3. Enroll the passkey
+
+Use the created passkey credential and the enrollment challenge to enroll the passkey with Auth0.
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .enroll(passkey: newPasskey,
+            challenge: enrollmentChallenge)
+    .start { result in
+        switch result {
+        case .success(let authenticationMethod):
+            print("Enrolled passkey: \(authenticationMethod)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let authenticationMethod = try await Auth0
+        .myAccount(token: apiCredentials.accessToken)
+        .authenticationMethods
+        .enroll(passkey: newPasskey,
+                challenge: enrollmentChallenge)
+        .start()
+    print("Enrolled passkey: \(authenticationMethod)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .myAccount(token: apiCredentials.accessToken)
+    .authenticationMethods
+    .enroll(passkey: newPasskey,
+            challenge: enrollmentChallenge)
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { authenticationMethod in
+        print("Enrolled passkey: \(authenticationMethod)")
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+### My Account API client errors
+
+The My Account API client will only produce `MyAccountError` error values.
+
+- The `cause` property contains the underlying error value –if any.
+- Use the `isNetworkError` property to check if the request failed due to networking issues.
+- Find more information about the error in the `info` dictionary.
+
+See the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/myaccounterror) to learn more about the available `MyAccountError` properties.
+
+[Go up ⤴](#examples)
+
+## Management API (Users) (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/users)**
 
@@ -1311,7 +1691,7 @@ Auth0
 
 ### Retrieve user metadata
 
-To call this method, you need to request the `read:current_user` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you must request the `read:current_user` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1367,7 +1747,7 @@ Auth0
 
 ### Update user metadata
 
-To call this method, you need to request the `update:current_user_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
+To call this method, you must request the `update:current_user_metadata` scope when logging in. You can get the user ID value from the `sub` [claim](https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims) of the user's ID token, or from the `sub` property of a `UserInfo` instance.
 
 ```swift
 Auth0
@@ -1515,7 +1895,13 @@ Auth0
 
 ### Management API client errors
 
-The Management API client will only produce `ManagementError` error values. You can find the error information in the `info` dictionary of the error value. Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/managementerror) to learn more about the available `ManagementError` properties.
+The Management API client will only produce `ManagementError` error values.
+
+- The `cause` property contains the underlying error value –if any.
+- Use the `isNetworkError` property to check if the request failed due to networking issues.
+- Find more information about the error in the `info` dictionary.
+
+Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/managementerror) to learn more about the available `ManagementError` properties.
 
 [Go up ⤴](#examples)
 

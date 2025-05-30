@@ -31,65 +31,19 @@ public extension Auth0Error {
 
 extension Auth0Error {
 
-    func appendCause(to errorMessage: String) -> String {
+    func appendCause(to message: String) -> String {
         guard let cause = self.cause else {
-            return errorMessage
+            return message
         }
 
-        let separator = errorMessage.hasSuffix(".") ? "" : "."
-        return "\(errorMessage)\(separator) CAUSE: \(String(describing: cause))"
+        let errorMessage = self.appendPeriod(to: message)
+        let causeMessage = self.appendPeriod(to: String(describing: cause))
+
+        return "\(errorMessage) CAUSE: \(causeMessage)"
     }
 
-}
-
-/// Generic representation of Auth0 API errors.
-public protocol Auth0APIError: Auth0Error {
-
-    /// Additional information about the error.
-    var info: [String: Any] { get }
-
-    /// The code of the error as a string.
-    var code: String { get }
-
-    /// HTTP status code of the response.
-    var statusCode: Int { get }
-
-    /// Creates an error from a JSON response.
-    ///
-    /// - Parameters:
-    ///   - info:       JSON response from Auth0.
-    ///   - statusCode: HTTP status code of the response.
-    ///
-    /// - Returns: A new `Auth0APIError`.
-    init(info: [String: Any], statusCode: Int)
-
-}
-
-extension Auth0APIError {
-
-    init(info: [String: Any], statusCode: Int = 0) {
-        self.init(info: info, statusCode: statusCode)
-    }
-
-    init(cause error: Error, statusCode: Int = 0) {
-        let info: [String: Any] = [
-            "code": nonJSONError,
-            "description": "Unable to complete the operation.",
-            "cause": error
-        ]
-        self.init(info: info, statusCode: statusCode)
-    }
-
-    init(description: String?, statusCode: Int = 0) {
-        let info: [String: Any] = [
-            "code": description != nil ? nonJSONError : emptyBodyError,
-            "description": description ?? "Empty response body."
-        ]
-        self.init(info: info, statusCode: statusCode)
-    }
-
-    init(from response: Response<Self>) {
-        self.init(description: string(response.data), statusCode: response.response?.statusCode ?? 0)
+    func appendPeriod(to message: String) -> String {
+        return message.hasSuffix(".") ? message : "\(message)."
     }
 
 }

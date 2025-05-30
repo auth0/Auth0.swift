@@ -7,7 +7,7 @@ import Foundation
 /// - [Standard Error Responses](https://auth0.com/docs/api/authentication#standard-error-responses)
 public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
 
-    /// Additional information about the error.
+    /// Raw error values.
     public let info: [String: Any]
 
     /// Creates an error from a JSON response.
@@ -27,15 +27,9 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
     /// HTTP status code of the response.
     public let statusCode: Int
 
-    /// The underlying `Error` value, if any. Defaults to `nil`.
-    public var cause: Error? {
-        return self.info["cause"] as? Error
-    }
-
-    /// The code of the error as a string.
+    /// Error code.
     public var code: String {
-        let code = self.info["error"] ?? self.info["code"]
-        return code as? String ?? unknownError
+        return  self.info["error"] as? String ?? self.info[apiErrorCode] as? String ?? unknownError
     }
 
     /// Description of the error.
@@ -135,37 +129,6 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
         return self.code == "login_required"
     }
 
-    /// When the request failed due to network issues.
-    ///
-    /// Returns `true` when the `URLError` code is one of the following:
-    /// - [notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet)
-    /// - [networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost)
-    /// - [dnsLookupFailed](https://developer.apple.com/documentation/foundation/urlerror/2293434-dnslookupfailed)
-    /// - [cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/2293460-cannotfindhost)
-    /// - [cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/2293028-cannotconnecttohost)
-    /// - [timedOut](https://developer.apple.com/documentation/foundation/urlerror/2293002-timedout)
-    /// - [internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/2292893-internationalroamingoff)
-    /// - [callIsActive](https://developer.apple.com/documentation/foundation/urlerror/2293147-callisactive)
-    ///
-    /// The underlying `URLError` is available in the ``Auth0Error/cause-9wuyi`` property.
-    public var isNetworkError: Bool {
-        guard let code = (self.cause as? URLError)?.code else {
-            return false
-        }
-
-        let networkErrorCodes: [URLError.Code] = [
-            .dataNotAllowed,
-            .notConnectedToInternet,
-            .networkConnectionLost,
-            .dnsLookupFailed,
-            .cannotFindHost,
-            .cannotConnectToHost,
-            .timedOut,
-            .internationalRoamingOff,
-            .callIsActive
-        ]
-        return networkErrorCodes.contains(code)
-    }
 }
 
 // MARK: - Error Messages
@@ -173,13 +136,12 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
 extension AuthenticationError {
 
     var message: String {
-        let description = self.info["description"] ?? self.info["error_description"]
-
-        if let string = description as? String {
-            return string
+        if let description = self.info[apiErrorDescription] as? String ?? self.info["error_description"] as? String {
+            return description
         }
+
         if self.code == unknownError {
-            return "Failed with unknown error \(self.info)."
+            return "Failed with unknown error: \(self.info)."
         }
 
         return "Received error with code \(self.code)."

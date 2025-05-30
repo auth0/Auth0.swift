@@ -284,17 +284,18 @@ class AuthenticationSpec: QuickSpec {
                 var signature: Data!
             }
 
+            let authSession = "y1PI7ue7QX85WMxoR6Qa-9INuqA3xxKLVoDOxBOD6yYQL1Fl-zgwjFtZIQfRORhY"
             let userId = "LcICuavHdO2zbcA8zRgnTRIkzPrruI_HQqe0J3RL0ou5VSrWhRybCQqyNMXWj1LDdxOzat6KVf9xpW3qLw5qjw"
             let credentialId = "mXTk10IfDhdxZnJltERtBRyNUkE"
+            let credentialType = "public-key"
             let clientData = "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiTDRTYVN4eDh0cHFyU2NUX2hicFpYLTUwcW" +
             "ZLaDEyX294bVNVSUtTR0ZwTSIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4ud2lkY2tldC5jb20ifQ-MN8A"
             let authenticatorData = "lDH4SiOEQFwNz4z4dy3yWLJ5CkueUJPzpqulBxP_X_8dAAAAAA"
             let signature = "MEUCIH6XVeR9aTIEQZJ1vRv96y2ndS4da75h9K41Gnt6ssd9AiEA0DHoeNMrPw8GBzYkagdQD6I4ySOGONSTWPV" +
             "YA0FAwII"
-            let authSession = "y1PI7ue7QX85WMxoR6Qa-9INuqA3xxKLVoDOxBOD6yYQL1Fl-zgwjFtZIQfRORhY"
-            let challengeData = "L4SaSxx8tpqrScT_hbpZX-50qfKh12_oxmSUIKSGFpM".a0_decodeBase64URLSafe()!
+            let challengeString = "L4SaSxx8tpqrScT_hbpZX-50qfKh12_oxmSUIKSGFpM"
+            let challengeData = challengeString.a0_decodeBase64URLSafe()!
             let authenticatorAttachment = "platform"
-            let type = "public-key"
 
             let passkey = MockLoginPasskey(userID: userId.a0_decodeBase64URLSafe(),
                                            credentialID: credentialId.a0_decodeBase64URLSafe()!,
@@ -318,7 +319,7 @@ class AuthenticationSpec: QuickSpec {
                                 "id": credentialId,
                                 "rawId": credentialId,
                                 "authenticatorAttachment": authenticatorAttachment,
-                                "type": type,
+                                "type": credentialType,
                                 "response": [
                                     "userHandle": userId,
                                     "authenticatorData": authenticatorData,
@@ -353,7 +354,7 @@ class AuthenticationSpec: QuickSpec {
                                 "id": credentialId,
                                 "rawId": credentialId,
                                 "authenticatorAttachment": authenticatorAttachment,
-                                "type": type,
+                                "type": credentialType,
                                 "response": [
                                     "userHandle": userId,
                                     "authenticatorData": authenticatorData,
@@ -449,7 +450,7 @@ class AuthenticationSpec: QuickSpec {
                             "auth_session": authSession,
                             "authn_response": [
                                 "authenticatorAttachment": authenticatorAttachment,
-                                "type": type,
+                                "type": credentialType,
                                 "response": [
                                     "attestationObject": attestationObject,
                                     "clientDataJSON": clientData
@@ -480,7 +481,7 @@ class AuthenticationSpec: QuickSpec {
                             "auth_session": authSession,
                             "authn_response": [
                                 "authenticatorAttachment": authenticatorAttachment,
-                                "type": type,
+                                "type": credentialType,
                                 "response": [
                                     "attestationObject": attestationObject,
                                     "clientDataJSON": clientData
@@ -514,7 +515,11 @@ class AuthenticationSpec: QuickSpec {
                             "client_id": ClientId,
                             "user_profile": ["email": Email]
                         ])
-                    }, response: passkeySignupChallengeResponse(identifier: Email))
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: Domain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                challenge: challengeString))
                     
                     waitUntil(timeout: Timeout) { done in
                         auth
@@ -532,7 +537,11 @@ class AuthenticationSpec: QuickSpec {
                             "client_id": ClientId,
                             "user_profile": ["phone_number": Phone]
                         ])
-                    }, response: passkeySignupChallengeResponse(identifier: Phone))
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: Domain,
+                                                                userId: userId,
+                                                                userName: Phone,
+                                                                challenge: challengeString))
                     
                     waitUntil(timeout: Timeout) { done in
                         auth
@@ -550,7 +559,11 @@ class AuthenticationSpec: QuickSpec {
                             "client_id": ClientId,
                             "user_profile": ["username": Username]
                         ])
-                    }, response: passkeySignupChallengeResponse(identifier: Username))
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: Domain,
+                                                                userId: userId,
+                                                                userName: Username,
+                                                                challenge: challengeString))
                     
                     waitUntil(timeout: Timeout) { done in
                         auth
@@ -569,7 +582,12 @@ class AuthenticationSpec: QuickSpec {
                             "realm": ConnectionName,
                             "user_profile": ["email": Email, "phone_number": Phone, "username": Username, "name": Name]
                         ])
-                    }, response: passkeySignupChallengeResponse(identifier: Email, name: Name))
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: Domain,
+                                                                userId: userId,
+                                                                userName: Email,
+                                                                userDisplayName: Name,
+                                                                challenge: challengeString))
 
                     waitUntil(timeout: Timeout) { done in
                         auth

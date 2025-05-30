@@ -10,6 +10,11 @@ public typealias AuthenticationResult<T> = Result<T, AuthenticationError>
  */
 public typealias ManagementResult<T> = Result<T, ManagementError>
 
+/**
+ `Result` wrapper for My Account API operations.
+ */
+public typealias MyAccountResult<T> = Result<T, MyAccountError>
+
 #if WEB_AUTH_PLATFORM
 /**
  `Result` wrapper for Web Auth operations.
@@ -28,7 +33,8 @@ public typealias CredentialsManagerResult<T> = Result<T, CredentialsManagerError
 public let defaultScope = "openid profile email"
 
 /**
- Auth0 [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate your user using Database, Social, Enterprise or Passwordless connections.
+ [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate a user with Database, Social,
+ Enterprise or Passwordless connections.
 
  ## Usage
 
@@ -40,15 +46,15 @@ public let defaultScope = "openid profile email"
    - clientId: Client ID of your Auth0 application.
    - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
    - session:  `URLSession` instance used for networking. Defaults to `URLSession.shared`.
- - Returns: Auth0 Authentication API client.
+ - Returns: Authentication API client.
  */
 public func authentication(clientId: String, domain: String, session: URLSession = .shared) -> Authentication {
     return Auth0Authentication(clientId: clientId, url: .httpsURL(from: domain), session: session)
 }
 
 /**
- Auth0 [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate your user using Database,
- Social, Enterprise or Passwordless connections.
+ [Authentication API](https://auth0.com/docs/api/authentication) client to authenticate a user with Database, Social,
+ Enterprise or Passwordless connections.
 
  ## Usage
 
@@ -64,10 +70,10 @@ public func authentication(clientId: String, domain: String, session: URLSession
  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
  <plist version="1.0">
  <dict>
-	  <key>ClientId</key>
-	  <string>YOUR_AUTH0_CLIENT_ID</string>
-	  <key>Domain</key>
-	  <string>YOUR_AUTH0_DOMAIN</string>
+     <key>ClientId</key>
+     <string>YOUR_AUTH0_CLIENT_ID</string>
+     <key>Domain</key>
+     <string>YOUR_AUTH0_DOMAIN</string>
  </dict>
  </plist>
  ```
@@ -75,7 +81,7 @@ public func authentication(clientId: String, domain: String, session: URLSession
  - Parameters:
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
    - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
- - Returns: Auth0 Authentication API client.
+ - Returns: Authentication API client.
  - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
 public func authentication(session: URLSession = .shared, bundle: Bundle = .main) -> Authentication {
@@ -84,8 +90,7 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
 }
 
 /**
- Auth0 [Management API v2](https://auth0.com/docs/api/management/v2) client to perform operations with the Users
- endpoints.
+ [Management API v2](https://auth0.com/docs/api/management/v2) client for performing operations with the Users endpoints.
 
  ## Usage
 
@@ -107,19 +112,19 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
  <plist version="1.0">
  <dict>
-	  <key>ClientId</key>
-	  <string>YOUR_AUTH0_CLIENT_ID</string>
-	  <key>Domain</key>
-	  <string>YOUR_AUTH0_DOMAIN</string>
+     <key>ClientId</key>
+     <string>YOUR_AUTH0_CLIENT_ID</string>
+     <key>Domain</key>
+     <string>YOUR_AUTH0_DOMAIN</string>
  </dict>
  </plist>
  ```
 
  - Parameters:
-   - token:   Management API token with the correct allowed scopes to perform the desired action.
+   - token:   Access token for the Management API with the correct allowed scopes to perform the desired action.
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
    - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
- - Returns: Auth0 Management API v2 client.
+ - Returns: Management API v2 client.
  - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
 public func users(token: String, session: URLSession = .shared, bundle: Bundle = .main) -> Users {
@@ -128,8 +133,7 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
 }
 
 /**
- Auth0 [Management API v2](https://auth0.com/docs/api/management/v2) client to perform operations with the Users
- endpoints.
+ [Management API v2](https://auth0.com/docs/api/management/v2) client for performing operations with the Users endpoints.
 
  ## Usage
 
@@ -145,10 +149,10 @@ public func users(token: String, session: URLSession = .shared, bundle: Bundle =
  * Unlink users
 
  - Parameters:
-   - token:   Management API token with the correct allowed scopes to perform the desired action.
+   - token:   Access token for the Management API with the correct allowed scopes to perform the desired action.
    - domain:  Domain of your Auth0 account, for example `samples.us.auth0.com`.
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
- - Returns: Auth0 Management API v2 client.
+ - Returns: Management API v2 client.
  */
 public func users(token: String, domain: String, session: URLSession = .shared) -> Users {
     return Management(token: token, url: .httpsURL(from: domain), session: session)
@@ -156,7 +160,8 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
 
 #if WEB_AUTH_PLATFORM
 /**
- Auth0 client for performing web-based authentication with [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login).
+ [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) client for performing web-based
+ authentication.
 
  ## Usage
 
@@ -171,10 +176,10 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
  <plist version="1.0">
  <dict>
-    <key>ClientId</key>
-    <string>YOUR_AUTH0_CLIENT_ID</string>
-    <key>Domain</key>
-    <string>YOUR_AUTH0_DOMAIN</string>
+     <key>ClientId</key>
+     <string>YOUR_AUTH0_CLIENT_ID</string>
+     <key>Domain</key>
+     <string>YOUR_AUTH0_DOMAIN</string>
  </dict>
  </plist>
  ```
@@ -182,7 +187,7 @@ public func users(token: String, domain: String, session: URLSession = .shared) 
  - Parameters:
    - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
    - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
- - Returns: Auth0 Web Auth client.
+ - Returns: Web Auth client.
  - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
  */
 public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main) -> WebAuth {
@@ -191,7 +196,8 @@ public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main)
 }
 
 /**
- Auth0 client for performing web-based authentication with [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login).
+ [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) client for performing web-based
+ authentication.
 
  ## Usage
 
@@ -203,7 +209,7 @@ public func webAuth(session: URLSession = .shared, bundle: Bundle = Bundle.main)
    - clientId: Client ID of your Auth0 application.
    - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
    - session:  `URLSession` instance used for networking. Defaults to `URLSession.shared`.
- - Returns: Auth0 Web Auth client.
+ - Returns: Web Auth client.
  */
 public func webAuth(clientId: String, domain: String, session: URLSession = .shared) -> WebAuth {
     return Auth0WebAuth(clientId: clientId, url: .httpsURL(from: domain), session: session)
