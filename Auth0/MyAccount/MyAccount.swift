@@ -10,7 +10,10 @@ import Foundation
 /// Auth0.myAccount(token: apiCredentials.accessToken, domain: "samples.us.auth0.com")
 /// ```
 ///
-/// You can use the refresh token to get an access token for the My Account API. Refer to ``CredentialsManager/apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)``, or alternatively ``Authentication/renew(withRefreshToken:audience:scope:)`` if you are not using the ``CredentialsManager``.
+/// You can use the refresh token to get an access token for the My Account API. Refer to
+/// ``CredentialsManager/apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)``,
+/// or alternatively ``Authentication/renew(withRefreshToken:audience:scope:)`` if you are not using the
+/// ``CredentialsManager``.
 ///
 /// > Note: See [Get a refresh token](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#get-a-refresh-token)
 /// to learn how to obtain a refresh token.
@@ -32,7 +35,10 @@ public func myAccount(token: String, domain: String, session: URLSession = .shar
 /// Auth0.myAccount(token: apiCredentials.accessToken)
 /// ```
 ///
-/// You can use the refresh token to get an access token for the My Account API. Refer to ``CredentialsManager/apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)``, or alternatively ``Authentication/renew(withRefreshToken:audience:scope:)`` if you are not using the ``CredentialsManager``.
+/// You can use the refresh token to get an access token for the My Account API. Refer to
+/// ``CredentialsManager/apiCredentials(forAudience:scope:minTTL:parameters:headers:callback:)``,
+/// or alternatively ``Authentication/renew(withRefreshToken:audience:scope:)`` if you are not using the
+/// ``CredentialsManager``.
 ///
 /// > Note: See [Get a refresh token](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#get-a-refresh-token)
 /// to learn how to obtain a refresh token.
