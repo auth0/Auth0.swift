@@ -171,62 +171,64 @@ actor Auth0WebAuth: @preconcurrency WebAuth {
         return self
     }
 
-    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) async {
-        guard await barrier.raise() else {
-            return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
-        }
-
-        guard let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
-        }
-
-        let handler = self.handler(redirectURL)
-        let state = self.state
-        var organization: String? = self.organization
-        var invitation: String?
-
-        if let invitationURL = self.invitationURL {
-            guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
-                  let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
-                  let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
-                return callback(.failure(WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))))
+    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) {
+        Task {
+            guard await barrier.raise() else {
+                return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
             }
-
-            organization = organizationId
-            invitation = invitationId
-        }
-
-        let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL,
-                                                  defaults: handler.defaults,
-                                                  state: state,
-                                                  organization: organization,
-                                                  invitation: invitation)
-
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
-                                                                     ephemeralSession: ephemeralSession,
-                                                                     headers: headers)
-        let userAgent = await provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
-            Task {
-                await storage.clear()
-                await barrier.lower()
+            
+            guard let redirectURL = self.redirectURL else {
+                return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            }
+            
+            let handler = self.handler(redirectURL)
+            let state = self.state
+            var organization: String? = self.organization
+            var invitation: String?
+            
+            if let invitationURL = self.invitationURL {
+                guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
+                      let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
+                      let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
+                    return callback(.failure(WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))))
+                }
                 
-                switch result {
-                case .success:
-                    onCloseCallback?()
-                case .failure(let error):
-                    callback(.failure(error))
+                organization = organizationId
+                invitation = invitationId
+            }
+            
+            let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL,
+                                                      defaults: handler.defaults,
+                                                      state: state,
+                                                      organization: organization,
+                                                      invitation: invitation)
+            
+            let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
+                                                                         ephemeralSession: ephemeralSession,
+                                                                         headers: headers)
+            let userAgent = await provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
+                Task {
+                    await storage.clear()
+                    await barrier.lower()
+                    
+                    switch result {
+                    case .success:
+                        onCloseCallback?()
+                    case .failure(let error):
+                        callback(.failure(error))
+                    }
                 }
             }
+            let transaction = LoginTransaction(redirectURL: redirectURL,
+                                               state: state,
+                                               userAgent: userAgent,
+                                               handler: handler,
+                                               logger: self.logger,
+                                               callback: callback)
+            await self.storage.store(transaction)
+            await userAgent.start()
+            logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
         }
-        let transaction = LoginTransaction(redirectURL: redirectURL,
-                                           state: state,
-                                           userAgent: userAgent,
-                                           handler: handler,
-                                           logger: self.logger,
-                                           callback: callback)
-        await self.storage.store(transaction)
-        await userAgent.start()
-        logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
     func clearSession(federated: Bool, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void) async {

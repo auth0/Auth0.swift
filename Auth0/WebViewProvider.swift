@@ -16,9 +16,9 @@ public extension WebAuthentication {
     static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
         return { url, callback  in
             let redirectURL = extractRedirectURL(from: url)!
-            Task {
+            return await Task {
                 await WebViewUserAgent(authorizeURL: url, redirectURL: redirectURL, modalPresentationStyle: style, callback: callback)
-            }
+            }.value
         }
     }
 }
@@ -44,9 +44,7 @@ public extension WebAuthentication {
         self.redirectURL = redirectURL
         self.callback = callback
         self.viewController = viewController
-        await MainActor.run {
-            self.viewController.modalPresentationStyle = modalPresentationStyle
-        }
+        self.viewController.modalPresentationStyle = modalPresentationStyle
 
         super.init()
         if !defaultSchemesSupportedByWKWebview.contains(redirectURL.scheme!) {
@@ -95,12 +93,15 @@ public extension WebAuthentication {
 
 /// Handling Custom Scheme Callbacks
 extension WebViewUserAgent: WKURLSchemeHandler {
+    
     func webView(_ webView: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {
-        _ = TransactionStore.shared.resume(urlSchemeTask.request.url!)
-        let error = NSError(domain: WebViewUserAgent.customSchemeRedirectionSuccessMessage, code: 200, userInfo: [
-            NSLocalizedDescriptionKey: "WebViewProvider: WKURLSchemeHandler: Succesfully redirected back to the app"
-        ])
-        urlSchemeTask.didFailWithError(error)
+        Task {
+            _ = await TransactionStore.shared.resume(urlSchemeTask.request.url!)
+            let error = NSError(domain: WebViewUserAgent.customSchemeRedirectionSuccessMessage, code: 200, userInfo: [
+                NSLocalizedDescriptionKey: "WebViewProvider: WKURLSchemeHandler: Succesfully redirected back to the app"
+            ])
+            urlSchemeTask.didFailWithError(error)
+        }
     }
 
     func webView(_ webView: WKWebView, stop urlSchemeTask: any WKURLSchemeTask) {
@@ -114,12 +115,14 @@ extension WebViewUserAgent: WKURLSchemeHandler {
 
 /// Handling HTTPS Callbacks
 extension WebViewUserAgent: WKNavigationDelegate {
-    @MainActor func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString), let scheme = callbackUrl.scheme, scheme == "https" {
-            _ = TransactionStore.shared.resume(callbackUrl)
-            decisionHandler(.cancel)
-        } else {
-            decisionHandler(.allow)
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        Task {
+            if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString), let scheme = callbackUrl.scheme, scheme == "https" {
+                _ = await TransactionStore.shared.resume(callbackUrl)
+                decisionHandler(.cancel)
+            } else {
+                decisionHandler(.allow)
+            }
         }
     }
 

@@ -236,7 +236,7 @@ public protocol WebAuth: Trackable, Loggable {
      - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
      application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
-    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) async
+    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void)
 
     #if canImport(_Concurrency)
     /**
