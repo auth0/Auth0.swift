@@ -618,7 +618,7 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 ```
 
 > [!IMPORTANT]
-> Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the provided Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
+> Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the default Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
 
 ### Credentials Manager errors
 
@@ -785,9 +785,15 @@ Auth0
 > [!NOTE]
 > This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
 
-Logging a user in with a passkey is a three-step process that requires the **Passkeys** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#prepare-your-application) for more information.
+Logging a user in with a passkey is a three-step process. First, you request a login challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to request an **existing passkey credential**. Finally, you use the resulting passkey credential and the original challenge to log the user in.
 
-First, you request a login challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to request an **existing passkey credential**. Finally, you use the resulting passkey credential and the original challenge to log the user in.
+#### Prerequisites
+
+- A custom domain configured for your Auth0 tenant.
+- The **Passkeys** grant to be enabled for your Auth0 application.
+- The iOS **Device settings** configured for your Auth0 application.
+
+Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#before-you-begin) for more information.
 
 #### 1. Request a login challenge
 
@@ -864,8 +870,8 @@ authController.performRequests()
 The resulting passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
 
 ```swift
-public func authorizationController(controller: ASAuthorizationController,
-                                    didCompleteWithAuthorization authorization: ASAuthorization) {
+func authorizationController(controller: ASAuthorizationController,
+                             didCompleteWithAuthorization authorization: ASAuthorization) {
     switch authorization.credential {
     case let loginPasskey as ASAuthorizationPlatformPublicKeyCredentialAssertion:
         // ...
@@ -944,9 +950,15 @@ Auth0
 > [!NOTE]
 > This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
 
-Signing a user up with a passkey is a three-step process that requires the **Passkeys** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#prepare-your-application) for more information.
+Signing a user up with a passkey is a three-step process. First, you request a signup challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a **new passkey credential**. Finally, you use the created passkey credential and the original challenge to log the new user in.
 
-First, you request a signup challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a **new passkey credential**. Finally, you use the created passkey credential and the original challenge to log the new user in.
+#### Prerequisites
+
+- A custom domain configured for your Auth0 tenant.
+- The **Passkeys** grant to be enabled for your Auth0 application.
+- The iOS **Device settings** configured for your Auth0 application.
+
+Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#before-you-begin) for more information.
 
 #### 1. Request a signup challenge
 
@@ -1033,8 +1045,8 @@ authController.performRequests()
 The created passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
 
 ```swift
-public func authorizationController(controller: ASAuthorizationController,
-                                   didCompleteWithAuthorization authorization: ASAuthorization) {
+func authorizationController(controller: ASAuthorizationController,
+                             didCompleteWithAuthorization authorization: ASAuthorization) {
     switch authorization.credential {
     case let signupPasskey as ASAuthorizationPlatformPublicKeyCredentialRegistration:
         // ...
@@ -1421,7 +1433,7 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 ```
 
 > [!IMPORTANT]
-> Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the provided Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
+> Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the default Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
 
 ### Authentication API client configuration
 
@@ -1463,9 +1475,9 @@ Auth0
 
 The Authentication API client will only produce `AuthenticationError` error values.
 
-- The `cause` property contains the underlying error value –if any.
+- The `info` property contains additional information about the error.
+- The `cause` property contains the underlying error value, if any.
 - Use the `isNetworkError` property to check if the request failed due to networking issues.
-- Find more information about the error in the `info` dictionary.
 
 Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about the available `AuthenticationError` properties.
 
@@ -1486,15 +1498,21 @@ Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/
 
 Use the Auth0 My Account API to manage the current user's account.
 
-To call the My Account API, you need an access token issued specifically for this API. See [API credentials [EA]](#api-credentials-ea) to learn how to obtain one.
+To call the My Account API, you need an access token issued specifically for this API, including any required scopes for the operations you want to perform. See [API credentials [EA]](#api-credentials-ea) to learn how to obtain one.
 
 ### Enroll a new passkey
 
 **Scopes required:** `create:me:authentication_methods`
 
-Enrolling a new passkey is a three-step process that requires the **Passkeys** grant to be enabled for your Auth0 application. Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#prepare-your-application) for more information.
+Enrolling a new passkey is a three-step process. First, you request an enrollment challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a new passkey credential. Finally, you use the created passkey credential and the original challenge to enroll the passkey with Auth0.
 
-First, you request an enrollment challenge from Auth0. Then, you pass that challenge to Apple's [`AuthenticationServices`](https://developer.apple.com/documentation/authenticationservices) APIs to create a new passkey credential. Finally, you use the created passkey credential and the original challenge to enroll the passkey with Auth0.
+#### Prerequisites
+
+- A custom domain configured for your Auth0 tenant.
+- The **Passkeys** grant to be enabled for your Auth0 application.
+- The iOS **Device settings** configured for your Auth0 application.
+
+Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#before-you-begin) for more information.
 
 #### 1. Request an enrollment challenge
 
@@ -1576,8 +1594,8 @@ authController.performRequests()
 The created passkey credential will be delivered through the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
 
 ```swift
-public func authorizationController(controller: ASAuthorizationController,
-                                   didCompleteWithAuthorization authorization: ASAuthorization) {
+func authorizationController(controller: ASAuthorizationController,
+                             didCompleteWithAuthorization authorization: ASAuthorization) {
     switch authorization.credential {
     case let newPasskey as ASAuthorizationPlatformPublicKeyCredentialRegistration:
         // ...
@@ -1652,9 +1670,9 @@ Auth0
 
 The My Account API client will only produce `MyAccountError` error values.
 
-- The `cause` property contains the underlying error value –if any.
+- The `info` property contains additional information about the error.
+- The `cause` property contains the underlying error value, if any.
 - Use the `isNetworkError` property to check if the request failed due to networking issues.
-- Find more information about the error in the `info` dictionary.
 
 See the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/myaccounterror) to learn more about the available `MyAccountError` properties.
 
@@ -1897,9 +1915,9 @@ Auth0
 
 The Management API client will only produce `ManagementError` error values.
 
-- The `cause` property contains the underlying error value –if any.
+- The `info` property contains additional information about the error.
+- The `cause` property contains the underlying error value, if any.
 - Use the `isNetworkError` property to check if the request failed due to networking issues.
-- Find more information about the error in the `info` dictionary.
 
 Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/managementerror) to learn more about the available `ManagementError` properties.
 
