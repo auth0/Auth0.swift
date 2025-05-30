@@ -47,6 +47,14 @@
 		5C0AF09D2833420200162044 /* WebAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AF09C2833420200162044 /* WebAuthentication.swift */; };
 		5C0AF09E2833420200162044 /* WebAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0AF09C2833420200162044 /* WebAuthentication.swift */; };
 		5C0E5B6D2DE1100000D38F4C /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4F552D23C9123000C89615 /* Mocks.swift */; };
+		5C0E5B712DE915DB00D38F4C /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5C0E5B722DE915E100D38F4C /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5C0E5B732DE915EB00D38F4C /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5C0E5B742DE915F100D38F4C /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5C0E5B752DE915F700D38F4C /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5C0E5B762DE915FD00D38F4C /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5C0E5B772DE9160600D38F4C /* JWTDecode.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5C0E5B782DE9160B00D38F4C /* SimpleKeychain.xcframework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5C1574452DD5083A00BF9373 /* MyAccountSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574442DD5083400BF9373 /* MyAccountSpec.swift */; };
 		5C1574462DD5083A00BF9373 /* MyAccountSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574442DD5083400BF9373 /* MyAccountSpec.swift */; };
 		5C1574472DD5083A00BF9373 /* MyAccountSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1574442DD5083400BF9373 /* MyAccountSpec.swift */; };
@@ -417,7 +425,6 @@
 		C12BFE442C352DD700D1CC00 /* StubURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */; };
 		C160EE352CABD0E5005ACE8E /* UIWindow+TopViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE302CABD0DA005ACE8E /* UIWindow+TopViewController.swift */; };
 		C160EE382CABD35A005ACE8E /* UIWindow+TopViewControllerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = C160EE372CABD358005ACE8E /* UIWindow+TopViewControllerSpec.swift */; };
-		C177D6C32C2ADDEB0094C657 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = C177D6C22C2ADDEB0094C657 /* Auth0.plist */; };
 		C177D6C72C2ADEB60094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6C62C2ADEB60094C657 /* CwlPreconditionTesting */; };
 		C177D6D42C2B0DCB0094C657 /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C177D6D32C2B0DCB0094C657 /* CwlPreconditionTesting */; };
 		C177D7702C2BDFE40094C657 /* NetworkStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = C177D76F2C2BDFE40094C657 /* NetworkStub.swift */; };
@@ -629,6 +636,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				5C0E5B742DE915F100D38F4C /* SimpleKeychain.xcframework in Copy Files */,
+				5C0E5B732DE915EB00D38F4C /* JWTDecode.xcframework in Copy Files */,
 				5B7EE46820FC9F5200367724 /* Auth0.framework in Copy Files */,
 			);
 			name = "Copy Files";
@@ -640,6 +649,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				5C0E5B762DE915FD00D38F4C /* SimpleKeychain.xcframework in Copy Files */,
+				5C0E5B752DE915F700D38F4C /* JWTDecode.xcframework in Copy Files */,
 				5B7EE48E20FCA0F400367724 /* Auth0.framework in Copy Files */,
 			);
 			name = "Copy Files";
@@ -651,6 +662,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				5C0E5B722DE915E100D38F4C /* SimpleKeychain.xcframework in Copy Files */,
+				5C0E5B712DE915DB00D38F4C /* JWTDecode.xcframework in Copy Files */,
 				5BE65DCA1F7270DE00CADD3B /* Auth0.framework in Copy Files */,
 			);
 			name = "Copy Files";
@@ -695,6 +708,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				5C0E5B782DE9160B00D38F4C /* SimpleKeychain.xcframework in Copy Files */,
+				5C0E5B772DE9160600D38F4C /* JWTDecode.xcframework in Copy Files */,
 				C1B3B9D42C24B39E004A32A4 /* Auth0.framework in Copy Files */,
 			);
 			name = "Copy Files";
@@ -946,7 +961,7 @@
 		C107B5202CA27F76006B6BEA /* WebViewProviderSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewProviderSpec.swift; sourceTree = "<group>"; };
 		C160EE302CABD0DA005ACE8E /* UIWindow+TopViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIWindow+TopViewController.swift"; sourceTree = "<group>"; };
 		C160EE372CABD358005ACE8E /* UIWindow+TopViewControllerSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIWindow+TopViewControllerSpec.swift"; sourceTree = "<group>"; };
-		C177D6C22C2ADDEB0094C657 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
+		C177D6C22C2ADDEB0094C657 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Auth0.plist; path = ../Auth0.plist; sourceTree = "<group>"; };
 		C177D76F2C2BDFE40094C657 /* NetworkStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStub.swift; sourceTree = "<group>"; };
 		C177D7742C2BE00D0094C657 /* StubURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubURLProtocol.swift; sourceTree = "<group>"; };
 		C1B3B9A82C24B297004A32A4 /* OAuth2Vision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2Vision.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2092,7 +2107,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C177D6C32C2ADDEB0094C657 /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
