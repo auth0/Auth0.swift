@@ -52,17 +52,18 @@ public extension WebAuthentication {
     static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
         return { url, callback  in
             let redirectURL = extractRedirectURL(from: url)!
-
-            return WebViewUserAgent(authorizeURL: url,
-                                    redirectURL: redirectURL,
-                                    modalPresentationStyle: style,
-                                    callback: callback)
+            return await Task {
+                return await WebViewUserAgent(authorizeURL: url,
+                                        redirectURL: redirectURL,
+                                        modalPresentationStyle: style,
+                                        callback: callback)
+            }.value
         }
     }
 
 }
 
-class WebViewUserAgent: NSObject, WebAuthUserAgent {
+@MainActor class WebViewUserAgent: NSObject, WebAuthUserAgent {    
 
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
     static let customSchemeRedirectionFailureMessage = "com.auth0.webview.redirection_failure"
@@ -74,7 +75,11 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     let redirectURL: URL
     let callback: WebAuthProviderCallback
 
-    init(authorizeURL: URL, redirectURL: URL, viewController: UIViewController = UIViewController(), modalPresentationStyle: UIModalPresentationStyle = .fullScreen, callback: @escaping WebAuthProviderCallback) {
+    init(authorizeURL: URL,
+         redirectURL: URL,
+         viewController: UIViewController = UIViewController(),
+         modalPresentationStyle: UIModalPresentationStyle = .fullScreen,
+         callback: @escaping WebAuthProviderCallback) async {
         self.request = URLRequest(url: authorizeURL)
         self.redirectURL = redirectURL
         self.callback = callback
@@ -129,13 +134,14 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
 
 /// Handling of Custom Scheme callbacks.
 extension WebViewUserAgent: WKURLSchemeHandler {
-
     func webView(_ webView: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {
-        _ = TransactionStore.shared.resume(urlSchemeTask.request.url!)
-        let error = NSError(domain: WebViewUserAgent.customSchemeRedirectionSuccessMessage, code: 200, userInfo: [
-            NSLocalizedDescriptionKey: "WebViewProvider: WKURLSchemeHandler: Succesfully redirected back to the app"
-        ])
-        urlSchemeTask.didFailWithError(error)
+        Task {
+            _ = await TransactionStore.shared.resume(urlSchemeTask.request.url!)
+            let error = NSError(domain: WebViewUserAgent.customSchemeRedirectionSuccessMessage, code: 200, userInfo: [
+                NSLocalizedDescriptionKey: "WebViewProvider: WKURLSchemeHandler: Succesfully redirected back to the app"
+            ])
+            urlSchemeTask.didFailWithError(error)
+        }
     }
 
     func webView(_ webView: WKWebView, stop urlSchemeTask: any WKURLSchemeTask) {
@@ -152,11 +158,13 @@ extension WebViewUserAgent: WKURLSchemeHandler {
 extension WebViewUserAgent: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString), let scheme = callbackUrl.scheme, scheme == "https" {
-            _ = TransactionStore.shared.resume(callbackUrl)
-            decisionHandler(.cancel)
-        } else {
-            decisionHandler(.allow)
+        Task {
+            if let callbackUrl = navigationAction.request.url, callbackUrl.absoluteString.starts(with: redirectURL.absoluteString), let scheme = callbackUrl.scheme, scheme == "https" {
+                _ = await TransactionStore.shared.resume(callbackUrl)
+                decisionHandler(.cancel)
+            } else {
+                decisionHandler(.allow)
+            }
         }
     }
 

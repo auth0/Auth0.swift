@@ -1,7 +1,7 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-struct IDTokenValidatorContext: IDTokenSignatureValidatorContext, IDTokenClaimsValidatorContext {
+struct IDTokenValidatorContext: IDTokenSignatureValidatorContext, IDTokenClaimsValidatorContext, Sendable {
     let issuer: String
     let audience: String
     let jwksRequest: Request<JWKS, AuthenticationError>

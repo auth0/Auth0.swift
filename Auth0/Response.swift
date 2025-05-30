@@ -12,7 +12,7 @@ func string(_ data: Data?) -> String? {
 
 typealias JSONResponse = (headers: [String: Any], body: Any, data: Data)
 
-struct Response<E: Auth0APIError> {
+struct Response<E: Auth0APIError>: Sendable {
     let data: Data?
     let response: HTTPURLResponse?
     let error: Error?

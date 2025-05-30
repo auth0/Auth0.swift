@@ -9,7 +9,7 @@ private struct _A0SSOCredentials {
 }
 
 /// Credentials obtained from Auth0 to perform web single sign-on (SSO).
-public struct SSOCredentials: CustomStringConvertible {
+public struct SSOCredentials: CustomStringConvertible, Sendable {
 
     /// Token that can be used to request a web session.
     public let sessionTransferToken: String
