@@ -791,7 +791,7 @@ Logging a user in with a passkey is a three-step process. First, you request a l
 
 - A custom domain configured for your Auth0 tenant.
 - The **Passkeys** grant to be enabled for your Auth0 application.
-- The iOS **Device settings** configured for your Auth0 application.
+- The iOS **Device Settings** configured for your Auth0 application.
 
 Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#before-you-begin) for more information.
 
@@ -956,7 +956,7 @@ Signing a user up with a passkey is a three-step process. First, you request a s
 
 - A custom domain configured for your Auth0 tenant.
 - The **Passkeys** grant to be enabled for your Auth0 application.
-- The iOS **Device settings** configured for your Auth0 application.
+- The iOS **Device Settings** configured for your Auth0 application.
 
 Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#before-you-begin) for more information.
 
@@ -1510,7 +1510,7 @@ Enrolling a new passkey is a three-step process. First, you request an enrollmen
 
 - A custom domain configured for your Auth0 tenant.
 - The **Passkeys** grant to be enabled for your Auth0 application.
-- The iOS **Device settings** configured for your Auth0 application.
+- The iOS **Device Settings** configured for your Auth0 application.
 
 Check [our documentation](https://auth0.com/docs/native-passkeys-for-mobile-applications#before-you-begin) for more information.
 
