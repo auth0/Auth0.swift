@@ -494,7 +494,7 @@ However, if you need an access token for a different API, you can exchange the [
 > Currently, only the Auth0 My Account API is supported. Support for other APIs will be added in the future.
 
 ```swift
-credentialsManager.apiCredentials(forAudience: "https://samples.us.auth0.com/me",
+credentialsManager.apiCredentials(forAudience: "https://example.com/me",
                                   scope: "create:me:authentication_methods") { result in
     switch result {
     case .success(let apiCredentials):
@@ -510,7 +510,7 @@ credentialsManager.apiCredentials(forAudience: "https://samples.us.auth0.com/me"
 
 ```swift
 do {
-    let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "https://samples.us.auth0.com/me",
+    let apiCredentials = try await credentialsManager.apiCredentials(forAudience: "https://example.com/me",
                                                                      scope: "create:me:authentication_methods")
     print("Obtained API credentials: \(apiCredentials)")
 } catch {
@@ -524,7 +524,7 @@ do {
 
 ```swift
 credentialsManager
-    .apiCredentials(forAudience: "https://samples.us.auth0.com/me",
+    .apiCredentials(forAudience: "https://example.com/me",
                     scope: "create:me:authentication_methods")
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {

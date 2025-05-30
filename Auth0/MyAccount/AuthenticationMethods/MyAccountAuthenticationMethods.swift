@@ -26,6 +26,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```swift
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
     ///     .passkeyEnrollmentChallenge()
     ///     .start { result in
     ///         switch result {
@@ -92,6 +93,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```swift
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
     ///     .enroll(passkey: newPasskey, challenge: enrollmentChallenge)
     ///     .start { result in
     ///         switch result {
