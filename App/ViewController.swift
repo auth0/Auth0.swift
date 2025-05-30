@@ -16,7 +16,7 @@ var enrollmentChallenge: PasskeyEnrollmentChallenge?
 class ViewController: UIViewController {
 
     @IBAction func login(_ sender: Any) {
-        // Intial login (1)
+        // Initial login
         Auth0
             .webAuth(clientId: clientId, domain: domain)
             .logging(enabled: true)
@@ -25,13 +25,13 @@ class ViewController: UIViewController {
             .start { result in
                 switch result {
                 case .failure(let error): print(error)
-                case .success(let credentials): // Logged in
+                case .success(let credentials):
                     guard let refreshToken = credentials.refreshToken else {
                         print("No refresh token")
                         return
                     }
 
-                    // Now, using MRRT to get an access token for the My Account API (2)
+                    // Use MRRT to get an access token for the My Account API (step 1)
                     authenticationClient
                         .renew(withRefreshToken: refreshToken, audience: myAccountAudience, scope: myAccountScope)
                         .start { result in
@@ -40,7 +40,7 @@ class ViewController: UIViewController {
                             case .success(let apiCredentials):
                                 let token = apiCredentials.accessToken
 
-                                // Now, requesting enrollment challenge (3)
+                                // Request an enrollment challenge (step 2)
                                 myAccountClient = Auth0.myAccount(token: token, domain: domain).logging(enabled: true)
                                 myAccountClient!
                                     .authenticationMethods
@@ -89,14 +89,6 @@ class ViewController: UIViewController {
 
 }
 
-extension ViewController: ASAuthorizationControllerPresentationContextProviding {
-
-    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return self.view.window!
-    }
-
-}
-
 extension ViewController: ASAuthorizationControllerDelegate {
 
     func authorizationController(controller: ASAuthorizationController,
@@ -105,7 +97,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
         case let newPasskey as ASAuthorizationPlatformPublicKeyCredentialRegistration:
             print("Passkey created: \(newPasskey)")
 
-            // Now, verifying the enrollment (4)
+            // Verify the enrollment (step 3)
             myAccountClient!
                 .authenticationMethods
                 .enroll(passkey: newPasskey, challenge: enrollmentChallenge!)
@@ -134,6 +126,14 @@ extension ViewController: ASAuthorizationControllerDelegate {
                 print("Other authorization error: \(authError.code)")
             }
         }
+    }
+
+}
+
+extension ViewController: ASAuthorizationControllerPresentationContextProviding {
+
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
     }
 
 }
