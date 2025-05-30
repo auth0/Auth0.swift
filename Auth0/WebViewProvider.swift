@@ -53,7 +53,7 @@ public extension WebAuthentication {
         return { url, callback  in
             let redirectURL = extractRedirectURL(from: url)!
             return await Task {
-                return WebViewUserAgent(authorizeURL: url,
+                return await WebViewUserAgent(authorizeURL: url,
                                         redirectURL: redirectURL,
                                         modalPresentationStyle: style,
                                         callback: callback)
