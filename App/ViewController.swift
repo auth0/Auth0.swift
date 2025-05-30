@@ -13,16 +13,15 @@ let myAccountScope = "create:me:authentication_methods"
 var myAccountClient: MyAccount? = nil
 var enrollmentChallenge: PasskeyEnrollmentChallenge?
 
-@available(iOS 16.6, *)
 class ViewController: UIViewController {
 
     @IBAction func login(_ sender: Any) {
+        // Intial login (1)
         Auth0
             .webAuth(clientId: clientId, domain: domain)
             .logging(enabled: true)
             .scope("profile email offline_access")
             .useEphemeralSession()
-            .audience(myAccountAudience)
             .start { result in
                 switch result {
                 case .failure(let error): print(error)
@@ -32,7 +31,7 @@ class ViewController: UIViewController {
                         return
                     }
 
-                    // Now, using MRRT to get an access token for the My Account API
+                    // Now, using MRRT to get an access token for the My Account API (2)
                     authenticationClient
                         .renew(withRefreshToken: refreshToken, audience: myAccountAudience, scope: myAccountScope)
                         .start { result in
@@ -41,7 +40,7 @@ class ViewController: UIViewController {
                             case .success(let apiCredentials):
                                 let token = apiCredentials.accessToken
 
-                                // Now, requesting enrollment challenge
+                                // Now, requesting enrollment challenge (3)
                                 myAccountClient = Auth0.myAccount(token: token, domain: domain).logging(enabled: true)
                                 myAccountClient!
                                     .authenticationMethods
@@ -90,7 +89,6 @@ class ViewController: UIViewController {
 
 }
 
-@available(iOS 16.6, *)
 extension ViewController: ASAuthorizationControllerPresentationContextProviding {
 
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
@@ -99,7 +97,6 @@ extension ViewController: ASAuthorizationControllerPresentationContextProviding 
 
 }
 
-@available(iOS 16.6, *)
 extension ViewController: ASAuthorizationControllerDelegate {
 
     func authorizationController(controller: ASAuthorizationController,
@@ -108,7 +105,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
         case let newPasskey as ASAuthorizationPlatformPublicKeyCredentialRegistration:
             print("Passkey created: \(newPasskey)")
 
-            // Now, verifying the enrollment
+            // Now, verifying the enrollment (4)
             myAccountClient!
                 .authenticationMethods
                 .enroll(passkey: newPasskey, challenge: enrollmentChallenge!)
