@@ -1,8 +1,33 @@
 import Foundation
 
-func json(_ data: Data?) -> Any? {
+func json(_ data: Data?) -> Sendable? {
     guard let data = data else { return nil }
-    return try? JSONSerialization.jsonObject(with: data, options: [])
+    do {
+        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+
+        if let dict = jsonObject as? [String: Any] {
+            let sendableDict: [String: Sendable] = dict.compactMapValues { value in
+                if let s = value as? String { return s }
+                if let i = value as? Int { return i }
+                if let d = value as? Double { return d }
+                if let b = value as? Bool { return b }
+                return nil
+            }
+            return sendableDict
+        } else if let array = jsonObject as? [Any] {
+            let sendableArray: [Sendable] = array.compactMap { value in
+                if let s = value as? String { return s }
+                if let i = value as? Int { return i }
+                if let d = value as? Double { return d }
+                if let b = value as? Bool { return b }
+                return nil
+            }
+            return sendableArray
+        }
+        return nil
+    } catch {
+        return nil
+    }
 }
 
 func string(_ data: Data?) -> String? {
@@ -10,7 +35,7 @@ func string(_ data: Data?) -> String? {
     return String(data: data, encoding: .utf8)
 }
 
-typealias JSONResponse = (headers: [String: Any], body: Any, data: Data)
+typealias JSONResponse = (headers: [String: any Sendable], body: any Sendable, data: Data)
 
 struct Response<E: Auth0APIError>: Sendable {
     let data: Data?
@@ -44,13 +69,28 @@ struct Response<E: Auth0APIError>: Sendable {
     }
 }
 
-private extension Dictionary where Key == AnyHashable, Value == Any {
+extension Dictionary where Key == AnyHashable, Value == Any {
 
-    var stringDictionary: [String: Any] {
-        var result: [String: Any] = [:]
+    var stringDictionary: [String: any Sendable] {
+        var result: [String: any Sendable] = [:]
         for (key, value) in self {
-            if let stringKey = key as? String {
-                result[stringKey] = value
+            guard let stringKey = key as? String else {
+                continue
+            }
+            if let str = value as? String {
+                result[stringKey] = str
+            } else if let num = value as? Int {
+                result[stringKey] = num
+            } else if let boolean = value as? Bool {
+                result[stringKey] = boolean
+            } else if let double = value as? Double {
+                result[stringKey] = double
+            } else if let array = value as? [any Sendable] {
+                result[stringKey] = array
+            } else if let dict = value as? [String: any Sendable] {
+                result[stringKey] = dict
+            } else {
+                continue
             }
         }
         return result

@@ -304,7 +304,7 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func credentials(withScope scope: String? = nil,
                             minTTL: Int = 0,
-                            parameters: [String: Any] = [:],
+                            parameters: [String: any Sendable] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         if let bioAuth = self.bioAuth {
@@ -1295,7 +1295,7 @@ public extension CredentialsManager {
     /// - <doc:RefreshTokens>
     func credentials(withScope scope: String? = nil,
                      minTTL: Int = 0,
-                     parameters: [String: Any] = [:],
+                     parameters: [String: any Sendable] = [:],
                      headers: [String: String] = [:]) async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
             self.credentials(withScope: scope,
