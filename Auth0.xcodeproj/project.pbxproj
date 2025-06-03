@@ -542,25 +542,15 @@
 		D41DED1D2DCA084E00F5B1A4 /* Nimble.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6B26FE30A6009C2B27 /* Nimble.xcframework */; };
 		D41DED1E2DCA085000F5B1A4 /* Quick.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC6C26FE30A6009C2B27 /* Quick.xcframework */; };
 		D41DED292DCA099E00F5B1A4 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
-		D41DED2A2DCA099E00F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED2C2DCA099F00F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
-		D41DED2D2DCA099F00F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED2E2DCA09A200F5B1A4 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
-		D41DED2F2DCA09A200F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED312DCA09A300F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
-		D41DED322DCA09A300F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED332DCA09AC00F5B1A4 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
-		D41DED342DCA09AC00F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED362DCA09AE00F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
-		D41DED372DCA09AE00F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED382DCA09B000F5B1A4 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
-		D41DED392DCA09B000F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED3B2DCA09B200F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
-		D41DED3C2DCA09B200F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED3D2DCA09B400F5B1A4 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
-		D41DED3E2DCA09B400F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D41DED402DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
-		D41DED412DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D4B8E9E42DCDD2340021262D /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = D4B8E9E32DCDD2340021262D /* CwlPreconditionTesting */; };
 		D4B8E9E62DCDD23C0021262D /* CwlPosixPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = D4B8E9E52DCDD23C0021262D /* CwlPosixPreconditionTesting */; };
 		D581CF772757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
@@ -725,66 +715,6 @@
 				C1B3B9E62C24B65B004A32A4 /* Nimble.xcframework in Copy Files */,
 			);
 			name = "Copy Files";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D41DED2B2DCA099E00F5B1A4 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				D41DED2A2DCA099E00F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */,
-				D41DED2D2DCA099F00F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D41DED302DCA09A200F5B1A4 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				D41DED2F2DCA09A200F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */,
-				D41DED322DCA09A300F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D41DED352DCA09AC00F5B1A4 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				D41DED342DCA09AC00F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */,
-				D41DED372DCA09AE00F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D41DED3A2DCA09B000F5B1A4 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				D41DED392DCA09B000F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */,
-				D41DED3C2DCA09B200F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D41DED3F2DCA09B400F5B1A4 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				D41DED3E2DCA09B400F5B1A4 /* JWTDecode.xcframework in Embed Frameworks */,
-				D41DED412DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -1691,7 +1621,6 @@
 				5F06DD751CC448B10011842B /* Headers */,
 				5F06DD761CC448B10011842B /* Resources */,
 				5B717B241E2E2696004A05A7 /* SwiftLint */,
-				D41DED2B2DCA099E00F5B1A4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1711,7 +1640,6 @@
 				5F06DD821CC448C90011842B /* Headers */,
 				5F06DD831CC448C90011842B /* Resources */,
 				5B717B251E2E26B9004A05A7 /* SwiftLint */,
-				D41DED302DCA09A200F5B1A4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1777,7 +1705,6 @@
 				5F23E6B61D4ACA7100C3F2D9 /* Headers */,
 				5F23E6B71D4ACA7100C3F2D9 /* Resources */,
 				5B717B261E2E26C4004A05A7 /* SwiftLint */,
-				D41DED3A2DCA09B000F5B1A4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1797,7 +1724,6 @@
 				5F23E6F31D4B87F000C3F2D9 /* Headers */,
 				5F23E6F41D4B87F000C3F2D9 /* Resources */,
 				5B717B271E2E26CE004A05A7 /* SwiftLint */,
-				D41DED352DCA09AC00F5B1A4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1880,7 +1806,6 @@
 				C1B3B9BD2C24B39E004A32A4 /* Frameworks */,
 				C1B3B9BE2C24B39E004A32A4 /* Resources */,
 				C1B3B9ED2C24B699004A32A4 /* SwiftLint */,
-				D41DED3F2DCA09B400F5B1A4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
