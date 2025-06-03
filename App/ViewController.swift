@@ -10,7 +10,6 @@ let domain = "YOUR_CUSTOM_DOMAIN"
 let authenticationClient = Auth0.authentication(clientId: clientId, domain: domain).logging(enabled: true)
 let myAccountAudience = "https://\(domain)/me/"
 let myAccountScope = "create:me:authentication_methods"
-let credentialsManager = CredentialsManager(authentication: authenticationClient)
 var myAccountClient: MyAccount? = nil
 var enrollmentChallenge: PasskeyEnrollmentChallenge?
 
