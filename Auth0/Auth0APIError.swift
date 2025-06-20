@@ -81,8 +81,19 @@ extension Auth0APIError {
         self.init(info: info, statusCode: statusCode)
     }
 
-    init(from response: Response<Self>) {
-        self.init(description: string(response.data), statusCode: response.response?.statusCode ?? 0)
+    init(from response: ResponseValue) {
+        if response.response.statusCode == 401,
+           let challenge = response.response.value(forHTTPHeaderField: "WWW-Authenticate"),
+           challenge.contains("error=\"\(DPoP.nonceRequiredErrorCode)\"") {
+            let info: [String: Any] = [
+                apiErrorCode: DPoP.nonceRequiredErrorCode,
+                apiErrorDescription: "Resource server requires nonce in DPoP proof."
+            ]
+            self.init(info: info, statusCode: response.response.statusCode)
+            return
+        }
+
+        self.init(description: string(response.data), statusCode: response.response.statusCode)
     }
 
     static var networkErrorCodes: [URLError.Code] {
@@ -99,4 +110,9 @@ extension Auth0APIError {
         ]
     }
 
+}
+
+func string(_ data: Data?) -> String? {
+    guard let data = data else { return nil }
+    return String(data: data, encoding: .utf8)
 }

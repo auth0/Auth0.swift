@@ -12,6 +12,7 @@ final class Auth0WebAuth: WebAuth {
     var telemetry: Telemetry
     var barrier: Barrier
     var logger: Logger?
+    var dpop: DPoP?
 
     #if os(macOS)
     private let platform = "macos"
@@ -274,6 +275,7 @@ final class Auth0WebAuth: WebAuth {
         entries["nonce"] = self.nonce
         entries["organization"] = organization
         entries["invitation"] = invitation
+        entries["dpop_jkt"] = try? dpop?.jkt()
 
         if let maxAge = self.maxAge {
             entries["max_age"] = String(maxAge)

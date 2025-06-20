@@ -9,6 +9,7 @@ struct Auth0Authentication: Authentication {
     let url: URL
     var telemetry: Telemetry
     var logger: Logger?
+    var dpop: DPoP?
 
     let session: URLSession
 
@@ -395,8 +396,8 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: userInfo,
                        method: "GET",
+                       accessToken: accessToken,
                        handle: authenticationObject,
-                       headers: ["Authorization": "Bearer \(accessToken)"],
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
@@ -495,6 +496,16 @@ private extension Auth0Authentication {
                        telemetry: self.telemetry)
     }
 
+    func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
+        var parameters: [String: Any] = parameters
+        parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
+        parameters["subject_token"] = subjectToken
+        parameters["subject_token_type"] = subjectTokenType
+        parameters["audience"] = audience
+        parameters["scope"] = scope
+        return self.token().parameters(parameters) // parameters() enforces 'openid' scope
+    }
+
     func token<T: Codable>() -> Request<T, AuthenticationError> {
         let payload: [String: Any] = [
             "client_id": self.clientId
@@ -507,16 +518,6 @@ private extension Auth0Authentication {
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry)
-    }
-
-    func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
-        var parameters: [String: Any] = parameters
-        parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
-        parameters["subject_token"] = subjectToken
-        parameters["subject_token_type"] = subjectTokenType
-        parameters["audience"] = audience
-        parameters["scope"] = scope
-        return self.token().parameters(parameters) // parameters() enforces 'openid' scope
     }
 
 }

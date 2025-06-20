@@ -25,7 +25,7 @@ class ResponseSpec: QuickSpec {
                 let response = Response<AuthenticationError>(data: JSONData, response: http(200), error: nil)
                 expect(try? response.result()).toNot(beNil())
 
-                let result: JSONResponse = try response.result()!
+                let result: ResponseValue = try response.result()!
                 expect(result.headers).toNot(beEmpty())
                 expect(result.body as? [String: Any]).toNot(beEmpty())
                 expect(result.data).toNot(beEmpty())

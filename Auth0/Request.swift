@@ -27,21 +27,41 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let session: URLSession
     let url: URL
     let method: String
-    let handle: (Response<E>, Callback) -> Void
+    let handle: (Result<ResponseValue, E>, Callback) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
+    let dpop: DPoP?
 
-    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, parameters: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
+    init(session: URLSession,
+         url: URL,
+         method: String,
+         accessToken: String? = nil,
+         handle: @escaping (Result<ResponseValue, E>, Callback) -> Void,
+         parameters: [String: Any] = [:],
+         headers: [String: String] = [:],
+         logger: Logger?,
+         telemetry: Telemetry,
+         dpop: DPoP? = nil) {
         self.session = session
         self.url = url
         self.method = method
         self.handle = handle
         self.parameters = parameters
-        self.headers = headers
         self.logger = logger
         self.telemetry = telemetry
+        self.dpop = dpop
+
+        var headers = headers
+        if let accessToken = accessToken {
+            let authScheme = dpop != nil ? "DPoP" : "Bearer"
+            headers["Authorization"] = "\(authScheme) \(accessToken)"
+        }
+        if let proof = try? dpop?.proof(url: url, method: method, token: accessToken) {
+            headers["DPoP"] = proof
+        }
+        self.headers = headers
     }
 
     var request: URLRequest {
@@ -77,16 +97,35 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         let handler = self.handle
         let request = self.request
         let logger = self.logger
+        var retryCount = 0
+        var shouldRetry = false
 
-        logger?.trace(request: request, session: self.session)
+        repeat {
+            logger?.trace(request: request, session: self.session)
 
-        let task = session.dataTask(with: request, completionHandler: { data, response, error in
-            if error == nil, let response = response {
-                logger?.trace(response: response, data: data)
-            }
-            handler(Response(data: data, response: response as? HTTPURLResponse, error: error), callback)
-        })
-        task.resume()
+            let task = session.dataTask(with: request, completionHandler: { data, response, error in
+                if error == nil, let response = response {
+                    logger?.trace(response: response, data: data)
+                }
+
+                let response = Response<E>(data: data, response: response as? HTTPURLResponse, error: error)
+                dpop?.storeNonce(from: response.response)
+
+                do {
+                    handler(.success(try response.result()), callback)
+                } catch let error as E {
+                    shouldRetry = dpop?.shouldRetry(for: error, retryCount: retryCount) ?? false
+                    if shouldRetry {
+                        retryCount += 1
+                    } else {
+                        handler(.failure(error), callback)
+                    }
+                } catch {
+                    handler(.failure(E(cause: error)), callback)
+                }
+            })
+            task.resume()
+        } while shouldRetry
     }
 
     /**

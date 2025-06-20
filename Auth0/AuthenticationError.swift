@@ -129,6 +129,10 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
         return self.code == "login_required"
     }
 
+    public var isDPoPNonceRequired: Bool {
+        return self.code == DPoP.nonceRequiredErrorCode
+    }
+
 }
 
 // MARK: - Error Messages

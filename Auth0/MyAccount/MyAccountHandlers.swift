@@ -1,12 +1,13 @@
 import Foundation
 
-func myAcccountDecodable<T: Decodable>(from response: Response<MyAccountError>,
+func myAcccountDecodable<T: Decodable>(result: Result<ResponseValue, MyAccountError>,
                                        callback: Request<T, MyAccountError>.Callback) {
     do {
-        if let jsonResponse = try response.result() {
+        let response = try result.get()
+        if let data = response.data {
             let decoder = JSONDecoder()
-            decoder.userInfo[.headersKey] = jsonResponse.headers
-            let decodedObject = try decoder.decode(T.self, from: jsonResponse.data)
+            decoder.userInfo[.locationHeaderKey] = response.response.value(forHTTPHeaderField: "Location")
+            let decodedObject = try decoder.decode(T.self, from: data)
             callback(.success(decodedObject))
         } else {
             callback(.failure(MyAccountError(from: response)))
@@ -20,9 +21,9 @@ func myAcccountDecodable<T: Decodable>(from response: Response<MyAccountError>,
 
 extension CodingUserInfoKey {
 
-    static var headersKey: CodingUserInfoKey {
+    static var locationHeaderKey: CodingUserInfoKey {
         // Force-unrapping it because it's never nil. See https://github.com/swiftlang/swift/issues/49302
-        return CodingUserInfoKey(rawValue: "headers")!
+        return CodingUserInfoKey(rawValue: "locationHeader")!
     }
 
 }
