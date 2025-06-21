@@ -1,7 +1,7 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-class ClearSessionTransaction: NSObject, AuthTransaction {
+actor ClearSessionTransaction: NSObject, AuthTransaction {
 
     private(set) var userAgent: WebAuthUserAgent?
 
@@ -10,20 +10,20 @@ class ClearSessionTransaction: NSObject, AuthTransaction {
         super.init()
     }
 
-    func cancel() {
+    func cancel() async {
         // The user agent can handle the error
-        self.finishUserAgent(with: .failure(WebAuthError(code: .userCancelled)))
+        await self.finishUserAgent(with: .failure(WebAuthError(code: .userCancelled)))
     }
 
-    func resume(_ url: URL) -> Bool {
+    func resume(_ url: URL) async -> Bool {
         // The user agent can close itself
-        self.finishUserAgent(with: .success(()))
+        await self.finishUserAgent(with: .success(()))
         return true
     }
 
-    private func finishUserAgent(with result: WebAuthResult<Void>) {
-        self.userAgent?.finish(with: result)
-        self.userAgent = nil
+    private func finishUserAgent(with result: WebAuthResult<Void>) async {
+        await userAgent?.finish(with: result)
+        userAgent = nil
     }
 
 }

@@ -2,28 +2,28 @@
 import Foundation
 
 /// Keeps track of the current Auth Transaction.
-class TransactionStore {
+actor TransactionStore {
 
     static let shared = TransactionStore()
 
     private(set) var current: AuthTransaction?
 
-    func resume(_ url: URL) -> Bool {
-        let isResumed = self.current?.resume(url) ?? false
-        self.clear()
+    func resume(_ url: URL) async -> Bool {
+        let isResumed = await self.current?.resume(url) ?? false
+        await self.clear()
         return isResumed
     }
 
-    func store(_ transaction: AuthTransaction) {
+    func store(_ transaction: AuthTransaction) async {
         self.current = transaction
     }
 
-    func cancel() {
-        self.current?.cancel()
-        self.clear()
+    func cancel() async {
+        await self.current?.cancel()
+        await self.clear()
     }
 
-    func clear() {
+    func clear() async {
         self.current = nil
     }
 

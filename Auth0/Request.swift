@@ -18,7 +18,7 @@ let parameterPropertyKey = "com.auth0.parameter"
  }
  ```
  */
-public struct Request<T, E: Auth0APIError>: Requestable {
+public struct Request<T, E: Auth0APIError>: Requestable, @unchecked Sendable {
     /**
      The callback closure type for the request.
      */
@@ -27,13 +27,13 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let session: URLSession
     let url: URL
     let method: String
-    let handle: (Response<E>, Callback) -> Void
+    let handle: @Sendable (Response<E>, Callback) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
 
-    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, parameters: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
+    init(session: URLSession, url: URL, method: String, handle: @escaping @Sendable (Response<E>, Callback) -> Void, parameters: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
         self.session = session
         self.url = url
         self.method = method
@@ -73,7 +73,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
-    public func start(_ callback: @escaping Callback) {
+    public func start(_ callback: @escaping @Sendable Callback) {
         let handler = self.handle
         let request = self.request
         let logger = self.logger
@@ -132,20 +132,20 @@ public extension Request {
 // MARK: - Async/Await
 
 #if canImport(_Concurrency)
-public extension Request {
-
-    /**
-     Performs the request.
-
-     - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
-     */
-    func start() async throws -> T {
-        return try await withCheckedThrowingContinuation { continuation in
-            self.start { result in
-                continuation.resume(with: result)
-            }
-        }
-    }
-
-}
+//public extension Request {
+//
+//    /**
+//     Performs the request.
+//
+//     - Throws: An error that conforms to ``Auth0APIError``; either an ``AuthenticationError`` or a ``ManagementError``.
+//     */
+//    func start() async throws -> T {
+//        return try await withCheckedThrowingContinuation { continuation in
+//            self.start { result in
+//                continuation.resume(with: result)
+//            }
+//        }
+//    }
+//
+//}
 #endif
