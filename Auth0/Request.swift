@@ -58,7 +58,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
             let authScheme = dpop != nil ? "DPoP" : "Bearer"
             headers["Authorization"] = "\(authScheme) \(accessToken)"
         }
-        if let proof = try? dpop?.proof(url: url, method: method, token: accessToken) {
+        if let proof = try? dpop?.proof(url: url, method: method, accessToken: accessToken) {
             headers["DPoP"] = proof
         }
         self.headers = headers
