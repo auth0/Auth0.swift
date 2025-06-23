@@ -82,18 +82,13 @@ extension Auth0APIError {
     }
 
     init(from response: ResponseValue) {
-        if response.response.statusCode == 401,
-           let challenge = response.response.value(forHTTPHeaderField: "WWW-Authenticate"),
-           challenge.contains("error=\"\(DPoP.nonceRequiredErrorCode)\"") {
-            let info: [String: Any] = [
-                apiErrorCode: DPoP.nonceRequiredErrorCode,
-                apiErrorDescription: "Resource server requires nonce in DPoP proof."
-            ]
+        if let dpopError = DPoP.challenge(from: response) {
+            var info: [String: Any] = [apiErrorCode: dpopError.errorCode]
+            info[apiErrorDescription] = dpopError.errorDescription
             self.init(info: info, statusCode: response.response.statusCode)
-            return
+        } else {
+            self.init(description: string(response.data), statusCode: response.response.statusCode)
         }
-
-        self.init(description: string(response.data), statusCode: response.response.statusCode)
     }
 
     static var networkErrorCodes: [URLError.Code] {

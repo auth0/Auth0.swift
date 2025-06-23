@@ -10,11 +10,7 @@ protocol DPoPProviding {
 extension DPoPProviding {
 
     mutating func dpop(enabled: Bool) -> Self {
-        if enabled {
-            self.dpop = DPoP()
-        } else {
-            self.dpop = nil
-        }
+        self.dpop = enabled ? DPoP() : nil
         return self
     }
 
@@ -30,6 +26,28 @@ struct DPoP {
 
     init() {
         self.keyProvider = SecureEnclave.isAvailable ? SecureEnclaveKeyProvider() : KeychainKeyProvider()
+    }
+
+    static func challenge(from response: ResponseValue) -> (errorCode: String, errorDescription: String?)? {
+        guard response.response.statusCode == 401,
+              let challengeHeader = response.response.value(forHTTPHeaderField: "WWW-Authenticate"),
+              challengeHeader.range(of: "DPoP ", options: .caseInsensitive) != nil else { return nil }
+
+        let valuePattern = #"([\x20-\x21\x23-\x5B\x5D-\x7E]+)"#
+        let errorCodePattern = #"error=""# + valuePattern + #"""#
+        let errorDescriptionPattern = #"error_description=""# + valuePattern + #"""#
+
+        guard let errorCodeRange = challengeHeader.range(of: errorCodePattern, options: .regularExpression) else {
+            return nil
+        }
+
+        let errorCode = String(challengeHeader[errorCodeRange])
+
+        if let errorDescriptionRange = challengeHeader.range(of: errorDescriptionPattern, options: .regularExpression) {
+            return (errorCode: errorCode, errorDescription: String(challengeHeader[errorDescriptionRange]))
+        }
+
+        return (errorCode: errorCode, errorDescription: nil)
     }
 
     func storeNonce(from response: HTTPURLResponse?) {
