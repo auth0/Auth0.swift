@@ -124,7 +124,7 @@ public struct DPoP: Sendable {
     static let nonceRequiredErrorCode = "use_dpop_nonce"
     private static var nonce: String?
 
-    init(keychainTag: String) {
+    public init(keychainTag: String = Bundle.main.bundleIdentifier!) {
         let tagData = keychainTag.data(using: .utf8)!
         self.keyStore = SecureEnclave.isAvailable ?
         SecureEnclaveKeyProvider(keychainTag: tagData) :
@@ -135,7 +135,7 @@ public struct DPoP: Sendable {
         return Challenge(from: response)
     }
 
-    public func proof(url: URL, method: String, accessToken: String? = nil) throws(DPoPError) -> String {
+    public func generateProof(url: URL, method: String, accessToken: String? = nil) throws(DPoPError) -> String {
         return try withSerialQueueSync {
             return try Proof.generate(using: keyStore,
                                       url: url,
@@ -145,7 +145,7 @@ public struct DPoP: Sendable {
         }
     }
 
-    public func clear() throws(DPoPError) {
+    public func clearKeypair() throws(DPoPError) {
         return try withSerialQueueSync {
             return try keyStore.clear()
         }

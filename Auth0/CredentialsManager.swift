@@ -115,7 +115,7 @@ public struct CredentialsManager {
         return self.storage.setEntry(data, forKey: self.storeKey)
     }
 
-    /// Clears credentials stored in the Keychain.
+    /// Clears credentials and DPoP keys stored in the Keychain.
     ///
     /// ## Usage
     ///
@@ -125,6 +125,14 @@ public struct CredentialsManager {
     ///
     /// - Returns: If the credentials were removed.
     public func clear() -> Bool {
+        do {
+            try authentication.dpop?.clearKeypair()
+        } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("Failed to clear DPoP keypair: \(error)")
+            return false
+        }
+
         return self.storage.deleteEntry(forKey: self.storeKey)
     }
 
@@ -241,6 +249,16 @@ public struct CredentialsManager {
     public func canRenew() -> Bool {
         guard let credentials = self.retrieveCredentials() else { return false }
         return credentials.refreshToken != nil
+    }
+
+    public func dpopProof(url: URL, method: String, accessToken: String? = nil) -> String? {
+        do {
+            return try authentication.dpop?.generateProof(url: url, method: method, accessToken: accessToken)
+        } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("Failed to generate DPoP proof: \(error)")
+            return nil
+        }
     }
 
     #if WEB_AUTH_PLATFORM

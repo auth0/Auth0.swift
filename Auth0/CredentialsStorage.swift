@@ -34,7 +34,13 @@ extension SimpleKeychain: CredentialsStorage {
     /// - Parameter key: The key to get from the Keychain.
     /// - Returns: The stored data.
     public func getEntry(forKey key: String) -> Data? {
-        return try? self.data(forKey: key)
+        do {
+            return try self.data(forKey: key)
+        } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("Failed to retrieve entry from the Keychain for key \"\(key)\": \(error)")
+            return nil
+        }
     }
 
     /// Sets a storage entry.
@@ -48,6 +54,8 @@ extension SimpleKeychain: CredentialsStorage {
             try self.set(data, forKey: key)
             return true
         } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("Failed to store entry in the Keychain for key \"\(key)\": \(error)")
             return false
         }
     }
@@ -61,6 +69,8 @@ extension SimpleKeychain: CredentialsStorage {
             try self.deleteItem(forKey: key)
             return true
         } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("Failed to delete entry from the Keychain for key \"\(key)\": \(error)")
             return false
         }
     }

@@ -58,9 +58,16 @@ public struct Request<T, E: Auth0APIError>: Requestable {
             let authScheme = dpop != nil ? "DPoP" : "Bearer"
             headers["Authorization"] = "\(authScheme) \(accessToken)"
         }
-        if let proof = try? dpop?.proof(url: url, method: method, accessToken: accessToken) {
-            headers["DPoP"] = proof
+
+        do {
+            if let proof = try dpop?.generateProof(url: url, method: method, accessToken: accessToken) {
+                headers["DPoP"] = proof
+            }
+        } catch {
+            // This will not run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("Failed to generate DPoP proof: \(error)")
         }
+
         self.headers = headers
     }
 
