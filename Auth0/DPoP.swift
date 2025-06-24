@@ -12,7 +12,7 @@ public protocol DPoPProviding {
 
 extension DPoPProviding {
 
-    mutating func dpop(enabled: Bool, keychainTag: String = Bundle.main.bundleIdentifier!) -> Self {
+    mutating func proofOfPossession(enabled: Bool, keychainTag: String = Bundle.main.bundleIdentifier!) -> Self {
         self.dpop = enabled ? DPoP(keychainTag: keychainTag) : nil
         return self
     }
