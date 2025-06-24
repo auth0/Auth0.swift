@@ -12,8 +12,8 @@ public protocol DPoPProviding {
 
 extension DPoPProviding {
 
-    mutating func dpop(enabled: Bool) -> Self {
-        self.dpop = enabled ? DPoP() : nil
+    mutating func dpop(enabled: Bool, keychainTag: String = Bundle.main.bundleIdentifier!) -> Self {
+        self.dpop = enabled ? DPoP(keychainTag: keychainTag) : nil
         return self
     }
 
@@ -108,7 +108,7 @@ public extension DPoPError {
 
 // MARK: - DPoP Service
 
-public struct DPoP {
+public struct DPoP: Sendable {
 
     enum Proof {}
     enum JKT {}
@@ -118,14 +118,17 @@ public struct DPoP {
         let errorDescription: String?
     }
 
-    private let keyProvider: PoPKeyProvider
+    private let keyStore: PoPKeyStore
     private let maxRetries = 1
 
     static let nonceRequiredErrorCode = "use_dpop_nonce"
     private static var nonce: String?
 
-    init() {
-        self.keyProvider = SecureEnclave.isAvailable ? SecureEnclaveKeyProvider() : KeychainKeyProvider()
+    init(keychainTag: String) {
+        let tagData = keychainTag.data(using: .utf8)!
+        self.keyStore = SecureEnclave.isAvailable ?
+        SecureEnclaveKeyProvider(keychainTag: tagData) :
+        KeychainKeyProvider(keychainTag: tagData)
     }
 
     static func challenge(from response: ResponseValue) -> Challenge? {
@@ -133,30 +136,24 @@ public struct DPoP {
     }
 
     public func proof(url: URL, method: String, accessToken: String? = nil) throws(DPoPError) -> String {
-        do {
-            return try serialQueue.sync {
-                return try Proof.generate(using: keyProvider,
-                                          url: url,
-                                          method: method,
-                                          nonce: Self.nonce,
-                                          accessToken: accessToken)
-            }
-        } catch let error as DPoPError {
-            throw error
-        } catch {
-            throw DPoPError(code: .other, cause: error)
+        return try withSerialQueueSync {
+            return try Proof.generate(using: keyStore,
+                                      url: url,
+                                      method: method,
+                                      nonce: Self.nonce,
+                                      accessToken: accessToken)
+        }
+    }
+
+    public func clear() throws(DPoPError) {
+        return try withSerialQueueSync {
+            return try keyStore.clear()
         }
     }
 
     func jkt() throws(DPoPError) -> String {
-        do {
-            return try serialQueue.sync {
-                return try JKT.generate(using: keyProvider)
-            }
-        } catch let error as DPoPError {
-            throw error
-        } catch {
-            throw DPoPError(code: .other, cause: error)
+        return try withSerialQueueSync {
+            return try JKT.generate(using: keyStore)
         }
     }
 
@@ -176,18 +173,30 @@ public struct DPoP {
         return isDPoPError && !isRetryCountExceeded
     }
 
+    private func withSerialQueueSync<T>(_ block: () throws -> T) throws(DPoPError) -> T {
+        do {
+            return try serialQueue.sync {
+                return try block()
+            }
+        } catch let error as DPoPError {
+            throw error
+        } catch {
+            throw DPoPError(code: .other, cause: error)
+        }
+    }
+
 }
 
 // MARK: - Proof Generation
 
 extension DPoP.Proof {
 
-    static func generate(using keyProvider: PoPKeyProvider,
+    static func generate(using keyStore: PoPKeyStore,
                          url: URL,
                          method: String,
                          nonce: String?,
                          accessToken: String?) throws(DPoPError) -> String {
-        let header = try generateHeader(using: keyProvider)
+        let header = try generateHeader(using: keyStore)
         let payload = generatePayload(url: url, method: method, nonce: nonce, accessToken: accessToken)
 
         let headerData: Data
@@ -201,7 +210,7 @@ extension DPoP.Proof {
 
         let jwtParts = "\(headerData.encodeBase64URLSafe()).\(payloadData.encodeBase64URLSafe())"
         let digest = SHA256.hash(data: jwtParts.data(using: .utf8)!)
-        let privateKey = try keyProvider.privateKey()
+        let privateKey = try keyStore.privateKey()
 
         do {
             let signature = try privateKey.signature(for: Data(digest))
@@ -212,8 +221,8 @@ extension DPoP.Proof {
         }
     }
 
-    private static func generateHeader(using keyProvider: PoPKeyProvider) throws(DPoPError) -> [String: String] {
-        let jwk = try keyProvider.privateKey().publicKey.jwkRepresentation
+    private static func generateHeader(using keyStore: PoPKeyStore) throws(DPoPError) -> [String: String] {
+        let jwk = try keyStore.privateKey().publicKey.jwkRepresentation
 
         let jsonJWK: Data
         do {
@@ -224,7 +233,7 @@ extension DPoP.Proof {
 
         return [
             "typ": "dpop+jwt",
-            "alg": keyProvider.publicKeyJWSIdentifier,
+            "alg": keyStore.publicKeyJWSIdentifier,
             "jwk": jsonJWK.encodeBase64URLSafe()
         ]
     }
@@ -259,8 +268,8 @@ extension DPoP.Proof {
 
 extension DPoP.JKT {
 
-    static func generate(using keyProvider: PoPKeyProvider) throws(DPoPError) -> String {
-        let publicKey = try keyProvider.privateKey().publicKey
+    static func generate(using keyStore: PoPKeyStore) throws(DPoPError) -> String {
+        let publicKey = try keyStore.privateKey().publicKey
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
 
@@ -441,15 +450,17 @@ extension P256.Signing.PrivateKey: SecKeyConvertible {
 
 // MARK: Key Providers
 
-protocol PoPKeyProvider {
+protocol PoPKeyStore: Sendable {
+
+    var keychainTag: Data { get }
+    var publicKeyJWSIdentifier: String { get }
 
     func privateKey() throws(DPoPError) -> PoPPrivateKey
-
-    var publicKeyJWSIdentifier: String { get }
+    func clear() throws(DPoPError)
 
 }
 
-extension PoPKeyProvider {
+extension PoPKeyStore {
 
     var privateKeyIdentifier: String {
         return "com.auth0.sdk.pop.privateKey"
@@ -462,7 +473,9 @@ extension PoPKeyProvider {
 }
 
 // Used when Secure Enclave is available
-struct SecureEnclaveKeyProvider: PoPKeyProvider {
+struct SecureEnclaveKeyProvider: PoPKeyStore {
+
+    let keychainTag: Data
 
     func privateKey() throws(DPoPError) -> PoPPrivateKey {
         // First, check if the key exists in the keychain
@@ -482,16 +495,22 @@ struct SecureEnclaveKeyProvider: PoPKeyProvider {
         return privateKey
     }
 
+    func clear() throws(DPoPError) {
+        let query = baseQuery(forIdentifier: privateKeyIdentifier)
+
+        let status = SecItemDelete(query as CFDictionary)
+        guard status == errSecSuccess else {
+            let message = "Unable to delete the private key representation from the Keychain. OSStatus: \(status)."
+            throw DPoPError(code: .keychainOperationFailed(message))
+        }
+    }
+
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
-    func store(_ key: GenericPasswordConvertible, forIdentifier identifier: String) throws(DPoPError) {
+    private func store(_ key: GenericPasswordConvertible, forIdentifier identifier: String) throws(DPoPError) {
         // Describe a generic password
-        let query = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: identifier,
-            kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-            kSecUseDataProtectionKeychain: true,
-            kSecValueData: key.rawRepresentation
-        ] as [String: Any]
+        var query = baseQuery(forIdentifier: identifier)
+        query[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        query[kSecValueData] = key.rawRepresentation
 
         let status = SecItemAdd(query as CFDictionary, nil)
         guard status == errSecSuccess else {
@@ -501,14 +520,10 @@ struct SecureEnclaveKeyProvider: PoPKeyProvider {
     }
 
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
-    func retrieve(forIdentifier identifier: String) throws(DPoPError) -> GenericPasswordConvertible? {
+    private func retrieve(forIdentifier identifier: String) throws(DPoPError) -> GenericPasswordConvertible? {
         // Seek a generic password with the given account
-        let query = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: identifier,
-            kSecUseDataProtectionKeychain: true,
-            kSecReturnData: true
-        ] as [String: Any]
+        var query = baseQuery(forIdentifier: identifier)
+        query[kSecReturnData] = true
 
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
@@ -530,10 +545,21 @@ struct SecureEnclaveKeyProvider: PoPKeyProvider {
         }
     }
 
+    private func baseQuery(forIdentifier identifier: String) -> [CFString: Any] {
+        return [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrApplicationTag: keychainTag,
+            kSecAttrAccount: identifier,
+            kSecUseDataProtectionKeychain: true
+        ]
+    }
+
 }
 
 // Used when Secure Enclave is not available
-struct KeychainKeyProvider: PoPKeyProvider {
+struct KeychainKeyProvider: PoPKeyStore {
+
+    let keychainTag: Data
 
     // When SecureEnclave is not available, we use a simple keychain store
     func privateKey() throws(DPoPError) -> PoPPrivateKey {
@@ -547,16 +573,22 @@ struct KeychainKeyProvider: PoPKeyProvider {
         return privateKey
     }
 
+    func clear() throws(DPoPError) {
+        let query = baseQuery(forIdentifier: privateKeyIdentifier)
+
+        let status = SecItemDelete(query as CFDictionary)
+        guard status == errSecSuccess else {
+            let message = "Unable to delete the private key from the Keychain. OSStatus: \(status)."
+            throw DPoPError(code: .keychainOperationFailed(message))
+        }
+    }
+
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
-    func retrieve(forIdentifier identifier: String) throws(DPoPError) -> SecKeyConvertible? {
+    private func retrieve(forIdentifier identifier: String) throws(DPoPError) -> SecKeyConvertible? {
         // Seek an elliptic-curve key with a given identifier
-        let query = [
-            kSecClass: kSecClassKey,
-            kSecAttrApplicationLabel: identifier,
-            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
-            kSecUseDataProtectionKeychain: true,
-            kSecReturnRef: true
-        ] as [String: Any]
+        var query = baseQuery(forIdentifier: privateKeyIdentifier)
+        query[kSecAttrKeyType] = kSecAttrKeyTypeECSECPrimeRandom
+        query[kSecReturnRef] = true
 
         // Find and cast the result as a SecKey instance
         var item: CFTypeRef?
@@ -591,7 +623,7 @@ struct KeychainKeyProvider: PoPKeyProvider {
     }
 
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
-    func store(_ key: SecKeyConvertible, forIdentifier identifier: String) throws(DPoPError) {
+    private func store(_ key: SecKeyConvertible, forIdentifier identifier: String) throws(DPoPError) {
         // Describe the key
         let attributes = [
             kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
@@ -608,13 +640,9 @@ struct KeychainKeyProvider: PoPKeyProvider {
         }
 
         // Describe the add operation
-        let query = [
-            kSecClass: kSecClassKey,
-            kSecAttrApplicationLabel: identifier,
-            kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-            kSecUseDataProtectionKeychain: true,
-            kSecValueRef: secKey
-        ] as [String: Any]
+        var query = baseQuery(forIdentifier: privateKeyIdentifier)
+        query[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        query[kSecValueRef] = secKey
 
         // Add the key to the keychain
         let status = SecItemAdd(query as CFDictionary, nil)
@@ -622,6 +650,15 @@ struct KeychainKeyProvider: PoPKeyProvider {
             let message = "Unable to store the private key in the Keychain. OSStatus: \(status)."
             throw DPoPError(code: .keychainOperationFailed(message))
         }
+    }
+
+    private func baseQuery(forIdentifier identifier: String) -> [CFString: Any] {
+        return [
+            kSecClass: kSecClassKey,
+            kSecAttrApplicationTag: keychainTag,
+            kSecAttrApplicationLabel: identifier,
+            kSecUseDataProtectionKeychain: true
+        ]
     }
 
 }
