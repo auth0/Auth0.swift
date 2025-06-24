@@ -2,6 +2,8 @@
 import Foundation
 import CryptoKit
 
+// MARK: - Enable/Disable DPoP
+
 public protocol DPoPProviding {
 
     var dpop: DPoP? { get set }
@@ -16,6 +18,8 @@ extension DPoPProviding {
     }
 
 }
+
+// MARK: - Error Type
 
 public struct DPoPError: Auth0Error, Sendable {
 
@@ -78,8 +82,6 @@ extension DPoPError {
 
 }
 
-// MARK: - Equatable
-
 extension DPoPError: Equatable {
 
     /// Conformance to `Equatable`.
@@ -88,8 +90,6 @@ extension DPoPError: Equatable {
     }
 
 }
-
-// MARK: - Pattern Matching Operator
 
 public extension DPoPError {
 
@@ -106,12 +106,17 @@ public extension DPoPError {
 
 }
 
-// MARK: - Service
+// MARK: - DPoP Service
 
 public struct DPoP {
 
     enum Proof {}
     enum JKT {}
+
+    struct Challenge {
+        let errorCode: String
+        let errorDescription: String?
+    }
 
     private let keyProvider: PoPKeyProvider
     private let maxRetries = 1
@@ -123,26 +128,8 @@ public struct DPoP {
         self.keyProvider = SecureEnclave.isAvailable ? SecureEnclaveKeyProvider() : KeychainKeyProvider()
     }
 
-    static func challenge(from response: ResponseValue) -> (errorCode: String, errorDescription: String?)? {
-        guard response.response.statusCode == 401,
-              let challengeHeader = response.response.value(forHTTPHeaderField: "WWW-Authenticate"),
-              challengeHeader.range(of: "DPoP ", options: .caseInsensitive) != nil else { return nil }
-
-        let valuePattern = #"([\x20-\x21\x23-\x5B\x5D-\x7E]+)"#
-        let errorCodePattern = #"error=""# + valuePattern + #"""#
-        let errorDescriptionPattern = #"error_description=""# + valuePattern + #"""#
-
-        guard let errorCodeRange = challengeHeader.range(of: errorCodePattern, options: .regularExpression) else {
-            return nil
-        }
-
-        let errorCode = String(challengeHeader[errorCodeRange])
-
-        if let errorDescriptionRange = challengeHeader.range(of: errorDescriptionPattern, options: .regularExpression) {
-            return (errorCode: errorCode, errorDescription: String(challengeHeader[errorDescriptionRange]))
-        }
-
-        return (errorCode: errorCode, errorDescription: nil)
+    static func challenge(from response: ResponseValue) -> Challenge? {
+        return Challenge(from: response)
     }
 
     public func proof(url: URL, method: String, accessToken: String? = nil) throws(DPoPError) -> String {
@@ -287,6 +274,34 @@ extension DPoP.JKT {
 
 }
 
+// MARK: - Challenge Parsing
+
+extension DPoP.Challenge {
+
+    init?(from response: ResponseValue) {
+        guard response.response.statusCode == 401,
+              let header = response.response.value(forHTTPHeaderField: "WWW-Authenticate"),
+              header.range(of: "DPoP ", options: .caseInsensitive) != nil else { return nil }
+
+        let valuePattern = #"([\x20-\x21\x23-\x5B\x5D-\x7E]+)"#
+        let errorCodePattern = #"error=""# + valuePattern + #"""#
+        let errorDescriptionPattern = #"error_description=""# + valuePattern + #"""#
+
+        guard let errorCodeRange = header.range(of: errorCodePattern, options: .regularExpression) else {
+            return nil
+        }
+
+        let errorCode = String(header[errorCodeRange])
+
+        if let errorDescriptionRange = header.range(of: errorDescriptionPattern, options: .regularExpression) {
+            self.init(errorCode: errorCode, errorDescription: String(header[errorDescriptionRange]))
+        }
+
+        self.init(errorCode: errorCode, errorDescription: nil)
+    }
+
+}
+
 // MARK: - Key Management
 
 struct ECPublicKeyJWK: Encodable {
@@ -327,30 +342,9 @@ extension P256.Signing.PublicKey {
 
 }
 
-// For non-Secure Enclave keys
-protocol SecKeyConvertible: PoPPrivateKey, CustomStringConvertible {
+// MARK: Secure Enclave Keys
+// From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
 
-    /// Creates a key from an X9.63 representation.
-    init<Bytes>(x963Representation: Bytes) throws where Bytes: ContiguousBytes
-
-    /// An X9.63 representation of the key.
-    var x963Representation: Data { get }
-
-}
-
-extension P256.Signing.PrivateKey: @retroactive CustomStringConvertible {}
-
-extension P256.Signing.PrivateKey: SecKeyConvertible {
-
-    public var description: String {
-        return self.x963Representation.withUnsafeBytes { bytes in
-            return "Key representation contains \(bytes.count) bytes."
-        }
-    }
-
-}
-
-// For Secure Enclave keys
 protocol GenericPasswordConvertible: PoPPrivateKey, CustomStringConvertible {
 
     /// Creates a key from a raw representation.
@@ -400,6 +394,23 @@ extension ContiguousBytes {
 
 }
 
+// MARK: Non-Secure Enclave Keys
+// From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
+
+protocol SecKeyConvertible: PoPPrivateKey, CustomStringConvertible {
+
+    /// Creates a key from an X9.63 representation.
+    init<Bytes>(x963Representation: Bytes) throws where Bytes: ContiguousBytes
+
+    /// An X9.63 representation of the key.
+    var x963Representation: Data { get }
+
+}
+
+extension P256.Signing.PrivateKey: @retroactive CustomStringConvertible {}
+
+// MARK: Private Key Type
+
 protocol PoPPrivateKey: Sendable {
 
     var publicKey: P256.Signing.PublicKey { get }
@@ -417,6 +428,18 @@ extension SecureEnclave.P256.Signing.PrivateKey: PoPPrivateKey {
     }
 
 }
+
+extension P256.Signing.PrivateKey: SecKeyConvertible {
+
+    public var description: String {
+        return self.x963Representation.withUnsafeBytes { bytes in
+            return "Key representation contains \(bytes.count) bytes."
+        }
+    }
+
+}
+
+// MARK: Key Providers
 
 protocol PoPKeyProvider {
 
@@ -438,6 +461,7 @@ extension PoPKeyProvider {
 
 }
 
+// Used when Secure Enclave is available
 struct SecureEnclaveKeyProvider: PoPKeyProvider {
 
     func privateKey() throws(DPoPError) -> PoPPrivateKey {
@@ -449,7 +473,7 @@ struct SecureEnclaveKeyProvider: PoPKeyProvider {
         do {
             privateKey = try SecureEnclave.P256.Signing.PrivateKey()
         } catch {
-            let message = "Unable to create a new private key from the Secure Enclave."
+            let message = "Unable to create a new private key on the Secure Enclave."
             throw DPoPError(code: .secureEnclaveOperationFailed(message), cause: error)
         }
 
@@ -458,6 +482,7 @@ struct SecureEnclaveKeyProvider: PoPKeyProvider {
         return privateKey
     }
 
+    // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     func store(_ key: GenericPasswordConvertible, forIdentifier identifier: String) throws(DPoPError) {
         // Describe a generic password
         let query = [
@@ -475,6 +500,7 @@ struct SecureEnclaveKeyProvider: PoPKeyProvider {
         }
     }
 
+    // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     func retrieve(forIdentifier identifier: String) throws(DPoPError) -> GenericPasswordConvertible? {
         // Seek a generic password with the given account
         let query = [
@@ -506,6 +532,7 @@ struct SecureEnclaveKeyProvider: PoPKeyProvider {
 
 }
 
+// Used when Secure Enclave is not available
 struct KeychainKeyProvider: PoPKeyProvider {
 
     // When SecureEnclave is not available, we use a simple keychain store
@@ -520,6 +547,7 @@ struct KeychainKeyProvider: PoPKeyProvider {
         return privateKey
     }
 
+    // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     func retrieve(forIdentifier identifier: String) throws(DPoPError) -> SecKeyConvertible? {
         // Seek an elliptic-curve key with a given identifier
         let query = [
@@ -562,6 +590,7 @@ struct KeychainKeyProvider: PoPKeyProvider {
         }
     }
 
+    // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     func store(_ key: SecKeyConvertible, forIdentifier identifier: String) throws(DPoPError) {
         // Describe the key
         let attributes = [
