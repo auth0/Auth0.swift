@@ -10,7 +10,7 @@ public protocol DPoPProviding {
 
 }
 
-extension DPoPProviding {
+public extension DPoPProviding {
 
     mutating func proofOfPossession(enabled: Bool, keychainTag: String = Bundle.main.bundleIdentifier!) -> Self {
         self.dpop = enabled ? DPoP(keychainTag: keychainTag) : nil
