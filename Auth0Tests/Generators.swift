@@ -23,7 +23,7 @@ enum TestKeys {
 private func encodeJWTPart(from dict: [String: Any]) -> String {
     let json = try! JSONSerialization.data(withJSONObject: dict, options: JSONSerialization.WritingOptions())
     
-    return json.a0_encodeBase64URLSafe()!
+    return json.encodeBase64URLSafe()
 }
 
 private func generateJWTHeader(alg: String, kid: String?) -> String {

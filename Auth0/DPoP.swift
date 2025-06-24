@@ -116,7 +116,6 @@ public extension DPoPError {
 public struct DPoP: Sendable {
 
     enum Proof {}
-    enum JKT {}
 
     struct Challenge {
         let errorCode: String
@@ -157,7 +156,8 @@ public struct DPoP: Sendable {
 
     func jkt() throws(DPoPError) -> String {
         return try withSerialQueueSync {
-            return try JKT.generate(using: keyStore)
+            let publicKey = try keyStore.privateKey().publicKey
+            return try ECPublicKeyJWK(publicKey: publicKey).thumbprint()
         }
     }
 
@@ -212,33 +212,26 @@ extension DPoP.Proof {
             throw DPoPError(code: .other, cause: error)
         }
 
-        let jwtParts = "\(headerData.encodeBase64URLSafe()).\(payloadData.encodeBase64URLSafe())"
-        let digest = SHA256.hash(data: jwtParts.data(using: .utf8)!)
+        let signableParts = "\(headerData.encodeBase64URLSafe()).\(payloadData.encodeBase64URLSafe())"
         let privateKey = try keyStore.privateKey()
 
         do {
-            let signature = try privateKey.signature(for: Data(digest))
-            return "\(jwtParts).\(signature.rawRepresentation.encodeBase64URLSafe())"
+            let signature = try privateKey.signature(for: signableParts.data(using: .utf8)!)
+            return "\(signableParts).\(signature.dataRepresentation.encodeBase64URLSafe())"
         } catch {
             let message = "Unable to sign the DPoP proof with the private key."
             throw DPoPError(code: .cryptoKitOperationFailed(message), cause: error)
         }
     }
 
-    private static func generateHeader(using keyStore: PoPKeyStore) throws(DPoPError) -> [String: String] {
-        let jwk = try keyStore.privateKey().publicKey.jwkRepresentation
-
-        let jsonJWK: Data
-        do {
-            jsonJWK = try JSONSerialization.data(withJSONObject: jwk, options: [])
-        } catch {
-            throw DPoPError(code: .other, cause: error)
-        }
+    private static func generateHeader(using keyStore: PoPKeyStore) throws(DPoPError) -> [String: Any] {
+        let publicKey = try keyStore.privateKey().publicKey
+        let jwk = ECPublicKeyJWK(publicKey: publicKey)
 
         return [
             "typ": "dpop+jwt",
             "alg": keyStore.publicKeyJWSIdentifier,
-            "jwk": jsonJWK.encodeBase64URLSafe()
+            "jwk": jwk.toDictionary()
         ]
     }
 
@@ -264,25 +257,6 @@ extension DPoP.Proof {
         }
 
         return payload
-    }
-
-}
-
-// MARK: - JKT Generation
-
-extension DPoP.JKT {
-
-    static func generate(using keyStore: PoPKeyStore) throws(DPoPError) -> String {
-        let publicKey = try keyStore.privateKey().publicKey
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .sortedKeys
-
-        do {
-            let jsonData = try encoder.encode(ECPublicKeyJWK(publicKey: publicKey))
-            return Data(SHA256.hash(data: jsonData)).encodeBase64URLSafe()
-        } catch {
-            throw DPoPError(code: .other, cause: error)
-        }
     }
 
 }
@@ -324,6 +298,12 @@ struct ECPublicKeyJWK: Encodable {
         case kty, crv, x, y
     }
 
+    static let jsonEncoder: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        return encoder
+    }()
+
     let kty = "EC"
     let crv: String
     let x: String // swiftlint:disable:this identifier_name
@@ -336,6 +316,17 @@ struct ECPublicKeyJWK: Encodable {
         self.y = bytes.suffix(32).encodeBase64URLSafe()
     }
 
+    func thumbprint() throws(DPoPError) -> String {
+        let jsonData: Data
+        do {
+            jsonData = try Self.jsonEncoder.encode(self)
+        } catch {
+            throw DPoPError(code: .other, cause: error)
+        }
+
+        return Data(SHA256.hash(data: jsonData)).encodeBase64URLSafe()
+    }
+
     func toDictionary() -> [String: Any] {
         return [
             CodingKeys.kty.rawValue: kty,
@@ -343,14 +334,6 @@ struct ECPublicKeyJWK: Encodable {
             CodingKeys.x.rawValue: x,
             CodingKeys.y.rawValue: y
         ]
-    }
-
-}
-
-extension P256.Signing.PublicKey {
-
-    var jwkRepresentation: [String: Any] {
-        return ECPublicKeyJWK(publicKey: self).toDictionary()
     }
 
 }
