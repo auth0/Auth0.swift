@@ -148,6 +148,12 @@ public struct DPoP: Sendable {
         }
     }
 
+    public func isKeypairStored() throws(DPoPError) -> Bool {
+        return try withSerialQueueSync {
+            return try keyStore.isPrivateKeyStored()
+        }
+    }
+
     public func clearKeypair() throws(DPoPError) {
         return try withSerialQueueSync {
             return try keyStore.clear()
@@ -441,6 +447,7 @@ protocol PoPKeyStore: Sendable {
 
     var publicKeyJWSIdentifier: String { get }
 
+    func isPrivateKeyStored() throws(DPoPError) -> Bool
     func privateKey() throws(DPoPError) -> PoPPrivateKey
     func clear() throws(DPoPError)
 
@@ -462,6 +469,13 @@ extension PoPKeyStore {
 struct SecureEnclaveKeyProvider: PoPKeyStore {
 
     let keychainService: String
+
+    func isPrivateKeyStored() throws(DPoPError) -> Bool {
+        if try retrieve(forIdentifier: privateKeyIdentifier) != nil {
+            return true
+        }
+        return false
+    }
 
     func privateKey() throws(DPoPError) -> PoPPrivateKey {
         // First, check if the key exists in the keychain
@@ -485,7 +499,7 @@ struct SecureEnclaveKeyProvider: PoPKeyStore {
         let query = baseQuery(forIdentifier: privateKeyIdentifier)
 
         let status = SecItemDelete(query as CFDictionary)
-        guard status == errSecSuccess else {
+        guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
             let message = "Unable to delete the private key representation from the Keychain. OSStatus: \(status)."
             throw DPoPError(code: .keychainOperationFailed(message))
         }
@@ -549,6 +563,13 @@ struct KeychainKeyProvider: PoPKeyStore {
 
     init(keychainTag: String) {
         self.keychainTag = keychainTag.data(using: .utf8)!
+    }
+
+    func isPrivateKeyStored() throws(DPoPError) -> Bool {
+        if try retrieve(forIdentifier: privateKeyIdentifier) != nil {
+            return true
+        }
+        return false
     }
 
     // When SecureEnclave is not available, we use a simple keychain store

@@ -60,8 +60,8 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         }
 
         do {
-            if let proof = try dpop?.generateProof(url: url, method: method, accessToken: accessToken) {
-                headers["DPoP"] = proof
+            if let dpop = dpop, try dpop.isKeypairStored() {
+                headers["DPoP"] = try dpop.generateProof(url: url, method: method, accessToken: accessToken)
             }
         } catch {
             // This will not run in release builds, but in debug builds it's helpful for debugging
