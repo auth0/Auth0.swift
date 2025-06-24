@@ -2,7 +2,7 @@
 import Foundation
 import CryptoKit
 
-protocol DPoPProviding {
+public protocol DPoPProviding {
 
     var dpop: DPoP? { get set }
 
@@ -106,9 +106,12 @@ public extension DPoPError {
 
 }
 
-// MARK: - Manager
+// MARK: - Service
 
 public struct DPoP {
+
+    enum Proof {}
+    enum JKT {}
 
     private let keyProvider: PoPKeyProvider
     private let maxRetries = 1
@@ -145,7 +148,23 @@ public struct DPoP {
     public func proof(url: URL, method: String, accessToken: String? = nil) throws(DPoPError) -> String {
         do {
             return try serialQueue.sync {
-                return try generateProof(url: url, method: method, accessToken: accessToken)
+                return try Proof.generate(using: keyProvider,
+                                          url: url,
+                                          method: method,
+                                          nonce: Self.nonce,
+                                          accessToken: accessToken)
+            }
+        } catch let error as DPoPError {
+            throw error
+        } catch {
+            throw DPoPError(code: .other, cause: error)
+        }
+    }
+
+    func jkt() throws(DPoPError) -> String {
+        do {
+            return try serialQueue.sync {
+                return try JKT.generate(using: keyProvider)
             }
         } catch let error as DPoPError {
             throw error
@@ -164,27 +183,25 @@ public struct DPoP {
     }
 
     func shouldRetry(for error: Auth0APIError, retryCount: Int) -> Bool {
-        let isDPoPError = error.code == DPoP.nonceRequiredErrorCode
+        let isDPoPError = error.code == Self.nonceRequiredErrorCode
         let isRetryCountExceeded = retryCount >= maxRetries
 
         return isDPoPError && !isRetryCountExceeded
     }
 
-    func jkt() throws -> String {
-        return try serialQueue.sync {
-            let publicKey = try keyProvider.privateKey().publicKey
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .sortedKeys
-            let jsonData = try encoder.encode(ECPublicKeyJWK(publicKey: publicKey))
-            let digest = SHA256.hash(data: jsonData)
+}
 
-            return Data(digest).encodeBase64URLSafe()
-        }
-    }
+// MARK: - Proof Generation
 
-    func generateProof(url: URL, method: String, accessToken: String?) throws(DPoPError) -> String {
-        let header = try generateProofHeader()
-        let payload = generateProofPayload(url: url, method: method, accessToken: accessToken)
+extension DPoP.Proof {
+
+    static func generate(using keyProvider: PoPKeyProvider,
+                         url: URL,
+                         method: String,
+                         nonce: String?,
+                         accessToken: String?) throws(DPoPError) -> String {
+        let header = try generateHeader(using: keyProvider)
+        let payload = generatePayload(url: url, method: method, nonce: nonce, accessToken: accessToken)
 
         let headerData: Data
         let payloadData: Data
@@ -208,7 +225,7 @@ public struct DPoP {
         }
     }
 
-    private func generateProofHeader() throws(DPoPError) -> [String: String] {
+    private static func generateHeader(using keyProvider: PoPKeyProvider) throws(DPoPError) -> [String: String] {
         let jwk = try keyProvider.privateKey().publicKey.jwkRepresentation
 
         let jsonJWK: Data
@@ -225,7 +242,10 @@ public struct DPoP {
         ]
     }
 
-    private func generateProofPayload(url: URL, method: String, accessToken: String?) -> [String: Any] {
+    private static func generatePayload(url: URL,
+                                        method: String,
+                                        nonce: String?,
+                                        accessToken: String?) -> [String: Any] {
         var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)!
         urlComponents.query = nil
         urlComponents.fragment = nil
@@ -236,7 +256,7 @@ public struct DPoP {
             "jti": UUID().uuidString,
             "iat": Date().timeIntervalSince1970
         ]
-        payload["nonce"] = Self.nonce
+        payload["nonce"] = nonce
 
         if let token = accessToken {
             let digest = SHA256.hash(data: token.data(using: .utf8)!)
@@ -246,11 +266,23 @@ public struct DPoP {
         return payload
     }
 
-    private func extractAccessToken(from request: URLRequest) -> String? {
-        guard let authorization = request.value(forHTTPHeaderField: "Authorization"),
-              let token = authorization.split(separator: " ").last else { return nil }
+}
 
-        return String(token)
+// MARK: - JKT Generation
+
+extension DPoP.JKT {
+
+    static func generate(using keyProvider: PoPKeyProvider) throws(DPoPError) -> String {
+        let publicKey = try keyProvider.privateKey().publicKey
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+
+        do {
+            let jsonData = try encoder.encode(ECPublicKeyJWK(publicKey: publicKey))
+            return Data(SHA256.hash(data: jsonData)).encodeBase64URLSafe()
+        } catch {
+            throw DPoPError(code: .other, cause: error)
+        }
     }
 
 }

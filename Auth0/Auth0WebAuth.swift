@@ -178,30 +178,22 @@ final class Auth0WebAuth: WebAuth {
         }
 
         guard let redirectURL = self.redirectURL else {
+            barrier.lower()
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
         let handler = self.handler(redirectURL)
         let state = self.state
-        var organization: String? = self.organization
-        var invitation: String?
 
-        if let invitationURL = self.invitationURL {
-            guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
-                  let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
-                  let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
-                return callback(.failure(WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))))
-            }
-
-            organization = organizationId
-            invitation = invitationId
+        let authorizeURL: URL
+        do {
+            authorizeURL = try self.buildAuthorizeURL(withRedirectURL: redirectURL,
+                                                      defaults: handler.defaults,
+                                                      state: state)
+        } catch {
+            barrier.lower()
+            return callback(.failure(error))
         }
-
-        let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL,
-                                                  defaults: handler.defaults,
-                                                  state: state,
-                                                  organization: organization,
-                                                  invitation: invitation)
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      ephemeralSession: ephemeralSession,
@@ -243,6 +235,7 @@ final class Auth0WebAuth: WebAuth {
         components?.queryItems = queryItems + [returnTo, clientId]
 
         guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
+            barrier.lower()
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
@@ -259,11 +252,13 @@ final class Auth0WebAuth: WebAuth {
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,
                            defaults: [String: String],
-                           state: String?,
-                           organization: String?,
-                           invitation: String?) -> URL {
-        let authorize = self.overrideAuthorizeURL ?? URL(string: "authorize", relativeTo: self.url)!
-        var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true)!
+                           state: String?) throws(WebAuthError) -> URL {
+        guard let authorize = self.overrideAuthorizeURL ?? URL(string: "authorize", relativeTo: self.url),
+              var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true) else {
+            let message = "Unable to build authorize URL with base URL: \(self.url.absoluteString)."
+            throw WebAuthError(code: .unknown(message))
+        }
+
         var items: [URLQueryItem] = []
         var entries = defaults
 
@@ -273,12 +268,27 @@ final class Auth0WebAuth: WebAuth {
         entries["redirect_uri"] = redirectURL.absoluteString
         entries["state"] = state
         entries["nonce"] = self.nonce
-        entries["organization"] = organization
-        entries["invitation"] = invitation
-        entries["dpop_jkt"] = try? dpop?.jkt()
+        entries["organization"] = self.organization
+
+        if let invitationURL = self.invitationURL {
+            guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
+                  let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
+                  let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
+                throw WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))
+            }
+
+            entries["organization"] = organizationId
+            entries["invitation"] = invitationId
+        }
 
         if let maxAge = self.maxAge {
             entries["max_age"] = String(maxAge)
+        }
+
+        do {
+            entries["dpop_jkt"] = try dpop?.jkt()
+        } catch {
+            throw WebAuthError(code: .other, cause: error)
         }
 
         self.parameters.forEach { entries[$0] = $1 }
