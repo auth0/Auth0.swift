@@ -15,7 +15,7 @@ public extension DPoPProviding {
     func proofOfPossession(enabled: Bool, keychainTag: String = Bundle.main.bundleIdentifier!) -> Self {
         var instance = self
         if enabled {
-            instance.dpop = DPoP(keychainTag: keychainTag)
+            instance.dpop = DPoP(keychainId: keychainTag)
         } else {
             instance.dpop = nil
         }
@@ -129,11 +129,10 @@ public struct DPoP: Sendable {
     static let nonceRequiredErrorCode = "use_dpop_nonce"
     private static var nonce: String?
 
-    public init(keychainTag: String = Bundle.main.bundleIdentifier!) {
-        let tagData = keychainTag.data(using: .utf8)!
+    public init(keychainId: String = Bundle.main.bundleIdentifier!) {
         self.keyStore = SecureEnclave.isAvailable ?
-        SecureEnclaveKeyProvider(keychainTag: tagData) :
-        KeychainKeyProvider(keychainTag: tagData)
+        SecureEnclaveKeyProvider(keychainService: keychainId) :
+        KeychainKeyProvider(keychainTag: keychainId)
     }
 
     static func challenge(from response: ResponseValue) -> Challenge? {
@@ -255,7 +254,7 @@ extension DPoP.Proof {
             "htm": method.uppercased(),
             "htu": urlComponents.url!.absoluteString,
             "jti": UUID().uuidString,
-            "iat": Date().timeIntervalSince1970
+            "iat": Int(Date().timeIntervalSince1970)
         ]
         payload["nonce"] = nonce
 
@@ -457,7 +456,6 @@ extension P256.Signing.PrivateKey: SecKeyConvertible {
 
 protocol PoPKeyStore: Sendable {
 
-    var keychainTag: Data { get }
     var publicKeyJWSIdentifier: String { get }
 
     func privateKey() throws(DPoPError) -> PoPPrivateKey
@@ -480,7 +478,7 @@ extension PoPKeyStore {
 // Used when Secure Enclave is available
 struct SecureEnclaveKeyProvider: PoPKeyStore {
 
-    let keychainTag: Data
+    let keychainService: String
 
     func privateKey() throws(DPoPError) -> PoPPrivateKey {
         // First, check if the key exists in the keychain
@@ -553,7 +551,7 @@ struct SecureEnclaveKeyProvider: PoPKeyStore {
     private func baseQuery(forIdentifier identifier: String) -> [CFString: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrApplicationTag: keychainTag,
+            kSecAttrService: keychainService,
             kSecAttrAccount: identifier,
             kSecUseDataProtectionKeychain: true
         ]
@@ -565,6 +563,10 @@ struct SecureEnclaveKeyProvider: PoPKeyStore {
 struct KeychainKeyProvider: PoPKeyStore {
 
     let keychainTag: Data
+
+    init(keychainTag: String) {
+        self.keychainTag = keychainTag.data(using: .utf8)!
+    }
 
     // When SecureEnclave is not available, we use a simple keychain store
     func privateKey() throws(DPoPError) -> PoPPrivateKey {

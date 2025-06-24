@@ -319,6 +319,7 @@ final class Auth0WebAuth: WebAuth {
                                                  url: self.url,
                                                  session: self.session,
                                                  telemetry: self.telemetry)
+        authentication.dpop = self.dpop
         authentication.logger = self.logger
         return PKCE(authentication: authentication,
                     redirectURL: redirectURL,

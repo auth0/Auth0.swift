@@ -45,7 +45,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
@@ -64,7 +65,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
@@ -81,7 +83,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError> {
@@ -103,7 +106,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
@@ -121,7 +125,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError> {
@@ -250,7 +255,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -307,7 +313,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -442,7 +449,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError> {
@@ -493,17 +501,27 @@ private extension Auth0Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = parameters
+        parameters["client_id"] = self.clientId
         parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
         parameters["subject_token"] = subjectToken
         parameters["subject_token_type"] = subjectTokenType
         parameters["audience"] = audience
-        parameters["scope"] = scope
-        return self.token().parameters(parameters) // parameters() enforces 'openid' scope
+        parameters["scope"] = includeRequiredScope(in: scope)
+
+        let token = URL(string: "oauth/token", relativeTo: self.url)!
+        return Request(session: session,
+                       url: token,
+                       method: "POST",
+                       handle: authenticationDecodable,
+                       parameters: parameters,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
     }
 
     func token<T: Codable>() -> Request<T, AuthenticationError> {
@@ -517,7 +535,8 @@ private extension Auth0Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
 }
