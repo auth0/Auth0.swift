@@ -88,45 +88,44 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         return request as URLRequest
     }
 
+    // MARK: - Request Handling
+
     /**
      Performs the request.
 
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
     public func start(_ callback: @escaping Callback) {
-        let handler = self.handle
-        let request = self.request
-        let logger = self.logger
-        var retryCount = 0
-        var shouldRetry = false
-
-        repeat {
-            logger?.trace(request: request, session: self.session)
-
-            let task = session.dataTask(with: request, completionHandler: { data, response, error in
-                if error == nil, let response = response {
-                    logger?.trace(response: response, data: data)
-                }
-
-                let response = Response<E>(data: data, response: response as? HTTPURLResponse, error: error)
-                dpop?.storeNonce(from: response.response)
-
-                do {
-                    handler(.success(try response.result()), callback)
-                } catch let error as E {
-                    shouldRetry = dpop?.shouldRetry(for: error, retryCount: retryCount) ?? false
-                    if shouldRetry {
-                        retryCount += 1
-                    } else {
-                        handler(.failure(error), callback)
-                    }
-                } catch {
-                    handler(.failure(E(cause: error)), callback)
-                }
-            })
-            task.resume()
-        } while shouldRetry
+        self.startDataTask(retryCount: 0, callback: callback)
     }
+
+    private func startDataTask(retryCount: Int, callback: @escaping Callback) {
+        logger?.trace(request: request, session: self.session)
+
+        let task = session.dataTask(with: request, completionHandler: { [logger, handle, dpop] data, response, error in
+            if error == nil, let response = response {
+                logger?.trace(response: response, data: data)
+            }
+
+            let response = Response<E>(data: data, response: response as? HTTPURLResponse, error: error)
+            dpop?.storeNonce(from: response.response)
+
+            do {
+                handle(.success(try response.result()), callback)
+            } catch let error as E {
+                if dpop?.shouldRetry(for: error, retryCount: retryCount - 1) ?? false {
+                    startDataTask(retryCount: retryCount - 1, callback: callback)
+                } else {
+                    handle(.failure(error), callback)
+                }
+            } catch {
+                handle(.failure(E(cause: error)), callback)
+            }
+        })
+        task.resume()
+    }
+
+    // MARK: - Request Modifiers
 
     /**
      Modifies the parameters by creating a copy of the request and adding the provided parameters to the existing ones.
