@@ -21,7 +21,7 @@ public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping WebAuthPro
 ///
 /// - ``WebAuthError``
 /// - [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login)
-public protocol WebAuth: Trackable, Loggable {
+public protocol WebAuth: DPoPProviding, Trackable, Loggable {
 
     /// The Auth0 Client ID.
     var clientId: String { get }
