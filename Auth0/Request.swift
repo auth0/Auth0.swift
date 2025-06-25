@@ -37,13 +37,12 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     init(session: URLSession,
          url: URL,
          method: String,
-         accessToken: String? = nil,
          handle: @escaping (Result<ResponseValue, E>, Callback) -> Void,
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
          logger: Logger?,
          telemetry: Telemetry,
-         dpop: DPoP? = nil) {
+         dpop: DPoP?) {
         self.session = session
         self.url = url
         self.method = method
@@ -141,7 +140,15 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
         parameters["scope"] = includeRequiredScope(in: parameters["scope"] as? String)
 
-        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, parameters: parameters, headers: self.headers, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session,
+                       url: self.url,
+                       method: self.method,
+                       handle: self.handle,
+                       parameters: parameters,
+                       headers: self.headers,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     /**
@@ -152,7 +159,15 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     public func headers(_ extraHeaders: [String: String]) -> Self {
         let headers = extraHeaders.merging(self.headers) {(current, _) in current}
 
-        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, parameters: self.parameters, headers: headers, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session,
+                       url: self.url,
+                       method: self.method,
+                       handle: self.handle,
+                       parameters: self.parameters,
+                       headers: headers,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 }
 

@@ -150,7 +150,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
 
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
@@ -211,7 +212,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDatabaseUser,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
 
     #if PASSKEYS_PLATFORM
@@ -272,7 +274,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -343,7 +346,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
     #endif
 
@@ -360,7 +364,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
 
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError> {
@@ -378,7 +383,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
 
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError> {
@@ -395,24 +401,29 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
 
-    func userInfo(withAccessToken accessToken: String, dpopProof: String?) -> Request<UserInfo, AuthenticationError> {
+    func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError> {
         let userInfo = URL(string: "userinfo", relativeTo: self.url)!
-        var headers: [String: String] = [:]
+        let method = "GET"
+        var headers: [String: String] = ["Authorization": "Bearer \(accessToken)"]
 
-        if dpop != nil, let proof = dpopProof {
-            headers["DPoP"] = proof
-            headers["Authorization"] = "DPoP \(accessToken)"
-        } else {
-            headers["Authorization"] = "Bearer \(accessToken)"
+        do {
+            if let dpop = dpop, try dpop.hasKeypair() {
+                let proof = try dpop.generateProof(url: userInfo, method: method, accessToken: accessToken)
+                headers["DPoP"] = proof
+                headers["Authorization"] = "DPoP \(accessToken)"
+            }
+        } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("DPoP operation failed when creating userInfo request: \(error)")
         }
 
         return Request(session: session,
                        url: userInfo,
-                       method: "GET",
-                       accessToken: accessToken,
+                       method: method,
                        handle: authenticationObject,
                        headers: headers,
                        logger: self.logger,
@@ -476,7 +487,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
 
     func jwks() -> Request<JWKS, AuthenticationError> {
@@ -486,7 +498,8 @@ struct Auth0Authentication: Authentication {
                        method: "GET",
                        handle: authenticationDecodable,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
 
 }
@@ -532,7 +545,8 @@ private extension Auth0Authentication {
                        handle: authenticationDecodable,
                        parameters: parameters,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: nil)
     }
 
     func token<T: Codable>() -> Request<T, AuthenticationError> {
