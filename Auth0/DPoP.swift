@@ -456,7 +456,7 @@ protocol PoPKeyStore: Sendable {
 extension PoPKeyStore {
 
     var privateKeyIdentifier: String {
-        return "com.auth0.sdk.pop.privateKey"
+        return "com.auth0.sdk.dpop.privateKey"
     }
 
     var publicKeyJWSIdentifier: String {
