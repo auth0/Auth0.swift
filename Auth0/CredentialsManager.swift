@@ -262,7 +262,7 @@ public struct CredentialsManager {
             }
         } catch {
             // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP operation failed: \(error)")
+            assertionFailure("DPoP operation failed when generating a proof: \(error)")
         }
 
         return nil

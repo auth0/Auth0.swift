@@ -58,6 +58,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     var request: URLRequest {
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = method
+
         if !parameters.isEmpty {
             if method.caseInsensitiveCompare("GET") == .orderedSame {
                 var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
@@ -73,8 +74,20 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                 #endif
             }
         }
+
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
+
+        do {
+            if request.value(forHTTPHeaderField: "DPoP") == nil, let dpop = dpop, try dpop.hasKeypair() {
+                let proof = try dpop.generateProof(url: url, method: method)
+                request.setValue(proof, forHTTPHeaderField: "DPoP")
+            }
+        } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("DPoP operation failed when creating a request: \(error)")
+        }
+
         telemetry.addTelemetryHeader(request: request)
         return request as URLRequest
     }
