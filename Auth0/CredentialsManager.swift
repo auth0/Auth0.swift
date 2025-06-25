@@ -251,9 +251,13 @@ public struct CredentialsManager {
         return credentials.refreshToken != nil
     }
 
-    public func dpopProof(url: URL, method: String, accessToken: String? = nil) -> String? {
+    public func dpopProof(url: URL, method: String) -> String? {
+        guard let dpop = authentication.dpop,
+              let credentials = self.retrieveCredentials(),
+              credentials.tokenType.caseInsensitiveCompare("dpop") == .orderedSame else { return nil }
+
         do {
-            return try authentication.dpop?.generateProof(url: url, method: method, accessToken: accessToken)
+            return try dpop.generateProof(url: url, method: method, accessToken: credentials.accessToken)
         } catch {
             // This won't run in release builds, but in debug builds it's helpful for debugging
             assertionFailure("Failed to generate DPoP proof: \(error)")
