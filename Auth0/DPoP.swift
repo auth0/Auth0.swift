@@ -4,15 +4,15 @@ import CryptoKit
 
 // MARK: - Enable/Disable DPoP
 
-public protocol DPoPProviding {
+public protocol SenderConstraining {
 
     var dpop: DPoP? { get set }
 
 }
 
-public extension DPoPProviding {
+public extension SenderConstraining {
 
-    func proofOfPossession(enabled: Bool, keychainTag: String = Bundle.main.bundleIdentifier!) -> Self {
+    func senderConstraining(enabled: Bool, keychainTag: String = Bundle.main.bundleIdentifier!) -> Self {
         var instance = self
         if enabled {
             instance.dpop = DPoP(keychainId: keychainTag)

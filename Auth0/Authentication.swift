@@ -13,7 +13,7 @@ public typealias DatabaseUser = (email: String, username: String?, verified: Boo
 
  - ``AuthenticationError``
  */
-public protocol Authentication: DPoPProviding, Trackable, Loggable {
+public protocol Authentication: SenderConstraining, Trackable, Loggable {
 
     /// The Auth0 Client ID.
     var clientId: String { get }
