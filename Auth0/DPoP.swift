@@ -148,7 +148,7 @@ public struct DPoP: Sendable {
         }
     }
 
-    public func isKeypairStored() throws(DPoPError) -> Bool {
+    public func hasKeypair() throws(DPoPError) -> Bool {
         return try withSerialQueueSync {
             return try keyStore.isPrivateKeyStored()
         }

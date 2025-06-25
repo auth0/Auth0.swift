@@ -60,7 +60,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         }
 
         do {
-            if let dpop = dpop, try dpop.isKeypairStored() {
+            if let dpop = dpop, try dpop.hasKeypair() {
                 headers["DPoP"] = try dpop.generateProof(url: url, method: method, accessToken: accessToken)
             }
         } catch {
