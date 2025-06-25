@@ -413,10 +413,11 @@ struct Auth0Authentication: Authentication {
         do {
             if tokenType.caseInsensitiveCompare("dpop") == .orderedSame, let dpop = dpop, try dpop.hasKeypair() {
                 headers["Authorization"] = "\(tokenType) \(accessToken)"
+                headers["DPoP"] = try dpop.generateProof(url: userInfo, method: method, accessToken: accessToken)
             }
         } catch {
             // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP keypair check failed: \(error)")
+            assertionFailure("DPoP operation failed when creating userinfo request: \(error)")
         }
 
         return Request(session: session,
