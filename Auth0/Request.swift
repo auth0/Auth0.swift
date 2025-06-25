@@ -120,7 +120,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
             do {
                 handle(.success(try response.result()), callback)
             } catch let error as E {
-                if dpop?.shouldRetry(for: error, retryCount: retryCount + 1) ?? false {
+                if dpop?.shouldRetry(for: error, retryCount: retryCount) ?? false {
                     startDataTask(retryCount: retryCount + 1, callback: callback)
                 } else {
                     handle(.failure(error), callback)
