@@ -138,6 +138,10 @@ public struct DPoP: Sendable {
         return Challenge(from: response)
     }
 
+    static func extractNonce(from response: HTTPURLResponse?) -> String? {
+        return response?.value(forHTTPHeaderField: "DPoP-Nonce")
+    }
+
     public func generateProof(url: URL,
                               method: String,
                               nonce: String? = nil,
@@ -171,11 +175,8 @@ public struct DPoP: Sendable {
     }
 
     func storeNonce(from response: HTTPURLResponse?) {
-        guard let response = response else { return }
-        guard let newNonce = response.value(forHTTPHeaderField: "DPoP-Nonce") else { return }
-
         serialQueue.sync {
-            Self.nonce = newNonce
+            Self.nonce = Self.extractNonce(from: response)
         }
     }
 

@@ -3,6 +3,7 @@ import Foundation
 let apiErrorCode = "code"
 let apiErrorDescription = "description"
 let apiErrorCause = "cause"
+let apiErrorDPoPNonce = "dpop_nonce"
 
 /// Generic representation of Auth0 API errors.
 public protocol Auth0APIError: Auth0Error {
@@ -60,10 +61,6 @@ public extension Auth0APIError {
 
 extension Auth0APIError {
 
-    init(info: [String: Any], statusCode: Int = 0) {
-        self.init(info: info, statusCode: statusCode)
-    }
-
     init(cause error: Error, statusCode: Int = 0) {
         let info: [String: Any] = [
             apiErrorCode: nonJSONError,
@@ -85,6 +82,10 @@ extension Auth0APIError {
         if let dpopError = DPoP.challenge(from: response) {
             var info: [String: Any] = [apiErrorCode: dpopError.errorCode]
             info[apiErrorDescription] = dpopError.errorDescription
+            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.response)
+            self.init(info: info, statusCode: response.response.statusCode)
+        } else if var info = json(response.data) as? [String: Any] {
+            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.response)
             self.init(info: info, statusCode: response.response.statusCode)
         } else {
             self.init(description: string(response.data), statusCode: response.response.statusCode)
@@ -105,6 +106,11 @@ extension Auth0APIError {
         ]
     }
 
+}
+
+func json(_ data: Data?) -> Any? {
+    guard let data = data else { return nil }
+    return try? JSONSerialization.jsonObject(with: data, options: [])
 }
 
 func string(_ data: Data?) -> String? {
