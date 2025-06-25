@@ -23,7 +23,7 @@ struct Response<E: Auth0APIError> {
             throw E(from: ResponseValue(response: response, data: data))
         }
         guard let data = self.data, !data.isEmpty else {
-            if response.statusCode == 204 {
+            if response.statusCode == 200 || response.statusCode == 204 {
                 return ResponseValue(response: response, data: nil)
             }
             // Not using the custom initializer because data could be empty
