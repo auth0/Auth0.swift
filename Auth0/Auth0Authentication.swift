@@ -418,7 +418,7 @@ struct Auth0Authentication: Authentication {
             }
         } catch {
             // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP operation failed when creating userInfo request: \(error)")
+            assertionFailure("DPoP operation failed when creating userinfo request: \(error)")
         }
 
         return Request(session: session,
