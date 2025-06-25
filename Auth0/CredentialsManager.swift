@@ -257,12 +257,15 @@ public struct CredentialsManager {
               credentials.tokenType.caseInsensitiveCompare("dpop") == .orderedSame else { return nil }
 
         do {
-            return try dpop.generateProof(url: url, method: method, accessToken: credentials.accessToken)
+            if try dpop.hasKeypair() {
+                return try dpop.generateProof(url: url, method: method, accessToken: credentials.accessToken)
+            }
         } catch {
             // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("Failed to generate DPoP proof: \(error)")
-            return nil
+            assertionFailure("DPoP operation failed: \(error)")
         }
+
+        return nil
     }
 
     #if WEB_AUTH_PLATFORM

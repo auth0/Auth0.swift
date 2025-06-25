@@ -52,25 +52,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         self.logger = logger
         self.telemetry = telemetry
         self.dpop = dpop
-        var mutableHeaders = headers
-
-        do {
-            if let dpop = dpop, try dpop.hasKeypair() {
-                mutableHeaders["DPoP"] = try dpop.generateProof(url: url, method: method, accessToken: accessToken)
-
-                if let accessToken = accessToken {
-                    let scheme = dpop.isSenderConstrained(accessToken: accessToken) ? "DPoP" : "Bearer"
-                    mutableHeaders["Authorization"] = "\(scheme) \(accessToken)"
-                }
-            } else if let accessToken = accessToken {
-                mutableHeaders["Authorization"] = "Bearer \(accessToken)"
-            }
-        } catch {
-            // This will not run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP operation failed: \(error)")
-        }
-
-        self.headers = mutableHeaders
+        self.headers = headers
     }
 
     var request: URLRequest {

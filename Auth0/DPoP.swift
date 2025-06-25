@@ -1,7 +1,6 @@
 // swiftlint:disable file_length
 import Foundation
 import CryptoKit
-import JWTDecode
 
 // MARK: - Enable/Disable DPoP
 
@@ -159,13 +158,6 @@ public struct DPoP: Sendable {
         return try withSerialQueueSync {
             return try keyStore.clear()
         }
-    }
-
-    func isSenderConstrained(accessToken: String) -> Bool {
-        guard let decodedToken = try? decode(jwt: accessToken),
-              let cnf = decodedToken.claim(name: "cnf").rawValue as? [String: Any] else { return false }
-
-        return cnf["jkt"] != nil
     }
 
     func jkt() throws(DPoPError) -> String {

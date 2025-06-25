@@ -398,15 +398,26 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError> {
+    func userInfo(withAccessToken accessToken: String, dpopProof: String?) -> Request<UserInfo, AuthenticationError> {
         let userInfo = URL(string: "userinfo", relativeTo: self.url)!
+        var headers: [String: String] = [:]
+
+        if dpop != nil, let proof = dpopProof {
+            headers["DPoP"] = proof
+            headers["Authorization"] = "DPoP \(accessToken)"
+        } else {
+            headers["Authorization"] = "Bearer \(accessToken)"
+        }
+
         return Request(session: session,
                        url: userInfo,
                        method: "GET",
                        accessToken: accessToken,
                        handle: authenticationObject,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {

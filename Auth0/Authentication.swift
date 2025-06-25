@@ -873,7 +873,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/user-profile/get-user-info)
      */
-    func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError>
+    func userInfo(withAccessToken accessToken: String, dpopProof: String?) -> Request<UserInfo, AuthenticationError>
 
     /**
      Performs the last step of Proof Key for Code Exchange (PKCE).
@@ -1160,6 +1160,11 @@ public extension Authentication {
 
     func startPasswordless(phoneNumber: String, type: PasswordlessType = .code, connection: String = "sms") -> Request<Void, AuthenticationError> {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
+    }
+
+    func userInfo(withAccessToken accessToken: String,
+                  dpopProof: String? = nil) -> Request<UserInfo, AuthenticationError> {
+        return self.userInfo(withAccessToken: accessToken, dpopProof: dpopProof)
     }
 
     func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
