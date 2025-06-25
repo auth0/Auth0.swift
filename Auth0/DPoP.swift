@@ -486,7 +486,7 @@ struct SecureEnclaveKeyProvider: PoPKeyStore {
         do {
             privateKey = try SecureEnclave.P256.Signing.PrivateKey()
         } catch {
-            let message = "Unable to create a new private key on the Secure Enclave."
+            let message = "Unable to create a new private key using the Secure Enclave."
             throw DPoPError(code: .secureEnclaveOperationFailed(message), cause: error)
         }
 
@@ -540,7 +540,7 @@ struct SecureEnclaveKeyProvider: PoPKeyStore {
         do {
             return try SecureEnclave.P256.Signing.PrivateKey(rawRepresentation: data)
         } catch {
-            let message = "Unable to create a Secure Enclave private key from the retrieved data."
+            let message = "Unable to recreate a Secure Enclave private key from the retrieved data."
             throw DPoPError(code: .secureEnclaveOperationFailed(message), cause: error)
         }
     }
