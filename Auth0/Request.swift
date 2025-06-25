@@ -78,7 +78,11 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
 
         do {
-            if request.value(forHTTPHeaderField: "DPoP") == nil, let dpop = dpop, try dpop.hasKeypair() {
+            let authorizationHeader = request.value(forHTTPHeaderField: "Authorization")
+            let hasAccessToken = authorizationHeader != nil
+            let hasBoundAccessToken = authorizationHeader?.prefix(4).caseInsensitiveCompare("dpop") == .orderedSame
+
+            if !hasAccessToken || hasBoundAccessToken, let dpop = dpop, try dpop.hasKeypair() {
                 let proof = try dpop.generateProof(url: url, method: method)
                 request.setValue(proof, forHTTPHeaderField: "DPoP")
             }
