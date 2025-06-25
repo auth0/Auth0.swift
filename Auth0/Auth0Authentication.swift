@@ -405,14 +405,14 @@ struct Auth0Authentication: Authentication {
                        dpop: nil)
     }
 
-    func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError> {
+    func userInfo(withAccessToken accessToken: String, tokenType: String) -> Request<UserInfo, AuthenticationError> {
         let userInfo = URL(string: "userinfo", relativeTo: self.url)!
         let method = "GET"
         var headers: [String: String] = ["Authorization": "Bearer \(accessToken)"]
 
         do {
-            if let dpop = dpop, try dpop.hasKeypair() {
-                headers["Authorization"] = "DPoP \(accessToken)"
+            if tokenType.caseInsensitiveCompare("dpop") == .orderedSame, let dpop = dpop, try dpop.hasKeypair() {
+                headers["Authorization"] = "\(tokenType) \(accessToken)"
             }
         } catch {
             // This won't run in release builds, but in debug builds it's helpful for debugging
