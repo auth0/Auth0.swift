@@ -138,12 +138,15 @@ public struct DPoP: Sendable {
         return Challenge(from: response)
     }
 
-    public func generateProof(url: URL, method: String, accessToken: String? = nil) throws(DPoPError) -> String {
+    public func generateProof(url: URL,
+                              method: String,
+                              nonce: String? = nil,
+                              accessToken: String? = nil) throws(DPoPError) -> String {
         return try withSerialQueueSync {
             return try Proof.generate(using: keyStore,
                                       url: url,
                                       method: method,
-                                      nonce: Self.nonce,
+                                      nonce: nonce ?? Self.nonce,
                                       accessToken: accessToken)
         }
     }
