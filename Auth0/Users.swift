@@ -258,27 +258,14 @@ extension Management: Users {
             ]
         }
 
-        return Request(session: self.session,
-                       url: component.url!,
-                       method: "GET",
-                       handle: self.managementObject,
-                       headers: self.defaultHeaders,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
+        return Request(session: self.session, url: component.url!, method: "GET", handle: self.managementObject, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError> {
         let userPath = "api/v2/users/\(identifier)"
         let component = components(baseURL: self.url as URL, path: userPath)
 
-        return Request(session: self.session,
-                       url: component.url!,
-                       method: "PATCH",
-                       handle: self.managementObject,
-                       parameters: attributes.dictionary,
-                       headers: self.defaultHeaders,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
+        return Request(session: self.session, url: component.url!, method: "PATCH", handle: self.managementObject, parameters: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError> {
@@ -302,26 +289,13 @@ extension Management: Users {
     private func link(_ identifier: String, parameters: [String: Any]) -> Request<[ManagementObject], ManagementError> {
         let identitiesPath = "api/v2/users/\(identifier)/identities"
         let url = components(baseURL: self.url as URL, path: identitiesPath).url!
-        return Request(session: self.session,
-                       url: url,
-                       method: "POST",
-                       handle: self.managementObjects,
-                       parameters: parameters,
-                       headers: self.defaultHeaders,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
+        return Request(session: self.session, url: url, method: "POST", handle: self.managementObjects, parameters: parameters, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
     func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError> {
         let identityPath = "api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
         let url = components(baseURL: self.url as URL, path: identityPath).url!
-        return Request(session: self.session,
-                       url: url,
-                       method: "DELETE",
-                       handle: self.managementObjects,
-                       headers: self.defaultHeaders,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
+        return Request(session: self.session, url: url, method: "DELETE", handle: self.managementObjects, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 }
 
