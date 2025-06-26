@@ -483,7 +483,7 @@ struct Auth0Authentication: Authentication {
         }
 
         var headers: [String: String] = [:]
-        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+        headers["DPoP"] = self.dpopProof(url: oauthToken, method: "POST", accessToken: self.clientId)
 
         return Request(session: session,
                        url: oauthToken,
