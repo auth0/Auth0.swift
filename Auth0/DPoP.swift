@@ -147,8 +147,8 @@ public struct DPoP: Sendable {
 
     public init(keychainId: String = Bundle.main.bundleIdentifier!) {
         self.keyStore = SecureEnclave.isAvailable ?
-        SecureEnclaveKeyProvider(keychainService: keychainId) :
-        KeychainKeyProvider(keychainTag: keychainId)
+        SecureEnclaveKeyStore(keychainService: keychainId) :
+        KeychainKeyStore(keychainTag: keychainId)
     }
 
     static func shouldRetry(for error: Auth0APIError, retryCount: Int) -> Bool {
@@ -489,7 +489,7 @@ extension PoPKeyStore {
 }
 
 // Used when Secure Enclave is available
-struct SecureEnclaveKeyProvider: PoPKeyStore {
+struct SecureEnclaveKeyStore: PoPKeyStore {
 
     let keychainService: String
 
@@ -580,7 +580,7 @@ struct SecureEnclaveKeyProvider: PoPKeyStore {
 }
 
 // Used when Secure Enclave is not available
-struct KeychainKeyProvider: PoPKeyStore {
+struct KeychainKeyStore: PoPKeyStore {
 
     let keychainTag: Data
 
