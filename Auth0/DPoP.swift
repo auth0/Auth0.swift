@@ -281,8 +281,8 @@ extension DPoP.Challenge {
               header.range(of: "DPoP ", options: .caseInsensitive) != nil else { return nil }
 
         let valuePattern = #"([\x20-\x21\x23-\x5B\x5D-\x7E]+)"#
-        let errorCodePattern = #"error\s?=\s?""# + valuePattern + #"""#
-        let errorDescriptionPattern = #"error_description\s?=\s?""# + valuePattern + #"""#
+        let errorCodePattern = #"error\s?=\s?""# + valuePattern + "\""
+        let errorDescriptionPattern = #"error_description\s?=\s?""# + valuePattern + "\""
         let compareOptions: String.CompareOptions = [.caseInsensitive, .regularExpression]
 
         guard let errorCodeRange = header.range(of: errorCodePattern, options: compareOptions) else {
