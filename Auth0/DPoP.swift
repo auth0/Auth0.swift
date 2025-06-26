@@ -24,6 +24,23 @@ public extension SenderConstraining {
 
 }
 
+extension SenderConstraining {
+
+    func dpopProof(url: URL, method: String, accessToken: String) -> String? {
+        do {
+            if let dpop = dpop, try dpop.hasKeypair() {
+                return try dpop.generateProof(url: url, method: method, accessToken: accessToken)
+            }
+        } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("DPoP operation failed when creating a request: \(error)")
+        }
+
+        return nil
+    }
+
+}
+
 // MARK: - Error Type
 
 public struct DPoPError: Auth0Error, Sendable {

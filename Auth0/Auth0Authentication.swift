@@ -588,17 +588,4 @@ private extension Auth0Authentication {
                        telemetry: self.telemetry)
     }
 
-    func dpopProof(url: URL, method: String, accessToken: String) -> String? {
-        do {
-            if let dpop = dpop, try dpop.hasKeypair() {
-                return try dpop.generateProof(url: url, method: method, accessToken: accessToken)
-            }
-        } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP operation failed when creating an Authentication API request: \(error)")
-        }
-
-        return nil
-    }
-
 }
