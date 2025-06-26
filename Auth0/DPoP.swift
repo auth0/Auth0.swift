@@ -413,7 +413,7 @@ extension ContiguousBytes {
                                                      bytes.baseAddress?.assumingMemoryBound(to: UInt8.self),
                                                      bytes.count,
                                                      kCFAllocatorNull)
-            return ((cfdata as NSData?) as Data?) ?? Data()
+            return ((cfdata as NSData?) as Data?) ?? Data(buffer: bytes.assumingMemoryBound(to: UInt8.self))
         }
     }
 
