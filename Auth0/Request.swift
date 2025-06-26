@@ -32,7 +32,6 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
-    let dpop: DPoP?
 
     init(session: URLSession,
          url: URL,
@@ -41,8 +40,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
          logger: Logger?,
-         telemetry: Telemetry,
-         dpop: DPoP?) {
+         telemetry: Telemetry) {
         self.session = session
         self.url = url
         self.method = method
@@ -50,14 +48,12 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         self.parameters = parameters
         self.logger = logger
         self.telemetry = telemetry
-        self.dpop = dpop
         self.headers = headers
     }
 
     var request: URLRequest {
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = method
-
         if !parameters.isEmpty {
             if method.caseInsensitiveCompare("GET") == .orderedSame {
                 var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
@@ -73,20 +69,8 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                 #endif
             }
         }
-
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
-
-        do {
-            if request.value(forHTTPHeaderField: "Authorization") == nil, let dpop = dpop, try dpop.hasKeypair() {
-                let proof = try dpop.generateProof(url: url, method: method)
-                request.setValue(proof, forHTTPHeaderField: "DPoP")
-            }
-        } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP operation failed when creating a request: \(error)")
-        }
-
         telemetry.addTelemetryHeader(request: request)
         return request as URLRequest
     }
@@ -105,18 +89,18 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     private func startDataTask(retryCount: Int, callback: @escaping Callback) {
         logger?.trace(request: request, session: self.session)
 
-        let task = session.dataTask(with: request, completionHandler: { [logger, handle, dpop] data, response, error in
+        let task = session.dataTask(with: request, completionHandler: { [logger, handle] data, response, error in
             if error == nil, let response = response {
                 logger?.trace(response: response, data: data)
             }
 
             let response = Response<E>(data: data, response: response as? HTTPURLResponse, error: error)
-            dpop?.storeNonce(from: response.response)
+            DPoP.storeNonce(from: response.response)
 
             do {
                 handle(.success(try response.result()), callback)
             } catch let error as E {
-                if dpop?.shouldRetry(for: error, retryCount: retryCount) ?? false {
+                if DPoP.shouldRetry(for: error, retryCount: retryCount) {
                     startDataTask(retryCount: retryCount + 1, callback: callback)
                 } else {
                     handle(.failure(error), callback)
@@ -147,8 +131,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        parameters: parameters,
                        headers: self.headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     /**
@@ -166,8 +149,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        parameters: self.parameters,
                        headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 }
 

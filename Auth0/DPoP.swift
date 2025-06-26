@@ -122,11 +122,11 @@ public struct DPoP: Sendable {
         let errorDescription: String?
     }
 
-    private let keyStore: PoPKeyStore
-    private let maxRetries = 1
-
     static let nonceRequiredErrorCode = "use_dpop_nonce"
-    private static var nonce: String?
+    static private let maxRetries = 1
+    static private var nonce: String?
+
+    private let keyStore: PoPKeyStore
 
     public init(keychainId: String = Bundle.main.bundleIdentifier!) {
         self.keyStore = SecureEnclave.isAvailable ?
@@ -134,12 +134,26 @@ public struct DPoP: Sendable {
         KeychainKeyProvider(keychainTag: keychainId)
     }
 
-    static func challenge(from response: ResponseValue) -> Challenge? {
-        return Challenge(from: response)
+    static func shouldRetry(for error: Auth0APIError, retryCount: Int) -> Bool {
+        let isDPoPError = error.code == nonceRequiredErrorCode
+        let isRetryCountExceeded = retryCount >= maxRetries
+
+        return isDPoPError && !isRetryCountExceeded
     }
 
     static func extractNonce(from response: HTTPURLResponse?) -> String? {
         return response?.value(forHTTPHeaderField: "DPoP-Nonce")
+    }
+
+    static func storeNonce(from response: HTTPURLResponse?) {
+        serialQueue.sync {
+            guard let newNonce = extractNonce(from: response) else { return }
+            nonce = newNonce
+        }
+    }
+
+    static func challenge(from response: ResponseValue) -> Challenge? {
+        return Challenge(from: response)
     }
 
     public func generateProof(url: URL,
@@ -157,7 +171,7 @@ public struct DPoP: Sendable {
 
     public func hasKeypair() throws(DPoPError) -> Bool {
         return try withSerialQueueSync {
-            return try keyStore.isPrivateKeyStored()
+            return try keyStore.hasPrivateKey()
         }
     }
 
@@ -172,19 +186,6 @@ public struct DPoP: Sendable {
             let publicKey = try keyStore.privateKey().publicKey
             return try ECPublicKeyJWK(publicKey: publicKey).thumbprint()
         }
-    }
-
-    func storeNonce(from response: HTTPURLResponse?) {
-        serialQueue.sync {
-            Self.nonce = Self.extractNonce(from: response)
-        }
-    }
-
-    func shouldRetry(for error: Auth0APIError, retryCount: Int) -> Bool {
-        let isDPoPError = error.code == Self.nonceRequiredErrorCode
-        let isRetryCountExceeded = retryCount >= maxRetries
-
-        return isDPoPError && !isRetryCountExceeded
     }
 
     private func withSerialQueueSync<T>(_ block: () throws -> T) throws(DPoPError) -> T {
@@ -452,7 +453,7 @@ protocol PoPKeyStore: Sendable {
 
     var publicKeyJWSIdentifier: String { get }
 
-    func isPrivateKeyStored() throws(DPoPError) -> Bool
+    func hasPrivateKey() throws(DPoPError) -> Bool
     func privateKey() throws(DPoPError) -> PoPPrivateKey
     func clear() throws(DPoPError)
 
@@ -475,7 +476,7 @@ struct SecureEnclaveKeyProvider: PoPKeyStore {
 
     let keychainService: String
 
-    func isPrivateKeyStored() throws(DPoPError) -> Bool {
+    func hasPrivateKey() throws(DPoPError) -> Bool {
         if try retrieve(forIdentifier: privateKeyIdentifier) != nil {
             return true
         }
@@ -570,7 +571,7 @@ struct KeychainKeyProvider: PoPKeyStore {
         self.keychainTag = keychainTag.data(using: .utf8)!
     }
 
-    func isPrivateKeyStored() throws(DPoPError) -> Bool {
+    func hasPrivateKey() throws(DPoPError) -> Bool {
         if try retrieve(forIdentifier: privateKeyIdentifier) != nil {
             return true
         }

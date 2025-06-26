@@ -264,8 +264,7 @@ extension Management: Users {
                        handle: self.managementObject,
                        headers: self.defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError> {
@@ -279,8 +278,7 @@ extension Management: Users {
                        parameters: attributes.dictionary,
                        headers: self.defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError> {
@@ -311,8 +309,7 @@ extension Management: Users {
                        parameters: parameters,
                        headers: self.defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError> {
@@ -324,8 +321,7 @@ extension Management: Users {
                        handle: self.managementObjects,
                        headers: self.defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 }
 

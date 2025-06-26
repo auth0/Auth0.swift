@@ -30,6 +30,7 @@ struct Auth0Authentication: Authentication {
 
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
+
         var payload: [String: Any] = [
             "username": username,
             "password": password,
@@ -39,18 +40,23 @@ struct Auth0Authentication: Authentication {
         ]
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
+
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: url,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
+
         var payload: [String: Any] = [
             "username": username,
             "password": password,
@@ -59,36 +65,46 @@ struct Auth0Authentication: Authentication {
         ]
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
+
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: url,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
+
         let payload: [String: Any] = [
             "otp": otp,
             "mfa_token": mfaToken,
             "grant_type": "http://auth0.com/oauth/grant-type/mfa-otp",
             "client_id": self.clientId
         ]
+
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: url,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
+
         var payload: [String: Any] = [
             "oob_code": oobCode,
             "mfa_token": mfaToken,
@@ -100,18 +116,22 @@ struct Auth0Authentication: Authentication {
             payload["binding_code"] = bindingCode
         }
 
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: url,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
+
         let payload: [String: Any] = [
             "recovery_code": recoveryCode,
             "mfa_token": mfaToken,
@@ -119,14 +139,17 @@ struct Auth0Authentication: Authentication {
             "client_id": self.clientId
         ]
 
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: url,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError> {
@@ -150,8 +173,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
@@ -212,8 +234,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDatabaseUser,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     #if PASSKEYS_PLATFORM
@@ -251,14 +272,17 @@ struct Auth0Authentication: Authentication {
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
 
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: url,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -274,8 +298,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -310,14 +333,17 @@ struct Auth0Authentication: Authentication {
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
 
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: url,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -346,8 +372,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationDecodable,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
     #endif
 
@@ -364,8 +389,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     func startPasswordless(email: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError> {
@@ -383,8 +407,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError> {
@@ -401,8 +424,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     func userInfo(withAccessToken accessToken: String, tokenType: String) -> Request<UserInfo, AuthenticationError> {
@@ -410,14 +432,10 @@ struct Auth0Authentication: Authentication {
         let method = "GET"
         var headers: [String: String] = ["Authorization": "Bearer \(accessToken)"]
 
-        do {
-            if tokenType.caseInsensitiveCompare("dpop") == .orderedSame, let dpop = dpop, try dpop.hasKeypair() {
-                headers["Authorization"] = "\(tokenType) \(accessToken)"
-                headers["DPoP"] = try dpop.generateProof(url: userInfo, method: method, accessToken: accessToken)
-            }
-        } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP operation failed when creating userinfo request: \(error)")
+        if tokenType.caseInsensitiveCompare("dpop") == .orderedSame,
+           let proof = self.dpopProof(url: userInfo, method: method, accessToken: accessToken) {
+            headers["Authorization"] = "\(tokenType) \(accessToken)"
+            headers["DPoP"] = proof
         }
 
         return Request(session: session,
@@ -426,8 +444,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationObject,
                        headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
@@ -448,12 +465,13 @@ struct Auth0Authentication: Authentication {
     }
 
     func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+        let oauthToken = URL(string: "oauth/token", relativeTo: self.url)!
+
         var payload: [String: Any] = [
             "refresh_token": refreshToken,
             "grant_type": "refresh_token",
             "client_id": self.clientId
         ]
-        let oauthToken = URL(string: "oauth/token", relativeTo: self.url)!
 
         if let audience = audience {
             // Make sure to always include the 'openid' scope if we're trying to get a new set of credentials for an
@@ -464,14 +482,17 @@ struct Auth0Authentication: Authentication {
             payload["scope"] = scope
         }
 
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: oauthToken,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError> {
@@ -486,8 +507,7 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationNoBody,
                        parameters: payload,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     func jwks() -> Request<JWKS, AuthenticationError> {
@@ -497,8 +517,7 @@ struct Auth0Authentication: Authentication {
                        method: "GET",
                        handle: authenticationDecodable,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
 }
@@ -509,6 +528,7 @@ private extension Auth0Authentication {
 
     func login(username: String, otp: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
+
         var payload: [String: Any] = [
             "username": username,
             "otp": otp,
@@ -518,14 +538,18 @@ private extension Auth0Authentication {
         ]
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
+
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: url, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: url,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
     }
 
     func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
@@ -544,23 +568,37 @@ private extension Auth0Authentication {
                        handle: authenticationDecodable,
                        parameters: parameters,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     func token<T: Codable>() -> Request<T, AuthenticationError> {
-        let payload: [String: Any] = [
-            "client_id": self.clientId
-        ]
         let token = URL(string: "oauth/token", relativeTo: self.url)!
+        let payload: [String: Any] = ["client_id": self.clientId]
+
+        var headers: [String: String] = [:]
+        headers["DPoP"] = self.dpopProof(url: token, method: "POST", accessToken: self.clientId)
+
         return Request(session: session,
                        url: token,
                        method: "POST",
                        handle: authenticationDecodable,
                        parameters: payload,
+                       headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       telemetry: self.telemetry)
+    }
+
+    func dpopProof(url: URL, method: String, accessToken: String) -> String? {
+        do {
+            if let dpop = dpop, try dpop.hasKeypair() {
+                return try dpop.generateProof(url: url, method: method, accessToken: accessToken)
+            }
+        } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("DPoP operation failed when creating an Authentication API request: \(error)")
+        }
+
+        return nil
     }
 
 }

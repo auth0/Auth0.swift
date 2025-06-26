@@ -38,8 +38,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -73,8 +72,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        parameters: payload,
                        headers: defaultHeaders,
                        logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: nil)
+                       telemetry: self.telemetry)
     }
     #endif
 
