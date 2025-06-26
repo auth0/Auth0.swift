@@ -178,7 +178,6 @@ final class Auth0WebAuth: WebAuth {
         }
 
         guard let redirectURL = self.redirectURL else {
-            barrier.lower()
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
@@ -191,7 +190,6 @@ final class Auth0WebAuth: WebAuth {
                                                       defaults: handler.defaults,
                                                       state: state)
         } catch {
-            barrier.lower()
             return callback(.failure(error))
         }
 
@@ -235,7 +233,6 @@ final class Auth0WebAuth: WebAuth {
         components?.queryItems = queryItems + [returnTo, clientId]
 
         guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
-            barrier.lower()
             return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
