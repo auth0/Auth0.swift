@@ -26,10 +26,15 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
-                                    connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
+                               connection: String?,
+                                    email: String?,
+                                    phoneNumber: String?,
+                                    preferredAuthenticationMethod: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = ["type": "passkey"]
         payload["identity_user_id"] = userIdentityId
         payload["connection"] = connection
+        payload["email"] = email
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod
 
         return Request(session: session,
                        url: self.url,
@@ -62,7 +67,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
         let payload: [String: Any] = [
             "auth_session": challenge.authenticationSession,
-            "authn_response": authenticatorResponse
+            "authn_response": authenticatorResponse,
+            "otp_code" = ""
         ]
 
         return Request(session: session,
@@ -76,4 +82,64 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
     #endif
 
+    func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError> {
+        return Request(session: session,
+                       url: self.url.appending(id),
+                       method: "DELETE",
+                       handle: myAccountDecodableNoBody,
+                       headers: defaultHeaders,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+    
+    func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError> {
+        return Request(session: session,
+                       url: url,
+                       method: "GET",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func getFactorStatus() -> Request<[Factor], MyAccountError> {
+        return Request(session: session,
+                       url: url.appending("factors"),
+                       method: "GET",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError> {
+        return Request(session: session,
+                       url: url.appending(id),
+                       method: "GET",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func deleteAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError> {
+        return Request(session: session,
+                       url: url.appending(id),
+                       method: "GET",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func updateAuthenticationMethod(id: String,
+                                    name: String,
+                                    preferredAuthenticationMethod: String) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["name"] = name
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod
+        return Request(session: session,
+                       url: url.appending(id),
+                       method: "PATCH",
+                       handle: myAcccountDecodable,
+                       parameters: payload,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
 }

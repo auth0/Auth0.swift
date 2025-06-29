@@ -4,8 +4,8 @@
 /// - ``MyAccount``
 /// - ``MyAccountError``
 public protocol MyAccountAuthenticationMethods: MyAccountClient {
-
-    #if PASSKEYS_PLATFORM
+    
+#if PASSKEYS_PLATFORM
     /// Requests a challenge for enrolling a new passkey. This is the first part of the enrollment flow.
     ///
     /// You can specify an optional user identity identifier and an optional database connection name. If a
@@ -75,7 +75,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
                                     connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
-
+    
     /// Enrolls a new passkey credential. This is the last part of the enrollment flow.
     ///
     /// ## Availability
@@ -111,13 +111,42 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Returns: A request that will yield an enrolled passkey authentication method.
     ///
     /// ## See Also
-    /// 
+    ///
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError>
-    #endif
-
+#endif
+    
+    /// <#Description#>
+    /// - Parameter id: <#id description#>
+    /// - Returns: <#description#>
+    func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError>
+    
+    /// <#Description#>
+    /// - Returns: <#description#>
+    func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError>
+    
+    /// <#Description#>
+    /// - Returns: <#description#>
+    func getFactorStatus() -> Request<[Factor], MyAccountError>
+    
+    /// <#Description#>
+    /// - Parameter id: <#id description#>
+    /// - Returns: <#description#>
+    func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
+    
+    /// <#Description#>
+    /// - Parameter id: <#id description#>
+    /// - Returns: <#description#>
+    func deleteAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
+    
+    /// <#Description#>
+    /// - Parameter id: <#id description#>
+    /// - Returns: <#description#>
+    func updateAuthenticationMethod(id: String,
+                                    name: String,
+                                    preferredAuthenticationMethod: String) -> Request<AuthenticationMethod, MyAccountError>
 }
 
 // MARK: - Default Parameters
