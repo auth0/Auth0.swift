@@ -26,26 +26,11 @@ public extension SenderConstraining {
 
 extension SenderConstraining {
 
-    func dpopProof(url: URL, method: String, accessToken: String) -> String? {
-        do {
-            if let dpop = dpop, try dpop.hasKeypair() {
-                return try dpop.generateProof(url: url, method: method, accessToken: accessToken)
-            }
-        } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP operation failed when creating a request: \(error)")
-        }
-
-        return nil
-    }
-
-    func dpopHeaders(url: URL, method: String, accessToken: String, tokenType: String) -> [String: String] {
+    func baseHeaders(accessToken: String, tokenType: String) -> [String: String] {
         var headers: [String: String] = ["Authorization": "Bearer \(accessToken)"]
 
-        if tokenType.caseInsensitiveCompare("dpop") == .orderedSame,
-           let proof = self.dpopProof(url: url, method: method, accessToken: accessToken) {
+        if tokenType.caseInsensitiveCompare("dpop") == .orderedSame {
             headers["Authorization"] = "\(tokenType) \(accessToken)"
-            headers["DPoP"] = proof
         }
 
         return headers
@@ -163,13 +148,6 @@ public struct DPoP: Sendable {
         KeychainKeyStore(keychainTag: keychainId)
     }
 
-    static func shouldRetry(for error: Auth0APIError, retryCount: Int) -> Bool {
-        let isDPoPError = error.code == nonceRequiredErrorCode
-        let isRetryCountExceeded = retryCount >= maxRetries
-
-        return isDPoPError && !isRetryCountExceeded
-    }
-
     static func extractNonce(from response: HTTPURLResponse?) -> String? {
         return response?.value(forHTTPHeaderField: "DPoP-Nonce")
     }
@@ -183,6 +161,13 @@ public struct DPoP: Sendable {
 
     static func challenge(from response: ResponseValue) -> Challenge? {
         return Challenge(from: response)
+    }
+
+    static func shouldRetry(for error: Auth0APIError, retryCount: Int) -> Bool {
+        let isDPoPError = error.code == nonceRequiredErrorCode
+        let isRetryCountExceeded = retryCount >= maxRetries
+
+        return isDPoPError && !isRetryCountExceeded
     }
 
     public func generateProof(url: URL,
@@ -208,6 +193,13 @@ public struct DPoP: Sendable {
         return try withSerialQueueSync {
             return try keyStore.clear()
         }
+    }
+
+    func generateProof(for request: URLRequest) throws(DPoPError) -> String {
+        let authorizationHeader = request.value(forHTTPHeaderField: "Authorization")
+        let accessToken = authorizationHeader?.components(separatedBy: " ").last
+
+        return try generateProof(url: request.url!, method: request.httpMethod!, accessToken: accessToken)
     }
 
     func jkt() throws(DPoPError) -> String {

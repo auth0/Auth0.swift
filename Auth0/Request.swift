@@ -32,6 +32,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
+    let dpop: DPoP?
 
     init(session: URLSession,
          url: URL,
@@ -40,7 +41,8 @@ public struct Request<T, E: Auth0APIError>: Requestable {
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
          logger: Logger?,
-         telemetry: Telemetry) {
+         telemetry: Telemetry,
+         dpop: DPoP? = nil) {
         self.session = session
         self.url = url
         self.method = method
@@ -49,9 +51,10 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         self.logger = logger
         self.telemetry = telemetry
         self.headers = headers
+        self.dpop = dpop
     }
 
-    var request: URLRequest {
+    var request: NSMutableURLRequest {
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = method
         if !parameters.isEmpty {
@@ -72,7 +75,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
         telemetry.addTelemetryHeader(request: request)
-        return request as URLRequest
+        return request
     }
 
     // MARK: - Request Handling
@@ -83,13 +86,24 @@ public struct Request<T, E: Auth0APIError>: Requestable {
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
     public func start(_ callback: @escaping Callback) {
-        self.startDataTask(retryCount: 0, callback: callback)
+        self.startDataTask(retryCount: 0, request: self.request, callback: callback)
     }
 
-    private func startDataTask(retryCount: Int, callback: @escaping Callback) {
-        logger?.trace(request: request, session: self.session)
+    private func startDataTask(retryCount: Int, request: NSMutableURLRequest, callback: @escaping Callback) {
+        do {
+            if let dpop = dpop, try dpop.hasKeypair() {
+                let proof = try dpop.generateProof(for: request as URLRequest)
+                request.setValue(proof, forHTTPHeaderField: "DPoP")
+            }
+        } catch {
+            // This won't run in release builds, but in debug builds it's helpful for debugging
+            assertionFailure("DPoP operation failed when setting up a request: \(error)")
+        }
 
-        let task = session.dataTask(with: request, completionHandler: { [logger, handle] data, response, error in
+        logger?.trace(request: request as URLRequest, session: self.session)
+
+        let task = session.dataTask(with: request as URLRequest,
+                                    completionHandler: { [logger, handle] data, response, error in
             if error == nil, let response = response {
                 logger?.trace(response: response, data: data)
             }
@@ -101,7 +115,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                 handle(.success(try response.result()), callback)
             } catch let error as E {
                 if DPoP.shouldRetry(for: error, retryCount: retryCount) {
-                    startDataTask(retryCount: retryCount + 1, callback: callback)
+                    startDataTask(retryCount: retryCount + 1, request: request, callback: callback)
                 } else {
                     handle(.failure(error), callback)
                 }
