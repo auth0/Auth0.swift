@@ -299,8 +299,7 @@ extension DPoP.Proof {
 extension DPoP.Challenge {
 
     init?(from response: ResponseValue) {
-        guard response.response.statusCode == 401,
-              let header = response.response.value(forHTTPHeaderField: "WWW-Authenticate"),
+        guard let header = response.response.value(forHTTPHeaderField: "WWW-Authenticate"),
               header.range(of: "DPoP ", options: .caseInsensitive) != nil else { return nil }
 
         let valuePattern = #"([\x20-\x21\x23-\x5B\x5D-\x7E]+)"#
