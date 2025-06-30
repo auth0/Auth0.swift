@@ -39,6 +39,18 @@ extension SenderConstraining {
         return nil
     }
 
+    func dpopHeaders(url: URL, method: String, accessToken: String, tokenType: String) -> [String: String] {
+        var headers: [String: String] = ["Authorization": "Bearer \(accessToken)"]
+
+        if tokenType.caseInsensitiveCompare("dpop") == .orderedSame,
+           let proof = self.dpopProof(url: url, method: method, accessToken: accessToken) {
+            headers["Authorization"] = "\(tokenType) \(accessToken)"
+            headers["DPoP"] = proof
+        }
+
+        return headers
+    }
+
 }
 
 // MARK: - Error Type

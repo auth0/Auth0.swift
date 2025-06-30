@@ -430,13 +430,7 @@ struct Auth0Authentication: Authentication {
     func userInfo(withAccessToken accessToken: String, tokenType: String) -> Request<UserInfo, AuthenticationError> {
         let userInfo = URL(string: "userinfo", relativeTo: self.url)!
         let method = "GET"
-        var headers: [String: String] = ["Authorization": "Bearer \(accessToken)"]
-
-        if tokenType.caseInsensitiveCompare("dpop") == .orderedSame,
-           let proof = self.dpopProof(url: userInfo, method: method, accessToken: accessToken) {
-            headers["Authorization"] = "\(tokenType) \(accessToken)"
-            headers["DPoP"] = proof
-        }
+        var headers = self.dpopHeaders(url: url, method: method, accessToken: accessToken, tokenType: tokenType)
 
         return Request(session: session,
                        url: userInfo,
