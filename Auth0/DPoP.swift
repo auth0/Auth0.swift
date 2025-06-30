@@ -154,7 +154,6 @@ public struct DPoP: Sendable {
     static let nonceRequiredErrorCode = "use_dpop_nonce"
     static private let maxRetries = 1
     static private var nonce: String?
-    static private var thumbprint: String?
 
     private let keyStore: PoPKeyStore
 
@@ -212,13 +211,9 @@ public struct DPoP: Sendable {
     }
 
     func jkt() throws(DPoPError) -> String {
-        if let thumbprint = Self.thumbprint { return thumbprint }
-
         return try withSerialQueueSync {
             let publicKey = try keyStore.privateKey().publicKey
-            let value = try ECPublicKeyJWK(publicKey: publicKey).thumbprint()
-            Self.thumbprint = value
-            return value
+            return try ECPublicKeyJWK(publicKey: publicKey).thumbprint()
         }
     }
 
