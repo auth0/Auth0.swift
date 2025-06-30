@@ -145,7 +145,8 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        parameters: parameters,
                        headers: self.headers,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     /**
@@ -163,7 +164,8 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        parameters: self.parameters,
                        headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 }
 
