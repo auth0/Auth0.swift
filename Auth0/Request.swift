@@ -91,7 +91,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
     private func startDataTask(retryCount: Int, request: NSMutableURLRequest, callback: @escaping Callback) {
         do {
-            if let dpop = dpop, try dpop.hasKeypair() {
+            if let dpop = dpop, try dpop.hasKeypair() || parameters["grant_type"] as? String != "refresh_token" {
                 let proof = try dpop.generateProof(for: request as URLRequest)
                 request.setValue(proof, forHTTPHeaderField: "DPoP")
             }
