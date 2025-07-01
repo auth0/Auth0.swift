@@ -21,6 +21,7 @@ private let Name = "John Doe"
 private let ValidPassword = "I.O.U. a password"
 private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
+private let OrganizationId = "Organization"
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -371,7 +372,8 @@ class AuthenticationSpec: QuickSpec {
                                    challenge: challenge,
                                    connection: ConnectionName,
                                    audience: Audience,
-                                   scope: Scope)
+                                   scope: Scope,
+                                   organization: OrganizationId)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken, RefreshToken))
                                 done()
@@ -409,7 +411,8 @@ class AuthenticationSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         auth
-                            .passkeyLoginChallenge(connection: ConnectionName)
+                            .passkeyLoginChallenge(connection: ConnectionName,
+                                                   organization: OrganizationId)
                             .start { result in
                                 expect(result).to(beSuccessful())
                                 done()
@@ -496,7 +499,8 @@ class AuthenticationSpec: QuickSpec {
                                    challenge: signupChallenge,
                                    connection: ConnectionName,
                                    audience: Audience,
-                                   scope: Scope)
+                                   scope: Scope,
+                                   organization: OrganizationId)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken, RefreshToken))
                                 done()
@@ -546,6 +550,28 @@ class AuthenticationSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         auth
                             .passkeySignupChallenge(phoneNumber: Phone)
+                            .start { result in
+                                expect(result).to(havePasskeySignupChallenge(identifier: Phone))
+                                done()
+                            }
+                    }
+                }
+                
+                it("should request passkey signup challenge with organization and default parameters") {
+                    NetworkStub.addStub(condition: {
+                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
+                            "client_id": ClientId,
+                            "user_profile": ["phone_number": Phone]
+                        ])
+                    }, response: passkeySignupChallengeResponse(authSession: authSession,
+                                                                rpId: Domain,
+                                                                userId: userId,
+                                                                userName: Phone,
+                                                                challenge: challengeString))
+                    
+                    waitUntil(timeout: Timeout) { done in
+                        auth
+                            .passkeySignupChallenge(organization: OrganizationId)
                             .start { result in
                                 expect(result).to(havePasskeySignupChallenge(identifier: Phone))
                                 done()
