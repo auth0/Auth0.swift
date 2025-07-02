@@ -21,7 +21,6 @@ private let Name = "John Doe"
 private let ValidPassword = "I.O.U. a password"
 private let InvalidPassword = "InvalidPassword"
 private let ConnectionName = "Username-Password-Authentication"
-private let OrganizationId = "Organization"
 private let AccessToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let IdToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 private let RefreshToken = UUID().uuidString.replacingOccurrences(of: "-", with: "")
@@ -372,8 +371,7 @@ class AuthenticationSpec: QuickSpec {
                                    challenge: challenge,
                                    connection: ConnectionName,
                                    audience: Audience,
-                                   scope: Scope,
-                                   organization: OrganizationId)
+                                   scope: Scope)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken, RefreshToken))
                                 done()
@@ -411,8 +409,7 @@ class AuthenticationSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         auth
-                            .passkeyLoginChallenge(connection: ConnectionName,
-                                                   organization: OrganizationId)
+                            .passkeyLoginChallenge(connection: ConnectionName)
                             .start { result in
                                 expect(result).to(beSuccessful())
                                 done()
@@ -499,8 +496,7 @@ class AuthenticationSpec: QuickSpec {
                                    challenge: signupChallenge,
                                    connection: ConnectionName,
                                    audience: Audience,
-                                   scope: Scope,
-                                   organization: OrganizationId)
+                                   scope: Scope)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken, RefreshToken))
                                 done()
@@ -550,28 +546,6 @@ class AuthenticationSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         auth
                             .passkeySignupChallenge(phoneNumber: Phone)
-                            .start { result in
-                                expect(result).to(havePasskeySignupChallenge(identifier: Phone))
-                                done()
-                            }
-                    }
-                }
-                
-                it("should request passkey signup challenge with organization and default parameters") {
-                    NetworkStub.addStub(condition: {
-                        $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
-                            "client_id": ClientId,
-                            "user_profile": ["phone_number": Phone]
-                        ])
-                    }, response: passkeySignupChallengeResponse(authSession: authSession,
-                                                                rpId: Domain,
-                                                                userId: userId,
-                                                                userName: Phone,
-                                                                challenge: challengeString))
-                    
-                    waitUntil(timeout: Timeout) { done in
-                        auth
-                            .passkeySignupChallenge(organization: OrganizationId)
                             .start { result in
                                 expect(result).to(havePasskeySignupChallenge(identifier: Phone))
                                 done()
@@ -780,7 +754,7 @@ class AuthenticationSpec: QuickSpec {
                         "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code",
                         "scope": "openid email",
                         "audience": Audience
-                    ])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))       
+                    ])}, response: authResponse(accessToken: AccessToken, idToken: IdToken))
                     
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast([
                         "grant_type": TokenExchangeGrantType,
@@ -797,7 +771,7 @@ class AuthenticationSpec: QuickSpec {
                         NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast([
                         "grant_type": TokenExchangeGrantType,
                         "subject_token": validMissingNameCode,
-                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) && 
+                        "subject_token_type": "http://auth0.com/oauth/token-type/apple-authz-code"]) &&
                             $0.hasNoneOf(["user_profile"])
                     }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
 

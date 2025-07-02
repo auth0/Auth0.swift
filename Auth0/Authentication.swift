@@ -664,7 +664,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
-    ///   - organization: organization id
+    ///   - organization: Identifier of an organization the user is a member of.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -746,7 +746,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - username:    Username of the user. Defaults to `nil`.
     ///   - name:        Display name of the user. Defaults to `nil`.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
-    ///   - organization: Organization id
+    ///   - organization: Identifier of an organization the user is a member of.
     /// - Returns: A request that will yield a passkey signup challenge.
     ///
     /// ## See Also
@@ -1132,8 +1132,8 @@ public extension Authentication {
                           challenge: challenge,
                           connection: connection,
                           audience: audience,
-                          organization: organization,
-                          scope: scope)
+                          scope: scope,
+                          organization: organization)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -1146,14 +1146,14 @@ public extension Authentication {
                challenge: PasskeySignupChallenge,
                connection: String? = nil,
                audience: String? = nil,
-               organization: String? = nil,
-               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope,
+               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
                           audience: audience,
-                          organization: organization,
-                          scope: scope)
+                          scope: scope,
+                          organization: organization)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
