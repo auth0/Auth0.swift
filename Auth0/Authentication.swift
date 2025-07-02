@@ -540,7 +540,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:  API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:  Space-separated list of requested scope values. Defaults to `openid profile email`.
-    ///   - organization: Organization id
+    ///   - organization: Identifier of an organization the user is a member of.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -606,7 +606,7 @@ public protocol Authentication: Trackable, Loggable {
     ///
     /// - Parameters:
     ///    - connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
-    ///    - organization: Organization id
+    ///    - organization: Identifier of an organization the user is a member of.
     /// - Returns: A request that will yield a passkey login challenge.
     ///
     /// ## See Also
