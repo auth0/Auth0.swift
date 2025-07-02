@@ -1126,8 +1126,8 @@ public extension Authentication {
                challenge: PasskeyLoginChallenge,
                connection: String? = nil,
                audience: String? = nil,
-               organization: String? = nil,
-               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope,
+               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,

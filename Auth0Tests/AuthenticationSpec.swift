@@ -587,7 +587,7 @@ class AuthenticationSpec: QuickSpec {
                         $0.isPasskeySignupChallenge(Domain) && $0.hasAtLeast([
                             "client_id": ClientId,
                             "realm": ConnectionName,
-                            "organization": "",
+                            "organization": OrganizationId,
                             "user_profile": ["email": Email, "phone_number": Phone, "username": Username, "name": Name]
                         ])
                     }, response: passkeySignupChallengeResponse(authSession: authSession,
@@ -604,7 +604,7 @@ class AuthenticationSpec: QuickSpec {
                                                     username: Username,
                                                     name: Name,
                                                     connection: ConnectionName,
-                                                    organization: "")
+                                                    organization: OrganizationId)
                             .start { result in
                                 expect(result).to(havePasskeySignupChallenge(identifier: Email))
                                 done()
