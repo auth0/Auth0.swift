@@ -341,7 +341,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
 
-                it("should login with signup passkey and all parameters") {
+                it("should login with passkey and all parameters") {
                     NetworkStub.addStub(condition: {
                         $0.isToken(Domain) &&
                         $0.hasAtLeast([
@@ -466,7 +466,8 @@ class AuthenticationSpec: QuickSpec {
 
                     waitUntil(timeout: Timeout) { done in
                         auth
-                            .login(passkey: signupPasskey, challenge: signupChallenge)
+                            .login(passkey: signupPasskey,
+                                   challenge: signupChallenge)
                             .start { result in
                                 expect(result).to(haveCredentials(AccessToken, IdToken))
                                 done()
