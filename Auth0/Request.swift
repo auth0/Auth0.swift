@@ -12,9 +12,9 @@ let parameterPropertyKey = "com.auth0.parameter"
 
  ```swift
  let request: Request<Credentials, AuthenticationError> = // ...
- 
+
  request.start { result in
-    print(result)
+ print(result)
  }
  ```
  */
@@ -91,7 +91,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
     private func startDataTask(retryCount: Int, request: NSMutableURLRequest, callback: @escaping Callback) {
         do {
-            if let dpop = dpop, try dpop.hasKeypair() || parameters["grant_type"] as? String != "refresh_token" {
+            if let dpop = dpop, try dpop.hasKeypair() || (parameters["grant_type"] as? String != "refresh_token") {
                 let proof = try dpop.generateProof(for: request as URLRequest)
                 request.setValue(proof, forHTTPHeaderField: "DPoP")
             }

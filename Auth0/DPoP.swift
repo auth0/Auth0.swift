@@ -12,10 +12,10 @@ public protocol SenderConstraining {
 
 public extension SenderConstraining {
 
-    func senderConstraining(enabled: Bool, keychainTag: String = Bundle.main.bundleIdentifier!) -> Self {
+    func senderConstraining(enabled: Bool, keychainTag: String = DPoP.defaultKeychainTag) -> Self {
         var instance = self
         if enabled {
-            instance.dpop = DPoP(keychainId: keychainTag)
+            instance.dpop = DPoP(keychainTag: keychainTag)
         } else {
             instance.dpop = nil
         }
@@ -27,13 +27,7 @@ public extension SenderConstraining {
 extension SenderConstraining {
 
     func baseHeaders(accessToken: String, tokenType: String) -> [String: String] {
-        var headers: [String: String] = ["Authorization": "Bearer \(accessToken)"]
-
-        if tokenType.caseInsensitiveCompare("dpop") == .orderedSame {
-            headers["Authorization"] = "\(tokenType) \(accessToken)"
-        }
-
-        return headers
+        return ["Authorization": "\(tokenType) \(accessToken)"]
     }
 
 }
@@ -47,6 +41,7 @@ public struct DPoPError: Auth0Error, Sendable {
         case keychainOperationFailed(String)
         case cryptoKitOperationFailed(String)
         case secKeyOperationFailed(String)
+        case unboundAccessToken(String)
         case other
         case unknown(String)
     }
@@ -76,6 +71,8 @@ public struct DPoPError: Auth0Error, Sendable {
 
     public static let secKeyOperationFailed: DPoPError = .init(code: .secKeyOperationFailed(""))
 
+    public static let unboundAccessToken: DPoPError = .init(code: .unboundAccessToken(""))
+
     /// An unexpected error occurred, and an `Error` value is available.
     /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let other: DPoPError = .init(code: .other)
@@ -94,6 +91,9 @@ extension DPoPError {
         case .cryptoKitOperationFailed(let message): return message
         case .secKeyOperationFailed(let message): return message
         case .keychainOperationFailed(let message): return message
+        case .unboundAccessToken(let tokenType):
+            return "The access token is not bound to a DPoP keypair. It has a token type of \"\(tokenType)\" but it " +
+                     "should be \"DPoP\". Make sure sender constraining is enabled when logging in."
         case .other: return "An unexpected error occurred."
         case .unknown(let message): return message
         }
@@ -136,16 +136,57 @@ public struct DPoP: Sendable {
         let errorDescription: String?
     }
 
+    static public let defaultKeychainTag = Bundle.main.bundleIdentifier!
     static let nonceRequiredErrorCode = "use_dpop_nonce"
     static private let maxRetries = 1
     static private var nonce: String?
 
     private let keyStore: PoPKeyStore
 
-    public init(keychainId: String = Bundle.main.bundleIdentifier!) {
-        self.keyStore = SecureEnclave.isAvailable ?
-        SecureEnclaveKeyStore(keychainService: keychainId) :
-        KeychainKeyStore(keychainTag: keychainId)
+    init(keychainTag: String) {
+        self.keyStore = Self.keyStore(for: keychainTag)
+    }
+
+    static public func generateProof(accessToken: String,
+                                     url: URL,
+                                     method: String,
+                                     nonce: String?,
+                                     keychainTag: String = defaultKeychainTag) throws(DPoPError) -> String {
+        return try withSerialQueueSync {
+            return try Proof.generate(using: DPoP.keyStore(for: keychainTag),
+                                      url: url,
+                                      method: method,
+                                      nonce: nonce,
+                                      accessToken: accessToken)
+        }
+    }
+
+    static public func addHeaders(to request: inout URLRequest,
+                                  credentials: Credentials,
+                                  nonce: String? = nil) throws(DPoPError) {
+        request.setValue("\(credentials.tokenType) \(credentials.accessToken)", forHTTPHeaderField: "Authorization")
+
+        guard credentials.tokenType.caseInsensitiveCompare("dpop") == .orderedSame else { return }
+        guard let url = request.url, let method = request.httpMethod else {
+            assert(request.url != nil, "The request URL must not be nil.")
+            assert(request.httpMethod != nil, "The request HTTP method must not be nil.")
+            return
+        }
+
+        let proof = try generateProof(accessToken: credentials.accessToken, url: url, method: method, nonce: nonce)
+        request.setValue(proof, forHTTPHeaderField: "DPoP")
+    }
+
+    static public func clearKeypair(for keychainTag: String = defaultKeychainTag) throws(DPoPError) {
+        return try withSerialQueueSync {
+            return try Self.keyStore(for: keychainTag).clear()
+        }
+    }
+
+    static func keyStore(for keychainTag: String, useSecureEncave: Bool = SecureEnclave.isAvailable) -> PoPKeyStore {
+        return useSecureEncave ?
+        SecureEnclaveKeyStore(keychainService: keychainTag) :
+        KeychainKeyStore(keychainTag: keychainTag)
     }
 
     static func extractNonce(from response: HTTPURLResponse?) -> String? {
@@ -153,8 +194,9 @@ public struct DPoP: Sendable {
     }
 
     static func storeNonce(from response: HTTPURLResponse?) {
+        guard let newNonce = extractNonce(from: response) else { return }
+
         serialQueue.sync {
-            guard let newNonce = extractNonce(from: response) else { return }
             nonce = newNonce
         }
     }
@@ -170,46 +212,7 @@ public struct DPoP: Sendable {
         return isDPoPError && !isRetryCountExceeded
     }
 
-    public func generateProof(url: URL,
-                              method: String,
-                              nonce: String? = nil,
-                              accessToken: String? = nil) throws(DPoPError) -> String {
-        return try withSerialQueueSync {
-            return try Proof.generate(using: keyStore,
-                                      url: url,
-                                      method: method,
-                                      nonce: nonce ?? Self.nonce,
-                                      accessToken: accessToken)
-        }
-    }
-
-    public func hasKeypair() throws(DPoPError) -> Bool {
-        return try withSerialQueueSync {
-            return try keyStore.hasPrivateKey()
-        }
-    }
-
-    public func clearKeypair() throws(DPoPError) {
-        return try withSerialQueueSync {
-            return try keyStore.clear()
-        }
-    }
-
-    func generateProof(for request: URLRequest) throws(DPoPError) -> String {
-        let authorizationHeader = request.value(forHTTPHeaderField: "Authorization")
-        let accessToken = authorizationHeader?.components(separatedBy: " ").last
-
-        return try generateProof(url: request.url!, method: request.httpMethod!, accessToken: accessToken)
-    }
-
-    func jkt() throws(DPoPError) -> String {
-        return try withSerialQueueSync {
-            let publicKey = try keyStore.privateKey().publicKey
-            return try ECPublicKeyJWK(publicKey: publicKey).thumbprint()
-        }
-    }
-
-    private func withSerialQueueSync<T>(_ block: () throws -> T) throws(DPoPError) -> T {
+    static private func withSerialQueueSync<T>(_ block: () throws -> T) throws(DPoPError) -> T {
         do {
             return try serialQueue.sync {
                 return try block()
@@ -218,6 +221,32 @@ public struct DPoP: Sendable {
             throw error
         } catch {
             throw DPoPError(code: .other, cause: error)
+        }
+    }
+
+    public func hasKeypair() throws(DPoPError) -> Bool {
+        return try Self.withSerialQueueSync {
+            return try keyStore.hasPrivateKey()
+        }
+    }
+
+    func generateProof(for request: URLRequest) throws(DPoPError) -> String {
+        let authorizationHeader = request.value(forHTTPHeaderField: "Authorization")
+        let accessToken = authorizationHeader?.components(separatedBy: " ").last
+
+        return try Self.withSerialQueueSync {
+            return try Proof.generate(using: keyStore,
+                                      url: request.url!,
+                                      method: request.httpMethod!,
+                                      nonce: Self.nonce,
+                                      accessToken: accessToken)
+        }
+    }
+
+    func jkt() throws(DPoPError) -> String {
+        return try Self.withSerialQueueSync {
+            let publicKey = try keyStore.privateKey().publicKey
+            return try ECPublicKeyJWK(publicKey: publicKey).thumbprint()
         }
     }
 

@@ -125,14 +125,6 @@ public struct CredentialsManager {
     ///
     /// - Returns: If the credentials were removed.
     public func clear() -> Bool {
-        do {
-            try authentication.dpop?.clearKeypair()
-        } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("Failed to clear DPoP keypair: \(error)")
-            return false
-        }
-
         return self.storage.deleteEntry(forKey: self.storeKey)
     }
 
@@ -249,26 +241,6 @@ public struct CredentialsManager {
     public func canRenew() -> Bool {
         guard let credentials = self.retrieveCredentials() else { return false }
         return credentials.refreshToken != nil
-    }
-
-    public func dpopProof(url: URL, method: String, nonce: String? = nil) -> String? {
-        guard let dpop = authentication.dpop,
-              let credentials = self.retrieveCredentials(),
-              credentials.tokenType.caseInsensitiveCompare("dpop") == .orderedSame else { return nil }
-
-        do {
-            if try dpop.hasKeypair() {
-                return try dpop.generateProof(url: url,
-                                              method: method,
-                                              nonce: nonce,
-                                              accessToken: credentials.accessToken)
-            }
-        } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP operation failed when generating a proof: \(error)")
-        }
-
-        return nil
     }
 
     #if WEB_AUTH_PLATFORM
