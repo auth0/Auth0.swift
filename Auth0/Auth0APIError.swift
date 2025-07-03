@@ -79,16 +79,16 @@ extension Auth0APIError {
     }
 
     init(from response: ResponseValue) {
-        if let dpopError = DPoP.challenge(from: response) {
-            var info: [String: Any] = [apiErrorCode: dpopError.errorCode]
-            info[apiErrorDescription] = dpopError.errorDescription
-            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.response)
-            self.init(info: info, statusCode: response.response.statusCode)
+        if let dpopChallenge = DPoP.challenge(from: response.value) {
+            var info: [String: Any] = [apiErrorCode: dpopChallenge.errorCode]
+            info[apiErrorDescription] = dpopChallenge.errorDescription
+            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.value)
+            self.init(info: info, statusCode: response.value.statusCode)
         } else if var info = json(response.data) as? [String: Any] {
-            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.response)
-            self.init(info: info, statusCode: response.response.statusCode)
+            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.value)
+            self.init(info: info, statusCode: response.value.statusCode)
         } else {
-            self.init(description: string(response.data), statusCode: response.response.statusCode)
+            self.init(description: string(response.data), statusCode: response.value.statusCode)
         }
     }
 

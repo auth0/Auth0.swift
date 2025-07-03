@@ -6,7 +6,7 @@ func myAcccountDecodable<T: Decodable>(result: Result<ResponseValue, MyAccountEr
         let response = try result.get()
         if let data = response.data {
             let decoder = JSONDecoder()
-            decoder.userInfo[.locationHeaderKey] = response.response.value(forHTTPHeaderField: "Location")
+            decoder.userInfo[.locationHeaderKey] = response.value.value(forHTTPHeaderField: "Location")
             let decodedObject = try decoder.decode(T.self, from: data)
             callback(.success(decodedObject))
         } else {

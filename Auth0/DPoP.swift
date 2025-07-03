@@ -129,17 +129,10 @@ public extension DPoPError {
 
 public struct DPoP: Sendable {
 
-    enum Proof {}
-
-    struct Challenge {
-        let errorCode: String
-        let errorDescription: String?
-    }
-
     static public let defaultKeychainTag = Bundle.main.bundleIdentifier!
     static let nonceRequiredErrorCode = "use_dpop_nonce"
     static private let maxRetries = 1
-    static private var nonce: String?
+    static private var auth0Nonce: String?
 
     private let keyStore: PoPKeyStore
 
@@ -153,7 +146,7 @@ public struct DPoP: Sendable {
                                      nonce: String?,
                                      keychainTag: String = defaultKeychainTag) throws(DPoPError) -> String {
         return try withSerialQueueSync {
-            return try Proof.generate(using: DPoP.keyStore(for: keychainTag),
+            return try DPoPProof.generate(using: DPoP.keyStore(for: keychainTag),
                                       url: url,
                                       method: method,
                                       nonce: nonce,
@@ -183,6 +176,14 @@ public struct DPoP: Sendable {
         }
     }
 
+    static public func isNonceRequired(by response: HTTPURLResponse) -> Bool {
+        return DPoPChallenge(from: response)?.errorCode == nonceRequiredErrorCode
+    }
+
+    static func challenge(from response: HTTPURLResponse) -> DPoPChallenge? {
+        return DPoPChallenge(from: response)
+    }
+
     static func keyStore(for keychainTag: String, useSecureEncave: Bool = SecureEnclave.isAvailable) -> PoPKeyStore {
         return useSecureEncave ?
         SecureEnclaveKeyStore(keychainService: keychainTag) :
@@ -194,15 +195,11 @@ public struct DPoP: Sendable {
     }
 
     static func storeNonce(from response: HTTPURLResponse?) {
-        guard let newNonce = extractNonce(from: response) else { return }
+        guard let nonce = extractNonce(from: response) else { return }
 
         serialQueue.sync {
-            nonce = newNonce
+            auth0Nonce = nonce
         }
-    }
-
-    static func challenge(from response: ResponseValue) -> Challenge? {
-        return Challenge(from: response)
     }
 
     static func shouldRetry(for error: Auth0APIError, retryCount: Int) -> Bool {
@@ -224,10 +221,18 @@ public struct DPoP: Sendable {
         }
     }
 
-    public func hasKeypair() throws(DPoPError) -> Bool {
+    func hasKeypair() throws(DPoPError) -> Bool {
         return try Self.withSerialQueueSync {
             return try keyStore.hasPrivateKey()
         }
+    }
+
+    func shouldGenerateProof(for url: URL, parameters: [String: Any]) throws(DPoPError) -> Bool {
+        if url.lastPathComponent == "token",
+           let grantType = parameters["grant_type"] as? String,
+           grantType != "refresh_token" { return true }
+
+        return try hasKeypair()
     }
 
     func generateProof(for request: URLRequest) throws(DPoPError) -> String {
@@ -235,10 +240,10 @@ public struct DPoP: Sendable {
         let accessToken = authorizationHeader?.components(separatedBy: " ").last
 
         return try Self.withSerialQueueSync {
-            return try Proof.generate(using: keyStore,
+            return try DPoPProof.generate(using: keyStore,
                                       url: request.url!,
                                       method: request.httpMethod!,
-                                      nonce: Self.nonce,
+                                      nonce: Self.auth0Nonce,
                                       accessToken: accessToken)
         }
     }
@@ -254,7 +259,7 @@ public struct DPoP: Sendable {
 
 // MARK: - Proof Generation
 
-extension DPoP.Proof {
+enum DPoPProof {
 
     static func generate(using keyStore: PoPKeyStore,
                          url: URL,
@@ -324,10 +329,18 @@ extension DPoP.Proof {
 
 // MARK: - Challenge Parsing
 
-extension DPoP.Challenge {
+struct DPoPChallenge {
 
-    init?(from response: ResponseValue) {
-        guard let header = response.response.value(forHTTPHeaderField: "WWW-Authenticate"),
+    let errorCode: String
+    let errorDescription: String?
+
+    init(errorCode: String, errorDescription: String?) {
+        self.errorCode = errorCode
+        self.errorDescription = errorDescription
+    }
+
+    init?(from response: HTTPURLResponse) {
+        guard let header = response.value(forHTTPHeaderField: "WWW-Authenticate"),
               header.range(of: "DPoP ", options: .caseInsensitive) != nil else { return nil }
 
         let valuePattern = #"([\x20-\x21\x23-\x5B\x5D-\x7E]+)"#
@@ -621,10 +634,7 @@ struct KeychainKeyStore: PoPKeyStore {
     }
 
     func hasPrivateKey() throws(DPoPError) -> Bool {
-        if try retrieve(forIdentifier: privateKeyIdentifier) != nil {
-            return true
-        }
-        return false
+        return try retrieve(forIdentifier: privateKeyIdentifier) != nil
     }
 
     // When SecureEnclave is not available, we use a simple keychain store
@@ -643,7 +653,7 @@ struct KeychainKeyStore: PoPKeyStore {
         let query = baseQuery(forIdentifier: privateKeyIdentifier)
 
         let status = SecItemDelete(query as CFDictionary)
-        guard status == errSecSuccess else {
+        guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
             let message = "Unable to delete the private key from the Keychain. OSStatus: \(status)."
             throw DPoPError(code: .keychainOperationFailed(message))
         }
