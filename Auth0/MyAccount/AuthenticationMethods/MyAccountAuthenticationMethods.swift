@@ -117,36 +117,29 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError>
 #endif
-    
-    /// <#Description#>
-    /// - Parameter id: <#id description#>
-    /// - Returns: <#description#>
+ 
     func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError>
-    
-    /// <#Description#>
-    /// - Returns: <#description#>
+ 
     func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError>
-    
-    /// <#Description#>
-    /// - Returns: <#description#>
+
     func getFactorStatus() -> Request<[Factor], MyAccountError>
-    
-    /// <#Description#>
-    /// - Parameter id: <#id description#>
-    /// - Returns: <#description#>
+
     func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
-    
-    /// <#Description#>
-    /// - Parameter id: <#id description#>
-    /// - Returns: <#description#>
+
     func deleteAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
     
-    /// <#Description#>
-    /// - Parameter id: <#id description#>
-    /// - Returns: <#description#>
     func updateAuthenticationMethod(id: String,
                                     name: String,
                                     preferredAuthenticationMethod: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func enrollAuthMethod(type: String,
+                          connection: String,
+                          userIdentityId: String,
+                          email: String,
+                          phoneNumber: String,
+                          preferredAuthenticationMethod: String) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
+
+    func confirmEnrollment() -> Request<PasskeyAuthenticationMethod, MyAccountError>
 }
 
 // MARK: - Default Parameters
