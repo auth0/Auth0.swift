@@ -136,33 +136,28 @@ public struct DPoP: Sendable {
         self.keyStore = Self.keyStore(for: keychainTag)
     }
 
-    static public func generateProof(accessToken: String,
-                                     url: URL,
-                                     method: String,
-                                     nonce: String?,
-                                     keychainTag: String = defaultKeychainTag) throws(DPoPError) -> String {
-        return try withSerialQueueSync {
-            return try DPoPProof.generate(using: DPoP.keyStore(for: keychainTag),
-                                      url: url,
-                                      method: method,
-                                      nonce: nonce,
-                                      accessToken: accessToken)
-        }
-    }
-
     static public func addHeaders(to request: inout URLRequest,
-                                  credentials: Credentials,
-                                  nonce: String? = nil) throws(DPoPError) {
-        request.setValue("\(credentials.tokenType) \(credentials.accessToken)", forHTTPHeaderField: "Authorization")
+                                  accessToken: String,
+                                  tokenType: String,
+                                  nonce: String? = nil,
+                                  keychainTag: String = defaultKeychainTag) throws(DPoPError) {
+        request.setValue("\(tokenType) \(accessToken)", forHTTPHeaderField: "Authorization")
 
-        guard credentials.tokenType.caseInsensitiveCompare("dpop") == .orderedSame else { return }
+        guard tokenType.caseInsensitiveCompare("dpop") == .orderedSame else { return }
         guard let url = request.url, let method = request.httpMethod else {
             assert(request.url != nil, "The request URL must not be nil.")
             assert(request.httpMethod != nil, "The request HTTP method must not be nil.")
             return
         }
 
-        let proof = try generateProof(accessToken: credentials.accessToken, url: url, method: method, nonce: nonce)
+        let proof = try withSerialQueueSync {
+            return try DPoPProof.generate(using: DPoP.keyStore(for: keychainTag),
+                                          url: url,
+                                          method: method,
+                                          nonce: nonce,
+                                          accessToken: accessToken)
+        }
+
         request.setValue(proof, forHTTPHeaderField: "DPoP")
     }
 
@@ -237,10 +232,10 @@ public struct DPoP: Sendable {
 
         return try Self.withSerialQueueSync {
             return try DPoPProof.generate(using: keyStore,
-                                      url: request.url!,
-                                      method: request.httpMethod!,
-                                      nonce: Self.auth0Nonce,
-                                      accessToken: accessToken)
+                                          url: request.url!,
+                                          method: request.httpMethod!,
+                                          nonce: Self.auth0Nonce,
+                                          accessToken: accessToken)
         }
     }
 
