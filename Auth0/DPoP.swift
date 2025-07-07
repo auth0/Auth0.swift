@@ -89,7 +89,7 @@ extension DPoPError {
         case .keychainOperationFailed(let message): return message
         case .unboundAccessToken(let tokenType):
             return "The access token is not bound to a DPoP keypair. It has a token type of \"\(tokenType)\" but it " +
-                     "should be \"DPoP\". Make sure sender constraining is enabled when logging in."
+                     "should be \"DPoP\". Make sure DPoP is enabled when logging in."
         case .other: return "An unexpected error occurred."
         case .unknown(let message): return message
         }
