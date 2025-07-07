@@ -37,7 +37,6 @@ public struct DPoPError: Auth0Error, Sendable {
         case keychainOperationFailed(String)
         case cryptoKitOperationFailed(String)
         case secKeyOperationFailed(String)
-        case unboundAccessToken(String)
         case other
         case unknown(String)
     }
@@ -67,8 +66,6 @@ public struct DPoPError: Auth0Error, Sendable {
 
     public static let secKeyOperationFailed: DPoPError = .init(code: .secKeyOperationFailed(""))
 
-    public static let unboundAccessToken: DPoPError = .init(code: .unboundAccessToken(""))
-
     /// An unexpected error occurred, and an `Error` value is available.
     /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let other: DPoPError = .init(code: .other)
@@ -87,9 +84,6 @@ extension DPoPError {
         case .cryptoKitOperationFailed(let message): return message
         case .secKeyOperationFailed(let message): return message
         case .keychainOperationFailed(let message): return message
-        case .unboundAccessToken(let tokenType):
-            return "The access token is not bound to a DPoP keypair. It has a token type of \"\(tokenType)\" but it " +
-                     "should be \"DPoP\". Make sure DPoP is enabled when logging in."
         case .other: return "An unexpected error occurred."
         case .unknown(let message): return message
         }
