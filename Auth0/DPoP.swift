@@ -12,13 +12,9 @@ public protocol SenderConstraining {
 
 public extension SenderConstraining {
 
-    func senderConstraining(enabled: Bool, keychainTag: String = DPoP.defaultKeychainTag) -> Self {
+    func useDPoP(keychainTag: String = DPoP.defaultKeychainTag) -> Self {
         var instance = self
-        if enabled {
-            instance.dpop = DPoP(keychainTag: keychainTag)
-        } else {
-            instance.dpop = nil
-        }
+        instance.dpop = DPoP(keychainTag: keychainTag)
         return instance
     }
 
