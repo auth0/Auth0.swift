@@ -37,8 +37,6 @@ extension SimpleKeychain: CredentialsStorage {
         do {
             return try self.data(forKey: key)
         } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("Failed to retrieve entry from the Keychain for key \"\(key)\": \(error)")
             return nil
         }
     }
@@ -54,8 +52,6 @@ extension SimpleKeychain: CredentialsStorage {
             try self.set(data, forKey: key)
             return true
         } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("Failed to store entry in the Keychain for key \"\(key)\": \(error)")
             return false
         }
     }
@@ -69,8 +65,6 @@ extension SimpleKeychain: CredentialsStorage {
             try self.deleteItem(forKey: key)
             return true
         } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("Failed to delete entry from the Keychain for key \"\(key)\": \(error)")
             return false
         }
     }
