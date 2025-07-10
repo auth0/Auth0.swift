@@ -6,6 +6,7 @@ import Nimble
 @testable import Auth0
 
 private let Url = URL(string: "https://samples.auth0.com")!
+private let DPoPNonce = "nonce"
 private let Timeout: NimbleTimeInterval = .seconds(2)
 
 fileprivate extension Request where T == [String: Any], E == AuthenticationError {
@@ -14,7 +15,8 @@ fileprivate extension Request where T == [String: Any], E == AuthenticationError
          url: URL = Url,
          method: String = "GET",
          parameters: [String: Any] = [:],
-         headers: [String: String] = [:]) {
+         headers: [String: String] = [:],
+         dpop: DPoP? = nil) {
         self.init(session: session,
                   url: url,
                   method: method,
@@ -22,7 +24,8 @@ fileprivate extension Request where T == [String: Any], E == AuthenticationError
                   parameters: parameters,
                   headers: headers,
                   logger: nil,
-                  telemetry: Telemetry())
+                  telemetry: Telemetry(),
+                  dpop: dpop)
     }
 
 }
@@ -127,6 +130,171 @@ class RequestSpec: QuickSpec {
                     let request = Request(headers: ["foo": "bar"])
                     expect(request.headers(["foo": "baz"]).headers["foo"]) == "baz"
                     expect(request.headers["foo"]) == "bar"
+                }
+
+            }
+
+            context("dpop") {
+
+                beforeEach {
+                    // Create a key pair
+                    _ = try DPoP.keyStore(for: DPoP.defaultKeychainTag).privateKey()
+                }
+
+                afterEach {
+                    DPoP.auth0Nonce = nil
+                    try DPoP.clearKeypair(for: DPoP.defaultKeychainTag)
+                }
+
+                it("should not include dpop by default") {
+                    let request = Request()
+                    expect(request.dpop).to(beNil())
+                }
+
+                it("should create a request with dpop") {
+                    let request = Request(dpop: newDPoP())
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should preserve dpop when adding parameters") {
+                    let request = Request(dpop: newDPoP()).parameters(["foo": "bar"])
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should preserve dpop when adding headers") {
+                    let request = Request(dpop: newDPoP()).headers(["foo": "bar"])
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should include the DPoP proof in the headers") {
+                    var capturedHeaders: [String: String] = [:]
+
+                    NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                        response: { request in
+                        if let headers = request.allHTTPHeaderFields {
+                            capturedHeaders = headers
+                        }
+                        return apiSuccessResponse()(request)
+                    })
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request(dpop: newDPoP()).start { result in
+                            expect(capturedHeaders["DPoP"]).toNot(beNil())
+                            done()
+                        }
+                    }
+                }
+
+                it("should retry the request once on DPoP nonce error") {
+                    var callCount = 0
+
+                    NetworkStub.addStub(condition: { $0.isHost(Url.host!) }, response: { request in
+                        callCount += 1
+
+                        // First call returns DPoP nonce error, second call succeeds
+                        if callCount == 1 {
+                            return dpopErrorResponse(url: Url, nonce: DPoPNonce)(request)
+                        }
+                        return apiSuccessResponse()(request)
+                    })
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request().start { result in
+                            expect(callCount) == 2
+
+                            switch result {
+                            case .success:
+                                done()
+                            case .failure(let error):
+                                fail("Expected success but got error: \(error)")
+                            }
+                        }
+                    }
+                }
+
+                it("should not retry the request more than once") {
+                    var callCount = 0
+
+                    NetworkStub.addStub(condition: { $0.isHost(Url.host!) }, response: { request in
+                        callCount += 1
+                        // Always return DPoP nonce error
+                        return dpopErrorResponse(url: Url, nonce: DPoPNonce)(request)
+                    })
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request().start { result in
+                            expect(callCount) == 2 // Should only call twice (original + 1 retry)
+
+                            switch result {
+                            case .success:
+                                fail("Expected failure but got success")
+                            case .failure:
+                                done()
+                            }
+                        }
+                    }
+                }
+
+                it("should not retry the request on non-DPoP errors") {
+                    var callCount = 0
+
+                    NetworkStub.addStub(condition: { $0.isHost(Url.host!) }, response: { request in
+                        callCount += 1
+                        return apiFailureResponse()(request)
+                    })
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request(dpop: newDPoP()).start { result in
+                            expect(callCount) == 1
+                            done()
+                        }
+                    }
+                }
+
+                it("should store the DPoP nonce contained in a successful response") {
+                    NetworkStub.addStub(condition: {$0.isHost(Url.host!) },
+                                        response: apiSuccessResponse(headers: ["DPoP-Nonce": DPoPNonce]))
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request(dpop: newDPoP()).start { result in
+                            expect(DPoP.auth0Nonce) == DPoPNonce
+                            done()
+                        }
+                    }
+                }
+
+                it("should store the DPoP nonce contained in an error response") {
+                    NetworkStub.addStub(condition: {$0.isHost(Url.host!) },
+                                        response: dpopErrorResponse(url: Url, nonce: DPoPNonce))
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request(dpop: newDPoP()).start { result in
+                            expect(DPoP.auth0Nonce) == DPoPNonce
+                            done()
+                        }
+                    }
+                }
+
+                it("should store the DPoP nonce after retrying a request") {
+                    let newNonce = "newNonce"
+                    var callCount = 0
+
+                    NetworkStub.addStub(condition: { $0.isHost(Url.host!) }, 
+                                        response: { request in
+                        callCount += 1
+
+                        if callCount == 1 {
+                            return dpopErrorResponse(url: Url, nonce: DPoPNonce)(request)
+                        }
+                        return apiSuccessResponse(headers: ["DPoP-Nonce": newNonce])(request)
+                    })
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request(dpop: newDPoP()).start { result in
+                            expect(DPoP.auth0Nonce) == newNonce
+                            done()
+                        }
+                    }
                 }
 
             }

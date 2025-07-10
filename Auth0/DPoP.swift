@@ -121,8 +121,8 @@ public struct DPoP: Sendable {
 
     static public let defaultKeychainTag = Bundle.main.bundleIdentifier!
     static let nonceRequiredErrorCode = "use_dpop_nonce"
+    static var auth0Nonce: String?
     static private let maxRetries = 1
-    static private var auth0Nonce: String?
 
     private let keyStore: PoPKeyStore
 
@@ -562,7 +562,9 @@ struct SecureEnclaveKeyStore: PoPKeyStore {
     private func store(_ key: GenericPasswordConvertible, forIdentifier identifier: String) throws(DPoPError) {
         // Describe a generic password
         var query = baseQuery(forIdentifier: identifier)
+        #if !os(macOS)
         query[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        #endif
         query[kSecValueData] = key.rawRepresentation
 
         let status = SecItemAdd(query as CFDictionary, nil)
@@ -602,8 +604,7 @@ struct SecureEnclaveKeyStore: PoPKeyStore {
         return [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: keychainService,
-            kSecAttrAccount: identifier,
-            kSecUseDataProtectionKeychain: true
+            kSecAttrAccount: identifier
         ]
     }
 

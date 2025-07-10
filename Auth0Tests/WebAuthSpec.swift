@@ -304,20 +304,50 @@ class WebAuthSpec: QuickSpec {
             }
 
             context("encoding") {
-                
+
                 it("should encode + as %2B"){
                     let url = try! newWebAuth()
                             .parameters(["login_hint": "first+last@host.com"])
                             .buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State)
                     expect(url.absoluteString.contains("first%2Blast@host.com")).to(beTrue())
                 }
-                
+
             }
 
             it("should build with a custom authorize url") {
                 let url = URL(string: "https://example.com/authorize")!
                 expect(newWebAuth().authorizeURL(url).overrideAuthorizeURL) == url
             }
+
+            it("should handle buildAuthorizeURL errors") {
+                let invitationUrl = URL(string: "https://example.com?invalid=query")!
+                let expectedError = WebAuthError(code: .invalidInvitationURL(invitationUrl.absoluteString))
+                let webAuth = newWebAuth().invitationURL(invitationUrl) // Invalid invitation URL
+
+                expect({
+                    _ = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State)
+                }).to(throwError(expectedError))
+            }
+
+            it("should include dpop_jkt parameter when DPoP is enabled") {
+                let webAuth = newWebAuth().useDPoP()
+                let url = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State)
+                let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+                let dpopJktItem = components?.queryItems?.first { $0.name == "dpop_jkt" }
+
+                expect(dpopJktItem).toNot(beNil())
+                expect(dpopJktItem?.value).toNot(beEmpty())
+            }
+
+            it("should not include dpop_jkt parameter when DPoP is not enabled") {
+                let webAuth = newWebAuth()
+                let url = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State)
+                let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+                let dpopJktItem = components?.queryItems?.first { $0.name == "dpop_jkt" }
+
+                expect(dpopJktItem).to(beNil())
+            }
+
         }
 
         describe("redirect uri") {
@@ -810,4 +840,11 @@ class MockUserAgent: WebAuthUserAgent {
         self.callback(result)
     }
 
+}
+
+// - MARK: Utilities
+
+// TODO: Move this to a more appropriate location
+func newDPoP() -> DPoP {
+    return DPoP(keychainTag: "test_dpop_key")
 }

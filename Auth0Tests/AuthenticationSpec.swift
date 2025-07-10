@@ -108,6 +108,20 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should use DPoP when it is enabled") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.login(withOTP: OTP, mfaToken: MFAToken)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not use DPoP when it is not enabled") {
+                let request = auth.login(withOTP: OTP, mfaToken: MFAToken)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         describe("login MFA OOB") {
@@ -158,6 +172,20 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should use DPoP when it is enabled") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.login(withOOBCode: OOB, mfaToken: MFAToken)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not use DPoP when it is not enabled") {
+                let request = auth.login(withOOBCode: OOB, mfaToken: MFAToken)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         describe("login MFA recovery code") {
@@ -194,6 +222,20 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should use DPoP when it is enabled") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.login(withRecoveryCode: RecoveryCode, mfaToken: MFAToken)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not use DPoP when it is not enabled") {
+                let request = auth.login(withRecoveryCode: RecoveryCode, mfaToken: MFAToken)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         // MARK:- MFA Challenge
@@ -269,6 +311,14 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should not use DPoP") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.multifactorChallenge(mfaToken: MFAToken)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
 
         // MARK: - Passkeys
@@ -380,6 +430,27 @@ class AuthenticationSpec: QuickSpec {
 
                 }
 
+                it("should use DPoP when it is enabled") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.login(passkey: passkey,
+                                             challenge: challenge,
+                                             connection: ConnectionName,
+                                             audience: Audience,
+                                             scope: Scope)
+
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should not use DPoP when it is not enabled") {
+                    let request = auth.login(passkey: passkey,
+                                             challenge: challenge,
+                                             connection: ConnectionName,
+                                             audience: Audience,
+                                             scope: Scope)
+
+                    expect(request.dpop).to(beNil())
+                }
+
             }
 
             describe("passkey login challenge") {
@@ -415,6 +486,13 @@ class AuthenticationSpec: QuickSpec {
                                 done()
                             }
                     }
+                }
+
+                it("should not use DPoP") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.passkeyLoginChallenge(connection: ConnectionName)
+
+                    expect(request.dpop).to(beNil())
                 }
 
             }
@@ -503,6 +581,27 @@ class AuthenticationSpec: QuickSpec {
                             }
                     }
 
+                }
+
+                it("should use DPoP when it is enabled") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.login(passkey: signupPasskey,
+                                             challenge: signupChallenge,
+                                             connection: ConnectionName,
+                                             audience: Audience,
+                                             scope: Scope)
+
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should not use DPoP when it is not enabled") {
+                    let request = auth.login(passkey: signupPasskey,
+                                             challenge: signupChallenge,
+                                             connection: ConnectionName,
+                                             audience: Audience,
+                                             scope: Scope)
+
+                    expect(request.dpop).to(beNil())
                 }
 
             }
@@ -604,6 +703,17 @@ class AuthenticationSpec: QuickSpec {
 
                 }
 
+                it("should not use DPoP") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.passkeySignupChallenge(email: Email,
+                                                              phoneNumber: Phone,
+                                                              username: Username,
+                                                              name: Name,
+                                                              connection: ConnectionName)
+
+                    expect(request.dpop).to(beNil())
+                }
+
             }
 
         }
@@ -691,22 +801,36 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-        }
-        
-        it("should fail to receive credentials") {
-            let invalidRefreshToken = "invalidtoken"
-            
-            NetworkStub.addStub(condition: {
-                $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": invalidRefreshToken])
-            }, response: authFailure(error: "", description: ""))
-            
-            waitUntil(timeout: Timeout) { done in
-                auth.renew(withRefreshToken: invalidRefreshToken)
-                    .start { result in
-                        expect(result).toNot(haveCredentials())
-                        done()
+
+            it("should fail to receive credentials") {
+                let invalidRefreshToken = "invalidtoken"
+
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": invalidRefreshToken])
+                }, response: authFailure(error: "", description: ""))
+
+                waitUntil(timeout: Timeout) { done in
+                    auth.renew(withRefreshToken: invalidRefreshToken)
+                        .start { result in
+                            expect(result).toNot(haveCredentials())
+                            done()
+                        }
                 }
             }
+
+            it("should use DPoP when it is enabled") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.renew(withRefreshToken: refreshToken)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not use DPoP when it is not enabled") {
+                let request = auth.renew(withRefreshToken: refreshToken)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
 
         // MARK:- Token Exchange
@@ -909,6 +1033,20 @@ class AuthenticationSpec: QuickSpec {
                         }
                     }
                 }
+
+                it("should use DPoP when it is enabled") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.login(appleAuthorizationCode: validCode)
+
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should not use DPoP when it is not enabled") {
+                    let request = auth.login(appleAuthorizationCode: validCode)
+
+                    expect(request.dpop).to(beNil())
+                }
+
             }
             
             context("facebook") {
@@ -990,6 +1128,20 @@ class AuthenticationSpec: QuickSpec {
                         }
                     }
                 }
+
+                it("should use DPoP when it is enabled") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should not use DPoP when it is not enabled") {
+                    let request = auth.login(facebookSessionAccessToken: sessionAccessToken, profile: profile)
+
+                    expect(request.dpop).to(beNil())
+                }
+
             }
             
         }
@@ -1019,7 +1171,14 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            it("should not use DPoP") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.revoke(refreshToken: refreshToken)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         // MARK:- password-realm grant type
@@ -1095,7 +1254,20 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            it("should use DPoP when it is enabled") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm")
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not use DPoP when it is not enabled") {
+                let request = auth.login(usernameOrEmail: SupportAtAuth0, password: ValidPassword, realmOrConnection: "myrealm")
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         // MARK:- password grant type
@@ -1161,7 +1333,20 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            it("should use DPoP when it is enabled") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not use DPoP when it is not enabled") {
+                let request = auth.loginDefaultDirectory(withUsername: SupportAtAuth0, password: ValidPassword)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         describe("create user") {
@@ -1243,7 +1428,14 @@ class AuthenticationSpec: QuickSpec {
                 }
                 
             }
-            
+
+            it("should not use DPoP") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.signup(email: SupportAtAuth0, password: ValidPassword, connection: ConnectionName)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         describe("reset password") {
@@ -1269,7 +1461,14 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            it("should not use DPoP") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.resetPassword(email: SupportAtAuth0, connection: ConnectionName)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         describe("passwordless email") {
@@ -1303,7 +1502,14 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            it("should not use DPoP") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.startPasswordless(email: SupportAtAuth0)
+
+                expect(request.dpop).to(beNil())
+            }
+
             context("passwordless login") {
                 
                 it("should login with email code") {
@@ -1365,8 +1571,20 @@ class AuthenticationSpec: QuickSpec {
                         }
                     }
                 }
-                
-                
+
+                it("should use DPoP when it is enabled") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.login(email: SupportAtAuth0, code: OTP)
+
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should not use DPoP when it is not enabled") {
+                    let request = auth.login(email: SupportAtAuth0, code: OTP)
+
+                    expect(request.dpop).to(beNil())
+                }
+
             }
         }
         
@@ -1401,7 +1619,14 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            it("should not use DPoP") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.startPasswordless(phoneNumber: Phone)
+
+                expect(request.dpop).to(beNil())
+            }
+
             context("passwordless login") {
                 
                 let smsRealm = "sms"
@@ -1465,7 +1690,20 @@ class AuthenticationSpec: QuickSpec {
                         }
                     }
                 }
-                
+
+                it("should use DPoP when it is enabled") {
+                    let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                    let request = auth.login(phoneNumber: Phone, code: OTP)
+
+                    expect(request.dpop).toNot(beNil())
+                }
+
+                it("should not use DPoP when it is not enabled") {
+                    let request = auth.login(phoneNumber: Phone, code: OTP)
+
+                    expect(request.dpop).to(beNil())
+                }
+
             }
         }
         
@@ -1490,9 +1728,58 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            it("should use DPoP when it is enabled") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.userInfo(withAccessToken: AccessToken)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not use DPoP when it is not enabled") {
+                let request = auth.userInfo(withAccessToken: AccessToken)
+
+                expect(request.dpop).to(beNil())
+            }
+
+            context("token type") {
+
+                it("should return user information using a Bearer token") {
+                    NetworkStub.addStub(condition: { $0.isUserInfo(Domain) && $0.hasBearerToken(AccessToken) },
+                                        response: apiSuccessResponse(json: basicProfile()))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.userInfo(withAccessToken: AccessToken, tokenType: "Bearer").start { result in
+                            expect(result).to(haveProfile(Sub))
+                            done()
+                        }
+                    }
+                }
+
+                it("should return user information using a DPoP token") {
+                    NetworkStub.addStub(condition: { $0.isUserInfo(Domain) && $0.hasDPoPToken(AccessToken) },
+                                        response: apiSuccessResponse(json: basicProfile()))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.userInfo(withAccessToken: AccessToken, tokenType: "DPoP").start { result in
+                            expect(result).to(haveProfile(Sub))
+                            done()
+                        }
+                    }
+                }
+
+                it("should use Bearer as the default token type") {
+                    NetworkStub.addStub(condition: { $0.isUserInfo(Domain) && $0.hasBearerToken(AccessToken) },
+                                        response: apiSuccessResponse(json: basicProfile()))
+                    waitUntil(timeout: Timeout) { done in
+                        auth.userInfo(withAccessToken: AccessToken).start { result in
+                            expect(result).to(haveProfile(Sub))
+                            done()
+                        }
+                    }
+                }
+
+            }
         }
-        
+
         describe("code exchange") {
             
             var code: String!
@@ -1526,7 +1813,20 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            it("should use DPoP when it is enabled") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not use DPoP when it is not enabled") {
+                let request = auth.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         describe("sso exchange") {
@@ -1599,10 +1899,24 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
+            it("should use DPoP when it is enabled") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.ssoExchange(withRefreshToken: RefreshToken)
+
+                expect(request.dpop).toNot(beNil())
+            }
+
+            it("should not use DPoP when it is not enabled") {
+                let request = auth.ssoExchange(withRefreshToken: RefreshToken)
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
         
         describe("jwks") {
+
             it("should fetch the jwks") {
                 NetworkStub.addStub(condition: { $0.isJWKSPath(Domain) }, response: jwksResponse())
                 waitUntil { done in
@@ -1622,7 +1936,15 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+
+            it("should not use DPoP") {
+                let auth = Auth0Authentication(clientId: ClientId, url: DomainURL).useDPoP()
+                let request = auth.jwks()
+
+                expect(request.dpop).to(beNil())
+            }
+
         }
-        
+
     }
 }

@@ -417,7 +417,8 @@ struct Auth0Authentication: Authentication {
                        handle: authenticationObject,
                        headers: headers,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: dpop)
     }
 
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
@@ -535,7 +536,8 @@ private extension Auth0Authentication {
                        handle: authenticationDecodable,
                        parameters: parameters,
                        logger: self.logger,
-                       telemetry: self.telemetry)
+                       telemetry: self.telemetry,
+                       dpop: dpop)
     }
 
     func token<T: Codable>() -> Request<T, AuthenticationError> {

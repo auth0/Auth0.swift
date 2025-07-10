@@ -486,6 +486,36 @@ class OAuthErrorBehavior: Behavior<[String:Any]> {
             expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
             expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
         }
+
+        describe("DPoP nonce extraction") {
+
+            it("should extract DPoP nonce from error response") {
+                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                               statusCode: 400,
+                                               httpVersion: nil,
+                                               headerFields: ["DPoP-Nonce": "test-nonce"])!
+                let errorDictionary = ["error": "use_dpop_nonce", "error_description": "DPoP nonce required"]
+                let data = try! JSONSerialization.data(withJSONObject: errorDictionary)
+                let responseValue = ResponseValue(value: response, data: data)
+                let error = AuthenticationError(from: responseValue)
+
+                expect(error.info[apiErrorDPoPNonce] as? String) == "test-nonce"
+            }
+
+            it("should handle missing DPoP nonce in error") {
+                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                               statusCode: 400,
+                                               httpVersion: nil,
+                                               headerFields: nil)!
+                let errorDictionary = ["error": "use_dpop_nonce", "error_description": "DPoP nonce required"]
+                let data = try! JSONSerialization.data(withJSONObject: errorDictionary)
+                let responseValue = ResponseValue(value: response, data: data)
+                let error = AuthenticationError(from: responseValue)
+
+                expect(error.info[apiErrorDPoPNonce]).to(beNil())
+            }
+
+        }
     }
 }
 
