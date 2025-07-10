@@ -18,24 +18,28 @@ class ResponseSpec: QuickSpec {
 
             it("should handle HTTP 204 responses") {
                 let response = Response<AuthenticationError>(data: nil, response: http(204), error: nil)
-                expect(try! response.result()).to(beNil())
+                let result = try! response.result()
+                expect(result.value.statusCode) == 204
+                expect(result.data).to(beNil())
             }
 
             it("should handle valid JSON") {
                 let response = Response<AuthenticationError>(data: JSONData, response: http(200), error: nil)
                 expect(try? response.result()).toNot(beNil())
 
-                let result: ResponseValue = try response.result()!
-                expect(result.headers).toNot(beEmpty())
-                expect(result.body as? [String: Any]).toNot(beEmpty())
+                let result: ResponseValue = try response.result()
+                expect(result.value.allHeaderFields).toNot(beEmpty())
                 expect(result.data).toNot(beEmpty())
             }
 
-            it("should handle string as json for reset password") {
+            it("should handle invalid JSON") {
                 let data = "A simple String".data(using: .utf8)
-                let response = Response<AuthenticationError>(data: data, response: http(200, url: Foundation.URL(string: "https://samples.auth0.com/dbconnections/change_password")!), error: nil)
-                expect(try! response.result()).to(beNil())
+                let response = Response<AuthenticationError>(data: data, response: http(200), error: nil)
+                let result = try! response.result()
+                expect(result.value.statusCode) == 200
+                expect(result.data).toNot(beEmpty())
             }
+
         }
 
         describe("failed response") {
@@ -57,13 +61,9 @@ class ResponseSpec: QuickSpec {
 
             it("should fail with empty HTTP 200 responses") {
                 let response = Response<AuthenticationError>(data: nil, response: http(200), error: nil)
-                expect(try? response.result()).to(beNil())
-            }
-
-            it("should fail with invalid JSON") {
-                let data = "A simple String".data(using: .utf8)
-                let response = Response<AuthenticationError>(data: data, response: http(200), error: nil)
-                expect(try? response.result()).to(beNil())
+                let result = try! response.result()
+                expect(result.value.statusCode) == 200
+                expect(result.data).to(beNil())
             }
 
             it("should fail with NSError") {

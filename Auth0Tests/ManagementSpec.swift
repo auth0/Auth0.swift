@@ -51,7 +51,8 @@ class ManagementSpec: QuickSpec {
                 it("should yield success with payload") {
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
-                    management.managementObject(response: response) { actual = $0 }
+                    let responseValue = try! response.result()
+                    management.managementObject(result: .success(responseValue)) { actual = $0 }
                     expect(actual).toEventually(haveObjectWithAttributes(["key"]))
                 }
             }
@@ -65,7 +66,12 @@ class ManagementSpec: QuickSpec {
                     let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
-                    management.managementObject(response: response) { actual = $0 }
+                    do {
+                        let responseValue = try response.result()
+                        management.managementObject(result: .success(responseValue)) { actual = $0 }
+                    } catch {
+                        management.managementObject(result: .failure(error as! ManagementError)) { actual = $0 }
+                    }
                     expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
                 }
 
@@ -76,7 +82,12 @@ class ManagementSpec: QuickSpec {
                     let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
-                    management.managementObject(response: response) { actual = $0 }
+                    do {
+                        let responseValue = try response.result()
+                        management.managementObject(result: .success(responseValue)) { actual = $0 }
+                    } catch {
+                        management.managementObject(result: .failure(error as! ManagementError)) { actual = $0 }
+                    }
                     expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
                 }
 
@@ -87,7 +98,12 @@ class ManagementSpec: QuickSpec {
                     let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
-                    management.managementObject(response: response) { actual = $0 }
+                    do {
+                        let responseValue = try response.result()
+                        management.managementObject(result: .success(responseValue)) { actual = $0 }
+                    } catch {
+                        management.managementObject(result: .failure(error as! ManagementError)) { actual = $0 }
+                    }
                     expect(actual).toEventually(haveManagementError(description: errorBody, code: nonJSONError, statusCode: statusCode))
                 }
 
@@ -98,7 +114,12 @@ class ManagementSpec: QuickSpec {
                     let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: data, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
-                    management.managementObject(response: response) { actual = $0 }
+                    do {
+                        let responseValue = try response.result()
+                        management.managementObject(result: .success(responseValue)) { actual = $0 }
+                    } catch {
+                        management.managementObject(result: .failure(error as! ManagementError)) { actual = $0 }
+                    }
                     expect(actual).toEventually(haveManagementError("error", description: "description", code: "code", statusCode: statusCode))
                 }
 
@@ -107,7 +128,12 @@ class ManagementSpec: QuickSpec {
                     let http = HTTPURLResponse(url: DomainURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)
                     let response = Response<ManagementError>(data: nil, response: http, error: nil)
                     var actual: ManagementResult<ManagementObject>? = nil
-                    management.managementObject(response: response) { actual = $0 }
+                    do {
+                        let responseValue = try response.result()
+                        management.managementObject(result: .success(responseValue)) { actual = $0 }
+                    } catch {
+                        management.managementObject(result: .failure(error as! ManagementError)) { actual = $0 }
+                    }
                     expect(actual).toEventually(haveManagementError(description: "Empty response body.", code: emptyBodyError, statusCode: statusCode))
                 }
 
@@ -116,7 +142,12 @@ class ManagementSpec: QuickSpec {
                     let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
                     let response = Response<ManagementError>(data: nil, response: nil, error: cause)
                     var actual: ManagementResult<ManagementObject>? = nil
-                    management.managementObject(response: response) { actual = $0 }
+                    do {
+                        let responseValue = try response.result()
+                        management.managementObject(result: .success(responseValue)) { actual = $0 }
+                    } catch {
+                        management.managementObject(result: .failure(error as! ManagementError)) { actual = $0 }
+                    }
                     expect(actual).toEventually(haveManagementError(description: description, code: nonJSONError, cause: cause))
                 }
 
