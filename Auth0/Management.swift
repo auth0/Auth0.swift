@@ -24,9 +24,10 @@ struct Management: Trackable, Loggable {
         self.telemetry = telemetry
     }
 
-    func managementObject(response: Response<ManagementError>, callback: Request<ManagementObject, ManagementError>.Callback) {
+    func managementObject(result: Result<ResponseValue, ManagementError>, callback: Request<ManagementObject, ManagementError>.Callback) {
         do {
-            if let dictionary = try response.result()?.body as? ManagementObject {
+            let response = try result.get()
+            if let dictionary = json(response.data) as? ManagementObject {
                 callback(.success(dictionary))
             } else {
                 callback(.failure(ManagementError(from: response)))
@@ -36,9 +37,10 @@ struct Management: Trackable, Loggable {
         }
     }
 
-    func managementObjects(response: Response<ManagementError>, callback: Request<[ManagementObject], ManagementError>.Callback) {
+    func managementObjects(result: Result<ResponseValue, ManagementError>, callback: Request<[ManagementObject], ManagementError>.Callback) {
         do {
-            if let list = try response.result()?.body as? [ManagementObject] {
+            let response = try result.get()
+            if let list = json(response.data) as? [ManagementObject] {
                 callback(.success(list))
             } else {
                 callback(.failure(ManagementError(from: response)))

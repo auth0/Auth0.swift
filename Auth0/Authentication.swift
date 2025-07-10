@@ -13,7 +13,7 @@ public typealias DatabaseUser = (email: String, username: String?, verified: Boo
 
  - ``AuthenticationError``
  */
-public protocol Authentication: Trackable, Loggable {
+public protocol Authentication: SenderConstraining, Trackable, Loggable {
 
     /// The Auth0 Client ID.
     var clientId: String { get }
@@ -873,7 +873,7 @@ public protocol Authentication: Trackable, Loggable {
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/user-profile/get-user-info)
      */
-    func userInfo(withAccessToken accessToken: String) -> Request<UserInfo, AuthenticationError>
+    func userInfo(withAccessToken accessToken: String, tokenType: String) -> Request<UserInfo, AuthenticationError>
 
     /**
      Performs the last step of Proof Key for Code Exchange (PKCE).
@@ -1160,6 +1160,11 @@ public extension Authentication {
 
     func startPasswordless(phoneNumber: String, type: PasswordlessType = .code, connection: String = "sms") -> Request<Void, AuthenticationError> {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
+    }
+
+    func userInfo(withAccessToken accessToken: String,
+                  tokenType: String = "Bearer") -> Request<UserInfo, AuthenticationError> {
+        self.userInfo(withAccessToken: accessToken, tokenType: tokenType)
     }
 
     func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {

@@ -17,19 +17,12 @@ class AuthenticationErrorSpec: QuickSpec {
 
         describe("init") {
 
-            it("should initialize with info") {
-                let info: [String: Any] = ["foo": "bar"]
-                let error = AuthenticationError(info: info)
-                expect(error.info["foo"] as? String) == "bar"
-                expect(error.info.count) == 2
-                expect(error.statusCode) == 0
-                expect(error.cause).to(beNil())
-            }
-
-            it("should initialize with info & status code") {
+            it("should initialize with info and status code") {
                 let info: [String: Any] = ["foo": "bar"]
                 let statusCode = 400
                 let error = AuthenticationError(info: info, statusCode: statusCode)
+                expect(error.info["foo"] as? String) == "bar"
+                expect(error.info.count) == 2
                 expect(error.statusCode) == statusCode
             }
 
@@ -65,25 +58,17 @@ class AuthenticationErrorSpec: QuickSpec {
             it("should initialize with response") {
                 let description = "foo"
                 let data = description.data(using: .utf8)!
-                let response = Response<AuthenticationError>(data: data, response: nil, error: nil)
-                let error = AuthenticationError(from: response)
-                expect(error.localizedDescription) == description
-                expect(error.statusCode) == 0
-                expect(error.cause).to(beNil())
-            }
-
-            it("should initialize with response & status code") {
-                let description = "foo"
-                let data = description.data(using: .utf8)!
                 let statusCode = 400
-                let httpResponse = HTTPURLResponse(url: URL(string: "example.com")!,
+                let httpResponse = HTTPURLResponse(url: URL(string: "https://example.com")!,
                                                    statusCode: statusCode,
                                                    httpVersion: nil,
-                                                   headerFields: nil)
-                let response = Response<AuthenticationError>(data: data, response: httpResponse, error: nil)
-                let error = AuthenticationError(from: response)
-                expect(error.localizedDescription) == description
+                                                   headerFields: nil)!
+                let responseValue = ResponseValue(value: httpResponse, data: data)
+                let error = AuthenticationError(from: responseValue)
+
+                expect(error.localizedDescription) == "\(description)"
                 expect(error.statusCode) == statusCode
+                expect(error.cause).to(beNil())
             }
 
             it("should initialize with cause") {
@@ -134,7 +119,7 @@ class AuthenticationErrorSpec: QuickSpec {
 
             it("should access the internal info dictionary") {
                 let info: [String: Any] = ["foo": "bar"]
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.info["foo"] as? String) == "bar"
             }
 
@@ -427,14 +412,14 @@ class AuthenticationErrorSpec: QuickSpec {
             it("should return the message") {
                 let description = "foo"
                 let info: [String: Any] = ["description": description]
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.localizedDescription) == description
             }
 
             it("should return the default message") {
-                let info: [String: Any] = ["foo": "bar", "statusCode": 0]
+                let info: [String: Any] = ["foo": "bar", "statusCode": 400]
                 let message = "Failed with unknown error: \(info)."
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.localizedDescription) == message
             }
 
@@ -443,7 +428,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 let cause =  MockError(message: "bar.")
                 let info: [String: Any] = ["description": description, "cause": cause]
                 let message = "\(description) CAUSE: \(cause.localizedDescription)"
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.localizedDescription) == message
             }
 
@@ -452,7 +437,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 let cause =  MockError(message: "bar")
                 let info: [String: Any] = ["description": description, "cause": cause]
                 let message = "\(description). CAUSE: \(cause.localizedDescription)."
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.localizedDescription) == message
             }
 

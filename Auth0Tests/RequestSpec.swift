@@ -234,15 +234,19 @@ class RequestSpec: QuickSpec {
     }
 }
 
-func plainJson(from response: Response<AuthenticationError>,
+func plainJson(from result: Result<ResponseValue, AuthenticationError>,
                callback: Request<[String: Any], AuthenticationError>.Callback) {
     do {
-        if let dictionary = try response.result()?.body as? [String: Any] {
+        let response = try result.get()
+        if let data = response.data,
+           let dictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
             callback(.success(dictionary))
         } else {
             callback(.failure(AuthenticationError(from: response)))
         }
-    } catch {
+    } catch let error as AuthenticationError {
         callback(.failure(error))
+    } catch {
+        callback(.failure(AuthenticationError(cause: error)))
     }
 }
