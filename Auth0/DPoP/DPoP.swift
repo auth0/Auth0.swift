@@ -124,4 +124,12 @@ public struct DPoP: Sendable {
         }
     }
 
+    // MARK: - Testing Utilities
+
+    static func resetNonce() {
+        serialQueue.sync {
+            Self.auth0Nonce = nil
+        }
+    }
+
 }

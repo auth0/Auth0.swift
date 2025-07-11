@@ -143,6 +143,7 @@ class RequestSpec: QuickSpec {
 
                 afterEach {
                     try DPoP.clearKeypair(for: DPoP.defaultKeychainTag)
+                    DPoP.resetNonce()
                 }
 
                 it("should not include dpop by default") {
