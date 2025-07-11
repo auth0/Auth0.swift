@@ -142,7 +142,6 @@ class RequestSpec: QuickSpec {
                 }
 
                 afterEach {
-                    DPoP.auth0Nonce = nil
                     try DPoP.clearKeypair(for: DPoP.defaultKeychainTag)
                 }
 
