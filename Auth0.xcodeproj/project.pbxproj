@@ -202,6 +202,10 @@
 		5C505FE32E2587BF005D0757 /* DPoPErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE12E2587B5005D0757 /* DPoPErrorSpec.swift */; };
 		5C505FE42E2587BF005D0757 /* DPoPErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE12E2587B5005D0757 /* DPoPErrorSpec.swift */; };
 		5C505FE52E2587BF005D0757 /* DPoPErrorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE12E2587B5005D0757 /* DPoPErrorSpec.swift */; };
+		5C505FE72E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */; };
+		5C505FE82E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */; };
+		5C505FE92E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */; };
+		5C505FEA2E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */; };
 		5C53A7E92703A23200A7C0A3 /* UserInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */; };
 		5C53A7EA2703A23300A7C0A3 /* UserInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */; };
 		5C6513A72791CDDE004EBC22 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6513A62791CDDE004EBC22 /* Version.swift */; };
@@ -839,6 +843,7 @@
 		5C505FD52E2168B7005D0757 /* KeychainKeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainKeyStore.swift; sourceTree = "<group>"; };
 		5C505FDC2E25864A005D0757 /* DPoPChallengeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPChallengeSpec.swift; sourceTree = "<group>"; };
 		5C505FE12E2587B5005D0757 /* DPoPErrorSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPErrorSpec.swift; sourceTree = "<group>"; };
+		5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SenderConstrainingSpec.swift; sourceTree = "<group>"; };
 		5C60412E27482A2600EEF515 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		5C6513A62791CDDE004EBC22 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		5C79AE072E040CA600CD0D41 /* DPoP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoP.swift; sourceTree = "<group>"; };
@@ -1224,6 +1229,7 @@
 		5C505FDB2E258623005D0757 /* DPoP */ = {
 			isa = PBXGroup;
 			children = (
+				5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */,
 				5C505FE12E2587B5005D0757 /* DPoPErrorSpec.swift */,
 				5C505FDC2E25864A005D0757 /* DPoPChallengeSpec.swift */,
 			);
@@ -2525,6 +2531,7 @@
 				5C809D96275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */,
 				C177D7752C2BE00D0094C657 /* StubURLProtocol.swift in Sources */,
 				5FBBF0381CC964BC0024D2AF /* Matchers.swift in Sources */,
+				5C505FE92E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */,
 				5F93BC0B1CC6B0DE0031519F /* Auth0Spec.swift in Sources */,
 				5C505FE42E2587BF005D0757 /* DPoPErrorSpec.swift in Sources */,
 				5FE2F8A61CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
@@ -2591,6 +2598,7 @@
 				5CF539252836DCC10073F623 /* SafariProviderSpec.swift in Sources */,
 				5FADB60A1CED500900D4BB50 /* ManagementSpec.swift in Sources */,
 				5F28B4681D8300D50000EB23 /* LoggerSpec.swift in Sources */,
+				5C505FEA2E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */,
 				5C505FE22E2587BF005D0757 /* DPoPErrorSpec.swift in Sources */,
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5CE775B2244FD70B00D054A0 /* TransactionStoreSpec.swift in Sources */,
@@ -2747,6 +2755,7 @@
 				5F331B0E1D4BB80700AE4382 /* Matchers.swift in Sources */,
 				5C505FE52E2587BF005D0757 /* DPoPErrorSpec.swift in Sources */,
 				5F331B0A1D4BB7F900AE4382 /* ManagementSpec.swift in Sources */,
+				5C505FE72E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */,
 				5CFB82782D6FD28E009FD237 /* SSOCredentialsSpec.swift in Sources */,
 				5C1574502DD5182400BF9373 /* MyAccountErrorSpec.swift in Sources */,
 				5F331B091D4BB7EE00AE4382 /* AuthenticationErrorSpec.swift in Sources */,
@@ -2905,6 +2914,7 @@
 				C1B3BA432C24BA36004A32A4 /* WebAuthSpies.swift in Sources */,
 				C1B3BA442C24BA36004A32A4 /* IDTokenValidatorBaseSpec.swift in Sources */,
 				C1B3BA452C24BA36004A32A4 /* IDTokenValidatorMocks.swift in Sources */,
+				5C505FE82E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */,
 				C1B3BA462C24BA36004A32A4 /* IDTokenValidatorSpec.swift in Sources */,
 				C1B3BA472C24BA36004A32A4 /* IDTokenSignatureValidatorSpec.swift in Sources */,
 				5CFB82562D5E9F9B009FD237 /* APICredentialsSpec.swift in Sources */,
