@@ -11,7 +11,7 @@ OS can open it on success/failure.
 - Important: Only one ``AuthTransaction`` can be active at a given time for Auth0.swift, if you start a new one before
  finishing the current one it will be cancelled.
 */
-protocol AuthTransaction {
+protocol AuthTransaction: Sendable {
 
     /**
      Resumes the transaction when the third party application notifies the application using a URL with a custom
@@ -20,12 +20,12 @@ protocol AuthTransaction {
      - Parameter url: The URL sent by the third party application that contains the result of the auth.
      - Returns: If the URL was expected and properly formatted. Otherwise, it will return `false`.
     */
-    func resume(_ url: URL) -> Bool
+    func resume(_ url: URL) async -> Bool
 
     /**
      Terminates the operation and reports back that it was cancelled.
     */
-    func cancel()
+    func cancel() async
 
 }
 #endif

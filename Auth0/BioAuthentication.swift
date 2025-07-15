@@ -1,8 +1,8 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
-import LocalAuthentication
+@preconcurrency import LocalAuthentication
 
-struct BioAuthentication {
+struct BioAuthentication: Sendable {
 
     private let authContext: LAContext
     private let evaluationPolicy: LAPolicy
@@ -30,7 +30,7 @@ struct BioAuthentication {
         self.fallbackTitle = fallbackTitle
     }
 
-    func validateBiometric(callback: @escaping (Error?) -> Void) {
+    func validateBiometric(callback: @escaping @Sendable (Error?) -> Void) {
         self.authContext.evaluatePolicy(evaluationPolicy, localizedReason: self.title) {
             guard $1 == nil else { return callback($1) }
             callback($0 ? nil : LAError(.authenticationFailed))

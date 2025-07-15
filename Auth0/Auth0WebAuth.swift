@@ -2,7 +2,7 @@
 import Foundation
 import Combine
 
-final class Auth0WebAuth: WebAuth {
+actor Auth0WebAuth: @preconcurrency WebAuth {
 
     let clientId: String
     let url: URL
@@ -34,7 +34,7 @@ final class Auth0WebAuth: WebAuth {
     private(set) var invitationURL: URL?
     private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
-    private(set) var onCloseCallback: (() -> Void)?
+    private(set) var onCloseCallback: (@Sendable () -> Void)?
 
     var state: String {
         return self.parameters["state"] ?? self.generateDefaultState()
@@ -75,38 +75,38 @@ final class Auth0WebAuth: WebAuth {
         self.issuer = url.absoluteString
     }
 
-    func connection(_ connection: String) -> Self {
+    func connection(_ connection: String) async -> Self {
         self.parameters["connection"] = connection
         return self
     }
 
-    func scope(_ scope: String) -> Self {
+    func scope(_ scope: String) async -> Self {
         self.parameters["scope"] = scope
         return self
     }
 
-    func connectionScope(_ connectionScope: String) -> Self {
+    func connectionScope(_ connectionScope: String) async -> Self {
         self.parameters["connection_scope"] = connectionScope
         return self
     }
 
-    func state(_ state: String) -> Self {
+    func state(_ state: String) async -> Self {
         self.parameters["state"] = state
         return self
     }
 
-    func parameters(_ parameters: [String: String]) -> Self {
+    func parameters(_ parameters: [String: String]) async -> Self {
         parameters.forEach { self.parameters[$0] = $1 }
         return self
     }
 
     @available(iOS 17.4, macOS 14.4, visionOS 1.2, *)
-    func headers(_ headers: [String: String]) -> Self {
+    func headers(_ headers: [String: String]) async -> Self {
         headers.forEach { self.headers[$0] = $1 }
         return self
     }
 
-    func redirectURL(_ redirectURL: URL) -> Self {
+    func redirectURL(_ redirectURL: URL) async -> Self {
         self.redirectURL = redirectURL
         return self
     }
@@ -116,119 +116,123 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    func nonce(_ nonce: String) -> Self {
+    func nonce(_ nonce: String) async -> Self {
         self.nonce = nonce
         return self
     }
 
-    func audience(_ audience: String) -> Self {
+    func audience(_ audience: String) async -> Self {
         self.parameters["audience"] = audience
         return self
     }
 
-    func issuer(_ issuer: String) -> Self {
+    func issuer(_ issuer: String) async -> Self {
         self.issuer = issuer
         return self
     }
 
-    func leeway(_ leeway: Int) -> Self {
+    func leeway(_ leeway: Int) async -> Self {
         self.leeway = leeway
         return self
     }
 
-    func maxAge(_ maxAge: Int) -> Self {
+    func maxAge(_ maxAge: Int) async -> Self {
         self.maxAge = maxAge
         return self
     }
 
-    func useHTTPS() -> Self {
+    func useHTTPS() async -> Self {
         self.https = true
         return self
     }
 
-    func useEphemeralSession() -> Self {
+    func useEphemeralSession() async -> Self {
         self.ephemeralSession = true
         return self
     }
 
-    func invitationURL(_ invitationURL: URL) -> Self {
+    func invitationURL(_ invitationURL: URL) async -> Self {
         self.invitationURL = invitationURL
         return self
     }
 
-    func organization(_ organization: String) -> Self {
+    func organization(_ organization: String) async -> Self {
         self.organization = organization
         return self
     }
 
-    func provider(_ provider: @escaping WebAuthProvider) -> Self {
+    func provider(_ provider: @escaping WebAuthProvider) async -> Self {
         self.provider = provider
         return self
     }
 
-    func onClose(_ callback: (() -> Void)?) -> Self {
+    func onClose(_ callback: (@Sendable () -> Void)?) async -> Self {
         self.onCloseCallback = callback
         return self
     }
 
-    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
-        guard barrier.raise() else {
-            return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
-        }
-
-        guard let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
-        }
-
-        let handler = self.handler(redirectURL)
-        let state = self.state
-        var organization: String? = self.organization
-        var invitation: String?
-
-        if let invitationURL = self.invitationURL {
-            guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
-                  let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
-                  let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
-                return callback(.failure(WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))))
+    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) {
+        Task {
+            guard await barrier.raise() else {
+                return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
             }
-
-            organization = organizationId
-            invitation = invitationId
-        }
-
-        let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL,
-                                                  defaults: handler.defaults,
-                                                  state: state,
-                                                  organization: organization,
-                                                  invitation: invitation)
-
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
-                                                                     ephemeralSession: ephemeralSession,
-                                                                     headers: headers)
-        let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
-            storage.clear()
-            barrier.lower()
-
-            switch result {
-            case .success:
-                onCloseCallback?()
-            case .failure(let error):
-                callback(.failure(error))
+            
+            guard let redirectURL = self.redirectURL else {
+                return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
             }
+            
+            let handler = self.handler(redirectURL)
+            let state = self.state
+            var organization: String? = self.organization
+            var invitation: String?
+            
+            if let invitationURL = self.invitationURL {
+                guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
+                      let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
+                      let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
+                    return callback(.failure(WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))))
+                }
+                
+                organization = organizationId
+                invitation = invitationId
+            }
+            
+            let authorizeURL = self.buildAuthorizeURL(withRedirectURL: redirectURL,
+                                                      defaults: handler.defaults,
+                                                      state: state,
+                                                      organization: organization,
+                                                      invitation: invitation)
+            
+            let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
+                                                                         ephemeralSession: ephemeralSession,
+                                                                         headers: headers)
+            let userAgent = await provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
+                Task {
+                    await storage.clear()
+                    await barrier.lower()
+                    
+                    switch result {
+                    case .success:
+                        onCloseCallback?()
+                    case .failure(let error):
+                        callback(.failure(error))
+                    }
+                }
+            }
+            let transaction = LoginTransaction(redirectURL: redirectURL,
+                                               state: state,
+                                               userAgent: userAgent,
+                                               handler: handler,
+                                               logger: self.logger,
+                                               callback: callback)
+            await self.storage.store(transaction)
+            await userAgent.start()
+            logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
         }
-        let transaction = LoginTransaction(redirectURL: redirectURL,
-                                           state: state,
-                                           userAgent: userAgent,
-                                           handler: handler,
-                                           logger: self.logger,
-                                           callback: callback)
-        self.storage.store(transaction)
-        userAgent.start()
-        logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
-    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
-        guard barrier.raise() else {
+    func clearSession(federated: Bool, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void) async {
+        guard await barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
@@ -246,14 +250,16 @@ final class Auth0WebAuth: WebAuth {
         }
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, headers: headers)
-        let userAgent = provider(logoutURL) { [storage, barrier] result in
-            storage.clear()
-            barrier.lower()
-            callback(result)
+        let userAgent = await provider(logoutURL) { [storage, barrier] result in
+            Task {
+                await storage.clear()
+                await barrier.lower()
+                callback(result)
+            }
         }
         let transaction = ClearSessionTransaction(userAgent: userAgent)
-        self.storage.store(transaction)
-        userAgent.start()
+        await self.storage.store(transaction)
+        await userAgent.start()
     }
 
     func buildAuthorizeURL(withRedirectURL redirectURL: URL,
@@ -322,12 +328,25 @@ final class Auth0WebAuth: WebAuth {
 // MARK: - Combine
 
 extension Auth0WebAuth {
-
-    public func start() -> AnyPublisher<Credentials, WebAuthError> {
-        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+    nonisolated public func start() -> AnyPublisher<Credentials, WebAuthError> {
+        return Deferred {
+            Future<Credentials, WebAuthError> { promise in
+                let wrapper = FutureResultWrapper<Credentials, WebAuthError>(promise)
+                Task {
+                    await self.start { result in
+                        switch result {
+                        case .success(let credentials):
+                            wrapper.completionResult(.success(credentials))
+                        case .failure(let error):
+                            wrapper.completionResult(.failure(error))
+                        }
+                    }
+                }
+            }
+        }.eraseToAnyPublisher()
     }
 
-    public func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
+    nonisolated public func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
         return Deferred {
             Future { callback in
                 self.clearSession(federated: federated) { result in
@@ -346,8 +365,8 @@ extension Auth0WebAuth {
 
     func start() async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            Task { @MainActor in
-                self.start { result in
+            Task {
+                await self.start { result in
                     continuation.resume(with: result)
                 }
             }
@@ -356,8 +375,8 @@ extension Auth0WebAuth {
 
     func clearSession(federated: Bool) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            Task { @MainActor in
-                self.clearSession(federated: federated) { result in
+            Task {
+                await self.clearSession(federated: federated) { result in
                     continuation.resume(with: result)
                 }
             }
@@ -367,3 +386,30 @@ extension Auth0WebAuth {
 }
 #endif
 #endif
+
+fileprivate final class FutureResultWrapper<Output, Failure: Error>: @unchecked Sendable {
+    fileprivate typealias Promise = (Result<Output, Failure>) -> Void
+
+    fileprivate let completionResult: Promise
+
+    /// Creates a publisher that invokes a promise closure when the publisher emits an element.
+    ///
+    /// - Parameter attemptToFulfill: A ``Future/Promise`` that the publisher invokes when the publisher emits an element or terminates with an error.
+    fileprivate init(_ attemptToFulfill: @escaping Promise) {
+        self.completionResult = attemptToFulfill
+    }
+}
+//and then use it like this:
+//
+//    let publisher = Future<T, Never> { [weak self] completionResult in
+//    guard let self = self else {
+//        completionResult(.success(object))
+//        return
+//    }
+//
+//    let wrapper = FutureResultWrapper<T, Never>(completionResult)
+//
+//    Task.detached { [weak self] in
+//        await self?.persist(object)
+//        wrapper.completionResult(.success(object))
+//    }
