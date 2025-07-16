@@ -36,12 +36,11 @@ struct DPoPProofGenerator {
 
     private func generateHeader() throws(DPoPError) -> [String: Any] {
         let publicKey = try keyStore.privateKey().publicKey
-        let jwk = ECPublicKeyJWK(from: publicKey)
 
         return [
             "typ": "dpop+jwt",
             "alg": keyStore.publicKeyJWSIdentifier,
-            "jwk": jwk.toDictionary()
+            "jwk": ECPublicKey(from: publicKey).jwk()
         ]
     }
 

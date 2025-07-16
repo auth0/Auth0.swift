@@ -120,7 +120,7 @@ public struct DPoP: Sendable {
     func jkt() throws(DPoPError) -> String {
         return try Self.withSerialQueueSync {
             let publicKey = try keyStore.privateKey().publicKey
-            return try ECPublicKeyJWK(from: publicKey).thumbprint()
+            return ECPublicKey(from: publicKey).thumbprint()
         }
     }
 

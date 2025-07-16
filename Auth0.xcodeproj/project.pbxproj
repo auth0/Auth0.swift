@@ -174,11 +174,11 @@
 		5C505FC02E21674A005D0757 /* DPoPChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FBD2E216746005D0757 /* DPoPChallenge.swift */; };
 		5C505FC12E21674A005D0757 /* DPoPChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FBD2E216746005D0757 /* DPoPChallenge.swift */; };
 		5C505FC22E21674A005D0757 /* DPoPChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FBD2E216746005D0757 /* DPoPChallenge.swift */; };
-		5C505FC42E216784005D0757 /* ECPublicKeyJWK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKeyJWK.swift */; };
-		5C505FC52E216784005D0757 /* ECPublicKeyJWK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKeyJWK.swift */; };
-		5C505FC62E216784005D0757 /* ECPublicKeyJWK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKeyJWK.swift */; };
-		5C505FC72E216784005D0757 /* ECPublicKeyJWK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKeyJWK.swift */; };
-		5C505FC82E216784005D0757 /* ECPublicKeyJWK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKeyJWK.swift */; };
+		5C505FC42E216784005D0757 /* ECPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKey.swift */; };
+		5C505FC52E216784005D0757 /* ECPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKey.swift */; };
+		5C505FC62E216784005D0757 /* ECPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKey.swift */; };
+		5C505FC72E216784005D0757 /* ECPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKey.swift */; };
+		5C505FC82E216784005D0757 /* ECPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC32E216783005D0757 /* ECPublicKey.swift */; };
 		5C505FCA2E2167EB005D0757 /* DPoPKeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC92E2167D1005D0757 /* DPoPKeyStore.swift */; };
 		5C505FCB2E2167EB005D0757 /* DPoPKeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC92E2167D1005D0757 /* DPoPKeyStore.swift */; };
 		5C505FCC2E2167EB005D0757 /* DPoPKeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FC92E2167D1005D0757 /* DPoPKeyStore.swift */; };
@@ -837,7 +837,7 @@
 		5C505FB12E216699005D0757 /* SenderConstraining.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SenderConstraining.swift; sourceTree = "<group>"; };
 		5C505FB72E2166FB005D0757 /* DPoPProofGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPProofGenerator.swift; sourceTree = "<group>"; };
 		5C505FBD2E216746005D0757 /* DPoPChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPChallenge.swift; sourceTree = "<group>"; };
-		5C505FC32E216783005D0757 /* ECPublicKeyJWK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECPublicKeyJWK.swift; sourceTree = "<group>"; };
+		5C505FC32E216783005D0757 /* ECPublicKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECPublicKey.swift; sourceTree = "<group>"; };
 		5C505FC92E2167D1005D0757 /* DPoPKeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPKeyStore.swift; sourceTree = "<group>"; };
 		5C505FCF2E216884005D0757 /* SecureEnclaveKeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureEnclaveKeyStore.swift; sourceTree = "<group>"; };
 		5C505FD52E2168B7005D0757 /* KeychainKeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainKeyStore.swift; sourceTree = "<group>"; };
@@ -1216,7 +1216,7 @@
 				5C79AE072E040CA600CD0D41 /* DPoP.swift */,
 				5C505FAB2E216672005D0757 /* DPoPError.swift */,
 				5C505FB12E216699005D0757 /* SenderConstraining.swift */,
-				5C505FC32E216783005D0757 /* ECPublicKeyJWK.swift */,
+				5C505FC32E216783005D0757 /* ECPublicKey.swift */,
 				5C505FB72E2166FB005D0757 /* DPoPProofGenerator.swift */,
 				5C505FBD2E216746005D0757 /* DPoPChallenge.swift */,
 				5C505FC92E2167D1005D0757 /* DPoPKeyStore.swift */,
@@ -2340,7 +2340,7 @@
 				970BC36B25C27095007A7745 /* MultifactorChallenge.swift in Sources */,
 				5FDE87591D8A424700EA27DC /* Authentication.swift in Sources */,
 				5B16D8931F714324009476A5 /* WebAuthUserAgent.swift in Sources */,
-				5C505FC42E216784005D0757 /* ECPublicKeyJWK.swift in Sources */,
+				5C505FC42E216784005D0757 /* ECPublicKey.swift in Sources */,
 				5C3D87E22DB8276000AACC34 /* PublicKeyCredentialCreationOptions.swift in Sources */,
 				5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */,
 				5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */,
@@ -2482,7 +2482,7 @@
 				5C41F6D9244F977900252548 /* WebAuthError.swift in Sources */,
 				5FCAB1741D09009600331C84 /* NSData+URLSafe.swift in Sources */,
 				970BC36C25C27095007A7745 /* MultifactorChallenge.swift in Sources */,
-				5C505FC62E216784005D0757 /* ECPublicKeyJWK.swift in Sources */,
+				5C505FC62E216784005D0757 /* ECPublicKey.swift in Sources */,
 				5C41F6DD244F982700252548 /* DesktopWebAuth.swift in Sources */,
 				5CA541CE2B1A81A700E4284D /* Documentation.docc in Sources */,
 				5FCAB17A1D09124D00331C84 /* NSURL+Auth0.swift in Sources */,
@@ -2659,7 +2659,7 @@
 				5C4F551C23C8FB8E00C89615 /* String+URLSafe.swift in Sources */,
 				5CFB82502D5BF324009FD237 /* APICredentials.swift in Sources */,
 				5C505FDA2E2168BD005D0757 /* KeychainKeyStore.swift in Sources */,
-				5C505FC72E216784005D0757 /* ECPublicKeyJWK.swift in Sources */,
+				5C505FC72E216784005D0757 /* ECPublicKey.swift in Sources */,
 				5F23E6DC1D4ACD6100C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				5F23E6E61D4ACD8500C3F2D9 /* Requestable.swift in Sources */,
 				5C79AE092E040CA900CD0D41 /* DPoP.swift in Sources */,
@@ -2716,7 +2716,7 @@
 				5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */,
 				5CFB82532D5BF324009FD237 /* APICredentials.swift in Sources */,
 				5C505FD92E2168BD005D0757 /* KeychainKeyStore.swift in Sources */,
-				5C505FC82E216784005D0757 /* ECPublicKeyJWK.swift in Sources */,
+				5C505FC82E216784005D0757 /* ECPublicKey.swift in Sources */,
 				5F23E7061D4B88EA00C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				5F23E70F1D4B88FC00C3F2D9 /* Requestable.swift in Sources */,
 				5C79AE0A2E040CA900CD0D41 /* DPoP.swift in Sources */,
@@ -2868,7 +2868,7 @@
 				C1B3BA202C24B6D4004A32A4 /* Auth0WebAuth.swift in Sources */,
 				C1B3BA212C24B6D4004A32A4 /* WebAuthError.swift in Sources */,
 				5C79AE0B2E040CA900CD0D41 /* DPoP.swift in Sources */,
-				5C505FC52E216784005D0757 /* ECPublicKeyJWK.swift in Sources */,
+				5C505FC52E216784005D0757 /* ECPublicKey.swift in Sources */,
 				C1B3BA222C24B6D4004A32A4 /* WebAuthentication.swift in Sources */,
 				C1B3BA232C24B6D4004A32A4 /* Auth0.swift in Sources */,
 				C1B3BA242C24B6D4004A32A4 /* Auth0Error.swift in Sources */,
