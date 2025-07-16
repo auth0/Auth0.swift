@@ -10,7 +10,8 @@ struct DPoPProofGenerator {
     }
 
     func generate(url: URL, method: String, nonce: String?, accessToken: String?) throws(DPoPError) -> String {
-        let header = try generateHeader()
+        let privateKey = try keyStore.privateKey()
+        let header = generateHeader(publicKey: privateKey.publicKey)
         let payload = generatePayload(url: url, method: method, nonce: nonce, accessToken: accessToken)
 
         let headerData: Data
@@ -23,7 +24,6 @@ struct DPoPProofGenerator {
         }
 
         let signableParts = "\(headerData.encodeBase64URLSafe()).\(payloadData.encodeBase64URLSafe())"
-        let privateKey = try keyStore.privateKey()
 
         do {
             let signature = try privateKey.signature(for: signableParts.data(using: .utf8)!)
@@ -34,12 +34,10 @@ struct DPoPProofGenerator {
         }
     }
 
-    private func generateHeader() throws(DPoPError) -> [String: Any] {
-        let publicKey = try keyStore.privateKey().publicKey
-
+    private func generateHeader(publicKey: P256.Signing.PublicKey) -> [String: Any] {
         return [
             "typ": "dpop+jwt",
-            "alg": keyStore.publicKeyJWSIdentifier,
+            "alg": publicKey.jwsIdentifier,
             "jwk": ECPublicKey(from: publicKey).jwk()
         ]
     }

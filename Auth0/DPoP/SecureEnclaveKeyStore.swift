@@ -13,7 +13,7 @@ struct SecureEnclaveKeyStore: DPoPKeyStore {
         return false
     }
 
-    func privateKey() throws(DPoPError) -> PoPPrivateKey {
+    func privateKey() throws(DPoPError) -> DPoPPrivateKey {
         // First, check if the key exists in the keychain
         if let privateKey = try retrieve(forIdentifier: privateKeyIdentifier) { return privateKey }
 

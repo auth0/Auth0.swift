@@ -15,7 +15,7 @@ struct KeychainKeyStore: DPoPKeyStore {
     }
 
     // When SecureEnclave is not available, we use a simple keychain store
-    func privateKey() throws(DPoPError) -> PoPPrivateKey {
+    func privateKey() throws(DPoPError) -> DPoPPrivateKey {
         // First, check if the key exists in the keychain
         if let privateKey = try retrieve(forIdentifier: privateKeyIdentifier) { return privateKey }
 

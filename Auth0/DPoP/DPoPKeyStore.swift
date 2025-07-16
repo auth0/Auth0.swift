@@ -5,10 +5,8 @@ import CryptoKit
 
 protocol DPoPKeyStore: Sendable {
 
-    var publicKeyJWSIdentifier: String { get }
-
     func hasPrivateKey() throws(DPoPError) -> Bool
-    func privateKey() throws(DPoPError) -> PoPPrivateKey
+    func privateKey() throws(DPoPError) -> DPoPPrivateKey
     func clear() throws(DPoPError)
 
 }
@@ -19,15 +17,11 @@ extension DPoPKeyStore {
         return "com.auth0.sdk.dpop.privateKey"
     }
 
-    var publicKeyJWSIdentifier: String {
-        return "ES256"
-    }
-
 }
 
 // MARK: Private Key Type
 
-protocol PoPPrivateKey: Sendable {
+protocol DPoPPrivateKey: Sendable {
 
     var publicKey: P256.Signing.PublicKey { get }
 
@@ -35,7 +29,15 @@ protocol PoPPrivateKey: Sendable {
 
 }
 
-extension SecureEnclave.P256.Signing.PrivateKey: PoPPrivateKey {
+extension P256.Signing.PublicKey {
+
+    var jwsIdentifier: String {
+        return "ES256"
+    }
+
+}
+
+extension SecureEnclave.P256.Signing.PrivateKey: DPoPPrivateKey {
 
     public var description: String {
         return self.dataRepresentation.withUnsafeBytes { bytes in
@@ -57,7 +59,7 @@ extension P256.Signing.PrivateKey: SecKeyConvertible {
 
 // MARK: Secure Enclave Keys
 
-protocol GenericPasswordConvertible: PoPPrivateKey, CustomStringConvertible {
+protocol GenericPasswordConvertible: DPoPPrivateKey, CustomStringConvertible {
 
     /// Creates a key from a raw representation.
     init<D>(rawRepresentation data: D) throws where D: ContiguousBytes
@@ -108,7 +110,7 @@ extension ContiguousBytes {
 
 // MARK: Non-Secure Enclave Keys
 
-protocol SecKeyConvertible: PoPPrivateKey, CustomStringConvertible {
+protocol SecKeyConvertible: DPoPPrivateKey, CustomStringConvertible {
 
     /// Creates a key from an X9.63 representation.
     init<Bytes>(x963Representation: Bytes) throws where Bytes: ContiguousBytes

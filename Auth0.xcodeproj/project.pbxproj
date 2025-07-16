@@ -206,6 +206,14 @@
 		5C505FE82E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */; };
 		5C505FE92E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */; };
 		5C505FEA2E26DAA9005D0757 /* SenderConstrainingSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */; };
+		5C505FEC2E27E967005D0757 /* ECPublicKeySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FEB2E27E963005D0757 /* ECPublicKeySpec.swift */; };
+		5C505FED2E27E967005D0757 /* ECPublicKeySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FEB2E27E963005D0757 /* ECPublicKeySpec.swift */; };
+		5C505FEE2E27E967005D0757 /* ECPublicKeySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FEB2E27E963005D0757 /* ECPublicKeySpec.swift */; };
+		5C505FEF2E27E967005D0757 /* ECPublicKeySpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FEB2E27E963005D0757 /* ECPublicKeySpec.swift */; };
+		5C505FF12E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FF02E27F974005D0757 /* DPoPProofGeneratorSpec.swift */; };
+		5C505FF22E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FF02E27F974005D0757 /* DPoPProofGeneratorSpec.swift */; };
+		5C505FF32E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FF02E27F974005D0757 /* DPoPProofGeneratorSpec.swift */; };
+		5C505FF42E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C505FF02E27F974005D0757 /* DPoPProofGeneratorSpec.swift */; };
 		5C53A7E92703A23200A7C0A3 /* UserInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */; };
 		5C53A7EA2703A23300A7C0A3 /* UserInfoSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2860D41EEF20F300C75D54 /* UserInfoSpec.swift */; };
 		5C6513A72791CDDE004EBC22 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6513A62791CDDE004EBC22 /* Version.swift */; };
@@ -844,6 +852,8 @@
 		5C505FDC2E25864A005D0757 /* DPoPChallengeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPChallengeSpec.swift; sourceTree = "<group>"; };
 		5C505FE12E2587B5005D0757 /* DPoPErrorSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPErrorSpec.swift; sourceTree = "<group>"; };
 		5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SenderConstrainingSpec.swift; sourceTree = "<group>"; };
+		5C505FEB2E27E963005D0757 /* ECPublicKeySpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECPublicKeySpec.swift; sourceTree = "<group>"; };
+		5C505FF02E27F974005D0757 /* DPoPProofGeneratorSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPProofGeneratorSpec.swift; sourceTree = "<group>"; };
 		5C60412E27482A2600EEF515 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		5C6513A62791CDDE004EBC22 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		5C79AE072E040CA600CD0D41 /* DPoP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoP.swift; sourceTree = "<group>"; };
@@ -1229,6 +1239,8 @@
 		5C505FDB2E258623005D0757 /* DPoP */ = {
 			isa = PBXGroup;
 			children = (
+				5C505FF02E27F974005D0757 /* DPoPProofGeneratorSpec.swift */,
+				5C505FEB2E27E963005D0757 /* ECPublicKeySpec.swift */,
 				5C505FE62E26DAA3005D0757 /* SenderConstrainingSpec.swift */,
 				5C505FE12E2587B5005D0757 /* DPoPErrorSpec.swift */,
 				5C505FDC2E25864A005D0757 /* DPoPChallengeSpec.swift */,
@@ -2536,6 +2548,8 @@
 				5C505FE42E2587BF005D0757 /* DPoPErrorSpec.swift in Sources */,
 				5FE2F8A61CCA9C17003628F4 /* CredentialsSpec.swift in Sources */,
 				C177D7702C2BDFE40094C657 /* NetworkStub.swift in Sources */,
+				5C505FEF2E27E967005D0757 /* ECPublicKeySpec.swift in Sources */,
+				5C505FF42E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */,
 				5CF539242836DCC10073F623 /* SafariProviderSpec.swift in Sources */,
 				5FADB6091CED500900D4BB50 /* ManagementSpec.swift in Sources */,
 				5FCAB16D1D07AC3500331C84 /* WebAuthSpec.swift in Sources */,
@@ -2591,6 +2605,7 @@
 				5C809D97275F878E00F15A67 /* CredentialsManagerErrorSpec.swift in Sources */,
 				C177D7762C2BE00D0094C657 /* StubURLProtocol.swift in Sources */,
 				5CE775AF244FD66D00D054A0 /* OAuth2GrantSpec.swift in Sources */,
+				5C505FED2E27E967005D0757 /* ECPublicKeySpec.swift in Sources */,
 				5FD255B21D14A9E000387ECB /* AuthenticationErrorSpec.swift in Sources */,
 				5CFB82582D5E9F9B009FD237 /* APICredentialsSpec.swift in Sources */,
 				5C53A7E92703A23200A7C0A3 /* UserInfoSpec.swift in Sources */,
@@ -2603,6 +2618,7 @@
 				5FBBF0441CCA90300024D2AF /* AuthenticationSpec.swift in Sources */,
 				5CE775B2244FD70B00D054A0 /* TransactionStoreSpec.swift in Sources */,
 				5CE775A9244FCF4900D054A0 /* ClaimValidatorsSpec.swift in Sources */,
+				5C505FF22E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */,
 				5C809D9B275FA3EF00F15A67 /* ManagementErrorSpec.swift in Sources */,
 				5CE775A3244FCF3600D054A0 /* Mocks.swift in Sources */,
 				5CE775B3244FD71000D054A0 /* WebAuthSpec.swift in Sources */,
@@ -2759,6 +2775,8 @@
 				5CFB82782D6FD28E009FD237 /* SSOCredentialsSpec.swift in Sources */,
 				5C1574502DD5182400BF9373 /* MyAccountErrorSpec.swift in Sources */,
 				5F331B091D4BB7EE00AE4382 /* AuthenticationErrorSpec.swift in Sources */,
+				5C505FF12E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */,
+				5C505FEE2E27E967005D0757 /* ECPublicKeySpec.swift in Sources */,
 				5C0E5B6D2DE1100000D38F4C /* Mocks.swift in Sources */,
 				5F331B101D4BB80700AE4382 /* Auth0Spec.swift in Sources */,
 				5C809D9C275FA3F000F15A67 /* ManagementErrorSpec.swift in Sources */,
@@ -2903,6 +2921,7 @@
 				C1B3BA3B2C24BA36004A32A4 /* ASProviderSpec.swift in Sources */,
 				C1B3BA3D2C24BA36004A32A4 /* WebAuthErrorSpec.swift in Sources */,
 				C177D7772C2BE00D0094C657 /* StubURLProtocol.swift in Sources */,
+				5C505FEC2E27E967005D0757 /* ECPublicKeySpec.swift in Sources */,
 				5C1574602DD7D83B00BF9373 /* MyAccountAuthenticationMethodsSpec.swift in Sources */,
 				C1B3BA3E2C24BA36004A32A4 /* ChallengeGeneratorSpec.swift in Sources */,
 				C1B3BA3F2C24BA36004A32A4 /* OAuth2GrantSpec.swift in Sources */,
@@ -2923,6 +2942,7 @@
 				5C3D886B2DC2CCA200AACC34 /* PasskeyLoginChallenge.swift in Sources */,
 				C1B3BA4A2C24BA37004A32A4 /* CredentialsManagerSpec.swift in Sources */,
 				5CFB82762D6FD28E009FD237 /* SSOCredentialsSpec.swift in Sources */,
+				5C505FF32E27F977005D0757 /* DPoPProofGeneratorSpec.swift in Sources */,
 				C1B3BA4B2C24BA37004A32A4 /* CredentialsManagerErrorSpec.swift in Sources */,
 				C1B3BA4C2C24BA37004A32A4 /* Mocks.swift in Sources */,
 				C1B3BA4D2C24BA37004A32A4 /* Matchers.swift in Sources */,
