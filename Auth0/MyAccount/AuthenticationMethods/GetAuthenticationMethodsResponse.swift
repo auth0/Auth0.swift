@@ -1,10 +1,3 @@
-public struct AuthenticationMethods: Decodable {
-    public let start: Int?
-    public let limit: Int?
-    public let total: Int?
-    public let authenticators: [AuthenticationMethod]?
-}
-
 public struct AuthenticationMethod: Decodable {
     let type: String?
     let credentialBackedUp: Bool?

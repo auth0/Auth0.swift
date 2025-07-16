@@ -117,10 +117,17 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError>
 #endif
- 
+    
+    func enrollAuthenticationMethod(type: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
+    
+    func enroll(email: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
+    
+    func enroll(phone: String,
+                preferredAuthenticationMethod: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
+    
     func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError>
  
-    func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError>
+    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
 
     func getFactorStatus() -> Request<[Factor], MyAccountError>
 
@@ -131,15 +138,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func updateAuthenticationMethod(id: String,
                                     name: String,
                                     preferredAuthenticationMethod: String) -> Request<AuthenticationMethod, MyAccountError>
-
-    func enrollAuthMethod(type: String,
-                          connection: String,
-                          userIdentityId: String,
-                          email: String,
-                          phoneNumber: String,
-                          preferredAuthenticationMethod: String) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
-
-    func confirmEnrollment() -> Request<PasskeyAuthenticationMethod, MyAccountError>
 }
 
 // MARK: - Default Parameters

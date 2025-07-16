@@ -85,8 +85,45 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        logger: self.logger,
                        telemetry: self.telemetry)
     }
+
+    func enrollAuthenticationMethod(type: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["type"] = type
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
     
-    func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError> {
+    func enroll(email: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["type"] = "email"
+        payload["email"] = email
+        return Request(session: session,
+                       url: url.appending("authentication-methods"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func enroll(phone: String,
+                preferredAuthenticationMethod: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["type"] = "phone"
+        payload["phone_number"] = phone
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod
+        return Request(session: session,
+                       url: url.appending("authentication-methods"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+    
+    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError> {
         return Request(session: session,
                        url: url.appending("authentication-methods"),
                        method: "GET",
@@ -133,38 +170,6 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        method: "PATCH",
                        handle: myAcccountDecodable,
                        parameters: payload,
-                       logger: logger,
-                       telemetry: telemetry)
-    }
-    
-    func enrollAuthMethod(type: String,
-                          connection: String?,
-                          userIdentityId: String?,
-                          email: String?,
-                          phoneNumber: String?,
-                          preferredAuthenticationMethod: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
-        var payload: [String: Any] = [:]
-        
-        payload["type"] = type
-        payload["connection"] = connection
-        payload["user_identity_id"] = userIdentityId
-        payload["emaail"] = email
-        payload["phone_number"] = phoneNumber
-        payload["preferred_authentication_method"] = preferredAuthenticationMethod
-        
-        return Request(session: self.session,
-                       url: self.url.appending("authentication-methods"),
-                       method: "",
-                       handle: myAcccountDecodable,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
-    }
-
-    func confirmEnrollment(id: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
-        return Request(session: session,
-                       url: url.appending("authentication-methods").appending(id).appending("verify"),
-                       method: "POST",
-                       handle: myAcccountDecodable,
                        logger: logger,
                        telemetry: telemetry)
     }
