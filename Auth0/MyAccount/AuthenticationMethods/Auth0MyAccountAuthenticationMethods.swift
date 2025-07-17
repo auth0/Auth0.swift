@@ -1,7 +1,6 @@
 import Foundation
 
 struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
-
     let url: URL
     let session: URLSession
     let token: String
@@ -15,7 +14,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
          telemetry: Telemetry = Telemetry(),
          logger: Logger? = nil) {
         self.token = token
-        self.url = url.appending("authentication-methods")
+        self.url = url
         self.session = session
         self.telemetry = telemetry
         self.logger = logger
@@ -32,7 +31,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
         payload["connection"] = connection
 
         return Request(session: session,
-                       url: self.url,
+                       url: self.url.appending("authentication-methods"),
                        method: "POST",
                        handle: myAcccountDecodable,
                        parameters: payload,
@@ -62,11 +61,11 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
         let payload: [String: Any] = [
             "auth_session": challenge.authenticationSession,
-            "authn_response": authenticatorResponse
+            "authn_response": authenticatorResponse,
         ]
 
         return Request(session: session,
-                       url: self.url.appending(path),
+                       url: self.url.appending("authentication-methods").appending(path),
                        method: "POST",
                        handle: myAcccountDecodable,
                        parameters: payload,
@@ -76,4 +75,194 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
     #endif
 
+    func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError> {
+        return Request(session: session,
+                       url: self.url.appending("authentication-methods").appending(id),
+                       method: "DELETE",
+                       handle: myAccountDecodableNoBody,
+                       headers: defaultHeaders,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
+    func enrollAuthenticationMethod(type: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["type"] = type
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+    
+    func enroll(email: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["type"] = "email"
+        payload["email"] = email
+        return Request(session: session,
+                       url: url.appending("authentication-methods"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func enroll(phone: String,
+                preferredAuthenticationMethod: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["type"] = "phone"
+        payload["phone_number"] = phone
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod
+        return Request(session: session,
+                       url: url.appending("authentication-methods"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+    
+    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError> {
+        return Request(session: session,
+                       url: url.appending("authentication-methods"),
+                       method: "GET",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func getFactorStatus() -> Request<[Factor], MyAccountError> {
+        return Request(session: session,
+                       url: url.appending("factors"),
+                       method: "GET",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError> {
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id),
+                       method: "GET",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func deleteAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError> {
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id),
+                       method: "GET",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func updateAuthenticationMethod(id: String,
+                                    name: String?,
+                                    preferredAuthenticationMethod: String?) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["name"] = name
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id),
+                       method: "PATCH",
+                       handle: myAcccountDecodable,
+                       parameters: payload,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func confirmWebAuthRoamingEnrolment(id: String,
+                                        authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        
+        payload["authn_session"] = authSession
+
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id).appending("verify"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func confirmWebAuthPlatformEnrolment(id: String,
+                                         authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["auth_session"] = authSession
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id).appending("verify"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry
+        )
+    }
+
+    func confirmTOTPEnrolment(id: String,
+                              authSession: String,
+                              otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id).appending("verify"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func confirmEmailEnrolment(id: String,
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["auth_session"] = authSession
+        payload["otp_code"] = otpCode
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id).appending("verify"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func confirmPushNotificationEnrolment(id: String,
+                                          authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["auth_session"] = authSession
+        payload["id"] = id
+    
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id).appending("verify"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func confirmPhoneEnrolment(id: String,
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["auth_session"] = authSession
+        payload["id"] = id
+        payload["otp_code"] = otpCode
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id).appending("verify"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func confirmRecoveryCodeEnrolment(id: String,
+                                      authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["auth_session"] = authSession
+        return Request(session: session,
+                       url: url.appending("authentication-methods").appending(id).appending("verify"),
+                       method: "POST",
+                       handle: myAcccountDecodable,
+                       logger: logger,
+                       telemetry: telemetry)
+    }
 }

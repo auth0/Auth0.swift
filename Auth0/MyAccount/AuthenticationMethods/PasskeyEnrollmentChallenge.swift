@@ -29,6 +29,10 @@ extension PasskeyEnrollmentChallenge: Decodable {
     enum CodingKeys: String, CodingKey {
         case authenticationSession = "auth_session"
         case credentialCreationOptions = "authn_params_public_key"
+        case id
+        case barcodeURI = "barcode_uri"
+        case manualInputCode = "manual_input_code"
+        case recovery_code = "recovery_code"
     }
 
     /// `Decodable` initializer.
