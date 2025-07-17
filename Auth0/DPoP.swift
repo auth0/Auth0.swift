@@ -716,7 +716,9 @@ struct KeychainKeyStore: PoPKeyStore {
 
         // Describe the add operation
         var query = baseQuery(forIdentifier: privateKeyIdentifier)
+        #if !os(macOS)
         query[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        #endif
         query[kSecValueRef] = secKey
 
         // Add the key to the keychain
