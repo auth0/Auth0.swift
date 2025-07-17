@@ -117,16 +117,16 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError>
 #endif
-    
+
+    func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError>
+
     func enrollAuthenticationMethod(type: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
-    
+
     func enroll(email: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
-    
+
     func enroll(phone: String,
                 preferredAuthenticationMethod: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
     
-    func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError>
- 
     func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
 
     func getFactorStatus() -> Request<[Factor], MyAccountError>
@@ -134,12 +134,35 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
 
     func deleteAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
-    
-    func updateAuthenticationMethod(id: String,
-                                    name: String,
-                                    preferredAuthenticationMethod: String) -> Request<AuthenticationMethod, MyAccountError>
-}
 
+    func updateAuthenticationMethod(id: String,
+                                    name: String?,
+                                    preferredAuthenticationMethod: String?) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmWebAuthRoamingEnrolment(id: String,
+                                        authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmWebAuthPlatformEnrolment(id: String,
+                                         authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmTOTPEnrolment(id: String,
+                              authSession: String,
+                              otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmEmailEnrolment(id: String,
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmPushNotificationEnrolment(id: String,
+                                          authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmPhoneEnrolment(id: String,
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmRecoveryCodeEnrolment(id: String,
+                                      authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+}
 // MARK: - Default Parameters
 
 public extension MyAccountAuthenticationMethods {
