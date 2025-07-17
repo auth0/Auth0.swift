@@ -2,9 +2,16 @@ import Foundation
 import CryptoKit
 
 // Used when Secure Enclave is available
-struct SecureEnclaveKeyStore: DPoPKeyStore {
+struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
 
     let keychainService: String
+
+    var store: StoreFunction = SecItemAdd
+    var retrieve: RetrieveFunction = SecItemCopyMatching
+    var remove: RemoveFunction = SecItemDelete
+    var newPrivateKey = { () throws -> GenericPasswordConvertible in
+        return try SecureEnclave.P256.Signing.PrivateKey()
+    }
 
     func hasPrivateKey() throws(DPoPError) -> Bool {
         if try retrieve(forIdentifier: privateKeyIdentifier) != nil {
@@ -18,9 +25,9 @@ struct SecureEnclaveKeyStore: DPoPKeyStore {
         if let privateKey = try retrieve(forIdentifier: privateKeyIdentifier) { return privateKey }
 
         // If not, create a new key and store it in the keychain
-        let privateKey: SecureEnclave.P256.Signing.PrivateKey
+        let privateKey: GenericPasswordConvertible
         do {
-            privateKey = try SecureEnclave.P256.Signing.PrivateKey()
+            privateKey = try newPrivateKey()
         } catch {
             let message = "Unable to create a new private key using the Secure Enclave."
             throw DPoPError(code: .secureEnclaveOperationFailed(message), cause: error)
@@ -34,7 +41,7 @@ struct SecureEnclaveKeyStore: DPoPKeyStore {
     func clear() throws(DPoPError) {
         let query = baseQuery(forIdentifier: privateKeyIdentifier)
 
-        let status = SecItemDelete(query as CFDictionary)
+        let status = remove(query as CFDictionary)
         guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
             let message = "Unable to delete the private key representation from the Keychain. OSStatus: \(status)."
             throw DPoPError(code: .keychainOperationFailed(message))
@@ -43,14 +50,13 @@ struct SecureEnclaveKeyStore: DPoPKeyStore {
 
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     private func store(_ key: GenericPasswordConvertible, forIdentifier identifier: String) throws(DPoPError) {
-        // Describe a generic password
         var query = baseQuery(forIdentifier: identifier)
         #if !os(macOS)
         query[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         #endif
         query[kSecValueData] = key.rawRepresentation
 
-        let status = SecItemAdd(query as CFDictionary, nil)
+        let status = store(query as CFDictionary, nil)
         guard status == errSecSuccess else {
             let message = "Unable to store private key representation in the Keychain. OSStatus: \(status)."
             throw DPoPError(code: .keychainOperationFailed(message))
@@ -59,12 +65,11 @@ struct SecureEnclaveKeyStore: DPoPKeyStore {
 
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     private func retrieve(forIdentifier identifier: String) throws(DPoPError) -> GenericPasswordConvertible? {
-        // Seek a generic password with the given account
         var query = baseQuery(forIdentifier: identifier)
         query[kSecReturnData] = true
 
         var item: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        let status = retrieve(query as CFDictionary, &item)
 
         guard status != errSecItemNotFound else { return nil }
         guard status == errSecSuccess else {
@@ -72,7 +77,7 @@ struct SecureEnclaveKeyStore: DPoPKeyStore {
             throw DPoPError(code: .keychainOperationFailed(message))
         }
         guard let data = item as? Data else {
-            throw DPoPError(code: .unknown("Unable to cast the retrieved private key representation to Data."))
+            throw DPoPError(code: .unknown("Unable to cast the retrieved private key representation to a Data value."))
         }
 
         do {

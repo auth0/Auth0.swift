@@ -1,10 +1,21 @@
 import Foundation
 import CryptoKit
 
+typealias CreateSecKeyFunction = (_ keyData: CFData,
+                                  _ attributes: CFDictionary,
+                                  _ error: UnsafeMutablePointer<Unmanaged<CFError>?>?) -> SecKey?
+typealias ExportSecKeyFunction = (_ key: SecKey, _ error: UnsafeMutablePointer<Unmanaged<CFError>?>?) -> CFData?
+
 // Used when Secure Enclave is not available
-struct KeychainKeyStore: DPoPKeyStore {
+struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
 
     let keychainTag: Data
+
+    var store: StoreFunction = SecItemAdd
+    var retrieve: RetrieveFunction = SecItemCopyMatching
+    var remove: RemoveFunction = SecItemDelete
+    var createSecKey: CreateSecKeyFunction = SecKeyCreateWithData
+    var exportSecKey: ExportSecKeyFunction = SecKeyCopyExternalRepresentation
 
     init(keychainTag: String) {
         self.keychainTag = keychainTag.data(using: .utf8)!
@@ -29,7 +40,7 @@ struct KeychainKeyStore: DPoPKeyStore {
     func clear() throws(DPoPError) {
         let query = baseQuery(forIdentifier: privateKeyIdentifier)
 
-        let status = SecItemDelete(query as CFDictionary)
+        let status = remove(query as CFDictionary)
         guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
             let message = "Unable to delete the private key from the Keychain. OSStatus: \(status)."
             throw DPoPError(code: .keychainOperationFailed(message))
@@ -45,7 +56,7 @@ struct KeychainKeyStore: DPoPKeyStore {
 
         // Find and cast the result as a SecKey instance
         var item: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        let status = retrieve(query as CFDictionary, &item)
 
         guard status != errSecItemNotFound else { return nil }
         guard status == errSecSuccess else {
@@ -62,7 +73,7 @@ struct KeychainKeyStore: DPoPKeyStore {
 
         // Convert the SecKey into a CryptoKit key
         var error: Unmanaged<CFError>?
-        guard let data = SecKeyCopyExternalRepresentation(secKey, &error) as Data?, error == nil else {
+        guard let data = exportSecKey(secKey, &error) as Data?, error == nil else {
             let message = "Unable to copy the external representation of the retrieved SecKey."
             throw DPoPError(code: .secKeyOperationFailed(message), cause: error?.takeUnretainedValue())
         }
@@ -85,20 +96,22 @@ struct KeychainKeyStore: DPoPKeyStore {
 
         // Get a SecKey representation
         var error: Unmanaged<CFError>?
-        guard let secKey = SecKeyCreateWithData(key.x963Representation as CFData,
-                                                attributes as CFDictionary,
-                                                &error), error == nil else {
+        guard let secKey = createSecKey(key.x963Representation as CFData,
+                                        attributes as CFDictionary,
+                                        &error), error == nil else {
             let message = "Unable to create a SecKey representation from the private key."
             throw DPoPError(code: .secKeyOperationFailed(message), cause: error?.takeUnretainedValue())
         }
 
         // Describe the add operation
         var query = baseQuery(forIdentifier: privateKeyIdentifier)
+        #if !os(macOS)
         query[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        #endif
         query[kSecValueRef] = secKey
 
         // Add the key to the keychain
-        let status = SecItemAdd(query as CFDictionary, nil)
+        let status = store(query as CFDictionary, nil)
         guard status == errSecSuccess else {
             let message = "Unable to store the private key in the Keychain. OSStatus: \(status)."
             throw DPoPError(code: .keychainOperationFailed(message))

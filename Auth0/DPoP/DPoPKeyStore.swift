@@ -3,6 +3,10 @@ import CryptoKit
 
 // MARK: Key Providers
 
+typealias StoreFunction = (_ attributes: CFDictionary, _ result: UnsafeMutablePointer<CFTypeRef?>?) -> OSStatus
+typealias RetrieveFunction = (_ query: CFDictionary, _ result: UnsafeMutablePointer<CFTypeRef?>?) -> OSStatus
+typealias RemoveFunction = (_ query: CFDictionary) -> OSStatus
+
 protocol DPoPKeyStore: Sendable {
 
     func hasPrivateKey() throws(DPoPError) -> Bool

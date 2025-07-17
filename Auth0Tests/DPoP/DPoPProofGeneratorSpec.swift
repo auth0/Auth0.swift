@@ -123,10 +123,15 @@ class DPoPProofGeneratorSpec: QuickSpec {
 
                 let url = URL(string: "https://example.com/resource")!
                 let method = "POST"
+                let message = "Unable to sign the DPoP proof with the private key."
+                let expectedError = DPoPError(code: .cryptoKitOperationFailed(message))
 
                 expect {
                     try proofGenerator.generate(url: url, method: method, nonce: nil, accessToken: nil)
-                }.to(throwError())
+                }.to(throwError { (error: DPoPError) in
+                    expect(error.code) == expectedError.code
+                    expect(error.localizedDescription).to(beginWith(prefix: expectedError.localizedDescription))
+                })
             }
 
         }
