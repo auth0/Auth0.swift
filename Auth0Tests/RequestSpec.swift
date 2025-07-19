@@ -6,7 +6,7 @@ import Nimble
 @testable import Auth0
 
 private let Url = URL(string: "https://samples.auth0.com")!
-private let DPoPNonce = "nonce"
+private let DPoPNonce = "auth0-nonce"
 private let Timeout: NimbleTimeInterval = .seconds(2)
 
 fileprivate extension Request where T == [String: Any], E == AuthenticationError {
@@ -133,17 +133,12 @@ class RequestSpec: QuickSpec {
                 }
 
             }
-
+            
             context("dpop") {
 
-                beforeEach {
-                    // Create a key pair
-                    _ = try DPoP.keyStore(for: DPoP.defaultKeychainTag).privateKey()
-                }
-
                 afterEach {
-                    try DPoP.clearKeypair(for: DPoP.defaultKeychainTag)
                     DPoP.resetNonce()
+                    try DPoP.clearKeypair()
                 }
 
                 it("should not include dpop by default") {
@@ -152,21 +147,45 @@ class RequestSpec: QuickSpec {
                 }
 
                 it("should create a request with dpop") {
-                    let request = Request(dpop: newDPoP())
+                    let request = Request(dpop: DPoP())
                     expect(request.dpop).toNot(beNil())
                 }
 
                 it("should preserve dpop when adding parameters") {
-                    let request = Request(dpop: newDPoP()).parameters(["foo": "bar"])
+                    let request = Request(dpop: DPoP()).parameters(["foo": "bar"])
                     expect(request.dpop).toNot(beNil())
                 }
 
                 it("should preserve dpop when adding headers") {
-                    let request = Request(dpop: newDPoP()).headers(["foo": "bar"])
+                    let request = Request(dpop: DPoP()).headers(["foo": "bar"])
                     expect(request.dpop).toNot(beNil())
                 }
 
-                it("should include the DPoP proof in the headers") {
+                it("should include the DPoP proof on RTE requests to /token when there is a key pair stored") {
+                    var capturedHeaders: [String: String] = [:]
+
+                    NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                        response: { request in
+                        if let headers = request.allHTTPHeaderFields {
+                            capturedHeaders = headers
+                        }
+                        return apiSuccessResponse()(request)
+                    })
+
+                    try DPoP.createKeypair()
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request(url: Url.appending("token"),
+                                method: "POST",
+                                parameters: ["grant_type": "refresh_token"],
+                                dpop: DPoP()).start { result in
+                            expect(capturedHeaders["DPoP"]).toNot(beNil())
+                            done()
+                        }
+                    }
+                }
+
+                it("should not include the DPoP proof on RTE requests to /token when there is no key pair stored") {
                     var capturedHeaders: [String: String] = [:]
 
                     NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
@@ -178,8 +197,73 @@ class RequestSpec: QuickSpec {
                     })
 
                     waitUntil(timeout: Timeout) { done in
-                        Request(dpop: newDPoP()).start { result in
+                        Request(url: Url.appending("token"),
+                                method: "POST",
+                                parameters: ["grant_type": "refresh_token"],
+                                dpop: DPoP()).start { result in
+                            expect(capturedHeaders["DPoP"]).to(beNil())
+                            done()
+                        }
+                    }
+                }
+
+                it("should include the DPoP proof on non-RTE requests to /token when there is no key pair stored") {
+                    var capturedHeaders: [String: String] = [:]
+
+                    NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                        response: { request in
+                        if let headers = request.allHTTPHeaderFields {
+                            capturedHeaders = headers
+                        }
+                        return apiSuccessResponse()(request)
+                    })
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request(url: Url.appending("token"),
+                                method: "POST",
+                                parameters: ["grant_type": "foo"],
+                                dpop: DPoP()).start { result in
                             expect(capturedHeaders["DPoP"]).toNot(beNil())
+                            done()
+                        }
+                    }
+                }
+
+                it("should include the DPoP proof on other requests when there is a key pair stored") {
+                    var capturedHeaders: [String: String] = [:]
+
+                    NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                        response: { request in
+                        if let headers = request.allHTTPHeaderFields {
+                            capturedHeaders = headers
+                        }
+                        return apiSuccessResponse()(request)
+                    })
+
+                    try DPoP.createKeypair()
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request(url: Url, dpop: DPoP()).start { result in
+                            expect(capturedHeaders["DPoP"]).toNot(beNil())
+                            done()
+                        }
+                    }
+                }
+
+                it("should not include the DPoP proof on other requests when there is no key pair stored") {
+                    var capturedHeaders: [String: String] = [:]
+
+                    NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                        response: { request in
+                        if let headers = request.allHTTPHeaderFields {
+                            capturedHeaders = headers
+                        }
+                        return apiSuccessResponse()(request)
+                    })
+
+                    waitUntil(timeout: Timeout) { done in
+                        Request(url: Url, dpop: DPoP()).start { result in
+                            expect(capturedHeaders["DPoP"]).to(beNil())
                             done()
                         }
                     }
@@ -244,7 +328,7 @@ class RequestSpec: QuickSpec {
                     })
 
                     waitUntil(timeout: Timeout) { done in
-                        Request(dpop: newDPoP()).start { result in
+                        Request(dpop: DPoP()).start { result in
                             expect(callCount) == 1
                             done()
                         }
@@ -256,7 +340,7 @@ class RequestSpec: QuickSpec {
                                         response: apiSuccessResponse(headers: ["DPoP-Nonce": DPoPNonce]))
 
                     waitUntil(timeout: Timeout) { done in
-                        Request(dpop: newDPoP()).start { result in
+                        Request(dpop: DPoP()).start { result in
                             expect(DPoP.auth0Nonce) == DPoPNonce
                             done()
                         }
@@ -268,7 +352,7 @@ class RequestSpec: QuickSpec {
                                         response: dpopErrorResponse(url: Url, nonce: DPoPNonce))
 
                     waitUntil(timeout: Timeout) { done in
-                        Request(dpop: newDPoP()).start { result in
+                        Request(dpop: DPoP()).start { result in
                             expect(DPoP.auth0Nonce) == DPoPNonce
                             done()
                         }
@@ -290,7 +374,7 @@ class RequestSpec: QuickSpec {
                     })
 
                     waitUntil(timeout: Timeout) { done in
-                        Request(dpop: newDPoP()).start { result in
+                        Request(dpop: DPoP()).start { result in
                             expect(DPoP.auth0Nonce) == newNonce
                             done()
                         }

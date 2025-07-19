@@ -841,10 +841,3 @@ class MockUserAgent: WebAuthUserAgent {
     }
 
 }
-
-// - MARK: Utilities
-
-// TODO: Move this to a more appropriate location
-func newDPoP() -> DPoP {
-    return DPoP(keychainTag: "test_dpop_key")
-}
