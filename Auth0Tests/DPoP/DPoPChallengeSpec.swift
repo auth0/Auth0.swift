@@ -29,71 +29,78 @@ class DPoPChallengeSpec: QuickSpec {
         describe("parsing") {
 
             it("should parse a DPoP challenge with an error code") {
-                let errorCode = "invalid_request"
-                let header = "DPoP error=\"\(errorCode)\""
-                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                               statusCode: 401,
-                                               httpVersion: nil,
-                                               headerFields: ["WWW-Authenticate": header])!
-                let challenge = DPoPChallenge(from: response)
+                let code = "invalid_request"
+                let challenges: [String] = [
+                    "DPoP error=\"\(code)\"",
+                    "DPoP error=\"\(code)\", Bearer realm=\"example\"",
+                    "Bearer realm=\"example\", DPoP error=\"\(code)\"",
+                    "DPoP error=\(code)",
+                    "DPoP error=\(code), Bearer realm=example",
+                    "Bearer realm=example, DPoP error=\(code)",
+                    "dpoP error=\"\(code)\"",
+                    "dpoP error=\"\(code)\", Bearer realm=\"example\"",
+                    "Bearer realm=\"example\", dpoP error=\"\(code)\"",
+                    "dpoP error=\(code)",
+                    "dpoP error=\(code), Bearer realm=example",
+                    "Bearer realm=example, dpoP error=\(code)",
+                    "DPoP error =  \"\(code)\"",
+                    "DPoP error =  \"\(code)\", Bearer realm  = \"example\"",
+                    "Bearer realm  = \"example\", DPoP error =  \"\(code)\"",
+                    "DPoP error =  \(code)",
+                    "DPoP error =  \(code), Bearer realm  = example",
+                    "Bearer realm  = example, DPoP error =  \(code)"
+                ]
 
-                expect(challenge).toNot(beNil())
-                expect(challenge?.errorCode) == errorCode
-                expect(challenge?.errorDescription).to(beNil())
+                challenges.forEach { header in
+                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                                   statusCode: 401,
+                                                   httpVersion: nil,
+                                                   headerFields: ["WWW-Authenticate": header])!
+                    let challenge = DPoPChallenge(from: response)
+
+                    expect(challenge).toNot(beNil())
+                    expect(challenge?.errorCode) == code
+                    expect(challenge?.errorDescription).to(beNil())
+                }
+
             }
 
             it("should parse a DPoP challenge with an error code and description") {
-                let errorCode = "invalid_request"
-                let errorDescription = "Invalid request"
-                let header = "DPoP error=\"\(errorCode)\", error_description=\"\(errorDescription)\""
-                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                               statusCode: 401,
-                                               httpVersion: nil,
-                                               headerFields: ["WWW-Authenticate": header])!
-                let challenge = DPoPChallenge(from: response)
+                let code = "invalid_request"
+                let description = "Invalid request"
+                let challenges: [String] = [
+                    "DPoP error=\"\(code)\", error_description=\"\(description)\"",
+                    "DPoP error=\"\(code)\", error_description=\"\(description)\", Bearer realm=\"example\"",
+                    "Bearer realm=\"example\", DPoP error=\"\(code)\", error_description=\"\(description)\"",
+                    "DPoP error=\(code), error_description=\"\(description)\"",
+                    "DPoP error=\(code), error_description=\"\(description)\", Bearer realm=example",
+                    "Bearer realm=example, DPoP error=\(code), error_description=\"\(description)\"",
+                    "dpoP error=\"\(code)\", error_description=\"\(description)\"",
+                    "dpoP error=\"\(code)\", error_description=\"\(description)\", Bearer realm=\"example\"",
+                    "Bearer realm=\"example\", dpoP error=\"\(code)\", error_description=\"\(description)\"",
+                    "dpoP error=\(code), error_description=\"\(description)\"",
+                    "dpoP error=\(code), error_description=\"\(description)\", Bearer realm=example",
+                    "Bearer realm=example, dpoP error=\(code), error_description=\"\(description)\"",
+                    "DPoP error =  \"\(code)\", error_description = \"\(description)\"",
+                    "DPoP error =  \"\(code)\", error_description = \"\(description)\", Bearer realm  = \"example\"",
+                    "Bearer realm  = \"example\", DPoP error =  \"\(code)\", error_description = \"\(description)\"",
+                    "DPoP error =  \(code), error_description = \"\(description)\"",
+                    "DPoP error =  \(code), error_description = \"\(description)\", Bearer realm  = example",
+                    "Bearer realm  = example, DPoP error =  \(code), error_description = \"\(description)\""
+                ]
 
-                expect(challenge).toNot(beNil())
-                expect(challenge?.errorCode) == errorCode
-                expect(challenge?.errorDescription) == errorDescription
-            }
+                challenges.forEach { header in
+                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                                   statusCode: 401,
+                                                   httpVersion: nil,
+                                                   headerFields: ["WWW-Authenticate": header])!
+                    let challenge = DPoPChallenge(from: response)
 
-            it("should ignore case when parsing the authentication scheme") {
-                let errorCode = "invalid_request"
-                let header = "dpoP error=\"\(errorCode)\""
-                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                               statusCode: 401,
-                                               httpVersion: nil,
-                                               headerFields: ["WWW-Authenticate": header])!
-                let challenge = DPoPChallenge(from: response)
+                    expect(challenge).toNot(beNil())
+                    expect(challenge?.errorCode) == code
+                    expect(challenge?.errorDescription) == description
+                }
 
-                expect(challenge).toNot(beNil())
-                expect(challenge?.errorCode) == errorCode
-            }
-
-            it("should ignore whitespace when parsing the error code") {
-                let errorCode = "invalid_request"
-                let header = "DPoP error = \"\(errorCode)\""
-                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                               statusCode: 401,
-                                               httpVersion: nil,
-                                               headerFields: ["WWW-Authenticate": header])!
-                let challenge = DPoPChallenge(from: response)
-
-                expect(challenge).toNot(beNil())
-                expect(challenge?.errorCode) == errorCode
-            }
-
-            it("should ignore whitespace when parsing the error description") {
-                let errorDescription = "Invalid request"
-                let header = "DPoP error=\"invalid_request\", error_description = \"\(errorDescription)\""
-                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                               statusCode: 401,
-                                               httpVersion: nil,
-                                               headerFields: ["WWW-Authenticate": header])!
-                let challenge = DPoPChallenge(from: response)
-
-                expect(challenge).toNot(beNil())
-                expect(challenge?.errorDescription) == errorDescription
             }
 
             it("should return nil when the DPoP challenge does not contain an error code") {

@@ -22,7 +22,7 @@ class DPoPProofGeneratorSpec: QuickSpec {
             it("should generate a valid DPoP proof with all claims") {
                 let url = URL(string: "https://example.com/api/endpoint")!
                 let method = "POST"
-                let nonce = "nonce"
+                let nonce = "auth0-nonce"
                 let accessToken = "access-token"
                 let proof = try proofGenerator.generate(url: url,
                                                         method: method,
