@@ -35,7 +35,7 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
 
         return try Self.withSerialQueueSync {
             // If not, create a new key and store it in the keychain
-            let privateKey = P256.Signing.PrivateKey()
+            let privateKey = newPrivateKey()
             try store(privateKey, forIdentifier: privateKeyIdentifier)
 
             return privateKey
