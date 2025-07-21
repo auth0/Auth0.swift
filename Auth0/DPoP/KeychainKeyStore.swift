@@ -16,6 +16,9 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
     var remove: RemoveFunction = SecItemDelete
     var createSecKey: CreateSecKeyFunction = SecKeyCreateWithData
     var exportSecKey: ExportSecKeyFunction = SecKeyCopyExternalRepresentation
+    var newPrivateKey = { () -> SecKeyConvertible in
+        return P256.Signing.PrivateKey()
+    }
 
     init(keychainTag: String) {
         self.keychainTag = keychainTag.data(using: .utf8)!
@@ -30,20 +33,24 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
         // First, check if the key exists in the keychain
         if let privateKey = try retrieve(forIdentifier: privateKeyIdentifier) { return privateKey }
 
-        // If not, create a new key and store it in the keychain
-        let privateKey = P256.Signing.PrivateKey()
-        try store(privateKey, forIdentifier: privateKeyIdentifier)
+        return try Self.withSerialQueueSync {
+            // If not, create a new key and store it in the keychain
+            let privateKey = P256.Signing.PrivateKey()
+            try store(privateKey, forIdentifier: privateKeyIdentifier)
 
-        return privateKey
+            return privateKey
+        }
     }
 
     func clear() throws(DPoPError) {
-        let query = baseQuery(forIdentifier: privateKeyIdentifier)
+        return try Self.withSerialQueueSync {
+            let query = baseQuery(forIdentifier: privateKeyIdentifier)
 
-        let status = remove(query as CFDictionary)
-        guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
-            let message = "Unable to delete the private key from the Keychain. OSStatus: \(status)."
-            throw DPoPError(code: .keychainOperationFailed(message))
+            let status = remove(query as CFDictionary)
+            guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
+                let message = "Unable to delete the private key from the Keychain. OSStatus: \(status)."
+                throw DPoPError(code: .keychainOperationFailed(message))
+            }
         }
     }
 
@@ -122,8 +129,7 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
         return [
             kSecClass: kSecClassKey,
             kSecAttrApplicationTag: keychainTag,
-            kSecAttrApplicationLabel: identifier,
-            kSecUseDataProtectionKeychain: true
+            kSecAttrApplicationLabel: identifier
         ]
     }
 

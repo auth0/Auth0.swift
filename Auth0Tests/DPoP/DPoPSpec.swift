@@ -238,6 +238,7 @@ class DPoPSpec: QuickSpec {
             }
 
         }
+
     }
 }
 
@@ -248,15 +249,11 @@ extension DPoP {
     }
 
     static func createKeypair() throws {
-        try serialQueue.sync {
-            _ = try DPoP.keyStore(for: testKeyTag).privateKey()
-        }
+        _ = try DPoP.keyStore(for: testKeyTag).privateKey()
     }
 
     static func clearKeypair() throws {
-        try serialQueue.sync {
-            _ = try DPoP.keyStore(for: testKeyTag).clear()
-        }
+        _ = try DPoP.keyStore(for: testKeyTag).clear()
     }
 
     init() {

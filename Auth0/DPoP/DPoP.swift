@@ -32,18 +32,14 @@ public struct DPoP: Sendable {
             return
         }
 
-        let proof = try withSerialQueueSync {
-            let proofGenerator = DPoPProofGenerator(keyStore: DPoP.keyStore(for: keychainTag))
-            return try proofGenerator.generate(url: url, method: method, nonce: nonce, accessToken: accessToken)
-        }
+        let proofGenerator = DPoPProofGenerator(keyStore: DPoP.keyStore(for: keychainTag))
+        let proof = try proofGenerator.generate(url: url, method: method, nonce: nonce, accessToken: accessToken)
 
         request.setValue(proof, forHTTPHeaderField: "DPoP")
     }
 
     static public func clearKeypair(for keychainTag: String = defaultKeychainTag) throws(DPoPError) {
-        return try withSerialQueueSync {
-            return try Self.keyStore(for: keychainTag).clear()
-        }
+        return try Self.keyStore(for: keychainTag).clear()
     }
 
     static public func isNonceRequired(by response: HTTPURLResponse) -> Bool {
@@ -79,22 +75,8 @@ public struct DPoP: Sendable {
         return isDPoPError && !isRetryCountExceeded
     }
 
-    static private func withSerialQueueSync<T>(_ block: () throws -> T) throws(DPoPError) -> T {
-        do {
-            return try serialQueue.sync {
-                return try block()
-            }
-        } catch let error as DPoPError {
-            throw error
-        } catch {
-            throw DPoPError(code: .other, cause: error)
-        }
-    }
-
     func hasKeypair() throws(DPoPError) -> Bool {
-        return try Self.withSerialQueueSync {
-            return try keyStore.hasPrivateKey()
-        }
+        return try keyStore.hasPrivateKey()
     }
 
     func shouldGenerateProof(for url: URL, parameters: [String: Any]) throws(DPoPError) -> Bool {
@@ -109,19 +91,15 @@ public struct DPoP: Sendable {
         let authorizationHeader = request.value(forHTTPHeaderField: "Authorization")
         let accessToken = authorizationHeader?.components(separatedBy: " ").last
 
-        return try Self.withSerialQueueSync {
-            return try proofGenerator.generate(url: request.url!,
-                                               method: request.httpMethod!,
-                                               nonce: Self.auth0Nonce,
-                                               accessToken: accessToken)
-        }
+        return try proofGenerator.generate(url: request.url!,
+                                           method: request.httpMethod!,
+                                           nonce: Self.auth0Nonce,
+                                           accessToken: accessToken)
     }
 
     func jkt() throws(DPoPError) -> String {
-        return try Self.withSerialQueueSync {
-            let publicKey = try keyStore.privateKey().publicKey
-            return ECPublicKey(from: publicKey).thumbprint()
-        }
+        let publicKey = try keyStore.privateKey().publicKey
+        return ECPublicKey(from: publicKey).thumbprint()
     }
 
     // MARK: - Testing Utilities

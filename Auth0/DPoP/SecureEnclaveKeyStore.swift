@@ -14,10 +14,7 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
     }
 
     func hasPrivateKey() throws(DPoPError) -> Bool {
-        if try retrieve(forIdentifier: privateKeyIdentifier) != nil {
-            return true
-        }
-        return false
+        return try retrieve(forIdentifier: privateKeyIdentifier) != nil
     }
 
     func privateKey() throws(DPoPError) -> DPoPPrivateKey {
@@ -25,26 +22,30 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
         if let privateKey = try retrieve(forIdentifier: privateKeyIdentifier) { return privateKey }
 
         // If not, create a new key and store it in the keychain
-        let privateKey: GenericPasswordConvertible
-        do {
-            privateKey = try newPrivateKey()
-        } catch {
-            let message = "Unable to create a new private key using the Secure Enclave."
-            throw DPoPError(code: .secureEnclaveOperationFailed(message), cause: error)
+        return try Self.withSerialQueueSync {
+            let privateKey: GenericPasswordConvertible
+            do {
+                privateKey = try newPrivateKey()
+            } catch {
+                let message = "Unable to create a new private key using the Secure Enclave."
+                throw DPoPError(code: .secureEnclaveOperationFailed(message), cause: error)
+            }
+
+            try store(privateKey, forIdentifier: privateKeyIdentifier)
+
+            return privateKey
         }
-
-        try store(privateKey, forIdentifier: privateKeyIdentifier)
-
-        return privateKey
     }
 
     func clear() throws(DPoPError) {
-        let query = baseQuery(forIdentifier: privateKeyIdentifier)
+        return try Self.withSerialQueueSync {
+            let query = baseQuery(forIdentifier: privateKeyIdentifier)
 
-        let status = remove(query as CFDictionary)
-        guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
-            let message = "Unable to delete the private key representation from the Keychain. OSStatus: \(status)."
-            throw DPoPError(code: .keychainOperationFailed(message))
+            let status = remove(query as CFDictionary)
+            guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
+                let message = "Unable to delete the private key representation from the Keychain. OSStatus: \(status)."
+                throw DPoPError(code: .keychainOperationFailed(message))
+            }
         }
     }
 

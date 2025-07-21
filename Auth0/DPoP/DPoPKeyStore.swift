@@ -21,6 +21,18 @@ extension DPoPKeyStore {
         return "com.auth0.sdk.dpop.privateKey"
     }
 
+    static func withSerialQueueSync<T>(_ block: () throws -> T) throws(DPoPError) -> T {
+        do {
+            return try serialQueue.sync {
+                return try block()
+            }
+        } catch let error as DPoPError {
+            throw error
+        } catch {
+            throw DPoPError(code: .other, cause: error)
+        }
+    }
+
 }
 
 // MARK: Private Key Type

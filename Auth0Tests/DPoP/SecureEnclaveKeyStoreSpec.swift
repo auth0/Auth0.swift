@@ -5,12 +5,18 @@ import CryptoKit
 
 @testable import Auth0
 
+private let serialQueueKey = DispatchSpecificKey<Void>()
+
 class SecureEnclaveKeyStoreSpec: QuickSpec {
     override class func spec() {
 
         describe("SecureEnclaveKeyStore") {
 
             var keyStore: SecureEnclaveKeyStore!
+
+            beforeSuite {
+                serialQueue.setSpecific(key: serialQueueKey, value: ())
+            }
 
             beforeEach {
                 keyStore = SecureEnclaveKeyStore(keychainService: "com.auth0.test")
@@ -113,6 +119,20 @@ class SecureEnclaveKeyStoreSpec: QuickSpec {
                     expect { try keyStore.privateKey() }.to(throwError(expectedError))
                 }
 
+                it("should run the private key creation and storage inside the shared serial queue") {
+                    keyStore.newPrivateKey = {
+                        expect(DispatchQueue.getSpecific(key: serialQueueKey)).toNot(beNil())
+                        return try SecureEnclave.P256.Signing.PrivateKey()
+                    }
+
+                    keyStore.store = { _, _ in
+                        expect(DispatchQueue.getSpecific(key: serialQueueKey)).toNot(beNil())
+                        return errSecSuccess
+                    }
+
+                    _ = try keyStore.privateKey()
+                }
+
             }
 
             context("clear") {
@@ -139,6 +159,15 @@ class SecureEnclaveKeyStoreSpec: QuickSpec {
                     }
 
                     expect { try keyStore.clear() }.to(throwError(expectedError))
+                }
+
+                it("should run inside the shared serial queue") {
+                    keyStore.remove = { _ in
+                        expect(DispatchQueue.getSpecific(key: serialQueueKey)).toNot(beNil())
+                        return errSecSuccess
+                    }
+
+                    try keyStore.clear()
                 }
 
             }
