@@ -32,7 +32,7 @@ extension PasskeyEnrollmentChallenge: Decodable {
         case id
         case barcodeURI = "barcode_uri"
         case manualInputCode = "manual_input_code"
-        case recovery_code = "recovery_code"
+        case recoveryCode = "recovery_code"
     }
 
     /// `Decodable` initializer.

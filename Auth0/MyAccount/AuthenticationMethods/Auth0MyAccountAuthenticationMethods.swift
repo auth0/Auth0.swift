@@ -149,15 +149,6 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func deleteAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError> {
-        return Request(session: session,
-                       url: url.appending("authentication-methods").appending(id),
-                       method: "GET",
-                       handle: myAcccountDecodable,
-                       logger: logger,
-                       telemetry: telemetry)
-    }
-
     func updateAuthenticationMethod(id: String,
                                     name: String?,
                                     preferredAuthenticationMethod: String?) -> Request<AuthenticationMethod, MyAccountError> {
@@ -176,7 +167,6 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     func confirmWebAuthRoamingEnrolment(id: String,
                                         authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
-        
         payload["authn_session"] = authSession
 
         return Request(session: session,
@@ -203,6 +193,9 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     func confirmTOTPEnrolment(id: String,
                               authSession: String,
                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+        var payload: [String: Any] = [:]
+        payload["auth_session"] = authSession
+        payload["otp_code"] = otpCode
         return Request(session: session,
                        url: url.appending("authentication-methods").appending(id).appending("verify"),
                        method: "POST",

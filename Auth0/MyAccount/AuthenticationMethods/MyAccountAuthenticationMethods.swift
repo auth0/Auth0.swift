@@ -126,14 +126,12 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
     func enroll(phone: String,
                 preferredAuthenticationMethod: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
-    
+
     func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
 
     func getFactorStatus() -> Request<[Factor], MyAccountError>
 
     func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
-
-    func deleteAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
 
     func updateAuthenticationMethod(id: String,
                                     name: String?,
