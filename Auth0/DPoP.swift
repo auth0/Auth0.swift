@@ -331,9 +331,13 @@ struct DPoPChallenge {
         }
 
         let captureGroupName = "value"
-        let captureGroupPattern = #"(?<"# + captureGroupName + #">[\x20-\x21\x23-\x5B\x5D-\x7E]+)"#
-        let errorCodePattern = #"error\s?=\s?""# + captureGroupPattern + "\""
-        let errorDescriptionPattern = #"error_description\s?=\s?""# + captureGroupPattern + "\""
+        // If the value is a quoted string, use the first pattern, otherwise use the second pattern.
+        // The first pattern captures quoted strings, allowing for commas and spaces within the quotes.
+        // The second pattern allows for unquoted strings without commas and spaces.
+        let pattern = #"\s*=\s*"?(?<"# + captureGroupName +
+        #">(?<=")([\x20-\x21\x23-\x5B\x5D-\x7E]+)|([\x21\x23-\x2B\x2D-\x5B\x5D-\x7E]+))"?"#
+        let errorCodePattern = "error" + pattern
+        let errorDescriptionPattern = "error_description" + pattern
 
         guard let errorCode = header.captureGroup(named: captureGroupName, pattern: errorCodePattern) else {
             return nil
@@ -576,7 +580,9 @@ struct SecureEnclaveKeyStore: PoPKeyStore {
     private func store(_ key: GenericPasswordConvertible, forIdentifier identifier: String) throws(DPoPError) {
         // Describe a generic password
         var query = baseQuery(forIdentifier: identifier)
+        #if !os(macOS)
         query[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        #endif
         query[kSecValueData] = key.rawRepresentation
 
         let status = SecItemAdd(query as CFDictionary, nil)
@@ -733,8 +739,7 @@ struct KeychainKeyStore: PoPKeyStore {
         return [
             kSecClass: kSecClassKey,
             kSecAttrApplicationTag: keychainTag,
-            kSecAttrApplicationLabel: identifier,
-            kSecUseDataProtectionKeychain: true
+            kSecAttrApplicationLabel: identifier
         ]
     }
 
