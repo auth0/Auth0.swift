@@ -29,11 +29,16 @@ class KeychainKeyStoreSpec: QuickSpec {
                     expect { try keyStore.hasPrivateKey() } == false
                 }
 
+                // Otherwise entitlements would have to be added to the test bundle
+                // That requires code signing (even on CI)
+                // And code signing on CI requires access to the Apple Developer Account
+                #if !os(macOS)
                 it("should return true if a private key exists") {
                     _ = try keyStore.privateKey()
 
                     expect { try keyStore.hasPrivateKey() } == true
                 }
+                #endif
 
                 it("should throw an error if the key cannot be retrieved") {
                     let status = errSecUnimplemented
@@ -60,6 +65,10 @@ class KeychainKeyStoreSpec: QuickSpec {
                     expect { try keyStore.hasPrivateKey() }.to(throwError(expectedError))
                 }
 
+                // Otherwise entitlements would have to be added to the test bundle
+                // That requires code signing (even on CI)
+                // And code signing on CI requires access to the Apple Developer Account
+                #if !os(macOS)
                 it("should throw an error if the key cannot be exported") {
                     let message = "Unable to copy the external representation of the retrieved SecKey."
                     let expectedError = DPoPError(code: .secKeyOperationFailed(message))
@@ -100,18 +109,28 @@ class KeychainKeyStoreSpec: QuickSpec {
                         return P256.Signing.PrivateKey()
                     }
 
-                    keyStore.store = { _, _ in
+                    keyStore.store = { attributes, result in
                         expect(DispatchQueue.getSpecific(key: serialQueueKey)).toNot(beNil())
-                        return errSecSuccess
+                        return SecItemAdd(attributes, result)
+                    }
+
+                    keyStore.createSecKey = { keyData, attributes, error in
+                        expect(DispatchQueue.getSpecific(key: serialQueueKey)).toNot(beNil())
+                        return SecKeyCreateWithData(keyData, attributes, error)
                     }
 
                     _ = try keyStore.privateKey()
                 }
+                #endif
 
             }
 
             context("privateKey") {
 
+                // Otherwise entitlements would have to be added to the test bundle
+                // That requires code signing (even on CI)
+                // And code signing on CI requires access to the Apple Developer Account
+                #if !os(macOS)
                 it("should create a new private key if none exists") {
                     let privateKey = try keyStore.privateKey()
 
@@ -124,6 +143,7 @@ class KeychainKeyStoreSpec: QuickSpec {
 
                     expect(firstKey.publicKey.rawRepresentation) == secondKey.publicKey.rawRepresentation
                 }
+                #endif
 
                 it("should throw an error if a new key cannot be created") {
                     let message = "Unable to create a SecKey representation from the private key."
@@ -158,6 +178,10 @@ class KeychainKeyStoreSpec: QuickSpec {
 
             context("clear") {
 
+                // Otherwise entitlements would have to be added to the test bundle
+                // That requires code signing (even on CI)
+                // And code signing on CI requires access to the Apple Developer Account
+                #if !os(macOS)
                 it("should clear the private key") {
                     _ = try keyStore.privateKey()
 
@@ -167,6 +191,7 @@ class KeychainKeyStoreSpec: QuickSpec {
 
                     expect { try keyStore.hasPrivateKey() } == false
                 }
+                #endif
 
                 it("should not throw an error if the key is not found") {
                     expect { try keyStore.clear() }.toNot(throwError())
