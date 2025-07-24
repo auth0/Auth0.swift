@@ -1216,7 +1216,7 @@ public extension Authentication {
         return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
     }
 
-    func customTokenExchange(subjectTokenType: String, subjectToken: String, scope: String = "openid profile email", audience: String? = nil) -> Request<Credentials, AuthenticationError> {
+    func customTokenExchange(subjectTokenType: String, subjectToken: String, scope: String = defaultScope, audience: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.customTokenExchange(subjectTokenType: subjectTokenType, subjectToken: subjectToken, scope: scope, audience: audience)
     }
 

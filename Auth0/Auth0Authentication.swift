@@ -476,7 +476,7 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func customTokenExchange(subjectTokenType: String, subjectToken: String, scope: String = "openid profile email", audience: String? = nil) -> Request<Credentials, AuthenticationError> {
+    func customTokenExchange(subjectTokenType: String, subjectToken: String, scope: String, audience: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.tokenExchange(subjectToken: subjectToken, subjectTokenType: subjectTokenType, scope: scope, audience: audience)
     }
 

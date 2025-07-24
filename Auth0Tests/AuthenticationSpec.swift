@@ -1698,6 +1698,21 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
+            it("should exchange a custom token for credentials with custom scope") {
+                let customScope = "openid email profile custom_scope"
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
+                    "subject_token_type": subjectTokenType,
+                    "subject_token": subjectToken,
+                    "scope": customScope
+                ]) }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectTokenType: subjectTokenType, subjectToken: subjectToken, scope: customScope).start { result in
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
+                        done()
+                    }
+                }
+            }
         }
         
     }
