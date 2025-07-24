@@ -72,6 +72,7 @@ class SecureEnclaveKeyStoreSpec: QuickSpec {
                     expect { try keyStore.hasPrivateKey() }.to(throwError { (error: DPoPError) in
                         expect(error.code) == expectedError.code
                         expect(error.localizedDescription).to(beginWith(prefix: expectedError.localizedDescription))
+                        expect(error.cause).toNot(beNil())
                     })
                 }
 
@@ -103,6 +104,7 @@ class SecureEnclaveKeyStoreSpec: QuickSpec {
                     expect { try keyStore.privateKey() }.to(throwError { (error: DPoPError) in
                         expect(error.code) == expectedError.code
                         expect(error.localizedDescription).to(beginWith(prefix: expectedError.localizedDescription))
+                        expect(error.cause).toNot(beNil())
                     })
                 }
 

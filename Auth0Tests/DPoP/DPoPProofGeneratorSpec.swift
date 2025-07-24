@@ -131,6 +131,7 @@ class DPoPProofGeneratorSpec: QuickSpec {
                 }.to(throwError { (error: DPoPError) in
                     expect(error.code) == expectedError.code
                     expect(error.localizedDescription).to(beginWith(prefix: expectedError.localizedDescription))
+                    expect(error.cause).toNot(beNil())
                 })
             }
 
