@@ -15,14 +15,14 @@ class SenderConstrainingSpec: QuickSpec {
 
         describe("useDPoP") {
 
-            it("should set dpop with the default keychain tag") {
+            it("should set dpop with the default keychain identifier") {
                 senderConstrainer = senderConstrainer.useDPoP()
 
                 expect(senderConstrainer.dpop).toNot(beNil())
             }
 
-            it("should set dpop with a custom keychain tag") {
-                senderConstrainer = senderConstrainer.useDPoP(keychainTag: "custom-keychain-tag")
+            it("should set dpop with a custom keychain identifier") {
+                senderConstrainer = senderConstrainer.useDPoP(keychainIdentifier: "custom-keychain-identifier")
 
                 expect(senderConstrainer.dpop).toNot(beNil())
             }

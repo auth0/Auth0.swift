@@ -14,12 +14,12 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
     }
 
     func hasPrivateKey() throws(DPoPError) -> Bool {
-        return try get(forIdentifier: privateKeyIdentifier) != nil
+        return try get() != nil
     }
 
     func privateKey() throws(DPoPError) -> DPoPPrivateKey {
         // First, check if the key exists in the keychain
-        if let privateKey = try get(forIdentifier: privateKeyIdentifier) { return privateKey }
+        if let privateKey = try get() { return privateKey }
 
         // If not, create a new key and store it in the keychain
         return try Self.withSerialQueueSync {
@@ -31,7 +31,7 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
                 throw DPoPError(code: .secureEnclaveOperationFailed(message), cause: error)
             }
 
-            try store(privateKey, forIdentifier: privateKeyIdentifier)
+            try store(privateKey)
 
             return privateKey
         }
@@ -39,7 +39,7 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
 
     func clear() throws(DPoPError) {
         return try Self.withSerialQueueSync {
-            let query = baseQuery(forIdentifier: privateKeyIdentifier)
+            let query = baseQuery()
 
             let status = remove(query as CFDictionary)
             guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
@@ -50,8 +50,8 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
     }
 
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
-    private func store(_ key: GenericPasswordConvertible, forIdentifier identifier: String) throws(DPoPError) {
-        var query = baseQuery(forIdentifier: identifier)
+    private func store(_ key: GenericPasswordConvertible) throws(DPoPError) {
+        var query = baseQuery()
         #if !os(macOS)
         query[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         #endif
@@ -65,8 +65,8 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
     }
 
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
-    private func get(forIdentifier identifier: String) throws(DPoPError) -> GenericPasswordConvertible? {
-        var query = baseQuery(forIdentifier: identifier)
+    private func get() throws(DPoPError) -> GenericPasswordConvertible? {
+        var query = baseQuery()
         query[kSecReturnData] = true
 
         var item: CFTypeRef?
@@ -89,11 +89,11 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
         }
     }
 
-    private func baseQuery(forIdentifier identifier: String) -> [CFString: Any] {
+    private func baseQuery() -> [CFString: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: keychainService,
-            kSecAttrAccount: identifier
+            kSecAttrAccount: privateKeyIdentifier
         ]
     }
 

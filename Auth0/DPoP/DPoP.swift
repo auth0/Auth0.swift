@@ -3,9 +3,20 @@ import CryptoKit
 
 // MARK: - DPoP Service
 
+/// Utilities for securing requests with DPoP (Demonstrating Proof of Possession) as described in
+/// [RFC 9449](https://datatracker.ietf.org/doc/html/rfc9449).
+///
+/// ## See Also
+///
+/// - ``DPoPError``
 public struct DPoP: Sendable {
 
-    static public let defaultKeychainTag = Bundle.main.bundleIdentifier!
+    /// The default identifier used to store the key pair on the Keychain, which is the bundle identifier.
+    static public let defaultKeychainIdentifier: String = Bundle.main.bundleIdentifier!
+
+    /// The identifier used to store the key pair on the Keychain.
+    public let keychainIdentifier: String
+
     static let nonceRequiredErrorCode = "use_dpop_nonce"
     static private(set) var auth0Nonce: String?
     static private let maxRetries = 1
@@ -13,16 +24,43 @@ public struct DPoP: Sendable {
     private let keyStore: DPoPKeyStore
     private let proofGenerator: DPoPProofGenerator
 
-    init(keychainTag: String) {
-        self.keyStore = Self.keyStore(for: keychainTag)
+    init(keychainIdentifier: String = DPoP.defaultKeychainIdentifier) {
+        self.keychainIdentifier = keychainIdentifier
+        self.keyStore = Self.keyStore(for: keychainIdentifier)
         self.proofGenerator = DPoPProofGenerator(keyStore: keyStore)
     }
 
+    /// Adds the `Authorization` and `DPoP` headers to the provided `URLRequest`. The `Authorization` header is set
+    /// using the access token and token type. The `DPoP` header contains the generated DPoP proof.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// var request = URLRequest(url: URL(string: "https://example.com/api/endpoint")!)
+    /// request.httpMethod = "POST"
+    ///
+    /// do {
+    ///     try DPoP.addHeaders(to: &request,
+    ///                         accessToken: credentials.accessToken,
+    ///                         tokenType: credentials.tokenType)
+    /// } catch {
+    ///     print(error)
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - request: The `URLRequest` to which the headers will be added.
+    ///   - accessToken: The access token to include in the `Authorization` header. See ``Credentials/accessToken``.
+    ///   - tokenType: Either `DPoP` or `Bearer`. See ``Credentials/tokenType``.
+    ///   - nonce: Optional nonce value to include in the DPoP proof.
+    ///   - keychainIdentifier: The identifier used to store the key pair on the Keychain. Defaults to the bundle identifier.
+    /// - Important: The HTTP method is needed for the generation of the DPoP proof, and must already be set on the `URLRequest`.
+    /// - Throws: `DPoPError` if the DPoP proof generation fails.
     static public func addHeaders(to request: inout URLRequest,
                                   accessToken: String,
                                   tokenType: String,
                                   nonce: String? = nil,
-                                  keychainTag: String = defaultKeychainTag) throws(DPoPError) {
+                                  keychainIdentifier: String = defaultKeychainIdentifier) throws(DPoPError) {
         request.setValue("\(tokenType) \(accessToken)", forHTTPHeaderField: "Authorization")
 
         guard tokenType.caseInsensitiveCompare("dpop") == .orderedSame else { return }
@@ -32,16 +70,58 @@ public struct DPoP: Sendable {
             return
         }
 
-        let proofGenerator = DPoPProofGenerator(keyStore: DPoP.keyStore(for: keychainTag))
+        let proofGenerator = DPoPProofGenerator(keyStore: DPoP.keyStore(for: keychainIdentifier))
         let proof = try proofGenerator.generate(url: url, method: method, nonce: nonce, accessToken: accessToken)
 
         request.setValue(proof, forHTTPHeaderField: "DPoP")
     }
 
-    static public func clearKeypair(for keychainTag: String = defaultKeychainTag) throws(DPoPError) {
-        return try Self.keyStore(for: keychainTag).clear()
+    /// Clears the key pair stored in the Keychain.
+    ///
+    /// This method should be called as part of the logout process, along with ``CredentialsManager/clear()``, and
+    /// ``WebAuth/clearSession(federated:callback:)-9xcu3`` –when using web-based authentication.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// do {
+    ///     try DPoP.clearKeypair()
+    /// } catch {
+    ///     print(error)
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - keychainIdentifier: The identifier used to store the key pair on the Keychain. Defaults to the bundle identifier.
+    /// - Throws: `DPoPError` if the key pair removal fails.
+    static public func clearKeypair(for keychainIdentifier: String = defaultKeychainIdentifier) throws(DPoPError) {
+        return try Self.keyStore(for: keychainIdentifier).clear()
     }
 
+    /// Checks the `WWW-Authenticate` header of an error `HTTPURLResponse` to determine if a nonce must be included in
+    /// the DPoP proof. If so, a new nonce value should be present in the `DPoP-Nonce` header of the response. This
+    /// nonce should be extracted and used to generate a new DPoP proof. The failed request should then be retried with
+    /// the new DPoP proof.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// if DPoP.isNonceRequired(by: response) {
+    ///     // Extract the nonce from the response
+    ///     guard let nonce = response.value(forHTTPHeaderField: "DPoP-Nonce") else {
+    ///         // ...
+    ///         return
+    ///     }
+    ///
+    ///     // Use DPoP.addHeaders(to:accessToken:tokenType:nonce:)
+    ///     // to generate a new DPoP proof with the extracted nonce,
+    ///     // and then retry the request.
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - response: The HTTP response to check.
+    /// - Returns: `true` if a DPoP nonce is required, `false` otherwise.
     static public func isNonceRequired(by response: HTTPURLResponse) -> Bool {
         return DPoPChallenge(from: response)?.errorCode == nonceRequiredErrorCode
     }
@@ -50,10 +130,11 @@ public struct DPoP: Sendable {
         return DPoPChallenge(from: response)
     }
 
-    static func keyStore(for keychainTag: String, useSecureEncave: Bool = SecureEnclave.isAvailable) -> DPoPKeyStore {
+    static func keyStore(for keychainIdentifier: String,
+                         useSecureEncave: Bool = SecureEnclave.isAvailable) -> DPoPKeyStore {
         return useSecureEncave ?
-        SecureEnclaveKeyStore(keychainService: keychainTag) :
-        KeychainKeyStore(keychainTag: keychainTag)
+        SecureEnclaveKeyStore(keychainService: keychainIdentifier) :
+        KeychainKeyStore(keychainTag: keychainIdentifier)
     }
 
     static func extractNonce(from response: HTTPURLResponse?) -> String? {

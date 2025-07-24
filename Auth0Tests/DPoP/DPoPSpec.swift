@@ -226,12 +226,12 @@ class DPoPSpec: QuickSpec {
             context("key store creation") {
 
                 it("should use SecureEnclaveKeyStore when Secure Enclave is available") {
-                    let keyStore = DPoP.keyStore(for: DPoP.testKeyTag, useSecureEncave: true)
+                    let keyStore = DPoP.keyStore(for: DPoP.testKeychainIdentifier, useSecureEncave: true)
                     expect(keyStore).to(beAKindOf(SecureEnclaveKeyStore.self))
                 }
 
                 it("should use KeychainKeyStore when Secure Enclave is not available") {
-                    let keyStore = DPoP.keyStore(for: DPoP.testKeyTag, useSecureEncave: false)
+                    let keyStore = DPoP.keyStore(for: DPoP.testKeychainIdentifier, useSecureEncave: false)
                     expect(keyStore).to(beAKindOf(KeychainKeyStore.self))
                 }
 
@@ -244,20 +244,20 @@ class DPoPSpec: QuickSpec {
 
 extension DPoP {
 
-    static var testKeyTag: String {
-        return "test_dpop_key"
+    static var testKeychainIdentifier: String {
+        return "com.auth0.sdk.DPoPTests"
     }
 
     static func createKeypair() throws {
-        _ = try DPoP.keyStore(for: testKeyTag).privateKey()
+        _ = try DPoP.keyStore(for: testKeychainIdentifier).privateKey()
     }
 
     static func clearKeypair() throws {
-        _ = try DPoP.keyStore(for: testKeyTag).clear()
+        _ = try DPoP.keyStore(for: testKeychainIdentifier).clear()
     }
 
     init() {
-        self.init(keychainTag: DPoP.testKeyTag)
+        self.init(keychainIdentifier: DPoP.testKeychainIdentifier)
     }
 
 }

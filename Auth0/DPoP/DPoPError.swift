@@ -1,3 +1,7 @@
+/// Represents an error during a DPoP operation.
+///
+/// This error type encapsulates various issues that can occur while performing DPoP-related operations, such as key
+/// generation, proof creation, or cryptographic failures.
 public struct DPoPError: Auth0Error, Sendable {
 
     enum Code: Equatable {
@@ -26,12 +30,20 @@ public struct DPoPError: Auth0Error, Sendable {
         self.appendCause(to: self.message)
     }
 
+    /// A Secure Enclave operation failed.
+    /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let secureEnclaveOperationFailed: DPoPError = .init(code: .secureEnclaveOperationFailed(""))
 
+    /// A Keychain operation failed.
+    /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let keychainOperationFailed: DPoPError = .init(code: .keychainOperationFailed(""))
 
+    /// A CryptoKit operation failed.
+    /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let cryptoKitOperationFailed: DPoPError = .init(code: .cryptoKitOperationFailed(""))
 
+    /// A SecKey operation failed.
+    /// When available, the underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
     public static let secKeyOperationFailed: DPoPError = .init(code: .secKeyOperationFailed(""))
 
     /// An unexpected error occurred, and an `Error` value is available.
@@ -59,6 +71,8 @@ extension DPoPError {
 
 }
 
+// MARK: - Equatable
+
 extension DPoPError: Equatable {
 
     /// Conformance to `Equatable`.
@@ -67,6 +81,8 @@ extension DPoPError: Equatable {
     }
 
 }
+
+// MARK: - Pattern Matching Operator
 
 public extension DPoPError {
 

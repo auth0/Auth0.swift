@@ -9,7 +9,7 @@ typealias ExportSecKeyFunction = (_ key: SecKey, _ error: UnsafeMutablePointer<U
 // Used when Secure Enclave is not available
 struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
 
-    let keychainTag: Data
+    let keychainTag: String
 
     var store: StoreFunction = SecItemAdd
     var retrieve: RetrieveFunction = SecItemCopyMatching
@@ -21,22 +21,22 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
     }
 
     init(keychainTag: String) {
-        self.keychainTag = keychainTag.data(using: .utf8)!
+        self.keychainTag = keychainTag
     }
 
     func hasPrivateKey() throws(DPoPError) -> Bool {
-        return try get(forIdentifier: privateKeyIdentifier) != nil
+        return try get() != nil
     }
 
     // When SecureEnclave is not available, we use a simple keychain store
     func privateKey() throws(DPoPError) -> DPoPPrivateKey {
         // First, check if the key exists in the keychain
-        if let privateKey = try get(forIdentifier: privateKeyIdentifier) { return privateKey }
+        if let privateKey = try get() { return privateKey }
 
         return try Self.withSerialQueueSync {
             // If not, create a new key and store it in the keychain
             let privateKey = newPrivateKey()
-            try store(privateKey, forIdentifier: privateKeyIdentifier)
+            try store(privateKey)
 
             return privateKey
         }
@@ -44,7 +44,7 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
 
     func clear() throws(DPoPError) {
         return try Self.withSerialQueueSync {
-            let query = baseQuery(forIdentifier: privateKeyIdentifier)
+            let query = baseQuery()
 
             let status = remove(query as CFDictionary)
             guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
@@ -55,9 +55,9 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
     }
 
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
-    private func get(forIdentifier identifier: String) throws(DPoPError) -> SecKeyConvertible? {
+    private func get() throws(DPoPError) -> SecKeyConvertible? {
         // Seek an elliptic-curve key with a given identifier
-        var query = baseQuery(forIdentifier: privateKeyIdentifier)
+        var query = baseQuery()
         query[kSecAttrKeyType] = kSecAttrKeyTypeECSECPrimeRandom
         query[kSecReturnRef] = true
 
@@ -94,7 +94,7 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
     }
 
     // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
-    private func store(_ key: SecKeyConvertible, forIdentifier identifier: String) throws(DPoPError) {
+    private func store(_ key: SecKeyConvertible) throws(DPoPError) {
         // Describe the key
         let attributes = [
             kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
@@ -111,7 +111,7 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
         }
 
         // Describe the add operation
-        var query = baseQuery(forIdentifier: privateKeyIdentifier)
+        var query = baseQuery()
         #if !os(macOS)
         query[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         #endif
@@ -125,11 +125,11 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
         }
     }
 
-    private func baseQuery(forIdentifier identifier: String) -> [CFString: Any] {
+    private func baseQuery() -> [CFString: Any] {
         return [
             kSecClass: kSecClassKey,
-            kSecAttrApplicationTag: keychainTag,
-            kSecAttrApplicationLabel: identifier
+            kSecAttrApplicationTag: keychainTag.data(using: .utf8)!,
+            kSecAttrApplicationLabel: privateKeyIdentifier
         ]
     }
 

@@ -115,7 +115,7 @@ public struct CredentialsManager {
         return self.storage.setEntry(data, forKey: self.storeKey)
     }
 
-    /// Clears credentials and DPoP keys stored in the Keychain.
+    /// Clears credentials stored in the Keychain.
     ///
     /// ## Usage
     ///
