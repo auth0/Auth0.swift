@@ -7,6 +7,15 @@
 - **All tests must pass before merging.**
 - **All new functionality must be documented.**
 
+## Coding Guidelines
+
+- Follow [Swift API Design Guidelines](https://swift.org/documentation/api-design-guidelines/)
+- Use `camelCase` for variables and functions
+- All functions must be documented with a comment explaining their purpose
+- Avoid force-unwrapping (`!`) unless it’s 100% safe
+- Only set default value method parameters in Extensions
+- Use defaultScope instead of "openid profile email"
+
 ## Test Frameworks
 
 - Use [Quick](https://github.com/Quick/Quick) and [Nimble](https://github.com/Quick/Nimble) for BDD-style unit and integration tests.
@@ -29,6 +38,8 @@
 - Cover all public APIs, edge cases, and error conditions.
 - Test both success and failure scenarios.
 - For model objects, test decoding/encoding, required/optional fields, and invalid data.
+- Tests should also cover methods that have default paramters 
+- Tests should include error outcomes
 
 ## Platform Support
 
