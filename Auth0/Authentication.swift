@@ -923,6 +923,38 @@ public protocol Authentication: Trackable, Loggable {
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
     /**
+     Exchanges a subject token for Auth0 tokens using the OAuth 2.0 Token Exchange spec.
+
+     - Important: Custom Token Exchange is an Early Access feature for Auth0 Enterprise customers. You must enable it for your application and configure a Custom Token Exchange Profile and Action in your Auth0 Dashboard. See: https://auth0.com/docs/authenticate/custom-token-exchange
+     - Security: You are responsible for implementing strong validation logic in your Auth0 Action to prevent spoofing or replay attacks. See Auth0's security guidance for recommendations.
+
+     ## Usage
+
+     ```swift
+     Auth0
+         .authentication()
+         .customTokenExchange(subjectTokenType: "urn:partner0:external-idp-migration", subjectToken: "subject-token")
+         .start { result in
+             switch result {
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
+     - Parameters:
+       - subjectTokenType: The type of the subject token (must match your Auth0 profile, e.g., "urn:partner0:external-idp-migration").
+       - subjectToken: The subject token to exchange.
+       - scope: Optional scopes to request (default: "openid profile email").
+       - audience: Optional audience for the issued token.
+     - Returns: A request that will yield Auth0 user's credentials.
+     - SeeAlso: [OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693)
+     */
+    func customTokenExchange(subjectTokenType: String, subjectToken: String, scope: String, audience: String?) -> Request<Credentials, AuthenticationError>
+
+    /**
      Exchanges a user's refresh token for a session transfer token that can be used to perform web single sign-on
      (SSO).
 
@@ -1182,6 +1214,10 @@ public extension Authentication {
 
     func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
+    }
+
+    func customTokenExchange(subjectTokenType: String, subjectToken: String, scope: String = "openid profile email", audience: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.customTokenExchange(subjectTokenType: subjectTokenType, subjectToken: subjectToken, scope: scope, audience: audience)
     }
 
 }

@@ -1634,5 +1634,71 @@ class AuthenticationSpec: QuickSpec {
             }
         }
         
+        describe("custom token exchange") {
+            let subjectTokenType = "urn:partner0:external-idp-migration"
+            let subjectToken = "subject-token"
+            let customAudience = "https://api.example.com/"
+            let errorCode = "invalid_grant"
+            let errorDescription = "Invalid subject_token"
+            let invalidType = "urn:partner0:invalid-type"
+            beforeEach {
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
+                    "subject_token_type": subjectTokenType,
+                    "subject_token": subjectToken
+                ]) }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
+                    "subject_token_type": subjectTokenType,
+                    "subject_token": subjectToken,
+                    "audience": customAudience
+                ]) }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                // Error: invalid subject token
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
+                    "subject_token_type": subjectTokenType,
+                    "subject_token": "bad-token"
+                ]) }, response: authFailure(code: errorCode, description: errorDescription))
+                // Error: invalid subject token type
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast([
+                    "grant_type": TokenExchangeGrantType,
+                    "subject_token_type": invalidType,
+                    "subject_token": subjectToken
+                ]) }, response: authFailure(code: errorCode, description: "Invalid subject_token_type"))
+            }
+            it("should exchange a custom token for credentials") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectTokenType: subjectTokenType, subjectToken: subjectToken).start { result in
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
+                        done()
+                    }
+                }
+            }
+            it("should exchange a custom token for credentials with audience") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectTokenType: subjectTokenType, subjectToken: subjectToken, audience: customAudience).start { result in
+                        expect(result).to(haveCredentials(AccessToken, IdToken))
+                        done()
+                    }
+                }
+            }
+            it("should fail to exchange a custom token with invalid subject token") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectTokenType: subjectTokenType, subjectToken: "bad-token").start { result in
+                        expect(result).to(haveAuthenticationError(code: errorCode, description: errorDescription))
+                        done()
+                    }
+                }
+            }
+            it("should fail to exchange a custom token with invalid subject token type") {
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectTokenType: invalidType, subjectToken: subjectToken).start { result in
+                        expect(result).to(haveAuthenticationError(code: errorCode, description: "Invalid subject_token_type"))
+                        done()
+                    }
+                }
+            }
+        }
+        
     }
 }
