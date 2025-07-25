@@ -85,18 +85,19 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: self.telemetry)
     }
 
-    func enrollAuthenticationMethod(type: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+    func enrollAuthenticationMethod(type: String) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = type
         return Request(session: session,
                        url: url,
                        method: "POST",
                        handle: myAcccountDecodable,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
-    
-    func enroll(email: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+
+    func enroll(email: String) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "email"
         payload["email"] = email
@@ -104,12 +105,14 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("authentication-methods"),
                        method: "POST",
                        handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
 
     func enroll(phone: String,
-                preferredAuthenticationMethod: String) -> Request<PasskeyAuthenticationMethod, MyAccountError> {
+                preferredAuthenticationMethod: String) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "phone"
         payload["phone_number"] = phone
@@ -118,15 +121,18 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("authentication-methods"),
                        method: "POST",
                        handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
-    
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError> {
+
+    func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError> {
         return Request(session: session,
                        url: url.appending("authentication-methods"),
                        method: "GET",
                        handle: myAcccountDecodable,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
@@ -136,6 +142,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("factors"),
                        method: "GET",
                        handle: myAcccountDecodable,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
@@ -145,6 +152,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("authentication-methods").appending(id),
                        method: "GET",
                        handle: myAcccountDecodable,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
@@ -160,6 +168,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        method: "PATCH",
                        handle: myAcccountDecodable,
                        parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
@@ -173,6 +182,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("authentication-methods").appending(id).appending("verify"),
                        method: "POST",
                        handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
@@ -185,6 +196,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("authentication-methods").appending(id).appending("verify"),
                        method: "POST",
                        handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry
         )
@@ -200,6 +213,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("authentication-methods").appending(id).appending("verify"),
                        method: "POST",
                        handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
@@ -214,6 +229,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("authentication-methods").appending(id).appending("verify"),
                        method: "POST",
                        handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
@@ -223,11 +240,13 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         payload["id"] = id
-    
+
         return Request(session: session,
                        url: url.appending("authentication-methods").appending(id).appending("verify"),
                        method: "POST",
                        handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
@@ -243,6 +262,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("authentication-methods").appending(id).appending("verify"),
                        method: "POST",
                        handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
@@ -255,6 +276,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        url: url.appending("authentication-methods").appending(id).appending("verify"),
                        method: "POST",
                        handle: myAcccountDecodable,
+                       parameters: payload,
+                       headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }

@@ -1,3 +1,11 @@
+public struct AuthenticationMethods: Decodable {
+    public let authenticationMethods: [AuthenticationMethod]
+    
+    enum CodingKeys: String, CodingKey {
+        case authenticationMethods = "authentication_methods"
+    }
+}
+
 public struct AuthenticationMethod: Decodable {
     let type: String?
     let credentialBackedUp: Bool?
@@ -6,7 +14,7 @@ public struct AuthenticationMethod: Decodable {
     let keyId: String?
     let publicKey: String?
     let transports: [String]?
-    let userAgent: String
+    let userAgent: String?
     let userHandle: String?
     let lastPasswordReset: String?
     let id: String?

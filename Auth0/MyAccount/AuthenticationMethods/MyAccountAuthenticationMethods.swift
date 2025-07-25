@@ -120,14 +120,14 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
 
     func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError>
 
-    func enrollAuthenticationMethod(type: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
+    func enrollAuthenticationMethod(type: String) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
 
-    func enroll(email: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
+    func enroll(email: String) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
 
     func enroll(phone: String,
-                preferredAuthenticationMethod: String) -> Request<PasskeyAuthenticationMethod, MyAccountError>
+                preferredAuthenticationMethod: String) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
 
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
+    func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError>
 
     func getFactorStatus() -> Request<[Factor], MyAccountError>
 
