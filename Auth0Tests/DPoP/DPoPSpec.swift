@@ -179,23 +179,17 @@ class DPoPSpec: QuickSpec {
 
                 it("should return true when the use_dpop_nonce error is present") {
                     let error = AuthenticationError(info: infoWithNonceError, statusCode: 400)
-                    let shouldRetry = DPoP.shouldRetry(for: error, retryCount: 0)
-
-                    expect(shouldRetry) == true
+                    expect(DPoP.shouldRetry(for: error, retryCount: 0)) == true
                 }
 
                 it("should return false after the max retries have been reached") {
                     let error = AuthenticationError(info: infoWithNonceError, statusCode: 400)
-                    let shouldRetry = DPoP.shouldRetry(for: error, retryCount: 1)
-
-                    expect(shouldRetry) == false
+                    expect(DPoP.shouldRetry(for: error, retryCount: 1)) == false
                 }
 
                 it("should return false when no use_dpop_nonce error is present") {
-                    let error = AuthenticationError(info: infoWithoutNonceError, statusCode: 400)
-                    let shouldRetry = DPoP.shouldRetry(for: error, retryCount: 0)
-
-                    expect(shouldRetry) == false
+                    let error: AuthenticationError = AuthenticationError(info: infoWithoutNonceError, statusCode: 400)
+                    expect(DPoP.shouldRetry(for: error, retryCount: 0)) == false
                 }
 
             }
@@ -444,6 +438,126 @@ class DPoPSpec: QuickSpec {
                         expect { try keyStore.hasPrivateKey() } == false
                     }
 
+                }
+
+            }
+
+            context("shouldGenerateProof") {
+
+                beforeEach {
+                    // Create a key pair
+                    _ = try DPoP.keyStore(for: DPoP.defaultKeychainIdentifier).privateKey()
+                }
+
+                context("token endpoint") {
+
+                    let tokenURL = URL(string: "https://example.com/oauth/token")!
+
+                    context("with refresh_token grant") {
+
+                        it("should return true when a key pair exists") {
+                            let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
+                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == true
+                        }
+
+                        it("should return false when no key pair exists") {
+                            try DPoP.clearKeypair()
+
+                            let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
+                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == false
+                        }
+
+                    }
+
+                    context("without refresh_token grant") {
+
+                        it("should return true when a key pair exists") {
+                            let parameters = ["grant_type": "authorization_code"]
+                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == true
+                        }
+
+                        it("should return true when no key pair exists") {
+                            try DPoP.clearKeypair()
+
+                            let parameters = ["grant_type": "authorization_code"]
+                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == true
+                        }
+
+                    }
+
+                }
+
+                context("non-token endpoint") {
+
+                    let apiURL = URL(string: "https://example.com/api/endpoint")!
+
+                    context("with refresh_token grant") {
+
+                        it("should return true when a key pair exists") {
+                            let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
+                            expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == true
+                        }
+
+                        it("should return false when no key pair exists") {
+                            try DPoP.clearKeypair()
+
+                            let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
+                            expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == false
+                        }
+
+                    }
+
+                    context("without refresh_token grant") {
+
+                        it("should return true when a key pair exists") {
+                            let parameters = ["grant_type": "authorization_code"]
+                            expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == true
+                        }
+
+                        it("should return false when no key pair exists") {
+                            try DPoP.clearKeypair()
+
+                            let parameters = ["grant_type": "authorization_code"]
+                            expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == false
+                        }
+
+                    }
+
+                }
+
+            }
+
+            context("jkt") {
+
+                beforeEach {
+                    // Create a key pair
+                    _ = try DPoP.keyStore(for: DPoP.defaultKeychainIdentifier).privateKey()
+                }
+
+                it("should generate a JWK thumbprint") {
+                    let thumbprint = try dpop.jkt()
+
+                    expect(thumbprint).toNot(beEmpty())
+                    expect(thumbprint).to(match("^[A-Za-z0-9_-]*$")) // Base64URL-safe format
+                }
+
+                it("should return the same JWK thumbprint for the same key pair") {
+                    let thumbprint1 = try dpop.jkt()
+                    let thumbprint2 = try dpop.jkt()
+
+                    expect(thumbprint1) == thumbprint2
+                }
+
+                it("should return different JWK thumbprints for different key pairs") {
+                    let thumbprint1 = try dpop.jkt()
+
+                    // Clear and create a new key pair
+                    try DPoP.clearKeypair()
+                    _ = try DPoP.keyStore(for: DPoP.defaultKeychainIdentifier).privateKey()
+
+                    let thumbprint2 = try dpop.jkt()
+
+                    expect(thumbprint1) != thumbprint2
                 }
 
             }
