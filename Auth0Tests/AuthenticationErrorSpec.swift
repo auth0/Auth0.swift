@@ -490,7 +490,7 @@ class OAuthErrorBehavior: Behavior<[String:Any]> {
         describe("DPoP nonce extraction") {
 
             it("should extract DPoP nonce from error response") {
-                let nonce = "nonce"
+                let nonce = "auth0-nonce"
                 let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
                                                statusCode: 400,
                                                httpVersion: nil,

@@ -523,10 +523,6 @@ extension URLRequest {
         return hasHeader("Authorization", value: "DPoP \(token)")
     }
     
-    func hasAuthorizationHeader(tokenType: String, token: String) -> Bool {
-        return hasHeader("Authorization", value: "\(tokenType) \(token)")
-    }
-    
     func hasAllOf(_ parameters: [String: String]) -> Bool {
         guard let payload = self.payload else { return false }
         return parameters.count == payload.count && parameters.reduce(true, { (initial, entry) -> Bool in
