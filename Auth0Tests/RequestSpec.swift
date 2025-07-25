@@ -172,7 +172,8 @@ class RequestSpec: QuickSpec {
                         return apiSuccessResponse()(request)
                     })
 
-                    try DPoP.createKeypair()
+                    // Create a key pair
+                    _ = try DPoP.keyStore(for: DPoP.defaultKeychainIdentifier).privateKey()
 
                     waitUntil(timeout: Timeout) { done in
                         Request(url: Url.appending("token"),
@@ -240,7 +241,8 @@ class RequestSpec: QuickSpec {
                         return apiSuccessResponse()(request)
                     })
 
-                    try DPoP.createKeypair()
+                    // Create a key pair
+                    _ = try DPoP.keyStore(for: DPoP.defaultKeychainIdentifier).privateKey()
 
                     waitUntil(timeout: Timeout) { done in
                         Request(url: Url, dpop: DPoP()).start { result in

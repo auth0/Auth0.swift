@@ -49,7 +49,6 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
         }
     }
 
-    // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     private func store(_ key: GenericPasswordConvertible) throws(DPoPError) {
         var query = baseQuery()
         #if !os(macOS)
@@ -64,7 +63,6 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
         }
     }
 
-    // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     private func get() throws(DPoPError) -> GenericPasswordConvertible? {
         var query = baseQuery()
         query[kSecReturnData] = true

@@ -130,7 +130,7 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
     }
 
     /// When a nonce must be included in the DPoP proof. The Authentication API client will retry the request *once*
-    /// when a nonce is required by Auth0., but subsequent failures must be handled by the app.
+    /// when a nonce is required by Auth0, but subsequent failures must be handled by the app.
     ///
     /// The nonce is sent on the `DPoP-Nonce` header of the response. It is available in the ``info`` dictionary under
     /// the `dpop_nonce` key.

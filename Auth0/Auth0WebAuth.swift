@@ -283,7 +283,7 @@ final class Auth0WebAuth: WebAuth {
         }
 
         do {
-            entries["dpop_jkt"] = try dpop?.jkt() // This creates a new keypair if one is not already stored
+            entries["dpop_jkt"] = try dpop?.jkt() // This creates a new key pair if one is not already stored
         } catch {
             throw WebAuthError(code: .other, cause: error)
         }

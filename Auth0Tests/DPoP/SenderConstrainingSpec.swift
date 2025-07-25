@@ -18,13 +18,14 @@ class SenderConstrainingSpec: QuickSpec {
             it("should set dpop with the default keychain identifier") {
                 senderConstrainer = senderConstrainer.useDPoP()
 
-                expect(senderConstrainer.dpop).toNot(beNil())
+                expect(senderConstrainer.dpop?.keychainIdentifier) == DPoP.defaultKeychainIdentifier
             }
 
             it("should set dpop with a custom keychain identifier") {
-                senderConstrainer = senderConstrainer.useDPoP(keychainIdentifier: "custom-keychain-identifier")
+                let customIdentifer = "custom-keychain-identifier"
+                senderConstrainer = senderConstrainer.useDPoP(keychainIdentifier: customIdentifer)
 
-                expect(senderConstrainer.dpop).toNot(beNil())
+                expect(senderConstrainer.dpop?.keychainIdentifier) == customIdentifer
             }
 
         }

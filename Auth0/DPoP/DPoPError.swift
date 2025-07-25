@@ -1,7 +1,7 @@
 /// Represents an error during a DPoP operation.
 ///
 /// This error type encapsulates various issues that can occur while performing DPoP-related operations, such as key
-/// generation, proof creation, or cryptographic failures.
+/// generation or cryptographic failures.
 public struct DPoPError: Auth0Error, Sendable {
 
     enum Code: Equatable {

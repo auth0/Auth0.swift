@@ -54,7 +54,6 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
         }
     }
 
-    // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     private func get() throws(DPoPError) -> SecKeyConvertible? {
         // Seek an elliptic-curve key with a given identifier
         var query = baseQuery()
@@ -93,7 +92,6 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
         }
     }
 
-    // From Apple's sample code at https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
     private func store(_ key: SecKeyConvertible) throws(DPoPError) {
         // Describe the key
         let attributes = [
