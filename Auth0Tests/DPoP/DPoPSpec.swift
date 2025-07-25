@@ -226,12 +226,12 @@ class DPoPSpec: QuickSpec {
             context("key store creation") {
 
                 it("should use SecureEnclaveKeyStore when Secure Enclave is available") {
-                    let keyStore = DPoP.keyStore(for: DPoP.testKeychainIdentifier, useSecureEncave: true)
+                    let keyStore = DPoP.keyStore(for: DPoP.testKeychainIdentifier, useSecureEnclave: true)
                     expect(keyStore).to(beAKindOf(SecureEnclaveKeyStore.self))
                 }
 
                 it("should use KeychainKeyStore when Secure Enclave is not available") {
-                    let keyStore = DPoP.keyStore(for: DPoP.testKeychainIdentifier, useSecureEncave: false)
+                    let keyStore = DPoP.keyStore(for: DPoP.testKeychainIdentifier, useSecureEnclave: false)
                     expect(keyStore).to(beAKindOf(KeychainKeyStore.self))
                 }
 

@@ -131,8 +131,8 @@ public struct DPoP: Sendable {
     }
 
     static func keyStore(for keychainIdentifier: String,
-                         useSecureEncave: Bool = SecureEnclave.isAvailable) -> DPoPKeyStore {
-        return useSecureEncave ?
+                         useSecureEnclave: Bool = SecureEnclave.isAvailable) -> DPoPKeyStore {
+        return useSecureEnclave ?
         SecureEnclaveKeyStore(keychainService: keychainIdentifier) :
         KeychainKeyStore(keychainTag: keychainIdentifier)
     }
