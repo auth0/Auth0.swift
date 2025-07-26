@@ -70,7 +70,7 @@ class PasskeyEnrollmentChallengeSpec: QuickSpec {
 
             it("should fail when the Location header is missing") {
                 decoder = JSONDecoder()
-                // Don't set the locationHeaderKey to simulate missing header
+                // Don't set the locationHeaderKey to simulate a missing header
 
                 let jsonData = JSON.data(using: .utf8)!
                 let errorDescription = "Missing authentication method identifier in header 'Location'"

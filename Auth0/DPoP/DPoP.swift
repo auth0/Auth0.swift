@@ -185,7 +185,7 @@ public struct DPoP: Sendable {
 
     // MARK: - Testing Utilities
 
-    static func resetNonce() {
+    static func clearNonce() {
         serialQueue.sync {
             Self.auth0Nonce = nil
         }

@@ -18,33 +18,31 @@ class ResponseSpec: QuickSpec {
 
             it("should handle empty HTTP 200 responses") {
                 let response = Response<AuthenticationError>(data: nil, response: http(200), error: nil)
-                let result = try! response.result()
+                let result = try response.result()
                 expect(result.value.statusCode) == 200
                 expect(result.data).to(beNil())
             }
 
             it("should handle HTTP 204 responses") {
                 let response = Response<AuthenticationError>(data: nil, response: http(204), error: nil)
-                let result = try! response.result()
+                let result = try response.result()
                 expect(result.value.statusCode) == 204
                 expect(result.data).to(beNil())
             }
 
             it("should handle valid JSON") {
                 let response = Response<AuthenticationError>(data: JSONData, response: http(200), error: nil)
-                expect(try? response.result()).toNot(beNil())
-
                 let result: ResponseValue = try response.result()
-                expect(result.value.allHeaderFields).toNot(beEmpty())
-                expect(result.data).toNot(beEmpty())
+                expect(result.value.statusCode) == 200
+                expect(result.data) == JSONData
             }
 
             it("should handle plain text") {
                 let data = "A simple String".data(using: .utf8)
                 let response = Response<AuthenticationError>(data: data, response: http(200), error: nil)
-                let result = try! response.result()
+                let result = try response.result()
                 expect(result.value.statusCode) == 200
-                expect(result.data).toNot(beEmpty())
+                expect(result.data) == data
             }
 
         }
@@ -75,22 +73,6 @@ class ResponseSpec: QuickSpec {
             it("should fail with code greater than 200") {
                 let response = Response<AuthenticationError>(data: nil, response: http(300), error: nil)
                 expect({ try response.result() }).to(throwError())
-            }
-
-        }
-
-        describe("response value") {
-
-            it("should contain HTTPURLResponse and data") {
-                let responseValue = ResponseValue(value: http(200), data: JSONData)
-                expect(responseValue.value.statusCode) == 200
-                expect(responseValue.data) == JSONData
-            }
-
-            it("should contain HTTPURLResponse with nil data") {
-                let responseValue = ResponseValue(value: http(204), data: nil)
-                expect(responseValue.value.statusCode) == 204
-                expect(responseValue.data).to(beNil())
             }
 
         }

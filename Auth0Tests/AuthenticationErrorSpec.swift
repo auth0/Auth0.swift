@@ -493,7 +493,22 @@ class OAuthErrorBehavior: Behavior<[String:Any]> {
                 expect(error.info[apiErrorDPoPNonce] as? String) == nonce
             }
 
-            it("should handle missing DPoP nonce in error") {
+            it("should extract DPoP nonce from error response with missing error_description") {
+                let nonce = "auth0-nonce"
+                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                               statusCode: 400,
+                                               httpVersion: nil,
+                                               headerFields: ["DPoP-Nonce": nonce])!
+                let errorDictionary = ["error": "use_dpop_nonce"]
+                let data = try! JSONSerialization.data(withJSONObject: errorDictionary)
+                let responseValue = ResponseValue(value: response, data: data)
+                let error = AuthenticationError(from: responseValue)
+
+                expect(error.isDPoPNonceRequired) == true
+                expect(error.info[apiErrorDPoPNonce] as? String) == nonce
+            }
+
+            it("should handle missing DPoP nonce in error response") {
                 let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
                                                statusCode: 400,
                                                httpVersion: nil,

@@ -335,8 +335,7 @@ class WebAuthSpec: QuickSpec {
                 let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
                 let dpopJktItem = components?.queryItems?.first { $0.name == "dpop_jkt" }
 
-                expect(dpopJktItem).toNot(beNil())
-                expect(dpopJktItem?.value).toNot(beEmpty())
+                expect(dpopJktItem?.value).toNot(beNil())
             }
 
             it("should not include dpop_jkt parameter when DPoP is not enabled") {

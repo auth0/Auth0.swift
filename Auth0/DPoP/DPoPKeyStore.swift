@@ -85,16 +85,6 @@ protocol GenericPasswordConvertible: DPoPPrivateKey, CustomStringConvertible {
 
 }
 
-extension GenericPasswordConvertible {
-
-    public var description: String {
-        return self.rawRepresentation.withUnsafeBytes { bytes in
-            return "Key representation contains \(bytes.count) bytes."
-        }
-    }
-
-}
-
 extension SecureEnclave.P256.Signing.PrivateKey: @retroactive CustomStringConvertible {}
 
 extension SecureEnclave.P256.Signing.PrivateKey: GenericPasswordConvertible {

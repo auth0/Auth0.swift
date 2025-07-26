@@ -29,8 +29,8 @@ class KeychainKeyStoreSpec: QuickSpec {
                     expect { try keyStore.hasPrivateKey() } == false
                 }
 
-                // Otherwise entitlements would have to be added to the test bundle
-                // That requires code signing (even on CI)
+                // Otherwise entitlements must be added to the test bundle
+                // Adding entitlements requires code signing (even on CI)
                 // And code signing on CI requires access to the Apple Developer Account
                 #if !os(macOS)
                 it("should return true if a private key exists") {
@@ -65,8 +65,8 @@ class KeychainKeyStoreSpec: QuickSpec {
                     expect { try keyStore.hasPrivateKey() }.to(throwError(expectedError))
                 }
 
-                // Otherwise entitlements would have to be added to the test bundle
-                // That requires code signing (even on CI)
+                // Otherwise entitlements must be added to the test bundle
+                // Adding entitlements requires code signing (even on CI)
                 // And code signing on CI requires access to the Apple Developer Account
                 #if !os(macOS)
                 it("should throw an error if the key cannot be exported") {
@@ -129,8 +129,8 @@ class KeychainKeyStoreSpec: QuickSpec {
 
             context("privateKey") {
 
-                // Otherwise entitlements would have to be added to the test bundle
-                // That requires code signing (even on CI)
+                // Otherwise entitlements must be added to the test bundle
+                // Adding entitlements requires code signing (even on CI)
                 // And code signing on CI requires access to the Apple Developer Account
                 #if !os(macOS)
                 it("should create a new private key if none exists") {
@@ -181,8 +181,8 @@ class KeychainKeyStoreSpec: QuickSpec {
 
             context("clear") {
 
-                // Otherwise entitlements would have to be added to the test bundle
-                // That requires code signing (even on CI)
+                // Otherwise entitlements must be added to the test bundle
+                // Adding entitlements requires code signing (even on CI)
                 // And code signing on CI requires access to the Apple Developer Account
                 #if !os(macOS)
                 it("should clear the private key") {
@@ -222,6 +222,22 @@ class KeychainKeyStoreSpec: QuickSpec {
                 }
 
             }
+
+            // Otherwise entitlements must be added to the test bundle
+            // Adding entitlements requires code signing (even on CI)
+            // And code signing on CI requires access to the Apple Developer Account
+            #if !os(macOS)
+            context("key description") {
+
+                it("should provide a description of the P256 private key") {
+                    let privateKey = try keyStore.privateKey()
+                    let description = (privateKey as! P256.Signing.PrivateKey).description
+
+                    expect(description).to(match("^Key representation contains \\d+ bytes\\.$"))
+                }
+
+            }
+            #endif
 
         }
 

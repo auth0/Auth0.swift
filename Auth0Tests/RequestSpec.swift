@@ -137,7 +137,7 @@ class RequestSpec: QuickSpec {
             context("dpop") {
 
                 afterEach {
-                    DPoP.resetNonce()
+                    DPoP.clearNonce()
                     try DPoP.clearKeypair()
                 }
 
@@ -326,6 +326,7 @@ class RequestSpec: QuickSpec {
 
                     NetworkStub.addStub(condition: { $0.isHost(Url.host!) }, response: { request in
                         callCount += 1
+                        // Always return an error
                         return apiFailureResponse()(request)
                     })
 
@@ -362,7 +363,7 @@ class RequestSpec: QuickSpec {
                 }
 
                 it("should store the DPoP nonce after retrying a request") {
-                    let newNonce = "newNonce"
+                    let newNonce = "new-\(DPoPNonce)"
                     var callCount = 0
 
                     NetworkStub.addStub(condition: { $0.isHost(Url.host!) }, 

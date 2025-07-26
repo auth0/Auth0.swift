@@ -12,14 +12,18 @@ class DPoPErrorSpec: QuickSpec {
 
             it("should initialize with code") {
                 let error = DPoPError(code: .other)
+
                 expect(error.code) == DPoPError.Code.other
                 expect(error.cause).to(beNil())
             }
 
-            it("should initialize with code & cause") {
-                let cause = NSError(domain: "example", code: 123)
+            it("should initialize with code and cause") {
+                let cause = MockError()
+                let description = "An unexpected error occurred. CAUSE: \(cause.localizedDescription)."
                 let error = DPoPError(code: .other, cause: cause)
-                expect(error.cause).to(matchError(cause))
+
+                expect(error.localizedDescription) == description
+                expect(error.cause).toNot(beNil())
             }
 
         }
@@ -82,36 +86,42 @@ class DPoPErrorSpec: QuickSpec {
             it("should return message for secure enclave operation failed") {
                 let message = "foo"
                 let error = DPoPError(code: .secureEnclaveOperationFailed(message))
+
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for keychain operation failed") {
                 let message = "foo"
                 let error = DPoPError(code: .keychainOperationFailed(message))
+
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for cryptokit operation failed") {
                 let message = "foo"
                 let error = DPoPError(code: .cryptoKitOperationFailed(message))
+
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for seckey operation failed") {
                 let message = "foo"
                 let error = DPoPError(code: .secKeyOperationFailed(message))
+
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for other") {
                 let message = "An unexpected error occurred."
                 let error = DPoPError(code: .other)
+
                 expect(error.localizedDescription) == message
             }
 
             it("should return message for unknown") {
                 let message = "foo"
                 let error = DPoPError(code: .unknown(message))
+
                 expect(error.localizedDescription) == message
             }
 
@@ -120,6 +130,7 @@ class DPoPErrorSpec: QuickSpec {
                 let cause = MockError(message: "foo bar.")
                 let message = "\(description) CAUSE: \(cause.localizedDescription)"
                 let error = DPoPError(code: .unknown(description), cause: cause)
+
                 expect(error.localizedDescription) == message
             }
 
@@ -128,6 +139,7 @@ class DPoPErrorSpec: QuickSpec {
                 let cause = MockError(message: "foo bar")
                 let message = "\(description). CAUSE: \(cause.localizedDescription)."
                 let error = DPoPError(code: .unknown(description), cause: cause)
+
                 expect(error.localizedDescription) == message
             }
 

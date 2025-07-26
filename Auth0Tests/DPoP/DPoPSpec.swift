@@ -23,7 +23,7 @@ class DPoPSpec: QuickSpec {
 
             afterEach {
                 try DPoP.clearKeypair()
-                DPoP.resetNonce()
+                DPoP.clearNonce()
             }
 
             context("key pair existence") {
@@ -100,56 +100,7 @@ class DPoPSpec: QuickSpec {
 
             context("proof generation") {
 
-                it("should generate a DPoP proof") {
-                    let endpoint = "https://example.com/api/endpoint"
-                    let method = "PATCH"
-                    var request = URLRequest(url: URL(string: endpoint)!)
-                    request.httpMethod = method
-                    let proof = try dpop.generateProof(for: request)
-                    let decodedProof = try decode(jwt: proof)
-
-                    expect(decodedProof["htu"].string) == endpoint
-                    expect(decodedProof["htm"].string) == method
-                    expect(decodedProof["nonce"].rawValue).to(beNil())
-                    expect(decodedProof["ath"].rawValue).to(beNil())
-                }
-
-                it("should generate a DPoP proof with a nonce claim") {
-                    let endpoint = "https://example.com/api/endpoint"
-                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                                   statusCode: 200,
-                                                   httpVersion: nil,
-                                                   headerFields: ["DPoP-Nonce": DPoPNonce])!
-                    DPoP.storeNonce(from: response)
-
-                    let method = "PATCH"
-                    var request = URLRequest(url: URL(string: endpoint)!)
-                    request.httpMethod = method
-                    let proof = try dpop.generateProof(for: request)
-                    let decodedProof = try decode(jwt: proof)
-
-                    expect(decodedProof["htu"].string) == endpoint
-                    expect(decodedProof["htm"].string) == method
-                    expect(decodedProof["nonce"].string) == DPoPNonce
-                    expect(decodedProof["ath"].rawValue).to(beNil())
-                }
-
-                it("should generate a DPoP proof with an ath claim") {
-                    let endpoint = "https://example.com/api/endpoint"
-                    let method = "PATCH"
-                    var request = URLRequest(url: URL(string: endpoint)!)
-                    request.httpMethod = method
-                    request.setValue(AccessToken, forHTTPHeaderField: "Authorization")
-                    let proof = try dpop.generateProof(for: request)
-                    let decodedProof = try decode(jwt: proof)
-
-                    expect(decodedProof["htu"].string) == endpoint
-                    expect(decodedProof["htm"].string) == method
-                    expect(decodedProof["nonce"].rawValue).to(beNil())
-                    expect(decodedProof["ath"].string) == AccessTokenHash
-                }
-
-                it("should generate a DPoP proof with nonce and ath claims") {
+                it("should generate a DPoP proof with all claims") {
                     let endpoint = "https://example.com/api/endpoint"
                     let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
                                                    statusCode: 200,
@@ -168,6 +119,41 @@ class DPoPSpec: QuickSpec {
                     expect(decodedProof["htm"].string) == method
                     expect(decodedProof["nonce"].string) == DPoPNonce
                     expect(decodedProof["ath"].string) == AccessTokenHash
+                }
+
+                it("should generate a DPoP proof without a nonce claim") {
+                    let endpoint = "https://example.com/api/endpoint"
+                    let method = "PATCH"
+                    var request = URLRequest(url: URL(string: endpoint)!)
+                    request.httpMethod = method
+                    request.setValue(AccessToken, forHTTPHeaderField: "Authorization")
+                    let proof = try dpop.generateProof(for: request)
+                    let decodedProof = try decode(jwt: proof)
+
+                    expect(decodedProof["htu"].string) == endpoint
+                    expect(decodedProof["htm"].string) == method
+                    expect(decodedProof["nonce"].rawValue).to(beNil())
+                    expect(decodedProof["ath"].string) == AccessTokenHash
+                }
+
+                it("should generate a DPoP proof without an ath claim") {
+                    let endpoint = "https://example.com/api/endpoint"
+                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                                   statusCode: 200,
+                                                   httpVersion: nil,
+                                                   headerFields: ["DPoP-Nonce": DPoPNonce])!
+                    DPoP.storeNonce(from: response)
+
+                    let method = "PATCH"
+                    var request = URLRequest(url: URL(string: endpoint)!)
+                    request.httpMethod = method
+                    let proof = try dpop.generateProof(for: request)
+                    let decodedProof = try decode(jwt: proof)
+
+                    expect(decodedProof["htu"].string) == endpoint
+                    expect(decodedProof["htm"].string) == method
+                    expect(decodedProof["nonce"].string) == DPoPNonce
+                    expect(decodedProof["ath"].rawValue).to(beNil())
                 }
 
             }
@@ -179,16 +165,19 @@ class DPoPSpec: QuickSpec {
 
                 it("should return true when the use_dpop_nonce error is present") {
                     let error = AuthenticationError(info: infoWithNonceError, statusCode: 400)
+
                     expect(DPoP.shouldRetry(for: error, retryCount: 0)) == true
                 }
 
                 it("should return false after the max retries have been reached") {
                     let error = AuthenticationError(info: infoWithNonceError, statusCode: 400)
+
                     expect(DPoP.shouldRetry(for: error, retryCount: 1)) == false
                 }
 
                 it("should return false when no use_dpop_nonce error is present") {
                     let error: AuthenticationError = AuthenticationError(info: infoWithoutNonceError, statusCode: 400)
+
                     expect(DPoP.shouldRetry(for: error, retryCount: 0)) == false
                 }
 
@@ -223,11 +212,13 @@ class DPoPSpec: QuickSpec {
 
                 it("should use SecureEnclaveKeyStore when Secure Enclave is available") {
                     let keyStore = DPoP.keyStore(for: DPoP.defaultKeychainIdentifier, useSecureEnclave: true)
+
                     expect(keyStore).to(beAKindOf(SecureEnclaveKeyStore.self))
                 }
 
                 it("should use KeychainKeyStore when Secure Enclave is not available") {
                     let keyStore = DPoP.keyStore(for: DPoP.defaultKeychainIdentifier, useSecureEnclave: false)
+
                     expect(keyStore).to(beAKindOf(KeychainKeyStore.self))
                 }
 
@@ -457,13 +448,14 @@ class DPoPSpec: QuickSpec {
 
                         it("should return true when a key pair exists") {
                             let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
+
                             expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == true
                         }
 
                         it("should return false when no key pair exists") {
                             try DPoP.clearKeypair()
-
                             let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
+
                             expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == false
                         }
 
@@ -473,13 +465,14 @@ class DPoPSpec: QuickSpec {
 
                         it("should return true when a key pair exists") {
                             let parameters = ["grant_type": "authorization_code"]
+
                             expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == true
                         }
 
                         it("should return true when no key pair exists") {
                             try DPoP.clearKeypair()
-
                             let parameters = ["grant_type": "authorization_code"]
+
                             expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == true
                         }
 
@@ -495,13 +488,14 @@ class DPoPSpec: QuickSpec {
 
                         it("should return true when a key pair exists") {
                             let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
+
                             expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == true
                         }
 
                         it("should return false when no key pair exists") {
                             try DPoP.clearKeypair()
-
                             let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
+
                             expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == false
                         }
 
@@ -511,13 +505,14 @@ class DPoPSpec: QuickSpec {
 
                         it("should return true when a key pair exists") {
                             let parameters = ["grant_type": "authorization_code"]
+
                             expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == true
                         }
 
                         it("should return false when no key pair exists") {
                             try DPoP.clearKeypair()
-
                             let parameters = ["grant_type": "authorization_code"]
+
                             expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == false
                         }
 

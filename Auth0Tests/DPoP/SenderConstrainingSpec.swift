@@ -32,7 +32,7 @@ class SenderConstrainingSpec: QuickSpec {
 
         describe("baseHeaders") {
 
-            it("should generate Authorization header") {
+            it("should generate the Authorization header") {
                 let headers = senderConstrainer.baseHeaders(accessToken: "test-token", tokenType: "Bearer")
 
                 expect(headers.count) == 1

@@ -174,6 +174,17 @@ class SecureEnclaveKeyStoreSpec: QuickSpec {
 
             }
 
+            context("key description") {
+
+                it("should provide a description of the Secure Enclave private key") {
+                    let privateKey = try keyStore.privateKey()
+                    let description = (privateKey as! SecureEnclave.P256.Signing.PrivateKey).description
+
+                    expect(description).to(match("^Key representation contains \\d+ bytes\\.$"))
+                }
+
+            }
+
         }
 
     }
