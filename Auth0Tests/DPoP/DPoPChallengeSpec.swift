@@ -104,7 +104,7 @@ class DPoPChallengeSpec: QuickSpec {
             }
 
             it("should return nil when the DPoP challenge does not contain an error code") {
-                let header = "Bearer realm=\"example\", DPoP"
+                let header = "Bearer realm=\"example\", DPoP algs=ES256"
                 let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
                                                statusCode: 401,
                                                httpVersion: nil,

@@ -39,9 +39,8 @@ struct SecureEnclaveKeyStore: DPoPKeyStore, @unchecked Sendable {
 
     func clear() throws(DPoPError) {
         return try Self.withSerialQueueSync {
-            let query = baseQuery()
+            let status = remove(baseQuery() as CFDictionary)
 
-            let status = remove(query as CFDictionary)
             guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
                 let message = "Unable to delete the private key representation from the Keychain. OSStatus: \(status)."
                 throw DPoPError(code: .keychainOperationFailed(message))

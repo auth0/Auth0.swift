@@ -17,6 +17,10 @@ public extension SenderConstraining {
     ///
     /// - Parameter keychainIdentifier: The identifier used to store the key pair on the Keychain. Defaults to the bundle identifier.
     /// - Returns: A modified instance with DPoP enabled.
+    ///
+    /// ## See Also
+    ///
+    /// - [RFC 9449](https://www.rfc-editor.org/rfc/rfc9449.html)
     func useDPoP(keychainIdentifier: String = DPoP.defaultKeychainIdentifier) -> Self {
         var instance = self
         instance.dpop = DPoP(keychainIdentifier: keychainIdentifier)

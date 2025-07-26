@@ -22,19 +22,21 @@ class MyAccountErrorSpec: QuickSpec {
             }
 
             it("should initialize with cause") {
-                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+                let cause = MockError()
+                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
                 let error = MyAccountError(cause: cause)
 
-                expect(error.cause).to(matchError(cause))
+                expect(error.cause).toNot(beNil())
+                expect(error.localizedDescription) == description
                 expect(error.statusCode) == 0
             }
 
             it("should initialize with cause and status code") {
-                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
                 let statusCode = 400
-                let error = MyAccountError(cause: cause, statusCode: statusCode)
+                let error = MyAccountError(cause: MockError(), statusCode: statusCode)
 
                 expect(error.statusCode) == statusCode
+                expect(error.cause).toNot(beNil())
             }
 
             it("should initialize with description") {
@@ -51,7 +53,9 @@ class MyAccountErrorSpec: QuickSpec {
                 let statusCode = 400
                 let error = MyAccountError(description: description, statusCode: statusCode)
 
+                expect(error.localizedDescription) == "\(description)."
                 expect(error.statusCode) == statusCode
+                expect(error.cause).to(beNil())
             }
 
             it("should initialize with response") {
@@ -68,23 +72,6 @@ class MyAccountErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == "\(description)."
                 expect(error.statusCode) == statusCode
                 expect(error.cause).to(beNil())
-            }
-
-            it("should initialize with cause") {
-                let cause = MockError()
-                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
-                let error = MyAccountError(cause: cause)
-
-                expect(error.cause).toNot(beNil())
-                expect(error.localizedDescription) == description
-                expect(error.statusCode) == 0
-            }
-
-            it("should initialize with cause and status code") {
-                let statusCode = 400
-                let error = MyAccountError(cause: MockError(), statusCode: statusCode)
-
-                expect(error.statusCode) == statusCode
             }
 
         }

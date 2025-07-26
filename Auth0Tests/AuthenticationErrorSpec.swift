@@ -24,20 +24,23 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.info["foo"] as? String) == "bar"
                 expect(error.info.count) == 2
                 expect(error.statusCode) == statusCode
+                expect(error.cause).to(beNil())
             }
 
             it("should initialize with cause") {
-                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+                let cause = MockError()
+                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
                 let error = AuthenticationError(cause: cause)
-                expect(error.cause).to(matchError(cause))
+                expect(error.localizedDescription) == description
                 expect(error.statusCode) == 0
+                expect(error.cause).toNot(beNil())
             }
 
-            it("should initialize with cause & status code") {
-                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+            it("should initialize with cause and status code") {
                 let statusCode = 400
-                let error = AuthenticationError(cause: cause, statusCode: statusCode)
+                let error = AuthenticationError(cause: MockError(), statusCode: statusCode)
                 expect(error.statusCode) == statusCode
+                expect(error.cause).toNot(beNil())
             }
 
             it("should initialize with description") {
@@ -48,11 +51,13 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.cause).to(beNil())
             }
 
-            it("should initialize with description & status code") {
+            it("should initialize with description and status code") {
                 let description = "foo"
                 let statusCode = 400
                 let error = AuthenticationError(description: description, statusCode: statusCode)
+                expect(error.localizedDescription) == description
                 expect(error.statusCode) == statusCode
+                expect(error.cause).to(beNil())
             }
 
             it("should initialize with response") {
@@ -65,25 +70,9 @@ class AuthenticationErrorSpec: QuickSpec {
                                                    headerFields: nil)!
                 let responseValue = ResponseValue(value: httpResponse, data: data)
                 let error = AuthenticationError(from: responseValue)
-
                 expect(error.localizedDescription) == "\(description)"
                 expect(error.statusCode) == statusCode
                 expect(error.cause).to(beNil())
-            }
-
-            it("should initialize with cause") {
-                let cause = MockError()
-                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
-                let error = AuthenticationError(cause: cause)
-                expect(error.cause).toNot(beNil())
-                expect(error.localizedDescription) == description
-                expect(error.statusCode) == 0
-            }
-
-            it("should initialize with cause & status code") {
-                let statusCode = 400
-                let error = AuthenticationError(cause: MockError(), statusCode: statusCode)
-                expect(error.statusCode) == statusCode
             }
 
         }

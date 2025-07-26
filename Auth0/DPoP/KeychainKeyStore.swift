@@ -44,9 +44,8 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
 
     func clear() throws(DPoPError) {
         return try Self.withSerialQueueSync {
-            let query = baseQuery()
+            let status = remove(baseQuery() as CFDictionary)
 
-            let status = remove(query as CFDictionary)
             guard (status == errSecSuccess) || (status == errSecItemNotFound) else {
                 let message = "Unable to delete the private key from the Keychain. OSStatus: \(status)."
                 throw DPoPError(code: .keychainOperationFailed(message))
@@ -55,7 +54,7 @@ struct KeychainKeyStore: DPoPKeyStore, @unchecked Sendable {
     }
 
     private func get() throws(DPoPError) -> SecKeyConvertible? {
-        // Seek an elliptic-curve key with a given identifier
+        // Seek an elliptic-curve key
         var query = baseQuery()
         query[kSecAttrKeyType] = kSecAttrKeyTypeECSECPrimeRandom
         query[kSecReturnRef] = true
