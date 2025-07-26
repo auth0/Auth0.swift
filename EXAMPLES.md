@@ -17,6 +17,7 @@
 - [Web Auth signup](#web-auth-signup)
 - [Web Auth configuration](#web-auth-configuration)
 - [ID token validation](#id-token-validation)
+- [DPoP [EA]](#dpop-ea)
 - [Web Auth errors](#web-auth-errors)
 
 ### Web Auth signup
@@ -265,6 +266,58 @@ Auth0
 ### ID token validation
 
 Auth0.swift automatically [validates](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) the ID token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID token have not been tampered with and can be safely used.
+
+### DPoP [EA]
+
+> [!NOTE]  
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Posession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method.
+
+```swift
+Auth0
+    .webAuth()
+    .useHTTPS()
+    .useDPoP()
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+When making requests to your own APIs, use the `DPoP.addHeaders()` method to add the `Authorization` and `DPoP` headers to a `URLRequest`. The `Authorization` header is set using the access token and token type, while the `DPoP` header contains the generated DPoP proof.
+
+```swift
+var request = URLRequest(url: URL(string: "https://example.com/api/endpoint")!)
+request.httpMethod = "POST"
+
+try DPoP.addHeaders(to: &request,
+                    accessToken: credentials.accessToken,
+                    tokenType: credentials.tokenType)
+```
+
+On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair from the Keychain.
+
+```swift
+Auth0.webAuth()
+    .useHTTPS()
+    .clearSession { result in 
+    // ...
+}
+
+if !credentialsManager.clear() {
+    // ...
+}
+
+try DPoP.clearKeypair()
+```
+
+> [!NOTE]  
+> When logging out, you do not need to call `useDPoP()` as it has no effect during the logout process.
 
 ### Web Auth errors
 
@@ -641,6 +694,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 - [Retrieve user information](#retrieve-user-information)
 - [Renew credentials](#renew-credentials)
 - [Get SSO credentials [EA]](#get-sso-credentials-ea)
+- [DPoP [EA]](#dpop-ea-1)
 - [Authentication API client configuration](#authentication-api-client-configuration)
 - [Authentication API client errors](#authentication-api-client-errors)
 
@@ -1435,6 +1489,38 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 > [!IMPORTANT]
 > Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the default Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
 
+### DPoP [EA]
+
+> [!NOTE]  
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Posession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method. This ensures that DPoP proofs are generated for requests made through the Authentication API client.
+
+```swift
+let authenticationClient = Auth0.authentication().useDPoP()
+```
+
+When making requests to your own APIs, use the `DPoP.addHeaders()` method to add the `Authorization` and `DPoP` headers to a `URLRequest`. The `Authorization` header is set using the access token and token type, while the `DPoP` header contains the generated DPoP proof.
+
+```swift
+var request = URLRequest(url: URL(string: "https://example.com/api/endpoint")!)
+request.httpMethod = "POST"
+
+try DPoP.addHeaders(to: &request,
+                    accessToken: credentials.accessToken,
+                    tokenType: credentials.tokenType)
+```
+
+On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair from the Keychain.
+
+```swift
+if !credentialsManager.clear() {
+    // ...
+}
+
+try DPoP.clearKeypair()
+```
+
 ### Authentication API client configuration
 
 #### Add custom parameters
@@ -2221,5 +2307,3 @@ Auth0
 Check how to set up Web Auth in the [Web Auth Configuration](#web-auth-configuration) section.
 
 ---
-
-[Go up ⤴](#examples)

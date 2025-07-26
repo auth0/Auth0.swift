@@ -1,5 +1,7 @@
 import Foundation
 
+let serialQueue = DispatchQueue(label: "com.auth0.sdk.serial")
+
 func date(from string: String) -> Date? {
     guard let interval = Double(string) else {
         let formatter = DateFormatter()

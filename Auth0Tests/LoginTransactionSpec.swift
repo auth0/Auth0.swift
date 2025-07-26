@@ -40,7 +40,7 @@ class LoginTransactionSpec: QuickSpec {
                 it("should handle url with error") {
                     let url = URL(string: "https://samples.auth0.com/callback?error=error&error_description=description&state=state")!
                     let errorInfo = ["error": "error", "error_description": "description", "state": "state"]
-                    let expectedError = WebAuthError(code: .other, cause: AuthenticationError(info: errorInfo))
+                    let expectedError = WebAuthError(code: .other, cause: AuthenticationError(info: errorInfo, statusCode: 400))
                     expect(transaction.resume(url)) == true
                     expect(userAgent.result).to(haveWebAuthError(expectedError))
                     expect(transaction.userAgent).to(beNil())

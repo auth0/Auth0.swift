@@ -17,34 +17,30 @@ class AuthenticationErrorSpec: QuickSpec {
 
         describe("init") {
 
-            it("should initialize with info") {
-                let info: [String: Any] = ["foo": "bar"]
-                let error = AuthenticationError(info: info)
-                expect(error.info["foo"] as? String) == "bar"
-                expect(error.info.count) == 2
-                expect(error.statusCode) == 0
-                expect(error.cause).to(beNil())
-            }
-
-            it("should initialize with info & status code") {
+            it("should initialize with info and status code") {
                 let info: [String: Any] = ["foo": "bar"]
                 let statusCode = 400
                 let error = AuthenticationError(info: info, statusCode: statusCode)
+                expect(error.info["foo"] as? String) == "bar"
+                expect(error.info.count) == 2
                 expect(error.statusCode) == statusCode
+                expect(error.cause).to(beNil())
             }
 
             it("should initialize with cause") {
-                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+                let cause = MockError()
+                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
                 let error = AuthenticationError(cause: cause)
-                expect(error.cause).to(matchError(cause))
+                expect(error.localizedDescription) == description
                 expect(error.statusCode) == 0
+                expect(error.cause).toNot(beNil())
             }
 
-            it("should initialize with cause & status code") {
-                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
+            it("should initialize with cause and status code") {
                 let statusCode = 400
-                let error = AuthenticationError(cause: cause, statusCode: statusCode)
+                let error = AuthenticationError(cause: MockError(), statusCode: statusCode)
                 expect(error.statusCode) == statusCode
+                expect(error.cause).toNot(beNil())
             }
 
             it("should initialize with description") {
@@ -55,50 +51,28 @@ class AuthenticationErrorSpec: QuickSpec {
                 expect(error.cause).to(beNil())
             }
 
-            it("should initialize with description & status code") {
+            it("should initialize with description and status code") {
                 let description = "foo"
                 let statusCode = 400
                 let error = AuthenticationError(description: description, statusCode: statusCode)
+                expect(error.localizedDescription) == description
                 expect(error.statusCode) == statusCode
+                expect(error.cause).to(beNil())
             }
 
             it("should initialize with response") {
                 let description = "foo"
                 let data = description.data(using: .utf8)!
-                let response = Response<AuthenticationError>(data: data, response: nil, error: nil)
-                let error = AuthenticationError(from: response)
-                expect(error.localizedDescription) == description
-                expect(error.statusCode) == 0
-                expect(error.cause).to(beNil())
-            }
-
-            it("should initialize with response & status code") {
-                let description = "foo"
-                let data = description.data(using: .utf8)!
                 let statusCode = 400
-                let httpResponse = HTTPURLResponse(url: URL(string: "example.com")!,
+                let httpResponse = HTTPURLResponse(url: URL(string: "https://example.com")!,
                                                    statusCode: statusCode,
                                                    httpVersion: nil,
-                                                   headerFields: nil)
-                let response = Response<AuthenticationError>(data: data, response: httpResponse, error: nil)
-                let error = AuthenticationError(from: response)
-                expect(error.localizedDescription) == description
+                                                   headerFields: nil)!
+                let responseValue = ResponseValue(value: httpResponse, data: data)
+                let error = AuthenticationError(from: responseValue)
+                expect(error.localizedDescription) == "\(description)"
                 expect(error.statusCode) == statusCode
-            }
-
-            it("should initialize with cause") {
-                let cause = MockError()
-                let description = "Unable to complete the operation. CAUSE: \(cause.localizedDescription)."
-                let error = AuthenticationError(cause: cause)
-                expect(error.cause).toNot(beNil())
-                expect(error.localizedDescription) == description
-                expect(error.statusCode) == 0
-            }
-
-            it("should initialize with cause & status code") {
-                let statusCode = 400
-                let error = AuthenticationError(cause: MockError(), statusCode: statusCode)
-                expect(error.statusCode) == statusCode
+                expect(error.cause).to(beNil())
             }
 
         }
@@ -134,7 +108,7 @@ class AuthenticationErrorSpec: QuickSpec {
 
             it("should access the internal info dictionary") {
                 let info: [String: Any] = ["foo": "bar"]
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.info["foo"] as? String) == "bar"
             }
 
@@ -427,14 +401,14 @@ class AuthenticationErrorSpec: QuickSpec {
             it("should return the message") {
                 let description = "foo"
                 let info: [String: Any] = ["description": description]
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.localizedDescription) == description
             }
 
             it("should return the default message") {
-                let info: [String: Any] = ["foo": "bar", "statusCode": 0]
+                let info: [String: Any] = ["foo": "bar", "statusCode": 400]
                 let message = "Failed with unknown error: \(info)."
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.localizedDescription) == message
             }
 
@@ -443,7 +417,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 let cause =  MockError(message: "bar.")
                 let info: [String: Any] = ["description": description, "cause": cause]
                 let message = "\(description) CAUSE: \(cause.localizedDescription)"
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.localizedDescription) == message
             }
 
@@ -452,7 +426,7 @@ class AuthenticationErrorSpec: QuickSpec {
                 let cause =  MockError(message: "bar")
                 let info: [String: Any] = ["description": description, "cause": cause]
                 let message = "\(description). CAUSE: \(cause.localizedDescription)."
-                let error = AuthenticationError(info: info)
+                let error = AuthenticationError(info: info, statusCode: 400)
                 expect(error.localizedDescription) == message
             }
 
@@ -500,6 +474,54 @@ class OAuthErrorBehavior: Behavior<[String:Any]> {
             expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
             expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
             expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
+        }
+
+        describe("DPoP nonce extraction") {
+
+            it("should extract DPoP nonce from error response") {
+                let nonce = "auth0-nonce"
+                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                               statusCode: 400,
+                                               httpVersion: nil,
+                                               headerFields: ["DPoP-Nonce": nonce])!
+                let errorDictionary = ["error": "use_dpop_nonce", "error_description": "DPoP nonce required"]
+                let data = try! JSONSerialization.data(withJSONObject: errorDictionary)
+                let responseValue = ResponseValue(value: response, data: data)
+                let error = AuthenticationError(from: responseValue)
+
+                expect(error.isDPoPNonceRequired) == true
+                expect(error.info[apiErrorDPoPNonce] as? String) == nonce
+            }
+
+            it("should extract DPoP nonce from error response with missing error_description") {
+                let nonce = "auth0-nonce"
+                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                               statusCode: 400,
+                                               httpVersion: nil,
+                                               headerFields: ["DPoP-Nonce": nonce])!
+                let errorDictionary = ["error": "use_dpop_nonce"]
+                let data = try! JSONSerialization.data(withJSONObject: errorDictionary)
+                let responseValue = ResponseValue(value: response, data: data)
+                let error = AuthenticationError(from: responseValue)
+
+                expect(error.isDPoPNonceRequired) == true
+                expect(error.info[apiErrorDPoPNonce] as? String) == nonce
+            }
+
+            it("should handle missing DPoP nonce in error response") {
+                let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                                               statusCode: 400,
+                                               httpVersion: nil,
+                                               headerFields: nil)!
+                let errorDictionary = ["error": "use_dpop_nonce", "error_description": "DPoP nonce required"]
+                let data = try! JSONSerialization.data(withJSONObject: errorDictionary)
+                let responseValue = ResponseValue(value: response, data: data)
+                let error = AuthenticationError(from: responseValue)
+
+                expect(error.isDPoPNonceRequired) == true
+                expect(error.info[apiErrorDPoPNonce]).to(beNil())
+            }
+
         }
     }
 }
@@ -577,6 +599,7 @@ class UnknownErrorBehavior: Behavior<[String:Any]> {
             expect(error.isInvalidRefreshToken).to(beFalse(), description: "should not match invalid refresh token")
             expect(error.isPasswordLeaked).to(beFalse(), description: "should not match password leaked")
             expect(error.isLoginRequired).to(beFalse(), description: "should not match login required")
+            expect(error.isDPoPNonceRequired).to(beFalse(), description: "should not match is DPoP nonce required")
         }
     }
 }
