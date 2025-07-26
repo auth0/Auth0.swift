@@ -39,7 +39,7 @@ extension DPoPKeyStore {
 
 protocol DPoPPrivateKey: Sendable {
 
-    var publicKey: P256.Signing.PublicKey { get }
+    nonisolated var publicKey: P256.Signing.PublicKey { get }
 
     func signature(for data: Data) throws -> P256.Signing.ECDSASignature
 
