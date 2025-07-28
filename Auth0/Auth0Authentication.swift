@@ -1,5 +1,6 @@
 // swiftlint:disable file_length
 // swiftlint:disable type_body_length
+// swiftlint:disable function_parameter_count
 
 import Foundation
 

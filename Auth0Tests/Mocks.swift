@@ -32,7 +32,7 @@ struct MockError: LocalizedError, CustomStringConvertible {
 }
 
 struct MockDPoPKeyStore: DPoPKeyStore, Sendable {
-    private let key: DPoPPrivateKey
+    nonisolated private let key: DPoPPrivateKey
     private let shouldFail: Bool
 
     init(privateKey: DPoPPrivateKey = MockDPoPPrivateKey(), shouldFail: Bool = false) {

@@ -54,7 +54,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         self.dpop = dpop
     }
 
-    var request: NSMutableURLRequest {
+    var request: URLRequest {
         let request = NSMutableURLRequest(url: url)
         request.httpMethod = method
         if !parameters.isEmpty {
@@ -75,7 +75,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         headers.forEach { name, value in request.setValue(value, forHTTPHeaderField: name) }
         telemetry.addTelemetryHeader(request: request)
-        return request
+        return request as URLRequest
     }
 
     // MARK: - Request Handling
@@ -89,7 +89,9 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         self.startDataTask(retryCount: 0, request: self.request, callback: callback)
     }
 
-    private func startDataTask(retryCount: Int, request: NSMutableURLRequest, callback: @escaping Callback) {
+    private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
+        var request = request
+
         do {
             if let dpop = dpop, try dpop.shouldGenerateProof(for: url, parameters: parameters) {
                 let proof = try dpop.generateProof(for: request as URLRequest)
@@ -100,9 +102,9 @@ public struct Request<T, E: Auth0APIError>: Requestable {
             assertionFailure("DPoP operation failed when setting up a request: \(error)")
         }
 
-        logger?.trace(request: request as URLRequest, session: self.session)
+        logger?.trace(request: request, session: self.session)
 
-        let task = session.dataTask(with: request as URLRequest,
+        let task = session.dataTask(with: request,
                                     completionHandler: { [logger, handle] data, response, error in
             if error == nil, let response = response {
                 logger?.trace(response: response, data: data)

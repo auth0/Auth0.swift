@@ -37,7 +37,7 @@ extension DPoPKeyStore {
 
 // MARK: Private Key Type
 
-protocol DPoPPrivateKey: Sendable {
+protocol DPoPPrivateKey {
 
     nonisolated var publicKey: P256.Signing.PublicKey { get }
 
