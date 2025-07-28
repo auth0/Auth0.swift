@@ -289,6 +289,11 @@ Auth0
     }
 ```
 
+> [!IMPORTANT]
+> DPoP will only be used for new user sessions created after enabling it. DPoP **will not** be applied to any requests involving existing access and refresh tokens (such as exchanging the refresh token for new credentials).
+>
+> This means that, after you've enabled it in your app, DPoP will only take effect when users log in again. It's up to you to decide how to roll out this change to your users. For example, you might require users to log in again the next time they open your app. You'll need to implement the logic to handle this transition based on your app's requirements.
+
 When making requests to your own APIs, use the `DPoP.addHeaders()` method to add the `Authorization` and `DPoP` headers to a `URLRequest`. The `Authorization` header is set using the access token and token type, while the `DPoP` header contains the generated DPoP proof.
 
 ```swift
@@ -1499,6 +1504,11 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 ```swift
 let authenticationClient = Auth0.authentication().useDPoP()
 ```
+
+> [!IMPORTANT]
+> DPoP will only be used for new user sessions created after enabling it. DPoP **will not** be applied to any requests involving existing access and refresh tokens (such as exchanging the refresh token for new credentials).
+>
+> This means that, after you've enabled it in your app, DPoP will only take effect when users log in again. It's up to you to decide how to roll out this change to your users. For example, you might require users to log in again the next time they open your app. You'll need to implement the logic to handle this transition based on your app's requirements.
 
 When making requests to your own APIs, use the `DPoP.addHeaders()` method to add the `Authorization` and `DPoP` headers to a `URLRequest`. The `Authorization` header is set using the access token and token type, while the `DPoP` header contains the generated DPoP proof.
 
