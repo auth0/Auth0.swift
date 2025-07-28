@@ -1,4 +1,4 @@
 public struct Factor: Decodable {
-    let type: String?
-    let usage: [String]
+    public let type: String?
+    public let usage: [String]
 }

@@ -7,23 +7,23 @@ public struct AuthenticationMethods: Decodable {
 }
 
 public struct AuthenticationMethod: Decodable {
-    let type: String?
-    let credentialBackedUp: Bool?
-    let credentialDeviceType: String?
-    let identityUserId: String?
-    let keyId: String?
-    let publicKey: String?
-    let transports: [String]?
-    let userAgent: String?
-    let userHandle: String?
-    let lastPasswordReset: String?
-    let id: String?
-    let createdAt: String
-    let usage: [String]
-    let confirmed: Bool?
-    let name: String?
-    let preferredAuthenticationMethod: String?
-    let phoneNumber: String?
+    public let type: String?
+    public let credentialBackedUp: Bool?
+    public let credentialDeviceType: String?
+    public let identityUserId: String?
+    public let keyId: String?
+    public let publicKey: String?
+    public let transports: [String]?
+    public let userAgent: String?
+    public let userHandle: String?
+    public let lastPasswordReset: String?
+    public let id: String
+    public let createdAt: String
+    public let usage: [String]
+    public let confirmed: Bool?
+    public let name: String?
+    public let preferredAuthenticationMethod: String?
+    public let phoneNumber: String?
 
     enum CodingKeys: String, CodingKey {
         case type
