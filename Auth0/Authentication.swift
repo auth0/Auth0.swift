@@ -878,7 +878,12 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
          }
      ```
 
-     - Parameter accessToken: Access token obtained by authenticating the user.
+     > Important: If you're using DPoP, make sure to set the `tokenType` parameter to `DPoP` instead of `Bearer`.
+     You can simply use the ``Credentials/tokenType`` value for this purpose.
+
+     - Parameters:
+       - accessToken: Access token obtained by authenticating the user.
+       - tokenType: Indicates how the access token should be used. Defaults to `Bearer`.
      - Returns: A request that will yield user information.
 
      ## See Also
