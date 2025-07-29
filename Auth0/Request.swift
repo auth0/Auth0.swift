@@ -14,7 +14,7 @@ let parameterPropertyKey = "com.auth0.parameter"
  let request: Request<Credentials, AuthenticationError> = // ...
 
  request.start { result in
- print(result)
+     print(result)
  }
  ```
  */
@@ -98,8 +98,8 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                 request.setValue(proof, forHTTPHeaderField: "DPoP")
             }
         } catch {
-            // This won't run in release builds, but in debug builds it's helpful for debugging
-            assertionFailure("DPoP operation failed when setting up a request: \(error)")
+            handle(.failure(E(cause: error)), callback)
+            return
         }
 
         logger?.trace(request: request, session: self.session)

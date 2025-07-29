@@ -106,7 +106,7 @@ class DPoPProofGeneratorSpec: QuickSpec {
             }
 
             it("should throw an error if the keystore fails") {
-                keyStore = MockDPoPKeyStore(shouldFail: true)
+                keyStore = MockDPoPKeyStore(failPrivateKey: true)
                 proofGenerator = DPoPProofGenerator(keyStore: keyStore)
 
                 let url = URL(string: "https://example.com/resource")!

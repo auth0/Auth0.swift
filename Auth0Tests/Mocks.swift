@@ -33,26 +33,41 @@ struct MockError: LocalizedError, CustomStringConvertible {
 
 struct MockDPoPKeyStore: DPoPKeyStore, Sendable {
     nonisolated private let key: DPoPPrivateKey
-    private let shouldFail: Bool
+    private let failHasPrivateKey: Bool
+    private let failPrivateKey: Bool
+    private let failClear: Bool
 
-    init(privateKey: DPoPPrivateKey = MockDPoPPrivateKey(), shouldFail: Bool = false) {
+    init(privateKey: DPoPPrivateKey = MockDPoPPrivateKey(),
+         failHasPrivateKey: Bool = false,
+         failPrivateKey: Bool = false,
+         failClear: Bool = false) {
         self.key = privateKey
-        self.shouldFail = shouldFail
+        self.failHasPrivateKey = failHasPrivateKey
+        self.failPrivateKey = failPrivateKey
+        self.failClear = failClear
     }
 
     func hasPrivateKey() throws(DPoPError) -> Bool {
+        if failHasPrivateKey {
+            throw DPoPError(code: .unknown("Error"))
+        }
+
         return true
     }
 
     func privateKey() throws(DPoPError) -> DPoPPrivateKey {
-        if shouldFail {
+        if failPrivateKey {
             throw DPoPError(code: .unknown("Error"))
         }
 
         return key
     }
 
-    func clear() throws(DPoPError) {}
+    func clear() throws(DPoPError) {
+        if failClear {
+            throw DPoPError(code: .unknown("Error"))
+        }
+    }
 }
 
 struct MockDPoPPrivateKey: DPoPPrivateKey, Sendable {

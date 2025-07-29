@@ -191,4 +191,10 @@ public struct DPoP: Sendable {
         }
     }
 
+    init(keyStore: DPoPKeyStore) {
+        self.keychainIdentifier = DPoP.defaultKeychainIdentifier
+        self.keyStore = keyStore
+        self.proofGenerator = DPoPProofGenerator(keyStore: keyStore)
+    }
+
 }

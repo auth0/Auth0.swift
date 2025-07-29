@@ -6,6 +6,7 @@ import JWTDecode
 
 @testable import Auth0
 
+private let EndpointURL = URL(string: "https://example.com/api/endpoint")!
 private let DPoPNonce = "auth0-nonce"
 private let AccessToken = "access-token"
 private let AccessTokenHash = Data(SHA256.hash(data: AccessToken.data(using: .utf8)!)).encodeBase64URLSafe()
@@ -45,6 +46,12 @@ class DPoPSpec: QuickSpec {
                     expect { try dpop.hasKeypair() } == false
                 }
 
+                it("should throw an error when the key store throws an error") {
+                    dpop = DPoP(keyStore: MockDPoPKeyStore(failHasPrivateKey: true))
+
+                    expect { try dpop.hasKeypair() }.to(throwError())
+                }
+
             }
 
             context("nonce handling") {
@@ -53,16 +60,16 @@ class DPoPSpec: QuickSpec {
                 let headersWithoutNonce = ["Foo": "Bar"]
 
                 it("should extract the nonce from the response") {
-                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                                 statusCode: 200,
-                                                 httpVersion: nil,
-                                                 headerFields: headersWithNonce)!
+                    let response = HTTPURLResponse(url: EndpointURL,
+                                                   statusCode: 200,
+                                                   httpVersion: nil,
+                                                   headerFields: headersWithNonce)!
 
                     expect(DPoP.extractNonce(from: response)) == DPoPNonce
                 }
 
                 it("should return nil when no nonce is present in the response") {
-                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                    let response = HTTPURLResponse(url: EndpointURL,
                                                    statusCode: 200,
                                                    httpVersion: nil,
                                                    headerFields: headersWithoutNonce)!
@@ -71,23 +78,23 @@ class DPoPSpec: QuickSpec {
                 }
 
                 it("should extract and store the nonce from the response") {
-                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
-                                                 statusCode: 200,
-                                                 httpVersion: nil,
-                                                 headerFields: headersWithNonce)!
+                    let response = HTTPURLResponse(url: EndpointURL,
+                                                   statusCode: 200,
+                                                   httpVersion: nil,
+                                                   headerFields: headersWithNonce)!
                     DPoP.storeNonce(from: response)
 
                     expect(DPoP.auth0Nonce) == DPoPNonce
                 }
 
                 it("should not clear the stored nonce if the next response does not contain a nonce") {
-                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                    let response = HTTPURLResponse(url: EndpointURL,
                                                    statusCode: 200,
                                                    httpVersion: nil,
                                                    headerFields: headersWithNonce)!
                     DPoP.storeNonce(from: response)
 
-                    let newResponse = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                    let newResponse = HTTPURLResponse(url: EndpointURL,
                                                       statusCode: 200,
                                                       httpVersion: nil,
                                                       headerFields: headersWithoutNonce)!
@@ -101,59 +108,66 @@ class DPoPSpec: QuickSpec {
             context("proof generation") {
 
                 it("should generate a DPoP proof with all claims") {
-                    let endpoint = "https://example.com/api/endpoint"
-                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                    let response = HTTPURLResponse(url: EndpointURL,
                                                    statusCode: 200,
                                                    httpVersion: nil,
                                                    headerFields: ["DPoP-Nonce": DPoPNonce])!
                     DPoP.storeNonce(from: response)
 
                     let method = "PATCH"
-                    var request = URLRequest(url: URL(string: endpoint)!)
+                    var request = URLRequest(url: EndpointURL)
                     request.httpMethod = method
                     request.setValue(AccessToken, forHTTPHeaderField: "Authorization")
                     let proof = try dpop.generateProof(for: request)
                     let decodedProof = try decode(jwt: proof)
 
-                    expect(decodedProof["htu"].string) == endpoint
+                    expect(decodedProof["htu"].string) == EndpointURL.absoluteString
                     expect(decodedProof["htm"].string) == method
                     expect(decodedProof["nonce"].string) == DPoPNonce
                     expect(decodedProof["ath"].string) == AccessTokenHash
                 }
 
                 it("should generate a DPoP proof without a nonce claim") {
-                    let endpoint = "https://example.com/api/endpoint"
                     let method = "PATCH"
-                    var request = URLRequest(url: URL(string: endpoint)!)
+                    var request = URLRequest(url: EndpointURL)
                     request.httpMethod = method
                     request.setValue(AccessToken, forHTTPHeaderField: "Authorization")
                     let proof = try dpop.generateProof(for: request)
                     let decodedProof = try decode(jwt: proof)
 
-                    expect(decodedProof["htu"].string) == endpoint
+                    expect(decodedProof["htu"].string) == EndpointURL.absoluteString
                     expect(decodedProof["htm"].string) == method
                     expect(decodedProof["nonce"].rawValue).to(beNil())
                     expect(decodedProof["ath"].string) == AccessTokenHash
                 }
 
                 it("should generate a DPoP proof without an ath claim") {
-                    let endpoint = "https://example.com/api/endpoint"
-                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                    let response = HTTPURLResponse(url: EndpointURL,
                                                    statusCode: 200,
                                                    httpVersion: nil,
                                                    headerFields: ["DPoP-Nonce": DPoPNonce])!
                     DPoP.storeNonce(from: response)
 
                     let method = "PATCH"
-                    var request = URLRequest(url: URL(string: endpoint)!)
+                    var request = URLRequest(url: EndpointURL)
                     request.httpMethod = method
                     let proof = try dpop.generateProof(for: request)
                     let decodedProof = try decode(jwt: proof)
 
-                    expect(decodedProof["htu"].string) == endpoint
+                    expect(decodedProof["htu"].string) == EndpointURL.absoluteString
                     expect(decodedProof["htm"].string) == method
                     expect(decodedProof["nonce"].string) == DPoPNonce
                     expect(decodedProof["ath"].rawValue).to(beNil())
+                }
+
+                it("should throw an error when the key store throws an error") {
+                    dpop = DPoP(keyStore: MockDPoPKeyStore(failPrivateKey: true))
+                    let method = "POST"
+                    var request = URLRequest(url: EndpointURL)
+                    request.httpMethod = method
+                    request.setValue(AccessToken, forHTTPHeaderField: "Authorization")
+
+                    expect { try dpop.generateProof(for: request) }.to(throwError())
                 }
 
             }
@@ -189,7 +203,7 @@ class DPoPSpec: QuickSpec {
                 let headersWithoutNonceError = ["WWW-Authenticate": "DPoP error=invalid_request"]
 
                 it("should return true when use_dpop_nonce error is present") {
-                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                    let response = HTTPURLResponse(url: EndpointURL,
                                                    statusCode: 401,
                                                    httpVersion: nil,
                                                    headerFields: headersWithNonceError)
@@ -198,7 +212,7 @@ class DPoPSpec: QuickSpec {
                 }
 
                 it("should return false when no use_dpop_nonce error is present") {
-                    let response = HTTPURLResponse(url: URL(string: "https://example.com")!,
+                    let response = HTTPURLResponse(url: EndpointURL,
                                                    statusCode: 401,
                                                    httpVersion: nil,
                                                    headerFields: headersWithoutNonceError)
@@ -226,8 +240,6 @@ class DPoPSpec: QuickSpec {
 
             context("addHeaders") {
 
-                let endpoint = "https://example.com/api/endpoint"
-
                 beforeEach {
                     // Create a key pair
                     _ = try DPoP.keyStore(for: DPoP.defaultKeychainIdentifier).privateKey()
@@ -241,7 +253,7 @@ class DPoPSpec: QuickSpec {
                 context("with DPoP token type") {
 
                     it("should add Authorization and DPoP headers") {
-                        var request = URLRequest(url: URL(string: endpoint)!)
+                        var request = URLRequest(url: EndpointURL)
                         request.httpMethod = "POST"
 
                         try DPoP.addHeaders(to: &request, accessToken: AccessToken, tokenType: "DPoP")
@@ -251,7 +263,7 @@ class DPoPSpec: QuickSpec {
                     }
 
                     it("should add Authorization and DPoP headers with case insensitive token type") {
-                        var request = URLRequest(url: URL(string: endpoint)!)
+                        var request = URLRequest(url: EndpointURL)
                         request.httpMethod = "POST"
 
                         try DPoP.addHeaders(to: &request, accessToken: AccessToken, tokenType: "dpoP")
@@ -261,21 +273,21 @@ class DPoPSpec: QuickSpec {
                     }
 
                     it("should generate a valid DPoP proof") {
-                        var request = URLRequest(url: URL(string: endpoint)!)
+                        var request = URLRequest(url: EndpointURL)
                         request.httpMethod = "PATCH"
 
                         try DPoP.addHeaders(to: &request, accessToken: AccessToken, tokenType: "DPoP")
                         let proof = request.value(forHTTPHeaderField: "DPoP")!
                         let decodedProof = try decode(jwt: proof)
 
-                        expect(decodedProof["htu"].string) == endpoint
+                        expect(decodedProof["htu"].string) == EndpointURL.absoluteString
                         expect(decodedProof["htm"].string) == "PATCH"
                         expect(decodedProof["ath"].string) == AccessTokenHash
                         expect(decodedProof["nonce"].rawValue).to(beNil())
                     }
 
                     it("should include nonce in DPoP proof when provided") {
-                        var request = URLRequest(url: URL(string: endpoint)!)
+                        var request = URLRequest(url: EndpointURL)
                         request.httpMethod = "POST"
 
                         try DPoP.addHeaders(to: &request, accessToken: AccessToken, tokenType: "DPoP", nonce: DPoPNonce)
@@ -290,7 +302,7 @@ class DPoPSpec: QuickSpec {
                 context("with Bearer token type") {
 
                     it("should only add Authorization header") {
-                        var request = URLRequest(url: URL(string: endpoint)!)
+                        var request = URLRequest(url: EndpointURL)
                         request.httpMethod = "POST"
 
                         try DPoP.addHeaders(to: &request, accessToken: AccessToken, tokenType: "Bearer")
@@ -300,7 +312,7 @@ class DPoPSpec: QuickSpec {
                     }
 
                     it("should only add Authorization header with case insensitive Bearer") {
-                        var request = URLRequest(url: URL(string: endpoint)!)
+                        var request = URLRequest(url: EndpointURL)
                         request.httpMethod = "POST"
 
                         try DPoP.addHeaders(to: &request, accessToken: AccessToken, tokenType: "bearer")
@@ -314,7 +326,7 @@ class DPoPSpec: QuickSpec {
                 context("with custom token type") {
 
                     it("should only add Authorization header") {
-                        var request = URLRequest(url: URL(string: endpoint)!)
+                        var request = URLRequest(url: EndpointURL)
                         request.httpMethod = "POST"
 
                         try DPoP.addHeaders(to: &request, accessToken: AccessToken, tokenType: "Custom")
@@ -348,9 +360,7 @@ class DPoPSpec: QuickSpec {
                     }
 
                     it("should not throw when clearing a non-existent key pair") {
-                        expect {
-                            try DPoP.clearKeypair()
-                        }.toNot(throwError())
+                        expect { try DPoP.clearKeypair() }.toNot(throwError())
                     }
 
                 }
@@ -381,9 +391,7 @@ class DPoPSpec: QuickSpec {
                     }
 
                     it("should not throw when clearing a non-existent key pair") {
-                        expect {
-                            try DPoP.clearKeypair(for: customIdentifier)
-                        }.toNot(throwError())
+                        expect { try DPoP.clearKeypair(for: customIdentifier) }.toNot(throwError())
                     }
 
                     it("should not affect other keychain identifiers") {
@@ -435,6 +443,9 @@ class DPoPSpec: QuickSpec {
 
             context("shouldGenerateProof") {
 
+                let rteParameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
+                let nonRTEParameters = ["grant_type": "authorization_code"]
+
                 beforeEach {
                     // Create a key pair
                     _ = try DPoP.keyStore(for: DPoP.defaultKeychainIdentifier).privateKey()
@@ -447,16 +458,21 @@ class DPoPSpec: QuickSpec {
                     context("with refresh_token grant") {
 
                         it("should return true when a key pair exists") {
-                            let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
-
-                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == true
+                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: rteParameters) } == true
                         }
 
                         it("should return false when no key pair exists") {
                             try DPoP.clearKeypair()
-                            let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
 
-                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == false
+                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: rteParameters) } == false
+                        }
+
+                        it("should throw an error when the key store throws an error") {
+                            dpop = DPoP(keyStore: MockDPoPKeyStore(failHasPrivateKey: true))
+
+                            expect {
+                                try dpop.shouldGenerateProof(for: tokenURL, parameters: rteParameters)
+                            }.to(throwError())
                         }
 
                     }
@@ -464,16 +480,13 @@ class DPoPSpec: QuickSpec {
                     context("without refresh_token grant") {
 
                         it("should return true when a key pair exists") {
-                            let parameters = ["grant_type": "authorization_code"]
-
-                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == true
+                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: nonRTEParameters) } == true
                         }
 
                         it("should return true when no key pair exists") {
                             try DPoP.clearKeypair()
-                            let parameters = ["grant_type": "authorization_code"]
 
-                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: parameters) } == true
+                            expect { try dpop.shouldGenerateProof(for: tokenURL, parameters: nonRTEParameters) } == true
                         }
 
                     }
@@ -482,40 +495,26 @@ class DPoPSpec: QuickSpec {
 
                 context("non-token endpoint") {
 
-                    let apiURL = URL(string: "https://example.com/api/endpoint")!
-
-                    context("with refresh_token grant") {
-
-                        it("should return true when a key pair exists") {
-                            let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
-
-                            expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == true
-                        }
-
-                        it("should return false when no key pair exists") {
-                            try DPoP.clearKeypair()
-                            let parameters = ["grant_type": "refresh_token", "refresh_token": "test_refresh_token"]
-
-                            expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == false
-                        }
-
+                    it("should return true when a key pair exists") {
+                        expect {
+                            try dpop.shouldGenerateProof(for: EndpointURL, parameters: nonRTEParameters)
+                        } == true
                     }
 
-                    context("without refresh_token grant") {
+                    it("should return false when no key pair exists") {
+                        try DPoP.clearKeypair()
 
-                        it("should return true when a key pair exists") {
-                            let parameters = ["grant_type": "authorization_code"]
+                        expect {
+                            try dpop.shouldGenerateProof(for: EndpointURL, parameters: nonRTEParameters)
+                        } == false
+                    }
 
-                            expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == true
-                        }
+                    it("should throw an error when the key store throws an error") {
+                        dpop = DPoP(keyStore: MockDPoPKeyStore(failHasPrivateKey: true))
 
-                        it("should return false when no key pair exists") {
-                            try DPoP.clearKeypair()
-                            let parameters = ["grant_type": "authorization_code"]
-
-                            expect { try dpop.shouldGenerateProof(for: apiURL, parameters: parameters) } == false
-                        }
-
+                        expect {
+                            try dpop.shouldGenerateProof(for: EndpointURL, parameters: nonRTEParameters)
+                        }.to(throwError())
                     }
 
                 }
@@ -553,6 +552,12 @@ class DPoPSpec: QuickSpec {
                     let thumbprint2 = try dpop.jkt()
 
                     expect(thumbprint1) != thumbprint2
+                }
+
+                it("should throw an error when the key store throws an error") {
+                    dpop = DPoP(keyStore: MockDPoPKeyStore(failPrivateKey: true))
+
+                    expect { try dpop.jkt() }.to(throwError())
                 }
 
             }

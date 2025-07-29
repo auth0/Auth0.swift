@@ -271,6 +271,36 @@ class RequestSpec: QuickSpec {
                     }
                 }
 
+                it("should return an error when the DPoP proof generation check fails") {
+                    waitUntil(timeout: Timeout) { done in
+                        let dpop = DPoP(keyStore: MockDPoPKeyStore(failHasPrivateKey: true))
+
+                        Request(url: Url, dpop: dpop).start { result in
+                            expect(result).to(beFailure { error in
+                                expect(error.cause).toNot(beNil())
+                                expect(error.cause).to(beAKindOf(DPoPError.self))
+                            })
+                            done()
+                        }
+                    }
+                }
+
+                it("should return an error when the DPoP proof generation fails") {
+                    waitUntil(timeout: Timeout) { done in
+                        let dpop = DPoP(keyStore: MockDPoPKeyStore(failPrivateKey: true))
+                        let url = URL(string: "https://example.com/oauth/token")!
+                        let parameters = ["grant_type": "authorization_code"]
+
+                        Request(url: url, dpop: dpop).start { result in
+                            expect(result).to(beFailure { error in
+                                expect(error.cause).toNot(beNil())
+                                expect(error.cause).to(beAKindOf(DPoPError.self))
+                            })
+                            done()
+                        }
+                    }
+                }
+
                 it("should retry the request once on DPoP nonce error") {
                     var callCount = 0
 
