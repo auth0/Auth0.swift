@@ -105,7 +105,7 @@ class DPoPProofGeneratorSpec: QuickSpec {
                 expect(decodedProof["htu"].string) == "https://example.com/api/endpoint"
             }
 
-            it("should throw an error if the keystore fails") {
+            it("should throw an error if the key store fails") {
                 keyStore = MockDPoPKeyStore(failPrivateKey: true)
                 proofGenerator = DPoPProofGenerator(keyStore: keyStore)
 

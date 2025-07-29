@@ -305,6 +305,20 @@ try DPoP.addHeaders(to: &request,
                     tokenType: credentials.tokenType)
 ```
 
+If your API is issuing DPoP nonces to prevent replay attacks, you can pass the nonce value to the `addHeaders()` method to include it in the DPoP proof. Use the `DPoP.isNonceRequired(by:)` method to check if a particular API response failed because a nonce is required.
+
+```swift
+if DPoP.isNonceRequired(by: response), 
+    let nonce = response.value(forHTTPHeaderField: "DPoP-Nonce") {
+    try DPoP.addHeaders(to: &request,
+                        accessToken: credentials.accessToken,
+                        tokenType: credentials.tokenType,
+                        nonce: nonce)
+
+    // Retry the request with the new DPoP proof that includes the nonce
+}
+```
+
 On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair from the Keychain.
 
 ```swift
@@ -1519,6 +1533,20 @@ request.httpMethod = "POST"
 try DPoP.addHeaders(to: &request,
                     accessToken: credentials.accessToken,
                     tokenType: credentials.tokenType)
+```
+
+If your API is issuing DPoP nonces to prevent replay attacks, you can pass the nonce value to the `addHeaders()` method to include it in the DPoP proof. Use the `DPoP.isNonceRequired(by:)` method to check if a particular API response failed because a nonce is required.
+
+```swift
+if DPoP.isNonceRequired(by: response), 
+    let nonce = response.value(forHTTPHeaderField: "DPoP-Nonce") {
+    try DPoP.addHeaders(to: &request,
+                        accessToken: credentials.accessToken,
+                        tokenType: credentials.tokenType,
+                        nonce: nonce)
+
+    // Retry the request with the new DPoP proof that includes the nonce
+}
 ```
 
 On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair from the Keychain.

@@ -98,7 +98,7 @@ public struct DPoP: Sendable {
         return try Self.keyStore(for: keychainIdentifier).clear()
     }
 
-    /// Checks the `WWW-Authenticate` header of an error `HTTPURLResponse` to determine if a nonce must be included in
+    /// Checks the `WWW-Authenticate` header of a failed `HTTPURLResponse` to determine if a nonce must be included in
     /// the DPoP proof. If so, a new nonce value should be present in the `DPoP-Nonce` header of the response. This
     /// nonce should be extracted and used to generate a new DPoP proof. The failed request should then be retried with
     /// the new DPoP proof.
@@ -106,16 +106,14 @@ public struct DPoP: Sendable {
     /// ## Usage
     ///
     /// ```swift
-    /// if DPoP.isNonceRequired(by: response) {
-    ///     // Extract the nonce from the response
-    ///     guard let nonce = response.value(forHTTPHeaderField: "DPoP-Nonce") else {
-    ///         // ...
-    ///         return
-    ///     }
+    /// if DPoP.isNonceRequired(by: response),
+    ///     let nonce = response.value(forHTTPHeaderField: "DPoP-Nonce") {
+    ///     try DPoP.addHeaders(to: &request,
+    ///                         accessToken: credentials.accessToken,
+    ///                         tokenType: credentials.tokenType,
+    ///                         nonce: nonce)
     ///
-    ///     // Use DPoP.addHeaders(to:accessToken:tokenType:nonce:)
-    ///     // to generate a new DPoP proof with the extracted nonce,
-    ///     // and then retry the request.
+    ///     // Retry the request with the new DPoP proof that includes the nonce
     /// }
     /// ```
     ///
