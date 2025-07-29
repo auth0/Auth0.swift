@@ -210,11 +210,12 @@ struct Auth0Authentication: Authentication {
 
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(passkey: LoginPasskey,
+    func login(passkey: any LoginPasskey,
                challenge: PasskeyLoginChallenge,
                connection: String?,
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError> {
+               scope: String,
+               organization: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -238,10 +239,10 @@ struct Auth0Authentication: Authentication {
             "auth_session": challenge.authenticationSession,
             "authn_response": authenticatorResponse
         ]
-
         payload["realm"] = connection
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
+        payload["organization"] = organization
 
         return Request(session: session,
                        url: url,
@@ -253,11 +254,13 @@ struct Auth0Authentication: Authentication {
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func passkeyLoginChallenge(connection: String?) -> Request<PasskeyLoginChallenge, AuthenticationError> {
+    func passkeyLoginChallenge(connection: String?,
+                               organization: String?) -> Request<PasskeyLoginChallenge, AuthenticationError> {
         let url = URL(string: "passkey/challenge", relativeTo: self.url)!
 
         var payload: [String: String] = ["client_id": self.clientId]
         payload["realm"] = connection
+        payload["organization"] = organization
 
         return Request(session: session,
                        url: url,
@@ -269,11 +272,12 @@ struct Auth0Authentication: Authentication {
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func login(passkey: SignupPasskey,
+    func login(passkey: any SignupPasskey,
                challenge: PasskeySignupChallenge,
                connection: String?,
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError> {
+               scope: String,
+               organization: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -299,6 +303,7 @@ struct Auth0Authentication: Authentication {
         payload["realm"] = connection
         payload["audience"] = audience
         payload["scope"] = includeRequiredScope(in: scope)
+        payload["organization"] = organization
 
         return Request(session: session,
                        url: url,
@@ -314,7 +319,8 @@ struct Auth0Authentication: Authentication {
                                 phoneNumber: String?,
                                 username: String?,
                                 name: String?,
-                                connection: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
+                                connection: String?,
+                                organization: String?) -> Request<PasskeySignupChallenge, AuthenticationError> {
         let url = URL(string: "passkey/register", relativeTo: self.url)!
 
         var userProfile: [String: Any] = [:]
@@ -328,6 +334,7 @@ struct Auth0Authentication: Authentication {
             "user_profile": userProfile
         ]
         payload["realm"] = connection
+        payload["organization"] = organization
 
         return Request(session: session,
                        url: url,

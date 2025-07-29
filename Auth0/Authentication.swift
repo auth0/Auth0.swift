@@ -529,7 +529,8 @@ public protocol Authentication: Trackable, Loggable {
     ///            challenge: loginChallenge,
     ///            connection: "Username-Password-Authentication",
     ///            audience: "https://example.com/api",
-    ///            scope: "openid profile email offline_access")
+    ///            scope: "openid profile email offline_access",
+    ///            organization: "org_aaAA1aa11aAAAA1a")
     ///     .start { print($0) }
     /// ```
     ///
@@ -537,8 +538,9 @@ public protocol Authentication: Trackable, Loggable {
     ///   - passkey:  The existing passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
     ///   - challenge:  The passkey challenge obtained from ``passkeyLoginChallenge(connection:)``.
     ///   - connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
-    ///   - audience:   API Identifier that your application is requesting access to. Defaults to `nil`.
-    ///   - scope:      Space-separated list of requested scope values. Defaults to `openid profile email`.
+    ///   - audience:  API Identifier that your application is requesting access to. Defaults to `nil`.
+    ///   - scope:  Space-separated list of requested scope values. Defaults to `openid profile email`.
+    ///   - organization: Identifier of an organization the user is a member of.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -551,7 +553,8 @@ public protocol Authentication: Trackable, Loggable {
                challenge: PasskeyLoginChallenge,
                connection: String?,
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError>
+               scope: String,
+               organization: String?) -> Request<Credentials, AuthenticationError>
 
     /// Requests a challenge for logging a user in with an existing passkey. This is the first part of the passkey login flow.
     ///
@@ -601,7 +604,9 @@ public protocol Authentication: Trackable, Loggable {
     /// Then, call ``login(passkey:challenge:connection:audience:scope:)-7s3cz`` with the resulting
     /// passkey credential and the challenge to log the user in.
     ///
-    /// - Parameter connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
+    /// - Parameters:
+    ///    - connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
+    ///    - organization: Identifier of an organization the user is a member of.
     /// - Returns: A request that will yield a passkey login challenge.
     ///
     /// ## See Also
@@ -610,7 +615,8 @@ public protocol Authentication: Trackable, Loggable {
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Connect-to-a-service-with-an-existing-account)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func passkeyLoginChallenge(connection: String?) -> Request<PasskeyLoginChallenge, AuthenticationError>
+    func passkeyLoginChallenge(connection: String?,
+                               organization: String?) -> Request<PasskeyLoginChallenge, AuthenticationError>
 
     /// Logs a new user in using a signup passkey credential and the signup challenge. This is the last part of the passkey signup flow.
     ///
@@ -647,7 +653,8 @@ public protocol Authentication: Trackable, Loggable {
     ///            challenge: signupChallenge,
     ///            connection: "Username-Password-Authentication",
     ///            audience: "https://example.com/api",
-    ///            scope: "openid profile email offline_access")
+    ///            scope: "openid profile email offline_access",
+    ///            organization: "org_aaAA1aa11aAAAA1a")
     ///     .start { print($0) }
     /// ```
     ///
@@ -657,6 +664,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
     ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
     ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
+    ///   - organization: Identifier of an organization the user is a member of.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -669,7 +677,8 @@ public protocol Authentication: Trackable, Loggable {
                challenge: PasskeySignupChallenge,
                connection: String?,
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError>
+               scope: String,
+               organization: String?) -> Request<Credentials, AuthenticationError>
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
@@ -694,7 +703,8 @@ public protocol Authentication: Trackable, Loggable {
     ///     .authentication()
     ///     .passkeySignupChallenge(email: "support@auth0.com",
     ///                             name: "John Appleseed",
-    ///                             connection: "Username-Password-Authentication")
+    ///                             connection: "Username-Password-Authentication",
+    ///                             organization: "org_aaAA1aa11aAAAA1a")
     ///     .start { result in
     ///         switch result {
     ///         case .success(let signupChallenge):
@@ -736,6 +746,7 @@ public protocol Authentication: Trackable, Loggable {
     ///   - username:    Username of the user. Defaults to `nil`.
     ///   - name:        Display name of the user. Defaults to `nil`.
     ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - organization: Identifier of an organization the user is a member of.
     /// - Returns: A request that will yield a passkey signup challenge.
     ///
     /// ## See Also
@@ -748,7 +759,8 @@ public protocol Authentication: Trackable, Loggable {
                                 phoneNumber: String?,
                                 username: String?,
                                 name: String?,
-                                connection: String?) -> Request<PasskeySignupChallenge, AuthenticationError>
+                                connection: String?,
+                                organization: String?) -> Request<PasskeySignupChallenge, AuthenticationError>
     #endif
 
     /**
@@ -1114,17 +1126,19 @@ public extension Authentication {
                challenge: PasskeyLoginChallenge,
                connection: String? = nil,
                audience: String? = nil,
-               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope,
+               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
                           audience: audience,
-                          scope: scope)
+                          scope: scope,
+                          organization: organization)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func passkeyLoginChallenge(connection: String? = nil) -> Request<PasskeyLoginChallenge, AuthenticationError> {
-        return self.passkeyLoginChallenge(connection: connection)
+    func passkeyLoginChallenge(connection: String? = nil, organization: String? = nil) -> Request<PasskeyLoginChallenge, AuthenticationError> {
+        return self.passkeyLoginChallenge(connection: connection, organization: organization)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -1132,12 +1146,14 @@ public extension Authentication {
                challenge: PasskeySignupChallenge,
                connection: String? = nil,
                audience: String? = nil,
-               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope,
+               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
                           audience: audience,
-                          scope: scope)
+                          scope: scope,
+                          organization: organization)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -1145,12 +1161,14 @@ public extension Authentication {
                                 phoneNumber: String? = nil,
                                 username: String? = nil,
                                 name: String? = nil,
-                                connection: String? = nil) -> Request<PasskeySignupChallenge, AuthenticationError> {
+                                connection: String? = nil,
+                                organization: String? = nil) -> Request<PasskeySignupChallenge, AuthenticationError> {
         return self.passkeySignupChallenge(email: email,
                                            phoneNumber: phoneNumber,
                                            username: username,
                                            name: name,
-                                           connection: connection)
+                                           connection: connection,
+                                           organization: organization)
     }
     #endif
 
