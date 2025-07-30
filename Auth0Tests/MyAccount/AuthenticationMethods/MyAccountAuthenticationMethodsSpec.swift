@@ -37,7 +37,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
             it("should init with token and url") {
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
                 expect(authMethods.token) == AccessToken
-                expect(authMethods.url) == DomainURL.appending("authentication-methods")
+                expect(authMethods.url) == DomainURL
             }
 
             it("should init with token, url, and session") {

@@ -91,7 +91,7 @@ class MyAccountSpec: QuickSpec {
                 let authenticationMethods = myAccount.authenticationMethods as! Auth0MyAccountAuthenticationMethods
 
                 expect(authenticationMethods.token) == Token
-                expect(authenticationMethods.url) == myAccount.url.appending("authentication-methods")
+                expect(authenticationMethods.url) == myAccount.url
                 expect(authenticationMethods.session).to(be(session))
             }
 
@@ -102,7 +102,7 @@ class MyAccountSpec: QuickSpec {
                     let myAccountURL = myAccount.url.absoluteString
                     let authenticationMethodsUrl = myAccount.authenticationMethods.url.absoluteString
 
-                    expect(authenticationMethodsUrl) == "\(myAccountURL)/authentication-methods"
+                    expect(authenticationMethodsUrl) == "\(myAccountURL)"
                 }
 
                 it("should return my account endpoint with trailing slash") {
@@ -110,7 +110,7 @@ class MyAccountSpec: QuickSpec {
                     let myAccountURL = myAccount.url.absoluteString
                     let authenticationMethodsUrl = myAccount.authenticationMethods.url.absoluteString
 
-                    expect(authenticationMethodsUrl) == "\(myAccountURL)/authentication-methods"
+                    expect(authenticationMethodsUrl) == "\(myAccountURL)"
                 }
 
             }

@@ -158,8 +158,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func updateAuthenticationMethod(id: String,
                                     name: String?,
                                     preferredAuthenticationMethod: String?) -> Request<AuthenticationMethod, MyAccountError>
-
-    
 }
 // MARK: - Default Parameters
 
@@ -172,5 +170,13 @@ public extension MyAccountAuthenticationMethods {
         self.passkeyEnrollmentChallenge(userIdentityId: userIdentityId, connection: connection)
     }
     #endif
+
+    func updateAuthenticationMethod(id: String,
+                                    name: String? = nil,
+                                    preferredAuthenticationMethod: String? = nil) -> Request<AuthenticationMethod, MyAccountError> {
+        self.updateAuthenticationMethod(id: id,
+                                        name: name,
+                                        preferredAuthenticationMethod: preferredAuthenticationMethod)
+    }
 
 }
