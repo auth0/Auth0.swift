@@ -1126,6 +1126,7 @@ public protocol Authentication: Trackable, Loggable {
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange)
+     - [Custom Token Exchange Documentation](https://auth0.com/docs/authenticate/custom-token-exchange)
      - [RFC 8693: OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693)
      */
     func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String, additionalParameters: [String: Any]) -> Request<Credentials, AuthenticationError>
