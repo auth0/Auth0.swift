@@ -1080,6 +1080,57 @@ public protocol Authentication: Trackable, Loggable {
      */
     func jwks() -> Request<JWKS, AuthenticationError>
 
+    /**
+     Performs a custom token exchange to obtain Auth0 credentials using an existing identity provider token.
+
+     ## Usage
+
+     ```swift
+     Auth0
+         .authentication()
+         .customTokenExchange(subjectToken: "existing-token",
+                              subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                              audience: "https://example.com/api",
+                              scope: "openid profile email")
+         .start { result in
+             switch result {
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
+     You can also include additional parameters:
+
+     ```swift
+     Auth0
+         .authentication()
+         .customTokenExchange(subjectToken: "existing-token",
+                              subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                              audience: "https://example.com/api",
+                              scope: "openid profile email",
+                              additionalParameters: ["custom_claim": "value"])
+         .start { print($0) }
+     ```
+
+     - Parameters:
+       - subjectToken: The security token to be exchanged.
+       - subjectTokenType: URI that identifies the type of the subject token.
+       - audience: API Identifier that your application is requesting access to. Defaults to `nil`.
+       - scope: Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - additionalParameters: Additional parameters to include in the token exchange request. Defaults to empty dictionary.
+     - Returns: A request that will yield Auth0 user's credentials.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange)
+     - [Custom Token Exchange Documentation](https://auth0.com/docs/authenticate/custom-token-exchange)
+     - [RFC 8693: OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693)
+     */
+    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String, additionalParameters: [String: Any]) -> Request<Credentials, AuthenticationError>
+
 }
 
 public extension Authentication {
@@ -1182,6 +1233,10 @@ public extension Authentication {
 
     func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
+    }
+
+    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String? = nil, scope: String = defaultScope, additionalParameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
+        return self.customTokenExchange(subjectToken: subjectToken, subjectTokenType: subjectTokenType, audience: audience, scope: scope, additionalParameters: additionalParameters)
     }
 
 }
