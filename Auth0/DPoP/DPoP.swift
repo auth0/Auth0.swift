@@ -6,6 +6,12 @@ import CryptoKit
 /// Utilities for securing requests with DPoP (Demonstrating Proof of Possession) as described in
 /// [RFC 9449](https://datatracker.ietf.org/doc/html/rfc9449).
 ///
+/// ## Availability
+///
+/// This feature is currently available in
+/// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+/// Please reach out to Auth0 support to get it enabled for your tenant.
+///
 /// ## See Also
 ///
 /// - ``DPoPError``
@@ -32,6 +38,12 @@ public struct DPoP: Sendable {
 
     /// Adds the `Authorization` and `DPoP` headers to the provided `URLRequest`. The `Authorization` header is set
     /// using the access token and token type. The `DPoP` header contains the generated DPoP proof.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Usage
     ///
@@ -81,6 +93,12 @@ public struct DPoP: Sendable {
     /// This method should be called as part of the logout process, along with ``CredentialsManager/clear()``, and
     /// ``WebAuth/clearSession(federated:callback:)-9xcu3`` –when using web-based authentication.
     ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
     /// ## Usage
     ///
     /// ```swift
@@ -102,6 +120,12 @@ public struct DPoP: Sendable {
     /// the DPoP proof. If so, a new nonce value should be present in the `DPoP-Nonce` header of the response. This
     /// nonce should be extracted and used to generate a new DPoP proof. The failed request should then be retried with
     /// the new DPoP proof.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// ## Usage
     ///

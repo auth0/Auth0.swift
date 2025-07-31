@@ -1,4 +1,10 @@
 /// A type that can use DPoP for securing requests.
+///
+/// ## Availability
+///
+/// This feature is currently available in
+/// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+/// Please reach out to Auth0 support to get it enabled for your tenant.
 public protocol SenderConstraining {
 
     /// The ``DPoP`` instance used for securing requests.
@@ -14,6 +20,12 @@ public extension SenderConstraining {
     ///
     /// This method initializes a ``DPoP`` instance with the specified keychain identifier and assigns it to the
     /// ``dpop`` property.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
     ///
     /// - Parameter keychainIdentifier: The identifier used to store the key pair on the Keychain. Defaults to the bundle identifier.
     /// - Returns: A modified instance with DPoP enabled.
