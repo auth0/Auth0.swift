@@ -1661,31 +1661,6 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
             
-            it("should exchange custom token with additional parameters") {
-                let additionalParams = ["custom_claim": "custom_value"]
-                
-                NetworkStub.addStub(condition: {
-                    $0.isToken(Domain) && $0.hasAllOf([
-                        "grant_type": TokenExchangeGrantType,
-                        "subject_token": subjectToken,
-                        "subject_token_type": subjectTokenType,
-                        "scope": defaultScope,
-                        "custom_claim": "custom_value",
-                        "client_id": ClientId
-                    ])
-                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
-                
-                waitUntil(timeout: Timeout) { done in
-                    auth.customTokenExchange(subjectToken: subjectToken,
-                                           subjectTokenType: subjectTokenType,
-                                           additionalParameters: additionalParams)
-                        .start { result in
-                            expect(result).to(haveCredentials(AccessToken, IdToken))
-                            done()
-                        }
-                }
-            }
-            
             it("should produce authentication error") {
                 let code = "invalid_grant"
                 let description = "Invalid subject token"

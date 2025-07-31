@@ -1129,7 +1129,7 @@ public protocol Authentication: Trackable, Loggable {
      - [Custom Token Exchange Documentation](https://auth0.com/docs/authenticate/custom-token-exchange)
      - [RFC 8693: OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693)
      */
-    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String, additionalParameters: [String: Any]) -> Request<Credentials, AuthenticationError>
+    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
 }
 
@@ -1235,8 +1235,8 @@ public extension Authentication {
         return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
     }
 
-    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String? = nil, scope: String = defaultScope, additionalParameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
-        return self.customTokenExchange(subjectToken: subjectToken, subjectTokenType: subjectTokenType, audience: audience, scope: scope, additionalParameters: additionalParameters)
+    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+        return self.customTokenExchange(subjectToken: subjectToken, subjectTokenType: subjectTokenType, audience: audience, scope: scope)
     }
 
 }
