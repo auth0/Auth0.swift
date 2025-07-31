@@ -4,7 +4,7 @@ import Foundation
 ///
 /// ## See Also
 ///
-/// - [Standard Error Responses](https://auth0.com/docs/api/authentication#standard-error-responses)
+/// - [Authentication API Errors](https://auth0.com/docs/api/authentication#errors)
 public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
 
     /// Raw error values.
@@ -98,7 +98,7 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
             && self.localizedDescription == "The refresh_token was generated for a user who doesn't exist anymore."
     }
 
-    // When the provided refresh token is invalid or expired
+    /// When the provided refresh token is invalid or expired.
     public var isInvalidRefreshToken: Bool {
         return self.code == "invalid_grant"
             && self.localizedDescription == "Unknown or invalid refresh token."
@@ -127,6 +127,15 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
     /// When performing Web Auth login with `prompt: "none"` and the Auth0 session has expired.
     public var isLoginRequired: Bool {
         return self.code == "login_required"
+    }
+
+    /// When a nonce must be included in the DPoP proof. The Authentication API client will retry the request *once*
+    /// when a nonce is required by Auth0, but subsequent failures must be handled by the app.
+    ///
+    /// The nonce is sent on the `DPoP-Nonce` header of the response. It is available in the ``info`` dictionary under
+    /// the `dpop_nonce` key.
+    public var isDPoPNonceRequired: Bool {
+        return self.code == DPoP.nonceRequiredErrorCode
     }
 
 }

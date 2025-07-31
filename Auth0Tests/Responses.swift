@@ -93,6 +93,19 @@ func apiFailureResponse(string: String, statusCode: Int) -> RequestResponse {
     }
 }
 
+func dpopErrorResponse(url: URL, nonce: String) -> RequestResponse {
+    return { request in
+        let headers = ["Content-Type": "application/json", "DPoP-Nonce": nonce]
+        let response = HTTPURLResponse(url: url,
+                                       statusCode: 401,
+                                       httpVersion: "1.1",
+                                       headerFields: headers)!
+        let errorJson = ["error": "use_dpop_nonce", "error_description": "DPoP nonce required"]
+        let data = try! JSONSerialization.data(withJSONObject: errorJson, options: [])
+        return (data, response, nil)
+    }
+}
+
 func authResponse(accessToken: String,
                   tokenType: String = "bearer",
                   issuedTokenType: String? = nil,
