@@ -1,6 +1,6 @@
 public struct AuthenticationMethods: Decodable {
     public let authenticationMethods: [AuthenticationMethod]
-    
+
     enum CodingKeys: String, CodingKey {
         case authenticationMethods = "authentication_methods"
     }

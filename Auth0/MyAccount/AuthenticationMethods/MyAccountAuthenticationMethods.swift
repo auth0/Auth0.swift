@@ -117,7 +117,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError>
 #endif
-    
+
     func enrolRecoveryCode() -> Request<RecoveryCodeChallenge, MyAccountError>
 
     func enrollTOTP() -> Request<TOTPPushEnrollmentChallenge, MyAccountError>
