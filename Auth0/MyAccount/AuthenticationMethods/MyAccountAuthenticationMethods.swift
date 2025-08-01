@@ -4,8 +4,8 @@
 /// - ``MyAccount``
 /// - ``MyAccountError``
 public protocol MyAccountAuthenticationMethods: MyAccountClient {
-
-    #if PASSKEYS_PLATFORM
+    
+#if PASSKEYS_PLATFORM
     /// Requests a challenge for enrolling a new passkey. This is the first part of the enrollment flow.
     ///
     /// You can specify an optional user identity identifier and an optional database connection name. If a
@@ -75,7 +75,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
                                     connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
-
+    
     /// Enrolls a new passkey credential. This is the last part of the enrollment flow.
     ///
     /// ## Availability
@@ -111,15 +111,54 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Returns: A request that will yield an enrolled passkey authentication method.
     ///
     /// ## See Also
-    /// 
+    ///
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func enroll(passkey: NewPasskey,
                 challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError>
-    #endif
+#endif
 
+    func enrolRecoveryCode() -> Request<RecoveryCodeChallenge, MyAccountError>
+
+    func enrollTOTP() -> Request<TOTPPushEnrollmentChallenge, MyAccountError>
+
+    func enrollPushNotification() -> Request<TOTPPushEnrollmentChallenge, MyAccountError>
+
+    func enrollEmail(emailAddress: String) -> Request<PhoneEmailChallenge, MyAccountError>
+
+    func enrollPhone(phoneNumber: String,
+                     preferredAuthenticationMethod: String) -> Request<PhoneEmailChallenge, MyAccountError>
+
+    func confirmTOTPEnrolment(id: String,
+                              authSession: String,
+                              otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmEmailEnrolment(id: String,
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmPushNotificationEnrolment(id: String,
+                                          authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmPhoneEnrolment(id: String,
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func confirmRecoveryCodeEnrolment(id: String,
+                                      authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError>
+
+    func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError>
+
+    func getFactorStatus() -> Request<[Factor], MyAccountError>
+
+    func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    func updateAuthenticationMethod(id: String,
+                                    name: String?,
+                                    preferredAuthenticationMethod: String?) -> Request<AuthenticationMethod, MyAccountError>
 }
-
 // MARK: - Default Parameters
 
 public extension MyAccountAuthenticationMethods {
@@ -131,5 +170,13 @@ public extension MyAccountAuthenticationMethods {
         self.passkeyEnrollmentChallenge(userIdentityId: userIdentityId, connection: connection)
     }
     #endif
+
+    func updateAuthenticationMethod(id: String,
+                                    name: String? = nil,
+                                    preferredAuthenticationMethod: String? = nil) -> Request<AuthenticationMethod, MyAccountError> {
+        self.updateAuthenticationMethod(id: id,
+                                        name: name,
+                                        preferredAuthenticationMethod: preferredAuthenticationMethod)
+    }
 
 }
