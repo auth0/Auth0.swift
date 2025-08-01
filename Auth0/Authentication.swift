@@ -1082,6 +1082,12 @@ public protocol Authentication: Trackable, Loggable {
 
     /**
      Performs a custom token exchange to obtain Auth0 credentials using an existing identity provider token.
+     
+     ## Availability
+     
+     This feature is currently available in
+     [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+     Please reach out to Auth0 support to get it enabled for your tenant.
 
      ## Usage
 
