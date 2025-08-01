@@ -1087,7 +1087,7 @@ public protocol Authentication: Trackable, Loggable {
      
      This feature is currently available in
      [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-     Please reach out to [Auth0 support](https://support.auth0.com/) to get it enabled for your tenant.
+     Please reach out to [Auth0 support](https://support.auth0.com/) to enable for your tenant.
 
      ## Usage
 
