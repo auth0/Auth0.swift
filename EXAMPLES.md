@@ -1969,6 +1969,7 @@ Connection: keep-alive
 
 - [Native social login](#native-social-login)
 - [Organizations](#organizations)
+- [Custom Token Exchange](#custom-token-exchange)
 - [Bot detection](#bot-detection)
 
 ### Native social login
@@ -2087,6 +2088,75 @@ Auth0
 
 > [!NOTE]
 > See the [Setting up Facebook Login](https://auth0.com/docs/authenticate/identity-providers/social-identity-providers/facebook-native) guide for more information about integrating Facebook Login with Auth0.
+
+### Custom Token Exchange
+
+[Custom Token Exchange](https://auth0.com/docs/authenticate/custom-token-exchange) allows you to enable applications to exchange their existing tokens for Auth0 tokens when calling the /oauth/token endpoint. This is useful for advanced integration use cases, such as:
+- Get Auth0 tokens for another audience
+- Integrate an external identity provider 
+- Migrate to Auth0
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+#### Exchange to obtain Auth0 credentials using an existing identity provider token
+
+```swift
+Auth0
+    .authentication()
+    .customTokenExchange(subjectToken: "existing-token",
+                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                        audience: "https://example.com/api",
+                        scope: "openid profile email")
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .customTokenExchange(subjectToken: "existing-token",
+                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                        audience: "https://example.com/api",
+                        scope: "openid profile email")
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+     .customTokenExchange(subjectToken: "existing-token",
+                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                        audience: "https://example.com/api",
+                        scope: "openid profile email")
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
 
 ### Organizations
 
