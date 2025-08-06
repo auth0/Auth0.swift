@@ -12,9 +12,9 @@ let parameterPropertyKey = "com.auth0.parameter"
 
  ```swift
  let request: Request<Credentials, AuthenticationError> = // ...
- 
+
  request.start { result in
-    print(result)
+     print(result)
  }
  ```
  */
@@ -27,21 +27,31 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let session: URLSession
     let url: URL
     let method: String
-    let handle: (Response<E>, Callback) -> Void
+    let handle: (Result<ResponseValue, E>, Callback) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
     let telemetry: Telemetry
+    let dpop: DPoP?
 
-    init(session: URLSession, url: URL, method: String, handle: @escaping (Response<E>, Callback) -> Void, parameters: [String: Any] = [:], headers: [String: String] = [:], logger: Logger?, telemetry: Telemetry) {
+    init(session: URLSession,
+         url: URL,
+         method: String,
+         handle: @escaping (Result<ResponseValue, E>, Callback) -> Void,
+         parameters: [String: Any] = [:],
+         headers: [String: String] = [:],
+         logger: Logger?,
+         telemetry: Telemetry,
+         dpop: DPoP? = nil) {
         self.session = session
         self.url = url
         self.method = method
         self.handle = handle
         self.parameters = parameters
-        self.headers = headers
         self.logger = logger
         self.telemetry = telemetry
+        self.headers = headers
+        self.dpop = dpop
     }
 
     var request: URLRequest {
@@ -68,26 +78,57 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         return request as URLRequest
     }
 
+    // MARK: - Request Handling
+
     /**
      Performs the request.
 
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
     public func start(_ callback: @escaping Callback) {
-        let handler = self.handle
-        let request = self.request
-        let logger = self.logger
+        self.startDataTask(retryCount: 0, request: self.request, callback: callback)
+    }
+
+    private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
+        var request = request
+
+        do {
+            if let dpop = dpop, try dpop.shouldGenerateProof(for: url, parameters: parameters) {
+                let proof = try dpop.generateProof(for: request as URLRequest)
+                request.setValue(proof, forHTTPHeaderField: "DPoP")
+            }
+        } catch {
+            handle(.failure(E(cause: error)), callback)
+            return
+        }
 
         logger?.trace(request: request, session: self.session)
 
-        let task = session.dataTask(with: request, completionHandler: { data, response, error in
+        let task = session.dataTask(with: request,
+                                    completionHandler: { [logger, handle] data, response, error in
             if error == nil, let response = response {
                 logger?.trace(response: response, data: data)
             }
-            handler(Response(data: data, response: response as? HTTPURLResponse, error: error), callback)
+
+            let response = Response<E>(data: data, response: response as? HTTPURLResponse, error: error)
+            DPoP.storeNonce(from: response.response)
+
+            do {
+                handle(.success(try response.result()), callback)
+            } catch let error as E {
+                if DPoP.shouldRetry(for: error, retryCount: retryCount) {
+                    startDataTask(retryCount: retryCount + 1, request: request, callback: callback)
+                } else {
+                    handle(.failure(error), callback)
+                }
+            } catch {
+                handle(.failure(E(cause: error)), callback)
+            }
         })
         task.resume()
     }
+
+    // MARK: - Request Modifiers
 
     /**
      Modifies the parameters by creating a copy of the request and adding the provided parameters to the existing ones.
@@ -99,7 +140,15 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
         parameters["scope"] = includeRequiredScope(in: parameters["scope"] as? String)
 
-        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, parameters: parameters, headers: self.headers, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session,
+                       url: self.url,
+                       method: self.method,
+                       handle: self.handle,
+                       parameters: parameters,
+                       headers: self.headers,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 
     /**
@@ -110,7 +159,15 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     public func headers(_ extraHeaders: [String: String]) -> Self {
         let headers = extraHeaders.merging(self.headers) {(current, _) in current}
 
-        return Request(session: self.session, url: self.url, method: self.method, handle: self.handle, parameters: self.parameters, headers: headers, logger: self.logger, telemetry: self.telemetry)
+        return Request(session: self.session,
+                       url: self.url,
+                       method: self.method,
+                       handle: self.handle,
+                       parameters: self.parameters,
+                       headers: headers,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
     }
 }
 
