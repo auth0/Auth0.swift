@@ -39,7 +39,7 @@ class PasskeyEnrollmentChallengeSpec: QuickSpec {
 
             beforeEach {
                 decoder = JSONDecoder()
-                decoder.userInfo[.headersKey] = ["Location": "https://example.com/foo/bar/\(AuthenticationMethodId)"]
+                decoder.userInfo[.locationHeaderKey] = "https://example.com/foo/bar/\(AuthenticationMethodId)"
             }
 
             it("should have all properties") {
@@ -70,7 +70,7 @@ class PasskeyEnrollmentChallengeSpec: QuickSpec {
 
             it("should fail when the Location header is missing") {
                 decoder = JSONDecoder()
-                decoder.userInfo[.headersKey] = ["Foo": "Bar"]
+                // Don't set the locationHeaderKey to simulate a missing header
 
                 let jsonData = JSON.data(using: .utf8)!
                 let errorDescription = "Missing authentication method identifier in header 'Location'"
