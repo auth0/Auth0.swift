@@ -2,22 +2,22 @@
 import Foundation
 import CommonCrypto
 
-private func getVerifier() -> String? {
+private func getVerifier() -> String {
     let data = Data(count: 32)
     var tempData = data
     _ = tempData.withUnsafeMutableBytes {
         SecRandomCopyBytes(kSecRandomDefault, data.count, $0.baseAddress!)
     }
-    return tempData.a0_encodeBase64URLSafe()
+    return tempData.encodeBase64URLSafe()
 }
 
-private func getChallenge(for verifier: String) -> String? {
-    guard let data = verifier.data(using: .utf8) else { return nil }
+private func getChallenge(for verifier: String) -> String {
+    let data = verifier.data(using: .utf8)!
     var buffer = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
     _ = data.withUnsafeBytes {
         CC_SHA256($0.baseAddress, CC_LONG(data.count), &buffer)
     }
-    return Data(buffer).a0_encodeBase64URLSafe()
+    return Data(buffer).encodeBase64URLSafe()
 }
 
 struct ChallengeGenerator {
@@ -26,8 +26,8 @@ struct ChallengeGenerator {
     let method = "S256"
 
     init(verifier: String? = nil) {
-        self.verifier = verifier ?? getVerifier()!
-        self.challenge = getChallenge(for: self.verifier)!
+        self.verifier = verifier ?? getVerifier()
+        self.challenge = getChallenge(for: self.verifier)
     }
 }
 #endif
