@@ -1925,6 +1925,80 @@ class AuthenticationSpec: QuickSpec {
 
         }
         
+        describe("customTokenExchange") {
+            let subjectToken = "example-token"
+            let subjectTokenType = "urn:ietf:params:oauth:token-type:jwt"
+            
+            it("should exchange custom token for credentials") {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) && $0.hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": subjectToken,
+                        "subject_token_type": subjectTokenType,
+                        "scope": defaultScope,
+                        "client_id": ClientId
+                    ])
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectToken: subjectToken,
+                                           subjectTokenType: subjectTokenType)
+                        .start { result in
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                        }
+                }
+            }
+            
+            it("should exchange custom token with audience and scope") {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) && $0.hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": subjectToken,
+                        "subject_token_type": subjectTokenType,
+                        "scope": "openid email",
+                        "audience": Audience,
+                        "client_id": ClientId
+                    ])
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectToken: subjectToken,
+                                           subjectTokenType: subjectTokenType,
+                                           audience: Audience,
+                                           scope: "openid email")
+                        .start { result in
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                        }
+                }
+            }
+            
+            it("should produce authentication error") {
+                let code = "invalid_grant"
+                let description = "Invalid subject token"
+                
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) && $0.hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": subjectToken,
+                        "subject_token_type": subjectTokenType,
+                        "scope": defaultScope,
+                        "client_id": ClientId
+                    ])
+                }, response: authFailure(code: code, description: description))
+                
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectToken: subjectToken,
+                                           subjectTokenType: subjectTokenType)
+                        .start { result in
+                            expect(result).to(haveAuthenticationError(code: code, description: description))
+                            done()
+                        }
+                }
+            }
+        }
+        
         describe("jwks") {
 
             it("should fetch the jwks") {
