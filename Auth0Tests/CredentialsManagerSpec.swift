@@ -603,7 +603,7 @@ class CredentialsManagerSpec: QuickSpec {
 
                 it("should yield error on failed renewal") {
                     NetworkStub.clearStubs()
-                    let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
+                    let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"], statusCode: 400)
                     let expectedError = CredentialsManagerError(code: .renewFailed, cause: cause)
                     NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authFailure(code: "invalid_request", description: "missing_params"))
                     credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
@@ -1024,7 +1024,7 @@ class CredentialsManagerSpec: QuickSpec {
                         $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
                     }, response: authFailure(code: "invalid_request", description: "missing_params"))
                     
-                    let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
+                    let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"], statusCode: 400)
                     let expectedError = CredentialsManagerError(code: .apiExchangeFailed, cause: cause)
                     
                     _ = credentialsManager.store(credentials: credentials)
@@ -1421,7 +1421,7 @@ class CredentialsManagerSpec: QuickSpec {
                     $0.hasAtLeast(["refresh_token": RefreshToken, "audience": SessionTransferAudience])
                 }, response: authFailure(code: errorCode, description: errorDescription))
 
-                let cause = AuthenticationError(info: ["error": errorCode, "error_description": errorDescription])
+                let cause = AuthenticationError(info: ["error": errorCode, "error_description": errorDescription], statusCode: 400)
                 let expectedError = CredentialsManagerError(code: .ssoExchangeFailed, cause: cause)
 
                 waitUntil(timeout: Timeout) { done in
@@ -1670,7 +1670,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should yield error on failed renewal") {
                 NetworkStub.clearStubs()
-                let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"])
+                let cause = AuthenticationError(info: ["error": "invalid_request", "error_description": "missing_params"], statusCode: 400)
                 let expectedError = CredentialsManagerError(code: .renewFailed, cause: cause)
                 NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authFailure(code: "invalid_request", description: "missing_params"))
                 _ = credentialsManager.store(credentials: credentials)

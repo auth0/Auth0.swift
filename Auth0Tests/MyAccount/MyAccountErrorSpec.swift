@@ -10,81 +10,15 @@ class MyAccountErrorSpec: QuickSpec {
 
         describe("init") {
 
-            it("should initialize with info") {
-                let info: [String: Any] = ["foo": "bar"]
-                let error = MyAccountError(info: info)
-
-                expect(error.info["foo"] as? String) == "bar"
-                expect(error.info.count) == 1
-                expect(error.statusCode) == 0
-                expect(error.cause).to(beNil())
-            }
-
             it("should initialize with info and status code") {
                 let info: [String: Any] = ["foo": "bar"]
                 let statusCode = 400
                 let error = MyAccountError(info: info, statusCode: statusCode)
 
+                expect(error.info["foo"] as? String) == "bar"
+                expect(error.info.count) == 1
                 expect(error.statusCode) == statusCode
-            }
-
-            it("should initialize with cause") {
-                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
-                let error = MyAccountError(cause: cause)
-
-                expect(error.cause).to(matchError(cause))
-                expect(error.statusCode) == 0
-            }
-
-            it("should initialize with cause and status code") {
-                let cause = NSError(domain: "com.auth0", code: -99999, userInfo: nil)
-                let statusCode = 400
-                let error = MyAccountError(cause: cause, statusCode: statusCode)
-
-                expect(error.statusCode) == statusCode
-            }
-
-            it("should initialize with description") {
-                let description = "foo"
-                let error = MyAccountError(description: description)
-
-                expect(error.localizedDescription) == "\(description)."
-                expect(error.statusCode) == 0
                 expect(error.cause).to(beNil())
-            }
-
-            it("should initialize with description and status code") {
-                let description = "foo"
-                let statusCode = 400
-                let error = MyAccountError(description: description, statusCode: statusCode)
-
-                expect(error.statusCode) == statusCode
-            }
-
-            it("should initialize with response") {
-                let description = "foo"
-                let data = description.data(using: .utf8)!
-                let response = Response<MyAccountError>(data: data, response: nil, error: nil)
-                let error = MyAccountError(from: response)
-
-                expect(error.localizedDescription) == "\(description)."
-                expect(error.statusCode) == 0
-                expect(error.cause).to(beNil())
-            }
-
-            it("should initialize with response and status code") {
-                let description = "foo"
-                let data = description.data(using: .utf8)!
-                let statusCode = 400
-                let httpResponse = HTTPURLResponse(url: URL(string: "example.com")!,
-                                                   statusCode: statusCode,
-                                                   httpVersion: nil,
-                                                   headerFields: nil)
-                let response = Response<MyAccountError>(data: data, response: httpResponse, error: nil)
-                let error = MyAccountError(from: response)
-
-                expect(error.localizedDescription) == "\(description)."
-                expect(error.statusCode) == statusCode
             }
 
             it("should initialize with cause") {
@@ -102,6 +36,42 @@ class MyAccountErrorSpec: QuickSpec {
                 let error = MyAccountError(cause: MockError(), statusCode: statusCode)
 
                 expect(error.statusCode) == statusCode
+                expect(error.cause).toNot(beNil())
+            }
+
+            it("should initialize with description") {
+                let description = "foo"
+                let error = MyAccountError(description: description)
+
+                expect(error.localizedDescription) == "\(description)."
+                expect(error.statusCode) == 0
+                expect(error.cause).to(beNil())
+            }
+
+            it("should initialize with description and status code") {
+                let description = "foo"
+                let statusCode = 400
+                let error = MyAccountError(description: description, statusCode: statusCode)
+
+                expect(error.localizedDescription) == "\(description)."
+                expect(error.statusCode) == statusCode
+                expect(error.cause).to(beNil())
+            }
+
+            it("should initialize with response") {
+                let description = "foo"
+                let data = description.data(using: .utf8)!
+                let statusCode = 400
+                let httpResponse = HTTPURLResponse(url: URL(string: "https://example.com")!, 
+                                                   statusCode: statusCode, 
+                                                   httpVersion: nil, 
+                                                   headerFields: nil)!
+                let responseValue = ResponseValue(value: httpResponse, data: data)
+                let error = MyAccountError(from: responseValue)
+
+                expect(error.localizedDescription) == "\(description)."
+                expect(error.statusCode) == statusCode
+                expect(error.cause).to(beNil())
             }
 
         }
@@ -158,7 +128,7 @@ class MyAccountErrorSpec: QuickSpec {
 
             it("should access the internal info dictionary") {
                 let info: [String: Any] = ["foo": "bar"]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.info["foo"] as? String) == "bar"
             }
@@ -170,7 +140,7 @@ class MyAccountErrorSpec: QuickSpec {
             it("should return the type") {
                 let type = "foo"
                 let info: [String: Any] = ["type": type]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.code) == type
             }
@@ -178,13 +148,13 @@ class MyAccountErrorSpec: QuickSpec {
             it("should return the code") {
                 let code = "foo"
                 let info: [String: Any] = ["code": code]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.code) == code
             }
 
             it("should return the default code") {
-                let error = MyAccountError(info: [:])
+                let error = MyAccountError(info: [:], statusCode: 400)
 
                 expect(error.code) == unknownError
             }
@@ -196,7 +166,7 @@ class MyAccountErrorSpec: QuickSpec {
             it("should return the title") {
                 let title = "foo"
                 let info: [String: Any] = ["title": title]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.title) == title
             }
@@ -204,14 +174,14 @@ class MyAccountErrorSpec: QuickSpec {
             it("should return the description") {
                 let description = "foo"
                 let info: [String: Any] = ["description": description]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.title) == description
             }
 
             it("should return an empty title") {
                 let info: [String: Any] = [:]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.title).to(beEmpty())
             }
@@ -223,14 +193,14 @@ class MyAccountErrorSpec: QuickSpec {
             it("should return the title") {
                 let detail = "foo"
                 let info: [String: Any] = ["detail": detail]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.detail) == detail
             }
 
             it("should return an empty detail") {
                 let info: [String: Any] = [:]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.detail).to(beEmpty())
             }
@@ -243,7 +213,7 @@ class MyAccountErrorSpec: QuickSpec {
                 let title = "foo"
                 let detail = "bar."
                 let info: [String: Any] = ["title": title, "detail": detail, "type": "baz"]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.localizedDescription) == "\(title): \(detail)"
             }
@@ -252,7 +222,7 @@ class MyAccountErrorSpec: QuickSpec {
                 let title = "foo"
                 let detail = "bar"
                 let info: [String: Any] = ["title": title, "detail": detail, "type": "baz"]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.localizedDescription) == "\(title): \(detail)."
             }
@@ -260,7 +230,7 @@ class MyAccountErrorSpec: QuickSpec {
             it("should return the title") {
                 let title = "foo."
                 let info: [String: Any] = ["title": title, "type": "bar"]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.localizedDescription) == "\(title)"
             }
@@ -268,7 +238,7 @@ class MyAccountErrorSpec: QuickSpec {
             it("should return the title adding period") {
                 let title = "foo"
                 let info: [String: Any] = ["title": title, "type": "bar"]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.localizedDescription) == "\(title)."
             }
@@ -276,7 +246,7 @@ class MyAccountErrorSpec: QuickSpec {
             it("should return the default message") {
                 let info: [String: Any] = [:]
                 let message = "Failed with unknown error: \(info)."
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.localizedDescription) == message
             }
@@ -293,7 +263,7 @@ class MyAccountErrorSpec: QuickSpec {
                     (json: ["detail": "foo", "pointer": "baz"], error: .init(detail: "foo", pointer: "baz")),
                 ]
                 let info: [String: Any] = ["validation_errors": expectedValidationErrors.map(\.json)]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.validationErrors).to(haveCount(4))
 
@@ -311,7 +281,7 @@ class MyAccountErrorSpec: QuickSpec {
 
             it("should return nil when there are no validation errors") {
                 let info: [String: Any] = [:]
-                let error = MyAccountError(info: info)
+                let error = MyAccountError(info: info, statusCode: 400)
 
                 expect(error.validationErrors).to(beNil())
             }

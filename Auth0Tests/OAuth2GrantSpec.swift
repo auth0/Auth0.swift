@@ -168,7 +168,7 @@ class OAuth2GrantSpec: QuickSpec {
                 let values = ["code": code, "nonce": nonce]
                 let errorCode = "foo"
                 let errorDescription = "bar"
-                let cause = AuthenticationError(info: ["error": errorCode, "error_description": errorDescription])
+                let cause = AuthenticationError(info: ["error": errorCode, "error_description": errorDescription], statusCode: 400)
                 let expectedError = WebAuthError(code: .other, cause: cause)
                 NetworkStub.addStub(condition: {
                     $0.isToken(domain.host!) && $0.hasAtLeast(["code": code, "code_verifier": pkce.verifier, "grant_type": "authorization_code", "redirect_uri": pkce.redirectURL.absoluteString])
