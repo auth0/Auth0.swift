@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.14.0](https://github.com/auth0/Auth0.swift/tree/2.14.0) (2025-08-07)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.13.0...2.14.0)
+
+**Added**
+- Added Custom Token Exchange (CTE) Support [\#989](https://github.com/auth0/Auth0.swift/pull/989) ([cocojoe](https://github.com/cocojoe))
+- Add DPoP support [SDK-5542] [\#983](https://github.com/auth0/Auth0.swift/pull/983) ([Widcket](https://github.com/Widcket))
+- Organization support for passkeys [\#973](https://github.com/auth0/Auth0.swift/pull/973) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
+**Changed**
+- Do not embed Carthage frameworks [\#969](https://github.com/auth0/Auth0.swift/pull/969) ([olejnjak](https://github.com/olejnjak))
+
 ## [2.13.0](https://github.com/auth0/Auth0.swift/tree/2.13.0) (2025-05-30)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.12.0...2.13.0)
 
