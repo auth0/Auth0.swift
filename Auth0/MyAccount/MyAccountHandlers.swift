@@ -19,10 +19,10 @@ func myAcccountDecodable<T: Decodable>(result: Result<ResponseValue, MyAccountEr
     }
 }
 
-func myAccountDecodableNoBody(from response: Response<MyAccountError>,
+func myAccountDecodableNoBody(from result: Result<ResponseValue, MyAccountError>,
                               callback: Request<Void, MyAccountError>.Callback) {
     do {
-        _ = try response.result()
+        _ = try result.get()
         callback(.success(()))
     } catch let error where error.code == emptyBodyError {
         callback(.success(()))
