@@ -3,6 +3,7 @@ import Foundation
 let apiErrorCode = "code"
 let apiErrorDescription = "description"
 let apiErrorCause = "cause"
+let apiErrorDPoPNonce = "dpop_nonce"
 
 /// Generic representation of Auth0 API errors.
 public protocol Auth0APIError: Auth0Error {
@@ -60,10 +61,6 @@ public extension Auth0APIError {
 
 extension Auth0APIError {
 
-    init(info: [String: Any], statusCode: Int = 0) {
-        self.init(info: info, statusCode: statusCode)
-    }
-
     init(cause error: Error, statusCode: Int = 0) {
         let info: [String: Any] = [
             apiErrorCode: nonJSONError,
@@ -81,8 +78,18 @@ extension Auth0APIError {
         self.init(info: info, statusCode: statusCode)
     }
 
-    init(from response: Response<Self>) {
-        self.init(description: string(response.data), statusCode: response.response?.statusCode ?? 0)
+    init(from response: ResponseValue) {
+        if let dpopChallenge = DPoP.challenge(from: response.value) {
+            var info: [String: Any] = [apiErrorCode: dpopChallenge.errorCode]
+            info[apiErrorDescription] = dpopChallenge.errorDescription
+            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.value)
+            self.init(info: info, statusCode: response.value.statusCode)
+        } else if var info = json(response.data) as? [String: Any] {
+            info[apiErrorDPoPNonce] = DPoP.extractNonce(from: response.value)
+            self.init(info: info, statusCode: response.value.statusCode)
+        } else {
+            self.init(description: string(response.data), statusCode: response.value.statusCode)
+        }
     }
 
     static var networkErrorCodes: [URLError.Code] {
@@ -99,4 +106,14 @@ extension Auth0APIError {
         ]
     }
 
+}
+
+func json(_ data: Data?) -> Any? {
+    guard let data = data else { return nil }
+    return try? JSONSerialization.jsonObject(with: data, options: [])
+}
+
+func string(_ data: Data?) -> String? {
+    guard let data = data else { return nil }
+    return String(data: data, encoding: .utf8)
 }

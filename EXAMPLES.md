@@ -17,6 +17,7 @@
 - [Web Auth signup](#web-auth-signup)
 - [Web Auth configuration](#web-auth-configuration)
 - [ID token validation](#id-token-validation)
+- [DPoP [EA]](#dpop-ea)
 - [Web Auth errors](#web-auth-errors)
 
 ### Web Auth signup
@@ -265,6 +266,77 @@ Auth0
 ### ID token validation
 
 Auth0.swift automatically [validates](https://auth0.com/docs/secure/tokens/id-tokens/validate-id-tokens) the ID token obtained from Web Auth login, following the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html). This ensures the contents of the ID token have not been tampered with and can be safely used.
+
+### DPoP [EA]
+
+> [!NOTE]  
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Posession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method.
+
+```swift
+Auth0
+    .webAuth()
+    .useHTTPS()
+    .useDPoP()
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+> [!IMPORTANT]
+> DPoP will only be used for new user sessions created after enabling it. DPoP **will not** be applied to any requests involving existing access and refresh tokens (such as exchanging the refresh token for new credentials).
+>
+> This means that, after you've enabled it in your app, DPoP will only take effect when users log in again. It's up to you to decide how to roll out this change to your users. For example, you might require users to log in again the next time they open your app. You'll need to implement the logic to handle this transition based on your app's requirements.
+
+When making requests to your own APIs, use the `DPoP.addHeaders()` method to add the `Authorization` and `DPoP` headers to a `URLRequest`. The `Authorization` header is set using the access token and token type, while the `DPoP` header contains the generated DPoP proof.
+
+```swift
+var request = URLRequest(url: URL(string: "https://example.com/api/endpoint")!)
+request.httpMethod = "POST"
+
+try DPoP.addHeaders(to: &request,
+                    accessToken: credentials.accessToken,
+                    tokenType: credentials.tokenType)
+```
+
+If your API is issuing DPoP nonces to prevent replay attacks, you can pass the nonce value to the `addHeaders()` method to include it in the DPoP proof. Use the `DPoP.isNonceRequired(by:)` method to check if a particular API response failed because a nonce is required.
+
+```swift
+if DPoP.isNonceRequired(by: response), 
+    let nonce = response.value(forHTTPHeaderField: "DPoP-Nonce") {
+    try DPoP.addHeaders(to: &request,
+                        accessToken: credentials.accessToken,
+                        tokenType: credentials.tokenType,
+                        nonce: nonce)
+
+    // Retry the request with the new DPoP proof that includes the nonce
+}
+```
+
+On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair from the Keychain.
+
+```swift
+Auth0.webAuth()
+    .useHTTPS()
+    .clearSession { result in 
+    // ...
+}
+
+if !credentialsManager.clear() {
+    // ...
+}
+
+try DPoP.clearKeypair()
+```
+
+> [!NOTE]  
+> When logging out, you do not need to call `useDPoP()` as it has no effect during the logout process.
 
 ### Web Auth errors
 
@@ -641,6 +713,7 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 - [Retrieve user information](#retrieve-user-information)
 - [Renew credentials](#renew-credentials)
 - [Get SSO credentials [EA]](#get-sso-credentials-ea)
+- [DPoP [EA]](#dpop-ea-1)
 - [Authentication API client configuration](#authentication-api-client-configuration)
 - [Authentication API client errors](#authentication-api-client-errors)
 
@@ -1435,6 +1508,57 @@ webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 > [!IMPORTANT]
 > Make sure the cookie's domain matches the Auth0 domain your *website* is using, regardless of the one your mobile app is using. Otherwise, the `/authorize` endpoint will not receive the cookie. If your website is using the default Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the other hand, if your website is using a custom domain, use this value instead.
 
+### DPoP [EA]
+
+> [!NOTE]  
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+[DPoP](https://www.rfc-editor.org/rfc/rfc9449.html) (Demonstrating Proof of Posession) is an application-level mechanism for sender-constraining OAuth 2.0 access and refresh tokens by proving that the app is in possession of a certain private key. You can enable it by calling the `useDPoP()` method. This ensures that DPoP proofs are generated for requests made through the Authentication API client.
+
+```swift
+let authenticationClient = Auth0.authentication().useDPoP()
+```
+
+> [!IMPORTANT]
+> DPoP will only be used for new user sessions created after enabling it. DPoP **will not** be applied to any requests involving existing access and refresh tokens (such as exchanging the refresh token for new credentials).
+>
+> This means that, after you've enabled it in your app, DPoP will only take effect when users log in again. It's up to you to decide how to roll out this change to your users. For example, you might require users to log in again the next time they open your app. You'll need to implement the logic to handle this transition based on your app's requirements.
+
+When making requests to your own APIs, use the `DPoP.addHeaders()` method to add the `Authorization` and `DPoP` headers to a `URLRequest`. The `Authorization` header is set using the access token and token type, while the `DPoP` header contains the generated DPoP proof.
+
+```swift
+var request = URLRequest(url: URL(string: "https://example.com/api/endpoint")!)
+request.httpMethod = "POST"
+
+try DPoP.addHeaders(to: &request,
+                    accessToken: credentials.accessToken,
+                    tokenType: credentials.tokenType)
+```
+
+If your API is issuing DPoP nonces to prevent replay attacks, you can pass the nonce value to the `addHeaders()` method to include it in the DPoP proof. Use the `DPoP.isNonceRequired(by:)` method to check if a particular API response failed because a nonce is required.
+
+```swift
+if DPoP.isNonceRequired(by: response), 
+    let nonce = response.value(forHTTPHeaderField: "DPoP-Nonce") {
+    try DPoP.addHeaders(to: &request,
+                        accessToken: credentials.accessToken,
+                        tokenType: credentials.tokenType,
+                        nonce: nonce)
+
+    // Retry the request with the new DPoP proof that includes the nonce
+}
+```
+
+On logout, you should call `DPoP.clearKeypair()` to delete the user's key pair from the Keychain.
+
+```swift
+if !credentialsManager.clear() {
+    // ...
+}
+
+try DPoP.clearKeypair()
+```
+
 ### Authentication API client configuration
 
 #### Add custom parameters
@@ -1969,6 +2093,7 @@ Connection: keep-alive
 
 - [Native social login](#native-social-login)
 - [Organizations](#organizations)
+- [Custom Token Exchange](#custom-token-exchange)
 - [Bot detection](#bot-detection)
 
 ### Native social login
@@ -2087,6 +2212,75 @@ Auth0
 
 > [!NOTE]
 > See the [Setting up Facebook Login](https://auth0.com/docs/authenticate/identity-providers/social-identity-providers/facebook-native) guide for more information about integrating Facebook Login with Auth0.
+
+### Custom Token Exchange
+
+[Custom Token Exchange](https://auth0.com/docs/authenticate/custom-token-exchange) allows you to enable applications to exchange their existing tokens for Auth0 tokens when calling the /oauth/token endpoint. This is useful for advanced integration use cases, such as:
+- Get Auth0 tokens for another audience
+- Integrate an external identity provider 
+- Migrate to Auth0
+
+> [!NOTE]
+> This feature is currently available in [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access). Please reach out to Auth0 support to get it enabled for your tenant.
+
+#### Exchange to obtain Auth0 credentials using an existing identity provider token
+
+```swift
+Auth0
+    .authentication()
+    .customTokenExchange(subjectToken: "existing-token",
+                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                        audience: "https://example.com/api",
+                        scope: "openid profile email")
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .customTokenExchange(subjectToken: "existing-token",
+                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                        audience: "https://example.com/api",
+                        scope: "openid profile email")
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+Auth0
+    .authentication()
+     .customTokenExchange(subjectToken: "existing-token",
+                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                        audience: "https://example.com/api",
+                        scope: "openid profile email")
+    .start()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("Obtained credentials: \(credentials)")
+    })
+    .store(in: &cancellables)
+```
+</details>
 
 ### Organizations
 
@@ -2221,5 +2415,3 @@ Auth0
 Check how to set up Web Auth in the [Web Auth Configuration](#web-auth-configuration) section.
 
 ---
-
-[Go up ⤴](#examples)
