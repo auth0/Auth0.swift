@@ -26,10 +26,15 @@ import LocalAuthentication
 /// - <doc:RefreshTokens>
 public struct CredentialsManager {
 
+    // MARK: - Static Properties for Session Management
+    static private var lastBiometricAuthTime: Date?
+    static private let sessionLock = DispatchQueue(label: "com.auth0.credentials-manager.biometric-session", attributes: .concurrent)
+
     private let storage: CredentialsStorage
     private let storeKey: String
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
+    private let biometricPolicy: BiometricPolicy
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     #endif
@@ -40,12 +45,15 @@ public struct CredentialsManager {
     ///   - authentication: Auth0 Authentication API client.
     ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to 'credentials'.
     ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `SimpleKeychain` instance.
+    ///   - biometricPolicy: The policy that dictates when a biometric prompt should be shown. Defaults to `.always`.
     public init(authentication: Authentication,
                 storeKey: String = "credentials",
-                storage: CredentialsStorage = SimpleKeychain()) {
+                storage: CredentialsStorage = SimpleKeychain(),
+                biometricPolicy: BiometricPolicy = .always) {
         self.storeKey = storeKey
         self.authentication = authentication
         self.storage = storage
+        self.biometricPolicy = biometricPolicy
     }
 
     /// Retrieves the user information from the Keychain synchronously, without checking if the credentials are expired.
@@ -125,6 +133,7 @@ public struct CredentialsManager {
     ///
     /// - Returns: If the credentials were removed.
     public func clear() -> Bool {
+        clearBiometricSession()
         return self.storage.deleteEntry(forKey: self.storeKey)
     }
 
@@ -140,6 +149,20 @@ public struct CredentialsManager {
     /// - Returns: If the API credentials were removed.
     public func clear(forAudience audience: String) -> Bool {
         return self.storage.deleteEntry(forKey: audience)
+    }
+
+    /// Clears the in-memory biometric session timestamp.
+    /// This is useful for programmatically ending a biometric session, such as when the app is backgrounded.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// credentialsManager.clearBiometricSession()
+    /// ```
+    public func clearBiometricSession() {
+        CredentialsManager.sessionLock.sync(flags: .barrier) {
+            CredentialsManager.lastBiometricAuthTime = nil
+        }
     }
 
     /// Calls the `/oauth/revoke` endpoint to revoke the refresh token and then clears the credentials if the request
@@ -307,10 +330,31 @@ public struct CredentialsManager {
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
-        if let bioAuth = self.bioAuth {
+        
+        // If biometrics are not configured, proceed with the standard flow.
+        guard let bioAuth = self.bioAuth else {
+            self.retrieveCredentials(scope: scope, minTTL: minTTL, parameters: parameters, headers: headers, forceRenewal: false, callback: callback)
+            return
+        }
+
+        if isBiometricSessionValid() {
+            // Session is valid, bypass prompt by using a temporary, non-biometric manager.
+            var tempManager = self
+            tempManager.bioAuth = nil // Temporarily disable biometrics for this call
+            tempManager.retrieveCredentials(scope: scope, minTTL: minTTL, parameters: parameters, headers: headers, forceRenewal: false, callback: callback)
+        } else {
+            // Session is invalid/expired, must trigger biometric prompt.
+            // Wrap the callback to update the session timestamp on success.
+            let wrappedCallback = { (result: CredentialsManagerResult<Credentials>) in
+                if case .success = result {
+                    self.updateBiometricSession()
+                }
+                callback(result)
+            }
+            
+            // This is the original flow that triggers the biometric prompt.
             guard bioAuth.available else {
-                let error = CredentialsManagerError(code: .biometricsFailed,
-                                                    cause: LAError(.biometryNotAvailable))
+                let error = CredentialsManagerError(code: .biometricsFailed, cause: LAError(.biometryNotAvailable))
                 return callback(.failure(error))
             }
 
@@ -324,15 +368,8 @@ public struct CredentialsManager {
                                          parameters: parameters,
                                          headers: headers,
                                          forceRenewal: false,
-                                         callback: callback)
+                                         callback: wrappedCallback)
             }
-        } else {
-            self.retrieveCredentials(scope: scope,
-                                     minTTL: minTTL,
-                                     parameters: parameters,
-                                     headers: headers,
-                                     forceRenewal: false,
-                                     callback: callback)
         }
     }
     #else
@@ -818,6 +855,34 @@ public struct CredentialsManager {
         }
 
         return false
+    }
+
+    // MARK: - Private Helper Methods
+
+    private func isBiometricSessionValid() -> Bool {
+        var valid = false
+        CredentialsManager.sessionLock.sync {
+            guard let lastAuth = CredentialsManager.lastBiometricAuthTime else {
+                valid = false
+                return
+            }
+
+            switch self.biometricPolicy {
+            case .session(let timeout):
+                valid = Date().timeIntervalSince(lastAuth) < TimeInterval(timeout)
+            case .appLifecycle:
+                valid = true // Valid until cleared externally
+            case .always:
+                valid = false
+            }
+        }
+        return valid
+    }
+
+    private func updateBiometricSession() {
+        CredentialsManager.sessionLock.sync(flags: .barrier) {
+            CredentialsManager.lastBiometricAuthTime = Date()
+        }
     }
 
 }

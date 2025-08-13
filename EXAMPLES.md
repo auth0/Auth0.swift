@@ -358,6 +358,9 @@ Web Auth will only produce `WebAuthError` error values. You can find the underly
 - [Retrieve stored user information](#retrieve-stored-user-information)
 - [Clear stored credentials](#clear-stored-credentials)
 - [Biometric authentication](#biometric-authentication)
+  - [Basic biometric setup](#basic-biometric-setup)
+  - [Biometric policy configuration](#biometric-policy-configuration)
+  - [Managing biometric sessions](#managing-biometric-sessions)
 - [Other credentials](#other-credentials)
 - [Credentials Manager errors](#credentials-manager-errors)
 
@@ -537,6 +540,8 @@ let didClear = credentialsManager.clear()
 
 You can enable an additional level of user authentication before retrieving credentials using the biometric authentication supported by the device, such as Face ID or Touch ID.
 
+#### Basic biometric setup
+
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID")
 ```
@@ -546,6 +551,203 @@ If needed, you can specify a particular `LAPolicy` to be used. For example, you 
 ```swift
 credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID or passcode", 
                                     evaluationPolicy: .deviceOwnerAuthentication)
+```
+
+#### Biometric policy configuration
+
+You can configure when the biometric prompt should be shown by specifying a `BiometricPolicy` when creating the Credentials Manager. This allows you to control the frequency of biometric authentication requests.
+
+##### Always prompt (default behavior)
+
+```swift
+let credentialsManager = CredentialsManager(
+    authentication: Auth0.authentication(),
+    biometricPolicy: .always
+)
+
+// Enable biometrics
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID")
+
+// Every call to credentials() will show the biometric prompt
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+##### Session-based prompt
+
+Shows the biometric prompt only once within a specified timeout period (in seconds). Subsequent calls within the timeout will not show the prompt.
+
+```swift
+let credentialsManager = CredentialsManager(
+    authentication: Auth0.authentication(),
+    biometricPolicy: .session(timeout: 300) // 5 minutes
+)
+
+// Enable biometrics
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID")
+
+// First call - shows biometric prompt
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("First call - prompted for biometrics: \(credentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+
+// Second call within 5 minutes - no biometric prompt
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Second call - no biometric prompt: \(credentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+##### App lifecycle-based prompt
+
+Shows the biometric prompt only once while the app is in the foreground. The session persists until manually cleared or the app is terminated.
+
+```swift
+let credentialsManager = CredentialsManager(
+    authentication: Auth0.authentication(),
+    biometricPolicy: .appLifecycle
+)
+
+// Enable biometrics
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID")
+
+// First call - shows biometric prompt
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("First call - prompted for biometrics: \(credentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+
+// Subsequent calls - no biometric prompt until session is cleared
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("Subsequent call - no biometric prompt: \(credentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+
+// Manually clear the session (e.g., when app goes to background)
+credentialsManager.clearBiometricSession()
+
+// Next call after clearing - shows biometric prompt again
+credentialsManager.credentials { result in
+    switch result {
+    case .success(let credentials):
+        print("After clearing - prompted for biometrics again: \(credentials)")
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+<details>
+  <summary>Using async/await with biometric policies</summary>
+
+```swift
+// Session-based policy example
+let credentialsManager = CredentialsManager(
+    authentication: Auth0.authentication(),
+    biometricPolicy: .session(timeout: 600) // 10 minutes
+)
+
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID")
+
+do {
+    // First call - shows biometric prompt
+    let credentials1 = try await credentialsManager.credentials()
+    print("First call - prompted for biometrics: \(credentials1)")
+    
+    // Second call within 10 minutes - no biometric prompt
+    let credentials2 = try await credentialsManager.credentials()
+    print("Second call - no biometric prompt: \(credentials2)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine with biometric policies</summary>
+
+```swift
+// App lifecycle policy example
+let credentialsManager = CredentialsManager(
+    authentication: Auth0.authentication(),
+    biometricPolicy: .appLifecycle
+)
+
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID")
+
+// First call - shows biometric prompt
+credentialsManager
+    .credentials()
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { credentials in
+        print("First call - prompted for biometrics: \(credentials)")
+        
+        // Second call - no biometric prompt
+        credentialsManager
+            .credentials()
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    print("Failed with: \(error)")
+                }
+            }, receiveValue: { credentials in
+                print("Second call - no biometric prompt: \(credentials)")
+            })
+            .store(in: &cancellables)
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+#### Managing biometric sessions
+
+When using `.appLifecycle` policy, you can programmatically clear the biometric session:
+
+```swift
+// Clear session when app goes to background
+NotificationCenter.default.addObserver(
+    forName: UIApplication.didEnterBackgroundNotification,
+    object: nil,
+    queue: .main
+) { _ in
+    credentialsManager.clearBiometricSession()
+}
+
+// Clear session on logout
+credentialsManager.revoke { result in
+    switch result {
+    case .success:
+        print("Logged out successfully")
+        // Session is automatically cleared when calling clear() or revoke()
+    case .failure(let error):
+        print("Logout failed: \(error)")
+    }
+}
 ```
 
 > [!NOTE]
