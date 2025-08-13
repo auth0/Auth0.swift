@@ -113,6 +113,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        logger: logger,
                        telemetry: telemetry)
     }
+
     func enrollEmail(emailAddress: String) -> Request<PhoneEmailChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "email"
@@ -239,7 +240,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getFactorStatus() -> Request<[Factor], MyAccountError> {
+    func getFactorStatus() -> Request<Factors, MyAccountError> {
         return Request(session: session,
                        url: url.appending("factors"),
                        method: "GET",

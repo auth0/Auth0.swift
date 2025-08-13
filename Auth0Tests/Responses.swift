@@ -328,8 +328,8 @@ func authenticationMethodsListResponse(methods: [[String: Any]], headers: [Strin
     return apiSuccessResponse(json: ["authentication_methods": methods], headers: headers)
 }
 
-func factorListResponse(factors: [[String: Any]]) -> RequestResponse {
-    return apiSuccessResponse(jsonArray: factors)
+func factorListResponse(factors: [String: Any]) -> RequestResponse {
+    return apiSuccessResponse(json: factors)
 }
 
 #endif

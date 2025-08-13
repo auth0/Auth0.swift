@@ -228,7 +228,7 @@ func haveRecoveryCodeChallenge(id: String, authSession: String, recoveryCode: St
     "identifier <\(id)>, " +
     "authSession <\(authSession)>, " +
     "and recovery code <\(recoveryCode)>"
-    return Matcher<MyAccountResult<RecoveryCodeChallenge>>.define() { expression, failureMessage in
+    return Matcher<MyAccountResult<RecoveryCodeChallenge>>.define(definition) { expression, failureMessage in
         return try beSuccessful(expression, failureMessage) { (created: RecoveryCodeChallenge) ->
             Bool in
             return created.authenticationId == id &&
@@ -291,18 +291,18 @@ func haveAuthenticationMethodInList(id: String) -> Nimble.Matcher<MyAccountResul
     }
 }
  
-func haveFactorInList(type: String) -> Nimble.Matcher<MyAccountResult<[Factor]>> {
-    return Matcher<MyAccountResult<[Factor]>>.define("have factors in list") { expression, failureMessage in
-        return try beSuccessful(expression, failureMessage) { (created: [Factor]) -> Bool in
-            created.contains(where: { $0.type == type })
+func haveFactorInList(type: String) -> Nimble.Matcher<MyAccountResult<Factors>> {
+    return Matcher<MyAccountResult<Factors>>.define("have factors in list") { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: Factors) -> Bool in
+            created.factors.contains(where: { $0.type == type })
         }
     }
 }
 
-func haveEmptyFactorsInList() -> Nimble.Matcher<MyAccountResult<[Factor]>> {
-    return Matcher<MyAccountResult<[Factor]>>.define("have empty factors in list") { expression, FailureMessage in
-        return try beSuccessful(expression, FailureMessage) { (created: [Factor]) -> Bool in
-            created.isEmpty
+func haveEmptyFactorsInList() -> Nimble.Matcher<MyAccountResult<Factors>> {
+    return Matcher<MyAccountResult<Factors>>.define("have empty factors in list") { expression, FailureMessage in
+        return try beSuccessful(expression, FailureMessage) { (created: Factors) -> Bool in
+            created.factors.isEmpty
         }
     }
 }

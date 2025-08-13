@@ -741,7 +741,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 NetworkStub.addStub(condition: {
                     $0.isFactorsMethods(Domain, token: AccessToken) && // Note: `factors` endpoint
                     $0.isMethodGET
-                }, response: factorListResponse(factors: [factor1, factor2]))
+                }, response: factorListResponse(factors: ["factors": [factor1, factor2]]))
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.getFactorStatus().start { result in
@@ -756,7 +756,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 NetworkStub.addStub(condition: {
                     $0.isFactorsMethods(Domain, token: AccessToken) &&
                     $0.isMethodGET
-                }, response: factorListResponse(factors: []))
+                }, response: factorListResponse(factors: ["factors": []]))
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.getFactorStatus().start { result in
