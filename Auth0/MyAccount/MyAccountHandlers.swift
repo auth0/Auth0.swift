@@ -19,6 +19,18 @@ func myAcccountDecodable<T: Decodable>(result: Result<ResponseValue, MyAccountEr
     }
 }
 
+func myAccountDecodableNoBody(from result: Result<ResponseValue, MyAccountError>,
+                              callback: Request<Void, MyAccountError>.Callback) {
+    do {
+        _ = try result.get()
+        callback(.success(()))
+    } catch let error where error.code == emptyBodyError {
+        callback(.success(()))
+    } catch {
+        callback(.failure(error))
+    }
+}
+
 extension CodingUserInfoKey {
 
     static var locationHeaderKey: CodingUserInfoKey {
