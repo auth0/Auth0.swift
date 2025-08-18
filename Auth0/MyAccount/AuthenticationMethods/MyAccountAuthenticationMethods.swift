@@ -136,7 +136,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
     ///     .authenticationMethods
-    ///     .enrolRecoveryCode()
+    ///     .enrollRecoveryCode()
     ///     .start { result in
     ///         switch result {
     ///         case .success(let recoveryCodeChallenge):
@@ -148,7 +148,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request that will yield an recovery code challenge
-    func enrolRecoveryCode() -> Request<RecoveryCodeChallenge, MyAccountError>
+    func enrollRecoveryCode() -> Request<RecoveryCodeChallenge, MyAccountError>
     
     /// Requests a challenge for enrolling a TOTP authentication method. This is the first part of the enrollment flow.
     ///
@@ -279,7 +279,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///
     /// - Parameters:
     ///   - phoneNumber: The destination phone number used to send verification codes via text and voice.
-    ///   - preferredAuthenticationMethod: The preferred communication method.
+    ///   - preferredAuthenticationMethod: The preferred communication method.(sms/voice)
     /// - Returns: A request that will yield a phone enrolment challenge
     func enrollPhone(phoneNumber: String,
                      preferredAuthenticationMethod: String) -> Request<PhoneEmailChallenge, MyAccountError>
@@ -302,7 +302,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
     ///     .authenticationMethods
-    ///     .confirmTOTPEnrolment(id: id, authSession: authSession, otpCode: otpCode)
+    ///     .confirmTOTPEnrollment(id: id, authSession: authSession, otpCode: otpCode)
     ///     .start { result in
     ///         switch result {
     ///         case .success(let authenticationMethod):
@@ -318,10 +318,10 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
     ///   - otpCode: The one-time password code retrieved from the TOTP application.
     /// - Returns: A request that will yield an enrolled TOTP authentication method.
-    func confirmTOTPEnrolment(id: String,
+    func confirmTOTPEnrollment(id: String,
                               authSession: String,
                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
-    
+
     /// Enrolls a new Email authentication method. This is the last part of the enrollment flow.
     ///
     /// ## Availability
@@ -340,7 +340,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
     ///     .authenticationMethods
-    ///     .confirmEmailEnrolment(id: id, authSession: authSession, otpCode: otpCode)
+    ///     .confirmEmailEnrollment(id: id, authSession: authSession, otpCode: otpCode)
     ///     .start { result in
     ///         switch result {
     ///         case .success(let authenticationMethod):
@@ -356,10 +356,10 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
     ///   - otpCode: The one-time password code sent to the email address.
     /// - Returns: A request that will yield an enrolled email authentication method.
-    func confirmEmailEnrolment(id: String,
+    func confirmEmailEnrollment(id: String,
                                authSession: String,
                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
-    
+
     /// Enrolls a new Push Notification authentication method. This is the last part of the enrollment flow.
     ///
     /// ## Availability
@@ -378,7 +378,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
     ///     .authenticationMethods
-    ///     .confirmPushNotificationEnrolment(id: id, authSession: authSession)
+    ///     .confirmPushNotificationEnrollment(id: id, authSession: authSession)
     ///     .start { result in
     ///         switch result {
     ///         case .success(let authenticationMethod):
@@ -394,9 +394,9 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
     /// - Returns: A request that will yield an enrolled Push Notification authentication method.
     ///
-    func confirmPushNotificationEnrolment(id: String,
+    func confirmPushNotificationEnrollment(id: String,
                                           authSession: String) -> Request<AuthenticationMethod, MyAccountError>
-    
+
     /// Enrolls a new Phone authentication method. This is the last part of the enrollment flow.
     ///
     /// ## Availability
@@ -415,7 +415,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
     ///     .authenticationMethods
-    ///     .confirmPhoneEnrolment(id: id, authSession: authSession, otpCode: otpCode)
+    ///     .confirmPhoneEnrollment(id: id, authSession: authSession, otpCode: otpCode)
     ///     .start { result in
     ///         switch result {
     ///         case .success(let authenticationMethod):
@@ -431,10 +431,10 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
     ///   - otpCode: The one-time password code sent to the phone number.
     /// - Returns: A request that will yield an enrolled phone authentication method.
-    func confirmPhoneEnrolment(id: String,
+    func confirmPhoneEnrollment(id: String,
                                authSession: String,
                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
-    
+
     /// Enrolls a new Recovery code credential. This is the last part of the enrollment flow.
     ///
     /// ## Availability
@@ -453,7 +453,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
     ///     .authenticationMethods
-    ///     .confirmRecoveryCodeEnrolment(id: id, authSession: authSession)
+    ///     .confirmRecoveryCodeEnrollment(id: id, authSession: authSession)
     ///     .start { result in
     ///         switch result {
     ///         case .success(let authenticationMethod):
@@ -468,7 +468,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
     ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
     /// - Returns: A request that will yield an enrolled recovery code authentication method.
-    func confirmRecoveryCodeEnrolment(id: String,
+    func confirmRecoveryCodeEnrollment(id: String,
                                       authSession: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Retrieve detailed list of authentication methods belonging to the authenticated user.
@@ -502,7 +502,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///
     /// - Returns: A request that will return list of authentication methods of an authenticated user
     func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError>
-    
+
     /// Delete an authentication method associated with an id
     ///
     /// ## Availability
@@ -547,7 +547,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///
     /// ## Scopes Required
     ///
-    /// `read:me:factors
+    /// `read:me:factors`
     ///
     /// ## Usage
     ///
@@ -555,7 +555,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
     ///     .authenticationMethods
-    ///     .getFactorStatus()
+    ///     .getFactors()
     ///     .start { result in
     ///         switch result {
     ///         case .success(let factors):
@@ -567,8 +567,8 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request fetches factors enabled for the Auth0 tenant and available for enrollment
-    func getFactorStatus() -> Request<Factors, MyAccountError>
-    
+    func getFactors() -> Request<Factors, MyAccountError>
+
     /// Fetch details of an authentication method associated with an id
     ///
     /// ## Availability

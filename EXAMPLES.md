@@ -2422,7 +2422,8 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .getAllFactors()
+    .confirmRecoveryCodeEnrolment(id: id,
+                                  authSession: authSession)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -2443,7 +2444,7 @@ Auth0
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .getFactorStatus()
+    .getFactors()
     .start { result in
         switch result {
         case .success(let response):
@@ -2462,7 +2463,7 @@ do {
     let response = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .getFactorStatus()
+        .getFactors()
         .start()
     print("Obtained factors: \(response.factors)")
 } catch {
@@ -2478,7 +2479,7 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .getFactorStatus()
+    .getFactors()
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {

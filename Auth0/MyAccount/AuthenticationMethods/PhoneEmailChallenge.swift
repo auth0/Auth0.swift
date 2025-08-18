@@ -1,4 +1,4 @@
-/// A Recovery code enrollment challenge.
+/// A Phone/Email enrollment challenge.
 public struct PhoneEmailChallenge {
 
     /// The unique identifier for the authentication method.
@@ -31,5 +31,3 @@ extension PhoneEmailChallenge: Decodable {
     }
 
 }
-
-

@@ -278,7 +278,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                                                          recoveryCode: recoveryCode))
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.enrolRecoveryCode().start { result in
+                    authMethods.enrollRecoveryCode().start { result in
                         expect(result).to(haveRecoveryCodeChallenge(id: AuthenticationMethodId,
                                                                     authSession: AuthSession,
                                                                     recoveryCode: recoveryCode))
@@ -295,7 +295,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiFailureResponse())
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.enrolRecoveryCode().start { result in
+                    authMethods.enrollRecoveryCode().start { result in
                         expect(result).to(beUnsuccessful())
                         done()
                     }
@@ -472,10 +472,10 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "totp", createdAt: createdAt, usage: usage))
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmTOTPEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmTOTPEnrollment(id: AuthenticationMethodId,
                                                      authSession: AuthSession,
                                                      otpCode: OTPCode).start { result in
-//                        expect(result).to(haveauth(id: AuthenticationMethodId, type: "totp"))
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
                         done()
                     }
                 }
@@ -489,7 +489,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiFailureResponse())
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmTOTPEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmTOTPEnrollment(id: AuthenticationMethodId,
                                                      authSession: AuthSession,
                                                      otpCode: OTPCode).start { result in
                         expect(result).to(beUnsuccessful())
@@ -511,7 +511,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "email", createdAt: createdAt, usage: usage))
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmEmailEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmEmailEnrollment(id: AuthenticationMethodId,
                                                       authSession: AuthSession,
                                                       otpCode: OTPCode).start { result in
                         expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
@@ -528,7 +528,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiFailureResponse())
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmEmailEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmEmailEnrollment(id: AuthenticationMethodId,
                                                       authSession: AuthSession,
                                                       otpCode: OTPCode).start { result in
                         expect(result).to(beUnsuccessful())
@@ -550,7 +550,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "push-notification", createdAt: createdAt, usage: usage))
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmPushNotificationEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmPushNotificationEnrollment(id: AuthenticationMethodId,
                                                                  authSession: AuthSession).start { result in
                         expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
                         done()
@@ -566,7 +566,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiFailureResponse())
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmPushNotificationEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmPushNotificationEnrollment(id: AuthenticationMethodId,
                                                                  authSession: AuthSession).start { result in
                         expect(result).to(beUnsuccessful())
                         done()
@@ -588,7 +588,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "phone", createdAt: createdAt, usage: usage))
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmPhoneEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmPhoneEnrollment(id: AuthenticationMethodId,
                                                       authSession: AuthSession,
                                                       otpCode: OTPCode).start { result in
                         expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
@@ -605,7 +605,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiFailureResponse())
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmPhoneEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmPhoneEnrollment(id: AuthenticationMethodId,
                                                       authSession: AuthSession,
                                                       otpCode: OTPCode).start { result in
                         expect(result).to(beUnsuccessful())
@@ -628,7 +628,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "recovery-code", createdAt: createdAt, usage: usage))
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmRecoveryCodeEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmRecoveryCodeEnrollment(id: AuthenticationMethodId,
                                                              authSession: AuthSession).start { result in
                         expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
                         done()
@@ -644,7 +644,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiFailureResponse())
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.confirmRecoveryCodeEnrolment(id: AuthenticationMethodId,
+                    authMethods.confirmRecoveryCodeEnrollment(id: AuthenticationMethodId,
                                                              authSession: AuthSession).start { result in
                         expect(result).to(beUnsuccessful())
                         done()
@@ -744,7 +744,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: factorListResponse(factors: ["factors": [factor1, factor2]]))
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.getFactorStatus().start { result in
+                    authMethods.getFactors().start { result in
                         expect(result).to(haveFactorInList(type: "totp"))
                         expect(result).to(haveFactorInList(type: "sms"))
                         done()
@@ -759,7 +759,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: factorListResponse(factors: ["factors": []]))
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.getFactorStatus().start { result in
+                    authMethods.getFactors().start { result in
                         expect(result).to(haveEmptyFactorsInList())
                         done()
                     }
@@ -773,7 +773,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiFailureResponse())
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.getFactorStatus().start { result in
+                    authMethods.getFactors().start { result in
                         expect(result).to(beUnsuccessful())
                         done()
                     }

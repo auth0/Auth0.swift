@@ -1,6 +1,6 @@
 import Foundation
 
-struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
+struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {    
     let url: URL
     let session: URLSession
     let token: String
@@ -75,7 +75,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
     #endif
 
-    func enrolRecoveryCode() -> Request<RecoveryCodeChallenge, MyAccountError> {
+    func enrollRecoveryCode() -> Request<RecoveryCodeChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "recovery-code"
         return Request(session: session,
@@ -128,7 +128,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func enrollPhone(phoneNumber: String, preferredAuthenticationMethod: String) -> Request<PhoneEmailChallenge, MyAccountError> {
+    func enrollPhone(phoneNumber: String,
+                     preferredAuthenticationMethod: String) -> Request<PhoneEmailChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "phone"
         payload["phone_number"] = phoneNumber
@@ -143,7 +144,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func confirmTOTPEnrolment(id: String,
+    func confirmTOTPEnrollment(id: String,
                               authSession: String,
                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
@@ -159,7 +160,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func confirmEmailEnrolment(id: String,
+    func confirmEmailEnrollment(id: String,
                                authSession: String,
                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
@@ -175,7 +176,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func confirmPushNotificationEnrolment(id: String,
+    func confirmPushNotificationEnrollment(id: String,
                                           authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
@@ -190,7 +191,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func confirmPhoneEnrolment(id: String,
+    func confirmPhoneEnrollment(id: String,
                                authSession: String,
                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
@@ -206,7 +207,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func confirmRecoveryCodeEnrolment(id: String,
+    func confirmRecoveryCodeEnrollment(id: String,
                                       authSession: String) -> Request<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
@@ -226,8 +227,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        method: "DELETE",
                        handle: myAccountDecodableNoBody,
                        headers: defaultHeaders,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
+                       logger: logger,
+                       telemetry: telemetry)
     }
 
     func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError> {
@@ -240,7 +241,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getFactorStatus() -> Request<Factors, MyAccountError> {
+    func getFactors() -> Request<Factors, MyAccountError> {
         return Request(session: session,
                        url: url.appending("factors"),
                        method: "GET",
