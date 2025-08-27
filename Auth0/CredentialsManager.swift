@@ -95,11 +95,20 @@ public struct CredentialsManager {
     ///   - cancelTitle:      Cancel message to display when Face ID or Touch ID is used.
     ///   - fallbackTitle:    Fallback message to display when Face ID or Touch ID is used after a failed match.
     ///   - evaluationPolicy: Policy to be used for authentication policy evaluation.
+    ///   - policy:           The biometric policy that dictates when a biometric prompt should be shown. Defaults to `.always`.
     /// - Important: Access to the ``user`` property will not be protected by biometric authentication.
     public mutating func enableBiometrics(withTitle title: String,
                                           cancelTitle: String? = nil,
                                           fallbackTitle: String? = nil,
-                                          evaluationPolicy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics) {
+                                          evaluationPolicy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics,
+                                          policy: BiometricPolicy? = nil) {
+        if let policy = policy {
+            // Create a new instance with the updated policy
+            self = CredentialsManager(authentication: self.authentication, 
+                                     storeKey: self.storeKey, 
+                                     storage: self.storage, 
+                                     biometricPolicy: policy)
+        }
         self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
     }
     #endif
