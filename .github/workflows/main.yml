@@ -34,7 +34,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: Set up environment
               uses: ./.github/actions/setup
@@ -55,7 +55,7 @@ jobs:
 
             - name: Upload coverage report
               if: ${{ matrix.platform.os == 'iOS' }}
-              uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # pin@5.4.3
+              uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # pin@5.5.0
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -70,7 +70,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: Set up environment
               uses: ./.github/actions/setup
@@ -92,7 +92,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: Set up environment
               uses: ./.github/actions/setup
@@ -109,7 +109,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
               
             - name: Install SwiftLint
               run: brew install swiftlint

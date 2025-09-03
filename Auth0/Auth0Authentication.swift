@@ -499,6 +499,13 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
+    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+        return self.tokenExchange(subjectToken: subjectToken,
+                                  subjectTokenType: subjectTokenType,
+                                  scope: scope,
+                                  audience: audience)
+    }
+
 }
 
 // MARK: - Private Methods
