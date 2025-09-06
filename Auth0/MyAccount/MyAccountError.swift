@@ -2,7 +2,7 @@
 public struct MyAccountError: Auth0APIError, @unchecked Sendable {
 
     /// A server-side validation error.
-    public struct ValidationError: Sendable {
+    public struct ValidationError: Sendable, Equatable {
 
         /// Information about the validation error.
         let detail: String

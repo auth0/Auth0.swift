@@ -10,28 +10,28 @@ public struct AuthenticationMethods: Decodable {
 public struct AuthenticationMethod: Decodable {
     /// Authentication method type (factor)
     public let type: String?
-    
+
     /// Whether the credential was backed up
     public let credentialBackedUp: Bool?
-    
+
     /// Enum: "multi_device" "single_device"
     public let credentialDeviceType: String?
-    
+
     /// The ID of the user identity linked with the authentication method
     public let identityUserId: String?
-    
+
     /// The ID of the credential
     public let keyId: String?
-    
+
     /// The public key
     public let publicKey: String?
-    
+
     /// The transports used by clients to communicate with the authenticator
     public let transports: [String]?
-    
+
     /// The user-agent of the browser used to create the passkey
     public let userAgent: String?
-    
+
     /// The user handle of the user identity
     public let userHandle: String?
 
@@ -75,7 +75,7 @@ public struct AuthenticationMethod: Decodable {
         case transports
         case confirmed
         case name
-        case preferredAuthenticationMethod = "preferrred_authentication_method"
+        case preferredAuthenticationMethod = "preferred_authentication_method"
         case phoneNumber = "phone_number"
     }
 }

@@ -279,10 +279,10 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///
     /// - Parameters:
     ///   - phoneNumber: The destination phone number used to send verification codes via text and voice.
-    ///   - preferredAuthenticationMethod: The preferred communication method.(sms/voice)
+    ///   - preferredAuthenticationMethod: The preferred communication method.(sms/voice). If no value is passed by default sms will be the preferred authentication method
     /// - Returns: A request that will yield a phone enrolment challenge
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: String) -> Request<PhoneEmailChallenge, MyAccountError>
+                     preferredAuthenticationMethod: String?) -> Request<PhoneEmailChallenge, MyAccountError>
 
     /// Enrolls a new ToTP authentication method. This is the last part of the enrollment flow.
     ///
@@ -319,8 +319,8 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - otpCode: The one-time password code retrieved from the TOTP application.
     /// - Returns: A request that will yield an enrolled TOTP authentication method.
     func confirmTOTPEnrollment(id: String,
-                              authSession: String,
-                              otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Enrolls a new Email authentication method. This is the last part of the enrollment flow.
     ///
@@ -566,7 +566,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///     }
     /// ```
     ///
-    /// - Returns: A request fetches factors enabled for the Auth0 tenant and available for enrollment
+    /// - Returns: A request to fetch factors enabled for the Auth0 tenant and available for enrollment
     func getFactors() -> Request<Factors, MyAccountError>
 
     /// Fetch details of an authentication method associated with an id
@@ -661,4 +661,9 @@ public extension MyAccountAuthenticationMethods {
                                         preferredAuthenticationMethod: preferredAuthenticationMethod)
     }
 
+    func enrollPhone(phoneNumber: String,
+                     preferredAuthenticationMethod: String? = nil) -> Request<PhoneEmailChallenge, MyAccountError> {
+        self.enrollPhone(phoneNumber: phoneNumber,
+                         preferredAuthenticationMethod: preferredAuthenticationMethod)
+    }
 }

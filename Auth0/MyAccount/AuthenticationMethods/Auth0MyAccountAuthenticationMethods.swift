@@ -61,7 +61,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
 
         let payload: [String: Any] = [
             "auth_session": challenge.authenticationSession,
-            "authn_response": authenticatorResponse,
+            "authn_response": authenticatorResponse
         ]
 
         return Request(session: session,
@@ -129,7 +129,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
 
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: String) -> Request<PhoneEmailChallenge, MyAccountError> {
+                     preferredAuthenticationMethod: String?) -> Request<PhoneEmailChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "phone"
         payload["phone_number"] = phoneNumber
@@ -145,8 +145,8 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
 
     func confirmTOTPEnrollment(id: String,
-                              authSession: String,
-                              otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["auth_session"] = authSession
         payload["otp_code"] = otpCode

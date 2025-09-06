@@ -238,6 +238,20 @@ func haveRecoveryCodeChallenge(id: String, authSession: String, recoveryCode: St
     }
 }
 
+func haveAuthMethodEnrolmentError<T>(type: String,
+                                     title: String,
+                                     detail: String,
+                                     statusCode: Int,
+                                     validationErrors: [MyAccountError.ValidationError]? = nil) -> Nimble.Matcher<MyAccountResult<T>> {
+    return Matcher<MyAccountResult<T>>.define("be an error response with code <\(statusCode)> and description <\(detail)") { expression, failureMessage -> MatcherResult in
+        return try beUnsuccessful(expression, failureMessage) { (error: MyAccountError) -> Bool in
+            return validationErrors == error.validationErrors
+            && detail == error.detail
+            && statusCode == error.statusCode
+        }
+    }
+}
+
 func havePhoneEmailChallenge(id: String, authSession: String) -> Nimble.Matcher<MyAccountResult<PhoneEmailChallenge>> {
     let definition = "havePhoneEmailChallenge with " +
     "identifier <\(id)>, " +

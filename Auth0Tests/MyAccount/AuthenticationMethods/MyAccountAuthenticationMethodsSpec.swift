@@ -314,7 +314,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: totpPushEnrollmentChallengeResponse(id: AuthenticationMethodId,
                                                                  authSession: AuthSession,
                                                                  barcodeUri: barcodeUri,
-                                                                 manualInoutcode: manualInputCode))
+                                                                 manualInputCode: manualInputCode))
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.enrollTOTP().start { result in
@@ -438,7 +438,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                     }
                 }
             }
-
+            
             it("should fail to enroll phone") {
                 NetworkStub.addStub(condition: {
                     $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
@@ -446,12 +446,17 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                     $0.hasAllOf(["type": "phone",
                                  "phone_number": PhoneNumber,
                                  "preferred_authentication_method": preferredAuthMethod])
-                }, response: apiFailureResponse())
+                }, response: phoneEnrolmentFailureResponse(json: ["title": "Validation Error", "type": "https://auth0.com/api-errors/A0E-400-0003", "detail": "Invalid request payload input", "status": 400, "validation_errors": [
+                                    [
+                                            "pointer": "/preferred_authentication_method",
+                                           "detail": "data/preferred_authentication_method must be equal to one of the allowed values"
+                                      ]
+                                    ]]))
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.enrollPhone(phoneNumber: PhoneNumber,
                                             preferredAuthenticationMethod: preferredAuthMethod).start { result in
-                        expect(result).to(beUnsuccessful())
+                        expect(result).to(haveAuthMethodEnrolmentError(type: "https://auth0.com/api-errors/A0E-400-0003", title: "Validation Error", detail: "Invalid request payload input", statusCode: 400, validationErrors: [MyAccountError.ValidationError(detail: "data/preferred_authentication_method must be equal to one of the allowed values", pointer: "/preferred_authentication_method")]))
                         done()
                     }
                 }

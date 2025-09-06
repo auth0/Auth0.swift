@@ -314,13 +314,20 @@ func phoneEmailChallengeResponse(id: String, authSession: String, type: String) 
     return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
 }
 
-func totpPushEnrollmentChallengeResponse(id: String, authSession: String, barcodeUri: String? = nil, manualInoutcode: String? = nil) -> RequestResponse {
+func phoneEnrolmentFailureResponse(json: [String: Any]) -> RequestResponse {
+    return apiFailureResponse(json: json, statusCode: 400)
+}
+
+func totpPushEnrollmentChallengeResponse(id: String,
+                                         authSession: String,
+                                         barcodeUri: String? = nil,
+                                         manualInputCode: String? = nil) -> RequestResponse {
     var payload: [String: Any] = [
         "id": id,
         "auth_session": authSession,
     ]
     if let uri = barcodeUri { payload["barcode_uri"] = uri }
-    if let manualInoutcode = manualInoutcode { payload["manual_input_code"] = manualInoutcode }
+    if let manualInputCode = manualInputCode { payload["manual_input_code"] = manualInputCode }
     return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
 }
 
