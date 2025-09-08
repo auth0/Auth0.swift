@@ -612,53 +612,63 @@
 		D41DED3B2DCA09B200F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
 		D41DED3D2DCA09B400F5B1A4 /* JWTDecode.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8426FE30EB009C2B27 /* JWTDecode.xcframework */; };
 		D41DED402DCA09B500F5B1A4 /* SimpleKeychain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD9FC8526FE30EB009C2B27 /* SimpleKeychain.xcframework */; };
+		D499DAEE2E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift */; };
+		D499DAEF2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift */; };
+		D499DAF02E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift */; };
+		D499DAF12E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE32E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift */; };
+		D499DAF22E6EB1FD000E7E2F /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE52E6EB1FD000E7E2F /* Factor.swift */; };
+		D499DAF32E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE82E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift */; };
+		D499DAF42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift */; };
+		D499DAF52E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE62E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift */; };
+		D499DAF62E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE72E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift */; };
+		D499DAF72E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEC2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift */; };
+		D499DAF82E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAED2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift */; };
+		D499DAF92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift */; };
+		D499DAFA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift */; };
+		D499DAFB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift */; };
+		D499DAFC2E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE32E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift */; };
+		D499DAFD2E6EB1FD000E7E2F /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE52E6EB1FD000E7E2F /* Factor.swift */; };
+		D499DAFE2E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE82E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift */; };
+		D499DAFF2E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift */; };
+		D499DB002E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE62E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift */; };
+		D499DB012E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE72E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift */; };
+		D499DB022E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEC2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift */; };
+		D499DB032E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAED2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift */; };
+		D499DB042E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift */; };
+		D499DB052E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift */; };
+		D499DB062E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift */; };
+		D499DB072E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE32E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift */; };
+		D499DB082E6EB1FD000E7E2F /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE52E6EB1FD000E7E2F /* Factor.swift */; };
+		D499DB092E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE82E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift */; };
+		D499DB0A2E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift */; };
+		D499DB0B2E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE62E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift */; };
+		D499DB0C2E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE72E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift */; };
+		D499DB0D2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEC2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift */; };
+		D499DB0E2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAED2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift */; };
+		D499DB0F2E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift */; };
+		D499DB102E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift */; };
+		D499DB112E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift */; };
+		D499DB122E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE32E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift */; };
+		D499DB132E6EB1FD000E7E2F /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE52E6EB1FD000E7E2F /* Factor.swift */; };
+		D499DB142E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE82E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift */; };
+		D499DB152E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift */; };
+		D499DB162E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE62E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift */; };
+		D499DB172E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE72E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift */; };
+		D499DB182E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEC2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift */; };
+		D499DB192E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAED2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift */; };
+		D499DB1A2E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift */; };
+		D499DB1B2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift */; };
+		D499DB1C2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift */; };
+		D499DB1D2E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE32E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift */; };
+		D499DB1E2E6EB1FD000E7E2F /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE52E6EB1FD000E7E2F /* Factor.swift */; };
+		D499DB1F2E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE82E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift */; };
+		D499DB202E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift */; };
+		D499DB212E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE62E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift */; };
+		D499DB222E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAE72E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift */; };
+		D499DB232E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAEC2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift */; };
+		D499DB242E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499DAED2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift */; };
 		D4B8E9E42DCDD2340021262D /* CwlPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = D4B8E9E32DCDD2340021262D /* CwlPreconditionTesting */; };
 		D4B8E9E62DCDD23C0021262D /* CwlPosixPreconditionTesting in Frameworks */ = {isa = PBXBuildFile; productRef = D4B8E9E52DCDD23C0021262D /* CwlPosixPreconditionTesting */; };
-		D4CFA35D2E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3552E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift */; };
-		D4CFA35E2E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3582E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift */; };
-		D4CFA35F2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35B2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift */; };
-		D4CFA3602E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35A2E3CA55A00B06859 /* RecoveryCodeChallenge.swift */; };
-		D4CFA3612E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3572E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift */; };
-		D4CFA3622E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3592E3CA55A00B06859 /* PhoneEmailChallenge.swift */; };
-		D4CFA3632E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3532E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift */; };
-		D4CFA3642E3CA55A00B06859 /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3542E3CA55A00B06859 /* Factor.swift */; };
-		D4CFA3652E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3562E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift */; };
-		D4CFA3662E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3552E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift */; };
-		D4CFA3672E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3582E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift */; };
-		D4CFA3682E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35B2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift */; };
-		D4CFA3692E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35A2E3CA55A00B06859 /* RecoveryCodeChallenge.swift */; };
-		D4CFA36A2E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3572E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift */; };
-		D4CFA36B2E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3592E3CA55A00B06859 /* PhoneEmailChallenge.swift */; };
-		D4CFA36C2E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3532E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift */; };
-		D4CFA36D2E3CA55A00B06859 /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3542E3CA55A00B06859 /* Factor.swift */; };
-		D4CFA36E2E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3562E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift */; };
-		D4CFA36F2E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3552E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift */; };
-		D4CFA3702E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3582E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift */; };
-		D4CFA3712E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35B2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift */; };
-		D4CFA3722E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35A2E3CA55A00B06859 /* RecoveryCodeChallenge.swift */; };
-		D4CFA3732E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3572E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift */; };
-		D4CFA3742E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3592E3CA55A00B06859 /* PhoneEmailChallenge.swift */; };
-		D4CFA3752E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3532E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift */; };
-		D4CFA3762E3CA55A00B06859 /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3542E3CA55A00B06859 /* Factor.swift */; };
-		D4CFA3772E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3562E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift */; };
-		D4CFA3782E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3552E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift */; };
-		D4CFA3792E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3582E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift */; };
-		D4CFA37A2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35B2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift */; };
-		D4CFA37B2E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35A2E3CA55A00B06859 /* RecoveryCodeChallenge.swift */; };
-		D4CFA37C2E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3572E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift */; };
-		D4CFA37D2E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3592E3CA55A00B06859 /* PhoneEmailChallenge.swift */; };
-		D4CFA37E2E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3532E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift */; };
-		D4CFA37F2E3CA55A00B06859 /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3542E3CA55A00B06859 /* Factor.swift */; };
-		D4CFA3802E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3562E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift */; };
-		D4CFA3812E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3552E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift */; };
-		D4CFA3822E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3582E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift */; };
-		D4CFA3832E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35B2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift */; };
-		D4CFA3842E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA35A2E3CA55A00B06859 /* RecoveryCodeChallenge.swift */; };
-		D4CFA3852E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3572E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift */; };
-		D4CFA3862E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3592E3CA55A00B06859 /* PhoneEmailChallenge.swift */; };
-		D4CFA3872E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3532E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift */; };
-		D4CFA3882E3CA55A00B06859 /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3542E3CA55A00B06859 /* Factor.swift */; };
-		D4CFA3892E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CFA3562E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift */; };
 		D581CF772757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF782757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D581CF792757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
@@ -1019,15 +1029,17 @@
 		C1B3B9B72C24B298004A32A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C1B3B9C02C24B39E004A32A4 /* Auth0.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Auth0.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1B3B9C72C24B39E004A32A4 /* Auth0Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Auth0Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4CFA3532E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth0MyAccountAuthenticationMethods.swift; sourceTree = "<group>"; };
-		D4CFA3542E3CA55A00B06859 /* Factor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Factor.swift; sourceTree = "<group>"; };
-		D4CFA3552E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetAuthenticationMethodsResponse.swift; sourceTree = "<group>"; };
-		D4CFA3562E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAccountAuthenticationMethods.swift; sourceTree = "<group>"; };
-		D4CFA3572E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeyAuthenticationMethod.swift; sourceTree = "<group>"; };
-		D4CFA3582E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeyEnrollmentChallenge.swift; sourceTree = "<group>"; };
-		D4CFA3592E3CA55A00B06859 /* PhoneEmailChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneEmailChallenge.swift; sourceTree = "<group>"; };
-		D4CFA35A2E3CA55A00B06859 /* RecoveryCodeChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryCodeChallenge.swift; sourceTree = "<group>"; };
-		D4CFA35B2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPPushEnrollmentChallenge.swift; sourceTree = "<group>"; };
+		D499DAE32E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth0MyAccountAuthenticationMethods.swift; sourceTree = "<group>"; };
+		D499DAE42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailEnrollmentChallenge.swift; sourceTree = "<group>"; };
+		D499DAE52E6EB1FD000E7E2F /* Factor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Factor.swift; sourceTree = "<group>"; };
+		D499DAE62E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetAuthenticationMethodsResponse.swift; sourceTree = "<group>"; };
+		D499DAE72E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAccountAuthenticationMethods.swift; sourceTree = "<group>"; };
+		D499DAE82E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeyAuthenticationMethod.swift; sourceTree = "<group>"; };
+		D499DAE92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeyEnrollmentChallenge.swift; sourceTree = "<group>"; };
+		D499DAEA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneEnrollmentChallenge.swift; sourceTree = "<group>"; };
+		D499DAEB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushEnrollmentChallenge.swift; sourceTree = "<group>"; };
+		D499DAEC2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryCodeEnrollmentChallenge.swift; sourceTree = "<group>"; };
+		D499DAED2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPEnrollmentChallenge.swift; sourceTree = "<group>"; };
 		D581CF762757D773007327D1 /* RequestSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestSpec.swift; sourceTree = "<group>"; };
 		D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1686,15 +1698,17 @@
 		D4CFA35C2E3CA55A00B06859 /* AuthenticationMethods */ = {
 			isa = PBXGroup;
 			children = (
-				D4CFA3532E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift */,
-				D4CFA3542E3CA55A00B06859 /* Factor.swift */,
-				D4CFA3552E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift */,
-				D4CFA3562E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift */,
-				D4CFA3572E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift */,
-				D4CFA3582E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift */,
-				D4CFA3592E3CA55A00B06859 /* PhoneEmailChallenge.swift */,
-				D4CFA35A2E3CA55A00B06859 /* RecoveryCodeChallenge.swift */,
-				D4CFA35B2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift */,
+				D499DAE32E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift */,
+				D499DAE42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift */,
+				D499DAE52E6EB1FD000E7E2F /* Factor.swift */,
+				D499DAE62E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift */,
+				D499DAE72E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift */,
+				D499DAE82E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift */,
+				D499DAE92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift */,
+				D499DAEA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift */,
+				D499DAEB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift */,
+				D499DAEC2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift */,
+				D499DAED2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift */,
 			);
 			path = AuthenticationMethods;
 			sourceTree = "<group>";
@@ -2390,7 +2404,6 @@
 			files = (
 				5CB41D4423D0BA2C00074024 /* IDTokenSignatureValidator.swift in Sources */,
 				5CB41D4C23D0BA2C00074024 /* Optional+DebugDescription.swift in Sources */,
-				5CDF67482DD3B74200A9B513 /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
 				5C505FB62E21669F005D0757 /* SenderConstraining.swift in Sources */,
 				5C4F551A23C8FB8E00C89615 /* String+URLSafe.swift in Sources */,
 				5C79AE0C2E040CA900CD0D41 /* DPoP.swift in Sources */,
@@ -2399,20 +2412,22 @@
 				5C0AF09D2833420200162044 /* WebAuthentication.swift in Sources */,
 				5C505FB02E216677005D0757 /* DPoPError.swift in Sources */,
 				5CB41D4823D0BA2C00074024 /* IDTokenValidator.swift in Sources */,
+				D499DB1A2E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
+				D499DB1B2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
+				D499DB1C2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */,
+				D499DB1D2E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
+				D499DB1E2E6EB1FD000E7E2F /* Factor.swift in Sources */,
+				D499DB1F2E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */,
+				D499DB202E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */,
+				D499DB212E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */,
+				D499DB222E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */,
+				D499DB232E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */,
+				D499DB242E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */,
 				5C505FD72E2168BD005D0757 /* KeychainKeyStore.swift in Sources */,
 				5C354C04276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5FCAB1711D09005A00331C84 /* NSURLComponents+OAuth2.swift in Sources */,
 				5CFB82632D6D221F009FD237 /* Barrier.swift in Sources */,
 				5FDE876D1D8A424700EA27DC /* AuthenticationHandlers.swift in Sources */,
-				D4CFA3662E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */,
-				D4CFA3672E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */,
-				D4CFA3682E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */,
-				D4CFA3692E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */,
-				D4CFA36A2E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */,
-				D4CFA36B2E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */,
-				D4CFA36C2E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
-				D4CFA36D2E3CA55A00B06859 /* Factor.swift in Sources */,
-				D4CFA36E2E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */,
 				5C38EA232DA4611B0085AC31 /* MyAccount.swift in Sources */,
 				5FE2F8BB1CD0EAAD003628F4 /* Response.swift in Sources */,
 				970BC36B25C27095007A7745 /* MultifactorChallenge.swift in Sources */,
@@ -2494,15 +2509,6 @@
 				5B7EE47420FCA00A00367724 /* CredentialsManagerError.swift in Sources */,
 				5C0AF09E2833420200162044 /* WebAuthentication.swift in Sources */,
 				5FDE876A1D8A424700EA27DC /* Credentials.swift in Sources */,
-				D4CFA3812E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */,
-				D4CFA3822E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */,
-				D4CFA3832E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */,
-				D4CFA3842E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */,
-				D4CFA3852E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */,
-				D4CFA3862E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */,
-				D4CFA3872E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
-				D4CFA3882E3CA55A00B06859 /* Factor.swift in Sources */,
-				D4CFA3892E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */,
 				5C354C05276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5CFB82512D5BF324009FD237 /* APICredentials.swift in Sources */,
 				5C3D88262DC1509800AACC34 /* LoginPasskey.swift in Sources */,
@@ -2545,6 +2551,17 @@
 				5C3D87F32DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */,
 				5C41F6CE244F970500252548 /* IDTokenValidator.swift in Sources */,
 				5C41F6CA244F96AE00252548 /* LoginTransaction.swift in Sources */,
+				D499DAF92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
+				D499DAFA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
+				D499DAFB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */,
+				D499DAFC2E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
+				D499DAFD2E6EB1FD000E7E2F /* Factor.swift in Sources */,
+				D499DAFE2E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */,
+				D499DAFF2E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */,
+				D499DB002E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */,
+				D499DB012E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */,
+				D499DB022E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */,
+				D499DB032E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */,
 				5FADB60D1CED7E0800D4BB50 /* UserPatchAttributes.swift in Sources */,
 				5C41F6CF244F970E00252548 /* IDTokenValidatorContext.swift in Sources */,
 				5C41F6DB244F97AB00252548 /* Auth0WebAuth.swift in Sources */,
@@ -2741,20 +2758,22 @@
 				5FDE876B1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5CA541D02B1A81A700E4284D /* Documentation.docc in Sources */,
 				5FE1182A1D8A4A2B00A374BF /* Telemetry.swift in Sources */,
+				D499DB0F2E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
+				D499DB102E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
+				D499DB112E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */,
+				D499DB122E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
+				D499DB132E6EB1FD000E7E2F /* Factor.swift in Sources */,
+				D499DB142E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */,
+				D499DB152E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */,
+				D499DB162E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */,
+				D499DB172E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */,
+				D499DB182E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */,
+				D499DB192E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */,
 				5CC9940324ED9EC50027DC74 /* CredentialsManager.swift in Sources */,
 				5CFB82712D6E640F009FD237 /* SSOCredentials.swift in Sources */,
 				5CDF67382DD3A8D600A9B513 /* Auth0APIError.swift in Sources */,
 				5F23E6E41D4ACD8500C3F2D9 /* JSONObjectPayload.swift in Sources */,
 				5C4F551C23C8FB8E00C89615 /* String+URLSafe.swift in Sources */,
-				D4CFA35D2E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */,
-				D4CFA35E2E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */,
-				D4CFA35F2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */,
-				D4CFA3602E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */,
-				D4CFA3612E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */,
-				D4CFA3622E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */,
-				D4CFA3632E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
-				D4CFA3642E3CA55A00B06859 /* Factor.swift in Sources */,
-				D4CFA3652E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */,
 				5CFB82502D5BF324009FD237 /* APICredentials.swift in Sources */,
 				5C505FDA2E2168BD005D0757 /* KeychainKeyStore.swift in Sources */,
 				5C505FC72E216784005D0757 /* ECPublicKey.swift in Sources */,
@@ -2767,7 +2786,6 @@
 				5C6513AA2791CDDE004EBC22 /* Version.swift in Sources */,
 				5C505FD32E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C505FAD2E216677005D0757 /* DPoPError.swift in Sources */,
-				5CDF67562DD4AD8500A9B513 /* MyAccountAuthenticationMethods.swift in Sources */,
 				5B1748761EF2D3A70060E653 /* Shared.swift in Sources */,
 				5F23E6E31D4ACD7F00C3F2D9 /* ManagementError.swift in Sources */,
 				5C80980E275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
@@ -2806,20 +2824,22 @@
 				5FDE876C1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5CA541CF2B1A81A700E4284D /* Documentation.docc in Sources */,
 				5FE118291D8A4A2A00A374BF /* Telemetry.swift in Sources */,
+				D499DB042E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
+				D499DB052E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
+				D499DB062E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */,
+				D499DB072E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
+				D499DB082E6EB1FD000E7E2F /* Factor.swift in Sources */,
+				D499DB092E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */,
+				D499DB0A2E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */,
+				D499DB0B2E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */,
+				D499DB0C2E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */,
+				D499DB0D2E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */,
+				D499DB0E2E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */,
 				5F23E70D1D4B88FC00C3F2D9 /* JSONObjectPayload.swift in Sources */,
 				5CFB82722D6E640F009FD237 /* SSOCredentials.swift in Sources */,
 				5CDF67372DD3A8D600A9B513 /* Auth0APIError.swift in Sources */,
 				5C4F552623C8FBA100C89615 /* JWKS.swift in Sources */,
 				5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */,
-				D4CFA36F2E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */,
-				D4CFA3702E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */,
-				D4CFA3712E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */,
-				D4CFA3722E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */,
-				D4CFA3732E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */,
-				D4CFA3742E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */,
-				D4CFA3752E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
-				D4CFA3762E3CA55A00B06859 /* Factor.swift in Sources */,
-				D4CFA3772E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */,
 				5CFB82532D5BF324009FD237 /* APICredentials.swift in Sources */,
 				5C505FD92E2168BD005D0757 /* KeychainKeyStore.swift in Sources */,
 				5C505FC82E216784005D0757 /* ECPublicKey.swift in Sources */,
@@ -2832,7 +2852,6 @@
 				5C6513A92791CDDE004EBC22 /* Version.swift in Sources */,
 				5C505FD22E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C505FAC2E216677005D0757 /* DPoPError.swift in Sources */,
-				5CDF67582DD4AD8500A9B513 /* MyAccountAuthenticationMethods.swift in Sources */,
 				5B1748771EF2D3A90060E653 /* Shared.swift in Sources */,
 				5F23E70C1D4B88F600C3F2D9 /* ManagementError.swift in Sources */,
 				5C80980D275A7B8600DC0A76 /* CredentialsStorage.swift in Sources */,
@@ -2910,15 +2929,6 @@
 				C1B3B9F22C24B6D4004A32A4 /* MultifactorChallenge.swift in Sources */,
 				5C505FD12E21688E005D0757 /* SecureEnclaveKeyStore.swift in Sources */,
 				5C3D87E42DB8276000AACC34 /* PublicKeyCredentialCreationOptions.swift in Sources */,
-				D4CFA3782E3CA55A00B06859 /* GetAuthenticationMethodsResponse.swift in Sources */,
-				D4CFA3792E3CA55A00B06859 /* PasskeyEnrollmentChallenge.swift in Sources */,
-				D4CFA37A2E3CA55A00B06859 /* TOTPPushEnrollmentChallenge.swift in Sources */,
-				D4CFA37B2E3CA55A00B06859 /* RecoveryCodeChallenge.swift in Sources */,
-				D4CFA37C2E3CA55A00B06859 /* PasskeyAuthenticationMethod.swift in Sources */,
-				D4CFA37D2E3CA55A00B06859 /* PhoneEmailChallenge.swift in Sources */,
-				D4CFA37E2E3CA55A00B06859 /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
-				D4CFA37F2E3CA55A00B06859 /* Factor.swift in Sources */,
-				D4CFA3802E3CA55A00B06859 /* MyAccountAuthenticationMethods.swift in Sources */,
 				5C3D881D2DC148C600AACC34 /* PasskeyLoginChallenge.swift in Sources */,
 				C1B3B9F32C24B6D4004A32A4 /* JWKS.swift in Sources */,
 				5CFB82522D5BF324009FD237 /* APICredentials.swift in Sources */,
@@ -2929,8 +2939,18 @@
 				C1B3B9F72C24B6D4004A32A4 /* Telemetry.swift in Sources */,
 				C1B3B9F82C24B6D4004A32A4 /* IDTokenValidator.swift in Sources */,
 				C1B3B9F92C24B6D4004A32A4 /* IDTokenValidatorContext.swift in Sources */,
-				5CDF67252DD3922B00A9B513 /* PasskeyEnrollmentChallenge.swift in Sources */,
 				5C505FD62E2168BD005D0757 /* KeychainKeyStore.swift in Sources */,
+				D499DAEE2E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
+				D499DAEF2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
+				D499DAF02E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */,
+				D499DAF12E6EB1FD000E7E2F /* Auth0MyAccountAuthenticationMethods.swift in Sources */,
+				D499DAF22E6EB1FD000E7E2F /* Factor.swift in Sources */,
+				D499DAF32E6EB1FD000E7E2F /* PasskeyAuthenticationMethod.swift in Sources */,
+				D499DAF42E6EB1FD000E7E2F /* EmailEnrollmentChallenge.swift in Sources */,
+				D499DAF52E6EB1FD000E7E2F /* GetAuthenticationMethodsResponse.swift in Sources */,
+				D499DAF62E6EB1FD000E7E2F /* MyAccountAuthenticationMethods.swift in Sources */,
+				D499DAF72E6EB1FD000E7E2F /* RecoveryCodeEnrollmentChallenge.swift in Sources */,
+				D499DAF82E6EB1FD000E7E2F /* TOTPEnrollmentChallenge.swift in Sources */,
 				C1B3B9FA2C24B6D4004A32A4 /* IDTokenSignatureValidator.swift in Sources */,
 				C1B3B9FB2C24B6D4004A32A4 /* ClaimValidators.swift in Sources */,
 				C1B3B9FC2C24B6D4004A32A4 /* Shared.swift in Sources */,
