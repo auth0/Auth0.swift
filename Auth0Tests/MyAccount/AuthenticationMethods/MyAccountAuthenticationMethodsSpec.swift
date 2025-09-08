@@ -296,7 +296,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.enrollRecoveryCode().start { result in
-                        expect(result).to(beUnsuccessful())
+                        expect(result).to(beUnsuccessful("api failed with 400 due to invalid input"))
                         done()
                     }
                 }
@@ -318,7 +318,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.enrollTOTP().start { result in
-                        expect(result).to(haveTOTPPushEnrollmentChallenge(id: AuthenticationMethodId,
+                        expect(result).to(haveTOTPEnrollmentChallenge(id: AuthenticationMethodId,
                                                                          authSession: AuthSession,
                                                                          barcodeUri: barcodeUri,
                                                                          manualInputCode: manualInputCode))
@@ -356,9 +356,9 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.enrollPushNotification().start { result in
-                        expect(result).to(haveTOTPPushEnrollmentChallenge(id: AuthenticationMethodId,
-                                                                         authSession: AuthSession,
-                                                                          barcodeUri: barcodeUri))
+                        expect(result).to(havePushEnrollmentChallenge(id: AuthenticationMethodId,
+                                                                      authSession: AuthSession,
+                                                                      barcodeUri: barcodeUri))
                         done()
                     }
                 }
@@ -392,8 +392,8 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.enrollEmail(emailAddress: Email).start { result in
-                        expect(result).to(havePhoneEmailChallenge(id: AuthenticationMethodId,
-                                                                  authSession: AuthSession))
+                        expect(result).to(haveEmailChallenge(id: AuthenticationMethodId,
+                                                            authSession: AuthSession))
                         done()
                     }
                 }
@@ -432,8 +432,8 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     authMethods.enrollPhone(phoneNumber: PhoneNumber,
                                             preferredAuthenticationMethod: preferredAuthMethod).start { result in
-                        expect(result).to(havePhoneEmailChallenge(id: AuthenticationMethodId,
-                                                                  authSession: AuthSession))
+                        expect(result).to(havePhoneChallenge(id: AuthenticationMethodId,
+                                                             authSession: AuthSession))
                         done()
                     }
                 }

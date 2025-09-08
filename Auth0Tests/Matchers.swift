@@ -223,13 +223,13 @@ func havePasskeyAuthenticationMethod(id: String,
 }
 #endif
 
-func haveRecoveryCodeChallenge(id: String, authSession: String, recoveryCode: String) -> Nimble.Matcher<MyAccountResult<RecoveryCodeChallenge>> {
+func haveRecoveryCodeChallenge(id: String, authSession: String, recoveryCode: String) -> Nimble.Matcher<MyAccountResult<RecoveryCodeEnrollmentChallenge>> {
     let definition = "haveRecoveryCodeChallenge with " +
     "identifier <\(id)>, " +
     "authSession <\(authSession)>, " +
     "and recovery code <\(recoveryCode)>"
-    return Matcher<MyAccountResult<RecoveryCodeChallenge>>.define(definition) { expression, failureMessage in
-        return try beSuccessful(expression, failureMessage) { (created: RecoveryCodeChallenge) ->
+    return Matcher<MyAccountResult<RecoveryCodeEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: RecoveryCodeEnrollmentChallenge) ->
             Bool in
             return created.authenticationId == id &&
             created.authenticationSession == authSession &&
@@ -252,12 +252,12 @@ func haveAuthMethodEnrolmentError<T>(type: String,
     }
 }
 
-func havePhoneEmailChallenge(id: String, authSession: String) -> Nimble.Matcher<MyAccountResult<PhoneEmailChallenge>> {
-    let definition = "havePhoneEmailChallenge with " +
+func haveEmailChallenge(id: String, authSession: String) -> Nimble.Matcher<MyAccountResult<EmailEnrollmentChallenge>> {
+    let definition = "haveEmailChallenge with " +
     "identifier <\(id)>, " +
     "authSession <\(authSession)>"
-    return Matcher<MyAccountResult<PhoneEmailChallenge>>.define(definition) { expression, failureMessage in
-        return try beSuccessful(expression, failureMessage) { (created: PhoneEmailChallenge) ->
+    return Matcher<MyAccountResult<EmailEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: EmailEnrollmentChallenge) ->
             Bool in
             return created.authenticationId == id &&
             created.authenticationSession == authSession
@@ -265,14 +265,27 @@ func havePhoneEmailChallenge(id: String, authSession: String) -> Nimble.Matcher<
     }
 }
 
-func haveTOTPPushEnrollmentChallenge(id: String, authSession: String, barcodeUri: String? = nil, manualInputCode: String? = nil) -> Nimble.Matcher<MyAccountResult<TOTPPushEnrollmentChallenge>> {
-    let definition = "haveTOTPPushEnrollmentChallenge with " +
+func havePhoneChallenge(id: String, authSession: String) -> Nimble.Matcher<MyAccountResult<PhoneEnrollmentChallenge>> {
+    let definition = "havePhoneChallenge with " +
+    "identifier <\(id)>, " +
+    "authSession <\(authSession)>"
+    return Matcher<MyAccountResult<PhoneEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: PhoneEnrollmentChallenge) ->
+            Bool in
+            return created.authenticationId == id &&
+            created.authenticationSession == authSession
+        }
+    }
+}
+
+func havePushEnrollmentChallenge(id: String, authSession: String, barcodeUri: String? = nil, manualInputCode: String? = nil) -> Nimble.Matcher<MyAccountResult<PushEnrollmentChallenge>> {
+    let definition = "havePushEnrollmentChallenge with " +
     "identifier <\(id)>, " +
     "authSession <\(authSession)>, " +
     "barCodeUri <\(String(describing: barcodeUri))>, " +
     "manualInputCode <\(String(describing: manualInputCode))>"
-    return Matcher<MyAccountResult<TOTPPushEnrollmentChallenge>>.define(definition) { expression, failureMessage in
-        return try beSuccessful(expression, failureMessage) { (created: TOTPPushEnrollmentChallenge) -> Bool in
+    return Matcher<MyAccountResult<PushEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: PushEnrollmentChallenge) -> Bool in
             return created.authenticationId == id &&
             created.authenticationSession == authSession &&
             created.authenticatorManualInputCode == manualInputCode &&
@@ -280,6 +293,23 @@ func haveTOTPPushEnrollmentChallenge(id: String, authSession: String, barcodeUri
         }
     }
 }
+
+func haveTOTPEnrollmentChallenge(id: String, authSession: String, barcodeUri: String? = nil, manualInputCode: String? = nil) -> Nimble.Matcher<MyAccountResult<TOTPEnrollmentChallenge>> {
+    let definition = "haveTOTPEnrollmentChallenge with " +
+    "identifier <\(id)>, " +
+    "authSession <\(authSession)>, " +
+    "barCodeUri <\(String(describing: barcodeUri))>, " +
+    "manualInputCode <\(String(describing: manualInputCode))>"
+    return Matcher<MyAccountResult<TOTPEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: TOTPEnrollmentChallenge) -> Bool in
+            return created.authenticationId == id &&
+            created.authenticationSession == authSession &&
+            created.authenticatorManualInputCode == manualInputCode &&
+            created.authenticatorQRCodeURI == barcodeUri
+        }
+    }
+}
+
 
 func haveAuthenticationMethods(count: Int) -> Nimble.Matcher<MyAccountResult<AuthenticationMethods>> {
     return Matcher<MyAccountResult<AuthenticationMethods>>.define("have authentication methods") { expression, failureMessage in
