@@ -5,8 +5,8 @@ public struct Factors: Decodable {
 
 public struct Factor: Decodable {
     /// Authentication method type (factor)
-    public let type: String?
+    public let type: String
 
     /// Primary and/or secondary factor
-    public let usage: [String]
+    public let usage: [String]?
 }

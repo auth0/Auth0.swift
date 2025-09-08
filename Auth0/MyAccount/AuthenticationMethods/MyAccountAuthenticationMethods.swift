@@ -148,8 +148,8 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request that will yield an recovery code challenge
-    func enrollRecoveryCode() -> Request<RecoveryCodeChallenge, MyAccountError>
-    
+    func enrollRecoveryCode() -> Request<RecoveryCodeEnrollmentChallenge, MyAccountError>
+
     /// Requests a challenge for enrolling a TOTP authentication method. This is the first part of the enrollment flow.
     ///
     /// ## Availability
@@ -180,7 +180,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request that will yield a totp enrolment challenge
-    func enrollTOTP() -> Request<TOTPPushEnrollmentChallenge, MyAccountError>
+    func enrollTOTP() -> Request<TOTPEnrollmentChallenge, MyAccountError>
 
     /// Requests a challenge for enrolling a push notification authentication method. This is the first part of the enrollment flow.
     ///
@@ -212,7 +212,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request that will yield a push notification enrolment challenge
-    func enrollPushNotification() -> Request<TOTPPushEnrollmentChallenge, MyAccountError>
+    func enrollPushNotification() -> Request<PushEnrollmentChallenge, MyAccountError>
 
     /// Requests a challenge for enrolling a Email authentication method. This is the first part of the enrollment flow.
     ///
@@ -246,7 +246,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Parameters:
     ///   - emailAddress:  The email address to use for sending one-time codes.
     /// - Returns: A request that will yield a email enrolment challenge
-    func enrollEmail(emailAddress: String) -> Request<PhoneEmailChallenge, MyAccountError>
+    func enrollEmail(emailAddress: String) -> Request<EmailEnrollmentChallenge, MyAccountError>
 
     /// Requests a challenge for enrolling a Phone authentication method. This is the first part of the enrollment flow.
     ///
@@ -282,7 +282,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - preferredAuthenticationMethod: The preferred communication method.(sms/voice). If no value is passed by default sms will be the preferred authentication method
     /// - Returns: A request that will yield a phone enrolment challenge
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: String?) -> Request<PhoneEmailChallenge, MyAccountError>
+                     preferredAuthenticationMethod: String?) -> Request<PhoneEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new ToTP authentication method. This is the last part of the enrollment flow.
     ///
@@ -536,7 +536,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - id: Id of the authentication method user wishes to delete
     /// - Returns: A request that will delete an authentication method associated with an id
     func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError>
-    
+
     /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
     ///
     /// ## Availability
@@ -662,7 +662,7 @@ public extension MyAccountAuthenticationMethods {
     }
 
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: String? = nil) -> Request<PhoneEmailChallenge, MyAccountError> {
+                     preferredAuthenticationMethod: String? = nil) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
         self.enrollPhone(phoneNumber: phoneNumber,
                          preferredAuthenticationMethod: preferredAuthenticationMethod)
     }

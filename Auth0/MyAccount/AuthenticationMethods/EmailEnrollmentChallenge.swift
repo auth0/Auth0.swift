@@ -1,24 +1,18 @@
-import Foundation
-
-/// A Recovery code enrollment challenge.
-public struct RecoveryCodeChallenge {
+/// A Email enrollment challenge.
+public struct EmailEnrollmentChallenge {
 
     /// The unique identifier for the authentication method.
     public let authenticationId: String
 
     /// The unique session identifier for the enrollment.
     public let authenticationSession: String
-
-    /// The recovery code value.
-    public let recoveryCode: String
 }
 
-extension RecoveryCodeChallenge: Decodable {
+extension EmailEnrollmentChallenge: Decodable {
 
     enum CodingKeys: String, CodingKey {
         case authenticationSession = "auth_session"
         case authenticationId = "id"
-        case recoveryCode = "recovery_code"
     }
 
     /// `Decodable` initializer.
@@ -33,8 +27,7 @@ extension RecoveryCodeChallenge: Decodable {
 
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.init(authenticationId: try values.decode(String.self, forKey: .authenticationId),
-                  authenticationSession: try values.decode(String.self, forKey: .authenticationSession),
-                  recoveryCode: try values.decode(String.self, forKey: .recoveryCode))
+                  authenticationSession: try values.decode(String.self, forKey: .authenticationSession))
     }
 
 }

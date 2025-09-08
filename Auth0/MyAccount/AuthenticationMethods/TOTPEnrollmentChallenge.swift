@@ -1,18 +1,28 @@
-/// A Phone/Email enrollment challenge.
-public struct PhoneEmailChallenge {
+import Foundation
+
+/// A TOTP enrollment challenge.
+public struct TOTPEnrollmentChallenge {
 
     /// The unique identifier for the authentication method.
     public let authenticationId: String
 
     /// The unique session identifier for the enrollment.
     public let authenticationSession: String
+
+    /// The URI for the QR code to be scanned by the authenticator.
+    public let authenticatorQRCodeURI: String
+
+    /// The manual input code for the authenticator in case QR codes cannot be used.
+    public let authenticatorManualInputCode: String?
 }
 
-extension PhoneEmailChallenge: Decodable {
+extension TOTPEnrollmentChallenge: Decodable {
 
     enum CodingKeys: String, CodingKey {
         case authenticationSession = "auth_session"
         case authenticationId = "id"
+        case authenticatorQRCodeURI = "barcode_uri"
+        case authenticatorManualInputCode = "manual_input_code"
     }
 
     /// `Decodable` initializer.
@@ -27,7 +37,9 @@ extension PhoneEmailChallenge: Decodable {
 
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.init(authenticationId: try values.decode(String.self, forKey: .authenticationId),
-                  authenticationSession: try values.decode(String.self, forKey: .authenticationSession))
+                  authenticationSession: try values.decode(String.self, forKey: .authenticationSession),
+                  authenticatorQRCodeURI: try values.decode(String.self, forKey: .authenticatorQRCodeURI),
+                  authenticatorManualInputCode: try values.decodeIfPresent(String.self, forKey: .authenticatorManualInputCode))
     }
 
 }

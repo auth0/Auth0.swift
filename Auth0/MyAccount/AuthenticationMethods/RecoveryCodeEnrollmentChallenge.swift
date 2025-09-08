@@ -1,7 +1,7 @@
 import Foundation
 
-/// A TOTP/Push enrollment challenge.
-public struct TOTPPushEnrollmentChallenge {
+/// A Recovery code enrollment challenge.
+public struct RecoveryCodeEnrollmentChallenge {
 
     /// The unique identifier for the authentication method.
     public let authenticationId: String
@@ -9,20 +9,16 @@ public struct TOTPPushEnrollmentChallenge {
     /// The unique session identifier for the enrollment.
     public let authenticationSession: String
 
-    /// The URI for the QR code to be scanned by the authenticator.
-    public let authenticatorQRCodeURI: String
-
-    /// The manual input code for the authenticator in case QR codes cannot be used.
-    public let authenticatorManualInputCode: String?
+    /// The recovery code value.
+    public let recoveryCode: String
 }
 
-extension TOTPPushEnrollmentChallenge: Decodable {
+extension RecoveryCodeEnrollmentChallenge: Decodable {
 
     enum CodingKeys: String, CodingKey {
         case authenticationSession = "auth_session"
         case authenticationId = "id"
-        case authenticatorQRCodeURI = "barcode_uri"
-        case authenticatorManualInputCode = "manual_input_code"
+        case recoveryCode = "recovery_code"
     }
 
     /// `Decodable` initializer.
@@ -38,8 +34,8 @@ extension TOTPPushEnrollmentChallenge: Decodable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.init(authenticationId: try values.decode(String.self, forKey: .authenticationId),
                   authenticationSession: try values.decode(String.self, forKey: .authenticationSession),
-                  authenticatorQRCodeURI: try values.decode(String.self, forKey: .authenticatorQRCodeURI),
-                  authenticatorManualInputCode: try values.decodeIfPresent(String.self, forKey: .authenticatorManualInputCode))
+                  recoveryCode: try values.decode(String.self, forKey: .recoveryCode))
     }
 
 }
+
