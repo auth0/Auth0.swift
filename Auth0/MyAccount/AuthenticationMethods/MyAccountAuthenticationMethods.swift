@@ -279,7 +279,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///
     /// - Parameters:
     ///   - phoneNumber: The destination phone number used to send verification codes via text and voice.
-    ///   - preferredAuthenticationMethod: The preferred communication method.(sms/voice). If no value is passed by default sms will be the preferred authentication method
+    ///   - preferredAuthenticationMethod: The preferred communication method(sms). If no value is passed by default sms will be the preferred authentication method
     /// - Returns: A request that will yield a phone enrolment challenge
     func enrollPhone(phoneNumber: String,
                      preferredAuthenticationMethod: String?) -> Request<PhoneEnrollmentChallenge, MyAccountError>
@@ -432,8 +432,8 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - otpCode: The one-time password code sent to the phone number.
     /// - Returns: A request that will yield an enrolled phone authentication method.
     func confirmPhoneEnrollment(id: String,
-                               authSession: String,
-                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+                                authSession: String,
+                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Enrolls a new Recovery code credential. This is the last part of the enrollment flow.
     ///
@@ -602,44 +602,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - id:  Id of the returned authentication method
     /// - Returns: A request to fetch authentication method associated with the id.
     func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
-
-    /// Update name or/and preferredAuthenticationMethod associated with an authentication method
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `update:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .updateAuthenticationMethod(id: id, name: name, preferredAuthenticationMethod: preferredAuthenticationMethod)
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let authenticationMethod):
-    ///             print("Updated authenticationMethod: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - id: Id associated with the authentication method for which data needs to be updated
-    ///   - name: The friendly name of the authentication method
-    ///   - preferredAuthenticationMethod: The preferred authentication method (for phone authenticators)
-    /// - Returns: A request that updates authentication method.
-    func updateAuthenticationMethod(id: String,
-                                    name: String?,
-                                    preferredAuthenticationMethod: String?) -> Request<AuthenticationMethod, MyAccountError>
 }
 // MARK: - Default Parameters
 
@@ -652,14 +614,6 @@ public extension MyAccountAuthenticationMethods {
         self.passkeyEnrollmentChallenge(userIdentityId: userIdentityId, connection: connection)
     }
     #endif
-
-    func updateAuthenticationMethod(id: String,
-                                    name: String? = nil,
-                                    preferredAuthenticationMethod: String? = nil) -> Request<AuthenticationMethod, MyAccountError> {
-        self.updateAuthenticationMethod(id: id,
-                                        name: name,
-                                        preferredAuthenticationMethod: preferredAuthenticationMethod)
-    }
 
     func enrollPhone(phoneNumber: String,
                      preferredAuthenticationMethod: String? = nil) -> Request<PhoneEnrollmentChallenge, MyAccountError> {

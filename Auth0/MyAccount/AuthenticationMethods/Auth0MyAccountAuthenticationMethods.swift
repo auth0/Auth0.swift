@@ -260,20 +260,4 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        logger: logger,
                        telemetry: telemetry)
     }
-
-    func updateAuthenticationMethod(id: String,
-                                    name: String?,
-                                    preferredAuthenticationMethod: String?) -> Request<AuthenticationMethod, MyAccountError> {
-        var payload: [String: Any] = [:]
-        payload["name"] = name
-        payload["preferred_authentication_method"] = preferredAuthenticationMethod
-        return Request(session: session,
-                       url: url.appending("authentication-methods").appending(id),
-                       method: "PATCH",
-                       handle: myAcccountDecodable,
-                       parameters: payload,
-                       headers: defaultHeaders,
-                       logger: logger,
-                       telemetry: telemetry)
-    }
 }
