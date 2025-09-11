@@ -281,6 +281,8 @@ func passkeyAuthenticationMethodResponse(id: String,
     return apiSuccessResponse(json: json)
 }
 
+#endif
+
 func authenticationMethodResponse(id: String, type: String, name: String? = nil, preferredAuthMethod: String? = nil, confirmed: Bool = true, createdAt: String, usage: [String]) -> RequestResponse {
     var payload: [String: Any] = [
         "id": id,
@@ -338,5 +340,3 @@ func authenticationMethodsListResponse(methods: [[String: Any]], headers: [Strin
 func factorListResponse(factors: [String: Any]) -> RequestResponse {
     return apiSuccessResponse(json: factors)
 }
-
-#endif
