@@ -2572,12 +2572,12 @@ Auth0
 
 ```swift
 do {
-    try await Auth0
+    let authenticationMethod = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
         .getAuthenticationMethod(id: id)
         .start()
-    print("Authentication method is deleted")
+    print("Obtained authentication method: \(authenticationMethod)")
 } catch {
     print("Failed with: \(error)")
 }
@@ -2597,8 +2597,9 @@ Auth0
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
         }
-    }, receiveValue: { _ in
-        print("Authentication method is deleted")
+    }, receiveValue: { authenticationMethod in
+        print("Obtained authentication method: \(authenticationMethod)")
+
     })
     .store(in: &cancellables)
 ```
