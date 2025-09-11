@@ -1867,13 +1867,13 @@ Auth0
 
 #### 2. Enroll the email authentication method
 
-Use the otpCode recieved in the email used for generating enrollment challenge, authSession and id from enrollment challenge to enroll the email with Auth0.
+Use the otpCode received in the email used for generating enrollment challenge, authSession and id from enrollment challenge to enroll the email with Auth0.
 
 ```swift
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .confirmEmailEnrolment(id: id,
+    .confirmEmailEnrollment(id: id,
                            authSession: authSession,
                            otpCode: otpCode)
     .start { result in
@@ -1894,9 +1894,9 @@ do {
     let authenticationMethod = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .confirmEmailEnrolment(id: id,
-                               authSession: authSession,
-                               otpCode: otpCode)
+        .confirmEmailEnrollment(id: id,
+                                authSession: authSession,
+                                otpCode: otpCode)
         .start()
     print("Enrolled email: \(authenticationMethod)")
 } catch {
@@ -1912,9 +1912,9 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .confirmEmailEnrolment(id: id,
-                           authSession: authSession,
-                           otpCode: otpCode)
+    .confirmEmailEnrollment(id: id,
+                            authSession: authSession,
+                            otpCode: otpCode)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -1937,7 +1937,7 @@ Enrolling a new phone authentication method is a two-step process. First, you re
 
 - Enable the MFA grant type for your application. Go to Auth0 Dashboard > Applications > Advanced Settings > Grant Types and select MFA.
 - Enable the Phone Message factor. Go to Auth0 Dashboard > Security > Multi-factor Auth > Phone Message.
-- The iOS **Device Settings** configured for your Auth0 application.- The iOS **Device Settings** configured for your Auth0 application.
+- The iOS **Device Settings** configured for your Auth0 application.
 
 #### 1. Request an enrollment challenge
 
@@ -1998,13 +1998,13 @@ Auth0
 
 #### 2. Enroll the phone authentication method
 
-Use the otpCode recieved in the phone number used for generating challenge, authSession and id from enrolment challenge to enroll the phone with Auth0.
+Use the otpCode received in the phone number used for generating challenge, authSession and id from enrollment challenge to enroll the phone with Auth0.
 
 ```swift
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .confirmPhoneEnrolment(id: id,
+    .confirmPhoneEnrollment(id: id,
                            authSession: authSession,
                            otpCode: otpCode)
     .start { result in
@@ -2025,7 +2025,7 @@ do {
     let authenticationMethod = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .confirmEmailEnrolment(id: id,
+        .confirmPhoneEnrollment(id: id,
                                authSession: authSession,
                                otpCode: otpCode)
         .start()
@@ -2043,7 +2043,7 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .confirmEmailEnrolment(id: id,
+    .confirmPhoneEnrollment(id: id,
                            authSession: authSession,
                            otpCode: otpCode)
     .start()
@@ -2068,7 +2068,7 @@ Enrolling a new TOTP authentication method is a two-step process. First, you req
 
 - Enable the MFA grant type for your application. Go to Auth0 Dashboard > Applications > Advanced Settings > Grant Types and select MFA.
 - Enable the One-time Password factor. Go to Auth0 Dashboard > Security > Multi-factor Auth > One-time Password.
-- The iOS **Device Settings** configured for your Auth0 application.- The iOS **Device Settings** configured for your Auth0 application.
+- The iOS **Device Settings** configured for your Auth0 application.
 
 #### 1. Request an enrollment challenge
 
@@ -2126,15 +2126,15 @@ Auth0
 
 #### 2. Enroll the TOTP authentication method
 
-Use the otpCode from the authenticator app, authSession and id from enrolment challenge to enroll the phone with Auth0.
+Use the otpCode from the authenticator app, authSession and id from enrollment challenge to enroll the TOTP with Auth0.
 
 ```swift
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .confirmTOTPEnrolment(id: id, 
-                          authSession: authSession, 
-                          otpCode: otpCode)
+    .confirmTOTPEnrollment(id: id, 
+                           authSession: authSession, 
+                           otpCode: otpCode)
     .start { result in
         switch result {
         case .success(let authenticationMethod):
@@ -2153,9 +2153,9 @@ do {
     let authenticationMethod = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .confirmTOTPEnrolment(id: id, 
-                              authSession: authSession, 
-                              otpCode: otpCode)
+        .confirmTOTPEnrollment(id: id, 
+                               authSession: authSession, 
+                               otpCode: otpCode)
         .start()
     print("Enrolled TOTP: \(authenticationMethod)")
 } catch {
@@ -2171,9 +2171,9 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-   .confirmTOTPEnrolment(id: id, 
-                         authSession: authSession, 
-                         otpCode: otpCode)
+   .confirmTOTPEnrollment(id: id, 
+                          authSession: authSession, 
+                          otpCode: otpCode)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -2254,14 +2254,14 @@ Auth0
 
 #### 2. Enroll the push notification authentication method
 
-To confirm the enrollment, the end user will need to scan a QR code with the barcode_uri from enrolment challenge in the Guardian application, within the next 5 minutes and invoke confirmPushNotificatonEnrolment method.
+To confirm the enrollment, the end user will need to scan a QR code with the barcode_uri from enrollment challenge in the Guardian application, within the next 5 minutes and invoke confirmPushNotificatonEnrollment method.
 
 ```swift
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .confirmPushNotificationEnrolment(id: id, 
-                                      authSession: authSession)
+    .confirmPushNotificationEnrollment(id: id, 
+                                       authSession: authSession)
     .start { result in
         switch result {
         case .success(let authenticationMethod):
@@ -2280,8 +2280,8 @@ do {
     let authenticationMethod = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .confirmPushNotificationEnrolment(id: id, 
-                                          authSession: authSession)
+        .confirmPushNotificationEnrollment(id: id, 
+                                           authSession: authSession)
         .start()
     print("Enrolled push notification: \(authenticationMethod)")
 } catch {
@@ -2297,8 +2297,8 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-   .confirmPushNotificationEnrolment(id: id, 
-                                     authSession: authSession)
+   .confirmPushNotificationEnrollment(id: id, 
+                                      authSession: authSession)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -2329,7 +2329,7 @@ Enrolling a new recovery code authentication method is a two-step process. First
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .enrolRecoveryCode()
+    .enrollRecoveryCode()
     .start { result in
         switch result {
         case .success(let enrollmentChallenge):
@@ -2348,7 +2348,7 @@ do {
     let enrollmentChallenge = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .enrolRecoveryCode()
+        .enrollRecoveryCode()
         .start()
     print("Obtained enrollment challenge: \(enrollmentChallenge)")
 } catch {
@@ -2364,7 +2364,7 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .enrolRecoveryCode()
+    .enrollRecoveryCode()
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -2385,8 +2385,8 @@ Use the authSession and id from enrollment challenge to enroll the recovery code
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .confirmRecoveryCodeEnrolment(id: id,
-                                  authSession: authSession)
+    .confirmRecoveryCodeEnrollment(id: id,
+                                   authSession: authSession)
     .start { result in
         switch result {
         case .success(let authenticationMethod):
@@ -2405,10 +2405,10 @@ do {
     let authenticationMethod = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .confirmRecoveryCodeEnrolment(id: id,
-                                      authSession: authSession)
+        .confirmRecoveryCodeEnrollment(id: id,
+                                       authSession: authSession)
         .start()
-    print("Enrolled email: \(authenticationMethod)")
+    print("Enrolled Recovery code: \(authenticationMethod)")
 } catch {
     print("Failed with: \(error)")
 }
@@ -2422,8 +2422,8 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .confirmRecoveryCodeEnrolment(id: id,
-                                  authSession: authSession)
+    .confirmRecoveryCodeEnrollment(id: id,
+                                   authSession: authSession)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -2448,7 +2448,7 @@ Auth0
     .start { result in
         switch result {
         case .success(let response):
-            print("Obtained fctors: \(response.factors)")
+            print("Obtained factors: \(response.factors)")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -2631,7 +2631,7 @@ do {
     let _ = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .getAuthenticationMethod(id: id)
+        .deleteAuthenticationMethod(id: id)
         .start()
     print("Authentication method is successfully deleted")
 } catch {
@@ -2647,7 +2647,7 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .getAuthenticationMethod(id: id)
+    .deleteAuthenticationMethod(id: id)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
