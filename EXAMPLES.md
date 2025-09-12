@@ -1946,7 +1946,7 @@ Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
     .enrollPhone(phoneNumber: phoneNumber, 
-                 preferredAuthenticationMethod: "sms")
+                 preferredAuthenticationMethod: .sms)
     .start { result in
         switch result {
         case .success(let enrollmentChallenge):
@@ -1966,7 +1966,7 @@ do {
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
         .enrollPhone(phoneNumber: phoneNumber, 
-                     preferredAuthenticationMethod: "sms")
+                     preferredAuthenticationMethod: .sms)
         .start()
     print("Obtained enrollment challenge: \(enrollmentChallenge)")
 } catch {
@@ -1983,7 +1983,7 @@ Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
     .enrollPhone(phoneNumber: phoneNumber, 
-                 preferredAuthenticationMethod: "sms")
+                 preferredAuthenticationMethod: .sms)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
