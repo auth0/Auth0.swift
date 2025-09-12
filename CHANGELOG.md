@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.15.0](https://github.com/auth0/Auth0.swift/tree/2.15.0) (2025-09-12)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.14.0...2.15.0)
+
+**Added**
+- My Account Auth APIs [\#974](https://github.com/auth0/Auth0.swift/pull/974) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [2.14.0](https://github.com/auth0/Auth0.swift/tree/2.14.0) (2025-08-07)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.13.0...2.14.0)
 
