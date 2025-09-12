@@ -280,4 +280,63 @@ func passkeyAuthenticationMethodResponse(id: String,
 
     return apiSuccessResponse(json: json)
 }
+
 #endif
+
+func authenticationMethodResponse(id: String, type: String, name: String? = nil, preferredAuthMethod: String? = nil, confirmed: Bool = true, createdAt: String, usage: [String]) -> RequestResponse {
+    var payload: [String: Any] = [
+        "id": id,
+        "type": type,
+        "confirmed": confirmed,
+        "created_at": createdAt,
+        "usage": usage
+    ]
+    if let preferred = preferredAuthMethod {
+        payload["preferred_authentication_method"] = preferred
+    }
+    return apiSuccessResponse(json: payload)
+}
+
+func recoveryCodeChallengeResponse(id: String, authSession: String, recoveryCode: String) -> RequestResponse {
+    let payload: [String: Any] = [
+        "id": id,
+        "auth_session": authSession,
+        "recovery_code": recoveryCode,
+        "type": "recovery-code"
+    ]
+    return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
+}
+
+func phoneEmailChallengeResponse(id: String, authSession: String, type: String) -> RequestResponse {
+    let payload: [String: Any] = [
+        "id": id,
+        "auth_session": authSession,
+        "type": type
+    ]
+    return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
+}
+
+func phoneEnrolmentFailureResponse(json: [String: Any]) -> RequestResponse {
+    return apiFailureResponse(json: json, statusCode: 400)
+}
+
+func totpPushEnrollmentChallengeResponse(id: String,
+                                         authSession: String,
+                                         barcodeUri: String? = nil,
+                                         manualInputCode: String? = nil) -> RequestResponse {
+    var payload: [String: Any] = [
+        "id": id,
+        "auth_session": authSession,
+    ]
+    if let uri = barcodeUri { payload["barcode_uri"] = uri }
+    if let manualInputCode = manualInputCode { payload["manual_input_code"] = manualInputCode }
+    return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
+}
+
+func authenticationMethodsListResponse(methods: [String: Any], headers: [String: String] = [:]) -> RequestResponse {
+    return apiSuccessResponse(json: methods)
+}
+
+func factorListResponse(factors: [String: Any], headers: [String: String] = [:]) -> RequestResponse {
+    return apiSuccessResponse(json: factors)
+}

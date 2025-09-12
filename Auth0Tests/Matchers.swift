@@ -223,6 +223,134 @@ func havePasskeyAuthenticationMethod(id: String,
 }
 #endif
 
+func haveRecoveryCodeChallenge(id: String, authSession: String, recoveryCode: String) -> Nimble.Matcher<MyAccountResult<RecoveryCodeEnrollmentChallenge>> {
+    let definition = "haveRecoveryCodeChallenge with " +
+    "identifier <\(id)>, " +
+    "authSession <\(authSession)>, " +
+    "and recovery code <\(recoveryCode)>"
+    return Matcher<MyAccountResult<RecoveryCodeEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: RecoveryCodeEnrollmentChallenge) ->
+            Bool in
+            return created.authenticationId == id &&
+            created.authenticationSession == authSession &&
+            created.recoveryCode == recoveryCode
+        }
+    }
+}
+
+func haveAuthMethodEnrolmentError<T>(type: String,
+                                     title: String,
+                                     detail: String,
+                                     statusCode: Int,
+                                     validationErrors: [MyAccountError.ValidationError]? = nil) -> Nimble.Matcher<MyAccountResult<T>> {
+    return Matcher<MyAccountResult<T>>.define("be an error response with code <\(statusCode)> and description <\(detail)") { expression, failureMessage -> MatcherResult in
+        return try beUnsuccessful(expression, failureMessage) { (error: MyAccountError) -> Bool in
+            return validationErrors == error.validationErrors
+            && detail == error.detail
+            && statusCode == error.statusCode
+        }
+    }
+}
+
+func haveEmailChallenge(id: String, authSession: String) -> Nimble.Matcher<MyAccountResult<EmailEnrollmentChallenge>> {
+    let definition = "haveEmailChallenge with " +
+    "identifier <\(id)>, " +
+    "authSession <\(authSession)>"
+    return Matcher<MyAccountResult<EmailEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: EmailEnrollmentChallenge) ->
+            Bool in
+            return created.authenticationId == id &&
+            created.authenticationSession == authSession
+        }
+    }
+}
+
+func havePhoneChallenge(id: String, authSession: String) -> Nimble.Matcher<MyAccountResult<PhoneEnrollmentChallenge>> {
+    let definition = "havePhoneChallenge with " +
+    "identifier <\(id)>, " +
+    "authSession <\(authSession)>"
+    return Matcher<MyAccountResult<PhoneEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: PhoneEnrollmentChallenge) ->
+            Bool in
+            return created.authenticationId == id &&
+            created.authenticationSession == authSession
+        }
+    }
+}
+
+func havePushEnrollmentChallenge(id: String, authSession: String, barcodeUri: String? = nil, manualInputCode: String? = nil) -> Nimble.Matcher<MyAccountResult<PushEnrollmentChallenge>> {
+    let definition = "havePushEnrollmentChallenge with " +
+    "identifier <\(id)>, " +
+    "authSession <\(authSession)>, " +
+    "barCodeUri <\(String(describing: barcodeUri))>, " +
+    "manualInputCode <\(String(describing: manualInputCode))>"
+    return Matcher<MyAccountResult<PushEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: PushEnrollmentChallenge) -> Bool in
+            return created.authenticationId == id &&
+            created.authenticationSession == authSession &&
+            created.authenticatorManualInputCode == manualInputCode &&
+            created.authenticatorQRCodeURI == barcodeUri
+        }
+    }
+}
+
+func haveTOTPEnrollmentChallenge(id: String, authSession: String, barcodeUri: String? = nil, manualInputCode: String? = nil) -> Nimble.Matcher<MyAccountResult<TOTPEnrollmentChallenge>> {
+    let definition = "haveTOTPEnrollmentChallenge with " +
+    "identifier <\(id)>, " +
+    "authSession <\(authSession)>, " +
+    "barCodeUri <\(String(describing: barcodeUri))>, " +
+    "manualInputCode <\(String(describing: manualInputCode))>"
+    return Matcher<MyAccountResult<TOTPEnrollmentChallenge>>.define(definition) { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: TOTPEnrollmentChallenge) -> Bool in
+            return created.authenticationId == id &&
+            created.authenticationSession == authSession &&
+            created.authenticatorManualInputCode == manualInputCode &&
+            created.authenticatorQRCodeURI == barcodeUri
+        }
+    }
+}
+
+
+func haveAuthenticationMethods(count: Int) -> Nimble.Matcher<MyAccountResult<[AuthenticationMethod]>> {
+    return Matcher<MyAccountResult<[AuthenticationMethod]>>.define("have authentication methods") { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: [AuthenticationMethod]) -> Bool in
+            return created.count == count
+        }
+    }
+}
+
+func haveAuthenticationMethod(id: String) -> Nimble.Matcher<Result<AuthenticationMethod, MyAccountError>> {
+    return Matcher<MyAccountResult<AuthenticationMethod>>.define("have authentication method") { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: AuthenticationMethod) -> Bool in
+            created.id == id
+        }
+    }
+}
+
+func haveAuthenticationMethodInList(id: String) -> Nimble.Matcher<MyAccountResult<[AuthenticationMethod]>> {
+    return Matcher<MyAccountResult<[AuthenticationMethod]>>.define("have authentication method in list") { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: [AuthenticationMethod]) -> Bool in
+            created.contains(where: { $0.id == id})
+        }
+    }
+}
+ 
+func haveFactorInList(type: String) -> Nimble.Matcher<MyAccountResult<[Factor]>> {
+    return Matcher<MyAccountResult<[Factor]>>.define("have factors in list") { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: [Factor]) -> Bool in
+            created.contains(where: { $0.type == type })
+        }
+    }
+}
+
+func haveEmptyFactorsInList() -> Nimble.Matcher<MyAccountResult<[Factor]>> {
+    return Matcher<MyAccountResult<[Factor]>>.define("have empty factors in list") { expression, FailureMessage in
+        return try beSuccessful(expression, FailureMessage) { (created: [Factor]) -> Bool in
+            created.isEmpty
+        }
+    }
+}
+
 func haveCreatedUser(_ email: String, username: String? = nil) -> Nimble.Matcher<AuthenticationResult<DatabaseUser>> {
     return Matcher<AuthenticationResult<DatabaseUser>>.define("have created user with email <\(email)>") { expression, failureMessage -> MatcherResult in
         return try beSuccessful(expression, failureMessage) { (created: DatabaseUser) -> Bool in
@@ -256,6 +384,13 @@ func beSuccessful<T>() -> Nimble.Matcher<CredentialsManagerResult<T>> {
         return try beSuccessful(expression, failureMessage)
     }
 }
+
+func beSuccessful<T>() -> Nimble.Matcher<MyAccountResult<T>> {
+    return Matcher<MyAccountResult<T>>.define("be a successful result") { expression, failureMessage -> MatcherResult in
+        return try beSuccessful(expression, failureMessage)
+    }
+}
+
 
 func beUnsuccessful<T>(_ cause: String? = nil) -> Nimble.Matcher<AuthenticationResult<T>> {
     return Matcher<AuthenticationResult<T>>.define("be a failure result") { expression, failureMessage -> MatcherResult in
@@ -485,6 +620,12 @@ extension URLRequest {
         return isHost(domain) && isPath(path) && hasBearerToken(token)
     }
     
+    func isFactorsMethods(_ domain: String, _ endpoint: String = "", token: String) -> Bool {
+        let subpath = endpoint.isEmpty ? endpoint : "/\(endpoint)"
+        let path = "/me/\(Auth0MyAccount.apiVersion)/factors"
+        return isHost(domain) && isPath(path) && hasBearerToken(token)
+    }
+
     func isLinkPath(_ domain: String, identifier: String) -> Bool {
         return isHost(domain) && isPath("/api/v2/users/\(identifier)/identities")
     }

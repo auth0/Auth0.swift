@@ -16,6 +16,9 @@ private let AuthenticationMethodId = "PASSKEY_ID"
 private let Connection = "Username-Password-Authentication"
 private let Email = "user@example.com"
 private let Timeout: NimbleTimeInterval = .seconds(2)
+private let PhoneNumber = "+15551234567"
+private let OTPCode = "123456"
+private let AuthSession = "someAuthSessionToken"
 
 class MyAccountAuthenticationMethodsSpec: QuickSpec {
     override class func spec() {
@@ -37,7 +40,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
             it("should init with token and url") {
                 let authMethods = Auth0MyAccountAuthenticationMethods(token: AccessToken, url: DomainURL)
                 expect(authMethods.token) == AccessToken
-                expect(authMethods.url) == DomainURL.appending("authentication-methods")
+                expect(authMethods.url) == DomainURL
             }
 
             it("should init with token, url, and session") {
@@ -57,7 +60,6 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                                                                       telemetry: telemetry)
                 expect(authMethods.telemetry.info) == telemetryInfo
             }
-
         }
 
         #if PASSKEYS_PLATFORM
@@ -69,7 +71,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 let rawClientDataJSON: Data
             }
 
-            let authSession = "y1PI7ue7QX85WMxoR6Qa-9INuqA3xxKLVoDOxBOD6yYQL1Fl-zgwjFtZIQfRORhY"
+            let passkeyAuthSession = "y1PI7ue7QX85WMxoR6Qa-9INuqA3xxKLVoDOxBOD6yYQL1Fl-zgwjFtZIQfRORhY"
             let userId = "LcICuavHdO2zbcA8zRgnTRIkzPrruI_HQqe0J3RL0ou5VSrWhRybCQqyNMXWj1LDdxOzat6KVf9xpW3qLw5qjw"
             let userIdData = userId.a0_decodeBase64URLSafe()!
             let userIdentityId = "681359da4a20c7993310ff1d"
@@ -77,22 +79,21 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
             let challengeData = challenge.a0_decodeBase64URLSafe()!
 
             describe("enroll passkey") {
-
                 let endpoint = "\(AuthenticationMethodId)/verify"
                 let credentialId = "mXTk10IfDhdxZnJltERtBRyNUkE"
                 let credentialType = "public-key"
                 let authenticatorAttachment = "platform"
                 let attestationObject = "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYlDH4SiOEQFwNz4z4dy3yWLJ5CkueUJPzpqu" +
-                "lBxP_X_9dAAAAAPv8MAcVTk7MjAtuAgVX170AFJl05NdCHw4XcWZyZbREbQUcjVJBpQECAyYgASFYII53hB2t9eUcxo6B4PdeSa" +
-                "WKQCb-sQRSSJIsSl1iXE6VIlgg9SFUiFdAPMrCwC-RQaNKVwNrMFzsRkiu0Djz-GPjDfA"
+                    "lBxP_X_9dAAAAAPv8MAcVTk7MjAtuAgVX170AFJl05NdCHw4XcWZyZbREbQUcjVJBpQECAyYgASFYII53hB2t9eUcxo6B4PdeSa" +
+                    "WKQCb-sQRSSJIsSl1iXE6VIlgg9SFUiFdAPMrCwC-RQaNKVwNrMFzsRkiu0Djz-GPjDfA"
                 let clientData = "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiTDRTYVN4eDh0cHFyU2NUX2hicFpYLT" +
-                "UwcWZLaDEyX294bVNVSUtTR0ZwTSIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4ud2lkY2tldC5jb20ifQ-MN8A"
+                    "UwcWZLaDEyX294bVNVSUtTR0ZwTSIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4ud2lkY2tldC5jb20ifQ-MN8A"
 
                 let newPasskey = MockNewPasskey(credentialID: credentialId.a0_decodeBase64URLSafe()!,
                                                 rawAttestationObject: attestationObject.a0_decodeBase64URLSafe(),
                                                 rawClientDataJSON: clientData.a0_decodeBase64URLSafe()!)
                 let enrollmentChallenge = PasskeyEnrollmentChallenge(authenticationMethodId: AuthenticationMethodId,
-                                                                     authenticationSession: authSession,
+                                                                     authenticationSession: passkeyAuthSession,
                                                                      relyingPartyId: Domain,
                                                                      userId: userIdData,
                                                                      userName: Email,
@@ -100,7 +101,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
 
                 it("should enroll passkey") {
                     let publicKey = "pQECAyYgASFYIGK0OMbKXIHgb1Es/MrVoCTrGDzi96vGxUpAGJOhUOp4IlggxIbnS81JDZHWv+NZtWV" +
-                    "7wMzbg7sTOJbACvk7xY6DE7A="
+                        "7wMzbg7sTOJbACvk7xY6DE7A="
                     let publicKeyData = Data(base64Encoded: publicKey)!
                     let createdAt = "2025-05-15T13:29:32.321Z"
                     let createdAtDateFormatter = ISO8601DateFormatter()
@@ -111,7 +112,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                         $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
                         $0.isMethodPOST &&
                         $0.hasAtLeast([
-                            "auth_session": authSession,
+                            "auth_session": passkeyAuthSession,
                             "authn_response": [
                                 "authenticatorAttachment": authenticatorAttachment,
                                 "type": credentialType,
@@ -151,7 +152,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                         $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
                         $0.isMethodPOST &&
                         $0.hasAtLeast([
-                            "auth_session": authSession,
+                            "auth_session": passkeyAuthSession,
                             "authn_response": [
                                 "authenticatorAttachment": authenticatorAttachment,
                                 "type": credentialType,
@@ -184,7 +185,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                         $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
                         $0.isMethodPOST &&
                         $0.hasAllOf(["type": "passkey"])
-                    }, response: passkeyEnrollmentChallengeResponse(authSession: authSession,
+                    }, response: passkeyEnrollmentChallengeResponse(authSession: passkeyAuthSession,
                                                                     rpId: Domain,
                                                                     userId: userId,
                                                                     userName: Email,
@@ -197,11 +198,11 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                             .start { result in
                                 expect(result)
                                     .to(havePasskeyEnrollmentChallenge(authenticationMethodId: AuthenticationMethodId,
-                                                                       authenticationSession: authSession,
-                                                                       relyingPartyId: Domain,
-                                                                       userId: userIdData,
-                                                                       userName: Email,
-                                                                       challengeData: challengeData))
+                                                                        authenticationSession: passkeyAuthSession,
+                                                                        relyingPartyId: Domain,
+                                                                        userId: userIdData,
+                                                                        userName: Email,
+                                                                        challengeData: challengeData))
                                 done()
                             }
                     }
@@ -218,7 +219,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                             "connection": Connection,
                             "identity_user_id": identityUserId
                         ])
-                    }, response: passkeyEnrollmentChallengeResponse(authSession: authSession,
+                    }, response: passkeyEnrollmentChallengeResponse(authSession: passkeyAuthSession,
                                                                     rpId: Domain,
                                                                     userId: userId,
                                                                     userName: Email,
@@ -231,11 +232,11 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                             .start { result in
                                 expect(result)
                                     .to(havePasskeyEnrollmentChallenge(authenticationMethodId: AuthenticationMethodId,
-                                                                       authenticationSession: authSession,
-                                                                       relyingPartyId: Domain,
-                                                                       userId: userIdData,
-                                                                       userName: Email,
-                                                                       challengeData: challengeData))
+                                                                        authenticationSession: passkeyAuthSession,
+                                                                        relyingPartyId: Domain,
+                                                                        userId: userIdData,
+                                                                        userName: Email,
+                                                                        challengeData: challengeData))
                                 done()
                             }
                     }
@@ -265,5 +266,557 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
         }
         #endif
 
+        describe("enroll Recovery Code") {
+            it("should enroll recovery code successfully") {
+                let recoveryCode = "ABCDEFGH-IJKL-MNOP-QRST-UVWXYZ123456"
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "recovery-code"])
+                }, response: recoveryCodeChallengeResponse(id: AuthenticationMethodId,
+                                                         authSession: AuthSession,
+                                                         recoveryCode: recoveryCode))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollRecoveryCode().start { result in
+                        expect(result).to(haveRecoveryCodeChallenge(id: AuthenticationMethodId,
+                                                                    authSession: AuthSession,
+                                                                    recoveryCode: recoveryCode))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to enroll recovery code") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "recovery-code"])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollRecoveryCode().start { result in
+                        expect(result).to(beUnsuccessful("api failed with 400 due to invalid input"))
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("enroll TOTP") {
+            it("should enroll TOTP successfully") {
+                let barcodeUri = "otpauth://totp/Auth0:user@example.com?secret=ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678&issuer=Auth0"
+                let manualInputCode = "N47VVYSDHRKWWSLJONYEQ7LXLV5XEMC5"
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "totp"])
+                }, response: totpPushEnrollmentChallengeResponse(id: AuthenticationMethodId,
+                                                                 authSession: AuthSession,
+                                                                 barcodeUri: barcodeUri,
+                                                                 manualInputCode: manualInputCode))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollTOTP().start { result in
+                        expect(result).to(haveTOTPEnrollmentChallenge(id: AuthenticationMethodId,
+                                                                         authSession: AuthSession,
+                                                                         barcodeUri: barcodeUri,
+                                                                         manualInputCode: manualInputCode))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to enroll TOTP") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "totp"])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollTOTP().start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("enroll push notification") {
+            it("should enroll push notification successfully") {
+                let barcodeUri = "otpauth://totp/Auth0:user@example.com?secret=ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678&issuer=Auth0"
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "push-notification"])
+                }, response: totpPushEnrollmentChallengeResponse(id: AuthenticationMethodId,
+                                                                authSession: AuthSession,
+                                                                barcodeUri: barcodeUri))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollPushNotification().start { result in
+                        expect(result).to(havePushEnrollmentChallenge(id: AuthenticationMethodId,
+                                                                      authSession: AuthSession,
+                                                                      barcodeUri: barcodeUri))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to enroll push notification") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "push-notification"])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollPushNotification().start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("enroll Email") {
+            it("should enroll email successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "email", "email": Email])
+                }, response: phoneEmailChallengeResponse(id: AuthenticationMethodId,
+                                                        authSession: AuthSession,
+                                                        type: "email"))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollEmail(emailAddress: Email).start { result in
+                        expect(result).to(haveEmailChallenge(id: AuthenticationMethodId,
+                                                            authSession: AuthSession))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to enroll email") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "email", "email": Email])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollEmail(emailAddress: Email).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("enroll Phone") {
+            let preferredAuthMethod = PreferredAuthenticationMethod.sms
+
+            it("should enroll phone successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "phone",
+                                 "phone_number": PhoneNumber,
+                                 "preferred_authentication_method": preferredAuthMethod.rawValue])
+                }, response: phoneEmailChallengeResponse(id: AuthenticationMethodId,
+                                                        authSession: AuthSession,
+                                                        type: "phone"))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollPhone(phoneNumber: PhoneNumber,
+                                            preferredAuthenticationMethod: preferredAuthMethod).start { result in
+                        expect(result).to(havePhoneChallenge(id: AuthenticationMethodId,
+                                                             authSession: AuthSession))
+                        done()
+                    }
+                }
+            }
+            
+            it("should fail to enroll phone") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["type": "phone",
+                                 "phone_number": PhoneNumber,
+                                 "preferred_authentication_method": preferredAuthMethod.rawValue])
+                }, response: phoneEnrolmentFailureResponse(json: ["title": "Validation Error", "type": "https://auth0.com/api-errors/A0E-400-0003", "detail": "Invalid request payload input", "status": 400, "validation_errors": [
+                                    [
+                                            "pointer": "/preferred_authentication_method",
+                                           "detail": "data/preferred_authentication_method must be equal to one of the allowed values"
+                                      ]
+                                    ]]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.enrollPhone(phoneNumber: PhoneNumber,
+                                            preferredAuthenticationMethod: preferredAuthMethod).start { result in
+                        expect(result).to(haveAuthMethodEnrolmentError(type: "https://auth0.com/api-errors/A0E-400-0003", title: "Validation Error", detail: "Invalid request payload input", statusCode: 400, validationErrors: [MyAccountError.ValidationError(detail: "data/preferred_authentication_method must be equal to one of the allowed values", pointer: "/preferred_authentication_method")]))
+                        done()
+                    }
+                }
+            }
+        }
+
+        // MARK: - Confirmation Tests
+
+        describe("confirmTOTPEnrolment") {
+            let endpoint = "\(AuthenticationMethodId)/verify"
+            let usage = ["secondary"]
+            let createdAt = "2025-07-30T13:08:49.508Z"
+            it("should confirm TOTP enrollment successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession, "otp_code": OTPCode])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "totp", createdAt: createdAt, usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmTOTPEnrollment(id: AuthenticationMethodId,
+                                                     authSession: AuthSession,
+                                                     otpCode: OTPCode).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to confirm TOTP enrollment") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession, "otp_code": OTPCode])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmTOTPEnrollment(id: AuthenticationMethodId,
+                                                     authSession: AuthSession,
+                                                     otpCode: OTPCode).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("confirmEmailEnrolment") {
+            let endpoint = "\(AuthenticationMethodId)/verify"
+            let usage = ["secondary"]
+            let createdAt = "2025-07-30T13:08:49.508Z"
+            it("should confirm email enrollment successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession, "otp_code": OTPCode])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "email", createdAt: createdAt, usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmEmailEnrollment(id: AuthenticationMethodId,
+                                                      authSession: AuthSession,
+                                                      otpCode: OTPCode).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to confirm email enrollment") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession, "otp_code": OTPCode])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmEmailEnrollment(id: AuthenticationMethodId,
+                                                      authSession: AuthSession,
+                                                      otpCode: OTPCode).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("confirmPushNotificationEnrolment") {
+            let endpoint = "\(AuthenticationMethodId)/verify"
+            let usage = ["secondary"]
+            let createdAt = "2025-07-30T13:08:49.508Z"
+            it("should confirm push notification enrollment successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "push-notification", createdAt: createdAt, usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmPushNotificationEnrollment(id: AuthenticationMethodId,
+                                                                 authSession: AuthSession).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to confirm push notification enrollment") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmPushNotificationEnrollment(id: AuthenticationMethodId,
+                                                                 authSession: AuthSession).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("confirmPhoneEnrolment") {
+            let endpoint = "\(AuthenticationMethodId)/verify"
+
+            let usage = ["secondary"]
+            let createdAt = "2025-07-30T13:08:49.508Z"
+            it("should confirm phone enrollment successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession, "otp_code": OTPCode])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "phone", createdAt: createdAt, usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmPhoneEnrollment(id: AuthenticationMethodId,
+                                                      authSession: AuthSession,
+                                                      otpCode: OTPCode).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to confirm phone enrollment") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession, "otp_code": OTPCode])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmPhoneEnrollment(id: AuthenticationMethodId,
+                                                      authSession: AuthSession,
+                                                      otpCode: OTPCode).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("confirmRecoveryCodeEnrolment") {
+            let endpoint = "\(AuthenticationMethodId)/verify"
+            let usage = ["secondary"]
+            let createdAt = "2025-07-30T13:08:49.508Z"
+
+            it("should confirm recovery code enrollment successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession])
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "recovery-code", createdAt: createdAt, usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmRecoveryCodeEnrollment(id: AuthenticationMethodId,
+                                                             authSession: AuthSession).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to confirm recovery code enrollment") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodPOST &&
+                    $0.hasAllOf(["auth_session": AuthSession])
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.confirmRecoveryCodeEnrollment(id: AuthenticationMethodId,
+                                                             authSession: AuthSession).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        // MARK: - Management & Retrieval Tests
+
+        describe("getAuthenticationMethods") {
+            it("should get authentication methods successfully") {
+                let method1: [String: Any] = ["id": "id1", "type": "sms", "name": "SMS Method", "confirmed": true, "created_at": "2025-07-30T13:08:49.508Z", "usage": ["primary"]]
+                let method2: [String: Any] = ["id": "id2", "type": "email", "name": "Email Method", "confirmed": true, "created_at": "2025-07-30T13:08:49.508Z", "usage": ["secondary"]]
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET
+                }, response: authenticationMethodsListResponse(methods: ["authentication_methods" : [method1, method2]]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethods().start { result in
+                        expect(result).to(haveAuthenticationMethods(count: 2))
+                        expect(result).to(haveAuthenticationMethodInList(id: "id1"))
+                        expect(result).to(haveAuthenticationMethodInList(id: "id2"))
+                        done()
+                    }
+                }
+            }
+
+            it("should get an empty list of authentication methods") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET
+                }, response: authenticationMethodsListResponse(methods: ["authentication_methods": []]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethods().start { result in
+                        expect(result).to(haveAuthenticationMethods(count: 0))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to get authentication methods") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethods().start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("deleteAuthenticationMethod") {
+            let endpoint = "\(AuthenticationMethodId)"
+
+            it("should delete authentication method successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodDELETE
+                }, response: apiSuccessResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId).start { result in
+                        expect(result).to(beSuccessful())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to delete authentication method") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodDELETE
+                }, response: apiFailureResponse(statusCode: 404))
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("getFactorStatus") {
+            it("should get factor status successfully") {
+                let factor1: [String: Any] = ["type": "totp", "usage": ["primary"]]
+                let factor2: [String: Any] = ["type": "sms", "usage": ["secondary"]]
+                NetworkStub.addStub(condition: {
+                    $0.isFactorsMethods(Domain, token: AccessToken) && // Note: `factors` endpoint
+                    $0.isMethodGET
+                }, response: factorListResponse(factors: ["factors": [factor1, factor2]]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getFactors().start { result in
+                        expect(result).to(haveFactorInList(type: "totp"))
+                        expect(result).to(haveFactorInList(type: "sms"))
+                        done()
+                    }
+                }
+            }
+
+            it("should get an empty list of factor statuses") {
+                NetworkStub.addStub(condition: {
+                    $0.isFactorsMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET
+                }, response: factorListResponse(factors: ["factors": []]))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getFactors().start { result in
+                        expect(result).to(haveEmptyFactorsInList())
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to get factor status") {
+                NetworkStub.addStub(condition: {
+                    $0.isFactorsMethods(Domain, token: AccessToken) &&
+                    $0.isMethodGET
+                }, response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getFactors().start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("getAuthenticationMethod") {
+            let endpoint = "\(AuthenticationMethodId)"
+            let createdAt = "2025-07-30T13:08:49.508Z"
+            let usage = ["secondary"]
+        
+            it("should get a single authentication method successfully") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodGET
+                }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "passkey", name: "My Passkey", createdAt: createdAt, usage: usage))
+
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethod(by: AuthenticationMethodId).start { result in
+                        expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
+                        done()
+                    }
+                }
+            }
+
+            it("should fail to get a single authentication method (not found)") {
+                NetworkStub.addStub(condition: {
+                    $0.isMyAccountAuthenticationMethods(Domain, endpoint, token: AccessToken) &&
+                    $0.isMethodGET
+                }, response: apiFailureResponse(statusCode: 404))
+                waitUntil(timeout: Timeout) { done in
+                    authMethods.getAuthenticationMethod(by: AuthenticationMethodId).start { result in
+                        expect(result).to(beUnsuccessful())
+                        done()
+                    }
+                }
+            }
+        }
     }
 }
