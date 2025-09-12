@@ -139,8 +139,8 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///     .enrollRecoveryCode()
     ///     .start { result in
     ///         switch result {
-    ///         case .success(let recoveryCodeChallenge):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
+    ///         case .success(let enrollmentChallenge):
+    ///             print("Obtained enrollment Challenge \(enrollmentChallenge)")
     ///         case .failure(let error):
     ///             print("Failed with: \(error)")
     ///         }
@@ -149,291 +149,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///
     /// - Returns: A request that will yield an recovery code challenge
     func enrollRecoveryCode() -> Request<RecoveryCodeEnrollmentChallenge, MyAccountError>
-
-    /// Requests a challenge for enrolling a TOTP authentication method. This is the first part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `create:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .enrollTOTP()
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let totpEnrolmentChallenge):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Returns: A request that will yield a totp enrolment challenge
-    func enrollTOTP() -> Request<TOTPEnrollmentChallenge, MyAccountError>
-
-    /// Requests a challenge for enrolling a push notification authentication method. This is the first part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `create:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .enrollPushNotification()
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let pushEnrolmentChallenge):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Returns: A request that will yield a push notification enrolment challenge
-    func enrollPushNotification() -> Request<PushEnrollmentChallenge, MyAccountError>
-
-    /// Requests a challenge for enrolling a Email authentication method. This is the first part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `create:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .enrollEmail(emailAddress: emailAddress)
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let authenticationMethod):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - emailAddress:  The email address to use for sending one-time codes.
-    /// - Returns: A request that will yield a email enrolment challenge
-    func enrollEmail(emailAddress: String) -> Request<EmailEnrollmentChallenge, MyAccountError>
-
-    /// Requests a challenge for enrolling a Phone authentication method. This is the first part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `create:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .enrollPhone(phoneNumber: phoneNumber, preferredAuthenticationMethod: preferredAuthenticationMethod)
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let authenticationMethod):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - phoneNumber: The destination phone number used to send verification codes via text and voice.
-    ///   - preferredAuthenticationMethod: The preferred communication method(sms). If no value is passed by default sms will be the preferred authentication method
-    /// - Returns: A request that will yield a phone enrolment challenge
-    func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<PhoneEnrollmentChallenge, MyAccountError>
-
-    /// Enrolls a new ToTP authentication method. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `create:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .confirmTOTPEnrollment(id: id, authSession: authSession, otpCode: otpCode)
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let authenticationMethod):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
-    ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
-    ///   - otpCode: The one-time password code retrieved from the TOTP application.
-    /// - Returns: A request that will yield an enrolled TOTP authentication method.
-    func confirmTOTPEnrollment(id: String,
-                               authSession: String,
-                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
-
-    /// Enrolls a new Email authentication method. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `create:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .confirmEmailEnrollment(id: id, authSession: authSession, otpCode: otpCode)
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let authenticationMethod):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
-    ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
-    ///   - otpCode: The one-time password code sent to the email address.
-    /// - Returns: A request that will yield an enrolled email authentication method.
-    func confirmEmailEnrollment(id: String,
-                               authSession: String,
-                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
-
-    /// Enrolls a new Push Notification authentication method. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `create:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .confirmPushNotificationEnrollment(id: id, authSession: authSession)
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let authenticationMethod):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
-    ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
-    /// - Returns: A request that will yield an enrolled Push Notification authentication method.
-    ///
-    func confirmPushNotificationEnrollment(id: String,
-                                          authSession: String) -> Request<AuthenticationMethod, MyAccountError>
-
-    /// Enrolls a new Phone authentication method. This is the last part of the enrollment flow.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `create:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .confirmPhoneEnrollment(id: id, authSession: authSession, otpCode: otpCode)
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let authenticationMethod):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
-    ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
-    ///   - otpCode: The one-time password code sent to the phone number.
-    /// - Returns: A request that will yield an enrolled phone authentication method.
-    func confirmPhoneEnrollment(id: String,
-                                authSession: String,
-                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Enrolls a new Recovery code credential. This is the last part of the enrollment flow.
     ///
@@ -457,7 +172,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///     .start { result in
     ///         switch result {
     ///         case .success(let authenticationMethod):
-    ///             print("Enrolled passkey: \(authenticationMethod)")
+    ///             print("Enrolled recovery code: \(authenticationMethod)")
     ///         case .failure(let error):
     ///             print("Failed with: \(error)")
     ///         }
@@ -470,6 +185,291 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Returns: A request that will yield an enrolled recovery code authentication method.
     func confirmRecoveryCodeEnrollment(id: String,
                                       authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    /// Requests a challenge for enrolling a TOTP authentication method. This is the first part of the enrollment flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .enrollTOTP()
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let enrollmentChallenge):
+    ///             print("Obtained enrollment challenge \(enrollmentChallenge)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Returns: A request that will yield a totp enrollment challenge
+    func enrollTOTP() -> Request<TOTPEnrollmentChallenge, MyAccountError>
+    
+    /// Enrolls a new ToTP authentication method. This is the last part of the enrollment flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .confirmTOTPEnrollment(id: id, authSession: authSession, otpCode: otpCode)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticationMethod):
+    ///             print("Enrolled TOTP: \(authenticationMethod)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
+    ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
+    ///   - otpCode: The one-time password code retrieved from the TOTP application.
+    /// - Returns: A request that will yield an enrolled TOTP authentication method.
+    func confirmTOTPEnrollment(id: String,
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    /// Requests a challenge for enrolling a push notification authentication method. This is the first part of the enrollment flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .enrollPushNotification()
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let enrollmentChallenge):
+    ///             print("Obtained enrollment challenge \(enrollmentChallenge)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Returns: A request that will yield a push notification enrolment challenge
+    func enrollPushNotification() -> Request<PushEnrollmentChallenge, MyAccountError>
+
+    /// Enrolls a new Push Notification authentication method. This is the last part of the enrollment flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .confirmPushNotificationEnrollment(id: id, authSession: authSession)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticationMethod):
+    ///             print("Enrolled push notification: \(authenticationMethod)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
+    ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
+    /// - Returns: A request that will yield an enrolled Push Notification authentication method.
+    ///
+    func confirmPushNotificationEnrollment(id: String,
+                                           authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    /// Requests a challenge for enrolling a Email authentication method. This is the first part of the enrollment flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .enrollEmail(emailAddress: emailAddress)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let enrollmentChallenge):
+    ///             print("Enrolled enrollment challenge: \(enrollmentChallenge)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - emailAddress:  The email address to use for sending one-time codes.
+    /// - Returns: A request that will yield a email enrolment challenge
+    func enrollEmail(emailAddress: String) -> Request<EmailEnrollmentChallenge, MyAccountError>
+
+    /// Enrolls a new Email authentication method. This is the last part of the enrollment flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .confirmEmailEnrollment(id: id, authSession: authSession, otpCode: otpCode)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticationMethod):
+    ///             print("Enrolled email: \(authenticationMethod)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
+    ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
+    ///   - otpCode: The one-time password code sent to the email address.
+    /// - Returns: A request that will yield an enrolled email authentication method.
+    func confirmEmailEnrollment(id: String,
+                               authSession: String,
+                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    /// Requests a challenge for enrolling a Phone authentication method. This is the first part of the enrollment flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .enrollPhone(phoneNumber: phoneNumber, preferredAuthenticationMethod: preferredAuthenticationMethod)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let enrollmentChallenge):
+    ///             print("Obtained enrollment challenge: \(enrollmentChallenge)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - phoneNumber: The destination phone number used to send verification codes via text and voice.
+    ///   - preferredAuthenticationMethod: The preferred communication method(sms). If no value is passed by default sms will be the preferred authentication method
+    /// - Returns: A request that will yield a phone enrollment challenge
+    func enrollPhone(phoneNumber: String,
+                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<PhoneEnrollmentChallenge, MyAccountError>
+
+    /// Enrolls a new Phone authentication method. This is the last part of the enrollment flow.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `create:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .confirmPhoneEnrollment(id: id, authSession: authSession, otpCode: otpCode)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticationMethod):
+    ///             print("Enrolled phone: \(authenticationMethod)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - id: This value is part of the Location header returned when creating an authentication method. It should be used as it is, without any modifications.
+    ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
+    ///   - otpCode: The one-time password code sent to the phone number.
+    /// - Returns: A request that will yield an enrolled phone authentication method.
+    func confirmPhoneEnrollment(id: String,
+                                authSession: String,
+                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Retrieve detailed list of authentication methods belonging to the authenticated user.
     ///
