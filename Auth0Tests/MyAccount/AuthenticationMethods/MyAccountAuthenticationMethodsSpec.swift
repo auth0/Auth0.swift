@@ -416,7 +416,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
         }
 
         describe("enroll Phone") {
-            let preferredAuthMethod = "sms" // or "voice"
+            let preferredAuthMethod = PreferredAuthenticationMethod.sms
 
             it("should enroll phone successfully") {
                 NetworkStub.addStub(condition: {
@@ -424,7 +424,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                     $0.isMethodPOST &&
                     $0.hasAllOf(["type": "phone",
                                  "phone_number": PhoneNumber,
-                                 "preferred_authentication_method": preferredAuthMethod])
+                                 "preferred_authentication_method": preferredAuthMethod.rawValue])
                 }, response: phoneEmailChallengeResponse(id: AuthenticationMethodId,
                                                         authSession: AuthSession,
                                                         type: "phone"))
@@ -445,7 +445,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                     $0.isMethodPOST &&
                     $0.hasAllOf(["type": "phone",
                                  "phone_number": PhoneNumber,
-                                 "preferred_authentication_method": preferredAuthMethod])
+                                 "preferred_authentication_method": preferredAuthMethod.rawValue])
                 }, response: phoneEnrolmentFailureResponse(json: ["title": "Validation Error", "type": "https://auth0.com/api-errors/A0E-400-0003", "detail": "Invalid request payload input", "status": 400, "validation_errors": [
                                     [
                                             "pointer": "/preferred_authentication_method",
@@ -667,7 +667,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 NetworkStub.addStub(condition: {
                     $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
                     $0.isMethodGET
-                }, response: authenticationMethodsListResponse(methods: [method1, method2]))
+                }, response: authenticationMethodsListResponse(methods: ["authentication_methods" : [method1, method2]]))
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.getAuthenticationMethods().start { result in
@@ -683,7 +683,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 NetworkStub.addStub(condition: {
                     $0.isMyAccountAuthenticationMethods(Domain, token: AccessToken) &&
                     $0.isMethodGET
-                }, response: authenticationMethodsListResponse(methods: []))
+                }, response: authenticationMethodsListResponse(methods: ["authentication_methods": []]))
 
                 waitUntil(timeout: Timeout) { done in
                     authMethods.getAuthenticationMethods().start { result in
@@ -718,7 +718,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: apiSuccessResponse())
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.deleteAuthenticationMethod(id: AuthenticationMethodId).start { result in
+                    authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId).start { result in
                         expect(result).to(beSuccessful())
                         done()
                     }
@@ -731,7 +731,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                     $0.isMethodDELETE
                 }, response: apiFailureResponse(statusCode: 404))
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.deleteAuthenticationMethod(id: AuthenticationMethodId).start { result in
+                    authMethods.deleteAuthenticationMethod(by: AuthenticationMethodId).start { result in
                         expect(result).to(beUnsuccessful())
                         done()
                     }
@@ -798,7 +798,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 }, response: authenticationMethodResponse(id: AuthenticationMethodId, type: "passkey", name: "My Passkey", createdAt: createdAt, usage: usage))
 
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.getAuthenticationMethod(id: AuthenticationMethodId).start { result in
+                    authMethods.getAuthenticationMethod(by: AuthenticationMethodId).start { result in
                         expect(result).to(haveAuthenticationMethod(id: AuthenticationMethodId))
                         done()
                     }
@@ -811,7 +811,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                     $0.isMethodGET
                 }, response: apiFailureResponse(statusCode: 404))
                 waitUntil(timeout: Timeout) { done in
-                    authMethods.getAuthenticationMethod(id: AuthenticationMethodId).start { result in
+                    authMethods.getAuthenticationMethod(by: AuthenticationMethodId).start { result in
                         expect(result).to(beUnsuccessful())
                         done()
                     }

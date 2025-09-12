@@ -129,11 +129,11 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
 
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: String?) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
+                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
         var payload: [String: Any] = [:]
         payload["type"] = "phone"
         payload["phone_number"] = phoneNumber
-        payload["preferred_authentication_method"] = preferredAuthenticationMethod
+        payload["preferred_authentication_method"] = preferredAuthenticationMethod?.rawValue
         return Request(session: session,
                        url: url.appending("authentication-methods"),
                        method: "POST",
@@ -221,7 +221,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError> {
+    func deleteAuthenticationMethod(by id: String) -> Request<Void, MyAccountError> {
         return Request(session: session,
                        url: self.url.appending("authentication-methods").appending(id),
                        method: "DELETE",
@@ -231,27 +231,27 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError> {
+    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError> {
         return Request(session: session,
                        url: url.appending("authentication-methods"),
                        method: "GET",
-                       handle: myAcccountDecodable,
+                       handle: getAuthMethodsDecodable,
                        headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
 
-    func getFactors() -> Request<Factors, MyAccountError> {
+    func getFactors() -> Request<[Factor], MyAccountError> {
         return Request(session: session,
                        url: url.appending("factors"),
                        method: "GET",
-                       handle: myAcccountDecodable,
+                       handle: getFactorsDecodable,
                        headers: defaultHeaders,
                        logger: logger,
                        telemetry: telemetry)
     }
 
-    func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError> {
+    func getAuthenticationMethod(by id: String) -> Request<AuthenticationMethod, MyAccountError> {
         return Request(session: session,
                        url: url.appending("authentication-methods").appending(id),
                        method: "GET",

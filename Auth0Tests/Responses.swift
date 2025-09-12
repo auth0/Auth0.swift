@@ -333,10 +333,10 @@ func totpPushEnrollmentChallengeResponse(id: String,
     return apiSuccessResponse(json: payload, headers: ["Location": "https://example.com/auth-methods/\(id)"])
 }
 
-func authenticationMethodsListResponse(methods: [[String: Any]], headers: [String: String] = [:]) -> RequestResponse {
-    return apiSuccessResponse(json: ["authentication_methods": methods], headers: headers)
+func authenticationMethodsListResponse(methods: [String: Any], headers: [String: String] = [:]) -> RequestResponse {
+    return apiSuccessResponse(json: methods)
 }
 
-func factorListResponse(factors: [String: Any]) -> RequestResponse {
+func factorListResponse(factors: [String: Any], headers: [String: String] = [:]) -> RequestResponse {
     return apiSuccessResponse(json: factors)
 }

@@ -311,10 +311,10 @@ func haveTOTPEnrollmentChallenge(id: String, authSession: String, barcodeUri: St
 }
 
 
-func haveAuthenticationMethods(count: Int) -> Nimble.Matcher<MyAccountResult<AuthenticationMethods>> {
-    return Matcher<MyAccountResult<AuthenticationMethods>>.define("have authentication methods") { expression, failureMessage in
-        return try beSuccessful(expression, failureMessage) { (created: AuthenticationMethods) -> Bool in
-            return created.authenticationMethods.count == count
+func haveAuthenticationMethods(count: Int) -> Nimble.Matcher<MyAccountResult<[AuthenticationMethod]>> {
+    return Matcher<MyAccountResult<[AuthenticationMethod]>>.define("have authentication methods") { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: [AuthenticationMethod]) -> Bool in
+            return created.count == count
         }
     }
 }
@@ -327,26 +327,26 @@ func haveAuthenticationMethod(id: String) -> Nimble.Matcher<Result<Authenticatio
     }
 }
 
-func haveAuthenticationMethodInList(id: String) -> Nimble.Matcher<MyAccountResult<AuthenticationMethods>> {
-    return Matcher<MyAccountResult<AuthenticationMethods>>.define("have authentication method in list") { expression, failureMessage in
-        return try beSuccessful(expression, failureMessage) { (created: AuthenticationMethods) -> Bool in
-            created.authenticationMethods.contains(where: { $0.id == id})
+func haveAuthenticationMethodInList(id: String) -> Nimble.Matcher<MyAccountResult<[AuthenticationMethod]>> {
+    return Matcher<MyAccountResult<[AuthenticationMethod]>>.define("have authentication method in list") { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: [AuthenticationMethod]) -> Bool in
+            created.contains(where: { $0.id == id})
         }
     }
 }
  
-func haveFactorInList(type: String) -> Nimble.Matcher<MyAccountResult<Factors>> {
-    return Matcher<MyAccountResult<Factors>>.define("have factors in list") { expression, failureMessage in
-        return try beSuccessful(expression, failureMessage) { (created: Factors) -> Bool in
-            created.factors.contains(where: { $0.type == type })
+func haveFactorInList(type: String) -> Nimble.Matcher<MyAccountResult<[Factor]>> {
+    return Matcher<MyAccountResult<[Factor]>>.define("have factors in list") { expression, failureMessage in
+        return try beSuccessful(expression, failureMessage) { (created: [Factor]) -> Bool in
+            created.contains(where: { $0.type == type })
         }
     }
 }
 
-func haveEmptyFactorsInList() -> Nimble.Matcher<MyAccountResult<Factors>> {
-    return Matcher<MyAccountResult<Factors>>.define("have empty factors in list") { expression, FailureMessage in
-        return try beSuccessful(expression, FailureMessage) { (created: Factors) -> Bool in
-            created.factors.isEmpty
+func haveEmptyFactorsInList() -> Nimble.Matcher<MyAccountResult<[Factor]>> {
+    return Matcher<MyAccountResult<[Factor]>>.define("have empty factors in list") { expression, FailureMessage in
+        return try beSuccessful(expression, FailureMessage) { (created: [Factor]) -> Bool in
+            created.isEmpty
         }
     }
 }

@@ -2447,8 +2447,8 @@ Auth0
     .getFactors()
     .start { result in
         switch result {
-        case .success(let response):
-            print("Obtained factors: \(response.factors)")
+        case .success(let factors):
+            print("Obtained factors: \(factors)")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -2460,12 +2460,12 @@ Auth0
 
 ```swift
 do {
-    let response = try await Auth0
+    let factors = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
         .getFactors()
         .start()
-    print("Obtained factors: \(response.factors)")
+    print("Obtained factors: \(factors)")
 } catch {
     print("Failed with: \(error)")
 }
@@ -2485,8 +2485,8 @@ Auth0
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
         }
-    }, receiveValue: { response in
-        print("Obtained factors: \(response.factors)")
+    }, receiveValue: { factors in
+        print("Obtained factors: \(factors)")
     })
     .store(in: &cancellables)
 ```
@@ -2503,8 +2503,8 @@ Auth0
     .getAuthenticationMethods()
     .start { result in
         switch result {
-        case .success(let response):
-            print("Obtained authentication methods: \(response.authenticationMethods)")
+        case .success(let authenticationMethods):
+            print("Obtained authentication methods: \(authenticationMethods)")
         case .failure(let error):
             print("Failed with: \(error)")
         }
@@ -2516,12 +2516,12 @@ Auth0
 
 ```swift
 do {
-    let response = try await Auth0
+    let authenticationMethods = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
         .getAuthenticationMethods()
         .start()
-    print("Obtained authentication methods: \(response.authenticationMethods)")
+    print("Obtained authentication methods: \(authenticationMethods)")
 } catch {
     print("Failed with: \(error)")
 }
@@ -2541,8 +2541,8 @@ Auth0
         if case .failure(let error) = completion {
             print("Failed with: \(error)")
         }
-    }, receiveValue: { response in
-        print("Obtained authentication methods: \(response.authenticationMethods)")
+    }, receiveValue: { authenticationMethods in
+        print("Obtained authentication methods: \(authenticationMethods)")
     })
     .store(in: &cancellables)
 ```
@@ -2556,7 +2556,7 @@ Auth0
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .getAuthenticationMethod(id: id)
+    .getAuthenticationMethod(by: id)
     .start { result in
         switch result {
         case .success(let authenticationMethod):
@@ -2575,7 +2575,7 @@ do {
     let authenticationMethod = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .getAuthenticationMethod(id: id)
+        .getAuthenticationMethod(by: id)
         .start()
     print("Obtained authentication method: \(authenticationMethod)")
 } catch {
@@ -2591,7 +2591,7 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .getAuthenticationMethod(id: id)
+    .getAuthenticationMethod(by: id)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -2613,7 +2613,7 @@ Auth0
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .deleteAuthenticationMethod(id: id)
+    .deleteAuthenticationMethod(by: id)
     .start { result in
         switch result {
         case .success:
@@ -2632,7 +2632,7 @@ do {
     let _ = try await Auth0
         .myAccount(token: apiCredentials.accessToken)
         .authenticationMethods
-        .deleteAuthenticationMethod(id: id)
+        .deleteAuthenticationMethod(by: id)
         .start()
     print("Authentication method is successfully deleted")
 } catch {
@@ -2648,7 +2648,7 @@ do {
 Auth0
     .myAccount(token: apiCredentials.accessToken)
     .authenticationMethods
-    .deleteAuthenticationMethod(id: id)
+    .deleteAuthenticationMethod(by: id)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {

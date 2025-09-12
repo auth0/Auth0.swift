@@ -282,7 +282,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - preferredAuthenticationMethod: The preferred communication method(sms). If no value is passed by default sms will be the preferred authentication method
     /// - Returns: A request that will yield a phone enrolment challenge
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: String?) -> Request<PhoneEnrollmentChallenge, MyAccountError>
+                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<PhoneEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new ToTP authentication method. This is the last part of the enrollment flow.
     ///
@@ -501,7 +501,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request that will return list of authentication methods of an authenticated user
-    func getAuthenticationMethods() -> Request<AuthenticationMethods, MyAccountError>
+    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
 
     /// Delete an authentication method associated with an id
     ///
@@ -521,7 +521,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// Auth0
     ///     .myAccount(token: apiCredentials.accessToken)
     ///     .authenticationMethods
-    ///     .deleteAuthenticationMethod(id: id)
+    ///     .deleteAuthenticationMethod(by: id)
     ///     .start { result in
     ///         switch result {
     ///         case .success:
@@ -535,7 +535,41 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Parameters:
     ///   - id: Id of the authentication method user wishes to delete
     /// - Returns: A request that will delete an authentication method associated with an id
-    func deleteAuthenticationMethod(id: String) -> Request<Void, MyAccountError>
+    func deleteAuthenticationMethod(by id: String) -> Request<Void, MyAccountError>
+
+    /// Fetch details of an authentication method associated with an id
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `read:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .getAuthenticationMethod(by: id)
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticationMethod):
+    ///             print("Fetched authentication method: \(authenticationMethod)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - id:  Id of the returned authentication method
+    /// - Returns: A request to fetch authentication method associated with the id.
+    func getAuthenticationMethod(by id: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
     ///
@@ -567,41 +601,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request to fetch factors enabled for the Auth0 tenant and available for enrollment
-    func getFactors() -> Request<Factors, MyAccountError>
-
-    /// Fetch details of an authentication method associated with an id
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `read:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .getAuthenticationMethod(id: id)
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let authenticationMethod):
-    ///             print("Fetched authentication method: \(authenticationMethod)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - id:  Id of the returned authentication method
-    /// - Returns: A request to fetch authentication method associated with the id.
-    func getAuthenticationMethod(id: String) -> Request<AuthenticationMethod, MyAccountError>
+    func getFactors() -> Request<[Factor], MyAccountError>
 }
 // MARK: - Default Parameters
 
@@ -616,7 +616,7 @@ public extension MyAccountAuthenticationMethods {
     #endif
 
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: String? = nil) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
+                     preferredAuthenticationMethod: PreferredAuthenticationMethod? = nil) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
         self.enrollPhone(phoneNumber: phoneNumber,
                          preferredAuthenticationMethod: preferredAuthenticationMethod)
     }
