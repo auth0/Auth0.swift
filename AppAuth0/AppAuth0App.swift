@@ -5,7 +5,7 @@ import Auth0
 struct AppAuth0App: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(viewModel: ContentViewModel(credentialsManager: CredentialsManager(authentication: Auth0.authentication())))
         }
     }
 }
