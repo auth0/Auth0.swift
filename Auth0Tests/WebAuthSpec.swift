@@ -1,4 +1,5 @@
 import Quick
+import Combine
 import Nimble
 import SafariServices
 
@@ -697,6 +698,153 @@ class WebAuthSpec: QuickSpec {
             }
 
         }
+
+        // MARK: - Combine & Async/Await
+
+        describe("Combine API") {
+            var auth: Auth0WebAuth!
+            var cancellables: Set<AnyCancellable>!
+            
+            beforeEach {
+                let url = URL(string: "https://samples.auth0.com")!
+                auth = Auth0WebAuth(clientId: "client123", url: url, telemetry: Telemetry())
+                QueueBarrier.shared.lower()
+                cancellables = []
+            }
+            
+            afterEach {
+                cancellables.removeAll()
+            }
+            
+            it("start() publishes error on failure") {
+                waitUntil { done in
+                    auth.provider { url, completion in
+                        completion(.failure(WebAuthError(code: .other)))
+                        return SpyUserAgent()
+                    }
+                    
+                    auth.start()
+                        .sink(receiveCompletion: { completion in
+                            if case .failure(let error) = completion {
+                                expect(error.code).to(equal(.other))
+                                done()
+                            }
+                        }, receiveValue: { _ in
+                            fail("Should not emit credentials")
+                        })
+                        .store(in: &cancellables)
+                }
+            }
+            
+            it("clearSession() publishes completion on success") {
+                waitUntil { done in
+                    auth.provider { url, completion in
+                        completion(.success(()))
+                        return SpyUserAgent()
+                    }
+                    
+                    auth.clearSession(federated: false)
+                        .sink(receiveCompletion: { completion in
+                            if case .failure(let error) = completion {
+                                fail("Unexpected error: \(error)")
+                            }
+                        }, receiveValue: {
+                            done()
+                        })
+                        .store(in: &cancellables)
+                }
+            }
+            
+            it("clearSession() publishes error on failure") {
+                waitUntil { done in
+                    auth.provider { url, completion in
+                        completion(.failure(WebAuthError(code: .other)))
+                        return SpyUserAgent()
+                    }
+                    
+                    auth.clearSession(federated: false)
+                        .sink(receiveCompletion: { completion in
+                            if case .failure(let error) = completion {
+                                expect(error.code).to(equal(.other))
+                                done()
+                            }
+                        }, receiveValue: {
+                            fail("Should not succeed")
+                        })
+                        .store(in: &cancellables)
+                }
+            }
+        }
+
+        describe("Async/Await API") {
+            var auth: Auth0WebAuth!
+            
+            beforeEach {
+                let url = URL(string: "https://samples.auth0.com")!
+                QueueBarrier.shared.lower()
+                auth = Auth0WebAuth(clientId: "client123", url: url, telemetry: Telemetry())
+            }
+            it("start() async throws on failure") {
+                auth.provider { url, completion in
+                    completion(.failure(WebAuthError(code: .other)))
+                    return SpyUserAgent()
+                }
+                
+                waitUntil { done in
+                    Task {
+                        do {
+                            _ = try await auth.start()
+                            fail("Should have thrown an error")
+                        } catch let error as WebAuthError {
+                            expect(error.code).to(equal(.other))
+                            done()
+                        } catch {
+                            fail("Unexpected error type")
+                        }
+                    }
+                }
+            }
+            
+            it("clearSession() async completes on success") {
+                auth.provider { url, completion in
+                    completion(.success(()))
+                    return SpyUserAgent()
+                }
+                
+                waitUntil { done in
+                    Task {
+                        do {
+                            try await auth.clearSession(federated: false)
+                            done()
+                        } catch {
+                            fail("Unexpected error: \(error)")
+                        }
+                    }
+                }
+            }
+            
+            it("clearSession() async throws on failure") {
+                auth.provider { url, completion in
+                    completion(.failure(WebAuthError(code: .other)))
+                    return SpyUserAgent()
+                }
+                
+                waitUntil { done in
+                    Task {
+                        do {
+                            try await auth.clearSession(federated: false)
+                            fail("Should have thrown an error")
+                        } catch let error as WebAuthError {
+                            expect(error.code).to(equal(.other))
+                            done()
+                        } catch {
+                            fail("Unexpected error type")
+                        }
+                    }
+                }
+            }
+        }
+
 
         describe("logout") {
 
