@@ -805,6 +805,40 @@ class WebAuthSpec: QuickSpec {
                 }
             }
             
+            it("ignores double resume but still surfaces first error") {
+                let dummyCredentials = Credentials(
+                    accessToken: "access",
+                    tokenType: "bearer",
+                    idToken: "id",
+                    refreshToken: "refresh",
+                    expiresIn: Date()
+                )
+
+                var callbackRef: (WebAuthResult<Void>) -> Void = { _  in }
+                   auth.provider { url, callback in
+                       callbackRef = callback
+                       callbackRef(.failure(WebAuthError(code: .userCancelled)))
+                       // Second call -> ignored by continuation bridge
+                       callbackRef(.failure(WebAuthError(code: .userCancelled)))
+                       return SpyUserAgent()
+                   }
+
+                   waitUntil(timeout: .seconds(5)) { done in
+                       Task {
+                           // First call -> should throw
+                           
+
+                           do {
+                               _ = try await auth.start()
+                               fail("Expected error")
+                           } catch let error as WebAuthError {
+                               expect(error.code) == .userCancelled
+                               done()
+                           }
+                       }
+                   }
+               }
+            
             it("clearSession() async completes on success") {
                 auth.provider { url, completion in
                     completion(.success(()))
