@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.15.1](https://github.com/auth0/Auth0.swift/tree/2.15.1) (2025-10-03)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.15.0...2.15.1)
+
+**Fixed**
+- Added fix for GH issue 950  [\#1008](https://github.com/auth0/Auth0.swift/pull/1008) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [2.15.0](https://github.com/auth0/Auth0.swift/tree/2.15.0) (2025-09-12)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.14.0...2.15.0)
 
