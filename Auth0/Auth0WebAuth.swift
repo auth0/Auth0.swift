@@ -355,9 +355,12 @@ extension Auth0WebAuth {
 extension Auth0WebAuth {
 
     func start() async throws -> Credentials {
+        var alreadyResumed = false
         return try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
                 self.start { result in
+                    guard !alreadyResumed else { return }
+                    alreadyResumed = true
                     continuation.resume(with: result)
                 }
             }

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Auth0'
-  s.version          = '2.15.0'
+  s.version          = '2.15.1'
   s.summary          = "Auth0 SDK for Apple platforms"
   s.description      = <<-DESC
                         Auth0 SDK for iOS, macOS, tvOS, watchOS and visionOS apps.
