@@ -394,8 +394,8 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - otpCode: The one-time password code sent to the email address.
     /// - Returns: A request that will yield an enrolled email authentication method.
     func confirmEmailEnrollment(id: String,
-                               authSession: String,
-                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+                                authSession: String,
+                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Requests a challenge for enrolling a Phone authentication method. This is the first part of the enrollment flow.
     ///
