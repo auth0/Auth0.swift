@@ -1,6 +1,6 @@
 import Foundation
 
-protocol Requestable {
+public protocol Requestable {
     associatedtype ResultType
     associatedtype ErrorType: Auth0APIError
 

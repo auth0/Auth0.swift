@@ -569,7 +569,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Parameters:
     ///   - id:  Id of the returned authentication method
     /// - Returns: A request to fetch authentication method associated with the id.
-    func getAuthenticationMethod(by id: String) -> Request<AuthenticationMethod, MyAccountError>
+    func getAuthenticationMethod(by id: String) -> any Requestable // Request<AuthenticationMethod, MyAccountError>
 
     /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
     ///
@@ -601,7 +601,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request to fetch factors enabled for the Auth0 tenant and available for enrollment
-    func getFactors() -> Request<[Factor], MyAccountError>
+    func getFactors() -> any Requestable
 }
 // MARK: - Default Parameters
 
