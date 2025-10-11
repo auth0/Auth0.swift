@@ -231,7 +231,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getAuthenticationMethods() -> any Requestable {
+    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError> {
         return Request(session: session,
                        url: url.appending("authentication-methods"),
                        method: "GET",
@@ -241,7 +241,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
                        telemetry: telemetry)
     }
 
-    func getFactors() -> any Requestable {
+    func getFactors() -> Request<[Factor], MyAccountError> {
         return Request(session: session,
                        url: url.appending("factors"),
                        method: "GET",
