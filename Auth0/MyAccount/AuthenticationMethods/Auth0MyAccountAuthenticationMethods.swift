@@ -1,6 +1,6 @@
 import Foundation
 
-struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {    
+struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     let url: URL
     let session: URLSession
     let token: String
@@ -242,7 +242,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
 
     func getFactors() -> any Requestable {
-        return Request<[Factor], MyAccountError>(session: session,
+        return Request(session: session,
                        url: url.appending("factors"),
                        method: "GET",
                        handle: getFactorsDecodable,
@@ -252,7 +252,7 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     }
 
     func getAuthenticationMethod(by id: String) -> Request<AuthenticationMethod, MyAccountError> {
-        return Request<[AuthenticationMethod], MyAccountError>(session: session,
+        return Request(session: session,
                        url: url.appending("authentication-methods").appending(id),
                        method: "GET",
                        handle: myAcccountDecodable,

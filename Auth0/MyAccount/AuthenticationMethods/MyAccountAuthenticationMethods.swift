@@ -184,7 +184,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
     /// - Returns: A request that will yield an enrolled recovery code authentication method.
     func confirmRecoveryCodeEnrollment(id: String,
-                                      authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+                                       authSession: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Requests a challenge for enrolling a TOTP authentication method. This is the first part of the enrollment flow.
     ///
@@ -537,7 +537,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Parameters:
     ///   - id:  Id of the returned authentication method
     /// - Returns: A request to fetch authentication method associated with the id.
-    func getAuthenticationMethod(by id: String) -> any Requestable // Request<AuthenticationMethod, MyAccountError>
+    func getAuthenticationMethod(by id: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Retrieve detailed list of authentication methods belonging to the authenticated user.
     ///
