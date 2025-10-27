@@ -89,7 +89,7 @@ extension APICredentials: Codable {
 
 public extension APICredentials {
 
-    init(from credentials: Credentials) {
+    public init(from credentials: Credentials) {
         self.accessToken = credentials.accessToken
         self.tokenType = credentials.tokenType
         self.expiresIn = credentials.expiresIn

@@ -79,7 +79,7 @@ public struct WebAuthError: Auth0Error, Sendable {
 
 // MARK: - Error Messages
 
-extension WebAuthError {
+public extension WebAuthError {
 
     var message: String {
         switch self.code {
