@@ -8,6 +8,8 @@ struct BioAuthentication {
     private let evaluationPolicy: LAPolicy
 
     let title: String
+    let policy: BiometricPolicy
+    
     var fallbackTitle: String? {
         get { return self.authContext.localizedFallbackTitle }
         set { self.authContext.localizedFallbackTitle = newValue }
@@ -22,10 +24,11 @@ struct BioAuthentication {
         return self.authContext.canEvaluatePolicy(evaluationPolicy, error: nil)
     }
 
-    init(authContext: LAContext, evaluationPolicy: LAPolicy, title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil) {
+    init(authContext: LAContext, evaluationPolicy: LAPolicy, title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil, policy: BiometricPolicy = .always) {
         self.authContext = authContext
         self.evaluationPolicy = evaluationPolicy
         self.title = title
+        self.policy = policy
         self.cancelTitle = cancelTitle
         self.fallbackTitle = fallbackTitle
     }
