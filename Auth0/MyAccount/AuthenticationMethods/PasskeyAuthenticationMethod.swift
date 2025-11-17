@@ -21,6 +21,12 @@ public struct PasskeyAuthenticationMethod: Identifiable, Equatable, Sendable {
 
     /// Creation date of the authentication method.
     public let createdAt: Date
+    
+    /// Authenticator Attestation GUID for the passkey provider
+    public let aaguid: String
+    
+    /// Relying party Id for the domain
+    public let relyingPartyIdentifier: String
 
 }
 
@@ -64,6 +70,8 @@ extension PasskeyAuthenticationMethod: Decodable {
         case userAgent = "user_agent"
         case credential
         case createdAt = "created_at"
+        case aaguid = "aaguid"
+        case relyingPartyIdentifier = "relying_party_id"
     }
 
     /// `Decodable` initializer.
@@ -86,6 +94,8 @@ extension PasskeyAuthenticationMethod: Decodable {
         userIdentityId = try values.decode(String.self, forKey: .userIdentityId)
         userAgent = try values.decodeIfPresent(String.self, forKey: .userAgent)
         credential = try decoder.singleValueContainer().decode(PasskeyCredential.self)
+        aaguid = try decoder.decode?(String.self, forKey: .aaguid)
+        relyingPartyIdentifier = try decoder.decode?(String.self, forKey: .relyingPartyIdentifier)
     }
 
 }
