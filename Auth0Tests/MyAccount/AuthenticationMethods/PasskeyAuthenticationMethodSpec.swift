@@ -16,6 +16,8 @@ private let PasskeyPublicKey = "pQECAyYgASFYIGK0OMbKXIHgb1Es/MrVoCTrGDzi96vGxUpA
 "g7sTOJbACvk7xY6DE7A="
 private let PasskeyCredentialDeviceType = "multi_device"
 private let PasskeyIsCredentialBackedUp = true
+private let PasskeyAaguid = "08987058-cadc-4b81-b6e1-30de50dcbe96"
+private let PasskeyRelyingPartyId = "example.com"
 
 private let JSON = """
 {
@@ -28,7 +30,9 @@ private let JSON = """
     "key_id": "\(PasskeyKeyId)",
     "public_key": "\(PasskeyPublicKey)",
     "credential_device_type": "\(PasskeyCredentialDeviceType)",
-    "credential_backed_up": \(PasskeyIsCredentialBackedUp)
+    "credential_backed_up": \(PasskeyIsCredentialBackedUp),
+    "aaguid": "\(PasskeyAaguid)",
+    "relying_party_id": "\(PasskeyRelyingPartyId)"
 }
 """
 
@@ -59,6 +63,8 @@ class PasskeyAuthenticationMethodSpec: QuickSpec {
                 expect(challenge.credential.userHandle) == PasskeyUserHandle.a0_decodeBase64URLSafe()
                 expect(challenge.credential.deviceType) == .multiDevice
                 expect(challenge.credential.isBackedUp) == PasskeyIsCredentialBackedUp
+                expect(challenge.aaguid) == PasskeyAaguid
+                expect(challenge.relyingPartyIdentifier) == PasskeyRelyingPartyId
                 expect(challenge.createdAt).to(beCloseTo(createdAtDate, within: 0.01))
             }
 
@@ -73,7 +79,9 @@ class PasskeyAuthenticationMethodSpec: QuickSpec {
                     "key_id": "\(PasskeyKeyId)",
                     "public_key": "\(PasskeyPublicKey)",
                     "credential_device_type": "\(PasskeyCredentialDeviceType)",
-                    "credential_backed_up": \(PasskeyIsCredentialBackedUp)
+                    "credential_backed_up": \(PasskeyIsCredentialBackedUp),
+                    "aaguid": "\(PasskeyAaguid)",
+                    "relying_party_id": "\(PasskeyRelyingPartyId)"
                 }
                 """
                 let jsonData = json.data(using: .utf8)!
@@ -91,6 +99,8 @@ class PasskeyAuthenticationMethodSpec: QuickSpec {
                 expect(challenge.credential.userHandle) == PasskeyUserHandle.a0_decodeBase64URLSafe()
                 expect(challenge.credential.deviceType) == .multiDevice
                 expect(challenge.credential.isBackedUp) == PasskeyIsCredentialBackedUp
+                expect(challenge.aaguid) == PasskeyAaguid
+                expect(challenge.relyingPartyIdentifier) == PasskeyRelyingPartyId
                 expect(challenge.createdAt).to(beCloseTo(createdAtDate, within: 0.01))
             }
 
