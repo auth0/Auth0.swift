@@ -94,8 +94,8 @@ extension PasskeyAuthenticationMethod: Decodable {
         userIdentityId = try values.decode(String.self, forKey: .userIdentityId)
         userAgent = try values.decodeIfPresent(String.self, forKey: .userAgent)
         credential = try decoder.singleValueContainer().decode(PasskeyCredential.self)
-        aaguid = try decoder.decode?(String.self, forKey: .aaguid)
-        relyingPartyIdentifier = try decoder.decode?(String.self, forKey: .relyingPartyIdentifier)
+        aaguid = try decoder.decode(String.self, forKey: .aaguid)
+        relyingPartyIdentifier = try decoder.decode(String.self, forKey: .relyingPartyIdentifier)
     }
 
 }
