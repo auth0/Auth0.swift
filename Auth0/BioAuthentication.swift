@@ -24,7 +24,13 @@ struct BioAuthentication {
         return self.authContext.canEvaluatePolicy(evaluationPolicy, error: nil)
     }
 
-    init(authContext: LAContext, evaluationPolicy: LAPolicy, title: String, cancelTitle: String? = nil, fallbackTitle: String? = nil, policy: BiometricPolicy = .always) {
+    init(authContext: LAContext,
+         evaluationPolicy: LAPolicy,
+         title: String,
+         cancelTitle: String? = nil,
+         fallbackTitle: String? = nil,
+         policy: BiometricPolicy = .always
+    ) {
         self.authContext = authContext
         self.evaluationPolicy = evaluationPolicy
         self.title = title

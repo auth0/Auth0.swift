@@ -578,7 +578,7 @@ You can manually clear the biometric session to force re-authentication on the n
 
 ```swift
 // Clear the biometric session
-CredentialsManager.clearBiometricSession()
+credentialsManager.clearBiometricSession()
 
 // Check if the current session is valid
 let isValid = credentialsManager.isBiometricSessionValid()

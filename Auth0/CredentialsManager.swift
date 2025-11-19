@@ -32,10 +32,17 @@ public struct CredentialsManager {
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
-    // Biometric session management
-    private static let noSession: TimeInterval = -1
-    private static var lastBiometricAuthTime: TimeInterval = noSession
-    private static let sessionLock = NSLock()
+    // Biometric session management - using a class to allow mutation in non-mutating methods
+    private final class BiometricSession {
+        let noSession: TimeInterval = -1
+        var lastBiometricAuthTime: TimeInterval = -1
+        let lock = NSLock()
+        
+        init() {
+            lastBiometricAuthTime = noSession
+        }
+    }
+    private let biometricSession = BiometricSession()
     #endif
 
     /// Creates a new `CredentialsManager` instance.
@@ -140,7 +147,9 @@ public struct CredentialsManager {
     /// - Returns: If the credentials were removed.
     public func clear() -> Bool {
         #if WEB_AUTH_PLATFORM
-        Self.clearBiometricSession()
+        self.biometricSession.lock.lock()
+        self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
+        self.biometricSession.lock.unlock()
         #endif
         return self.storage.deleteEntry(forKey: self.storeKey)
     }
@@ -172,11 +181,11 @@ public struct CredentialsManager {
     public func isBiometricSessionValid() -> Bool {
         guard let bioAuth = self.bioAuth else { return false }
         
-        Self.sessionLock.lock()
-        defer { Self.sessionLock.unlock() }
+        self.biometricSession.lock.lock()
+        defer { self.biometricSession.lock.unlock() }
         
-        let lastAuth = Self.lastBiometricAuthTime
-        if lastAuth == Self.noSession { return false }
+        let lastAuth = self.biometricSession.lastBiometricAuthTime
+        if lastAuth == self.biometricSession.noSession { return false }
         
         switch bioAuth.policy {
         case .session(let timeoutInSeconds), .appLifecycle(let timeoutInSeconds):
@@ -193,12 +202,12 @@ public struct CredentialsManager {
     /// ## Usage
     ///
     /// ```swift
-    /// CredentialsManager.clearBiometricSession()
+    /// credentialsManager.clearBiometricSession()
     /// ```
-    public static func clearBiometricSession() {
-        sessionLock.lock()
-        defer { sessionLock.unlock() }
-        lastBiometricAuthTime = noSession
+    public func clearBiometricSession() {
+        self.biometricSession.lock.lock()
+        defer { self.biometricSession.lock.unlock() }
+        self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
     }
     #endif
 
@@ -392,7 +401,7 @@ public struct CredentialsManager {
                 }
 
                 // Update biometric session after successful authentication (only for session-based policies)
-                Self.updateBiometricSession(for: bioAuth.policy)
+                self.updateBiometricSession(for: bioAuth.policy)
 
                 self.retrieveCredentials(scope: scope,
                                          minTTL: minTTL,
@@ -1582,15 +1591,15 @@ public extension CredentialsManager {
     #if WEB_AUTH_PLATFORM
     /// Updates the biometric session timestamp to the current time.
     /// Only updates for session-based policies (Session and AppLifecycle).
-    private static func updateBiometricSession(for policy: BiometricPolicy) {
+    private func updateBiometricSession(for policy: BiometricPolicy) {
         // Don't update session for "Always" policy
         switch policy {
         case .always:
             return
         case .session, .appLifecycle:
-            sessionLock.lock()
-            defer { sessionLock.unlock() }
-            lastBiometricAuthTime = Date().timeIntervalSince1970
+            self.biometricSession.lock.lock()
+            defer { self.biometricSession.lock.unlock() }
+            self.biometricSession.lastBiometricAuthTime = Date().timeIntervalSince1970
         }
     }
     #endif
