@@ -4,7 +4,7 @@
 /// - ``MyAccount``
 /// - ``MyAccountError``
 public protocol MyAccountAuthenticationMethods: MyAccountClient {
-    
+
 #if PASSKEYS_PLATFORM
     /// Requests a challenge for enrolling a new passkey. This is the first part of the enrollment flow.
     ///
@@ -75,7 +75,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
                                     connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
-    
+
     /// Enrolls a new passkey credential. This is the last part of the enrollment flow.
     ///
     /// ## Availability
