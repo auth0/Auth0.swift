@@ -6,7 +6,7 @@ import Nimble
 import WebKit
 @testable import Auth0
 
-private let Timeout: NimbleTimeInterval = .seconds(5)
+private let Timeout: NimbleTimeInterval = .seconds(2)
 private let LongerTimeout: NimbleTimeInterval = .seconds(5)
 
 class WebViewProviderSpec: QuickSpec {

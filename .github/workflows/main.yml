@@ -18,7 +18,7 @@ env:
 jobs:
     test:
         name: Test on ${{ matrix.platform.os }} using Xcode ${{ matrix.xcode }}
-        runs-on: macos-15
+        runs-on: macos-14
 
         env:
             xcodeproj: Auth0.xcodeproj
@@ -30,7 +30,7 @@ jobs:
               - { os: macOS, scheme: Auth0.macOS }
               - { os: tvOS, scheme: Auth0.tvOS }
             xcode: 
-              - '26.0'
+              - '16.1'
 
         steps:
             - name: Checkout
@@ -61,12 +61,12 @@ jobs:
 
     test-package:
         name: Test Swift package using Xcode ${{ matrix.xcode }}
-        runs-on: macos-15
+        runs-on: macos-14
 
         strategy:
           matrix:
             xcode: 
-              - '26.0'
+              - '16.1'
 
         steps:
             - name: Checkout
@@ -83,12 +83,12 @@ jobs:
 
     pod-lint:
         name: Lint podspec using Xcode ${{ matrix.xcode }}
-        runs-on: macos-15-xlarge
+        runs-on: macos-14-xlarge
 
         strategy:
           matrix:
             xcode: 
-              - '26.0'
+              - '16.1'
 
         steps:
             - name: Checkout
@@ -105,7 +105,7 @@ jobs:
 
     swiftlint:
         name: Lint code with SwiftLint
-        runs-on: macos-15
+        runs-on: macos-14
 
         steps:
             - name: Checkout
