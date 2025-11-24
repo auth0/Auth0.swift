@@ -275,7 +275,9 @@ func passkeyAuthenticationMethodResponse(id: String,
         "public_key": publicKey,
         "credential_device_type": credentialDeviceType.rawValue,
         "credential_backed_up": true,
-        "created_at": createdAt
+        "created_at": createdAt,
+        "aaguid": "08987058-cadc-4b81-b6e1-30de50dcbe96",
+        "relying_party_id": "example.com"
     ]
 
     return apiSuccessResponse(json: json)
