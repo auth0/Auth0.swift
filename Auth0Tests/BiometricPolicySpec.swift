@@ -36,7 +36,7 @@ class BiometricPolicySpec: QuickSpec {
         
         afterEach {
             _ = credentialsManager.clear()
-            CredentialsManager.clearBiometricSession()
+            credentialsManager.clearBiometricSession()
         }
         
         // MARK: - BiometricPolicy Tests
@@ -197,7 +197,7 @@ class BiometricPolicySpec: QuickSpec {
                 }
                 
                 it("should clear session") {
-                    CredentialsManager.clearBiometricSession()
+                    credentialsManager.clearBiometricSession()
                     expect(credentialsManager.isBiometricSessionValid()).to(beFalse())
                 }
             }
@@ -215,7 +215,7 @@ class BiometricPolicySpec: QuickSpec {
                 }
                 
                 it("should clear session") {
-                    CredentialsManager.clearBiometricSession()
+                    credentialsManager.clearBiometricSession()
                     expect(credentialsManager.isBiometricSessionValid()).to(beFalse())
                 }
             }
@@ -230,7 +230,7 @@ class BiometricPolicySpec: QuickSpec {
                                                    policy: .session(timeoutInSeconds: 300))
                 
                 // Clear the session
-                CredentialsManager.clearBiometricSession()
+                credentialsManager.clearBiometricSession()
                 
                 // Session should not be valid after clearing
                 expect(credentialsManager.isBiometricSessionValid()).to(beFalse())
@@ -240,7 +240,7 @@ class BiometricPolicySpec: QuickSpec {
                 credentialsManager.enableBiometrics(withTitle: "Touch to unlock",
                                                    policy: .always)
                 
-                CredentialsManager.clearBiometricSession()
+                credentialsManager.clearBiometricSession()
                 
                 // Always policy should never have valid session
                 expect(credentialsManager.isBiometricSessionValid()).to(beFalse())
@@ -250,7 +250,7 @@ class BiometricPolicySpec: QuickSpec {
                 credentialsManager.enableBiometrics(withTitle: "Touch to unlock",
                                                    policy: .appLifecycle())
                 
-                CredentialsManager.clearBiometricSession()
+                credentialsManager.clearBiometricSession()
                 
                 expect(credentialsManager.isBiometricSessionValid()).to(beFalse())
             }
@@ -278,7 +278,7 @@ class BiometricPolicySpec: QuickSpec {
                 
                 // Multiple concurrent clears should not crash
                 DispatchQueue.concurrentPerform(iterations: 100) { _ in
-                    CredentialsManager.clearBiometricSession()
+                    credentialsManager.clearBiometricSession()
                 }
                 
                 expect(true).to(beTrue()) // Test passes if no crash
@@ -293,7 +293,7 @@ class BiometricPolicySpec: QuickSpec {
                     if index % 2 == 0 {
                         _ = credentialsManager.isBiometricSessionValid()
                     } else {
-                        CredentialsManager.clearBiometricSession()
+                        credentialsManager.clearBiometricSession()
                     }
                 }
                 
@@ -318,7 +318,7 @@ class BiometricPolicySpec: QuickSpec {
                 _ = credentialsManager1.clear()
                 _ = credentialsManager2.clear()
                 _ = credentialsManager3.clear()
-                CredentialsManager.clearBiometricSession()
+                credentialsManager.clearBiometricSession()
             }
             
             it("should share biometric session across instances") {
@@ -345,7 +345,7 @@ class BiometricPolicySpec: QuickSpec {
                                                     policy: .session(timeoutInSeconds: 300))
                 
                 // Clear session affects all instances
-                CredentialsManager.clearBiometricSession()
+                credentialsManager.clearBiometricSession()
                 
                 expect(credentialsManager1.isBiometricSessionValid()).to(beFalse())
                 expect(credentialsManager2.isBiometricSessionValid()).to(beFalse())
