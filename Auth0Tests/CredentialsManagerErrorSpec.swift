@@ -97,6 +97,12 @@ class CredentialsManagerErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
+            it("should return message for renew failed") {
+                let message = "Credentials renewal is disabled."
+                let error = CredentialsManagerError(code: .renewNotSupported)
+                expect(error.localizedDescription) == message
+            }
+
             it("should return message for API exchange failed") {
                 let message = "The exchange of the refresh token for API credentials failed."
                 let error = CredentialsManagerError(code: .apiExchangeFailed)
