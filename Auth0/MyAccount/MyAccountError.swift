@@ -5,11 +5,14 @@ public struct MyAccountError: Auth0APIError, @unchecked Sendable {
     public struct ValidationError: Sendable, Equatable {
 
         /// Information about the validation error.
-        let detail: String
+        public let detail: String
 
         /// The property in the request payload that failed validation.
-        let pointer: String?
+        public let pointer: String?
 
+        public let source: String?
+
+        public let field: String?
     }
 
     /// Raw error values.
@@ -62,7 +65,7 @@ public struct MyAccountError: Auth0APIError, @unchecked Sendable {
 
 // MARK: - Error Messages
 
-extension MyAccountError {
+public extension MyAccountError {
 
     var message: String {
         if self.code == unknownError {
@@ -98,6 +101,8 @@ extension MyAccountError.ValidationError {
 
         self.detail = dict["detail"] as? String ?? ""
         self.pointer = pointer.isEmpty ? nil : pointer
+        self.field = dict["field"] as? String
+        self.source = dict["source"] as? String
     }
 
 }

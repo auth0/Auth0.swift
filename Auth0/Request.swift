@@ -121,7 +121,9 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                 } else {
                     handle(.failure(error), callback)
                 }
+                print(error)
             } catch {
+                print(error)
                 handle(.failure(E(cause: error)), callback)
             }
         })

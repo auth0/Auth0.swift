@@ -142,7 +142,7 @@ public struct AuthenticationError: Auth0APIError, @unchecked Sendable {
 
 // MARK: - Error Messages
 
-extension AuthenticationError {
+public extension AuthenticationError {
 
     var message: String {
         if let description = self.info[apiErrorDescription] as? String ?? self.info["error_description"] as? String {
