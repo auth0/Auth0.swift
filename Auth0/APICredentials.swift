@@ -87,9 +87,7 @@ extension APICredentials: Codable {
 
 }
 
-// MARK: - Internal Initializer
-
-extension APICredentials {
+public extension APICredentials {
 
     init(from credentials: Credentials) {
         self.accessToken = credentials.accessToken

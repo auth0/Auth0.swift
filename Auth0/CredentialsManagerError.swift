@@ -70,12 +70,10 @@ public struct CredentialsManagerError: Auth0Error, Sendable {
     /// increase the **Token Expiration** value in the settings page of your [Auth0 API](https://manage.auth0.com/#/apis/).
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let largeMinTTL: CredentialsManagerError = .init(code: .largeMinTTL(minTTL: 0, lifetime: 0))
-
 }
 
 // MARK: - Error Messages
-
-extension CredentialsManagerError {
+public extension CredentialsManagerError {
 
     var message: String {
         switch self.code {

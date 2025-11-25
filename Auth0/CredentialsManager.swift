@@ -610,7 +610,7 @@ public struct CredentialsManager {
                                  callback: callback)
     }
 
-    func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
+    public func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
         guard let data = try? apiCredentials.encode() else {
             return false
         }

@@ -257,10 +257,10 @@ class MyAccountErrorSpec: QuickSpec {
 
             it("should return the validation errors") {
                 let expectedValidationErrors: [(json: [String: String], error: MyAccountError.ValidationError)] = [
-                    (json: ["detail": ""], error: .init(detail: "", pointer: nil)),
-                    (json: ["detail": "foo"], error: .init(detail: "foo", pointer: nil)),
-                    (json: ["detail": "foo", "pointer": ""], error: .init(detail: "foo", pointer: nil)),
-                    (json: ["detail": "foo", "pointer": "baz"], error: .init(detail: "foo", pointer: "baz")),
+                    (json: ["detail": ""], error: .init(detail: "", pointer: nil, source: nil, field: nil)),
+                    (json: ["detail": "foo"], error: .init(detail: "foo", pointer: nil, source: nil, field: nil)),
+                    (json: ["detail": "foo", "pointer": ""], error: .init(detail: "foo", pointer: nil, source: nil, field: nil)),
+                    (json: ["detail": "foo", "pointer": "baz"], error: .init(detail: "foo", pointer: "baz", source: nil, field: nil)),
                 ]
                 let info: [String: Any] = ["validation_errors": expectedValidationErrors.map(\.json)]
                 let error = MyAccountError(info: info, statusCode: 400)
