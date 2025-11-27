@@ -1,9 +1,3 @@
-I understand. Since you are looking for the **Auth0.swift** (iOS/macOS/tvOS/watchOS) equivalent of the `Agents.md` file you shared, I have adapted the structure and content to reflect the specific architecture, patterns (Async/Await, Combine), and tooling (SPM, Xcode) used in the Swift SDK.
-
-Here is the **Agents.md** for **Auth0.swift**.
-
------
-
 # AI Agent Guidelines for Auth0.swift SDK
 
 This document provides context and guidelines for AI coding assistants working with the Auth0.swift SDK codebase.
