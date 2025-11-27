@@ -548,6 +548,42 @@ credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID or passcode"
                                     evaluationPolicy: .deviceOwnerAuthentication)
 ```
 
+#### Biometric Policy
+
+You can configure a `BiometricPolicy` to control when biometric authentication is required. There are three types of policies available:
+
+- **`.always`**: Requires biometric authentication every time credentials are accessed. This is the default policy and provides the highest security level.
+- **`.session(timeoutInSeconds:)`**: Requires biometric authentication only if the specified time (in seconds) has passed since the last successful authentication. Once authenticated, subsequent access within the timeout period will not require re-authentication.
+- **`.appLifecycle(timeoutInSeconds:)`**: Similar to the session policy, but the session persists for the lifetime of the app process. The default timeout is 1 hour (3600 seconds).
+
+**Examples:**
+
+```swift
+// Always require biometric authentication (default)
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID",
+                                    policy: .always)
+
+// Require authentication only once per 5-minute session
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID",
+                                    policy: .session(timeoutInSeconds: 300))
+
+// Require authentication once per app lifecycle (1 hour default)
+credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID",
+                                    policy: .appLifecycle()) // Default: 3600 seconds (1 hour)
+```
+
+**Managing Biometric Sessions:**
+
+You can manually clear the biometric session to force re-authentication on the next credential access:
+
+```swift
+// Clear the biometric session
+credentialsManager.clearBiometricSession()
+
+// Check if the current session is valid
+let isValid = credentialsManager.isBiometricSessionValid()
+```
+
 > [!NOTE]
 > Retrieving the user information with `credentialsManager.user` will not be protected by biometric authentication.
 

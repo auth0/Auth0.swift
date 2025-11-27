@@ -456,7 +456,7 @@ class MyAccountAuthenticationMethodsSpec: QuickSpec {
                 waitUntil(timeout: Timeout) { done in
                     authMethods.enrollPhone(phoneNumber: PhoneNumber,
                                             preferredAuthenticationMethod: preferredAuthMethod).start { result in
-                        expect(result).to(haveAuthMethodEnrolmentError(type: "https://auth0.com/api-errors/A0E-400-0003", title: "Validation Error", detail: "Invalid request payload input", statusCode: 400, validationErrors: [MyAccountError.ValidationError(detail: "data/preferred_authentication_method must be equal to one of the allowed values", pointer: "/preferred_authentication_method")]))
+                        expect(result).to(haveAuthMethodEnrolmentError(type: "https://auth0.com/api-errors/A0E-400-0003", title: "Validation Error", detail: "Invalid request payload input", statusCode: 400, validationErrors: [MyAccountError.ValidationError(detail: "data/preferred_authentication_method must be equal to one of the allowed values", pointer: "/preferred_authentication_method", source: nil, field: nil)]))
                         done()
                     }
                 }
