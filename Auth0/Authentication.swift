@@ -229,6 +229,10 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-out-of-band)
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
 
+    func listMFAAuthenticators(mfaToken: String) -> Request<[Authenticator], AuthenticationError>
+
+    func enrollOTPMFA(mfaToken: String) -> Request<OTPMFAEnrollmentChallenge, AuthenticationError>
+
     /// Verifies multi-factor authentication (MFA) using a recovery code.
     /// Some multi-factor authentication (MFA) providers support using a recovery code to login. Use this method to
     /// authenticate when the user's enrolled device is unavailable, or the user cannot receive the challenge or accept

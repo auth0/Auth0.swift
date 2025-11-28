@@ -26,6 +26,23 @@ struct Response<E: Auth0APIError> {
             // Not using the custom initializer because data could be empty
             throw E(description: nil, statusCode: response.statusCode)
         }
+        do {
+            let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+            let prettyData = try JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted)
+            if let prettyString = String(data: prettyData, encoding: .utf8) {
+                print(":package: Response Body:\n\(prettyString)")
+            } else {
+                print(":x: Could not convert data to string")
+            }
+        } catch {
+            // If not JSON, just print raw
+            print(":warning: Response not JSON, raw body:")
+            if let rawString = String(data: data, encoding: .utf8) {
+                print(rawString)
+            } else {
+                print(":x: Cannot decode response body")
+            }
+        }
         return ResponseValue(value: response, data: data)
     }
 

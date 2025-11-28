@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2Z7FPPVSUUJRZC06V5RA8B2B /* BiometricPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */; };
 		5B0893E620F8A52100FBF962 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		5B0893E720F8A52400FBF962 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
 		5B16D88E1F7141A0009476A5 /* ASProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* ASProvider.swift */; };
@@ -30,7 +31,6 @@
 		5B7EE48D20FCA0F400367724 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; };
 		5B7EE48E20FCA0F400367724 /* Auth0.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5F06DD851CC448C90011842B /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5B9262C01ECF0CA800F4F6D3 /* BioAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */; };
-		A4PF2C6UJAB9I6DXDJUTRG3B /* BiometricPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */; };
 		5B9262C31ECF0CC200F4F6D3 /* BioAuthenticationSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */; };
 		5BE65DCA1F7270DE00CADD3B /* Auth0.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 5F06DD781CC448B10011842B /* Auth0.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5BEDE18A1EC21B040007300D /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
@@ -117,7 +117,6 @@
 		5C41F6C8244F969600252548 /* ASProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B16D88C1F7141A0009476A5 /* ASProvider.swift */; };
 		5C41F6CA244F96AE00252548 /* LoginTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* LoginTransaction.swift */; };
 		5C41F6CB244F96E300252548 /* BioAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */; };
-		V17KI34D4PWP799FLD81GPVP /* BiometricPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */; };
 		5C41F6CC244F96F200252548 /* ClaimValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimValidators.swift */; };
 		5C41F6CD244F96FD00252548 /* IDTokenSignatureValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3D23D0BA2C00074024 /* IDTokenSignatureValidator.swift */; };
 		5C41F6CE244F970500252548 /* IDTokenValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D3E23D0BA2C00074024 /* IDTokenValidator.swift */; };
@@ -465,6 +464,7 @@
 		970BC36C25C27095007A7745 /* MultifactorChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* MultifactorChallenge.swift */; };
 		970BC36D25C27095007A7745 /* MultifactorChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* MultifactorChallenge.swift */; };
 		970BC36E25C27095007A7745 /* MultifactorChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* MultifactorChallenge.swift */; };
+		A4PF2C6UJAB9I6DXDJUTRG3B /* BiometricPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */; };
 		A7DDDF6C2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		A7DDDF6D2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
 		A7DDDF6E2BC9A81E0077B067 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */; };
@@ -504,7 +504,6 @@
 		C1B3B9FB2C24B6D4004A32A4 /* ClaimValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB41D7023D0BED200074024 /* ClaimValidators.swift */; };
 		C1B3B9FC2C24B6D4004A32A4 /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1748731EF2D3A40060E653 /* Shared.swift */; };
 		C1B3B9FD2C24B6D4004A32A4 /* BioAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */; };
-		2Z7FPPVSUUJRZC06V5RA8B2B /* BiometricPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */; };
 		C1B3B9FE2C24B6D4004A32A4 /* CredentialsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEDE1891EC21B040007300D /* CredentialsManager.swift */; };
 		C1B3B9FF2C24B6D4004A32A4 /* CredentialsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C80980A275A7B8600DC0A76 /* CredentialsStorage.swift */; };
 		C1B3BA002C24B6D4004A32A4 /* CredentialsManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5E93F81EC45C22002A37F9 /* CredentialsManagerError.swift */; };
@@ -687,6 +686,7 @@
 		D581CF792757D773007327D1 /* RequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = D581CF762757D773007327D1 /* RequestSpec.swift */; };
 		D5E9E317273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */; };
 		D5E9E318273ACCA5000CDB0A /* ChallengeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */; };
+		V17KI34D4PWP799FLD81GPVP /* BiometricPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -858,7 +858,6 @@
 		5B7EE45820FC9F3200367724 /* OAuth2TV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2TV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B7EE47920FCA0A100367724 /* OAuth2Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OAuth2Mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B9262BF1ECF0CA800F4F6D3 /* BioAuthentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BioAuthentication.swift; sourceTree = "<group>"; };
-		KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BiometricPolicy.swift; sourceTree = "<group>"; };
 		5B9262C11ECF0CBA00F4F6D3 /* BioAuthenticationSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BioAuthenticationSpec.swift; path = Auth0Tests/BioAuthenticationSpec.swift; sourceTree = SOURCE_ROOT; };
 		5BA58D33209081A700782DD1 /* Cartfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
 		5BEDE1891EC21B040007300D /* CredentialsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CredentialsManager.swift; sourceTree = "<group>"; };
@@ -1042,7 +1041,7 @@
 		D4EDCFBF2E740295008E02F8 /* PreferredAuthenticationMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferredAuthenticationMethod.swift; sourceTree = "<group>"; };
 		D581CF762757D773007327D1 /* RequestSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestSpec.swift; sourceTree = "<group>"; };
 		D5E9E316273ACCA5000CDB0A /* ChallengeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeGenerator.swift; sourceTree = "<group>"; };
-		C177D6C22C2ADDEB0094C657 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Auth0.plist; path = ../Auth0.plist; sourceTree = "<group>"; };
+		KDG54I4VDN4TZII38JVUS4AP /* BiometricPolicy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BiometricPolicy.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2272,7 +2271,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\n\nif [ -f $AUTH0_PLIST ]; then\n    cp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nfi\n";
+			shellScript = "PLIST_PATH=\"${SRCROOT}/App/Auth0.plist\"\n\n# If missing, create a placeholder Auth0.plist so Xcode doesn't fail\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"Auth0.plist not found. Creating placeholder.\"\n    cat > \"$PLIST_PATH\" <<EOF\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>ClientId</key>\n    <string>YOUR_CLIENT_ID</string>\n    <key>Domain</key>\n    <string>YOUR_DOMAIN</string>\n</dict>\n</plist>\nEOF\nfi\n\n# Copy to .app bundle\ncp \"$PLIST_PATH\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\n\n\n";
 		};
 		5B7EE48C20FCA0D900367724 /* Auth0 */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2287,7 +2286,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\n\nif [ -f $AUTH0_PLIST ]; then\n    cp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources\"\nfi\n";
+			shellScript = "PLIST_PATH=\"${SRCROOT}/App/Auth0.plist\"\n\n# If missing, create a placeholder Auth0.plist so Xcode doesn't fail\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"Auth0.plist not found. Creating placeholder.\"\n    cat > \"$PLIST_PATH\" <<EOF\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>ClientId</key>\n    <string>YOUR_CLIENT_ID</string>\n    <key>Domain</key>\n    <string>YOUR_DOMAIN</string>\n</dict>\n</plist>\nEOF\nfi\n\n# Copy to .app bundle\ncp \"$PLIST_PATH\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\n\n";
 		};
 		5F53F5CB1CFCDC2500476A46 /* Auth0 */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2302,7 +2301,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\n\nif [ -f $AUTH0_PLIST ]; then\n    cp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nfi\n";
+			shellScript = "PLIST_PATH=\"${SRCROOT}/App/Auth0.plist\"\n\n# If missing, create a placeholder Auth0.plist so Xcode doesn't fail\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"Auth0.plist not found. Creating placeholder.\"\n    cat > \"$PLIST_PATH\" <<EOF\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>ClientId</key>\n    <string>YOUR_CLIENT_ID</string>\n    <key>Domain</key>\n    <string>YOUR_DOMAIN</string>\n</dict>\n</plist>\nEOF\nfi\n\n# Copy to .app bundle\ncp \"$PLIST_PATH\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\n\n";
 		};
 		C1B3B9ED2C24B699004A32A4 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2340,7 +2339,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\n\nif [ -f $AUTH0_PLIST ]; then\n    cp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nfi\n";
+			shellScript = "PLIST_PATH=\"${SRCROOT}/App/Auth0.plist\"\n\n# If missing, create a placeholder Auth0.plist so Xcode doesn't fail\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"Auth0.plist not found. Creating placeholder.\"\n    cat > \"$PLIST_PATH\" <<EOF\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>ClientId</key>\n    <string>YOUR_CLIENT_ID</string>\n    <key>Domain</key>\n    <string>YOUR_DOMAIN</string>\n</dict>\n</plist>\nEOF\nfi\n\n# Copy to .app bundle\ncp \"$PLIST_PATH\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3360,7 +3359,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build";
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3391,7 +3390,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build";
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3758,12 +3757,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = App/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3781,12 +3780,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = App/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
