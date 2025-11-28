@@ -2352,7 +2352,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\n\nif [ -f $AUTH0_PLIST ]; then\n    cp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nfi\n";
+			shellScript = "PLIST_PATH=\"${SRCROOT}/App/Auth0.plist\"\n\n# If missing, create a placeholder Auth0.plist so Xcode doesn't fail\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"Auth0.plist not found. Creating placeholder.\"\n    cat > \"$PLIST_PATH\" <<EOF\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>ClientId</key>\n    <string>YOUR_CLIENT_ID</string>\n    <key>Domain</key>\n    <string>YOUR_DOMAIN</string>\n</dict>\n</plist>\nEOF\nfi\n\n# Copy to .app bundle\ncp \"$PLIST_PATH\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\n\n\n";
 		};
 		5B7EE48C20FCA0D900367724 /* Auth0 */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2367,7 +2367,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\n\nif [ -f $AUTH0_PLIST ]; then\n    cp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources\"\nfi\n";
+			shellScript = "PLIST_PATH=\"${SRCROOT}/App/Auth0.plist\"\n\n# If missing, create a placeholder Auth0.plist so Xcode doesn't fail\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"Auth0.plist not found. Creating placeholder.\"\n    cat > \"$PLIST_PATH\" <<EOF\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>ClientId</key>\n    <string>YOUR_CLIENT_ID</string>\n    <key>Domain</key>\n    <string>YOUR_DOMAIN</string>\n</dict>\n</plist>\nEOF\nfi\n\n# Copy to .app bundle\ncp \"$PLIST_PATH\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\n\n";
 		};
 		5F53F5CB1CFCDC2500476A46 /* Auth0 */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2382,7 +2382,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\n\nif [ -f $AUTH0_PLIST ]; then\n    cp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nfi\n";
+			shellScript = "PLIST_PATH=\"${SRCROOT}/App/Auth0.plist\"\n\n# If missing, create a placeholder Auth0.plist so Xcode doesn't fail\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"Auth0.plist not found. Creating placeholder.\"\n    cat > \"$PLIST_PATH\" <<EOF\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>ClientId</key>\n    <string>YOUR_CLIENT_ID</string>\n    <key>Domain</key>\n    <string>YOUR_DOMAIN</string>\n</dict>\n</plist>\nEOF\nfi\n\n# Copy to .app bundle\ncp \"$PLIST_PATH\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\n\n";
 		};
 		C1B3B9ED2C24B699004A32A4 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2420,7 +2420,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "AUTH0_PLIST=\"${SRCROOT}/Auth0.plist\"\n\nif [ -f $AUTH0_PLIST ]; then\n    cp \"$AUTH0_PLIST\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nfi\n";
+			shellScript = "PLIST_PATH=\"${SRCROOT}/App/Auth0.plist\"\n\n# If missing, create a placeholder Auth0.plist so Xcode doesn't fail\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"Auth0.plist not found. Creating placeholder.\"\n    cat > \"$PLIST_PATH\" <<EOF\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>ClientId</key>\n    <string>YOUR_CLIENT_ID</string>\n    <key>Domain</key>\n    <string>YOUR_DOMAIN</string>\n</dict>\n</plist>\nEOF\nfi\n\n# Copy to .app bundle\ncp \"$PLIST_PATH\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3496,7 +3496,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build";
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3527,7 +3527,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build";
 				INFOPLIST_FILE = Auth0/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3894,12 +3894,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 86WQXF56BC;
 				INFOPLIST_FILE = App/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3917,12 +3917,12 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 86WQXF56BC;
 				INFOPLIST_FILE = App/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.auth0.OAuth2.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;

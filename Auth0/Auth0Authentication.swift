@@ -74,6 +74,34 @@ struct Auth0Authentication: Authentication {
                        dpop: self.dpop)
     }
 
+    func enrollOTPMFA(mfaToken: String) -> Request<OTPMFAEnrollmentChallenge, AuthenticationError> {
+        let url = URL(string: "mfa/associate", relativeTo: self.url)!
+
+        let payload: [String: Any] = [
+            "authenticator_types": ["otp"]
+        ]
+
+        return Request(session: session, url: url,
+                       method: "POST",
+                       handle: authenticationDecodable,
+                       parameters: payload,
+                       headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
+                       logger: logger,
+                       telemetry: telemetry)
+    }
+
+    func listMFAAuthenticators(mfaToken: String) -> Request<[Authenticator], AuthenticationError> {
+        let url = URL(string: "mfa/authenticators", relativeTo: self.url)!
+
+        return Request(session: session,
+                       url: url,
+                       method: "GET",
+                       handle: authenticationDecodable,
+                       headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
+                       logger: self.logger,
+                       telemetry: self.telemetry)
+    }
+
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
@@ -587,4 +615,50 @@ private extension Auth0Authentication {
                        dpop: self.dpop)
     }
 
+}
+
+
+
+public struct Authenticator: Decodable {
+    
+    public let type: String
+    public let oobChannel: String?
+    public let id: String
+    public let name: String?
+    public let active: Bool
+//        "authenticator_type": "oob",
+//        "oob_channel": "sms", //
+//        "id": "sms|dev_sEe99pcpN0xp0yOO",
+//        "name": "+1123XXXXX", //
+//        "active": true
+    
+    
+    enum CodingKeys: String, CodingKey {
+        case type = "authenticator_type"
+        case oobChannel = "oob_channel"
+        case name
+        case active
+        case id
+    }
+}
+
+
+public struct OTPMFAEnrollmentChallenge: Decodable {
+    public let authenticatorType: String
+    public let secret: String
+    public let barCodeURI: String
+    public let recoveryCodes: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case authenticatorType = "authenticator_type"
+        case secret
+        case barCodeURI = "barcode_uri"
+        case recoveryCodes = "recovery_codes"
+    }
+//    {
+//      "authenticator_type": "otp",
+//      "secret": "EN...S",
+//      "barcode_uri": "otpauth://totp/tenant:user?secret=...&issuer=tenant&algorithm=SHA1&digits=6&period=30",
+//      "recovery_codes": [ "N3B...XC"]
+//    }
 }
