@@ -106,13 +106,13 @@ public struct CredentialsManager {
     ///   - cancelTitle:      Cancel message to display when Face ID or Touch ID is used.
     ///   - fallbackTitle:    Fallback message to display when Face ID or Touch ID is used after a failed match.
     ///   - evaluationPolicy: Policy to be used for authentication policy evaluation.
-    ///   - policy:           The ``BiometricPolicy`` that controls when biometric authentication is required. Defaults to `.always`.
+    ///   - policy:           The ``BiometricPolicy`` that controls when biometric authentication is required. Defaults to `.default`.
     /// - Important: Access to the ``user`` property will not be protected by biometric authentication.
     public mutating func enableBiometrics(withTitle title: String,
                                           cancelTitle: String? = nil,
                                           fallbackTitle: String? = nil,
                                           evaluationPolicy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics,
-                                          policy: BiometricPolicy = .always) {
+                                          policy: BiometricPolicy = .default) {
         self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle, policy: policy)
     }
     #endif
@@ -191,7 +191,7 @@ public struct CredentialsManager {
         case .session(let timeoutInSeconds), .appLifecycle(let timeoutInSeconds):
             let timeoutInterval = TimeInterval(timeoutInSeconds)
             return Date().timeIntervalSince1970 - lastAuth < timeoutInterval
-        case .always:
+        case .always, .default:
             return false
         }
     }
@@ -1592,9 +1592,9 @@ public extension CredentialsManager {
     /// Updates the biometric session timestamp to the current time.
     /// Only updates for session-based policies (Session and AppLifecycle).
     private func updateBiometricSession(for policy: BiometricPolicy) {
-        // Don't update session for "Always" policy
+        // Don't update session for "Always" or "Default" policy
         switch policy {
-        case .always:
+        case .always, .default:
             return
         case .session, .appLifecycle:
             self.biometricSession.lock.lock()
