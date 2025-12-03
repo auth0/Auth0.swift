@@ -36,7 +36,7 @@ extension WebAuthentication {
         }
     }
 
-    static let completionHandler: (_ callback: @escaping WebAuthProviderCallback) -> ASHandler = { callback in
+    static let completionHandler: @Sendable (_ callback: @escaping WebAuthProviderCallback) -> ASHandler = { callback in
         return {
             guard let callbackURL = $0, $1 == nil else {
                 if let error = $1 as? NSError,
@@ -50,11 +50,14 @@ extension WebAuthentication {
                 return callback(.failure(WebAuthError(code: .unknown("ASWebAuthenticationSession failed"))))
             }
 
-            _ = TransactionStore.shared.resume(callbackURL)
+            Task { @MainActor in
+                  _ = TransactionStore.shared.resume(callbackURL)
+            }
         }
     }
 }
 
+@MainActor
 class ASUserAgent: NSObject, WebAuthUserAgent {
 
     private(set) static var currentSession: ASWebAuthenticationSession?

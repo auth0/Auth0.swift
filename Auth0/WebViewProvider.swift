@@ -50,7 +50,7 @@
 public extension WebAuthentication {
 
     static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
-        return { url, callback  in
+        return { @MainActor url, callback  in
             let redirectURL = extractRedirectURL(from: url)!
 
             return WebViewUserAgent(authorizeURL: url,
@@ -62,6 +62,7 @@ public extension WebAuthentication {
 
 }
 
+@MainActor
 class WebViewUserAgent: NSObject, WebAuthUserAgent {
 
     static let customSchemeRedirectionSuccessMessage = "com.auth0.webview.redirection_success"
@@ -74,7 +75,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     let redirectURL: URL
     let callback: WebAuthProviderCallback
 
-    init(authorizeURL: URL, redirectURL: URL, viewController: UIViewController = UIViewController(), modalPresentationStyle: UIModalPresentationStyle = .fullScreen, callback: @escaping WebAuthProviderCallback) {
+    init(authorizeURL: URL, redirectURL: URL, viewController: UIViewController = UIViewController(), modalPresentationStyle: UIModalPresentationStyle = .fullScreen, callback: @escaping @Sendable WebAuthProviderCallback) {
         self.request = URLRequest(url: authorizeURL)
         self.redirectURL = redirectURL
         self.callback = callback
@@ -109,19 +110,17 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     }
 
     func finish(with result: WebAuthResult<Void>) {
-        DispatchQueue.main.async { [weak webview, weak viewController, callback] in
-            webview?.removeFromSuperview()
-            guard let presenting = viewController?.presentingViewController else {
-                let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
-                return callback(.failure(error))
-            }
-            presenting.dismiss(animated: true) {
-                callback(result)
-            }
+        webview?.removeFromSuperview()
+        guard let presenting = viewController.presentingViewController else {
+            let error = WebAuthError(code: .unknown("Cannot dismiss WKWebView"))
+            return callback(.failure(error))
+        }
+        presenting.dismiss(animated: true) {
+            self.callback(result)
         }
     }
 
-    public override var description: String {
+    public override nonisolated var description: String {
         return String(describing: WKWebView.self)
     }
 

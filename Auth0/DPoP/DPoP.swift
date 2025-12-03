@@ -24,7 +24,20 @@ public struct DPoP: Sendable {
     public let keychainIdentifier: String
 
     static let nonceRequiredErrorCode = "use_dpop_nonce"
-    static private(set) var auth0Nonce: String?
+    
+    private actor NonceStorage {
+        private var nonce: String?
+        
+        func get() -> String? {
+            return nonce
+        }
+        
+        func set(_ newValue: String?) {
+            nonce = newValue
+        }
+    }
+    
+    private static let nonceStorage = NonceStorage()
     static private let maxRetries = 1
 
     private let keyStore: DPoPKeyStore
@@ -163,12 +176,9 @@ public struct DPoP: Sendable {
         return response?.value(forHTTPHeaderField: "DPoP-Nonce")
     }
 
-    static func storeNonce(from response: HTTPURLResponse?) {
+    static func storeNonce(from response: HTTPURLResponse?) async {
         guard let nonce = extractNonce(from: response) else { return }
-
-        serialQueue.sync {
-            auth0Nonce = nonce
-        }
+        await nonceStorage.set(nonce)
     }
 
     static func shouldRetry(for error: Auth0APIError, retryCount: Int) -> Bool {
@@ -190,13 +200,14 @@ public struct DPoP: Sendable {
         return try hasKeypair()
     }
 
-    func generateProof(for request: URLRequest) throws(DPoPError) -> String {
+    func generateProof(for request: URLRequest) async throws(DPoPError) -> String {
         let authorizationHeader = request.value(forHTTPHeaderField: "Authorization")
         let accessToken = authorizationHeader?.components(separatedBy: " ").last
+        let nonce = await Self.nonceStorage.get()
 
         return try proofGenerator.generate(url: request.url!,
                                            method: request.httpMethod!,
-                                           nonce: Self.auth0Nonce,
+                                           nonce: nonce,
                                            accessToken: accessToken)
     }
 
@@ -207,10 +218,8 @@ public struct DPoP: Sendable {
 
     // MARK: - Testing Utilities
 
-    static func clearNonce() {
-        serialQueue.sync {
-            Self.auth0Nonce = nil
-        }
+    static func clearNonce() async {
+        await nonceStorage.set(nil)
     }
 
     init(keyStore: DPoPKeyStore) {

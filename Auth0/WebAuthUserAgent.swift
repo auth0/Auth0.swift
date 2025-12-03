@@ -7,6 +7,7 @@
 public protocol WebAuthUserAgent {
 
     /// Starts the external user agent.
+    @MainActor
     func start()
 
     /// Tears down the external user agent after the web-based operation completed, if needed.
@@ -15,6 +16,7 @@ public protocol WebAuthUserAgent {
     ///
     /// - Parameter result: The outcome of the web-based operation, containing either an empty success case or an
     /// error.
+    @MainActor
     func finish(with result: WebAuthResult<Void>)
 
 }

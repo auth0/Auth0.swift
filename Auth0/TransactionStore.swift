@@ -2,11 +2,14 @@
 import Foundation
 
 /// Keeps track of the current Auth Transaction.
-class TransactionStore {
+@MainActor
+final class TransactionStore {
 
     static let shared = TransactionStore()
 
     private(set) var current: AuthTransaction?
+
+    private init() {}
 
     func resume(_ url: URL) -> Bool {
         let isResumed = self.current?.resume(url) ?? false

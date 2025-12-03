@@ -13,7 +13,7 @@ public typealias WebAuthProviderCallback = (WebAuthResult<Void>) -> Void
 /// ## See Also
 ///
 /// - [Example](https://github.com/auth0/Auth0.swift/blob/master/Auth0/SafariProvider.swift)
-public typealias WebAuthProvider = (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent
+public typealias WebAuthProvider = @MainActor (_ url: URL, _ callback: @escaping WebAuthProviderCallback) -> WebAuthUserAgent
 
 /// Web-based authentication using Auth0.
 ///

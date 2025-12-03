@@ -1,7 +1,7 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 
-class ClearSessionTransaction: NSObject, AuthTransaction {
+class ClearSessionTransaction: NSObject, AuthTransaction, @unchecked Sendable {
 
     private(set) var userAgent: WebAuthUserAgent?
 
@@ -22,8 +22,10 @@ class ClearSessionTransaction: NSObject, AuthTransaction {
     }
 
     private func finishUserAgent(with result: WebAuthResult<Void>) {
-        self.userAgent?.finish(with: result)
-        self.userAgent = nil
+        Task { @MainActor in
+            self.userAgent?.finish(with: result)
+            self.userAgent = nil
+        }
     }
 
 }
