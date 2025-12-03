@@ -43,6 +43,17 @@ class BiometricPolicySpec: QuickSpec {
         
         describe("BiometricPolicy") {
             
+            it("should have a default policy") {
+                let policy = BiometricPolicy.default
+                
+                switch policy {
+                case .default:
+                    expect(true).to(beTrue())
+                default:
+                    fail("Expected .default policy")
+                }
+            }
+            
             it("should have an always policy") {
                 let policy = BiometricPolicy.always
                 
@@ -94,18 +105,18 @@ class BiometricPolicySpec: QuickSpec {
         
         describe("enableBiometrics with policy") {
             
-            it("should enable biometrics with always policy by default") {
+            it("should enable biometrics with default policy by default") {
                 credentialsManager.enableBiometrics(withTitle: "Touch to unlock")
                 
                 // Verify that bioAuth is configured
                 expect(credentialsManager.bioAuth).toNot(beNil())
                 
-                // Verify the policy is .always
+                // Verify the policy is .default
                 switch credentialsManager.bioAuth?.policy {
-                case .always:
+                case .default:
                     expect(true).to(beTrue())
                 default:
-                    fail("Expected .always policy as default")
+                    fail("Expected .default policy as default")
                 }
             }
             

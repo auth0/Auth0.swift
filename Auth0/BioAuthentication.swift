@@ -23,13 +23,21 @@ struct BioAuthentication {
     var available: Bool {
         return self.authContext.canEvaluatePolicy(evaluationPolicy, error: nil)
     }
+    
+    /// Creates a new LAContext with the same settings for fresh biometric prompts.
+    private func createFreshContext() -> LAContext {
+        let newContext = LAContext()
+        newContext.localizedFallbackTitle = self.fallbackTitle
+        newContext.localizedCancelTitle = self.cancelTitle
+        return newContext
+    }
 
     init(authContext: LAContext,
          evaluationPolicy: LAPolicy,
          title: String,
          cancelTitle: String? = nil,
          fallbackTitle: String? = nil,
-         policy: BiometricPolicy = .always
+         policy: BiometricPolicy = .default
     ) {
         self.authContext = authContext
         self.evaluationPolicy = evaluationPolicy
@@ -40,7 +48,18 @@ struct BioAuthentication {
     }
 
     func validateBiometric(callback: @escaping (Error?) -> Void) {
-        self.authContext.evaluatePolicy(evaluationPolicy, localizedReason: self.title) {
+        let contextToUse: LAContext
+        
+        switch self.policy {
+        case .default:
+            // Use the existing context (preserves current behavior)
+            contextToUse = self.authContext
+        case .always, .session, .appLifecycle:
+            // Create a fresh context to ensure biometric prompt is shown
+            contextToUse = self.createFreshContext()
+        }
+        
+        contextToUse.evaluatePolicy(evaluationPolicy, localizedReason: self.title) {
             guard $1 == nil else { return callback($1) }
             callback($0 ? nil : LAError(.authenticationFailed))
         }
