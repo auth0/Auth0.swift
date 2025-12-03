@@ -4,7 +4,7 @@ This document provides context and guidelines for AI coding assistants working w
 
 ## Project Overview
 
-**Auth0.swift** is a idiomatic Swift SDK for integrating Auth0 authentication and authorization into Apple platform applications (iOS, macOS, tvOS, watchOS). The SDK provides a comprehensive solution for:
+**Auth0.swift** is an idiomatic Swift SDK for integrating Auth0 authentication and authorization into Apple platform applications (iOS, macOS, tvOS, watchOS). The SDK provides a comprehensive solution for:
 
   - **WebAuth**: Universal Login via `ASWebAuthenticationSession` (iOS 12+ / macOS 10.15+).
   - **Authentication**: Direct API client (Login, Signup, User Info, Passwordless).
@@ -35,39 +35,37 @@ Auth0.swift/
 
 ### Architecture Patterns
 
-  - **Protocol-Oriented**: Heavy use of protocols to define API contracts (`Authentication`, `WebAuth`, `CredentialsStorage`).
-  - **Functional Options**: Used in WebAuth builder pattern (e.g., `.scope()`, `.connection()`).
-  - **Concurrency**:
-      - **Primary**: Swift Concurrency (`async`/`await`) for modern targets.
-      - **Secondary**: Combine Publishers (via `.start()` returning `AnyPublisher`).
-      - **Legacy**: Result type Closures (`(Result<T, Auth0Error>) -> Void`).
+- **Protocol-Oriented**: Heavy use of protocols to define API contracts (`Authentication`, `WebAuth`, `CredentialsStorage`).
+- **Functional Options**: Used in WebAuth builder pattern (e.g., `.scope()`, `.connection()`).
+- **Concurrency**:
+  - **Primary**: Swift Concurrency (`async`/`await`) for modern targets.
+  - **Secondary**: Combine Publishers (via `.start()` returning `AnyPublisher`).
+  - **Legacy**: Result type Closures (`(Result<T, Auth0Error>) -> Void`).
 
 ### Authentication Flow
 
 1.  **WebAuth** (Recommended):
-
-      - Uses `ASWebAuthenticationSession` to share cookies with the system browser.
-      - Handles PKCE (Proof Key for Code Exchange) automatically.
-      - Support for Ephemeral Sessions (no cookies).
+    - Uses `ASWebAuthenticationSession` to share cookies with the system browser.
+    - Handles PKCE (Proof Key for Code Exchange) automatically.
+    - Support for Ephemeral Sessions (no cookies).
 
 2.  **Authentication API**:
-
-      - Direct HTTP calls to Auth0 Authentication endpoints.
-      - Used for custom UI (Resource Owner Password) or non-interactive flows.
+    - Direct HTTP calls to Auth0 Authentication endpoints.
+    - Used for custom UI (Resource Owner Password) or non-interactive flows.
 
 ### Credential Management
 
-  - **CredentialsManager**: Abstraction for storing tokens.
-  - **Storage**: Defaults to `SimpleKeychain` (a distinct Auth0 library) for Keychain access.
-  - **Automatic Refresh**: Handles checking expiration and refreshing access tokens automatically when requesting credentials.
+- **CredentialsManager**: Abstraction for storing tokens.
+- **Storage**: Defaults to `SimpleKeychain` (a distinct Auth0 library) for Keychain access.
+- **Automatic Refresh**: Handles checking expiration and refreshing access tokens automatically when requesting credentials.
 
 ## Development Guidelines
 
 ### Code Style
 
-  - **Language**: Swift 5.7+
-  - **Formatting**: Adheres to SwiftLint rules (see `.swiftlint.yml`).
-  - **Documentation**: 100% documentation coverage required for public APIs (Triple-slash `///`).
+- **Language**: Swift 5.7+
+- **Formatting**: Adheres to SwiftLint rules (see `.swiftlint.yml`).
+- **Documentation**: 100% documentation coverage required for public APIs (Triple-slash `///`).
 
 ### API Design Principles
 
@@ -88,17 +86,17 @@ When adding or modifying APIs, you must support the **Tri-brid Concurrency Model
 
 ### Error Handling
 
-  - All errors must map to `Auth0Error`.
-  - Specific domains:
-      - `AuthenticationError`: API failures.
-      - `WebAuthError`: User cancellation, browser issues.
-      - `ManagementError`: Management API failures.
+- All errors must map to `Auth0Error`.
+- Specific domains:
+  - `AuthenticationError`: API failures.
+  - `WebAuthError`: User cancellation, browser issues.
+  - `ManagementError`: Management API failures.
 
 ### Testing Requirements
 
-  - **Frameworks**: XCTest, Quick, and Nimble.
-  - **Mocking**: Use protocol-based mocking for `URLSession` and Storage.
-  - **Coverage**: Ensure tests cover Success, Failure (API error), and Network Failure scenarios.
+- **Frameworks**: XCTest, Quick, and Nimble.
+- **Mocking**: Use protocol-based mocking for `URLSession` and Storage.
+- **Coverage**: Ensure tests cover Success, Failure (API error), and Network Failure scenarios.
 
 ## Build & Testing Commands
 
@@ -120,8 +118,8 @@ swift package generate-documentation
 
 ### Package Management
 
-  - **`Package.swift`**: Primary definition (SPM).
-  - **`Auth0.podspec`**: Kept in sync for CocoaPods.
+- **`Package.swift`**: Primary definition (SPM).
+- **`Auth0.podspec`**: Kept in sync for CocoaPods.
 
 ### Auth0 Configuration
 
@@ -142,9 +140,9 @@ While the SDK can be configured in code, it defaults to reading from `Auth0.plis
 
 ## Dependencies
 
-  - **JWTDecode.swift**: For decoding JWTs to extract claims/expiry.
-  - **SimpleKeychain**: For Keychain access (iOS/macOS).
-  - **Quick/Nimble**: (Test Target only) Behavior-driven testing.
+- **JWTDecode.swift**: For decoding JWTs to extract claims/expiry.
+- **SimpleKeychain**: For Keychain access (iOS/macOS).
+- **Quick/Nimble**: (Test Target only) Behavior-driven testing.
 
 ## Security Considerations
 
@@ -155,15 +153,16 @@ While the SDK can be configured in code, it defaults to reading from `Auth0.plis
 
 ## Documentation
 
-  - **README.md**: Quickstart.
-  - **EXAMPLES.md**: (If present) or inline Code Snippets in docblocks.
-  - **MIGRATION.md**: Crucial when moving between major versions (e.g., v1 -\> v2).
+- **README.md**: Quickstart.
+- **EXAMPLES.md**: (If present) or inline Code Snippets in docblocks.
+- **MIGRATION.md**: Crucial when moving between major versions (e.g., v1 -> v2).
 
 ## Common Pitfalls
 
-  - **Bundle Identifier**: The callback URL in the Auth0 Dashboard must match the App's Bundle ID + formatting (e.g., `$(PRODUCT_BUNDLE_IDENTIFIER)://$(DOMAIN)/ios/$(PRODUCT_BUNDLE_IDENTIFIER)/callback`).
-  - **Dispatcher**: UI updates must happen on `@MainActor` / Main Thread.
-  - **Retain Cycles**: Be careful with `self` capture in closures within `CredentialsManager`.
+- **Bundle Identifier**: The callback URL in the Auth0 Dashboard must match the App's Bundle ID format (e.g., `com.example.app://YOUR_DOMAIN/ios/com.example.app/callback`).
+- **Dispatcher**: UI updates must happen on `@MainActor` / Main Thread.
+- **Retain Cycles**: Be careful with `self` capture in closures within `CredentialsManager`.
+- **Info.plist Configuration**: Ensure `CFBundleURLTypes` is properly configured for callback URL schemes.
 
 ## AI Agent Best Practices
 
@@ -179,8 +178,6 @@ When assisting with this codebase:
 ### Web Authentication (Async/Await)
 
 ```swift
-
-
 import Auth0
 
 func login() async {

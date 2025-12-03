@@ -3,7 +3,10 @@ import Auth0
 import Combine
 struct ContentView: View {
     @ObservedObject var viewModel: ContentViewModel
-    
+    @State private var showAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+
     init(viewModel: ContentViewModel) {
         self.viewModel = viewModel
     }
@@ -16,10 +19,14 @@ struct ContentView: View {
                     .logging(enabled: true)
                     .start {
                         switch $0 {
-                        case .failure:
-                            break
-                        case .success:
-                            break
+                        case .failure(let error):
+                            alertTitle = "Login Failed"
+                            alertMessage = error.localizedDescription
+                            showAlert = true
+                        case .success(let credentials):
+                            alertTitle = "Login Successful"
+                            alertMessage = "Access token: \(credentials.accessToken)"
+                            showAlert = true
                         }
                         print($0)
                     }
@@ -42,7 +49,11 @@ struct ContentView: View {
             } label: {
                 Text("Logout")
             }
-
+        }
+        .alert(alertTitle, isPresented: $showAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(alertMessage)
         }
     }
 
