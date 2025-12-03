@@ -4,7 +4,7 @@
 /// - ``MyAccount``
 /// - ``MyAccountError``
 public protocol MyAccountAuthenticationMethods: MyAccountClient {
-    
+
 #if PASSKEYS_PLATFORM
     /// Requests a challenge for enrolling a new passkey. This is the first part of the enrollment flow.
     ///
@@ -75,7 +75,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
                                     connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
-    
+
     /// Enrolls a new passkey credential. This is the last part of the enrollment flow.
     ///
     /// ## Availability
@@ -184,7 +184,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
     /// - Returns: A request that will yield an enrolled recovery code authentication method.
     func confirmRecoveryCodeEnrollment(id: String,
-                                      authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+                                       authSession: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Requests a challenge for enrolling a TOTP authentication method. This is the first part of the enrollment flow.
     ///
@@ -394,8 +394,8 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - otpCode: The one-time password code sent to the email address.
     /// - Returns: A request that will yield an enrolled email authentication method.
     func confirmEmailEnrollment(id: String,
-                               authSession: String,
-                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+                                authSession: String,
+                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
 
     /// Requests a challenge for enrolling a Phone authentication method. This is the first part of the enrollment flow.
     ///
@@ -471,38 +471,6 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
                                 authSession: String,
                                 otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
 
-    /// Retrieve detailed list of authentication methods belonging to the authenticated user.
-    ///
-    /// ## Availability
-    ///
-    /// This feature is currently available in
-    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
-    /// Please reach out to Auth0 support to get it enabled for your tenant.
-    ///
-    /// ## Scopes Required
-    ///
-    /// `read:me:authentication_methods`
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .myAccount(token: apiCredentials.accessToken)
-    ///     .authenticationMethods
-    ///     .getAuthenticationMethods()
-    ///     .start { result in
-    ///         switch result {
-    ///         case .success(let authenticationMethods):
-    ///             print("List of Authentication methods: \(authenticationMethods)")
-    ///         case .failure(let error):
-    ///             print("Failed with: \(error)")
-    ///         }
-    ///     }
-    /// ```
-    ///
-    /// - Returns: A request that will return list of authentication methods of an authenticated user
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
-
     /// Delete an authentication method associated with an id
     ///
     /// ## Availability
@@ -570,6 +538,38 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - id:  Id of the returned authentication method
     /// - Returns: A request to fetch authentication method associated with the id.
     func getAuthenticationMethod(by id: String) -> Request<AuthenticationMethod, MyAccountError>
+
+    /// Retrieve detailed list of authentication methods belonging to the authenticated user.
+    ///
+    /// ## Availability
+    ///
+    /// This feature is currently available in
+    /// [Early Access](https://auth0.com/docs/troubleshoot/product-lifecycle/product-release-stages#early-access).
+    /// Please reach out to Auth0 support to get it enabled for your tenant.
+    ///
+    /// ## Scopes Required
+    ///
+    /// `read:me:authentication_methods`
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .myAccount(token: apiCredentials.accessToken)
+    ///     .authenticationMethods
+    ///     .getAuthenticationMethods()
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let authenticationMethods):
+    ///             print("List of Authentication methods: \(authenticationMethods)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Returns: A request that will return list of authentication methods of an authenticated user
+    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
 
     /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
     ///

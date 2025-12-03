@@ -32,6 +32,17 @@ public struct CredentialsManager {
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
+    // Biometric session management - using a class to allow mutation in non-mutating methods
+    private final class BiometricSession {
+        let noSession: TimeInterval = -1
+        var lastBiometricAuthTime: TimeInterval = -1
+        let lock = NSLock()
+        
+        init() {
+            lastBiometricAuthTime = noSession
+        }
+    }
+    private let biometricSession = BiometricSession()
     #endif
 
     /// Creates a new `CredentialsManager` instance.
@@ -82,17 +93,27 @@ public struct CredentialsManager {
     ///                                     evaluationPolicy: .deviceOwnerAuthentication)
     /// ```
     ///
+    /// You can also configure a ``BiometricPolicy`` to control when biometric authentication is required:
+    ///
+    /// ```swift
+    /// // Require authentication only once per 5-minute session
+    /// credentialsManager.enableBiometrics(withTitle: "Unlock with Face ID",
+    ///                                     policy: .session(timeoutInSeconds: 300))
+    /// ```
+    ///
     /// - Parameters:
     ///   - title:            Main message to display when Face ID or Touch ID is used.
     ///   - cancelTitle:      Cancel message to display when Face ID or Touch ID is used.
     ///   - fallbackTitle:    Fallback message to display when Face ID or Touch ID is used after a failed match.
     ///   - evaluationPolicy: Policy to be used for authentication policy evaluation.
+    ///   - policy:           The ``BiometricPolicy`` that controls when biometric authentication is required. Defaults to `.default`.
     /// - Important: Access to the ``user`` property will not be protected by biometric authentication.
     public mutating func enableBiometrics(withTitle title: String,
                                           cancelTitle: String? = nil,
                                           fallbackTitle: String? = nil,
-                                          evaluationPolicy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics) {
-        self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle)
+                                          evaluationPolicy: LAPolicy = .deviceOwnerAuthenticationWithBiometrics,
+                                          policy: BiometricPolicy = .default) {
+        self.bioAuth = BioAuthentication(authContext: LAContext(), evaluationPolicy: evaluationPolicy, title: title, cancelTitle: cancelTitle, fallbackTitle: fallbackTitle, policy: policy)
     }
     #endif
 
@@ -125,6 +146,11 @@ public struct CredentialsManager {
     ///
     /// - Returns: If the credentials were removed.
     public func clear() -> Bool {
+        #if WEB_AUTH_PLATFORM
+        self.biometricSession.lock.lock()
+        self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
+        self.biometricSession.lock.unlock()
+        #endif
         return self.storage.deleteEntry(forKey: self.storeKey)
     }
 
@@ -141,6 +167,49 @@ public struct CredentialsManager {
     public func clear(forAudience audience: String) -> Bool {
         return self.storage.deleteEntry(forKey: audience)
     }
+
+    #if WEB_AUTH_PLATFORM
+    /// Checks if the current biometric session is valid based on the configured policy.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// let isValid = credentialsManager.isBiometricSessionValid()
+    /// ```
+    ///
+    /// - Returns: `true` if the session is valid and biometric authentication can be skipped, `false` otherwise.
+    public func isBiometricSessionValid() -> Bool {
+        guard let bioAuth = self.bioAuth else { return false }
+        
+        self.biometricSession.lock.lock()
+        defer { self.biometricSession.lock.unlock() }
+        
+        let lastAuth = self.biometricSession.lastBiometricAuthTime
+        if lastAuth == self.biometricSession.noSession { return false }
+        
+        switch bioAuth.policy {
+        case .session(let timeoutInSeconds), .appLifecycle(let timeoutInSeconds):
+            let timeoutInterval = TimeInterval(timeoutInSeconds)
+            return Date().timeIntervalSince1970 - lastAuth < timeoutInterval
+        case .always, .default:
+            return false
+        }
+    }
+
+    /// Clears the in-memory biometric session timestamp. This will force biometric authentication on the next
+    /// credential access.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// credentialsManager.clearBiometricSession()
+    /// ```
+    public func clearBiometricSession() {
+        self.biometricSession.lock.lock()
+        defer { self.biometricSession.lock.unlock() }
+        self.biometricSession.lastBiometricAuthTime = self.biometricSession.noSession
+    }
+    #endif
 
     /// Calls the `/oauth/revoke` endpoint to revoke the refresh token and then clears the credentials if the request
     /// was successful. Otherwise, the credentials will not be cleared and the callback will be called with a failure
@@ -314,10 +383,25 @@ public struct CredentialsManager {
                 return callback(.failure(error))
             }
 
+            // Check if biometric session is valid based on policy
+            if self.isBiometricSessionValid() {
+                // Session is valid, bypass biometric prompt
+                self.retrieveCredentials(scope: scope,
+                                         minTTL: minTTL,
+                                         parameters: parameters,
+                                         headers: headers,
+                                         forceRenewal: false,
+                                         callback: callback)
+                return
+            }
+
             bioAuth.validateBiometric { error in
                 guard error == nil else {
                     return callback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: error!)))
                 }
+
+                // Update biometric session after successful authentication (only for session-based policies)
+                self.updateBiometricSession(for: bioAuth.policy)
 
                 self.retrieveCredentials(scope: scope,
                                          minTTL: minTTL,
@@ -610,7 +694,7 @@ public struct CredentialsManager {
                                  callback: callback)
     }
 
-    func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
+    public func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
         guard let data = try? apiCredentials.encode() else {
             return false
         }
@@ -1503,6 +1587,22 @@ public extension CredentialsManager {
             }
         }
     }
+
+    #if WEB_AUTH_PLATFORM
+    /// Updates the biometric session timestamp to the current time.
+    /// Only updates for session-based policies (Session and AppLifecycle).
+    private func updateBiometricSession(for policy: BiometricPolicy) {
+        // Don't update session for "Always" or "Default" policy
+        switch policy {
+        case .always, .default:
+            return
+        case .session, .appLifecycle:
+            self.biometricSession.lock.lock()
+            defer { self.biometricSession.lock.unlock() }
+            self.biometricSession.lastBiometricAuthTime = Date().timeIntervalSince1970
+        }
+    }
+    #endif
 
 }
 #endif

@@ -1,6 +1,6 @@
 import Foundation
 
-struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {    
+struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     let url: URL
     let session: URLSession
     let token: String
