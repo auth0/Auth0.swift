@@ -11,7 +11,7 @@ final class Auth0WebAuth: WebAuth {
 
     var telemetry: Telemetry
     var barrier: Barrier
-    var logger: Logger?
+    var logger: Auth0Logger?
     var dpop: DPoP?
 
     #if os(macOS)

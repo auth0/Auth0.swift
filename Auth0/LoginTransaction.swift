@@ -10,14 +10,14 @@ class LoginTransaction: NSObject, AuthTransaction {
     let redirectURL: URL
     let state: String?
     let handler: OAuth2Grant
-    let logger: Logger?
+    let logger: Auth0Logger?
     let callback: FinishTransaction
 
     init(redirectURL: URL,
          state: String? = nil,
          userAgent: WebAuthUserAgent,
          handler: OAuth2Grant,
-         logger: Logger?,
+         logger: Auth0Logger?,
          callback: @escaping FinishTransaction) {
         self.redirectURL = redirectURL
         self.state = state

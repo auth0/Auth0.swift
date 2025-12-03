@@ -4,7 +4,7 @@ import Foundation
 public protocol Loggable {
 
     /// Logger used to print log statements.
-    var logger: Logger? { get set }
+    var logger: Auth0Logger? { get set }
 
 }
 
@@ -17,7 +17,7 @@ public extension Loggable {
      - Note: By default all logging is **disabled**.
      - Important: Logging should be turned on/off **before** making request to Auth0 for the flag to take effect.
      */
-    func using(logger: Logger) -> Self {
+    func using(logger: Auth0Logger) -> Self {
         var loggable = self
         loggable.logger = logger
         return loggable

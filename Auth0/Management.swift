@@ -9,7 +9,7 @@ struct Management: Trackable, Loggable {
     let session: URLSession
 
     var telemetry: Telemetry
-    var logger: Logger?
+    var logger: Auth0Logger?
 
     var defaultHeaders: [String: String] {
         return [
