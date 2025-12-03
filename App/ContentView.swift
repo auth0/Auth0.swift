@@ -44,10 +44,12 @@ struct ContentView: View {
                 TextField(text: $viewModel.otpCode) {
                     Text("Enter otp")
                 }.keyboardType(.numberPad)
+                    .padding()
+                    .cornerRadius(4)
                     .overlay {
-                    RoundedRectangle(cornerRadius: 4)
-                        .stroke(Color.blue, lineWidth: 1)
-                }
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(Color.blue, lineWidth: 1)
+                    }
                 
                 Button {
                     viewModel.confirmEnrollment()
