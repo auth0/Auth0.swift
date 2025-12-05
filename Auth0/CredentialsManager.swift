@@ -163,7 +163,8 @@ public struct CredentialsManager {
     /// ```
     ///
     /// - Parameter audience: Identifier of the API the stored API credentials are for.
-    /// - Parameter scope: Scope of the stored API credentials. If API credentials are fetched with scope, it is recommended to pass the scope to clear them.
+    /// - Parameter scope: Optional scope for which the  API Credentials are stored. If the credentials were initially fetched/stored with scope,
+    ///   it is recommended to pass scope also while clearing them.
     /// - Returns: If the API credentials were removed.
     public func clear(forAudience audience: String,scope:String? = nil) -> Bool {
         let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
@@ -719,7 +720,11 @@ public struct CredentialsManager {
     private func getAPICredentialsStorageKey(audience: String, scope: String?) -> String {
         // Use audience if scope is null else use a combination of audience and scope
         if let scope = scope {
-            return "\(audience)::\(scope.replacingOccurrences(of: " ", with: "::"))"
+            let normalisedScopes = scope
+            .split(separator: " ")
+            .sorted()
+            .joined(separator: "::")
+            return "\(audience)::\(normalisedScopes)"
         }  else {
             return audience
         }
