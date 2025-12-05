@@ -25,22 +25,6 @@ enum LogLevel {
     case fault
 }
 
-/// Protocol for unified logging operations.
-protocol UnifiedLogging {
-    /// Log a message with the specified parameters.
-    /// - Parameters:
-    ///   - category: The log category for filtering (e.g., `.networkTracing`, `.configuration`)
-    ///   - level: The severity level (`.debug`, `.info`, `.warning`, `.error`, `.fault`)
-    ///   - message: The message to log (lazy-evaluated via autoclosure)
-    ///   - isPublic: Whether the message is visible in system logs. Defaults to `false` to protect sensitive data
-    func log(
-        _ category: LogCategory,
-        level: LogLevel,
-        message: @autoclosure () -> String,
-        isPublic: Bool
-    )
-}
-
 /// Unified logging interface for the SDK.
 /// Provides a consistent, type-safe API for logging across all SDK components.
 enum Auth0Log {
@@ -65,10 +49,10 @@ enum Auth0Log {
     static func log(
         _ category: LogCategory,
         level: LogLevel = .debug,
-        message: @autoclosure () -> String,
+        message: String,
         isPublic: Bool = false
     ) {
-        loggingService.log(category, level: level, message: message(), isPublic: isPublic)
+        loggingService.log(category, level: level, message: message, isPublic: isPublic)
     }
     
     /// Log a debug message.
@@ -81,10 +65,10 @@ enum Auth0Log {
     ///   - isPublic: Whether the message is visible in system logs (default: `false`)
     static func debug(
         _ category: LogCategory,
-        _ message: @autoclosure () -> String,
+        _ message: String,
         isPublic: Bool = false
     ) {
-        log(category, level: .debug, message: message(), isPublic: isPublic)
+        log(category, level: .debug, message: message, isPublic: isPublic)
     }
     
     /// Log an informational message.
@@ -97,10 +81,10 @@ enum Auth0Log {
     ///   - isPublic: Whether the message is visible in system logs (default: `false`)
     static func info(
         _ category: LogCategory,
-        _ message: @autoclosure () -> String,
+        _ message:  String,
         isPublic: Bool = false
     ) {
-        log(category, level: .info, message: message(), isPublic: isPublic)
+        log(category, level: .info, message: message, isPublic: isPublic)
     }
     
     /// Log a warning message.
@@ -113,10 +97,10 @@ enum Auth0Log {
     ///   - isPublic: Whether the message is visible in system logs (default: `false`)
     static func warning(
         _ category: LogCategory,
-        _ message: @autoclosure () -> String,
+        _ message: String,
         isPublic: Bool = false
     ) {
-        log(category, level: .warning, message: message(), isPublic: isPublic)
+        log(category, level: .warning, message: message, isPublic: isPublic)
     }
     
     /// Log an error message.
@@ -129,10 +113,10 @@ enum Auth0Log {
     ///   - isPublic: Whether the message is visible in system logs (default: `false`)
     static func error(
         _ category: LogCategory,
-        _ message: @autoclosure () -> String,
+        _ message: String,
         isPublic: Bool = false
     ) {
-        log(category, level: .error, message: message(), isPublic: isPublic)
+        log(category, level: .error, message: message, isPublic: isPublic)
     }
     
     /// Log a fault message for critical system errors.

@@ -4,6 +4,22 @@ import os.log
 // Avoid naming conflict with Auth0Logger protocol
 typealias OSLogger = os.Logger
 
+/// Protocol for unified logging operations.
+protocol UnifiedLogging {
+    /// Log a message with the specified parameters.
+    /// - Parameters:
+    ///   - category: The log category for filtering (e.g., `.networkTracing`, `.configuration`)
+    ///   - level: The severity level (`.debug`, `.info`, `.warning`, `.error`, `.fault`)
+    ///   - message: The message to log (lazy-evaluated via autoclosure)
+    ///   - isPublic: Whether the message is visible in system logs. Defaults to `false` to protect sensitive data
+    func log(
+        _ category: LogCategory,
+        level: LogLevel,
+        message: @autoclosure () -> String,
+        isPublic: Bool
+    )
+}
+
 /// Production OSLog-based logging implementation.
 struct OSUnifiedLoggingService: UnifiedLogging {
     
@@ -13,13 +29,22 @@ struct OSUnifiedLoggingService: UnifiedLogging {
     /// Centralized subsystem identifier for all Auth0 logs.
     static let subsystem = Bundle(for: BundleMarker.self).bundleIdentifier ?? "com.auth0.Auth0"
     
+    /// Cached loggers for each category to avoid repeated allocations.
+    private static let loggers: [LogCategory: OSLogger] = {
+        var loggers: [LogCategory: OSLogger] = [:]
+        loggers[.networkTracing] = OSLogger(subsystem: subsystem, category: LogCategory.networkTracing.rawValue)
+        loggers[.configuration] = OSLogger(subsystem: subsystem, category: LogCategory.configuration.rawValue)
+        return loggers
+    }()
+    
     func log(
         _ category: LogCategory,
         level: LogLevel,
         message: @autoclosure () -> String,
         isPublic: Bool = false
     ) {
-        let logger = OSLogger(subsystem: Self.subsystem, category: category.rawValue)
+        guard let logger = Self.loggers[category] else { return }
+        
         let messageString = message()
         
         switch (level, isPublic) {
