@@ -1,4 +1,5 @@
 import SwiftUI
+import AuthenticationServices
 import Auth0
 import Combine
 struct ContentView: View {
@@ -13,9 +14,20 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 10) {
+            
+            Button {
+                viewModel
+                    .signupWithPasskey()
+
+            } label: {
+                Text("Sign up with passkey")
+                    .foregroundStyle(Color.blue)
+            }
+
             Button {
                 Auth0
-                    .webAuth()
+                    .webAuth(clientId: "GGUVoHL5nseaacSzqB810HWYGHZI34m8", domain: "passkeystestdomain.acmetest.org")
+                    .provider(WebAuthentication.webViewProvider())
                     .logging(enabled: true)
                     .start {
                         switch $0 {
@@ -33,15 +45,16 @@ struct ContentView: View {
             } label: {
                 Text("Login")
             }.padding(.horizontal)
-            
+
             Button {
                 Auth0
-                    .webAuth()
+                    .webAuth(clientId: "GGUVoHL5nseaacSzqB810HWYGHZI34m8", domain: "passkeystestdomain.acmetest.org")
+                    .provider(WebAuthentication.webViewProvider())
                     .logging(enabled: true)
                     .clearSession(federated: false) { result in
                         switch result {
                         case .success:
-                            break
+                    break
                         case .failure:
                             break
                         }

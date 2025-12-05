@@ -740,7 +740,7 @@ public struct CredentialsManager {
                     dispatchGroup.leave()
                     return callback(.failure(.noRefreshToken))
                 }
-
+// refresh token rotation
                 self.authentication
                     .renew(withRefreshToken: refreshToken, scope: scope)
                     .parameters(parameters)
