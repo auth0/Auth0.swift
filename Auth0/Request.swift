@@ -1,6 +1,5 @@
 import Foundation
 import Combine
-import OSLog
 
 #if DEBUG
 let parameterPropertyKey = "com.auth0.parameter"
@@ -31,7 +30,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let handle: (Result<ResponseValue, E>, Callback) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
-    let logger: Auth0Logger?
+    let logger: Logger?
     let telemetry: Telemetry
     let dpop: DPoP?
 
@@ -41,7 +40,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
          handle: @escaping (Result<ResponseValue, E>, Callback) -> Void,
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
-         logger: Auth0Logger?,
+         logger: Logger?,
          telemetry: Telemetry,
          dpop: DPoP? = nil) {
         self.session = session
@@ -122,9 +121,9 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                 } else {
                     handle(.failure(error), callback)
                 }
-                Auth0Log.error(.network, "Request failed: \(error)")
+                Auth0Log.debug(.networkTracing, "\(error)")
             } catch {
-                Auth0Log.error(.network, "Request failed: \(error)")
+                Auth0Log.debug(.networkTracing, "\(error)")
                 handle(.failure(E(cause: error)), callback)
             }
         })

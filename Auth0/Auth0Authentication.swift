@@ -9,7 +9,7 @@ struct Auth0Authentication: Authentication {
     let clientId: String
     let url: URL
     var telemetry: Telemetry
-    var logger: Auth0Logger?
+    var logger: Logger?
     var dpop: DPoP?
 
     let session: URLSession

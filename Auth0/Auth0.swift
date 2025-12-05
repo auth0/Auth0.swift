@@ -1,5 +1,4 @@
 import Foundation
-import OSLog
 
 /**
  `Result` wrapper for Authentication API operations.
@@ -226,7 +225,7 @@ func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
 
     guard let clientId = values["ClientId"] as? String, let domain = values["Domain"] as? String else {
             Auth0Log.error(.configuration, "Auth0.plist file at \(path) is missing 'ClientId' and/or 'Domain' entries!")
-            Auth0Log.error(.configuration, "File currently has the following entries: \(String(describing: values))")
+            Auth0Log.debug(.configuration, "File currently has the following entries: \(String(describing: values))")
             return nil
         }
     return (clientId: clientId, domain: domain)

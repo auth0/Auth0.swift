@@ -7,7 +7,7 @@ struct Auth0MyAccount: MyAccount {
     let token: String
 
     var telemetry: Telemetry
-    var logger: Auth0Logger?
+    var logger: Logger?
 
     static let apiVersion = "v1"
 
@@ -23,7 +23,7 @@ struct Auth0MyAccount: MyAccount {
          url: URL,
          session: URLSession = .shared,
          telemetry: Telemetry = Telemetry(),
-         logger: Auth0Logger? = nil) {
+         logger: Logger? = nil) {
         self.url = url.appending("me/\(Self.apiVersion)")
         self.session = session
         self.token = token

@@ -343,6 +343,52 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 - [**Clear stored credentials**](EXAMPLES.md#clear-stored-credentials) - delete the user's credentials to complete the logout process.
 - [**Retrieve user information**](EXAMPLES.md#retrieve-user-information) - fetch the latest user information from the `/userinfo` endpoint.
 
+## Logging
+
+Auth0.swift uses Apple's Unified Logging (OSLog) to help you troubleshoot issues during development. Enable detailed HTTP logging to see network requests, responses, and errors.
+
+### Enable Logging
+
+```swift
+Auth0
+    .webAuth()
+    .logging(enabled: true)
+    .start { result in
+        // Handle result
+    }
+
+// Or with Authentication client
+Auth0
+    .authentication()
+    .logging(enabled: true)
+    .login(usernameOrEmail: "user@example.com", password: "secret")
+    .start { result in
+        // Handle result
+    }
+```
+
+### Viewing Logs
+
+#### Xcode Console (Recommended)
+
+Logs appear automatically in the Xcode debug console during development on all platforms.
+
+**Filtering in Xcode 15+:**
+
+Use these filter expressions directly in the console search bar:
+
+| Filter | Description |
+|--------|-------------|
+| `subsystem:com.auth0.Auth0` | Show all Auth0 SDK logs |
+| `category:NetworkTracing` | Show only network requests/responses |
+| `category:Configuration` | Show only configuration errors |
+| `subsystem:com.auth0.Auth0 category:NetworkTracing` | Combine filters for specific logs |
+
+### Log Categories
+
+- **NetworkTracing** - HTTP requests, responses, and network errors
+- **Configuration** - SDK setup and configuration issues
+
 ## Support Policy
 
 This Policy defines the extent of the support for Xcode, Swift, and platform (iOS, macOS, tvOS, and watchOS) versions in Auth0.swift.

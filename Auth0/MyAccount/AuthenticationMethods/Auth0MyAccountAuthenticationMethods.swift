@@ -6,13 +6,13 @@ struct Auth0MyAccountAuthenticationMethods: MyAccountAuthenticationMethods {
     let token: String
 
     var telemetry: Telemetry
-    var logger: Auth0Logger?
+    var logger: Logger?
 
     init(token: String,
          url: URL,
          session: URLSession = .shared,
          telemetry: Telemetry = Telemetry(),
-         logger: Auth0Logger? = nil) {
+         logger: Logger? = nil) {
         self.token = token
         self.url = url
         self.session = session

@@ -3,7 +3,7 @@ import CryptoKit
 
 @testable import Auth0
 
-struct MockLogger: Auth0Logger {
+struct MockLogger: Logger {
     func trace(url: URL, source: String?) {}
     
     func trace(response: URLResponse, data: Data?) {}
