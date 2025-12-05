@@ -4,7 +4,7 @@ import Nimble
 
 @testable import Auth0
 
-class MockLoggingService: UnifiedLogging {
+final class MockLoggingService: UnifiedLogging {
     var loggedMessages: [(category: LogCategory, level: LogLevel, message: String, isPublic: Bool)] = []
     
     func log(_ category: LogCategory, level: LogLevel, message: @autoclosure () -> String, isPublic: Bool) {
@@ -26,7 +26,7 @@ class LoggerSpec: QuickSpec {
             }
             
             afterEach {
-                Auth0Log.loggingService = OSLogService()
+                Auth0Log.loggingService = OSUnifiedLoggingService()
             }
             
             it("should have correct subsystem identifier") {

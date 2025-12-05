@@ -478,6 +478,11 @@
 		62072A8E2EE1989E00690A4B /* Auth0Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62072A8B2EE1989E00690A4B /* Auth0Log.swift */; };
 		62072A8F2EE1989E00690A4B /* Auth0Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62072A8B2EE1989E00690A4B /* Auth0Log.swift */; };
 		62072A902EE1989E00690A4B /* Auth0Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62072A8B2EE1989E00690A4B /* Auth0Log.swift */; };
+		6287D5C72EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6287D5C62EE30033001E1651 /* OSUnifiedLoggingService.swift */; };
+		6287D5C82EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6287D5C62EE30033001E1651 /* OSUnifiedLoggingService.swift */; };
+		6287D5C92EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6287D5C62EE30033001E1651 /* OSUnifiedLoggingService.swift */; };
+		6287D5CA2EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6287D5C62EE30033001E1651 /* OSUnifiedLoggingService.swift */; };
+		6287D5CB2EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6287D5C62EE30033001E1651 /* OSUnifiedLoggingService.swift */; };
 		970BC36B25C27095007A7745 /* MultifactorChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* MultifactorChallenge.swift */; };
 		970BC36C25C27095007A7745 /* MultifactorChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* MultifactorChallenge.swift */; };
 		970BC36D25C27095007A7745 /* MultifactorChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970BC36A25C27095007A7745 /* MultifactorChallenge.swift */; };
@@ -1028,6 +1033,7 @@
 		5FE686A91D1894AA0075874C /* TelemetrySpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TelemetrySpec.swift; sourceTree = "<group>"; };
 		5FF465BB1CE2AC4500F7ED8C /* Management.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Management.swift; path = Auth0/Management.swift; sourceTree = SOURCE_ROOT; };
 		62072A8B2EE1989E00690A4B /* Auth0Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth0Log.swift; sourceTree = "<group>"; };
+		6287D5C62EE30033001E1651 /* OSUnifiedLoggingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSUnifiedLoggingService.swift; sourceTree = "<group>"; };
 		970BC36A25C27095007A7745 /* MultifactorChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultifactorChallenge.swift; sourceTree = "<group>"; };
 		A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		C107B51B2C9AC4D3006B6BEA /* WebViewProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewProvider.swift; sourceTree = "<group>"; };
@@ -1513,6 +1519,7 @@
 			isa = PBXGroup;
 			children = (
 				5F6FAC621D09E98000D5B4EA /* Logger.swift */,
+				6287D5C62EE30033001E1651 /* OSUnifiedLoggingService.swift */,
 				5F28B4601D8216180000EB23 /* Loggable.swift */,
 				62072A8B2EE1989E00690A4B /* Auth0Log.swift */,
 			);
@@ -2457,6 +2464,7 @@
 				5C505FC42E216784005D0757 /* ECPublicKey.swift in Sources */,
 				5C3D87E22DB8276000AACC34 /* PublicKeyCredentialCreationOptions.swift in Sources */,
 				5F6FAC631D09E98000D5B4EA /* Logger.swift in Sources */,
+				6287D5C82EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */,
 				5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */,
 				5C3D88252DC1509800AACC34 /* LoginPasskey.swift in Sources */,
 				5F28B4611D8216180000EB23 /* Loggable.swift in Sources */,
@@ -2529,6 +2537,7 @@
 				5FE2F8BC1CD0EAAD003628F4 /* Response.swift in Sources */,
 				5C505FD82E2168BD005D0757 /* KeychainKeyStore.swift in Sources */,
 				5B7EE47420FCA00A00367724 /* CredentialsManagerError.swift in Sources */,
+				6287D5CA2EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */,
 				5C0AF09E2833420200162044 /* WebAuthentication.swift in Sources */,
 				5FDE876A1D8A424700EA27DC /* Credentials.swift in Sources */,
 				5C354C05276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
@@ -2807,6 +2816,7 @@
 				5F23E6DC1D4ACD6100C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				5F23E6E61D4ACD8500C3F2D9 /* Requestable.swift in Sources */,
 				5C79AE092E040CA900CD0D41 /* DPoP.swift in Sources */,
+				6287D5C92EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */,
 				5C505FB22E21669F005D0757 /* SenderConstraining.swift in Sources */,
 				5C354C07276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5FDE875F1D8A424700EA27DC /* AuthenticationError.swift in Sources */,
@@ -2875,6 +2885,7 @@
 				5F23E7061D4B88EA00C3F2D9 /* NSData+URLSafe.swift in Sources */,
 				5F23E70F1D4B88FC00C3F2D9 /* Requestable.swift in Sources */,
 				5C79AE0A2E040CA900CD0D41 /* DPoP.swift in Sources */,
+				6287D5C72EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */,
 				5C505FB42E21669F005D0757 /* SenderConstraining.swift in Sources */,
 				5C354C06276CE1A500ADBC86 /* PasswordlessType.swift in Sources */,
 				5FDE87601D8A424700EA27DC /* AuthenticationError.swift in Sources */,
@@ -3015,6 +3026,7 @@
 				C1B3BA102C24B6D4004A32A4 /* Request.swift in Sources */,
 				C1B3BA112C24B6D4004A32A4 /* Requestable.swift in Sources */,
 				5C505FBB2E216702005D0757 /* DPoPProofGenerator.swift in Sources */,
+				6287D5CB2EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */,
 				5C38EA292DA4635B0085AC31 /* MyAccountError.swift in Sources */,
 				C1B3BA122C24B6D4004A32A4 /* Response.swift in Sources */,
 				5C3D87EA2DB99C5C00AACC34 /* PasskeySignupChallenge.swift in Sources */,

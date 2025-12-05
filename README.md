@@ -438,5 +438,3 @@ Please do not report security vulnerabilities on the public GitHub issue tracker
 </p>
 
 <p align="center">Auth0 is an easy-to-implement, adaptable authentication and authorization platform. To learn more check out <a href="https://auth0.com/why-auth0">Why Auth0?</a></p>
-
-<p align="center">This project is licensed under the MIT license. See the <a href="./LICENSE"> LICENSE</a> file for more info.</p>
