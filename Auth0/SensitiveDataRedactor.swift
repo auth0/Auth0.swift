@@ -14,7 +14,7 @@ struct SensitiveDataRedactor {
     /// Note: These logs are only for debugging purposes and never persisted in production.
     ///
     /// - Parameter data: The response data to redact.
-    /// - Returns: A JSON string with sensitive fields replaced by `<REDACTED>`, or `nil` if not valid JSON.
+    /// - Returns: A JSON string with sensitive fields replaced by `<REDACTED>` if valid JSON, otherwise returns the data decoded as a UTF-8 string, or `nil` if decoding fails.
     static func redact(_ data: Data) -> String? {
         do {
             // Attempt to parse as JSON
@@ -32,8 +32,8 @@ struct SensitiveDataRedactor {
             return String(data: redactedData, encoding: .utf8) ?? "<REDACTED>"
             
         } catch {
-            // If not JSON, return nil
-            return nil
+            // If not JSON, return try converting data to  string
+            return String(data: data, encoding: .utf8)
         }
     }
 }

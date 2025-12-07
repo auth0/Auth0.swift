@@ -189,9 +189,11 @@ class LoggerSpec: QuickSpec {
             }
 
             it("should log response body") {
-                let json = "{key: \"\(UUID().uuidString)\"}"
-                logger.trace(response: response, data: json.data(using: .utf8))
-                expect(output.messages).to(contain(json))
+                let jsonDict: [String: String] = ["key": UUID().uuidString]
+                let jsonData = try! JSONSerialization.data(withJSONObject: jsonDict, options: [.prettyPrinted])
+                let expectedJson = String(data: jsonData, encoding: .utf8)!
+                logger.trace(response: response, data: jsonData)
+                expect(output.messages).to(contain("API Response: \(expectedJson)"))
             }
 
             it("should log nothing for non http response") {
