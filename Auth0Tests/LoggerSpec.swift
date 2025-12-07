@@ -5,10 +5,10 @@ import Nimble
 @testable import Auth0
 
 final class MockLoggingService: UnifiedLogging {
-    var loggedMessages: [(category: LogCategory, level: LogLevel, message: String, isPublic: Bool)] = []
+    var loggedMessages: [(category: LogCategory, level: LogLevel, message: String)] = []
     
-    func log(_ category: LogCategory, level: LogLevel, message: @autoclosure () -> String, isPublic: Bool) {
-        loggedMessages.append((category, level, message(), isPublic))
+    func log(_ category: LogCategory, level: LogLevel, message: @autoclosure () -> String) {
+        loggedMessages.append((category, level, message()))
     }
 }
 
@@ -53,7 +53,6 @@ class LoggerSpec: QuickSpec {
                     expect(mockService.loggedMessages.first?.category) == .networkTracing
                     expect(mockService.loggedMessages.first?.level) == .debug
                     expect(mockService.loggedMessages.first?.message) == "test debug"
-                    expect(mockService.loggedMessages.first?.isPublic) == false
                 }
                 
             }
@@ -94,20 +93,6 @@ class LoggerSpec: QuickSpec {
                     Auth0Log.fault(.networkTracing, "test fault")
                     expect(mockService.loggedMessages.first?.level) == .fault
                     expect(mockService.loggedMessages.first?.message) == "test fault"
-                }
-                
-            }
-            
-            describe("privacy control") {
-                
-                it("should default to private") {
-                    Auth0Log.debug(.networkTracing, "private by default")
-                    expect(mockService.loggedMessages.first?.isPublic) == false
-                }
-                
-                it("should support public logging") {
-                    Auth0Log.error(.configuration, "public message", isPublic: true)
-                    expect(mockService.loggedMessages.first?.isPublic) == true
                 }
                 
             }

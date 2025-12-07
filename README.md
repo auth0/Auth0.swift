@@ -349,7 +349,7 @@ Auth0.swift uses Apple's Unified Logging (OSLog) to help you troubleshoot issues
 
 ### Enable Logging
 
-To enable detailed HTTP request and response tracing during development.
+To enable detailed HTTP request and response tracing during development:
 
 ```swift
 Auth0
@@ -361,14 +361,14 @@ Auth0
 
 // Or with Authentication client
 Auth0
-    .authentication()
+        authentication()
     .logging(enabled: true)
     .login(usernameOrEmail: "user@example.com", password: "secret")
     .start { result in
         // Handle result
     }
 ```
-
+For more information, see the [Loggable documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/loggable).
 ### Viewing Logs
 
 #### Xcode Console (Recommended)

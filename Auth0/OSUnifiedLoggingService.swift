@@ -11,12 +11,10 @@ protocol UnifiedLogging {
     ///   - category: The log category for filtering (e.g., `.networkTracing`, `.configuration`)
     ///   - level: The severity level (`.debug`, `.info`, `.warning`, `.error`, `.fault`)
     ///   - message: The message to log (lazy-evaluated via autoclosure)
-    ///   - isPublic: Whether the message is visible in system logs. Defaults to `false` to protect sensitive data
     func log(
         _ category: LogCategory,
         level: LogLevel,
-        message: @autoclosure () -> String,
-        isPublic: Bool
+        message: @autoclosure () -> String
     )
 }
 
@@ -37,36 +35,32 @@ struct OSUnifiedLoggingService: UnifiedLogging {
         return loggers
     }()
     
+    /// Logs a message with privacy redaction.
+    ///
+    /// All messages use `.private` privacy level, which means:
+    /// - **Debug/Info**: Never persisted to disk. Only visible during active debugging in Xcode Console.
+    /// - **Warning/Error/Fault**: Persisted to system logs but entire message is redacted as `<private>`
+    ///   when exported or viewed without debugger attached. Only visible unredacted during active debugging.
+
     func log(
         _ category: LogCategory,
         level: LogLevel,
-        message: @autoclosure () -> String,
-        isPublic: Bool = false
+        message: @autoclosure () -> String
     ) {
         guard let logger = Self.loggers[category] else { return }
         
         let messageString = message()
         
-        switch (level, isPublic) {
-        case (.debug, true):
-            logger.debug("\(messageString, privacy: .public)")
-        case (.debug, false):
+        switch level {
+        case .debug:
             logger.debug("\(messageString, privacy: .private)")
-        case (.info, true):
-            logger.info("\(messageString, privacy: .public)")
-        case (.info, false):
+        case .info:
             logger.info("\(messageString, privacy: .private)")
-        case (.warning, true):
-            logger.warning("\(messageString, privacy: .public)")
-        case (.warning, false):
+        case .warning:
             logger.warning("\(messageString, privacy: .private)")
-        case (.error, true):
-            logger.error("\(messageString, privacy: .public)")
-        case (.error, false):
+        case .error:
             logger.error("\(messageString, privacy: .private)")
-        case (.fault, true):
-            logger.fault("\(messageString, privacy: .public)")
-        case (.fault, false):
+        case .fault:
             logger.fault("\(messageString, privacy: .private)")
         }
     }

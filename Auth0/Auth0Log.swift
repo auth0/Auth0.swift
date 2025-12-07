@@ -44,15 +44,12 @@ enum Auth0Log {
     ///   - category: The log category for filtering and organization. See `LogCategory` for available categories.
     ///   - level: The severity level of the log. Defaults to `.debug`. See `LogLevel` for available levels.
     ///   - message: The message to log. Evaluated lazily via autoclosure for performance.
-    ///   - isPublic: Whether the message is visible in system logs. Defaults to `false` to protect sensitive data.
-    ///     Set to `true` only for non-sensitive debugging information.
     static func log(
         _ category: LogCategory,
         level: LogLevel = .debug,
-        message: String,
-        isPublic: Bool = false
+        message: String
     ) {
-        loggingService.log(category, level: level, message: message, isPublic: isPublic)
+        loggingService.log(category, level: level, message: message)
     }
     
     /// Log a debug message.
@@ -62,13 +59,11 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    ///   - isPublic: Whether the message is visible in system logs (default: `false`)
     static func debug(
         _ category: LogCategory,
-        _ message: String,
-        isPublic: Bool = false
+        _ message: String
     ) {
-        log(category, level: .debug, message: message, isPublic: isPublic)
+        log(category, level: .debug, message: message)
     }
     
     /// Log an informational message.
@@ -78,13 +73,11 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    ///   - isPublic: Whether the message is visible in system logs (default: `false`)
     static func info(
         _ category: LogCategory,
-        _ message:  String,
-        isPublic: Bool = false
+        _ message:  String
     ) {
-        log(category, level: .info, message: message, isPublic: isPublic)
+        log(category, level: .info, message: message)
     }
     
     /// Log a warning message.
@@ -94,13 +87,11 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    ///   - isPublic: Whether the message is visible in system logs (default: `false`)
     static func warning(
         _ category: LogCategory,
-        _ message: String,
-        isPublic: Bool = false
+        _ message: String
     ) {
-        log(category, level: .warning, message: message, isPublic: isPublic)
+        log(category, level: .warning, message: message)
     }
     
     /// Log an error message.
@@ -110,13 +101,11 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    ///   - isPublic: Whether the message is visible in system logs (default: `false`)
     static func error(
         _ category: LogCategory,
-        _ message: String,
-        isPublic: Bool = false
+        _ message: String
     ) {
-        log(category, level: .error, message: message, isPublic: isPublic)
+        log(category, level: .error, message: message)
     }
     
     /// Log a fault message for critical system errors.
@@ -126,12 +115,10 @@ enum Auth0Log {
     /// - Parameters:
     ///   - category: The log category for filtering
     ///   - message: The message to log
-    ///   - isPublic: Whether the message is visible in system logs (default: `false`)
     static func fault(
         _ category: LogCategory,
-        _ message: @autoclosure () -> String,
-        isPublic: Bool = false
+        _ message: @autoclosure () -> String
     ) {
-        log(category, level: .fault, message: message(), isPublic: isPublic)
+        log(category, level: .fault, message: message())
     }
 }

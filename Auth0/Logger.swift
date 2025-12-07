@@ -53,9 +53,9 @@ struct DefaultLogger: Logger {
         if let http = response as? HTTPURLResponse {
             output.log(message: "HTTP/1.1 \(http.statusCode)")
             http.allHeaderFields.forEach { key, value in output.log(message: "\(key): \(value)") }
-            if let data = data, let string = String(data: data, encoding: .utf8) {
+            if let data = data, let string = SensitiveDataRedactor.redact(data) {
                 output.newLine()
-                output.log(message: string)
+                output.log(message: "API Response: \(string)")
             }
             output.newLine()
         }
