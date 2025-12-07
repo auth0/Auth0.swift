@@ -1122,7 +1122,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
                                                     scope: "openid phone")
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience,forScope: "openid phone")
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: "openid phone") { result in
                             expect(result).to(haveAPICredentials(AccessToken))

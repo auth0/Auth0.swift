@@ -37,7 +37,7 @@ public struct CredentialsManager {
         let noSession: TimeInterval = -1
         var lastBiometricAuthTime: TimeInterval = -1
         let lock = NSLock()
-        
+
         init() {
             lastBiometricAuthTime = noSession
         }
@@ -166,7 +166,7 @@ public struct CredentialsManager {
     /// - Parameter scope: Optional scope for which the  API Credentials are stored. If the credentials were initially fetched/stored with scope,
     ///   it is recommended to pass scope also while clearing them.
     /// - Returns: If the API credentials were removed.
-    public func clear(forAudience audience: String,scope:String? = nil) -> Bool {
+    public func clear(forAudience audience: String, scope: String? = nil) -> Bool {
         let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
         return self.storage.deleteEntry(forKey: key)
     }
@@ -183,13 +183,13 @@ public struct CredentialsManager {
     /// - Returns: `true` if the session is valid and biometric authentication can be skipped, `false` otherwise.
     public func isBiometricSessionValid() -> Bool {
         guard let bioAuth = self.bioAuth else { return false }
-        
+
         self.biometricSession.lock.lock()
         defer { self.biometricSession.lock.unlock() }
-        
+
         let lastAuth = self.biometricSession.lastBiometricAuthTime
         if lastAuth == self.biometricSession.noSession { return false }
-        
+
         switch bioAuth.policy {
         case .session(let timeoutInSeconds), .appLifecycle(let timeoutInSeconds):
             let timeoutInterval = TimeInterval(timeoutInSeconds)
@@ -711,12 +711,12 @@ public struct CredentialsManager {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
-    private func retrieveAPICredentials(audience: String,scope: String?) -> APICredentials? {
+    private func retrieveAPICredentials(audience: String, scope: String?) -> APICredentials? {
         let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
         guard let data = self.storage.getEntry(forKey: key) else { return nil }
         return try? APICredentials(from: data)
     }
-    
+
     private func getAPICredentialsStorageKey(audience: String, scope: String?) -> String {
         // Use audience if scope is null else use a combination of audience and scope
         if let scope = scope {
@@ -725,7 +725,7 @@ public struct CredentialsManager {
             .sorted()
             .joined(separator: "::")
             return "\(audience)::\(normalisedScopes)"
-        }  else {
+        } else {
             return audience
         }
     }
@@ -850,7 +850,7 @@ public struct CredentialsManager {
             dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
-                if let apiCredentials = self.retrieveAPICredentials(audience: audience,scope: scope),
+                if let apiCredentials = self.retrieveAPICredentials(audience: audience, scope: scope),
                       !self.hasExpired(apiCredentials.expiresIn),
                       !self.willExpire(apiCredentials.expiresIn, within: minTTL),
                    !self.hasScopeChanged(from: apiCredentials.scope, to: scope, ignoreOpenid: scope?.contains("openid") == false) {
@@ -912,27 +912,27 @@ public struct CredentialsManager {
     }
 
     func hasScopeChanged(from lastScope: String?, to newScope: String?, ignoreOpenid: Bool = false) -> Bool {
-        
+
         if let lastScope = lastScope, let newScope = newScope {
-            
+
             var storedScopes = Set(
                     lastScope
                     .split(separator: " ")
                     .filter { !$0.isEmpty }
                     .map { String($0).lowercased() }
             )
-            
+
             if ignoreOpenid {
                 storedScopes.remove("openid")
             }
-            
+
             let requiredScopes = Set(
                     newScope
                     .split(separator: " ")
                     .filter { !$0.isEmpty }
                     .map { String($0).lowercased() }
             )
-            
+
             return storedScopes != requiredScopes
         }
         return false
