@@ -139,12 +139,12 @@ class LoggerSpec: QuickSpec {
 
             it("should log request basic info") {
                 logger.trace(request: request, session: URLSession.shared)
-                expect(output.messages.first) == "POST https://auth0.com HTTP/1.1"
+                expect(output.messages.first).toEventually(equal("POST https://auth0.com HTTP/1.1"))
             }
 
             it("should log request header") {
                 logger.trace(request: request, session: URLSession.shared)
-                expect(output.messages).to(contain("Content-Type: application/json"))
+                expect(output.messages).toEventually(contain("Content-Type: application/json"))
             }
 
             it("should log additional request header") {
@@ -152,20 +152,20 @@ class LoggerSpec: QuickSpec {
                 sessionConfig.httpAdditionalHeaders = ["Accept": "application/json"]
                 let urlSession = URLSession(configuration: sessionConfig)
                 logger.trace(request: request, session: urlSession)
-                expect(output.messages).to(contain("Accept: application/json"))
+                expect(output.messages).toEventually(contain("Accept: application/json"))
             }
 
             it("should log request body") {
                 let json = "{key: \"\(UUID().uuidString)\"}"
                 request.httpBody = json.data(using: .utf8)
                 logger.trace(request: request, session: URLSession.shared)
-                expect(output.messages).to(contain(json))
+                expect(output.messages).toEventually(contain(json))
             }
 
             it("should log nothing for invalid request") {
                 request.url = nil
                 logger.trace(request: request, session: URLSession.shared)
-                expect(output.messages).to(beEmpty())
+                expect(output.messages).toEventually(beEmpty())
             }
 
         }
@@ -180,12 +180,12 @@ class LoggerSpec: QuickSpec {
 
             it("should log response basic info") {
                 logger.trace(response: response, data: nil)
-                expect(output.messages.first) == "HTTP/1.1 200"
+                expect(output.messages.first).toEventually(equal("HTTP/1.1 200"))
             }
 
             it("should log response header") {
                 logger.trace(response: response, data: nil)
-                expect(output.messages).to(contain("Content-Type: application/json"))
+                expect(output.messages).toEventually(contain("Content-Type: application/json"))
             }
 
             it("should log response body") {
@@ -193,13 +193,13 @@ class LoggerSpec: QuickSpec {
                 let jsonData = try! JSONSerialization.data(withJSONObject: jsonDict, options: [.prettyPrinted])
                 let expectedJson = String(data: jsonData, encoding: .utf8)!
                 logger.trace(response: response, data: jsonData)
-                expect(output.messages).to(contain("API Response: \(expectedJson)"))
+                expect(output.messages).toEventually(contain("API Response: \(expectedJson)"))
             }
 
             it("should log nothing for non http response") {
                 let response = URLResponse()
                 logger.trace(response: response, data: nil)
-                expect(output.messages).to(beEmpty())
+                expect(output.messages).toEventually(beEmpty())
             }
 
         }
@@ -208,12 +208,12 @@ class LoggerSpec: QuickSpec {
 
             it("should log url") {
                 logger.trace(url: URL(string: "https://samples.auth0.com/callback")!, source: nil)
-                expect(output.messages.first) == "URL: https://samples.auth0.com/callback"
+                expect(output.messages.first).toEventually(equal("URL: https://samples.auth0.com/callback"))
             }
 
             it("should log url with source") {
                 logger.trace(url: URL(string: "https://samples.auth0.com/callback")!, source: "Safari")
-                expect(output.messages.first) == "Safari: https://samples.auth0.com/callback"
+                expect(output.messages.first).toEventually(equal("Safari: https://samples.auth0.com/callback"))
             }
 
         }
