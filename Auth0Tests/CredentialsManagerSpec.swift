@@ -127,6 +127,79 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
+        describe("storage with scoped keys") {
+
+            afterEach {
+                _ = credentialsManager.clear(forAudience: Audience)
+                _ = credentialsManager.clear(forAudience: Audience, scope: Scope)
+                _ = credentialsManager.clear(forAudience: Audience, scope: NewScope)
+                _ = credentialsManager.clear(forAudience: Audience, scope: "read write")
+                _ = credentialsManager.clear(forAudience: Audience, scope: "read")
+            }
+
+            it("should store api credentials without scope using audience as key") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                expect(credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)).to(beTrue())
+                expect(fetchAPICredentials(forAudience: Audience, from: store)).toNot(beNil())
+            }
+
+            it("should store api credentials with scope using compound key") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                expect(credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read write")).to(beTrue())
+              
+                expect(fetchAPICredentials(forAudience: Audience, forScope: "read write", from: store)).toNot(beNil())
+            }
+
+            it("should store credentials for same audience with different scopes separately") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                let apiCredentials1 = APICredentials(accessToken: "token1", tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "read")
+                let apiCredentials2 = APICredentials(accessToken: "token2", tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "write")
+
+                expect(credentialsManager.store(apiCredentials: apiCredentials1, forAudience: Audience, forScope: "read")).to(beTrue())
+                expect(credentialsManager.store(apiCredentials: apiCredentials2, forAudience: Audience, forScope: "write")).to(beTrue())
+
+                // Both should exist
+                let retrieved1 = fetchAPICredentials(forAudience: Audience, forScope: "read", from: store)
+                let retrieved2 = fetchAPICredentials(forAudience: Audience, forScope: "write", from: store)
+                expect(retrieved1?.accessToken) == "token1"
+                expect(retrieved2?.accessToken) == "token2"
+            }
+
+            it("should clear api credentials only for specified scope") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read")
+
+                _ = credentialsManager.clear(forAudience: Audience, scope: "read")
+
+                expect(fetchAPICredentials(forAudience: Audience, from: store)).toNot(beNil())
+                
+                expect(fetchAPICredentials(forAudience: Audience, forScope: "read", from: store)).to(beNil())
+            }
+
+            it("should not clear scoped credentials when clearing without scope") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read")
+
+                _ = credentialsManager.clear(forAudience: Audience)
+
+                expect(fetchAPICredentials(forAudience: Audience, from: store)).to(beNil())
+                expect(fetchAPICredentials(forAudience: Audience, forScope: "read", from: store)).toNot(beNil())
+            }
+
+        }
+
         describe("custom storage") {
 
             class CustomStore: CredentialsStorage {
@@ -1122,7 +1195,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
                                                     scope: "openid phone")
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience,forScope: "openid phone")
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: "openid phone") { result in
                             expect(result).to(haveAPICredentials(AccessToken))
@@ -1140,7 +1213,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
                                                     scope: "openid phone")
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "openid phone")
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: "openid email") { result in
                             expect(result).to(haveAPICredentials(NewAccessToken))
@@ -1178,6 +1251,64 @@ class CredentialsManagerSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, minTTL: minTTL) { result in
                             expect(result).to(haveCredentialsManagerError(expectedError))
+                            done()
+                        }
+                    }
+                }
+
+            }
+
+            context("retrieval of api credentials with scope") {
+
+                beforeEach {
+                    _ = credentialsManager.store(credentials: credentials)
+                }
+
+                afterEach {
+                    _ = credentialsManager.clear()
+                    _ = credentialsManager.clear(forAudience: Audience)
+                    _ = credentialsManager.clear(forAudience: Audience, scope: Scope)
+                    _ = credentialsManager.clear(forAudience: Audience, scope: "openid phone")
+                    _ = credentialsManager.clear(forAudience: Audience, scope: "different")
+                    _ = credentialsManager.clear(forAudience: Audience, scope: "read write")
+                }
+
+                it("should retrieve api credentials stored with matching scope") {
+                    apiCredentials = APICredentials(accessToken: AccessToken, tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: Scope)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: Scope)
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                            expect(result).to(haveAPICredentials(AccessToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should renew api credentials when scope does not match stored scope") {
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
+                    }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn, scope: "different"))
+
+                    apiCredentials = APICredentials(accessToken: AccessToken, tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: Scope)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: Scope)
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience, scope: "different") { result in
+                            expect(result).to(haveAPICredentials(NewAccessToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should retrieve api credentials with scopes in different order") {
+                    apiCredentials = APICredentials(accessToken: AccessToken, tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "read write")
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read write")
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience, scope: "write read") { result in
+                            expect(result).to(haveAPICredentials(AccessToken))
                             done()
                         }
                     }
@@ -2442,7 +2573,14 @@ private func fetchCredentials(from store: CredentialsStorage) -> Credentials? {
     return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
 }
 
-private func fetchAPICredentials(forAudience audience: String = Audience, from store: CredentialsStorage) -> APICredentials? {
-    guard let data = store.getEntry(forKey: audience) else { return nil }
+private func fetchAPICredentials(forAudience audience: String = Audience, forScope scope: String? = nil, from store: CredentialsStorage) -> APICredentials? {
+    let key: String
+    if let scope = scope {
+        let normalisedScopes = scope.split(separator: " ").sorted().joined(separator: "::")
+        key = "\(audience)::\(normalisedScopes)"
+    } else {
+        key = audience
+    }
+    guard let data = store.getEntry(forKey: key) else { return nil }
     return try? APICredentials(from: data)
 }

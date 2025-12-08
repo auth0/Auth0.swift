@@ -38,7 +38,7 @@ public struct CredentialsManager: Sendable {
         let noSession: TimeInterval = -1
         var lastBiometricAuthTime: TimeInterval = -1
         let lock = NSLock()
-        
+
         init() {
             lastBiometricAuthTime = noSession
         }
@@ -164,9 +164,12 @@ public struct CredentialsManager: Sendable {
     /// ```
     ///
     /// - Parameter audience: Identifier of the API the stored API credentials are for.
+    /// - Parameter scope: Optional scope for which the  API Credentials are stored. If the credentials were initially fetched/stored with scope,
+    ///   it is recommended to pass scope also while clearing them.
     /// - Returns: If the API credentials were removed.
-    public func clear(forAudience audience: String) -> Bool {
-        return self.storage.deleteEntry(forKey: audience)
+    public func clear(forAudience audience: String, scope: String? = nil) -> Bool {
+        let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
+        return self.storage.deleteEntry(forKey: key)
     }
 
     #if WEB_AUTH_PLATFORM
@@ -181,13 +184,13 @@ public struct CredentialsManager: Sendable {
     /// - Returns: `true` if the session is valid and biometric authentication can be skipped, `false` otherwise.
     public func isBiometricSessionValid() -> Bool {
         guard let bioAuth = self.bioAuth else { return false }
-        
+
         self.biometricSession.lock.lock()
         defer { self.biometricSession.lock.unlock() }
-        
+
         let lastAuth = self.biometricSession.lastBiometricAuthTime
         if lastAuth == self.biometricSession.noSession { return false }
-        
+
         switch bioAuth.policy {
         case .session(let timeoutInSeconds), .appLifecycle(let timeoutInSeconds):
             let timeoutInterval = TimeInterval(timeoutInSeconds)
@@ -695,12 +698,13 @@ public struct CredentialsManager: Sendable {
                                  callback: callback)
     }
 
-    public func store(apiCredentials: APICredentials, forAudience audience: String) -> Bool {
+    public func store(apiCredentials: APICredentials, forAudience audience: String, forScope scope: String? = nil) -> Bool {
         guard let data = try? apiCredentials.encode() else {
             return false
         }
 
-        return self.storage.setEntry(data, forKey: audience)
+        let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
+        return self.storage.setEntry(data, forKey: key)
     }
 
     private func retrieveCredentials() -> Credentials? {
@@ -708,9 +712,23 @@ public struct CredentialsManager: Sendable {
         return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
     }
 
-    private func retrieveAPICredentials(audience: String) -> APICredentials? {
-        guard let data = self.storage.getEntry(forKey: audience) else { return nil }
+    private func retrieveAPICredentials(audience: String, scope: String?) -> APICredentials? {
+        let key = getAPICredentialsStorageKey(audience: audience, scope: scope)
+        guard let data = self.storage.getEntry(forKey: key) else { return nil }
         return try? APICredentials(from: data)
+    }
+
+    private func getAPICredentialsStorageKey(audience: String, scope: String?) -> String {
+        // Use audience if scope is null else use a combination of audience and scope
+        if let scope = scope {
+            let normalisedScopes = scope
+            .split(separator: " ")
+            .sorted()
+            .joined(separator: "::")
+            return "\(audience)::\(normalisedScopes)"
+        } else {
+            return audience
+        }
     }
 
     // swiftlint:disable:next function_parameter_count
@@ -833,10 +851,10 @@ public struct CredentialsManager: Sendable {
             dispatchGroup.enter()
 
             DispatchQueue.global(qos: .userInitiated).async {
-                if let apiCredentials = self.retrieveAPICredentials(audience: audience),
+                if let apiCredentials = self.retrieveAPICredentials(audience: audience, scope: scope),
                       !self.hasExpired(apiCredentials.expiresIn),
                       !self.willExpire(apiCredentials.expiresIn, within: minTTL),
-                      !self.hasScopeChanged(from: apiCredentials.scope, to: scope) {
+                   !self.hasScopeChanged(from: apiCredentials.scope, to: scope, ignoreOpenid: scope?.contains("openid") == false) {
                     dispatchGroup.leave()
                     return callback(.success(apiCredentials))
                 }
@@ -868,7 +886,7 @@ public struct CredentialsManager: Sendable {
                             } else if !self.store(credentials: newCredentials) {
                                 dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
-                            } else if !self.store(apiCredentials: newAPICredentials, forAudience: audience) {
+                            } else if !self.store(apiCredentials: newAPICredentials, forAudience: audience, forScope: scope) {
                                 dispatchGroup.leave()
                                 callback(.failure(CredentialsManagerError(code: .storeFailed)))
                             } else {
@@ -894,14 +912,30 @@ public struct CredentialsManager: Sendable {
         return expiresIn < Date()
     }
 
-    func hasScopeChanged(from lastScope: String?, to newScope: String?) -> Bool {
+    func hasScopeChanged(from lastScope: String?, to newScope: String?, ignoreOpenid: Bool = false) -> Bool {
+
         if let lastScope = lastScope, let newScope = newScope {
-            let lastScopeList = lastScope.lowercased().split(separator: " ").sorted()
-            let newScopeList = newScope.lowercased().split(separator: " ").sorted()
 
-            return lastScopeList != newScopeList
+            var storedScopes = Set(
+                    lastScope
+                    .split(separator: " ")
+                    .filter { !$0.isEmpty }
+                    .map { String($0).lowercased() }
+            )
+
+            if ignoreOpenid {
+                storedScopes.remove("openid")
+            }
+
+            let requiredScopes = Set(
+                    newScope
+                    .split(separator: " ")
+                    .filter { !$0.isEmpty }
+                    .map { String($0).lowercased() }
+            )
+
+            return storedScopes != requiredScopes
         }
-
         return false
     }
 
