@@ -335,13 +335,19 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
        - profile:           Additional user profile data returned with the Apple ID Credentials.
        - audience:          API Identifier that your application is requesting access to.   
        - scope:             Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - organization:      Identifier of an organization the user is a member of.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange-for-native-social/token-exchange-native-social)
      */
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(appleAuthorizationCode authorizationCode: String,
+               fullName: PersonNameComponents?,
+               profile: [String: Any]?,
+               audience: String?,
+               scope: String,
+               organization: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs a user in with their Facebook [session info access token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and profile data.
@@ -380,13 +386,18 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
        - profile:            The user profile data retrieved from Facebook.
        - audience:           API Identifier that your application is requesting access to.
        - scope:              Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - organization:       Identifier of an organization the user is a member of.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange-for-native-social/token-exchange-native-social)
      */
-    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(facebookSessionAccessToken sessionAccessToken: String,
+               profile: [String: Any],
+               audience: String?,
+               scope: String,
+               organization: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs a user in using a username and password in the default directory.
@@ -1131,6 +1142,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
        - subjectTokenType: URI that identifies the type of the subject token.
        - audience: API Identifier that your application is requesting access to. Defaults to `nil`.
        - scope: Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - organization: Identifier of an organization the user is a member of.
        - additionalParameters: Additional parameters to include in the token exchange request. Defaults to empty dictionary.
      - Returns: A request that will yield Auth0 user's credentials.
 
@@ -1140,7 +1152,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
      - [Custom Token Exchange Documentation](https://auth0.com/docs/authenticate/custom-token-exchange)
      - [RFC 8693: OAuth 2.0 Token Exchange](https://tools.ietf.org/html/rfc8693)
      */
-    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func customTokenExchange(subjectToken: String,
+                             subjectTokenType: String,
+                             audience: String?,
+                             scope: String,
+                             organization: String?) -> Request<Credentials, AuthenticationError>
 
 }
 
@@ -1166,12 +1182,30 @@ public extension Authentication {
         return self.multifactorChallenge(mfaToken: mfaToken, types: types, authenticatorId: authenticatorId)
     }
 
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents? = nil, profile: [String: Any]? = nil, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(appleAuthorizationCode: authorizationCode, fullName: fullName, profile: profile, audience: audience, scope: scope)
+    func login(appleAuthorizationCode authorizationCode: String,
+               fullName: PersonNameComponents? = nil,
+               profile: [String: Any]? = nil,
+               audience: String? = nil,
+               scope: String = defaultScope,
+               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(appleAuthorizationCode: authorizationCode,
+                          fullName: fullName,
+                          profile: profile,
+                          audience: audience,
+                          scope: scope,
+                          organization: organization)
     }
 
-    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(facebookSessionAccessToken: sessionAccessToken, profile: profile, audience: audience, scope: scope)
+    func login(facebookSessionAccessToken sessionAccessToken: String,
+               profile: [String: Any],
+               audience: String? = nil,
+               scope: String = defaultScope,
+               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(facebookSessionAccessToken: sessionAccessToken,
+                          profile: profile,
+                          audience: audience,
+                          scope: scope,
+                          organization: organization)
     }
 
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
@@ -1251,8 +1285,16 @@ public extension Authentication {
         return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
     }
 
-    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.customTokenExchange(subjectToken: subjectToken, subjectTokenType: subjectTokenType, audience: audience, scope: scope)
+    func customTokenExchange(subjectToken: String,
+                             subjectTokenType: String,
+                             audience: String? = nil,
+                             scope: String = defaultScope,
+                             organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.customTokenExchange(subjectToken: subjectToken,
+                                        subjectTokenType: subjectTokenType,
+                                        audience: audience,
+                                        scope: scope,
+                                        organization: organization)
     }
 
 }
