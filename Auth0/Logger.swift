@@ -14,14 +14,21 @@ public protocol Logger {
 
 }
 
+private let networkTraceQueue = DispatchQueue(label: "com.auth0.networkTrace", qos: .utility)
+
 protocol LoggerOutput {
     func log(message: String)
     func newLine()
 }
 
 struct DefaultOutput: LoggerOutput {
-    func log(message: String) { print(message) }
-    func newLine() { print() }
+    func log(message: String) {
+        Auth0Log.debug(.networkTracing, message)
+    }
+    
+    func newLine() {
+        Auth0Log.debug(.networkTracing, "")
+    }
 }
 
 struct DefaultLogger: Logger {
@@ -33,22 +40,12 @@ struct DefaultLogger: Logger {
     }
 
     func trace(request: URLRequest, session: URLSession) {
-        guard let method = request.httpMethod, let url = request.url?.absoluteString else { return }
-        output.log(message: "\(method) \(url) HTTP/1.1")
-        session.configuration.httpAdditionalHeaders?.forEach { key, value in output.log(message: "\(key): \(value)") }
-        request.allHTTPHeaderFields?.forEach { key, value in output.log(message: "\(key): \(value)") }
-        if let data = request.httpBody, let string = String(data: data, encoding: .utf8) {
-            output.newLine()
-            output.log(message: string)
-        }
-        output.newLine()
-    }
-
-    func trace(response: URLResponse, data: Data?) {
-        if let http = response as? HTTPURLResponse {
-            output.log(message: "HTTP/1.1 \(http.statusCode)")
-            http.allHeaderFields.forEach { key, value in output.log(message: "\(key): \(value)") }
-            if let data = data, let string = String(data: data, encoding: .utf8) {
+        networkTraceQueue.async { [output] in
+            guard let method = request.httpMethod, let url = request.url?.absoluteString else { return }
+            output.log(message: "\(method) \(url) HTTP/1.1")
+            session.configuration.httpAdditionalHeaders?.forEach { key, value in output.log(message: "\(key): \(value)") }
+            request.allHTTPHeaderFields?.forEach { key, value in output.log(message: "\(key): \(value)") }
+            if let data = request.httpBody, let string = String(data: data, encoding: .utf8) {
                 output.newLine()
                 output.log(message: string)
             }
@@ -56,8 +53,24 @@ struct DefaultLogger: Logger {
         }
     }
 
+    func trace(response: URLResponse, data: Data?) {
+        networkTraceQueue.async { [output] in
+            if let http = response as? HTTPURLResponse {
+                output.log(message: "HTTP/1.1 \(http.statusCode)")
+                http.allHeaderFields.forEach { key, value in output.log(message: "\(key): \(value)") }
+                if let data = data, let string = SensitiveDataRedactor.redact(data) {
+                    output.newLine()
+                    output.log(message: "API Response: \(string)")
+                }
+                output.newLine()
+            }
+        }
+    }
+
     func trace(url: URL, source: String?) {
-        output.log(message: "\(source ?? "URL"): \(url.absoluteString)")
+        networkTraceQueue.async { [output] in
+            output.log(message: "\(source ?? "URL"): \(url.absoluteString)")
+        }
     }
 
 }
