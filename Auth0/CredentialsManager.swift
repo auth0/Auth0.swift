@@ -24,7 +24,7 @@ import LocalAuthentication
 ///
 /// - ``CredentialsManagerError``
 /// - <doc:RefreshTokens>
-public struct CredentialsManager {
+public struct CredentialsManager: Sendable {
 
     private let storage: CredentialsStorage
     private let storeKey: String
@@ -33,7 +33,8 @@ public struct CredentialsManager {
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     // Biometric session management - using a class to allow mutation in non-mutating methods
-    private final class BiometricSession {
+    // @unchecked Sendable is fine here as we are using lock to read and update lastBiometricAuthTime which is safe acorss threads.
+    private final class BiometricSession: @unchecked Sendable {
         let noSession: TimeInterval = -1
         var lastBiometricAuthTime: TimeInterval = -1
         let lock = NSLock()
