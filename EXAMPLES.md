@@ -367,6 +367,28 @@ The Credentials Manager utility allows you to securely store and retrieve the us
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 ```
 
+> [!NOTE]
+> **Swift 6 Concurrency Support**: The Credentials Manager conforms to `Sendable` and can be safely used across concurrency contexts, including within actors.
+>
+> ```swift
+> // Example: Using CredentialsManager in an Actor (Swift 6)
+> actor AuthService {
+>     let credentialsManager: CredentialsManager
+>     
+>     init() {
+>         self.credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+>     }
+>     
+>     func fetchCredentials() async throws -> Credentials {
+>         // Safe to call from within an actor
+>         return try await credentialsManager.credentials(withScope: "openid profile email",
+>                                                         minTTL: 60,
+>                                                         parameters: [:],
+>                                                         headers: [:])
+>     }
+> }
+> ```
+
 > [!CAUTION]
 > The Credentials Manager is not thread-safe, except for the following methods: 
 > 
