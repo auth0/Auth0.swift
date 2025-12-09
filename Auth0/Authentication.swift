@@ -335,7 +335,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
        - profile:           Additional user profile data returned with the Apple ID Credentials.
        - audience:          API Identifier that your application is requesting access to.   
        - scope:             Space-separated list of requested scope values. Defaults to `openid profile email`.
-       - organization:      Identifier of an organization the user is a member of.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
@@ -346,8 +345,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
                fullName: PersonNameComponents?,
                profile: [String: Any]?,
                audience: String?,
-               scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError>
+               scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs a user in with their Facebook [session info access token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and profile data.
@@ -396,8 +394,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
     func login(facebookSessionAccessToken sessionAccessToken: String,
                profile: [String: Any],
                audience: String?,
-               scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError>
+               scope: String) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs a user in using a username and password in the default directory.
@@ -1124,7 +1121,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
          }
      ```
 
-     You can also include additional parameters:
+     You can also include organization parameter:
 
      ```swift
      Auth0
@@ -1133,7 +1130,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
                               subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
                               audience: "https://example.com/api",
                               scope: "openid profile email",
-                              additionalParameters: ["custom_claim": "value"])
+                              organization: "org_id")
          .start { print($0) }
      ```
 
@@ -1143,9 +1140,8 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
        - audience: API Identifier that your application is requesting access to. Defaults to `nil`.
        - scope: Space-separated list of requested scope values. Defaults to `openid profile email`.
        - organization: Identifier of an organization the user is a member of.
-       - additionalParameters: Additional parameters to include in the token exchange request. Defaults to empty dictionary.
      - Returns: A request that will yield Auth0 user's credentials.
-
+  
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange)
@@ -1157,7 +1153,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
                              audience: String?,
                              scope: String,
                              organization: String?) -> Request<Credentials, AuthenticationError>
-
 }
 
 public extension Authentication {
@@ -1186,26 +1181,22 @@ public extension Authentication {
                fullName: PersonNameComponents? = nil,
                profile: [String: Any]? = nil,
                audience: String? = nil,
-               scope: String = defaultScope,
-               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         return self.login(appleAuthorizationCode: authorizationCode,
                           fullName: fullName,
                           profile: profile,
                           audience: audience,
-                          scope: scope,
-                          organization: organization)
+                          scope: scope)
     }
 
     func login(facebookSessionAccessToken sessionAccessToken: String,
                profile: [String: Any],
                audience: String? = nil,
-               scope: String = defaultScope,
-               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         return self.login(facebookSessionAccessToken: sessionAccessToken,
                           profile: profile,
                           audience: audience,
-                          scope: scope,
-                          organization: organization)
+                          scope: scope)
     }
 
     func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {

@@ -166,8 +166,7 @@ struct Auth0Authentication: Authentication {
                fullName: PersonNameComponents?,
                profile: [String: Any]?,
                audience: String?,
-               scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError> {
+               scope: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = [:]
         var profile: [String: Any] = profile ?? [:]
 
@@ -187,15 +186,13 @@ struct Auth0Authentication: Authentication {
                                   subjectTokenType: "http://auth0.com/oauth/token-type/apple-authz-code",
                                   scope: scope,
                                   audience: audience,
-                                  organization: organization,
                                   parameters: parameters)
     }
 
     func login(facebookSessionAccessToken sessionAccessToken: String,
                profile: [String: Any],
                audience: String?,
-               scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError> {
+               scope: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: String] = [:]
         if let jsonData = try? JSONSerialization.data(withJSONObject: profile, options: []),
             let json = String(data: jsonData, encoding: .utf8) {
@@ -205,7 +202,6 @@ struct Auth0Authentication: Authentication {
                                   subjectTokenType: "http://auth0.com/oauth/token-type/facebook-info-session-access-token",
                                   scope: scope,
                                   audience: audience,
-                                  organization: organization,
                                   parameters: parameters)
     }
 
