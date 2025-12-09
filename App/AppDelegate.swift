@@ -1,7 +1,7 @@
 import UIKit
 import Auth0
 
-@UIApplicationMain
+@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?

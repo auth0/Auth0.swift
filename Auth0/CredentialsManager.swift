@@ -33,7 +33,7 @@ public struct CredentialsManager: Sendable {
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     // Biometric session management - using a class to allow mutation in non-mutating methods
-    // @unchecked Sendable is fine here as we are using lock to read and update lastBiometricAuthTime which is safe acorss threads.
+    // @unchecked Sendable is fine here as we are using lock to read and update lastBiometricAuthTime which is safe across threads.
     private final class BiometricSession: @unchecked Sendable {
         let noSession: TimeInterval = -1
         var lastBiometricAuthTime: TimeInterval = -1
