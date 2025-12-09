@@ -2,7 +2,7 @@ import SimpleKeychain
 import Foundation
 
 /// Generic storage API for storing credentials.
-public protocol CredentialsStorage: Sendable {
+public protocol CredentialsStorage {
 
     /// Retrieves a storage entry.
     ///

@@ -26,7 +26,15 @@ import LocalAuthentication
 /// - <doc:RefreshTokens>
 public struct CredentialsManager: Sendable {
 
-    private let storage: CredentialsStorage
+    private let sendableStorage: SendableBox<CredentialsStorage>
+    private var storage: CredentialsStorage {
+        sendableStorage.value
+    }
+    
+    struct SendableBox<T>: @unchecked Sendable {
+        let value: T
+    }
+
     private let storeKey: String
     private let authentication: Authentication
     private let dispatchQueue = DispatchQueue(label: "com.auth0.credentialsmanager.serial")
