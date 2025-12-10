@@ -384,7 +384,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
        - profile:            The user profile data retrieved from Facebook.
        - audience:           API Identifier that your application is requesting access to.
        - scope:              Space-separated list of requested scope values. Defaults to `openid profile email`.
-       - organization:       Identifier of an organization the user is a member of.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
