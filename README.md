@@ -347,7 +347,7 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 Auth0.swift uses Apple's Unified Logging (OSLog) to help you troubleshoot issues during development. Enable detailed HTTP logging to see network requests, responses, and errors.
 
-### Enable Logging (NetworK Tracing based logs)
+### Enable Logging (Network Tracing based logs)
 
 To enable detailed HTTP request and response tracing during development:
 
