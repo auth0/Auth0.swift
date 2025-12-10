@@ -25,14 +25,12 @@ import LocalAuthentication
 /// - ``CredentialsManagerError``
 /// - <doc:RefreshTokens>
 public struct CredentialsManager: Sendable {
-
+    
+    // storage is inherently sendable as it uses Keychain under the hood and is stateless
     private let sendableStorage: SendableBox<CredentialsStorage>
+    
     private var storage: CredentialsStorage {
         sendableStorage.value
-    }
-    
-    struct SendableBox<T>: @unchecked Sendable {
-        let value: T
     }
 
     private let storeKey: String
