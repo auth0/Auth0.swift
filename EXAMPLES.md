@@ -3215,9 +3215,10 @@ Auth0
 Auth0
     .authentication()
     .customTokenExchange(subjectToken: "existing-token",
-                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
-                        audience: "https://example.com/api",
-                        scope: "openid profile email")
+                         subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                         audience: "https://example.com/api",
+                         scope: "openid profile email",
+                         organization: "org_id)
     .start { result in
         switch result {
         case .success(let credentials):
@@ -3235,9 +3236,10 @@ do {
     let credentials = try await Auth0
         .authentication()
         .customTokenExchange(subjectToken: "existing-token",
-                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
-                        audience: "https://example.com/api",
-                        scope: "openid profile email")
+                            subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                            audience: "https://example.com/api",
+                            scope: "openid profile email",
+                            organization: "org_id")
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -3253,9 +3255,10 @@ do {
 Auth0
     .authentication()
      .customTokenExchange(subjectToken: "existing-token",
-                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
-                        audience: "https://example.com/api",
-                        scope: "openid profile email")
+                          subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                          audience: "https://example.com/api",
+                          scope: "openid profile email",
+                          organization: "org_id")
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
