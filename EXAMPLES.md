@@ -378,7 +378,7 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 > To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
 
 > [!NOTE]
-> **Swift 6 Sendability Support**: The Credentials Manager conforms to `Sendable` and can be called within actors.
+> **Swift 6 Sendability Support**: The Credentials Manager conforms to `Sendable`, which allows it to be passed across concurrency boundaries (like into actors). However, this does **not** make all its methods thread-safe. Only the methods listed above (`credentials()`, `apiCredentials()`, `ssoCredentials()`, `renew()`) are thread-safe. Other methods and properties still require proper synchronization when called from multiple threads.
 >
 > ```swift
 > // Example: Using CredentialsManager in an Actor (Swift 6)

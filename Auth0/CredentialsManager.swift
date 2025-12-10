@@ -63,7 +63,7 @@ public struct CredentialsManager: Sendable {
                 storage: CredentialsStorage = SimpleKeychain()) {
         self.storeKey = storeKey
         self.authentication = authentication
-        self.storage = storage
+        self.sendableStorage = SendableBox(value: storage)
     }
 
     /// Retrieves the user information from the Keychain synchronously, without checking if the credentials are expired.

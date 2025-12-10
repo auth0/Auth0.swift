@@ -39,8 +39,9 @@ class ViewController: UIViewController {
                                    message: "Authorized and got a token \(credentials.accessToken)")
                     }
   //                   Test: Fetch credentials from actor with custom scope
-                    Task {
-                        await self?.testFetchCredentials()
+                    Task { [weak self] in
+                        guard let self = self else { return }
+                        await self.testFetchCredentials()
                     }
                 }
                 print(result)
