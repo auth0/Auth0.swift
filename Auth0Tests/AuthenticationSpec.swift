@@ -1928,6 +1928,7 @@ class AuthenticationSpec: QuickSpec {
         describe("customTokenExchange") {
             let subjectToken = "example-token"
             let subjectTokenType = "urn:ietf:params:oauth:token-type:jwt"
+            let orgId = "org_id"
             
             it("should exchange custom token for credentials") {
                 NetworkStub.addStub(condition: {
@@ -1967,6 +1968,29 @@ class AuthenticationSpec: QuickSpec {
                                            subjectTokenType: subjectTokenType,
                                            audience: Audience,
                                            scope: "openid email")
+                        .start { result in
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                        }
+                }
+            }
+            
+            it("should exchange custom token with organization") {
+                NetworkStub.addStub(condition: {
+                    $0.isToken(Domain) && $0.hasAllOf([
+                        "grant_type": TokenExchangeGrantType,
+                        "subject_token": subjectToken,
+                        "subject_token_type": subjectTokenType,
+                        "scope": defaultScope,
+                        "organization": orgId,
+                        "client_id": ClientId
+                    ])
+                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
+                
+                waitUntil(timeout: Timeout) { done in
+                    auth.customTokenExchange(subjectToken: subjectToken,
+                                             subjectTokenType: subjectTokenType,
+                                             organization: orgId)
                         .start { result in
                             expect(result).to(haveCredentials(AccessToken, IdToken))
                             done()
