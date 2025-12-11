@@ -18,6 +18,7 @@
 - [Web Auth configuration](#web-auth-configuration)
 - [ID token validation](#id-token-validation)
 - [DPoP [EA]](#dpop-ea)
+- [PAR (Pushed Authorization Requests)](#par-pushed-authorization-requests)
 - [Web Auth errors](#web-auth-errors)
 
 ### Web Auth signup
@@ -337,6 +338,81 @@ try DPoP.clearKeypair()
 
 > [!NOTE]  
 > When logging out, you do not need to call `useDPoP()` as it has no effect during the logout process.
+
+### PAR (Pushed Authorization Requests)
+
+The SDK supports [Pushed Authorization Requests (PAR)](https://datatracker.ietf.org/doc/html/rfc9126) for Backend-For-Frontend (BFF) authentication flows. In this pattern, your backend initiates the authorization request and the SDK returns only the authorization code, which your backend then exchanges for tokens.
+
+Use the `startForCode(requestURI:)` method with the `request_uri` obtained from your backend's PAR endpoint:
+
+```swift
+// 1. Get request_uri from your backend
+let parResponse = try await myBackend.initiatePAR()
+
+// 2. Open authorize and get authorization code
+Auth0
+    .webAuth()
+    .startForCode(requestURI: parResponse.requestURI) { result in
+        switch result {
+        case .success(let authorizationCode):
+            // 3. Send code to backend for token exchange
+            myBackend.exchangeCode(authorizationCode.code) { credentials in
+                // 4. Store credentials
+                credentialsManager.store(credentials: credentials)
+            }
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    // 1. Get request_uri from your backend
+    let parResponse = try await myBackend.initiatePAR()
+    
+    // 2. Open authorize and get authorization code
+    let authorizationCode = try await Auth0
+        .webAuth()
+        .startForCode(requestURI: parResponse.requestURI)
+    
+    // 3. Send code to backend for token exchange
+    let credentials = try await myBackend.exchangeCode(authorizationCode.code)
+    
+    // 4. Store credentials
+    credentialsManager.store(credentials: credentials)
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+myBackend.initiatePAR()
+    .flatMap { parResponse in
+        Auth0
+            .webAuth()
+            .startForCode(requestURI: parResponse.requestURI)
+    }
+    .flatMap { authorizationCode in
+        myBackend.exchangeCode(authorizationCode.code)
+    }
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            print("Failed with: \(error)")
+        }
+    }, receiveValue: { credentials in
+        credentialsManager.store(credentials: credentials)
+    })
+    .store(in: &cancellables)
+```
+</details>
 
 ### Web Auth errors
 
