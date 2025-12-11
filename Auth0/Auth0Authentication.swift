@@ -446,7 +446,7 @@ struct Auth0Authentication: Authentication {
         ])
     }
 
-    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil, useSynchronizationBarrier: Bool = true) -> Request<Credentials, AuthenticationError> {
         let oauthToken = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -471,7 +471,8 @@ struct Auth0Authentication: Authentication {
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
-                       dpop: self.dpop)
+                       dpop: self.dpop,
+                       useSynchronizationBarrier: useSynchronizationBarrier)
     }
 
     func revoke(refreshToken: String) -> Request<Void, AuthenticationError> {

@@ -992,6 +992,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
     /**
      Renews the user's credentials using a refresh token.
 
+     > Important: This method is **thread-safe** when `useSynchronizationBarrier` is enabled (default). When multiple
+     concurrent calls are made with the same refresh token, only one network request will be executed, and all callers
+     will receive the same refreshed credentials. This is critical when **Refresh Token Rotation** is enabled, as each
+     refresh token can only be used once.
+
      ## Usage
 
      ```swift
@@ -1026,6 +1031,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
        - refreshToken: The refresh token.
        - audience:     Identifier of the API that your application is requesting access to. Currently, only the Auth0 My Account API is supported. Defaults to `nil`.
        - scope:        Space-separated list of scope values to request. Defaults to `nil`.
+       - useSynchronizationBarrier: When `true` (default), ensures thread-safe execution by synchronizing concurrent refresh token requests. Only one network call will be made for multiple concurrent invocations, and all callers will receive the same result. Set to `false` only if you are managing synchronization externally (e.g., within `CredentialsManager`). Defaults to `true`.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
@@ -1034,7 +1040,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable {
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
      - <doc:RefreshTokens>
      */
-    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
+    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?, useSynchronizationBarrier: Bool) -> Request<Credentials, AuthenticationError>
 
     /**
      Revokes a user's refresh token by performing a request to the `/oauth/revoke` endpoint.
@@ -1247,8 +1253,8 @@ public extension Authentication {
         self.userInfo(withAccessToken: accessToken, tokenType: tokenType)
     }
 
-    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
+    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil, useSynchronizationBarrier: Bool = true) -> Request<Credentials, AuthenticationError> {
+        return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope, useSynchronizationBarrier: useSynchronizationBarrier)
     }
 
     func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {

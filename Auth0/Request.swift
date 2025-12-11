@@ -33,6 +33,10 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let logger: Logger?
     let telemetry: Telemetry
     let dpop: DPoP?
+    /// When `true`, the request will be synchronized using a barrier to ensure thread-safe execution.
+    /// This is used internally to prevent concurrent refresh token requests from causing race conditions
+    /// when Refresh Token Rotation is enabled.
+    let useSynchronizationBarrier: Bool
 
     init(session: URLSession,
          url: URL,
@@ -42,7 +46,8 @@ public struct Request<T, E: Auth0APIError>: Requestable {
          headers: [String: String] = [:],
          logger: Logger?,
          telemetry: Telemetry,
-         dpop: DPoP? = nil) {
+         dpop: DPoP? = nil,
+         useSynchronizationBarrier: Bool = false) {
         self.session = session
         self.url = url
         self.method = method
@@ -52,6 +57,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         self.telemetry = telemetry
         self.headers = headers
         self.dpop = dpop
+        self.useSynchronizationBarrier = useSynchronizationBarrier
     }
 
     var request: URLRequest {
@@ -86,7 +92,16 @@ public struct Request<T, E: Auth0APIError>: Requestable {
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
     public func start(_ callback: @escaping Callback) {
-        self.startDataTask(retryCount: 0, request: self.request, callback: callback)
+        if useSynchronizationBarrier {
+            SynchronizationBarrier.shared.execute { complete in
+                self.startDataTask(retryCount: 0, request: self.request, callback: { result in
+                    complete()
+                    callback(result)
+                })
+            }
+        } else {
+            self.startDataTask(retryCount: 0, request: self.request, callback: callback)
+        }
     }
 
     private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
