@@ -30,3 +30,9 @@ func extractRedirectURL(from url: URL) -> URL? {
 
     return nil
 }
+
+/// Wrapper for non-Sendable types that need to be used in Sendable contexts.
+/// Use only when thread-safety is guaranteed through synchronization (locks, serial queues, etc.).
+struct SendableBox<T>: @unchecked Sendable {
+    let value: T
+}

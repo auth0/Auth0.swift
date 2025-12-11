@@ -1,8 +1,8 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
-import LocalAuthentication
+@preconcurrency import LocalAuthentication
 
-struct BioAuthentication {
+struct BioAuthentication: Sendable {
 
     private let authContext: LAContext
     private let evaluationPolicy: LAPolicy
