@@ -16,7 +16,7 @@ class ViewController: UIViewController {
                 case .success(let credentials):
                     DispatchQueue.main.async {
                         self.alert(title: "Success",
-                                   message: "Authorized and got a token \(credentials.accessToken)")
+                                   message: "Authorized nice and got a token \(credentials.accessToken)")
                     }
                 }
                 print($0)
