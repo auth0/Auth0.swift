@@ -218,6 +218,58 @@ final class Auth0WebAuth: WebAuth {
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
+    // PAR Support
+
+    func startForCode(requestURI: String, callback: @escaping (WebAuthResult<AuthorizationCode>) -> Void) {
+        guard barrier.raise() else {
+            return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
+        }
+
+        guard let redirectURL = self.redirectURL else {
+            barrier.lower()
+            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
+        }
+
+        let authorizeURL = self.buildPARAuthorizeURL(requestURI: requestURI)
+
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
+                                                                     ephemeralSession: ephemeralSession,
+                                                                     headers: headers)
+        let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
+            storage.clear()
+            barrier.lower()
+
+            switch result {
+            case .success:
+                onCloseCallback?()
+            case .failure(let error):
+                callback(.failure(error))
+            }
+        }
+        let transaction = PARCodeTransaction(redirectURL: redirectURL,
+                                             userAgent: userAgent,
+                                             logger: self.logger,
+                                             callback: callback)
+        self.storage.store(transaction)
+        userAgent.start()
+        logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
+    }
+
+    private func buildPARAuthorizeURL(requestURI: String) -> URL {
+        guard let authorize = self.overrideAuthorizeURL ?? URL(string: "authorize", relativeTo: self.url),
+              var components = URLComponents(url: authorize, resolvingAgainstBaseURL: true) else {
+            fatalError("Unable to build PAR authorize URL with base URL: \(self.url.absoluteString)")
+        }
+
+        let items: [URLQueryItem] = [
+            URLQueryItem(name: "client_id", value: self.clientId),
+            URLQueryItem(name: "request_uri", value: requestURI)
+        ]
+
+        components.queryItems = self.telemetry.queryItemsWithTelemetry(queryItems: items)
+        return components.url!
+    }
+
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
         guard barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
@@ -337,6 +389,16 @@ extension Auth0WebAuth {
         return Deferred { Future(self.start) }.eraseToAnyPublisher()
     }
 
+    public func startForCode(requestURI: String) -> AnyPublisher<AuthorizationCode, WebAuthError> {
+        return Deferred {
+            Future { callback in
+                self.startForCode(requestURI: requestURI) { result in
+                    callback(result)
+                }
+            }
+        }.eraseToAnyPublisher()
+    }
+
     public func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
         return Deferred {
             Future { callback in
@@ -359,6 +421,19 @@ extension Auth0WebAuth {
         return try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
                 self.start { result in
+                    guard !alreadyResumed else { return }
+                    alreadyResumed = true
+                    continuation.resume(with: result)
+                }
+            }
+        }
+    }
+
+    func startForCode(requestURI: String) async throws -> AuthorizationCode {
+        var alreadyResumed = false
+        return try await withCheckedThrowingContinuation { continuation in
+            Task { @MainActor in
+                self.startForCode(requestURI: requestURI) { result in
                     guard !alreadyResumed else { return }
                     alreadyResumed = true
                     continuation.resume(with: result)
