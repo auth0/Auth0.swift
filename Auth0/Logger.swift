@@ -1,7 +1,7 @@
 import Foundation
 
 /// Logger for debugging purposes.
-public protocol Logger: Sendable {
+public protocol Logger {
 
     /// Log an HTTP request.
     func trace(request: URLRequest, session: URLSession)
@@ -16,7 +16,7 @@ public protocol Logger: Sendable {
 
 private let networkTraceQueue = DispatchQueue(label: "com.auth0.networkTrace", qos: .utility)
 
-protocol LoggerOutput: Sendable {
+protocol LoggerOutput {
     func log(message: String)
     func newLine()
 }
