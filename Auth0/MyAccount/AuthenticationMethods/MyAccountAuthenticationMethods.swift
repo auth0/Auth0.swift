@@ -217,7 +217,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///
     /// - Returns: A request that will yield a totp enrollment challenge
     func enrollTOTP() -> Request<TOTPEnrollmentChallenge, MyAccountError>
-    
+
     /// Enrolls a new ToTP authentication method. This is the last part of the enrollment flow.
     ///
     /// ## Availability
