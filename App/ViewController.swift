@@ -1,27 +1,7 @@
 import UIKit
 import Auth0
 
-// MARK: - Swift 6 Sendability Test: CredentialsManager in Actor
-actor AuthService {
-    let credentialsManager: CredentialsManager
-    
-    init() {
-        self.credentialsManager = CredentialsManager(authentication: Auth0.authentication())
-    }
-    
-    func fetchCredentials() async throws -> Credentials {
-        // This method can be called across concurrency contexts eg. Actor
-        return try await credentialsManager.credentials(withScope: "openid profile email",
-                                                        minTTL: 60,
-                                                        parameters: [:],
-                                                        headers: [:])
-    }
-}
-
 class ViewController: UIViewController {
-    
-    // Swift 6 test: CredentialsManager can be used within actors
-    private let authService = AuthService()
 
     @IBAction func login(_ sender: Any) {
         Auth0
@@ -38,11 +18,6 @@ class ViewController: UIViewController {
                         self?.alert(title: "Success",
                                    message: "Authorized and got a token \(credentials.accessToken)")
                     }
-  //                   Test: Fetch credentials from actor with custom scope
-                    Task { [weak self] in
-                        guard let self = self else { return }
-                        await self.testFetchCredentials()
-                    }
                 }
                 print(result)
             }
@@ -58,16 +33,6 @@ class ViewController: UIViewController {
                 case .failure(let error): print(error)
                 }
             }
-    }
-    
-    // Additional test method to fetch credentials from actor
-    func testFetchCredentials() async {
-        do {
-            let credentials = try await authService.fetchCredentials()
-            print("Successfully fetched credentials within actor: \(credentials.accessToken)")
-        } catch {
-            print("Failed to fetch credentials: \(error)")
-        }
     }
 
 }
