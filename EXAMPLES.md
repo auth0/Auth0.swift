@@ -339,29 +339,42 @@ try DPoP.clearKeypair()
 > [!NOTE]  
 > When logging out, you do not need to call `useDPoP()` as it has no effect during the logout process.
 
-### PAR (Pushed Authorization Requests)
+### PAR (Pushed Authorization Request)
 
-The SDK supports [Pushed Authorization Requests (PAR)](https://datatracker.ietf.org/doc/html/rfc9126) for Backend-For-Frontend (BFF) authentication flows. In this pattern, your backend initiates the authorization request and the SDK returns only the authorization code, which your backend then exchanges for tokens.
+PAR (Pushed Authorization Request) enables a Backend-for-Frontend (BFF) pattern where your backend server handles the `/par` and `/token` endpoints while the SDK manages the browser-based authorization flow.
 
-Use the `startForCode(requestURI:)` method with the `request_uri` obtained from your backend's PAR endpoint:
+This is useful when:
+- You need to use a confidential client with a `client_secret`
+- You want to keep sensitive parameters server-side
+- You're implementing a BFF architecture
+
+#### Usage
+
+The PAR flow requires coordination between your backend (BFF) and the mobile app:
+
+1. **Backend calls `/par` endpoint** - Your backend initiates the PAR request with the `client_secret` and receives a `request_uri`
+2. **SDK opens `/authorize`** - The mobile app uses the `request_uri` to open the browser for user authentication
+3. **SDK returns authorization code** - After authentication, the SDK returns the authorization code to the app
+4. **Backend exchanges code for tokens** - Your backend exchanges the code for tokens using the `client_secret`
 
 ```swift
-// 1. Get request_uri from your backend
-let parResponse = try await myBackend.initiatePAR()
+// Step 1: Your BFF calls /par and returns request_uri to the app
+let requestURI = yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
 
-// 2. Open authorize and get authorization code
+// Step 2 & 3: SDK opens browser and returns authorization code
 Auth0
     .webAuth()
-    .startForCode(requestURI: parResponse.requestURI) { result in
+    .authorizeWithRequestUri(requestURI: requestURI) { result in
         switch result {
         case .success(let authorizationCode):
-            // 3. Send code to backend for token exchange
-            myBackend.exchangeCode(authorizationCode.code) { credentials in
-                // 4. Store credentials
-                credentialsManager.store(credentials: credentials)
-            }
+            // Step 4: Send code to BFF to exchange for tokens
+            yourBffClient.exchangeCode(authorizationCode.code)
         case .failure(let error):
-            print("Failed with: \(error)")
+            if error.isUserCancelled {
+                // User closed the browser
+            } else {
+                // Handle error
+            }
         }
     }
 ```
@@ -371,21 +384,21 @@ Auth0
 
 ```swift
 do {
-    // 1. Get request_uri from your backend
-    let parResponse = try await myBackend.initiatePAR()
+    // Step 1: Your BFF calls /par and returns request_uri
+    let requestURI = try await yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
     
-    // 2. Open authorize and get authorization code
+    // Step 2 & 3: SDK opens browser and returns authorization code
     let authorizationCode = try await Auth0
         .webAuth()
-        .startForCode(requestURI: parResponse.requestURI)
+        .authorizeWithRequestUri(requestURI: requestURI)
     
-    // 3. Send code to backend for token exchange
-    let credentials = try await myBackend.exchangeCode(authorizationCode.code)
-    
-    // 4. Store credentials
+    // Step 4: Send code to BFF to exchange for tokens
+    let credentials = try await yourBffClient.exchangeCode(authorizationCode.code)
     credentialsManager.store(credentials: credentials)
+} catch let error as WebAuthError where error.isUserCancelled {
+    // User closed the browser
 } catch {
-    print("Failed with: \(error)")
+    // Handle error
 }
 ```
 </details>
@@ -394,18 +407,18 @@ do {
   <summary>Using Combine</summary>
 
 ```swift
-myBackend.initiatePAR()
-    .flatMap { parResponse in
+yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
+    .flatMap { requestURI in
         Auth0
             .webAuth()
-            .startForCode(requestURI: parResponse.requestURI)
+            .authorizeWithRequestUri(requestURI: requestURI)
     }
     .flatMap { authorizationCode in
-        myBackend.exchangeCode(authorizationCode.code)
+        yourBffClient.exchangeCode(authorizationCode.code)
     }
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
-            print("Failed with: \(error)")
+            // Handle error
         }
     }, receiveValue: { credentials in
         credentialsManager.store(credentials: credentials)
@@ -413,6 +426,9 @@ myBackend.initiatePAR()
     .store(in: &cancellables)
 ```
 </details>
+
+> [!NOTE]
+> The SDK only handles opening the browser with the `request_uri` and returning the authorization code. Token exchange must be performed by your backend server which holds the `client_secret`.
 
 ### Web Auth errors
 

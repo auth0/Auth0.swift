@@ -315,19 +315,21 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      ## Usage
 
      ```swift
-     // 1. BFF initiates PAR and returns request_uri
-     let parResponse = try await bffClient.initiatePAR()
+     // Step 1: Your BFF calls /par and returns request_uri to the app
+     let requestURI = yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
 
-     // 2. SDK opens authorize and returns authorization code
-     let authCode = try await Auth0
+     // Step 2 & 3: SDK opens browser and returns authorization code
+     Auth0
          .webAuth()
-         .startForCode(requestURI: parResponse.requestURI)
-
-     // 3. Send code to BFF for token exchange
-     let credentials = try await bffClient.exchangeCode(authCode.code)
-
-     // 4. Store credentials
-     credentialsManager.store(credentials: credentials)
+         .authorizeWithRequestUri(requestURI: requestURI) { result in
+             switch result {
+             case .success(let authorizationCode):
+                 // Step 4: Send code to BFF to exchange for tokens
+                 yourBffClient.exchangeCode(authorizationCode.code)
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
      ```
 
      - Parameters:
@@ -341,7 +343,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      - ``AuthorizationCode``
      - [RFC 9126 - Pushed Authorization Requests](https://datatracker.ietf.org/doc/html/rfc9126)
      */
-    func startForCode(requestURI: String, callback: @escaping (WebAuthResult<AuthorizationCode>) -> Void)
+    func authorizeWithRequestUri(requestURI: String, callback: @escaping (WebAuthResult<AuthorizationCode>) -> Void)
 
     #if canImport(_Concurrency)
     /**
@@ -354,19 +356,21 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      ## Usage
 
      ```swift
-     // 1. BFF initiates PAR and returns request_uri
-     let parResponse = try await bffClient.initiatePAR()
+     do {
+         // Step 1: Your BFF calls /par and returns request_uri
+         let requestURI = try await yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
 
-     // 2. SDK opens authorize and returns authorization code
-     let authCode = try await Auth0
-         .webAuth()
-         .startForCode(requestURI: parResponse.requestURI)
+         // Step 2 & 3: SDK opens browser and returns authorization code
+         let authorizationCode = try await Auth0
+             .webAuth()
+             .authorizeWithRequestUri(requestURI: requestURI)
 
-     // 3. Send code to BFF for token exchange
-     let credentials = try await bffClient.exchangeCode(authCode.code)
-
-     // 4. Store credentials
-     credentialsManager.store(credentials: credentials)
+         // Step 4: Send code to BFF to exchange for tokens
+         let credentials = try await yourBffClient.exchangeCode(authorizationCode.code)
+         credentialsManager.store(credentials: credentials)
+     } catch {
+         print("Failed with: \(error)")
+     }
      ```
 
      - Parameter requestURI: The request_uri from the PAR response.
@@ -380,7 +384,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      - ``AuthorizationCode``
      - [RFC 9126 - Pushed Authorization Requests](https://datatracker.ietf.org/doc/html/rfc9126)
      */
-    func startForCode(requestURI: String) async throws -> AuthorizationCode
+    func authorizeWithRequestUri(requestURI: String) async throws -> AuthorizationCode
     #endif
 
     /**
@@ -393,15 +397,14 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      ## Usage
 
      ```swift
-     // 1. BFF initiates PAR and returns request_uri
-     bffClient.initiatePAR()
-         .flatMap { parResponse in
+     yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
+         .flatMap { requestURI in
              Auth0
                  .webAuth()
-                 .startForCode(requestURI: parResponse.requestURI)
+                 .authorizeWithRequestUri(requestURI: requestURI)
          }
-         .flatMap { authCode in
-             bffClient.exchangeCode(authCode.code)
+         .flatMap { authorizationCode in
+             yourBffClient.exchangeCode(authorizationCode.code)
          }
          .sink(receiveCompletion: { completion in
              if case .failure(let error) = completion {
@@ -423,7 +426,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      - ``AuthorizationCode``
      - [RFC 9126 - Pushed Authorization Requests](https://datatracker.ietf.org/doc/html/rfc9126)
      */
-    func startForCode(requestURI: String) -> AnyPublisher<AuthorizationCode, WebAuthError>
+    func authorizeWithRequestUri(requestURI: String) -> AnyPublisher<AuthorizationCode, WebAuthError>
 
     /**
      Removes the Auth0 session and optionally removes the identity provider (IdP) session.

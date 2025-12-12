@@ -220,7 +220,7 @@ final class Auth0WebAuth: WebAuth {
 
     // PAR Support
 
-    func startForCode(requestURI: String, callback: @escaping (WebAuthResult<AuthorizationCode>) -> Void) {
+    func authorizeWithRequestUri(requestURI: String, callback: @escaping (WebAuthResult<AuthorizationCode>) -> Void) {
         guard barrier.raise() else {
             return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
@@ -389,10 +389,10 @@ extension Auth0WebAuth {
         return Deferred { Future(self.start) }.eraseToAnyPublisher()
     }
 
-    public func startForCode(requestURI: String) -> AnyPublisher<AuthorizationCode, WebAuthError> {
+    public func authorizeWithRequestUri(requestURI: String) -> AnyPublisher<AuthorizationCode, WebAuthError> {
         return Deferred {
             Future { callback in
-                self.startForCode(requestURI: requestURI) { result in
+                self.authorizeWithRequestUri(requestURI: requestURI) { result in
                     callback(result)
                 }
             }
@@ -429,11 +429,11 @@ extension Auth0WebAuth {
         }
     }
 
-    func startForCode(requestURI: String) async throws -> AuthorizationCode {
+    func authorizeWithRequestUri(requestURI: String) async throws -> AuthorizationCode {
         var alreadyResumed = false
         return try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
-                self.startForCode(requestURI: requestURI) { result in
+                self.authorizeWithRequestUri(requestURI: requestURI) { result in
                     guard !alreadyResumed else { return }
                     alreadyResumed = true
                     continuation.resume(with: result)

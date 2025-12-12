@@ -3,22 +3,22 @@ import Foundation
 
 /// Result containing the authorization code from a PAR (Pushed Authorization Request) flow.
 ///
-/// This struct is returned when using ``WebAuth/startForCode(requestURI:callback:)``
+/// This struct is returned when using ``WebAuth/authorizeWithRequestUri(requestURI:callback:)``
 /// for PAR flows where the BFF (Backend-For-Frontend) handles the token exchange.
 ///
 /// ## Usage
 ///
 /// ```swift
 /// // 1. BFF initiates PAR and returns request_uri
-/// let parResponse = try await bffClient.initiatePAR()
+/// let requestURI = try await yourBffClient.initiatePAR()
 ///
 /// // 2. SDK opens authorize and returns authorization code
 /// let authCode = try await Auth0
 ///     .webAuth()
-///     .startForCode(requestURI: parResponse.requestURI)
+///     .authorizeWithRequestUri(requestURI: requestURI)
 ///
 /// // 3. Send code to BFF for token exchange
-/// let credentials = try await bffClient.exchangeCode(authCode.code)
+/// let credentials = try await yourBffClient.exchangeCode(authCode.code)
 ///
 /// // 4. Store credentials
 /// credentialsManager.store(credentials: credentials)
@@ -26,7 +26,7 @@ import Foundation
 ///
 /// ## See Also
 ///
-/// - ``WebAuth/startForCode(requestURI:callback:)``
+/// - ``WebAuth/authorizeWithRequestUri(requestURI:callback:)``
 /// - [RFC 9126 - Pushed Authorization Requests](https://datatracker.ietf.org/doc/html/rfc9126)
 public struct AuthorizationCode: Sendable {
     
