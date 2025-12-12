@@ -1,5 +1,23 @@
 # Change Log
 
+## [2.16.0](https://github.com/auth0/Auth0.swift/tree/2.16.0) (2025-12-12)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.15.1...2.16.0)
+
+**Added**
+- Org support for  custom token exchange [\#1035](https://github.com/auth0/Auth0.swift/pull/1035) ([NandanPrabhu](https://github.com/NandanPrabhu))
+- chore: Add OSLog support for better SDK debugging/DX and redact sensitive tokens logging. [\#1030](https://github.com/auth0/Auth0.swift/pull/1030) ([sanchitmehta94](https://github.com/sanchitmehta94))
+- Added Agents.md file [\#1027](https://github.com/auth0/Auth0.swift/pull/1027) ([NandanPrabhu](https://github.com/NandanPrabhu))
+- feat: Add configurable biometric authentication policies for CredentialsManager [\#1019](https://github.com/auth0/Auth0.swift/pull/1019) ([subhankarmaiti](https://github.com/subhankarmaiti))
+- refactor: Added two new fields to passkey authentication [\#1020](https://github.com/auth0/Auth0.swift/pull/1020) ([pmathew92](https://github.com/pmathew92))
+- docs: Add Ask DeepWiki badge to README [\#1014](https://github.com/auth0/Auth0.swift/pull/1014) ([arpit-jn](https://github.com/arpit-jn))
+
+**Changed**
+- refactor: updated the key logic for storing MRRT token [\#1031](https://github.com/auth0/Auth0.swift/pull/1031) ([pmathew92](https://github.com/pmathew92))
+
+**Fixed**
+- Github issue: #890 Conforming Credential Manager to Sendable [\#1033](https://github.com/auth0/Auth0.swift/pull/1033) ([sanchitmehta94](https://github.com/sanchitmehta94))
+- fix: Ensure biometric prompt is shown reliably with fresh LAContext for non-default policies [\#1028](https://github.com/auth0/Auth0.swift/pull/1028) ([subhankarmaiti](https://github.com/subhankarmaiti))
+
 ## [2.15.1](https://github.com/auth0/Auth0.swift/tree/2.15.1) (2025-10-03)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.15.0...2.15.1)
 
