@@ -45,7 +45,6 @@ class PARCodeTransaction: NSObject, AuthTransaction {
         var items: [String: String] = [:]
         // Parse query parameters
         components.queryItems?.forEach { items[$0.name] = $0.value }
-        // Also check fragment for implicit flows
         if let fragment = components.fragment {
             let fragmentItems = fragment.split(separator: "&").compactMap { pair -> (String, String)? in
                 let parts = pair.split(separator: "=", maxSplits: 1)
