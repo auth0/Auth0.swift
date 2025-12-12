@@ -469,6 +469,28 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 > 
 > To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
 
+> [!NOTE]
+> **Swift 6 Sendability Support**: The Credentials Manager conforms to `Sendable`, which allows it to be passed across concurrency boundaries (like into actors). However, this does **not** make all its methods thread-safe. Only the methods listed above (`credentials()`, `apiCredentials()`, `ssoCredentials()`, `renew()`) are thread-safe. Other methods and properties still require proper synchronization when called from multiple threads.
+>
+> ```swift
+> // Example: Using CredentialsManager in an Actor (Swift 6)
+> actor AuthService {
+>     let credentialsManager: CredentialsManager
+>     
+>     init() {
+>         self.credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+>     }
+>     
+>     func fetchCredentials() async throws -> Credentials {
+>         // Safe to call from within an actor
+>         return try await credentialsManager.credentials(withScope: "openid profile email",
+>                                                         minTTL: 60,
+>                                                         parameters: [:],
+>                                                         headers: [:])
+>     }
+> }
+> ```
+
 ### Store credentials
 
 When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your app again.

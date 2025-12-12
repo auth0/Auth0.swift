@@ -7,19 +7,19 @@ class ViewController: UIViewController {
         Auth0
             .webAuth()
             .logging(enabled: true)
-            .start {
-                switch $0 {
+            .start { [weak self] result in
+                switch result {
                 case .failure(let error):
                     DispatchQueue.main.async {
-                        self.alert(title: "Error", message: "\(error)")
+                        self?.alert(title: "Error", message: "\(error)")
                     }
                 case .success(let credentials):
                     DispatchQueue.main.async {
-                        self.alert(title: "Success",
+                        self?.alert(title: "Success",
                                    message: "Authorized and got a token \(credentials.accessToken)")
                     }
                 }
-                print($0)
+                print(result)
             }
     }
 
