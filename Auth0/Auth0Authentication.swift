@@ -162,7 +162,11 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func login(appleAuthorizationCode authorizationCode: String, fullName: PersonNameComponents?, profile: [String: Any]?, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func login(appleAuthorizationCode authorizationCode: String,
+               fullName: PersonNameComponents?,
+               profile: [String: Any]?,
+               audience: String?,
+               scope: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = [:]
         var profile: [String: Any] = profile ?? [:]
 
@@ -185,7 +189,10 @@ struct Auth0Authentication: Authentication {
                                   parameters: parameters)
     }
 
-    func login(facebookSessionAccessToken sessionAccessToken: String, profile: [String: Any], audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func login(facebookSessionAccessToken sessionAccessToken: String,
+               profile: [String: Any],
+               audience: String?,
+               scope: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: String] = [:]
         if let jsonData = try? JSONSerialization.data(withJSONObject: profile, options: []),
             let json = String(data: jsonData, encoding: .utf8) {
@@ -499,11 +506,16 @@ struct Auth0Authentication: Authentication {
                        telemetry: self.telemetry)
     }
 
-    func customTokenExchange(subjectToken: String, subjectTokenType: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func customTokenExchange(subjectToken: String,
+                             subjectTokenType: String,
+                             audience: String?,
+                             scope: String,
+                             organization: String?) -> Request<Credentials, AuthenticationError> {
         return self.tokenExchange(subjectToken: subjectToken,
                                   subjectTokenType: subjectTokenType,
                                   scope: scope,
-                                  audience: audience)
+                                  audience: audience,
+                                  organization: organization)
     }
 
 }
@@ -535,7 +547,12 @@ private extension Auth0Authentication {
                        dpop: self.dpop)
     }
 
-    func tokenExchange(subjectToken: String, subjectTokenType: String, scope: String, audience: String?, parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
+    func tokenExchange(subjectToken: String,
+                       subjectTokenType: String,
+                       scope: String,
+                       audience: String?,
+                       organization: String? = nil,
+                       parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = parameters
         parameters["client_id"] = self.clientId
         parameters["grant_type"] = "urn:ietf:params:oauth:grant-type:token-exchange"
@@ -543,6 +560,7 @@ private extension Auth0Authentication {
         parameters["subject_token_type"] = subjectTokenType
         parameters["audience"] = audience
         parameters["scope"] = includeRequiredScope(in: scope)
+        parameters["organization"] = organization
 
         let token = URL(string: "oauth/token", relativeTo: self.url)!
         return Request(session: session,
