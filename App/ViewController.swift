@@ -18,13 +18,6 @@ class ViewController: UIViewController {
                     DispatchQueue.main.async {
                         self.alert(title: "Success",
                                    message: "Authorized and got a token \(credentials.accessToken)")
-                        
-                        // Store credentials and run concurrent tests
-                        let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
-                        _ = credentialsManager.store(credentials: credentials)
-                        
-                        // Multiple CredentialsManager instances
-                        self.testConcurrentCredentialsManagerCalls()
 
                     }
                 }
@@ -43,43 +36,7 @@ class ViewController: UIViewController {
                 }
             }
     }
-    
-    func testConcurrentCredentialsManagerCalls() {
-        print("\n=== Testing concurrent CredentialsManager.credentials() across multiple instances ===")
-        print("Creating 5 different CredentialsManager instances and calling credentials() concurrently...")
         
-        let requestCount = 5
-        let group = DispatchGroup()
-        
-        for i in 1...requestCount {
-            group.enter()
-            DispatchQueue.global().async {
-                // Create a NEW instance of CredentialsManager for each thread
-                let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
-                
-                let startTime = Date()
-                print("CredentialsManager \(i): Starting credentials() call at \(startTime)")
-                
-                credentialsManager.credentials { result in
-                    let endTime = Date()
-                    let duration = endTime.timeIntervalSince(startTime)
-                    
-                    switch result {
-                    case .success(_):
-                        print("CredentialsManager \(i): SUCCESS - Duration: \(String(format: "%.2f", duration))s")
-                    case .failure(let error):
-                        print("CredentialsManager \(i): FAILED - Duration: \(String(format: "%.2f", duration))s - Error: \(error)")
-                    }
-                    group.leave()
-                }
-            }
-        }
-        
-        group.notify(queue: .main) {
-            print("=== All CredentialsManager instances completed ===\n")
-        }
-    }
-
 }
 
 extension UIViewController {

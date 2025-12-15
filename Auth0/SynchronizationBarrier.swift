@@ -21,18 +21,7 @@ final class SynchronizationBarrier {
     /// Flag indicating whether an operation is currently executing
     private var isExecuting = false
 
-    /// Thread-local storage key for tracking if we're already inside the barrier
-    private let isInsideBarrierKey = DispatchSpecificKey<Bool>()
 
-    private init() {
-        // Set up dispatch queue context to track when we're inside the barrier
-        queue.setSpecific(key: isInsideBarrierKey, value: true)
-    }
-
-    /// Checks if the current execution context is already inside the barrier
-    var isInsideBarrier: Bool {
-        return DispatchQueue.getSpecific(key: isInsideBarrierKey) == true
-    }
 
     /// Executes an operation in a thread-safe manner.
     /// Only one operation will be executed at a time across all instances.
@@ -47,11 +36,6 @@ final class SynchronizationBarrier {
     ///   handler that it **must** call when finished. The completion handler can be called from
     ///   any thread. Operations are executed one at a time in the order they were submitted.
     func execute(_ operation: @escaping (@escaping () -> Void) -> Void) {
-        // If reentrant, execute immediately
-        if isInsideBarrier {
-            operation {}
-            return
-        }
 
         queue.async { [weak self] in
             guard let self = self else { return }
