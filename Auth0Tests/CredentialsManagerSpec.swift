@@ -932,6 +932,160 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
+        describe("concurrent credentials retrieval") {
+            
+            beforeEach {
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+            }
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+            
+            it("should handle multiple concurrent credentials() calls from the same instance") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                let callCount = 5
+                let group = DispatchGroup()
+                var results: [Result<Credentials, CredentialsManagerError>] = []
+                let resultsLock = NSLock()
+                
+                for _ in 1...callCount {
+                    group.enter()
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        credentialsManager.credentials { result in
+                            resultsLock.lock()
+                            results.append(result)
+                            resultsLock.unlock()
+                            group.leave()
+                        }
+                    }
+                }
+                
+                waitUntil(timeout: Timeout) { done in
+                    group.notify(queue: .main) {
+                        // All calls should succeed
+                        expect(results.count) == callCount
+                        
+                        for result in results {
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+            
+            it("should handle multiple concurrent credentials() calls from different instances") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                let callCount = 5
+                let group = DispatchGroup()
+                var results: [Result<Credentials, CredentialsManagerError>] = []
+                let resultsLock = NSLock()
+                
+                for _ in 1...callCount {
+                    group.enter()
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        // Create a NEW instance for each thread
+                        let manager = CredentialsManager(authentication: authentication)
+                        manager.credentials { result in
+                            resultsLock.lock()
+                            results.append(result)
+                            resultsLock.unlock()
+                            group.leave()
+                        }
+                    }
+                }
+                
+                waitUntil(timeout: Timeout) { done in
+                    group.notify(queue: .main) {
+                        // All calls should succeed with synchronization barrier
+                        expect(results.count) == callCount
+                        
+                        for result in results {
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+            
+            
+            it("should properly serialize concurrent requests with refresh token rotation") {
+                // This test ensures that with RTR enabled, concurrent requests don't fail
+                // because the synchronization barrier ensures they execute one at a time
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                let callCount = 3
+                let group = DispatchGroup()
+                var successCount = 0
+                let countLock = NSLock()
+                
+                for _ in 1...callCount {
+                    group.enter()
+                    DispatchQueue.global(qos: .utility).async {
+                        credentialsManager.credentials { result in
+                            if case .success = result {
+                                countLock.lock()
+                                successCount += 1
+                                countLock.unlock()
+                            }
+                            group.leave()
+                        }
+                    }
+                }
+                
+                waitUntil(timeout: Timeout) { done in
+                    group.notify(queue: .main) {
+                        // All concurrent calls should succeed
+                        expect(successCount) == callCount
+                        done()
+                    }
+                }
+            }
+            
+            it("should handle high concurrency with many simultaneous requests") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                let callCount = 10
+                let group = DispatchGroup()
+                var successCount = 0
+                var failureCount = 0
+                let countLock = NSLock()
+                
+                for _ in 1...callCount {
+                    group.enter()
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        credentialsManager.credentials { result in
+                            countLock.lock()
+                            if case .success = result {
+                                successCount += 1
+                            } else {
+                                failureCount += 1
+                            }
+                            countLock.unlock()
+                            group.leave()
+                        }
+                    }
+                }
+                
+                waitUntil(timeout: .seconds(15)) { done in
+                    group.notify(queue: .main) {
+                        // All requests should succeed
+                        expect(successCount) == callCount
+                        expect(failureCount) == 0
+                        done()
+                    }
+                }
+            }
+        }
+
         describe("retrieval of api credentials") {
             
             beforeEach {
