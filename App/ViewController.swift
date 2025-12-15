@@ -6,7 +6,7 @@ class ViewController: UIViewController {
     @IBAction func login(_ sender: Any) {
         Auth0
             .webAuth()
-            .scope("openid profile offline_access")
+            .scope("openid offline_access")
             .logging(enabled: true)
             .start {
                 switch $0 {
