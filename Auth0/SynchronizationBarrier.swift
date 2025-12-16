@@ -25,9 +25,7 @@ final class SynchronizationBarrier {
 
     /// Executes an operation in a thread-safe manner.
     /// Only one operation will be executed at a time across all instances.
-    /// This method is reentrant - if called from within an existing barrier context,
-    /// it will execute immediately without blocking.
-    ///
+
     /// The implementation uses a serial queue to coordinate operations without blocking threads.
     /// Operations are queued and executed sequentially. Each operation must call its completion
     /// handler to signal that it has finished, allowing the next operation to proceed.
@@ -62,3 +60,5 @@ final class SynchronizationBarrier {
         }
     }
 }
+
+
