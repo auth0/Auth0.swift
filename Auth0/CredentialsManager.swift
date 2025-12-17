@@ -24,15 +24,22 @@ import LocalAuthentication
 ///
 /// - ``CredentialsManagerError``
 /// - <doc:RefreshTokens>
-public struct CredentialsManager {
+public struct CredentialsManager: Sendable {
+    
+    // storage is inherently sendable as it uses Keychain under the hood and is stateless
+    private let sendableStorage: SendableBox<CredentialsStorage>
+    
+    private var storage: CredentialsStorage {
+        sendableStorage.value
+    }
 
-    private let storage: CredentialsStorage
     private let storeKey: String
     private let authentication: Authentication
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     // Biometric session management - using a class to allow mutation in non-mutating methods
-    private final class BiometricSession {
+    // @unchecked Sendable is fine here as we are using lock to read and update lastBiometricAuthTime which is safe across threads.
+    private final class BiometricSession: @unchecked Sendable {
         let noSession: TimeInterval = -1
         var lastBiometricAuthTime: TimeInterval = -1
         let lock = NSLock()
@@ -55,7 +62,7 @@ public struct CredentialsManager {
                 storage: CredentialsStorage = SimpleKeychain()) {
         self.storeKey = storeKey
         self.authentication = authentication
-        self.storage = storage
+        self.sendableStorage = SendableBox(value: storage)
     }
 
     /// Retrieves the user information from the Keychain synchronously, without checking if the credentials are expired.
