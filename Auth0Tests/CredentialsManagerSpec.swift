@@ -932,6 +932,184 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
+        describe("concurrent credentials retrieval") {
+            
+            beforeEach {
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+            }
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+            
+            it("should handle multiple concurrent credentials() calls from the same instance") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                let callCount = 5
+                let group = DispatchGroup()
+                var results: [Result<Credentials, CredentialsManagerError>] = []
+                let resultsLock = NSLock()
+                
+                for _ in 1...callCount {
+                    group.enter()
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        credentialsManager.credentials { result in
+                            resultsLock.lock()
+                            results.append(result)
+                            resultsLock.unlock()
+                            group.leave()
+                        }
+                    }
+                }
+                
+                waitUntil(timeout: Timeout) { done in
+                    group.notify(queue: .main) {
+                        // All calls should succeed
+                        expect(results.count) == callCount
+                        
+                        for result in results {
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+            
+            it("should handle multiple concurrent credentials() calls from different instances") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                let callCount = 5
+                let group = DispatchGroup()
+                var results: [Result<Credentials, CredentialsManagerError>] = []
+                let resultsLock = NSLock()
+                
+                for _ in 1...callCount {
+                    group.enter()
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        // Create a NEW instance for each thread
+                        let manager = CredentialsManager(authentication: authentication)
+                        manager.credentials { result in
+                            resultsLock.lock()
+                            results.append(result)
+                            resultsLock.unlock()
+                            group.leave()
+                        }
+                    }
+                }
+                
+                waitUntil(timeout: Timeout) { done in
+                    group.notify(queue: .main) {
+                        // All calls should succeed with synchronization barrier
+                        expect(results.count) == callCount
+                        
+                        for result in results {
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+        }
+        
+        describe("concurrent credentials retrieval with async/await") {
+            
+            beforeEach {
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+            }
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+            
+            it("should handle multiple concurrent async credentials() calls from the same instance") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                waitUntil(timeout: Timeout) { done in
+                    Task {
+                        let callCount = 5
+                        
+                        // Launch multiple concurrent tasks
+                        await withTaskGroup(of: Result<Credentials, CredentialsManagerError>.self) { group in
+                            for _ in 1...callCount {
+                                group.addTask {
+                                    do {
+                                        let creds = try await credentialsManager.credentials()
+                                        return .success(creds)
+                                    } catch let error as CredentialsManagerError {
+                                        return .failure(error)
+                                    } catch {
+                                        return .failure(CredentialsManagerError(code: .revokeFailed, cause: error))
+                                    }
+                                }
+                            }
+                            
+                            var results: [Result<Credentials, CredentialsManagerError>] = []
+                            for await result in group {
+                                results.append(result)
+                            }
+                            
+                            // All calls should succeed
+                            expect(results.count) == callCount
+                            
+                            for result in results {
+                                expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            }
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+            
+            it("should handle multiple concurrent async credentials() calls from different instances") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                waitUntil(timeout: Timeout) { done in
+                    Task {
+                        let callCount = 5
+                        
+                        // Launch multiple concurrent tasks with different instances
+                        await withTaskGroup(of: Result<Credentials, CredentialsManagerError>.self) { group in
+                            for _ in 1...callCount {
+                                group.addTask {
+                                    // Create a NEW instance for each task
+                                    let manager = CredentialsManager(authentication: authentication)
+                                    do {
+                                        let creds = try await manager.credentials()
+                                        return .success(creds)
+                                    } catch let error as CredentialsManagerError {
+                                        return .failure(error)
+                                    } catch {
+                                        return .failure(CredentialsManagerError(code: .revokeFailed, cause: error))
+                                    }
+                                }
+                            }
+                            
+                            var results: [Result<Credentials, CredentialsManagerError>] = []
+                            for await result in group {
+                                results.append(result)
+                            }
+                            
+                            // All calls should succeed with synchronization barrier
+                            expect(results.count) == callCount
+                            
+                            for result in results {
+                                expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            }
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+        }
+
         describe("retrieval of api credentials") {
             
             beforeEach {
