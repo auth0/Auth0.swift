@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.16.1](https://github.com/auth0/Auth0.swift/tree/2.16.1) (2025-12-19)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.16.0...2.16.1)
+
+**Added**
+- Make credential renewal resilient to concurrency conditions [\#1048](https://github.com/auth0/Auth0.swift/pull/1048) ([sanchitmehta94](https://github.com/sanchitmehta94))
+
 ## [2.16.0](https://github.com/auth0/Auth0.swift/tree/2.16.0) (2025-12-12)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.15.1...2.16.0)
 
