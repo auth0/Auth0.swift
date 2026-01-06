@@ -419,7 +419,7 @@ do {
 
 ---
 
-For more advanced features and use cases including Web Auth signup, passwordless authentication, biometric authentication, passkeys, DPoP, SSO credentials, API credentials, and more, visit the comprehensive [Examples documentation](EXAMPLES.md).
+**Explore more:** Check out the [Examples documentation](EXAMPLES.md) for illustrative guides covering all features like biometric authentication, passkeys, passwordless login, DPoP, and more.
 
 ## Logging
 
