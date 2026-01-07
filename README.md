@@ -15,7 +15,6 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 - [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift/interactive)
  - shows how to integrate Auth0.swift into an iOS / macOS app from scratch.
 - [**Sample App**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01) - a complete, running iOS / macOS app you can try.
-- [**Examples**](EXAMPLES.md) - explains how to use most features.
 - [**API Documentation**](https://auth0.github.io/Auth0.swift/documentation/auth0) - documentation auto-generated from the code comments that explains all the available features.
   + [Web Auth](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)
