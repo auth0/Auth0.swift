@@ -348,7 +348,7 @@ let didStore = credentialsManager.store(credentials: credentials)
 
 ### Retrieve stored credentials
 
-The credentials will be automatically renewed (if expired) using the refresh token.
+Retrieve the stored credentials from the Keychain. If the credentials have expired, they will be automatically renewed using the refresh token.
 
 ```swift
 credentialsManager.credentials { result in 
@@ -377,6 +377,9 @@ do {
 ### Clear stored credentials
 
 The stored credentials can be removed from the Keychain by using the `clear()` method.
+
+> [!NOTE]
+> It is recommended to call `clear()` when the user logs out of the application to remove their credentials from the Keychain.
 
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
