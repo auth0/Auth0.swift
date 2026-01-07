@@ -337,6 +337,9 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 Explore common use cases and integration patterns for Auth0.swift.
 
+> [!TIP]
+> **Looking for more examples?** Check out the [**Examples documentation**](EXAMPLES.md) for comprehensive guides on biometric authentication, passkeys, passwordless login, DPoP, and more. ✨
+
 ### Store credentials
 
 When your users log in, store their credentials securely in the Keychain.
@@ -378,9 +381,6 @@ do {
 
 The stored credentials can be removed from the Keychain by using the `clear()` method.
 
-> [!NOTE]
-> It is recommended to call `clear()` when the user logs out of the application to remove their credentials from the Keychain.
-
 ```swift
 let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 let didClear = credentialsManager.clear()
@@ -419,10 +419,6 @@ do {
 }
 ```
 </details>
-
----
-
-**Explore more:** Check out the [Examples documentation](EXAMPLES.md) for illustrative guides covering all features like biometric authentication, passkeys, passwordless login, DPoP, and more.
 
 ## Logging
 
