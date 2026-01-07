@@ -499,7 +499,7 @@ When a renewal request fails due to a transient error, the Credentials Manager w
 1. Request A calls `credentials()` and starts a token refresh
 2. Request A successfully hits the server and gets new credentials
 3. Request A fails on the way back (network issue), never reaching the client
-4. Later, request B retries with the same (old) refresh token
+4. The retry mechanism automatically retries the failed request using the same (old) refresh token
 
 To fully leverage the retry mechanism, ensure your Auth0 tenant's **Rotation Overlap Period** is set to at least 180 seconds. This overlap window ensures the old refresh token remains valid during retry attempts even if the backend resource was already updated. You can configure this setting in your Auth0 Dashboard under **Applications > [Your Application] > Settings > Refresh Token Rotation**.
 

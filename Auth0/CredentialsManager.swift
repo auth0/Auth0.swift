@@ -803,9 +803,9 @@ public struct CredentialsManager: Sendable {
                             callback(.success(newCredentials))
                         }
                     case .failure(let error):
+                        complete()
                         // Check if we should retry based on error type and retry count
                         if self.shouldRetryRenewal(for: error, retryCount: retryCount) {
-                            complete()
                             // Calculate exponential backoff delay: 0.5s, 1s, 2s, etc.
                             let delay = pow(2.0, Double(retryCount)) * 0.5
                             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) {
@@ -818,7 +818,6 @@ public struct CredentialsManager: Sendable {
                                                                  callback: callback)
                             }
                         } else {
-                            complete()
                             callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
                         }
                     }
