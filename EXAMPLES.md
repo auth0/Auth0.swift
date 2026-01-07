@@ -508,10 +508,10 @@ To fully leverage the retry mechanism, ensure your Auth0 tenant's **Rotation Ove
 By default, retries are disabled. You can enable retries by specifying a maximum retry count when creating the Credentials Manager. It is advisable to set a maximum of 2 retries, which provides sufficient resilience without introducing excessive delays or unnecessary network requests.
 
 ```swift
-// Enable up to 2 retry attempts (recommended maximum)
+// Enable 1 retry attempt
 let credentialsManager = CredentialsManager(
     authentication: Auth0.authentication(),
-    maxRetries: 2
+    maxRetries: 1
 )
 ```
 
