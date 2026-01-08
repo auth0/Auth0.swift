@@ -15,7 +15,6 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 - [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift/interactive)
  - shows how to integrate Auth0.swift into an iOS / macOS app from scratch.
 - [**Sample App**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01) - a complete, running iOS / macOS app you can try.
-- [**Examples**](EXAMPLES.md) - explains how to use most features.
 - [**API Documentation**](https://auth0.github.io/Auth0.swift/documentation/auth0) - documentation auto-generated from the code comments that explains all the available features.
   + [Web Auth](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)
@@ -422,58 +421,6 @@ do {
 }
 ```
 </details>
-
----
-
-**Explore more:** Check out the [Examples documentation](EXAMPLES.md) for illustrative guides covering all features like biometric authentication, passkeys, passwordless login, DPoP, and more.
-
-## Logging
-
-Auth0.swift uses Apple's Unified Logging (OSLog) to help you troubleshoot issues during development. Enable detailed HTTP logging to see network requests, responses, and errors.
-
-### Enable Logging (Network Tracing based logs)
-
-To enable detailed HTTP request and response tracing during development:
-
-```swift
-Auth0
-    .webAuth()
-    .logging(enabled: true)
-    .start { result in
-        // Handle result
-    }
-
-// Or with Authentication client
-Auth0
-        authentication()
-    .logging(enabled: true)
-    .login(usernameOrEmail: "user@example.com", password: "secret")
-    .start { result in
-        // Handle result
-    }
-```
-For more information, see the [Loggable documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/loggable).
-### Viewing Logs
-
-#### Xcode Console (Recommended)
-
-Logs appear automatically in the Xcode debug console during development on all platforms.
-
-**Filtering in Xcode 15+:**
-
-Use these filter expressions directly in the console search bar:
-
-| Filter | Description |
-|--------|-------------|
-| `subsystem:com.auth0.Auth0` | Show all Auth0 SDK logs |
-| `category:NetworkTracing` | Show only network requests/responses |
-| `category:Configuration` | Show only configuration errors |
-| `subsystem:com.auth0.Auth0 category:NetworkTracing` | Combine filters for specific logs |
-
-### Log Categories
-
-- **NetworkTracing** - HTTP requests and responses
-- **Configuration** - SDK setup and configuration issues
 
 ## Support Policy
 
