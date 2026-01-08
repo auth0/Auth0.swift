@@ -337,6 +337,9 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 
 Explore common use cases and integration patterns for Auth0.swift.
 
+> [!NOTE]
+> **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, and more. ✨
+
 ### Store credentials
 
 When your users log in, store their credentials securely in the Keychain.
