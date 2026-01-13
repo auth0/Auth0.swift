@@ -1706,10 +1706,7 @@ The MFA API allows you to implement multi-factor authentication flows using the 
 
 To use the MFA API, you need to:
 
-1. Enable the appropriate MFA grant types for your Auth0 application:
-   - `http://auth0.com/oauth/grant-type/mfa-oob` for SMS/Email verification
-   - `http://auth0.com/oauth/grant-type/mfa-otp` for OTP verification
-   - `http://auth0.com/oauth/grant-type/mfa-recovery-code` for recovery code verification
+1. Enable the appropriate **MFA** grant type for your Auth0 application
 
 2. Enable the MFA factors you want to use in the [Auth0 Dashboard](https://manage.auth0.com/#/security/mfa) under **Security > Multi-factor Auth**.
 

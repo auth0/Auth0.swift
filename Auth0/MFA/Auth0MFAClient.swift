@@ -63,8 +63,8 @@ public struct Auth0MFAClient: MFAClient {
     }
 
     public func verify(oobCode: String,
-               bindingCode: String?,
-               mfaToken: String) -> Request<Credentials, AuthenticationError> {
+                       bindingCode: String?,
+                       mfaToken: String) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = [:]
         parameters["oob_code"] = oobCode
         parameters["binding_code"] = bindingCode
@@ -89,7 +89,7 @@ public struct Auth0MFAClient: MFAClient {
     }
 
     public func verify(otp: String,
-               mfaToken: String) -> Request<Credentials, AuthenticationError> {
+                       mfaToken: String) -> Request<Credentials, AuthenticationError> {
         var payload: [String: Any] = [:]
         payload["otp"] = otp
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-otp"
@@ -98,7 +98,7 @@ public struct Auth0MFAClient: MFAClient {
     }
     
     public func verify(recoveryCode: String,
-               mfaToken: String) -> Request<Credentials, AuthenticationError> {
+                       mfaToken: String) -> Request<Credentials, AuthenticationError> {
         var payload: [String: Any] = [:]
         payload["recovery_code"] = recoveryCode
         payload["mfa_token"] = mfaToken
@@ -136,7 +136,6 @@ public struct Auth0MFAClient: MFAClient {
                        logger: logger,
                        telemetry: telemetry)
     }
-
 }
 
 private extension Auth0MFAClient {
