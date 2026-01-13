@@ -91,7 +91,6 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
     private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
         var request = request
-        print(request.cURL(pretty: true))
         do {
             if let dpop = dpop, try dpop.shouldGenerateProof(for: url, parameters: parameters) {
                 let proof = try dpop.generateProof(for: request as URLRequest)
@@ -206,25 +205,3 @@ public extension Request {
 
 }
 #endif
-
-
-extension URLRequest {
-    public func cURL(pretty: Bool = false) -> String {
-        let newLine = pretty ? "\\\n" : ""
-        let method = (pretty ? "--request " : "-X ") + "\(self.httpMethod ?? "GET") \(newLine)"
-        let url: String = (pretty ? "--url " : "") + "\'\(self.url?.absoluteString ?? "")\' \(newLine)"
-        var cURL = "curl "
-        var header = ""
-        var data: String = ""
-        if let httpHeaders = self.allHTTPHeaderFields, httpHeaders.keys.isEmpty == false {
-            for (key,value) in httpHeaders {
-                header += (pretty ? "--header " : "-H ") + "\'\(key): \(value)\' \(newLine)"
-            }
-        }
-        if let bodyData = self.httpBody, let bodyString = String(data: bodyData, encoding: .utf8),  !bodyString.isEmpty {
-            data = "--data '\(bodyString)'"
-        }
-        cURL += method + url + header + data
-        return cURL
-    }
-}
