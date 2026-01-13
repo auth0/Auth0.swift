@@ -1,104 +1,145 @@
-import Combine
 import SwiftUI
-import Foundation
 import Auth0
-import CoreImage.CIFilterBuiltins
+import Combine
+
 @MainActor
 final class ContentViewModel: ObservableObject {
-    let credentialsManager: CredentialsManager
-    @Published var otpCode: String = ""
-    @Published var qrCodeImage: Image?
-    @Published var showOTPTextField = false
-    var mfaToken: String = ""
-    @Published var credentials: Credentials? = nil
-
-    init(credentialsManager: CredentialsManager) {
-        self.credentialsManager = credentialsManager
-    }
-
-    func store(credentials: Credentials) {
-        _ = self.credentialsManager.store(credentials: credentials)
-        _ = self.credentialsManager.store(apiCredentials: APICredentials(from: credentials), forAudience: "")
-    }
-
-    func fetchAPICredentials() {
-        Task {
-            do {
-                let credentials = try await credentialsManager.apiCredentials(forAudience: "")
-                print(credentials.accessToken)
-            } catch {
-                print(error)
-            }
+    @Published var email: String = ""
+    @Published var password: String = ""
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+    @Published var isAuthenticated: Bool = false
+    private var challenges: [MFAFactor] = []
+    @Published var authenticators: [Authenticator]? = nil
+    @Published var enrollmentTypes: [MFAFactor]?
+    private(set) var mfaToken: String = ""
+    private let mfaClient = Auth0.mfa()
+    private let authentication = Auth0.authentication()
+    private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+    
+    // MARK: - Authentication Methods
+    
+    /// Login with email and password using Resource Owner Password flow
+    /// - Parameters:
+    ///   - email: User's email address
+    ///   - password: User's password
+    func login(email: String, password: String) async {
+        guard !email.isEmpty, !password.isEmpty else {
+            errorMessage = "Email and password are required"
+            return
         }
-    }
-
-    func login(email: String, password: String) {
-        Task {
-            do {
-                let credentials = try await Auth0.authentication()
-                    .login(usernameOrEmail: email, password: password, realmOrConnection: "Username-Password-Authentication", audience: "https://test-nandan.com", scope: "openid email profile offline_access")
-                    .start()
-                await MainActor.run {
-                    self.credentials = credentials
-                }
-                self.store(credentials: credentials)
-            } catch {
-                if let error = error as? AuthenticationError,
-                   error.isMultifactorRequired,
-                   let mfaToken = error.info["mfa_token"] as? String {
-                    self.mfaToken = mfaToken
-                    await self.fetchAuthenticators(mfaToken: mfaToken)
-                }
-            }
-        }
-    }
-
-    func confirmEnrollment() {
-        qrCodeImage = nil
-        showOTPTextField = false
-        Task {
-            do {
-                let credentials = try await Auth0.authentication()
-                    .login(withOTP: otpCode, mfaToken: mfaToken)
-                    .start()
-                await MainActor.run {
-                    self.credentials = credentials
-                }
-                self.store(credentials: credentials)
-            } catch {
-                print(error)
-            }
-        }
-    }
-    func fetchAuthenticators(mfaToken: String) async {
+        
+        isLoading = true
+        errorMessage = nil
+        
         do {
-            let authenticators = try await Auth0.authentication()
-                .listMFAAuthenticators(mfaToken: mfaToken)
+            let credentials = try await authentication
+                .login(
+                    usernameOrEmail: email,
+                    password: password,
+                    realmOrConnection: "Username-Password-Authentication",
+                    scope: "openid profile email offline_access"
+                )
                 .start()
-            if authenticators.filter { $0.type == "otp"  && $0.active == true }.isEmpty {
-                let challenge = try await Auth0.authentication()
-                    .enrollOTPMFA(mfaToken: mfaToken)
-                    .start()
-                await self.setAuthQRCodeImage(challenge: challenge)
+            
+            // Store credentials securely
+            let stored = credentialsManager.store(credentials: credentials)
+            if stored {
+                isAuthenticated = true
+                print("Access Token: \(credentials.accessToken)")
             } else {
-                showOTPTextField = true 
+                errorMessage = "Failed to store credentials"
+            }
+        } catch let error as AuthenticationError {
+            enrollmentTypes = error.mfaRequiredErrorPayload?.mfaRequirements.enroll?.uniqued()
+            challenges = error.mfaRequiredErrorPayload?.mfaRequirements.challenge?.uniqued() ?? []
+            mfaToken = error.mfaRequiredErrorPayload?.mfaToken ?? ""
+            do {
+                self.authenticators = try await mfaClient.getAuthenticators(mfaToken: mfaToken, factorsAllowed: challenges.map { $0.type }).start()
+            } catch {
+                errorMessage = "Unexpected error: \(error.localizedDescription)"
             }
         } catch {
-            print(error)
+            errorMessage = "Unexpected error: \(error.localizedDescription)"
+        }
+        
+        isLoading = false
+    }
+    
+    /// Web Authentication using Universal Login (Recommended)
+    func webLogin() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let credentials = try await Auth0
+                .webAuth()
+                .scope("openid profile email offline_access")
+                .start()
+            
+            // Store credentials securely
+            let stored = credentialsManager.store(credentials: credentials)
+            if stored {
+                isAuthenticated = true
+                print("Access Token: \(credentials.accessToken)")
+            } else {
+                errorMessage = "Failed to store credentials"
+            }
+        } catch let error as Auth0Error {
+            errorMessage = "Login failed: \(error.localizedDescription)"
+            print("Web login failed with error: \(error)")
+        } catch {
+            errorMessage = "Unexpected error: \(error.localizedDescription)"
+        }
+        
+        isLoading = false
+    }
+    
+    /// Logout and clear stored credentials
+    func logout() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            try await Auth0
+                .webAuth()
+                .clearSession()
+            
+            // Clear stored credentials
+            let cleared = credentialsManager.clear()
+            if cleared {
+                isAuthenticated = false
+                email = ""
+                password = ""
+                print("Logout successful")
+            }
+        } catch let error as Auth0Error {
+            errorMessage = "Logout failed: \(error.localizedDescription)"
+            print("Logout failed with error: \(error)")
+        } catch {
+            errorMessage = "Unexpected error: \(error.localizedDescription)"
+        }
+        
+        isLoading = false
+    }
+    
+    /// Check if user has valid credentials stored
+    func checkAuthentication() async {
+        do {
+            let credentials = try await credentialsManager.credentials()
+            isAuthenticated = true
+            print("Valid credentials found: \(credentials.accessToken)")
+        } catch {
+            isAuthenticated = false
+            print("No valid credentials found")
         }
     }
+}
 
-    @MainActor func setAuthQRCodeImage(challenge: OTPMFAEnrollmentChallenge) async {
-        let context = CIContext()
-        let filter = CIFilter.qrCodeGenerator()
-        filter.correctionLevel = "H"
-        filter.message = Data(challenge.barCodeURI.utf8)
-        
-        if let outputImage = filter.outputImage {
-            if let cgImage = context.createCGImage(outputImage, from: outputImage.extent) {
-                await MainActor.run {
-                    qrCodeImage = Image(decorative: cgImage, scale: 1.0)            }
-                }
-        }
+
+extension Array where Element: Hashable {
+    func uniqued() -> [Element] {
+        var seen = Set<Element>()
+        return filter { seen.insert($0).inserted }
     }
 }

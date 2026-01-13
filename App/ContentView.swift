@@ -1,121 +1,179 @@
 import SwiftUI
-import Auth0
 import Combine
+import Auth0
+
 struct ContentView: View {
-    @ObservedObject var viewModel: ContentViewModel
-    @State var email: String = ""
-    @State var password: String = ""
-    init(viewModel: ContentViewModel) {
-        self.viewModel = viewModel
-    }
-
+    @StateObject private var viewModel = ContentViewModel()
+    
     var body: some View {
-        if viewModel.showOTPTextField {
-            TextField(text: $viewModel.otpCode) {
-                Text("Enter otp")
-            }.keyboardType(.numberPad)
-            .padding()
-            .cornerRadius(4)
-            .overlay {
-                RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.blue, lineWidth: 1)
-            }
-            
-            Button {
-                viewModel.confirmEnrollment()
-            } label: {
-                Text("Continue")
-            }
-            .frame(height: 48)
-            .background(Color.black)
-        } else if let qrCodeImage = viewModel.qrCodeImage {
-            VStack {
-                Spacer()
-                qrCodeImage
-                    .resizable()
-                    .interpolation(.none)
-                    .aspectRatio(1.0, contentMode: .fit)
-                    .padding()
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(Color.black, lineWidth: 0.5)
+        NavigationView {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 20) {
+                    // List Section
+                    VStack(alignment: .leading, spacing: 10) {
+                        
+                        if let enrollmentTypes = viewModel.enrollmentTypes {
+                            Text("Enrollments")
+                                .font(.headline)
+                                .padding(.horizontal)
+                            ForEach(enrollmentTypes, id: \.self) { enrollmentType in
+                                NavigationLink {
+                                    if enrollmentType.type == "otp" || enrollmentType.type == "push-notification" {
+                                        QRView(viewModel: QRViewModel(mfaToken: viewModel.mfaToken, type: enrollmentType.type))
+                                    } else if enrollmentType.type == "phone" {
+                                        PhoneView(viewModel: PhoneViewModel(mfaToken: viewModel.mfaToken))
+                                    } else if enrollmentType.type == "recovery-code" {
+                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: ""))
+                                    }
+                                } label: {
+                                    Text(enrollmentType.type)
+                                }
+                            }
+                        }
+                        
+                        if let authenticators = viewModel.authenticators {
+                            Text("Authenticators")
+                                .font(.headline)
+                                .padding(.horizontal)
+                            ForEach(authenticators, id: \.self) { authenticator in
+                                NavigationLink {
+                                    if authenticator.type == "oob" {
+                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
+                                    } else if authenticator.type == "otp" {
+                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
+                                    } else {
+                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
+                                    }
+                                } label: {
+                                    Text(authenticator.id)
+                                }
+                            }
+                        }
                     }
-                
-                TextField(text: $viewModel.otpCode) {
-                    Text("Enter otp")
-                }.keyboardType(.numberPad)
-                    .overlay {
-                    RoundedRectangle(cornerRadius: 4)
-                        .stroke(Color.blue, lineWidth: 1)
+                    
+                    // Authentication Section
+                    VStack(spacing: 15) {
+                        // Error Message
+                        if let errorMessage = viewModel.errorMessage {
+                            Text(errorMessage)
+                                .foregroundColor(.red)
+                                .font(.caption)
+                                .padding(.horizontal)
+                        }
+                        
+                        // Email TextField
+                        TextField("Email", text: $viewModel.email)
+                            .textContentType(.emailAddress)
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
+                            .disabled(viewModel.isLoading)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(10)
+                            .padding(.horizontal)
+                        
+                        // Password SecureField
+                        SecureField("Password", text: $viewModel.password)
+                            .textContentType(.password)
+                            .disabled(viewModel.isLoading)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(10)
+                            .padding(.horizontal)
+                        
+                        // Login Button (Direct Authentication)
+                        Button {
+                            Task {
+                                await viewModel.login(email: viewModel.email, password: viewModel.password)
+                            }
+                        } label: {
+                            if viewModel.isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            } else {
+                                Text("Login")
+                            }
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                        
+                        // Web Login Button (Universal Login)
+                        Button {
+                            Task {
+                                await viewModel.webLogin()
+                            }
+                        } label: {
+                            Text("Login with Browser")
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
+                        
+                        // Logout Button
+                        Button {
+                            Task {
+                                await viewModel.logout()
+                            }
+                        } label: {
+                            Text("Logout")
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(viewModel.isLoading || !viewModel.isAuthenticated)
+                        
+                        // Authentication Status
+                        if viewModel.isAuthenticated {
+                            Text("✓ Authenticated")
+                                .foregroundColor(.green)
+                                .font(.caption)
+                        }
+                        
+                        Button("Button 4") {
+                            // Action
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        
+                        Button("Button 5") {
+                            // Action
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 10)
                 }
-                
-                Button {
-                    viewModel.confirmEnrollment()
-                } label: {
-                    Text("Continue")
-                }
-                .frame(height: 48)
-                .background(Color.black)
-                Spacer()
+                .padding(.vertical)
             }
-        } else {
-            VStack(spacing: 10) {
-                TextField("email", text: $email)
-                    .keyboardType(.emailAddress)
-                    .padding()
-                    .cornerRadius(4)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(Color.blue, lineWidth: 1)
-                    }
-                
-                SecureField("password", text: $password)
-                    .padding()
-                    .cornerRadius(4)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(Color.blue, lineWidth: 1)
-                    }
-                Button {
-                    viewModel.login(email: email, password: password)
-                } label: {
-                    Text("Login")
-                        .foregroundStyle(Color.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                }
-                .background(Color.black)
-
-                Button {
-                    _ = viewModel.credentialsManager.clear()
-                    _ = viewModel.credentialsManager.clear(forAudience: "")
-                } label: {
-                    Text("Logout")
-                        .foregroundStyle(Color.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                }
-                .background(Color.black)
-                
-                Button {
-                    viewModel.fetchAPICredentials()
-                } label: {
-                    Text("Get credentials")
-                        .foregroundStyle(Color.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                }
-                .background(Color.black)
-                Spacer()
-                
-                if let credentials = viewModel.credentials {
-                    Text("\(credentials.accessToken)")
-                        .foregroundStyle(Color.white)
-                        .background(Color.black)
-                        .frame(maxWidth: .infinity)
-                }
-            }.padding()
+        }
+        .task {
+            // Check for existing credentials on appear
+            await viewModel.checkAuthentication()
         }
     }
-
 }
+
+struct PrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+    }
+}
+
+struct SecondaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.white)
+            .foregroundColor(.blue)
+            .cornerRadius(10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.blue, lineWidth: 1)
+            )
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+    }
+}
+

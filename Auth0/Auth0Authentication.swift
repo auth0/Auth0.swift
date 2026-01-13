@@ -5,7 +5,6 @@
 import Foundation
 
 struct Auth0Authentication: Authentication {
-
     let clientId: String
     let url: URL
     var telemetry: Telemetry
@@ -72,122 +71,6 @@ struct Auth0Authentication: Authentication {
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: self.dpop)
-    }
-
-    func enrollOTPMFA(mfaToken: String) -> Request<OTPMFAEnrollmentChallenge, AuthenticationError> {
-        let url = URL(string: "mfa/associate", relativeTo: self.url)!
-
-        let payload: [String: Any] = [
-            "authenticator_types": ["otp"]
-        ]
-
-        return Request(session: session, url: url,
-                       method: "POST",
-                       handle: authenticationDecodable,
-                       parameters: payload,
-                       headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
-                       logger: logger,
-                       telemetry: telemetry)
-    }
-
-    func listMFAAuthenticators(mfaToken: String) -> Request<[Authenticator], AuthenticationError> {
-        let url = URL(string: "mfa/authenticators", relativeTo: self.url)!
-
-        return Request(session: session,
-                       url: url,
-                       method: "GET",
-                       handle: authenticationDecodable,
-                       headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
-                       logger: self.logger,
-                       telemetry: self.telemetry)
-    }
-
-    func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
-        let url = URL(string: "oauth/token", relativeTo: self.url)!
-
-        let payload: [String: Any] = [
-            "otp": otp,
-            "mfa_token": mfaToken,
-            "grant_type": "http://auth0.com/oauth/grant-type/mfa-otp",
-            "client_id": self.clientId
-        ]
-
-        return Request(session: session,
-                       url: url,
-                       method: "POST",
-                       handle: authenticationDecodable,
-                       parameters: payload,
-                       logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
-    }
-
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError> {
-        let url = URL(string: "oauth/token", relativeTo: self.url)!
-
-        var payload: [String: Any] = [
-            "oob_code": oobCode,
-            "mfa_token": mfaToken,
-            "grant_type": "http://auth0.com/oauth/grant-type/mfa-oob",
-            "client_id": self.clientId
-        ]
-
-        if let bindingCode = bindingCode {
-            payload["binding_code"] = bindingCode
-        }
-
-        return Request(session: session,
-                       url: url,
-                       method: "POST",
-                       handle: authenticationDecodable,
-                       parameters: payload,
-                       logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
-    }
-
-    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
-        let url = URL(string: "oauth/token", relativeTo: self.url)!
-
-        let payload: [String: Any] = [
-            "recovery_code": recoveryCode,
-            "mfa_token": mfaToken,
-            "grant_type": "http://auth0.com/oauth/grant-type/mfa-recovery-code",
-            "client_id": self.clientId
-        ]
-
-        return Request(session: session,
-                       url: url,
-                       method: "POST",
-                       handle: authenticationDecodable,
-                       parameters: payload,
-                       logger: self.logger,
-                       telemetry: self.telemetry,
-                       dpop: self.dpop)
-    }
-
-    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError> {
-        let url = URL(string: "mfa/challenge", relativeTo: self.url)!
-        var payload: [String: String] = [
-            "mfa_token": mfaToken,
-            "client_id": self.clientId
-        ]
-
-        if let types = types {
-            payload["challenge_type"] = types.joined(separator: " ")
-        }
-
-        if let authenticatorId = authenticatorId {
-            payload["authenticator_id"] = authenticatorId
-        }
-
-        return Request(session: session,
-                       url: url,
-                       method: "POST",
-                       handle: authenticationDecodable,
-                       parameters: payload,
-                       logger: self.logger,
-                       telemetry: self.telemetry)
     }
 
     func login(appleAuthorizationCode authorizationCode: String,
@@ -617,48 +500,82 @@ private extension Auth0Authentication {
 
 }
 
-
-
-public struct Authenticator: Decodable {
-    
-    public let type: String
+public struct Authenticator: Decodable, Hashable {
+    public let authenticatorType: String
     public let oobChannel: String?
     public let id: String
     public let name: String?
     public let active: Bool
-//        "authenticator_type": "oob",
-//        "oob_channel": "sms", //
-//        "id": "sms|dev_sEe99pcpN0xp0yOO",
-//        "name": "+1123XXXXX", //
-//        "active": true
-    
-    
+    public let type: String
+
     enum CodingKeys: String, CodingKey {
-        case type = "authenticator_type"
+        case authenticatorType = "authenticator_type"
         case oobChannel = "oob_channel"
+        case type
         case name
         case active
         case id
     }
-}
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
 
 public struct OTPMFAEnrollmentChallenge: Decodable {
     public let authenticatorType: String
     public let secret: String
-    public let barCodeURI: String
+    public let barcodeUri: String
     public let recoveryCodes: [String]?
 
     enum CodingKeys: String, CodingKey {
         case authenticatorType = "authenticator_type"
         case secret
-        case barCodeURI = "barcode_uri"
+        case barcodeUri = "barcode_uri"
         case recoveryCodes = "recovery_codes"
     }
-//    {
-//      "authenticator_type": "otp",
-//      "secret": "EN...S",
-//      "barcode_uri": "otpauth://totp/tenant:user?secret=...&issuer=tenant&algorithm=SHA1&digits=6&period=30",
-//      "recovery_codes": [ "N3B...XC"]
-//    }
+}
+
+public struct PushMFAEnrollmentChallenge: Decodable {
+    public let authenticatorType: String
+    public let oobChannel: String
+    public let oobCode: String
+    public let barcodeUri: String
+    public let recoveryCodes: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case authenticatorType = "authenticator_type"
+        case oobChannel = "oob_channel"
+        case oobCode = "oob_code"
+        case barcodeUri = "barcode_uri"
+        case recoveryCodes = "recovery_codes"
+    }
+}
+
+public struct MFAEnrollmentChallenge: Decodable {
+    public let authenticatorType: String
+    public let bindingMethod: String
+    public let recoveryCodes: [String]?
+    public let oobChannel: String
+    public let oobCode: String
+
+    enum CodingKeys: String, CodingKey {
+        case authenticatorType = "authenticator_type"
+        case bindingMethod = "binding_method"
+        case recoveryCodes = "recovery_codes"
+        case oobChannel = "oob_channel"
+        case oobCode = "oob_code"
+    }
+}
+
+public struct MFAChallenge: Decodable {
+    public let challengeType: String
+    public let oobCode: String
+    public let bindingMethod: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case challengeType = "challenge_type"
+        case oobCode = "oob_code"
+        case bindingMethod = "binding_method"
+    }
 }
