@@ -10,46 +10,46 @@ struct ContentView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
                     // List Section
-                    VStack(alignment: .leading, spacing: 10) {
-                        
-                        if let enrollmentTypes = viewModel.enrollmentTypes {
-                            Text("Enrollments")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            ForEach(enrollmentTypes, id: \.self) { enrollmentType in
-                                NavigationLink {
-                                    if enrollmentType.type == "otp" || enrollmentType.type == "push-notification" {
-                                        QRView(viewModel: QRViewModel(mfaToken: viewModel.mfaToken, type: enrollmentType.type))
-                                    } else if enrollmentType.type == "phone" {
-                                        PhoneView(viewModel: PhoneViewModel(mfaToken: viewModel.mfaToken))
-                                    } else if enrollmentType.type == "recovery-code" {
-                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: ""))
-                                    }
-                                } label: {
-                                    Text(enrollmentType.type)
-                                }
-                            }
-                        }
-                        
-                        if let authenticators = viewModel.authenticators {
-                            Text("Authenticators")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            ForEach(authenticators, id: \.self) { authenticator in
-                                NavigationLink {
-                                    if authenticator.type == "oob" {
-                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
-                                    } else if authenticator.type == "otp" {
-                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
-                                    } else {
-                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
-                                    }
-                                } label: {
-                                    Text(authenticator.id)
-                                }
-                            }
-                        }
-                    }
+//                    VStack(alignment: .leading, spacing: 10) {
+//                        
+//                        if let enrollmentTypes = viewModel.enrollmentTypes {
+//                            Text("Enrollments")
+//                                .font(.headline)
+//                                .padding(.horizontal)
+//                            ForEach(enrollmentTypes, id: \.self) { enrollmentType in
+//                                NavigationLink {
+//                                    if enrollmentType.type == "otp" || enrollmentType.type == "push-notification" {
+//                                        QRView(viewModel: QRViewModel(mfaToken: viewModel.mfaToken, type: enrollmentType.type))
+//                                    } else if enrollmentType.type == "phone" {
+//                                        PhoneView(viewModel: PhoneViewModel(mfaToken: viewModel.mfaToken))
+//                                    } else if enrollmentType.type == "recovery-code" {
+//                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: ""))
+//                                    }
+//                                } label: {
+//                                    Text(enrollmentType.type)
+//                                }
+//                            }
+//                        }
+//                        
+//                        if let authenticators = viewModel.authenticators {
+//                            Text("Authenticators")
+//                                .font(.headline)
+//                                .padding(.horizontal)
+//                            ForEach(authenticators, id: \.self) { authenticator in
+//                                NavigationLink {
+//                                    if authenticator.type == "oob" {
+//                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
+//                                    } else if authenticator.type == "otp" {
+//                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
+//                                    } else {
+//                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
+//                                    }
+//                                } label: {
+//                                    Text(authenticator.id)
+//                                }
+//                            }
+//                        }
+//                    }
                     
                     // Authentication Section
                     VStack(spacing: 15) {
