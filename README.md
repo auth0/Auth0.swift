@@ -27,7 +27,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 ### Requirements
 
-- iOS 14.0+ / macOS 11.0+ / tvOS 14.0+ / watchOS 7.0+
+- iOS 14.0+ / macOS 11.0+ / tvOS 14.0+ / watchOS 7.0+ / visionOS 1.0+
 - Xcode 16.x
 - Swift 6.0+
 
