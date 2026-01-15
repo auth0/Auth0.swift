@@ -11,7 +11,7 @@ We use [Carthage](https://github.com/Carthage/Carthage) to manage Auth0.swift's 
 brew install carthage
 ```
 
-You will also need simulators for the following platorms:
+You will also need simulators for the following platforms:
 - iOS
 - tvOS
 - watchOS
