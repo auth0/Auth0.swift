@@ -74,6 +74,7 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
 
     func finish(with result: WebAuthResult<Void>) {
         ASUserAgent.currentSession?.cancel()
+        ASUserAgent.currentSession = nil
         self.callback(result)
     }
 

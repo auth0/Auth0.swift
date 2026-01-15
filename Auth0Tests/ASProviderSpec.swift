@@ -116,6 +116,59 @@ class ASProviderSpec: QuickSpec {
                     userAgent.finish(with: .success(()))
                 }
             }
+            
+            it("should clear currentSession after finish with success") {
+                let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL)
+                let userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
+                
+                // Verify session is set during initialization
+                expect(ASUserAgent.currentSession).toNot(beNil())
+                
+                // Finish the authentication
+                userAgent?.finish(with: .success(()))
+                
+                // Verify currentSession is cleared to prevent memory leak
+                expect(ASUserAgent.currentSession).to(beNil())
+            }
+            
+            it("should clear currentSession after finish with failure") {
+                let provider = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL)
+                let userAgent = provider(AuthorizeURL, { _ in }) as? ASUserAgent
+                
+                // Verify session is set during initialization
+                expect(ASUserAgent.currentSession).toNot(beNil())
+                
+                // Finish the authentication with error
+                userAgent?.finish(with: .failure(.userCancelled))
+                
+                // Verify currentSession is cleared to prevent memory leak
+                expect(ASUserAgent.currentSession).to(beNil())
+            }
+            
+            it("should not leak sessions across multiple authentication cycles") {
+                // First authentication cycle
+                let provider1 = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL)
+                let userAgent1 = provider1(AuthorizeURL, { _ in }) as? ASUserAgent
+                let firstSession = ASUserAgent.currentSession
+                expect(firstSession).toNot(beNil())
+                
+                // Complete first authentication
+                userAgent1?.finish(with: .success(()))
+                expect(ASUserAgent.currentSession).to(beNil())
+                
+                // Second authentication cycle
+                let provider2 = WebAuthentication.asProvider(redirectURL: CustomSchemeRedirectURL)
+                let userAgent2 = provider2(AuthorizeURL, { _ in }) as? ASUserAgent
+                let secondSession = ASUserAgent.currentSession
+                expect(secondSession).toNot(beNil())
+                
+                // Verify sessions are different instances
+                expect(firstSession).toNot(be(secondSession))
+                
+                // Complete second authentication
+                userAgent2?.finish(with: .success(()))
+                expect(ASUserAgent.currentSession).to(beNil())
+            }
         }
         
     }
