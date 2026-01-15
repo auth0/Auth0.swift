@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.16.3](https://github.com/auth0/Auth0.swift/tree/2.16.3) (2026-01-15)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.16.2...2.16.3)
+
+**Changed**
+- Mention vision iOS support in readme file, fix typos and update links in docs [\#1072](https://github.com/auth0/Auth0.swift/pull/1072) ([sanchitmehta94](https://github.com/sanchitmehta94))
+
+**Fixed**
+- Fix memory leak in ASUserAgent by clearing static currentSession [\#1071](https://github.com/auth0/Auth0.swift/pull/1071) ([sanchitmehta94](https://github.com/sanchitmehta94))
+
 ## [2.16.2](https://github.com/auth0/Auth0.swift/tree/2.16.2) (2026-01-07)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.16.1...2.16.2)
 
