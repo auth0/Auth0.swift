@@ -9,7 +9,7 @@ Auth0.swift v2 includes many significant changes:
 - Adoption of the Swift 5 `Result` type.
 - Simplified error handling.
 
-As expected with a major release, Auth0.swift v2 contains breaking changes. Please review this guide thorougly to understand the changes required to migrate your application to v2.
+As expected with a major release, Auth0.swift v2 contains breaking changes. Please review this guide thoroughly to understand the changes required to migrate your application to v2.
 
 ---
 
