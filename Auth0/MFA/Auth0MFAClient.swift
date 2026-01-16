@@ -28,6 +28,7 @@ public struct Auth0MFAClient: MFAClient {
         }, headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
                        telemetry: telemetry)
+        .requestValidators([ListAuthenticatorsValidator(factorsAllowed: factorsAllowed)])
     }
 
     public func enroll(mfaToken: String, phoneNumber: String) -> Request<MFAEnrollmentChallenge, AuthenticationError> {
@@ -39,7 +40,7 @@ public struct Auth0MFAClient: MFAClient {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: mfaDecodable,
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
@@ -56,7 +57,7 @@ public struct Auth0MFAClient: MFAClient {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: mfaDecodable,
                        parameters: payload,
                        logger: logger,
                        telemetry: telemetry)
@@ -81,7 +82,7 @@ public struct Auth0MFAClient: MFAClient {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: mfaDecodable,
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
@@ -96,7 +97,7 @@ public struct Auth0MFAClient: MFAClient {
         payload["mfa_token"] = mfaToken
         return self.token().parameters(payload)
     }
-    
+
     public func verify(recoveryCode: String,
                        mfaToken: String) -> Request<Credentials, AuthenticationError> {
         var payload: [String: Any] = [:]
@@ -115,7 +116,7 @@ public struct Auth0MFAClient: MFAClient {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: mfaDecodable,
                        parameters: payload,
                        headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
@@ -131,7 +132,7 @@ public struct Auth0MFAClient: MFAClient {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: mfaDecodable,
                        parameters: payload,
                        logger: logger,
                        telemetry: telemetry)
@@ -146,7 +147,7 @@ private extension Auth0MFAClient {
         return Request(session: session,
                        url: token,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: mfaDecodable,
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
