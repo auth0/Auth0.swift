@@ -292,6 +292,142 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      */
     func start() -> AnyPublisher<Credentials, WebAuthError>
 
+    // PAR (Pushed Authorization Request) Support
+
+    /**
+     Starts the Web Auth flow using a request_uri from a PAR (Pushed Authorization Request) response.
+     Returns the authorization code for the app to exchange via BFF.
+
+     This method is used when your BFF (Backend-For-Frontend) has already pushed the authorization
+     parameters to Auth0's `/oauth/par` endpoint and returned the `request_uri` to the mobile app.
+
+     The flow is:
+     1. BFF calls `/oauth/par` with authorization parameters and `client_secret`
+     2. BFF returns `request_uri` to mobile app
+     3. Mobile app calls this method with `requestURI`
+     4. SDK opens `/authorize?client_id=...&request_uri=...`
+     5. User authenticates
+     6. SDK receives callback with authorization code
+     7. SDK returns the authorization code to the app
+     8. App sends code to BFF for token exchange (BFF uses `client_secret`)
+     9. App stores credentials in CredentialsManager
+
+     ## Usage
+
+     ```swift
+     // Step 1: Your BFF calls /par and returns request_uri to the app
+     let requestURI = yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
+
+     // Step 2 & 3: SDK opens browser and returns authorization code
+     Auth0
+         .webAuth()
+         .authorizeWithRequestUri(requestURI: requestURI) { result in
+             switch result {
+             case .success(let authorizationCode):
+                 // Step 4: Send code to BFF to exchange for tokens
+                 yourBffClient.exchangeCode(authorizationCode.code)
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
+     - Parameters:
+       - requestURI: The request_uri from the PAR response.
+       - callback: Callback that receives a `Result` containing either the authorization code or an error.
+     - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
+     application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
+
+     ## See Also
+
+     - ``AuthorizationCode``
+     - [RFC 9126 - Pushed Authorization Requests](https://datatracker.ietf.org/doc/html/rfc9126)
+     */
+    func authorizeWithRequestUri(requestURI: String, callback: @escaping (WebAuthResult<AuthorizationCode>) -> Void)
+
+    #if canImport(_Concurrency)
+    /**
+     Starts the Web Auth flow using a request_uri from a PAR (Pushed Authorization Request) response.
+     Returns the authorization code for the app to exchange via BFF.
+
+     This method is used when your BFF (Backend-For-Frontend) has already pushed the authorization
+     parameters to Auth0's `/oauth/par` endpoint and returned the `request_uri` to the mobile app.
+
+     ## Usage
+
+     ```swift
+     do {
+         // Step 1: Your BFF calls /par and returns request_uri
+         let requestURI = try await yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
+
+         // Step 2 & 3: SDK opens browser and returns authorization code
+         let authorizationCode = try await Auth0
+             .webAuth()
+             .authorizeWithRequestUri(requestURI: requestURI)
+
+         // Step 4: Send code to BFF to exchange for tokens
+         let credentials = try await yourBffClient.exchangeCode(authorizationCode.code)
+         credentialsManager.store(credentials: credentials)
+     } catch {
+         print("Failed with: \(error)")
+     }
+     ```
+
+     - Parameter requestURI: The request_uri from the PAR response.
+     - Returns: The authorization code result.
+     - Throws: An error of type ``WebAuthError``.
+     - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
+     application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
+
+     ## See Also
+
+     - ``AuthorizationCode``
+     - [RFC 9126 - Pushed Authorization Requests](https://datatracker.ietf.org/doc/html/rfc9126)
+     */
+    func authorizeWithRequestUri(requestURI: String) async throws -> AuthorizationCode
+    #endif
+
+    /**
+     Starts the Web Auth flow using a request_uri from a PAR (Pushed Authorization Request) response.
+     Returns the authorization code for the app to exchange via BFF.
+
+     This method is used when your BFF (Backend-For-Frontend) has already pushed the authorization
+     parameters to Auth0's `/oauth/par` endpoint and returned the `request_uri` to the mobile app.
+
+     ## Usage
+
+     ```swift
+     yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
+         .flatMap { requestURI in
+             Auth0
+                 .webAuth()
+                 .authorizeWithRequestUri(requestURI: requestURI)
+         }
+         .flatMap { authorizationCode in
+             yourBffClient.exchangeCode(authorizationCode.code)
+         }
+         .sink(receiveCompletion: { completion in
+             if case .failure(let error) = completion {
+                 print("Failed with: \(error)")
+             }
+         }, receiveValue: { credentials in
+             credentialsManager.store(credentials: credentials)
+         })
+         .store(in: &cancellables)
+     ```
+
+     - Parameter requestURI: The request_uri from the PAR response.
+     - Returns: A type-erased publisher.
+     - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
+     application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
+
+     ## See Also
+
+     - ``AuthorizationCode``
+     - [RFC 9126 - Pushed Authorization Requests](https://datatracker.ietf.org/doc/html/rfc9126)
+     */
+    func authorizeWithRequestUri(requestURI: String) -> AnyPublisher<AuthorizationCode, WebAuthError>
+
     /**
      Removes the Auth0 session and optionally removes the identity provider (IdP) session.
 
