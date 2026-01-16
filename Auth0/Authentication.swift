@@ -165,7 +165,140 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      */
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
 
-     /**
+    /**
+     Verifies multi-factor authentication (MFA) using a one-time password (OTP).
+
+     ## Usage
+
+     ```swift
+     Auth0
+         .authentication()
+         .login(withOTP: "123456", mfaToken: "mfa-token")
+         .start { result in
+             switch result {
+             case .success(let credentials):
+                 print("Obtained credentials: \(credentials)")
+             case .failure(let error):
+                 print("Failed with: \(error)")
+             }
+         }
+     ```
+
+     - Parameters:
+       - otp:      One-time password supplied by a MFA authenticator.
+       - mfaToken: Token returned when authentication fails with an ``AuthenticationError/isMultifactorRequired`` error due to MFA requirement.
+     - Returns: A request that will yield Auth0 user's credentials.
+     - Requires: The `http://auth0.com/oauth/grant-type/mfa-otp` grant. Check
+     [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+
+     ## See Also
+
+     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-mfa-with-otp)
+     */
+    func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
+
+    /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either push notification, SMS
+    /// or voice).
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .login(withOOBCode: "123456", mfaToken: "mfa-token")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let credentials):
+    ///             print("Obtained credentials: \(credentials)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - oobCode:     The OOB code received from the challenge request.
+    ///   - mfaToken:    Token returned when authentication fails with an ``AuthenticationError/isMultifactorRequired`` error due to MFA requirement.
+    ///   - bindingCode: A code used to bind the side channel (used to deliver the challenge) with the main channel you are using to authenticate. This is usually an OTP-like code delivered as part of the challenge message.
+    /// - Returns: A request that will yield Auth0 user's credentials.
+    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-oob` grant. Check
+    /// [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-out-of-band)
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
+
+    /// Verifies multi-factor authentication (MFA) using a recovery code.
+    /// Some multi-factor authentication (MFA) providers support using a recovery code to login. Use this method to
+    /// authenticate when the user's enrolled device is unavailable, or the user cannot receive the challenge or accept
+    /// it due to connectivity issues.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .login(withRecoveryCode: "recovery-code", mfaToken: "mfa-token")
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let credentials):
+    ///             print("Obtained credentials: \(credentials)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - recoveryCode: Recovery code provided by the user.
+    ///   - mfaToken:     Token returned when authentication fails with an ``AuthenticationError/isMultifactorRequired`` error due to MFA requirement.
+    /// - Returns: A request that will yield Auth0 user's credentials. Might include a **recovery code**, which the
+    /// application must display to the user to be stored securely for future use.
+    /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-recovery-code` grant. Check
+    /// [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
+    ///
+    /// ## See Also
+    ///
+    /// - ``Credentials/recoveryCode``
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-recovery-code)
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
+
+    /// Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
+    /// application and user.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .authentication()
+    ///     .multifactorChallenge(mfaToken: "mfa-token", types: ["otp"])
+    ///     .start { result in
+    ///         switch result {
+    ///         case .success(let challenge):
+    ///             print("Obtained challenge: \(challenge)")
+    ///         case .failure(let error):
+    ///             print("Failed with: \(error)")
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// The challenge type is how the user will get the challenge and prove possession. Supported challenge types include:
+    /// * `otp`:  for one-time password (OTP)
+    /// * `oob`:  for SMS/voice messages or out-of-band (OOB)
+    ///
+    /// - Parameters:
+    ///   - mfaToken:        Token returned when authentication fails with an ``AuthenticationError/isMultifactorRequired`` error due to MFA requirement.
+    ///   - types:           A list of the challenges types accepted by your application. Accepted challenge types are `oob` or `otp`. Excluding this parameter means that your application accepts all supported challenge types.
+    ///   - authenticatorId: The ID of the authenticator to challenge. You can get the ID by querying the list of available authenticators for the user.
+    /// - Returns: A request that will yield a multi-factor challenge.
+    ///
+    /// ## See Also
+    ///
+    /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/request-mfa-challenge)
+    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
+
+    /**
      Logs a user in with their Sign In with Apple authorization code.
 
      ## Usage
@@ -200,7 +333,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - authorizationCode: Authorization Code retrieved from Apple Authorization.
        - fullName:          The full name property returned with the Apple ID Credentials.
        - profile:           Additional user profile data returned with the Apple ID Credentials.
-       - audience:          API Identifier that your application is requesting access to.   
+       - audience:          API Identifier that your application is requesting access to.
        - scope:             Space-separated list of requested scope values. Defaults to `openid profile email`.
      - Returns: A request that will yield Auth0 user's credentials.
 
@@ -542,7 +675,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
-    /// 
+    ///
     /// - [Authentication API Endpoint](https://auth0.com/docs/native-passkeys-api#authenticate-new-user)
     /// - [Native Passkeys for Mobile Applications](https://auth0.com/docs/native-passkeys-for-mobile-applications)
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
@@ -1033,6 +1166,14 @@ public extension Authentication {
 
     func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, realmOrConnection: realm, audience: audience, scope: scope)
+    }
+
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(withOOBCode: oobCode, mfaToken: mfaToken, bindingCode: bindingCode)
+    }
+
+    func multifactorChallenge(mfaToken: String, types: [String]? = nil, authenticatorId: String? = nil) -> Request<Challenge, AuthenticationError> {
+        return self.multifactorChallenge(mfaToken: mfaToken, types: types, authenticatorId: authenticatorId)
     }
 
     func login(appleAuthorizationCode authorizationCode: String,

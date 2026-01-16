@@ -26,6 +26,7 @@ struct Response<E: Auth0APIError> {
             // Not using the custom initializer because data could be empty
             throw E(description: nil, statusCode: response.statusCode)
         }
+
         return ResponseValue(value: response, data: data)
     }
 

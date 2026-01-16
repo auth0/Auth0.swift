@@ -5,6 +5,7 @@
 import Foundation
 
 struct Auth0Authentication: Authentication {
+
     let clientId: String
     let url: URL
     var telemetry: Telemetry
@@ -71,6 +72,94 @@ struct Auth0Authentication: Authentication {
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: self.dpop)
+    }
+
+    func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
+        let url = URL(string: "oauth/token", relativeTo: self.url)!
+
+        let payload: [String: Any] = [
+            "otp": otp,
+            "mfa_token": mfaToken,
+            "grant_type": "http://auth0.com/oauth/grant-type/mfa-otp",
+            "client_id": self.clientId
+        ]
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: authenticationDecodable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
+    }
+
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError> {
+        let url = URL(string: "oauth/token", relativeTo: self.url)!
+
+        var payload: [String: Any] = [
+            "oob_code": oobCode,
+            "mfa_token": mfaToken,
+            "grant_type": "http://auth0.com/oauth/grant-type/mfa-oob",
+            "client_id": self.clientId
+        ]
+
+        if let bindingCode = bindingCode {
+            payload["binding_code"] = bindingCode
+        }
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: authenticationDecodable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
+    }
+
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
+        let url = URL(string: "oauth/token", relativeTo: self.url)!
+
+        let payload: [String: Any] = [
+            "recovery_code": recoveryCode,
+            "mfa_token": mfaToken,
+            "grant_type": "http://auth0.com/oauth/grant-type/mfa-recovery-code",
+            "client_id": self.clientId
+        ]
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: authenticationDecodable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry,
+                       dpop: self.dpop)
+    }
+
+    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError> {
+        let url = URL(string: "mfa/challenge", relativeTo: self.url)!
+        var payload: [String: String] = [
+            "mfa_token": mfaToken,
+            "client_id": self.clientId
+        ]
+
+        if let types = types {
+            payload["challenge_type"] = types.joined(separator: " ")
+        }
+
+        if let authenticatorId = authenticatorId {
+            payload["authenticator_id"] = authenticatorId
+        }
+
+        return Request(session: session,
+                       url: url,
+                       method: "POST",
+                       handle: authenticationDecodable,
+                       parameters: payload,
+                       logger: self.logger,
+                       telemetry: self.telemetry)
     }
 
     func login(appleAuthorizationCode authorizationCode: String,
