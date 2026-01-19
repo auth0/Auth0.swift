@@ -106,6 +106,25 @@ extension Auth0APIError {
         ]
     }
 
+    /// Determines if the error is retryable based on its type.
+    ///
+    /// Returns `true` for:
+    /// - Network errors (as determined by ``isNetworkError``)
+    /// - Rate limiting errors (HTTP 429)
+    /// - Server errors (HTTP 5xx)
+    ///
+    /// - Returns: `true` if the error is retryable, `false` otherwise.
+    var isRetryable: Bool {
+        // Retry on network errors
+        if self.isNetworkError {
+            return true
+        }
+
+        // Retry on rate limiting (429) or server errors (5xx)
+        let statusCode = self.statusCode
+        return statusCode == 429 || (500...599).contains(statusCode)
+    }
+
 }
 
 func json(_ data: Data?) -> Any? {

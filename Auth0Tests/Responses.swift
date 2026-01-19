@@ -342,3 +342,18 @@ func authenticationMethodsListResponse(methods: [String: Any], headers: [String:
 func factorListResponse(factors: [String: Any], headers: [String: String] = [:]) -> RequestResponse {
     return apiSuccessResponse(json: factors)
 }
+
+func networkErrorResponse(code: URLError.Code = .timedOut) -> RequestResponse {
+    return { request in
+        let error = URLError(code)
+        return (nil, nil, error)
+    }
+}
+
+func rateLimitErrorResponse() -> RequestResponse {
+    return apiFailureResponse(json: ["error": "too_many_requests", "error_description": "Rate limit exceeded"], statusCode: 429)
+}
+
+func serverErrorResponse() -> RequestResponse {
+    return apiFailureResponse(json: ["error": "server_error", "error_description": "Internal server error"], statusCode: 500)
+}

@@ -50,17 +50,17 @@ Note that with `useEphemeralSession()` you don't need to call `clearSession(fede
 
 #### Use `SFSafariViewController`
 
-See [Use `SFSafariViewController` instead of `ASWebAuthenticationSession`](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#use-sfsafariviewcontroller-instead-of-aswebauthenticationsession).
+See [Use `SFSafariViewController` instead of `ASWebAuthenticationSession`](EXAMPLES.md#use-sfsafariviewcontroller-instead-of-aswebauthenticationsession).
 
 #### Use `WKWebview`
 
-See [Use `WKWebview` instead of `ASWebAuthenticationSession`](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#use-wkwebview-instead-of-aswebauthenticationsession).
+See [Use `WKWebview` instead of `ASWebAuthenticationSession`](EXAMPLES.md#use-wkwebview-instead-of-aswebauthenticationsession).
 
 ### If you need SSO
 
 See:
 - [`ASWebAuthenticationSession` vs `SFSafariViewController` (iOS)](https://auth0.github.io/Auth0.swift/documentation/auth0/useragents) to help determine if `SFSafariViewController` suits your use case, depending on your SSO requirements.
-- [Use `SFSafariViewController` instead of `ASWebAuthenticationSession`](https://github.com/auth0/Auth0.swift/blob/master/EXAMPLES.md#use-sfsafariviewcontroller-instead-of-aswebauthenticationsession) for the setup instructions.
+- [Use `SFSafariViewController` instead of `ASWebAuthenticationSession`](EXAMPLES.md#use-sfsafariviewcontroller-instead-of-aswebauthenticationsession) for the setup instructions.
 
 ## 2. How can I disable the _logout_ alert box?
 

@@ -35,6 +35,7 @@ public struct CredentialsManager: Sendable {
 
     private let storeKey: String
     private let authentication: Authentication
+    private let maxRetries: Int
     #if WEB_AUTH_PLATFORM
     var bioAuth: BioAuthentication?
     // Biometric session management - using a class to allow mutation in non-mutating methods
@@ -57,12 +58,15 @@ public struct CredentialsManager: Sendable {
     ///   - authentication: Auth0 Authentication API client.
     ///   - storeKey:       Key used to store user credentials in the Keychain. Defaults to 'credentials'.
     ///   - storage:        The ``CredentialsStorage`` instance used to manage credentials storage. Defaults to a standard `SimpleKeychain` instance.
+    ///   - maxRetries:     Maximum number of retry attempts for credential renewal on transient errors. Defaults to 0.
     public init(authentication: Authentication,
                 storeKey: String = "credentials",
-                storage: CredentialsStorage = SimpleKeychain()) {
+                storage: CredentialsStorage = SimpleKeychain(),
+                maxRetries: Int = 0) {
         self.storeKey = storeKey
         self.authentication = authentication
         self.sendableStorage = SendableBox(value: storage)
+        self.maxRetries = max(0, maxRetries)
     }
 
     /// Retrieves the user information from the Keychain synchronously, without checking if the credentials are expired.
@@ -743,6 +747,23 @@ public struct CredentialsManager: Sendable {
                                      headers: [String: String],
                                      forceRenewal: Bool,
                                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        self.retrieveCredentialsWithRetry(scope: scope,
+                                         minTTL: minTTL,
+                                         parameters: parameters,
+                                         headers: headers,
+                                         forceRenewal: forceRenewal,
+                                         retryCount: 0,
+                                         callback: callback)
+    }
+
+    // swiftlint:disable:next function_parameter_count function_body_length
+    private func retrieveCredentialsWithRetry(scope: String?,
+                                             minTTL: Int,
+                                             parameters: [String: Any],
+                                             headers: [String: String],
+                                             forceRenewal: Bool,
+                                             retryCount: Int,
+                                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             guard let credentials = self.retrieveCredentials() else {
                 complete()
@@ -783,10 +804,30 @@ public struct CredentialsManager: Sendable {
                         }
                     case .failure(let error):
                         complete()
-                        callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
+                        // Check if we should retry based on error type and retry count
+                        if self.shouldRetryRenewal(for: error, retryCount: retryCount) {
+                            // Calculate exponential backoff delay: 0.5s, 1s, 2s, etc.
+                            let delay = pow(2.0, Double(retryCount)) * 0.5
+                            DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) {
+                                self.retrieveCredentialsWithRetry(scope: scope,
+                                                                 minTTL: minTTL,
+                                                                 parameters: parameters,
+                                                                 headers: headers,
+                                                                 forceRenewal: forceRenewal,
+                                                                 retryCount: retryCount + 1,
+                                                                 callback: callback)
+                            }
+                        } else {
+                            callback(.failure(CredentialsManagerError(code: .renewFailed, cause: error)))
+                        }
                     }
                 }
         }
+    }
+
+    private func shouldRetryRenewal(for error: AuthenticationError, retryCount: Int) -> Bool {
+        guard retryCount < self.maxRetries else { return false }
+        return error.isRetryable
     }
 
     private func retrieveSSOCredentials(parameters: [String: Any],

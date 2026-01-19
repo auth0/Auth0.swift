@@ -6,7 +6,7 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/auth0/Auth0.swift)
 ![License](https://img.shields.io/github/license/auth0/Auth0.swift.svg?style=flat)
 
-📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
+📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 💡 [**Examples**](#examples) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
 
 Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
@@ -15,7 +15,6 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 - [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift/interactive)
  - shows how to integrate Auth0.swift into an iOS / macOS app from scratch.
 - [**Sample App**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01) - a complete, running iOS / macOS app you can try.
-- [**Examples**](EXAMPLES.md) - explains how to use most features.
 - [**API Documentation**](https://auth0.github.io/Auth0.swift/documentation/auth0) - documentation auto-generated from the code comments that explains all the available features.
   + [Web Auth](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)
@@ -28,7 +27,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 ### Requirements
 
-- iOS 14.0+ / macOS 11.0+ / tvOS 14.0+ / watchOS 7.0+
+- iOS 14.0+ / macOS 11.0+ / tvOS 14.0+ / watchOS 7.0+ / visionOS 1.0+
 - Xcode 16.x
 - Swift 6.0+
 
@@ -333,138 +332,96 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 > [!NOTE]
 > See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of single sign-on (SSO) on iOS.
 
-### Next steps
+## Examples
 
-**Learn about most features in [Examples ↗](EXAMPLES.md)**
-
-- [**Store credentials**](EXAMPLES.md#store-credentials) - store the user's credentials securely in the Keychain.
-- [**Check for stored credentials**](EXAMPLES.md#check-for-stored-credentials) - check if the user is already logged in when your app starts up.
-- [**Retrieve stored credentials**](EXAMPLES.md#retrieve-stored-credentials) - fetch the user's credentials from the Keychain, automatically renewing them if they have expired.
-- [**Clear stored credentials**](EXAMPLES.md#clear-stored-credentials) - delete the user's credentials to complete the logout process.
-- [**Retrieve user information**](EXAMPLES.md#retrieve-user-information) - fetch the latest user information from the `/userinfo` endpoint.
-
-## Running the Sample App
-
-This repository includes a sample iOS app in the [App/](App/) directory that demonstrates the SDK's features. Before running the sample app, you need to configure it with your Auth0 credentials.
-
-### Prerequisites
-
-The sample app requires an `Auth0.plist` file to build successfully. This file contains your Auth0 application's Client ID and Domain.
-
-1. Create or update the [App/Auth0.plist](App/Auth0.plist) file with your Auth0 credentials:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>ClientId</key>
-    <string>YOUR_AUTH0_CLIENT_ID</string>
-    <key>Domain</key>
-    <string>YOUR_AUTH0_DOMAIN</string>
-</dict>
-</plist>
-```
-
-2. Replace `YOUR_AUTH0_CLIENT_ID` and `YOUR_AUTH0_DOMAIN` with the actual values from your Auth0 application settings.
-
-### Running on Simulator
-
-To run the sample app on the iOS Simulator:
-
-1. Open the project in Xcode
-2. Ensure the `Auth0.plist` file is configured with your credentials
-3. Select an iOS Simulator from the device menu
-4. Press **Cmd+R** or click the **Run** button
-5. The app will build and launch in the simulator
+Explore common use cases and integration patterns for Auth0.swift.
 
 > [!NOTE]
-> When running on the simulator with Universal Links (associated domains), you must sign the app with your Apple Developer Team certificate, even for simulator builds.
+> **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, and more. ✨
 
-### Running on a Physical Device
+### Store credentials
+>>>>>>> master
 
-To run the sample app on a physical iOS device, additional setup is required:
+When your users log in, store their credentials securely in the Keychain.
 
-#### Requirements
+```swift
+let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+let didStore = credentialsManager.store(credentials: credentials)
+```
 
-- A paid **Apple Developer account**
-- Your physical device must be registered in your Apple Developer account
-- The app's bundle identifier must be updated to one that's registered to your team
+### Retrieve stored credentials
 
-#### Steps
+Retrieve the stored credentials from the Keychain. If the credentials have expired, they will be automatically renewed using the refresh token.
 
-1. **Register your device**
-   - Go to the [Apple Developer Portal](https://developer.apple.com/account/resources/devices/list)
-   - Add your device by entering its UDID (Xcode can help you find this under **Window > Devices and Simulators**)
+```swift
+credentialsManager.credentials { result in 
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(let error):
+        print("Failed with: \(error)") 
+    }
+}
+```
 
-2. **Update the bundle identifier**
-   - Open the project in Xcode
-   - Select the app target in the project navigator
-   - Go to the **Signing & Capabilities** tab
-   - Update the **Bundle Identifier** to a unique identifier registered to your Apple Developer Team (e.g., `com.yourcompany.auth0demo`)
-   - Ensure **Automatically manage signing** is checked and select your Team
+<details>
+  <summary>Using async/await</summary>
 
-3. **Update Auth0 configuration**
-   - Go to your [Auth0 application settings](https://manage.auth0.com/#/applications/)
-   - Update the **Allowed Callback URLs** and **Allowed Logout URLs** with your new bundle identifier:
-     ```text
-     https://YOUR_AUTH0_DOMAIN/ios/YOUR_NEW_BUNDLE_IDENTIFIER/callback,
-     YOUR_NEW_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_NEW_BUNDLE_IDENTIFIER/callback
-     ```
+```swift
+do {
+    let credentials = try await credentialsManager.credentials()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
 
-4. **Run on device**
-   - Connect your device to your Mac
-   - Select your device from the device menu in Xcode
-   - Press **Cmd+R** or click the **Run** button
-   - If prompted, trust the developer certificate on your device (**Settings > General > VPN & Device Management**)
+### Clear stored credentials
 
-## Logging
+The stored credentials can be removed from the Keychain by using the `clear()` method.
 
-Auth0.swift uses Apple's Unified Logging (OSLog) to help you troubleshoot issues during development. Enable detailed HTTP logging to see network requests, responses, and errors.
+> [!NOTE]
+> It is recommended to call `clear()` when the user logs out of the application to remove their credentials from the Keychain.
 
-### Enable Logging (Network Tracing based logs)
+```swift
+let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+let didClear = credentialsManager.clear()
+```
 
-To enable detailed HTTP request and response tracing during development:
+### Retrieve user information
+
+Fetch the latest user information from the `/userinfo` endpoint.
 
 ```swift
 Auth0
-    .webAuth()
-    .logging(enabled: true)
-    .start { result in
-        // Handle result
-    }
-
-// Or with Authentication client
-Auth0
-        authentication()
-    .logging(enabled: true)
-    .login(usernameOrEmail: "user@example.com", password: "secret")
-    .start { result in
-        // Handle result
-    }
+   .authentication()
+   .userInfo(withAccessToken: credentials.accessToken)
+   .start { result in
+       switch result {
+       case .success(let user):
+           print("Obtained user: \(user)")
+       case .failure(let error):
+           print("Failed with: \(error)")
+       }
+   }
 ```
-For more information, see the [Loggable documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/loggable).
-### Viewing Logs
 
-#### Xcode Console (Recommended)
+<details>
+  <summary>Using async/await</summary>
 
-Logs appear automatically in the Xcode debug console during development on all platforms.
-
-**Filtering in Xcode 15+:**
-
-Use these filter expressions directly in the console search bar:
-
-| Filter | Description |
-|--------|-------------|
-| `subsystem:com.auth0.Auth0` | Show all Auth0 SDK logs |
-| `category:NetworkTracing` | Show only network requests/responses |
-| `category:Configuration` | Show only configuration errors |
-| `subsystem:com.auth0.Auth0 category:NetworkTracing` | Combine filters for specific logs |
-
-### Log Categories
-
-- **NetworkTracing** - HTTP requests and responses
-- **Configuration** - SDK setup and configuration issues
+```swift
+do {
+    let user = try await Auth0
+        .authentication()
+        .userInfo(withAccessToken: credentials.accessToken)
+        .start()
+    print("Obtained user: \(user)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
 
 ## Support Policy
 

@@ -80,4 +80,4 @@ Auth0
 
 ## See Also
 
-- [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md)
+- [FAQ](../../FAQ.md)

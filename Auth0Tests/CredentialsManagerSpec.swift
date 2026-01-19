@@ -1110,6 +1110,337 @@ class CredentialsManagerSpec: QuickSpec {
             }
         }
 
+        describe("retry mechanism for credential renewal") {
+            var credentialsManagerWithRetry: CredentialsManager!
+            
+            beforeEach {
+                credentialsManagerWithRetry = CredentialsManager(authentication: authentication, maxRetries: 2)
+                credentials = Credentials(refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManagerWithRetry.store(credentials: credentials)
+            }
+            
+            afterEach {
+                _ = credentialsManagerWithRetry.clear()
+            }
+            
+            context("network errors") {
+                
+                it("should retry on timeout error and eventually succeed") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .timedOut)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should retry on network connection lost error") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .networkConnectionLost)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should retry on not connected to internet error") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .notConnectedToInternet)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should fail after exhausting all retries on network errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return networkErrorResponse(code: .timedOut)(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(10)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 3 // Initial + 2 retries
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("rate limiting errors") {
+                
+                it("should retry on 429 error and eventually succeed") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return rateLimitErrorResponse()(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should fail after exhausting all retries on 429 errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return rateLimitErrorResponse()(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(10)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 3 // Initial + 2 retries
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("server errors") {
+                
+                it("should retry on 500 error and eventually succeed") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return serverErrorResponse()(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should fail after exhausting all retries on server errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return serverErrorResponse()(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(10)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 3 // Initial + 2 retries
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("non-retryable errors") {
+                
+                it("should not retry on authentication errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return authFailure(code: "invalid_grant", description: "Invalid refresh token")(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(3)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 1 // Should not retry
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not retry on unauthorized errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return apiFailureResponse(json: ["error": "unauthorized", "error_description": "Unauthorized"], statusCode: 401)(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(3)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 1 // Should not retry
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("retry disabled") {
+                
+                it("should not retry when maxRetries is 0") {
+                    var attemptCount = 0
+                    let credentialsManagerNoRetry = CredentialsManager(authentication: authentication, maxRetries: 0)
+                    _ = credentialsManagerNoRetry.store(credentials: credentials)
+                    
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return networkErrorResponse(code: .timedOut)(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(3)) { done in
+                        credentialsManagerNoRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 1 // Should not retry
+                            _ = credentialsManagerNoRetry.clear()
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("exponential backoff") {
+                
+                it("should use exponential backoff between retries") {
+                    var attemptCount = 0
+                    var attemptTimestamps: [Date] = []
+                    
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        attemptTimestamps.append(Date())
+                        
+                        if attemptCount < 3 {
+                            return networkErrorResponse(code: .timedOut)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(10)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 3
+                            
+                            // Verify exponential backoff delays
+                            if attemptTimestamps.count == 3 {
+                                // First retry should be ~0.5s after initial attempt
+                                let delay1 = attemptTimestamps[1].timeIntervalSince(attemptTimestamps[0])
+                                expect(delay1).to(beCloseTo(0.5, within: 0.2))
+                                
+                                // Second retry should be ~1s after first retry
+                                let delay2 = attemptTimestamps[2].timeIntervalSince(attemptTimestamps[1])
+                                expect(delay2).to(beCloseTo(1.0, within: 0.2))
+                            }
+                            
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("async/await") {
+                
+                it("should retry on network errors with async/await") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .timedOut)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        Task {
+                            do {
+                                let creds = try await credentialsManagerWithRetry.credentials()
+                                expect(creds.accessToken) == NewAccessToken
+                                expect(attemptCount) == 2
+                                done()
+                            } catch {
+                                fail("Should not fail: \(error)")
+                                done()
+                            }
+                        }
+                    }
+                }
+            }
+            
+            context("combine") {
+                var cancellables: Set<AnyCancellable>!
+                
+                beforeEach {
+                    cancellables = []
+                }
+                
+                it("should retry on network errors with combine") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .timedOut)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials()
+                            .sink(receiveCompletion: { completion in
+                                if case .failure(let error) = completion {
+                                    fail("Should not fail: \(error)")
+                                }
+                            }, receiveValue: { creds in
+                                expect(creds.accessToken) == NewAccessToken
+                                expect(attemptCount) == 2
+                                done()
+                            })
+                            .store(in: &cancellables)
+                    }
+                }
+            }
+        }
+
         describe("retrieval of api credentials") {
             
             beforeEach {
