@@ -43,7 +43,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#list-authenticators)
      */
-    func getAuthenticators(mfaToken: String, factorsAllowed: [String]) -> Request<[Authenticator], AuthenticationError>
+    func getAuthenticators(mfaToken: String, factorsAllowed: [String]) -> Request<[Authenticator], MfaListAuthenticatorsError>
 
     // MARK: - Phone (SMS) Enrollment
 
@@ -78,7 +78,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#enroll-and-challenge-a-sms-or-voice-authenticator)
      */
-    func enroll(mfaToken: String, phoneNumber: String) -> Request<MFAEnrollmentChallenge, AuthenticationError>
+    func enroll(mfaToken: String, phoneNumber: String) -> Request<MFAEnrollmentChallenge, MfaEnrollmentError>
 
     // MARK: - Challenge
 
@@ -113,7 +113,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#challenge-with-sms-oob-otp)
      */
-    func challenge(with authenticatorId: String, mfaToken: String) -> Request<MFAChallenge, AuthenticationError>
+    func challenge(with authenticatorId: String, mfaToken: String) -> Request<MFAChallenge, MfaChallengeError>
 
     // MARK: - OOB Verification
 
@@ -161,7 +161,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      */
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> Request<Credentials, AuthenticationError>
+                mfaToken: String) -> Request<Credentials, MFAVerifyError>
 
     // MARK: - OTP Enrollment
 
@@ -196,7 +196,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#enroll-and-challenge-a-otp-authenticator)
      */
-    func enroll(mfaToken: String) -> Request<OTPMFAEnrollmentChallenge, AuthenticationError>
+    func enroll(mfaToken: String) -> Request<OTPMFAEnrollmentChallenge, MfaEnrollmentError>
 
     // MARK: - OTP Verification
 
@@ -233,7 +233,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-one-time-password-otp)
      */
     func verify(otp: String,
-                mfaToken: String) -> Request<Credentials, AuthenticationError>
+                mfaToken: String) -> Request<Credentials, MFAVerifyError>
 
     // MARK: - Recovery Code Verification
 
@@ -270,7 +270,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-recovery-code)
      */
     func verify(recoveryCode: String,
-                mfaToken: String) -> Request<Credentials, AuthenticationError>
+                mfaToken: String) -> Request<Credentials, MFAVerifyError>
 
     // MARK: - Push Notification Enrollment
 
@@ -304,7 +304,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#enroll-and-challenge-push-notifications)
      - [Auth0 Guardian](https://auth0.com/docs/secure/multi-factor-authentication/auth0-guardian)
      */
-    func enroll(mfaToken: String) -> Request<PushMFAEnrollmentChallenge, AuthenticationError>
+    func enroll(mfaToken: String) -> Request<PushMFAEnrollmentChallenge, MfaEnrollmentError>
 
     // MARK: - Email Enrollment
 
@@ -339,6 +339,6 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#enroll-and-challenge-a-email-authenticator)
      */
-    func enroll(mfaToken: String, email: String) -> Request<MFAEnrollmentChallenge, AuthenticationError>
+    func enroll(mfaToken: String, email: String) -> Request<MFAEnrollmentChallenge, MfaEnrollmentError>
 
 }

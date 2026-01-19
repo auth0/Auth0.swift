@@ -343,6 +343,81 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 - [**Clear stored credentials**](EXAMPLES.md#clear-stored-credentials) - delete the user's credentials to complete the logout process.
 - [**Retrieve user information**](EXAMPLES.md#retrieve-user-information) - fetch the latest user information from the `/userinfo` endpoint.
 
+## Running the Sample App
+
+This repository includes a sample iOS app in the [App/](App/) directory that demonstrates the SDK's features. Before running the sample app, you need to configure it with your Auth0 credentials.
+
+### Prerequisites
+
+The sample app requires an `Auth0.plist` file to build successfully. This file contains your Auth0 application's Client ID and Domain.
+
+1. Create or update the [App/Auth0.plist](App/Auth0.plist) file with your Auth0 credentials:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>ClientId</key>
+    <string>YOUR_AUTH0_CLIENT_ID</string>
+    <key>Domain</key>
+    <string>YOUR_AUTH0_DOMAIN</string>
+</dict>
+</plist>
+```
+
+2. Replace `YOUR_AUTH0_CLIENT_ID` and `YOUR_AUTH0_DOMAIN` with the actual values from your Auth0 application settings.
+
+### Running on Simulator
+
+To run the sample app on the iOS Simulator:
+
+1. Open the project in Xcode
+2. Ensure the `Auth0.plist` file is configured with your credentials
+3. Select an iOS Simulator from the device menu
+4. Press **Cmd+R** or click the **Run** button
+5. The app will build and launch in the simulator
+
+> [!NOTE]
+> When running on the simulator with Universal Links (associated domains), you must sign the app with your Apple Developer Team certificate, even for simulator builds.
+
+### Running on a Physical Device
+
+To run the sample app on a physical iOS device, additional setup is required:
+
+#### Requirements
+
+- A paid **Apple Developer account**
+- Your physical device must be registered in your Apple Developer account
+- The app's bundle identifier must be updated to one that's registered to your team
+
+#### Steps
+
+1. **Register your device**
+   - Go to the [Apple Developer Portal](https://developer.apple.com/account/resources/devices/list)
+   - Add your device by entering its UDID (Xcode can help you find this under **Window > Devices and Simulators**)
+
+2. **Update the bundle identifier**
+   - Open the project in Xcode
+   - Select the app target in the project navigator
+   - Go to the **Signing & Capabilities** tab
+   - Update the **Bundle Identifier** to a unique identifier registered to your Apple Developer Team (e.g., `com.yourcompany.auth0demo`)
+   - Ensure **Automatically manage signing** is checked and select your Team
+
+3. **Update Auth0 configuration**
+   - Go to your [Auth0 application settings](https://manage.auth0.com/#/applications/)
+   - Update the **Allowed Callback URLs** and **Allowed Logout URLs** with your new bundle identifier:
+     ```text
+     https://YOUR_AUTH0_DOMAIN/ios/YOUR_NEW_BUNDLE_IDENTIFIER/callback,
+     YOUR_NEW_BUNDLE_IDENTIFIER://YOUR_AUTH0_DOMAIN/ios/YOUR_NEW_BUNDLE_IDENTIFIER/callback
+     ```
+
+4. **Run on device**
+   - Connect your device to your Mac
+   - Select your device from the device menu in Xcode
+   - Press **Cmd+R** or click the **Run** button
+   - If prompted, trust the developer certificate on your device (**Settings > General > VPN & Device Management**)
+
 ## Logging
 
 Auth0.swift uses Apple's Unified Logging (OSLog) to help you troubleshoot issues during development. Enable detailed HTTP logging to see network requests, responses, and errors.
