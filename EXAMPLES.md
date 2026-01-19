@@ -2645,12 +2645,20 @@ Auth0
 
 ### MFA client errors
 
-The MFA client will only produce `AuthenticationError` error values. You can use specific error properties to identify MFA-related errors:
+The MFA client produces specific error types for different operations, all conforming to the `MFAError` protocol:
 
-- `isMultifactorRequired`: MFA is required to authenticate
-- `isMultifactorEnrollRequired`: MFA is required and the user is not enrolled
-- `isMultifactorCodeInvalid`: The MFA code sent is invalid or expired
-- `isMultifactorTokenInvalid`: The MFA token is invalid or expired
+- **`MfaListAuthenticatorsError`**: Returned by `getAuthenticators()` when listing authenticators fails
+- **`MfaEnrollmentError`**: Returned by all `enroll()` methods when enrollment fails
+- **`MfaChallengeError`**: Returned by `challenge()` when initiating a challenge fails
+- **`MFAVerifyError`**: Returned by all `verify()` methods when verification fails
+
+All MFA error types provide:
+- `code`: The error code from the API response
+- `statusCode`: The HTTP status code
+- `info`: Raw error information dictionary
+- `getDescription()`: A human-readable error description
+
+#### Example error handling
 
 ```swift
 Auth0
@@ -2660,20 +2668,71 @@ Auth0
         switch result {
         case .success(let credentials):
             print("Success: \(credentials)")
-        case .failure(let error) where error.isMultifactorCodeInvalid:
-            print("Invalid or expired MFA code")
-        case .failure(let error) where error.isMultifactorTokenInvalid:
-            print("Invalid or expired MFA token")
+        case .failure(let error):
+            print("Failed with code: \(error.code)")
+            print("Description: \(error.getDescription())")
+            print("Status code: \(error.statusCode)")
+        }
+    }
+```
+
+#### Handling specific error cases
+
+You can check the `code` property to handle specific error scenarios:
+
+```swift
+Auth0
+    .mfa()
+    .enroll(mfaToken: mfaToken, phoneNumber: "+12025550135")
+    .start { result in
+        switch result {
+        case .success(let challenge):
+            print("Enrollment successful")
+        case .failure(let error):
+            switch error.code {
+            case "invalid_token":
+                print("MFA token is invalid or expired")
+            case "invalid_phone_number":
+                print("Phone number format is invalid")
+            case "unsupported_challenge_type":
+                print("This MFA factor is not supported")
+            default:
+                print("Enrollment failed: \(error.getDescription())")
+            }
+        }
+    }
+```
+
+#### Authentication flow errors
+
+When handling MFA-required errors from the authentication flow (not the MFA client), you'll still receive `AuthenticationError` values. Use these properties to identify MFA-related scenarios:
+
+- `isMultifactorRequired`: MFA is required to authenticate
+- `isMultifactorEnrollRequired`: MFA is required and the user is not enrolled
+- `isMultifactorCodeInvalid`: The MFA code sent is invalid or expired (legacy)
+- `isMultifactorTokenInvalid`: The MFA token is invalid or expired (legacy)
+
+```swift
+Auth0
+    .authentication()
+    .login(usernameOrEmail: "user@example.com", password: "password", realmOrConnection: "Username-Password-Authentication")
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Success: \(credentials)")
+        case .failure(let error) where error.isMultifactorRequired:
+            print("MFA is required")
+            // Extract mfaToken and proceed with MFA flow
         case .failure(let error):
             print("Failed with: \(error)")
         }
     }
 ```
 
-Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about the available `AuthenticationError` properties.
+Check the [MFAError API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/mfaerror) and [AuthenticationError API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more.
 
 > [!WARNING]
-> Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the [error types](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror/#topics) instead, which are part of the API.
+> Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the error `code` property and error types instead, which are part of the API.
 
 [Go up ⤴](#examples)
 

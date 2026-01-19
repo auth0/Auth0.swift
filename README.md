@@ -340,7 +340,6 @@ Explore common use cases and integration patterns for Auth0.swift.
 > **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, and more. ✨
 
 ### Store credentials
->>>>>>> master
 
 When your users log in, store their credentials securely in the Keychain.
 
