@@ -657,11 +657,11 @@
 		D424ED842F15FF9500052186 /* MFAChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D424ED812F15FF9500052186 /* MFAChallenge.swift */; };
 		D424ED852F15FF9500052186 /* MFAChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D424ED812F15FF9500052186 /* MFAChallenge.swift */; };
 		D424ED862F15FF9500052186 /* MFAChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D424ED812F15FF9500052186 /* MFAChallenge.swift */; };
-		D463908B2F18C63400FD84D7 /* MFAError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAError.swift */; };
-		D463908C2F18C63400FD84D7 /* MFAError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAError.swift */; };
-		D463908D2F18C63400FD84D7 /* MFAError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAError.swift */; };
-		D463908E2F18C63400FD84D7 /* MFAError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAError.swift */; };
-		D463908F2F18C63400FD84D7 /* MFAError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAError.swift */; };
+		D463908B2F18C63400FD84D7 /* MFAErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAErrors.swift */; };
+		D463908C2F18C63400FD84D7 /* MFAErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAErrors.swift */; };
+		D463908D2F18C63400FD84D7 /* MFAErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAErrors.swift */; };
+		D463908E2F18C63400FD84D7 /* MFAErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAErrors.swift */; };
+		D463908F2F18C63400FD84D7 /* MFAErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D463908A2F18C63100FD84D7 /* MFAErrors.swift */; };
 		D46390912F18F29100FD84D7 /* RequestValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46390902F18F28700FD84D7 /* RequestValidator.swift */; };
 		D46390922F18F29100FD84D7 /* RequestValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46390902F18F28700FD84D7 /* RequestValidator.swift */; };
 		D46390932F18F29100FD84D7 /* RequestValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46390902F18F28700FD84D7 /* RequestValidator.swift */; };
@@ -1096,7 +1096,7 @@
 		D424ED752F15FF8100052186 /* PushMFAEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushMFAEnrollmentChallenge.swift; sourceTree = "<group>"; };
 		D424ED7B2F15FF8B00052186 /* MFAEnrollmentChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAEnrollmentChallenge.swift; sourceTree = "<group>"; };
 		D424ED812F15FF9500052186 /* MFAChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAChallenge.swift; sourceTree = "<group>"; };
-		D463908A2F18C63100FD84D7 /* MFAError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAError.swift; sourceTree = "<group>"; };
+		D463908A2F18C63100FD84D7 /* MFAErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAErrors.swift; sourceTree = "<group>"; };
 		D46390902F18F28700FD84D7 /* RequestValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestValidator.swift; sourceTree = "<group>"; };
 		D46390962F18F59800FD84D7 /* ListAuthenticatorsValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListAuthenticatorsValidator.swift; sourceTree = "<group>"; };
 		D463909C2F19C32000FD84D7 /* MFAHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAHandlers.swift; sourceTree = "<group>"; };
@@ -1768,7 +1768,7 @@
 			children = (
 				D463909C2F19C32000FD84D7 /* MFAHandlers.swift */,
 				D46390962F18F59800FD84D7 /* ListAuthenticatorsValidator.swift */,
-				D463908A2F18C63100FD84D7 /* MFAError.swift */,
+				D463908A2F18C63100FD84D7 /* MFAErrors.swift */,
 				D424ED812F15FF9500052186 /* MFAChallenge.swift */,
 				D424ED7B2F15FF8B00052186 /* MFAEnrollmentChallenge.swift */,
 				D424ED752F15FF8100052186 /* PushMFAEnrollmentChallenge.swift */,
@@ -2503,7 +2503,7 @@
 				5CB41D4423D0BA2C00074024 /* IDTokenSignatureValidator.swift in Sources */,
 				5CB41D4C23D0BA2C00074024 /* Optional+DebugDescription.swift in Sources */,
 				5C505FB62E21669F005D0757 /* SenderConstraining.swift in Sources */,
-				D463908B2F18C63400FD84D7 /* MFAError.swift in Sources */,
+				D463908B2F18C63400FD84D7 /* MFAErrors.swift in Sources */,
 				5C4F551A23C8FB8E00C89615 /* String+URLSafe.swift in Sources */,
 				62610F662EE5B2F4006BB7A9 /* SensitiveDataRedactor.swift in Sources */,
 				5C79AE0C2E040CA900CD0D41 /* DPoP.swift in Sources */,
@@ -2710,7 +2710,7 @@
 				5FDE875A1D8A424700EA27DC /* Authentication.swift in Sources */,
 				5C41F6D8244F976200252548 /* WebAuth.swift in Sources */,
 				5C41F6CC244F96F200252548 /* ClaimValidators.swift in Sources */,
-				D463908F2F18C63400FD84D7 /* MFAError.swift in Sources */,
+				D463908F2F18C63400FD84D7 /* MFAErrors.swift in Sources */,
 				5C41F6D9244F977900252548 /* WebAuthError.swift in Sources */,
 				D424ED862F15FF9500052186 /* MFAChallenge.swift in Sources */,
 				5FCAB1741D09009600331C84 /* NSData+URLSafe.swift in Sources */,
@@ -2925,7 +2925,7 @@
 				62BD27022EEA928F001FC67C /* SynchronizationBarrier.swift in Sources */,
 				5C505FC72E216784005D0757 /* ECPublicKey.swift in Sources */,
 				5F23E6DC1D4ACD6100C3F2D9 /* NSData+URLSafe.swift in Sources */,
-				D463908D2F18C63400FD84D7 /* MFAError.swift in Sources */,
+				D463908D2F18C63400FD84D7 /* MFAErrors.swift in Sources */,
 				5F23E6E61D4ACD8500C3F2D9 /* Requestable.swift in Sources */,
 				5C79AE092E040CA900CD0D41 /* DPoP.swift in Sources */,
 				6287D5C92EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */,
@@ -3008,7 +3008,7 @@
 				62BD27002EEA928F001FC67C /* SynchronizationBarrier.swift in Sources */,
 				5C505FC82E216784005D0757 /* ECPublicKey.swift in Sources */,
 				5F23E7061D4B88EA00C3F2D9 /* NSData+URLSafe.swift in Sources */,
-				D463908E2F18C63400FD84D7 /* MFAError.swift in Sources */,
+				D463908E2F18C63400FD84D7 /* MFAErrors.swift in Sources */,
 				5F23E70F1D4B88FC00C3F2D9 /* Requestable.swift in Sources */,
 				5C79AE0A2E040CA900CD0D41 /* DPoP.swift in Sources */,
 				6287D5C72EE30033001E1651 /* OSUnifiedLoggingService.swift in Sources */,
@@ -3101,7 +3101,7 @@
 				5CFB82522D5BF324009FD237 /* APICredentials.swift in Sources */,
 				C1B3B9F42C24B6D4004A32A4 /* UserInfo.swift in Sources */,
 				D4ABFE6F2F10BEA9000C828C /* MFARequiredErrorPayload.swift in Sources */,
-				D463908C2F18C63400FD84D7 /* MFAError.swift in Sources */,
+				D463908C2F18C63400FD84D7 /* MFAErrors.swift in Sources */,
 				D424ED7C2F15FF8B00052186 /* MFAEnrollmentChallenge.swift in Sources */,
 				D46390A02F19C32400FD84D7 /* MFAHandlers.swift in Sources */,
 				C1B3B9F52C24B6D4004A32A4 /* Credentials.swift in Sources */,
