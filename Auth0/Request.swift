@@ -193,8 +193,11 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        method: method,
                        requestValidator: requestValidator,
                        handle: handle,
+                       parameters: parameters,
+                       headers: headers,
                        logger: logger,
-                       telemetry: telemetry)
+                       telemetry: telemetry,
+                       dpop: dpop)
     }
 }
 
