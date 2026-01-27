@@ -16,5 +16,9 @@
 	<dict/>
 	<key>UILaunchScreen</key>
 	<dict/>
+	<key>WKAppBoundDomains</key>
+	<array>
+		<string>passkeystestdomain.acmetest.org</string>
+	</array>
 </dict>
 </plist>

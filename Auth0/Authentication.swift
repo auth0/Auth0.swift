@@ -169,6 +169,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      Verifies multi-factor authentication (MFA) using a one-time password (OTP).
 
      ## Usage
+     ## Usage
 
      ```swift
      Auth0

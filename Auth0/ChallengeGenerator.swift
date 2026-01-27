@@ -1,6 +1,6 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
-import CommonCrypto
+import CryptoKit
 
 private func getVerifier() -> String {
     let data = Data(count: 32)
@@ -13,11 +13,8 @@ private func getVerifier() -> String {
 
 private func getChallenge(for verifier: String) -> String {
     let data = verifier.data(using: .utf8)!
-    var buffer = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
-    _ = data.withUnsafeBytes {
-        CC_SHA256($0.baseAddress, CC_LONG(data.count), &buffer)
-    }
-    return Data(buffer).encodeBase64URLSafe()
+    let hash = SHA256.hash(data: data)
+    return Data(hash).encodeBase64URLSafe()
 }
 
 struct ChallengeGenerator {

@@ -94,7 +94,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
     private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
         var request = request
-
+        print(request.cURL(pretty: true))
         do {
             try runClientValidation()
         } catch {
@@ -185,6 +185,19 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        dpop: self.dpop)
     }
 
+    /**
+     Adds client-side validators to the request.
+
+     Validators are called before the HTTP request is sent to catch invalid parameters early.
+     The provided validators are prepended to any existing validators and executed in order.
+
+     - Parameter extraValidators: Additional validators to apply to this request.
+     - Returns: A new request instance with the validators added.
+
+     ## See Also
+
+     - ``RequestValidator``
+     */
     public func requestValidators(_ extraValidators: [RequestValidator]) -> Self {
         var requestValidator = extraValidators
         requestValidator.append(contentsOf: self.requestValidator)
@@ -236,3 +249,24 @@ public extension Request {
 
 }
 #endif
+
+extension URLRequest {
+    public func cURL(pretty: Bool = false) -> String {
+        let newLine = pretty ? "\\\n" : ""
+        let method = (pretty ? "--request " : "-X ") + "\(self.httpMethod ?? "GET") \(newLine)"
+        let url: String = (pretty ? "--url " : "") + "\'\(self.url?.absoluteString ?? "")\' \(newLine)"
+        var cURL = "curl "
+        var header = ""
+        var data: String = ""
+        if let httpHeaders = self.allHTTPHeaderFields, httpHeaders.keys.isEmpty == false {
+            for (key,value) in httpHeaders {
+                header += (pretty ? "--header " : "-H ") + "\'\(key): \(value)\' \(newLine)"
+            }
+        }
+        if let bodyData = self.httpBody, let bodyString = String(data: bodyData, encoding: .utf8),  !bodyString.isEmpty {
+            data = "--data '\(bodyString)'"
+        }
+        cURL += method + url + header + data
+        return cURL
+    }
+}

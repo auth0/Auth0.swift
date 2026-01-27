@@ -9,6 +9,93 @@ struct ContentView: View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
+                    // List Section
+                    VStack(alignment: .leading, spacing: 10) {
+                        
+                        if let enrollmentTypes = viewModel.enrollmentTypes {
+                            Text("Enrollments")
+                                .font(.headline)
+                                .padding(.horizontal)
+                            ForEach(enrollmentTypes, id: \.self) { enrollmentType in
+                                NavigationLink {
+                                    if enrollmentType.type == "otp" || enrollmentType.type == "push-notification" {
+                                        QRView(viewModel: QRViewModel(mfaToken: viewModel.mfaToken, type: enrollmentType.type))
+                                    } else if enrollmentType.type == "phone" {
+                                        PhoneView(viewModel: PhoneViewModel(mfaToken: viewModel.mfaToken))
+                                    } else if enrollmentType.type == "recovery-code" {
+                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: ""))
+                                    }
+                                } label: {
+                                    Text(enrollmentType.type)
+                                }.background(Color.white)
+                            }
+                        }
+                        
+                        if let authenticators = viewModel.authenticators {
+                            Text("Authenticators")
+                                .font(.headline)
+                                .padding(.horizontal)
+                            ForEach(authenticators, id: \.self) { authenticator in
+                                NavigationLink {
+                                    if authenticator.authenticatorType == "oob" {
+                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
+                                    } else if authenticator.authenticatorType == "otp" {
+                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
+                                    } else {
+                                        PushChallengeView(viewModel: PushChallengeViewModel(mfaToken: viewModel.mfaToken, authenticatorId: authenticator.id))
+                                    }
+                                } label: {
+                                    Text(authenticator.id)
+                                }.background(Color.white)
+                            }
+                        }
+                    }
+                    
+                    // Authentication Section
+                    VStack(spacing: 15) {
+                        // Error Message
+                        if let errorMessage = viewModel.errorMessage {
+                            Text(errorMessage)
+                                .foregroundColor(.red)
+                                .font(.caption)
+                                .padding(.horizontal)
+                        }
+                        
+                        // Email TextField
+                        TextField("Email", text: $viewModel.email)
+                            .textContentType(.emailAddress)
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
+                            .disabled(viewModel.isLoading)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(10)
+                            .padding(.horizontal)
+                        
+                        // Password SecureField
+                        SecureField("Password", text: $viewModel.password)
+                            .textContentType(.password)
+                            .disabled(viewModel.isLoading)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(10)
+                            .padding(.horizontal)
+                        
+                        // Login Button (Direct Authentication)
+                        Button {
+                            Task {
+                                await viewModel.login(email: viewModel.email, password: viewModel.password)
+                            }
+                        } label: {
+                            if viewModel.isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            } else {
+                                Text("Login")
+                            }
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(viewModel.isLoading)
                         
                         // Web Login Button (Universal Login)
                         Button {
@@ -38,9 +125,21 @@ struct ContentView: View {
                                 .foregroundColor(.green)
                                 .font(.caption)
                         }
+                        
+                        Button("Button 4") {
+                            // Action
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        
+                        Button("Button 5") {
+                            // Action
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
                     }
                     .padding(.horizontal)
                     .padding(.top, 10)
+                }
+                .padding(.vertical)
             }
         }
         .task {

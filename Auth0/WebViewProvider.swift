@@ -93,6 +93,11 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         let configuration = WKWebViewConfiguration()
         configuration.setURLSchemeHandler(self, forURLScheme: redirectURL.scheme!)
         self.webview = WKWebView(frame: .zero, configuration: configuration)
+        if #available(iOS 16.4, *) {
+            self.webview.isInspectable = true
+        } else {
+            // Fallback on earlier versions
+        }
         self.viewController.view = webview
         webview.navigationDelegate = self
     }
@@ -100,6 +105,11 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     private func setupWebViewWithHTTPS() {
         self.webview = WKWebView(frame: .zero)
         self.viewController.view = webview
+        if #available(iOS 16.4, *) {
+            self.webview.isInspectable = true
+        } else {
+            // Fallback on earlier versions
+        }
         webview.navigationDelegate = self
     }
 
