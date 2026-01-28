@@ -89,6 +89,23 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
     return authentication(clientId: values.clientId, domain: values.domain, session: session)
 }
 
+
+public func mfa(clientId: String,
+                domain: String,
+                session: URLSession = .shared) -> MFAClient {
+    return Auth0MFAClient(clientId: clientId,
+                          url: .httpsURL(from: domain),
+                          session: session)
+}
+
+public func mfa(session: URLSession = .shared,
+                bundle: Bundle = .main) -> MFAClient {
+    let values = plistValues(bundle: bundle)!
+    return mfa(clientId: values.clientId,
+               domain: values.domain,
+               session: session)
+}
+
 /**
  [Management API v2](https://auth0.com/docs/api/management/v2) client for performing operations with the Users endpoints.
 

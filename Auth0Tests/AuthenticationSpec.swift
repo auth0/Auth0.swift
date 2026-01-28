@@ -91,7 +91,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
             it("should fail login with bad otp") {
                 waitUntil(timeout: Timeout) { done in
                     auth.login(withOTP: "bad_otp", mfaToken: MFAToken).start { result in
@@ -100,7 +100,7 @@ class AuthenticationSpec: QuickSpec {
                     }
                 }
             }
-            
+
             it("should fail login with invalid mfa") {
                 waitUntil(timeout: Timeout) { done in
                     auth.login(withOTP: OTP, mfaToken: "bad_token").start { result in
