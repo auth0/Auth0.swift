@@ -13,7 +13,8 @@ final class ContentViewModel: ObservableObject {
     func webLogin() async {
         isLoading = true
         errorMessage = nil
-        
+    
+        #if !os(tvOS) && !os(watchOS)
         do {
             let credentials = try await Auth0
                 .webAuth()
@@ -34,6 +35,7 @@ final class ContentViewModel: ObservableObject {
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
+        #endif
         
         isLoading = false
     }
@@ -42,7 +44,7 @@ final class ContentViewModel: ObservableObject {
     func logout() async {
         isLoading = true
         errorMessage = nil
-        
+        #if !os(tvOS) && !os(watchOS)
         do {
             try await Auth0
                 .webAuth()
@@ -60,6 +62,7 @@ final class ContentViewModel: ObservableObject {
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
+        #endif
         
         isLoading = false
     }
