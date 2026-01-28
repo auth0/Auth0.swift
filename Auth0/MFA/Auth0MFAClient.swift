@@ -134,6 +134,7 @@ struct Auth0MFAClient: MFAClient {
                        method: "POST",
                        handle: mfaEnrollDecodable,
                        parameters: payload,
+                       headers: baseHeaders(accessToken: mfaToken, tokenType: "Bearer"),
                        logger: logger,
                        telemetry: telemetry)
     }

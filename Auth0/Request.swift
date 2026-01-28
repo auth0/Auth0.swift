@@ -94,14 +94,8 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
     private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
         var request = request
-
         do {
             try runClientValidation()
-        } catch {
-            handle(.failure(E(cause: error)), callback)
-            return
-        }
-        do {
             if let dpop = dpop, try dpop.shouldGenerateProof(for: url, parameters: parameters) {
                 let proof = try dpop.generateProof(for: request as URLRequest)
                 request.setValue(proof, forHTTPHeaderField: "DPoP")
