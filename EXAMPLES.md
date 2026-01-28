@@ -1755,6 +1755,10 @@ To use the MFA API, you need to:
 
 When a user attempts to log in and MFA is required, you'll receive an `AuthenticationError` with the `isMultifactorRequired` property set to `true`. This error contains an MFA token that you'll need for subsequent MFA operations.
 
+The error payload includes two fields:
+- **`enroll`**: Available when the user needs to enroll a new MFA factor. Contains the types of factors they can enroll.
+- **`challenge`**: Available when the user has already enrolled MFA factors. Contains the types of factors available to challenge.
+
 ```swift
 Auth0
     .authentication()
@@ -1774,14 +1778,18 @@ Auth0
 
                 // Check if enrollment is required
                 if let enrollTypes = mfaPayload.mfaRequirements.enroll {
+                    print("User needs to enroll MFA")
                     print("Available enrollment types: \(enrollTypes.map { $0.type })")
-                    // Proceed with MFA enrollment
+                    // Example output: ["otp", "phone", "push-notification"]
+                    // Proceed with MFA enrollment using one of these types
                 }
 
-                // Check if challenge is available
+                // Check if challenge is available (user already enrolled)
                 if let challengeTypes = mfaPayload.mfaRequirements.challenge {
+                    print("User has enrolled MFA factors")
                     print("Available challenge types: \(challengeTypes.map { $0.type })")
-                    // Proceed with MFA challenge
+                    // Example output: ["otp", "phone"]
+                    // Get authenticators and challenge one of them
                 }
             }
         case .failure(let error):
@@ -1811,12 +1819,16 @@ do {
 
         // Check if enrollment is required
         if let enrollTypes = mfaPayload.mfaRequirements.enroll {
+            print("User needs to enroll MFA")
             print("Available enrollment types: \(enrollTypes.map { $0.type })")
+            // Example output: ["otp", "phone", "push-notification"]
         }
 
-        // Check if challenge is available
+        // Check if challenge is available (user already enrolled)
         if let challengeTypes = mfaPayload.mfaRequirements.challenge {
+            print("User has enrolled MFA factors")
             print("Available challenge types: \(challengeTypes.map { $0.type })")
+            // Example output: ["otp", "phone"]
         }
     }
 } catch {
@@ -1844,11 +1856,15 @@ Auth0
             print("MFA token: \(mfaToken)")
 
             if let enrollTypes = mfaPayload.mfaRequirements.enroll {
+                print("User needs to enroll MFA")
                 print("Available enrollment types: \(enrollTypes.map { $0.type })")
+                // Example output: ["otp", "phone", "push-notification"]
             }
 
             if let challengeTypes = mfaPayload.mfaRequirements.challenge {
+                print("User has enrolled MFA factors")
                 print("Available challenge types: \(challengeTypes.map { $0.type })")
+                // Example output: ["otp", "phone"]
             }
         }
     }, receiveValue: { credentials in
@@ -1860,12 +1876,15 @@ Auth0
 
 ### Get available authenticators
 
-After receiving an MFA token, you can retrieve the list of available authenticators that the user can enroll or use for authentication.
+After receiving an MFA token, you can retrieve the list of available authenticators that the user has already enrolled. Use the factors from the `challenge` field of the MFA required error payload to filter the authenticators.
 
 ```swift
+// Extract factors from the challenge field of MFA required error payload
+let factorsAllowed = mfaPayload.mfaRequirements.challenge?.map { $0.type } ?? []
+
 Auth0
     .mfa()
-    .getAuthenticators(mfaToken: mfaToken, factorsAllowed: ["otp", "oob", "push-notification"])
+    .getAuthenticators(mfaToken: mfaToken, factorsAllowed: factorsAllowed)
     .start { result in
         switch result {
         case .success(let authenticators):
@@ -1883,10 +1902,13 @@ Auth0
   <summary>Using async/await</summary>
 
 ```swift
+// Extract factors from the challenge field of MFA required error payload
+let factorsAllowed = mfaPayload.mfaRequirements.challenge?.map { $0.type } ?? []
+
 do {
     let authenticators = try await Auth0
         .mfa()
-        .getAuthenticators(mfaToken: mfaToken, factorsAllowed: ["otp", "oob", "push-notification"])
+        .getAuthenticators(mfaToken: mfaToken, factorsAllowed: factorsAllowed)
         .start()
     print("Available authenticators: \(authenticators)")
     for authenticator in authenticators {
@@ -1902,9 +1924,12 @@ do {
   <summary>Using Combine</summary>
 
 ```swift
+// Extract factors from the challenge field of MFA required error payload
+let factorsAllowed = mfaPayload.mfaRequirements.challenge?.map { $0.type } ?? []
+
 Auth0
     .mfa()
-    .getAuthenticators(mfaToken: mfaToken, factorsAllowed: ["otp", "oob", "push-notification"])
+    .getAuthenticators(mfaToken: mfaToken, factorsAllowed: factorsAllowed)
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {
@@ -2050,7 +2075,7 @@ Auth0
         switch result {
         case .success(let challenge):
             print("OTP enrollment initiated")
-            if let barcodeUri = challenge.barcode {
+            if let barcodeUri = challenge.barcodeUri {
                 print("QR Code URI: \(barcodeUri)")
                 // Display this as a QR code for the user to scan
             }
@@ -2076,7 +2101,7 @@ do {
         .enroll(mfaToken: mfaToken)
         .start()
     print("OTP enrollment initiated")
-    if let barcodeUri = challenge.barcode {
+    if let barcodeUri = challenge.barcodeUri {
         print("QR Code URI: \(barcodeUri)")
     }
     if let secret = challenge.secret {
@@ -2102,7 +2127,7 @@ Auth0
         }
     }, receiveValue: { challenge in
         print("OTP enrollment initiated")
-        if let barcodeUri = challenge.barcode {
+        if let barcodeUri = challenge.barcodeUri {
             print("QR Code URI: \(barcodeUri)")
         }
         if let secret = challenge.secret {
@@ -2507,7 +2532,7 @@ Auth0
                     switch enrollResult {
                     case .success(let challenge):
                         // Step 3: Display QR code to user
-                        if let barcodeUri = challenge.barcode {
+                        if let barcodeUri = challenge.barcodeUri {
                             print("Show this QR code to user: \(barcodeUri)")
                             // Generate and display QR code from this URI
                         }
@@ -2555,18 +2580,22 @@ Auth0
             print("Login successful: \(credentials)")
 
         case .failure(let error) where error.isMultifactorRequired:
-            guard let mfaToken = error.mfaRequiredErrorPayload?.mfaToken else { return }
+            guard let mfaPayload = error.mfaRequiredErrorPayload else { return }
+            let mfaToken = mfaPayload.mfaToken
 
-            // Step 2: Get available authenticators
+            // Step 2: Extract factors from the challenge field
+            let factorsAllowed = mfaPayload.mfaRequirements.challenge?.map { $0.type } ?? []
+
+            // Step 3: Get available authenticators
             Auth0
                 .mfa()
-                .getAuthenticators(mfaToken: mfaToken, factorsAllowed: ["otp", "oob"])
+                .getAuthenticators(mfaToken: mfaToken, factorsAllowed: factorsAllowed)
                 .start { authResult in
                     switch authResult {
                     case .success(let authenticators):
                         guard let authenticator = authenticators.first else { return }
 
-                        // Step 3: Challenge the authenticator
+                        // Step 4: Challenge the authenticator
                         Auth0
                             .mfa()
                             .challenge(with: authenticator.id, mfaToken: mfaToken)
@@ -2575,10 +2604,10 @@ Auth0
                                 case .success(let challenge):
                                     print("Challenge sent: \(challenge)")
 
-                                    // Step 4: User enters the code
+                                    // Step 5: User enters the code
                                     let userCode = "123456" // Get from user input
 
-                                    // Step 5: Verify based on challenge type
+                                    // Step 6: Verify based on challenge type
                                     if challenge.challengeType == "oob" {
                                         Auth0
                                             .mfa()
@@ -2645,7 +2674,7 @@ Auth0
 
 ### MFA client errors
 
-The MFA client produces specific error types for different operations, all conforming to the `MFAError` protocol:
+The MFA client produces specific error types for different operations, all conforming to the `Auth0APIError` protocol:
 
 - **`MfaListAuthenticatorsError`**: Returned by `getAuthenticators()` when listing authenticators fails
 - **`MfaEnrollmentError`**: Returned by all `enroll()` methods when enrollment fails
@@ -2656,7 +2685,11 @@ All MFA error types provide:
 - `code`: The error code from the API response
 - `statusCode`: The HTTP status code
 - `info`: Raw error information dictionary
-- `getDescription()`: A human-readable error description
+- `localizedDescription`: A human-readable error description (inherited from `LocalizedError`)
+- `debugDescription`: A detailed description for debugging purposes
+- `cause`: The underlying `Error` value, if any (useful for network errors)
+- `isNetworkError`: Whether the request failed due to network issues
+- `isRetryable`: Whether the error is retryable (network errors, rate limiting, or server errors)
 
 #### Example error handling
 
@@ -2670,11 +2703,39 @@ Auth0
             print("Success: \(credentials)")
         case .failure(let error):
             print("Failed with code: \(error.code)")
-            print("Description: \(error.getDescription())")
+            print("Description: \(error.localizedDescription)")
             print("Status code: \(error.statusCode)")
         }
     }
 ```
+
+#### Common error codes
+
+Each MFA error type provides specific error codes to help you handle different scenarios:
+
+**MfaListAuthenticatorsError** (from `getAuthenticators()`):
+- `invalid_request`: Request parameters are invalid (e.g., missing or empty factorsAllowed)
+- `invalid_token`: MFA token is invalid or expired
+- `access_denied`: User lacks permission to access this resource
+
+**MfaEnrollmentError** (from `enroll()` methods):
+- `invalid_request`: Enrollment parameters are invalid
+- `invalid_token`: MFA token is invalid or expired
+- `enrollment_conflict`: Authenticator is already enrolled
+- `unsupported_challenge_type`: Requested factor type is not enabled
+
+**MfaChallengeError** (from `challenge()`):
+- `invalid_request`: Challenge parameters are invalid
+- `invalid_token`: MFA token is invalid or expired
+- `authenticator_not_found`: Specified authenticator doesn't exist
+- `unsupported_challenge_type`: Authenticator type doesn't support challenges
+
+**MFAVerifyError** (from `verify()` methods):
+- `invalid_grant`: Verification code is incorrect or expired
+- `invalid_token`: MFA token is invalid or expired
+- `invalid_oob_code`: Out-of-band code is invalid
+- `invalid_binding_code`: Binding code (SMS/email code) is incorrect
+- `expired_token`: Verification code has expired
 
 #### Handling specific error cases
 
@@ -2697,11 +2758,46 @@ Auth0
             case "unsupported_challenge_type":
                 print("This MFA factor is not supported")
             default:
-                print("Enrollment failed: \(error.getDescription())")
+                print("Enrollment failed: \(error.localizedDescription)")
             }
         }
     }
 ```
+
+#### Network and retryable errors
+
+MFA errors inherit `isNetworkError` and `isRetryable` properties from `Auth0APIError` to help handle transient failures:
+
+```swift
+Auth0
+    .mfa()
+    .verify(otp: "123456", mfaToken: mfaToken)
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Success: \(credentials)")
+        case .failure(let error):
+            if error.isNetworkError {
+                print("Network connectivity issue - check your connection")
+            } else if error.isRetryable {
+                print("Request can be retried (rate limiting or server error)")
+            } else {
+                print("Permanent error: \(error.localizedDescription)")
+            }
+        }
+    }
+```
+
+The `isNetworkError` property returns `true` for network-related failures such as:
+- No internet connection
+- DNS lookup failures
+- Connection timeouts
+- Data not allowed
+
+The `isRetryable` property returns `true` for errors that can be retried:
+- Network errors (as determined by `isNetworkError`)
+- Rate limiting errors (HTTP 429)
+- Server errors (HTTP 5xx)
 
 #### Authentication flow errors
 
@@ -2729,7 +2825,7 @@ Auth0
     }
 ```
 
-Check the [MFAError API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/mfaerror) and [AuthenticationError API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more.
+Check the [Auth0APIError API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/auth0apierror) and [AuthenticationError API documentation](https://auth0.github.io/Auth0.swift/documentation/auth0/authenticationerror) to learn more about error handling.
 
 > [!WARNING]
 > Do not parse or otherwise rely on the error messages to handle the errors. The error messages are not part of the API and can change. Use the error `code` property and error types instead, which are part of the API.

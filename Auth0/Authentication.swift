@@ -195,6 +195,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-mfa-with-otp)
      */
+    @available(*, deprecated, message: "Use MFAClient APIs instead")
     func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either push notification, SMS
@@ -227,6 +228,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// ## See Also
     ///
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-out-of-band)
+    @available(*, deprecated, message: "Use MFAClient APIs instead")
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using a recovery code.
@@ -262,6 +264,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     ///
     /// - ``Credentials/recoveryCode``
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-recovery-code)
+    @available(*, deprecated, message: "Use MFAClient APIs instead")
     func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
 
     /// Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
@@ -296,6 +299,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// ## See Also
     ///
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/request-mfa-challenge)
+    @available(*, deprecated, message: "Use MFAClient APIs instead")
     func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
 
     /**
@@ -1168,10 +1172,12 @@ public extension Authentication {
         return self.login(usernameOrEmail: username, password: password, realmOrConnection: realm, audience: audience, scope: scope)
     }
 
+    @available(*, deprecated, message: "Use MFAClient APIs instead")
     func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(withOOBCode: oobCode, mfaToken: mfaToken, bindingCode: bindingCode)
     }
 
+    @available(*, deprecated, message: "Use MFAClient APIs instead")
     func multifactorChallenge(mfaToken: String, types: [String]? = nil, authenticatorId: String? = nil) -> Request<Challenge, AuthenticationError> {
         return self.multifactorChallenge(mfaToken: mfaToken, types: types, authenticatorId: authenticatorId)
     }

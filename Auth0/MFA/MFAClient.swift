@@ -41,7 +41,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#list-authenticators)
+     - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/list-authenticators)
      */
     func getAuthenticators(mfaToken: String, factorsAllowed: [String]) -> Request<[Authenticator], MfaListAuthenticatorsError>
 
@@ -76,7 +76,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#enroll-and-challenge-a-sms-or-voice-authenticator)
+     - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/add-an-authenticator)
      */
     func enroll(mfaToken: String, phoneNumber: String) -> Request<MFAEnrollmentChallenge, MfaEnrollmentError>
 
@@ -111,7 +111,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#challenge-with-sms-oob-otp)
+     - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/request-mfa-challenge)
      */
     func challenge(with authenticatorId: String, mfaToken: String) -> Request<MFAChallenge, MfaChallengeError>
 
@@ -157,7 +157,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-out-of-band-oob)
+     - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-out-of-band)
      */
     func verify(oobCode: String,
                 bindingCode: String?,
@@ -194,7 +194,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#enroll-and-challenge-a-otp-authenticator)
+     - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/add-an-authenticator)
      */
     func enroll(mfaToken: String) -> Request<OTPMFAEnrollmentChallenge, MfaEnrollmentError>
 
@@ -230,7 +230,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-one-time-password-otp)
+     - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-mfa-with-otp)
      */
     func verify(otp: String,
                 mfaToken: String) -> Request<Credentials, MFAVerifyError>
@@ -267,7 +267,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#verify-with-recovery-code)
+     - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-recovery-code)
      */
     func verify(recoveryCode: String,
                 mfaToken: String) -> Request<Credentials, MFAVerifyError>
@@ -301,7 +301,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#enroll-and-challenge-push-notifications)
+     - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/add-an-authenticator)
      - [Auth0 Guardian](https://auth0.com/docs/secure/multi-factor-authentication/auth0-guardian)
      */
     func enroll(mfaToken: String) -> Request<PushMFAEnrollmentChallenge, MfaEnrollmentError>
@@ -337,7 +337,7 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
 
      ## See Also
 
-     - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#enroll-and-challenge-a-email-authenticator)
+     - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/add-an-authenticator)
      */
     func enroll(mfaToken: String, email: String) -> Request<MFAEnrollmentChallenge, MfaEnrollmentError>
 
