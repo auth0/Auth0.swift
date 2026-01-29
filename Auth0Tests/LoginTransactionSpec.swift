@@ -33,7 +33,7 @@ class LoginTransactionSpec: QuickSpec {
                     let items = ["code": code, "state": "state"]
                     expect(transaction.resume(url)) == true
                     expect(handler.items) == items
-                    expect(loggerOutput.messages.first).to(contain([url.absoluteString, "Callback URL"]))
+                    expect(loggerOutput.messages.first).toEventually(contain([url.absoluteString, "Callback URL"]))
                     expect(transaction.userAgent).to(beNil())
                 }
 

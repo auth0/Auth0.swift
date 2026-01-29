@@ -2,7 +2,7 @@
 import Foundation
 
 /// Defines the policy for when a biometric prompt should be shown when using the Credentials Manager.
-public enum BiometricPolicy {
+public enum BiometricPolicy: Sendable {
     
     /// Default behavior. Uses the same LAContext instance, allowing the system to manage biometric prompts.
     /// The system may skip the prompt if biometric authentication was recently successful.

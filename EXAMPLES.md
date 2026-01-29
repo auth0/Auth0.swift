@@ -377,6 +377,28 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 > 
 > To avoid concurrency issues, do not call its non thread-safe methods and properties from different threads without proper synchronization.
 
+> [!NOTE]
+> **Swift 6 Sendability Support**: The Credentials Manager conforms to `Sendable`, which allows it to be passed across concurrency boundaries (like into actors). However, this does **not** make all its methods thread-safe. Only the methods listed above (`credentials()`, `apiCredentials()`, `ssoCredentials()`, `renew()`) are thread-safe. Other methods and properties still require proper synchronization when called from multiple threads.
+>
+> ```swift
+> // Example: Using CredentialsManager in an Actor (Swift 6)
+> actor AuthService {
+>     let credentialsManager: CredentialsManager
+>     
+>     init() {
+>         self.credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+>     }
+>     
+>     func fetchCredentials() async throws -> Credentials {
+>         // Safe to call from within an actor
+>         return try await credentialsManager.credentials(withScope: "openid profile email",
+>                                                         minTTL: 60,
+>                                                         parameters: [:],
+>                                                         headers: [:])
+>     }
+> }
+> ```
+
 ### Store credentials
 
 When your users log in, store their credentials securely in the Keychain. You can then check if their credentials are still valid when they open your app again.
@@ -461,6 +483,45 @@ credentialsManager
 
 > [!CAUTION]
 > To ensure that no concurrent renewal requests get made, do not call this method from multiple Credentials Manager instances. The Credentials Manager cannot synchronize requests across instances.
+
+#### Automatic retry on transient errors
+
+The Credentials Manager includes automatic retry logic for credential renewal when transient errors occur. This helps handle scenarios where network requests fail temporarily, such as:
+
+- Network connectivity issues (timeouts, connection lost, DNS failures)
+- Rate limiting responses (HTTP 429)
+- Server errors (HTTP 5xx)
+
+**How it works:**
+
+When a renewal request fails due to a transient error, the Credentials Manager will automatically retry the request with exponential backoff (0.5s, 1s, 2s, 4s, etc.). This addresses the following scenario:
+
+1. Request A calls `credentials()` and starts a token refresh
+2. Request A successfully hits the server and gets new credentials
+3. Request A fails on the way back (network issue), never reaching the client
+4. The retry mechanism automatically retries the failed request using the same (old) refresh token
+
+To fully leverage the retry mechanism, ensure your Auth0 tenant's **Rotation Overlap Period** is set to at least 180 seconds. This overlap window ensures the old refresh token remains valid during retry attempts even if the backend resource was already updated. You can configure this setting in your Auth0 Dashboard under **Applications > [Your Application] > Settings > Refresh Token Rotation**.
+
+**Configure retry behavior:**
+
+By default, retries are disabled. You can enable retries by specifying a maximum retry count when creating the Credentials Manager. It is advisable to set a maximum of 2 retries, which provides sufficient resilience without introducing excessive delays or unnecessary network requests.
+
+```swift
+// Enable 1 retry attempt
+let credentialsManager = CredentialsManager(
+    authentication: Auth0.authentication(),
+    maxRetries: 1
+)
+```
+
+
+**Important considerations:**
+
+- Retries only occur for transient errors (network issues, rate limiting, server errors)
+- Permanent errors (invalid refresh token, authorization failures) will not be retried
+- Each retry uses exponential backoff to avoid overwhelming the server
+- The 180-second refresh token overlap window ensures retries can succeed even after a successful backend renewal
 
 ### Renew stored credentials
 
@@ -2965,7 +3026,11 @@ Check the [API documentation](https://auth0.github.io/Auth0.swift/documentation/
 
 ## Logging
 
-Auth0.swift can print HTTP requests and responses for debugging purposes. Enable it by calling the following method in either `WebAuth`, `Authentication` or `Users`:
+Auth0.swift provides comprehensive logging capabilities for debugging HTTP requests and responses. The logging system is built on Apple's [Unified Logging](https://developer.apple.com/documentation/os/logging) (`OSLog`) for better performance and integration with system diagnostic tools.
+
+### Enable Logging
+
+Enable logging by calling the `logging(enabled:)` method on `WebAuth`, `Authentication`, or `Users`:
 
 ```swift
 Auth0
@@ -2974,31 +3039,97 @@ Auth0
     // ...
 ```
 
-> [!CAUTION]
-> Set this flag only when **DEBUGGING** to avoid leaking user's credentials in the device log.
+```swift
+Auth0
+    .authentication()
+    .logging(enabled: true)
+    // ...
+```
 
-With a successful authentication you should see something similar to the following:
+```swift
+Auth0
+    .users(token: credentials.accessToken)
+    .logging(enabled: true)
+    // ...
+```
+
+> [!CAUTION]
+> Enable logging **only when debugging** to avoid performance impacts and potential security concerns in production builds.
+
+### Automatic Token Redaction
+
+**Security First**: Auth0.swift automatically redacts sensitive information from logs to protect user credentials. The following fields are redacted when logging HTTP responses:
+
+- `access_token`
+- `refresh_token`
+- `id_token`
+
+Redacted tokens appear as `"redacted"` in the logs, ensuring sensitive data never appears in plain text.
+
+### Logging Output
+
+With logging enabled, you'll see detailed HTTP request and response information. Here's an example of what a successful authentication flow looks like:
 
 ```text
 ASWebAuthenticationSession: https://example.us.auth0.com/authorize?.....
 Callback URL: com.example.MyApp://example.us.auth0.com/ios/com.example.MyApp/callback?...
+
 POST https://example.us.auth0.com/oauth/token HTTP/1.1
 Content-Type: application/json
 Auth0-Client: eyJ2ZXJzaW9uI...
 
-{"code":"...","client_id":"...","grant_type":"authorization_code","redirect_uri":"com.example.MyApp:\/\/example.us.auth0.com\/ios\/com.example.MyApp\/callback","code_verifier":"..."}
+{
+  "code": "...",
+  "client_id": "...",
+  "grant_type": "authorization_code",
+  "redirect_uri": "com.example.MyApp://example.us.auth0.com/ios/com.example.MyApp/callback",
+  "code_verifier": "..."
+}
 
 HTTP/1.1 200
 Pragma: no-cache
 Content-Type: application/json
 Strict-Transport-Security: max-age=3600
-Date: Wed, 27 Apr 2022 19:04:39 GMT
-Content-Length: 57
+Date: Wed, 08 Dec 2025 10:30:00 GMT
+Content-Length: 1024
 Cache-Control: no-cache
 Connection: keep-alive
 
-{"access_token":"...","token_type":"Bearer"}
+{
+  "access_token": "redacted",
+  "refresh_token": "redacted",
+  "id_token": "redacted",
+  "token_type": "Bearer",
+  "expires_in": 86400
+}
 ```
+
+### Viewing Logs
+
+Auth0.swift logs are written to the **Unified Logging System** with the following identifiers:
+
+- **Subsystem**: `com.auth0.Auth0`
+- **Categories**: `NetworkTracing`, `Configuration`
+
+#### Xcode Console (Recommended)
+
+Logs appear automatically in the Xcode debug console during development on all platforms.
+
+**Filtering in Xcode 15+:**
+
+Use these filter expressions directly in the console search bar:
+
+| Filter | Description |
+|--------|-------------|
+| `subsystem:com.auth0.Auth0` | Show all Auth0 SDK logs |
+| `category:NetworkTracing` | Show only network requests/responses |
+| `category:Configuration` | Show only configuration errors |
+| `subsystem:com.auth0.Auth0 category:NetworkTracing` | Combine filters for specific logs |
+
+#### Log Categories
+
+- **NetworkTracing** - HTTP requests and responses (enabled via `logging(enabled: true)`)
+- **Configuration** - SDK setup and configuration issues (always logged)
 
 > [!TIP]
 > When troubleshooting, you can also check the logs in the [Auth0 Dashboard](https://manage.auth0.com/#/logs) for more information.
@@ -3145,9 +3276,10 @@ Auth0
 Auth0
     .authentication()
     .customTokenExchange(subjectToken: "existing-token",
-                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
-                        audience: "https://example.com/api",
-                        scope: "openid profile email")
+                         subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                         audience: "https://example.com/api",
+                         scope: "openid profile email",
+                         organization: "org_id)
     .start { result in
         switch result {
         case .success(let credentials):
@@ -3165,9 +3297,10 @@ do {
     let credentials = try await Auth0
         .authentication()
         .customTokenExchange(subjectToken: "existing-token",
-                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
-                        audience: "https://example.com/api",
-                        scope: "openid profile email")
+                            subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                            audience: "https://example.com/api",
+                            scope: "openid profile email",
+                            organization: "org_id")
         .start()
     print("Obtained credentials: \(credentials)")
 } catch {
@@ -3183,9 +3316,10 @@ do {
 Auth0
     .authentication()
      .customTokenExchange(subjectToken: "existing-token",
-                        subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
-                        audience: "https://example.com/api",
-                        scope: "openid profile email")
+                          subjectTokenType: "urn:ietf:params:oauth:token-type:jwt",
+                          audience: "https://example.com/api",
+                          scope: "openid profile email",
+                          organization: "org_id")
     .start()
     .sink(receiveCompletion: { completion in
         if case .failure(let error) = completion {

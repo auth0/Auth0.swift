@@ -127,6 +127,79 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
+        describe("storage with scoped keys") {
+
+            afterEach {
+                _ = credentialsManager.clear(forAudience: Audience)
+                _ = credentialsManager.clear(forAudience: Audience, scope: Scope)
+                _ = credentialsManager.clear(forAudience: Audience, scope: NewScope)
+                _ = credentialsManager.clear(forAudience: Audience, scope: "read write")
+                _ = credentialsManager.clear(forAudience: Audience, scope: "read")
+            }
+
+            it("should store api credentials without scope using audience as key") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                expect(credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)).to(beTrue())
+                expect(fetchAPICredentials(forAudience: Audience, from: store)).toNot(beNil())
+            }
+
+            it("should store api credentials with scope using compound key") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                expect(credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read write")).to(beTrue())
+              
+                expect(fetchAPICredentials(forAudience: Audience, forScope: "read write", from: store)).toNot(beNil())
+            }
+
+            it("should store credentials for same audience with different scopes separately") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                let apiCredentials1 = APICredentials(accessToken: "token1", tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "read")
+                let apiCredentials2 = APICredentials(accessToken: "token2", tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "write")
+
+                expect(credentialsManager.store(apiCredentials: apiCredentials1, forAudience: Audience, forScope: "read")).to(beTrue())
+                expect(credentialsManager.store(apiCredentials: apiCredentials2, forAudience: Audience, forScope: "write")).to(beTrue())
+
+                // Both should exist
+                let retrieved1 = fetchAPICredentials(forAudience: Audience, forScope: "read", from: store)
+                let retrieved2 = fetchAPICredentials(forAudience: Audience, forScope: "write", from: store)
+                expect(retrieved1?.accessToken) == "token1"
+                expect(retrieved2?.accessToken) == "token2"
+            }
+
+            it("should clear api credentials only for specified scope") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read")
+
+                _ = credentialsManager.clear(forAudience: Audience, scope: "read")
+
+                expect(fetchAPICredentials(forAudience: Audience, from: store)).toNot(beNil())
+                
+                expect(fetchAPICredentials(forAudience: Audience, forScope: "read", from: store)).to(beNil())
+            }
+
+            it("should not clear scoped credentials when clearing without scope") {
+                let store = SimpleKeychain()
+                credentialsManager = CredentialsManager(authentication: authentication, storage: store)
+
+                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read")
+
+                _ = credentialsManager.clear(forAudience: Audience)
+
+                expect(fetchAPICredentials(forAudience: Audience, from: store)).to(beNil())
+                expect(fetchAPICredentials(forAudience: Audience, forScope: "read", from: store)).toNot(beNil())
+            }
+
+        }
+
         describe("custom storage") {
 
             class CustomStore: CredentialsStorage {
@@ -859,6 +932,515 @@ class CredentialsManagerSpec: QuickSpec {
 
         }
 
+        describe("concurrent credentials retrieval") {
+            
+            beforeEach {
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+            }
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+            
+            it("should handle multiple concurrent credentials() calls from the same instance") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                let callCount = 5
+                let group = DispatchGroup()
+                var results: [Result<Credentials, CredentialsManagerError>] = []
+                let resultsLock = NSLock()
+                
+                for _ in 1...callCount {
+                    group.enter()
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        credentialsManager.credentials { result in
+                            resultsLock.lock()
+                            results.append(result)
+                            resultsLock.unlock()
+                            group.leave()
+                        }
+                    }
+                }
+                
+                waitUntil(timeout: Timeout) { done in
+                    group.notify(queue: .main) {
+                        // All calls should succeed
+                        expect(results.count) == callCount
+                        
+                        for result in results {
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+            
+            it("should handle multiple concurrent credentials() calls from different instances") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                let callCount = 5
+                let group = DispatchGroup()
+                var results: [Result<Credentials, CredentialsManagerError>] = []
+                let resultsLock = NSLock()
+                
+                for _ in 1...callCount {
+                    group.enter()
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        // Create a NEW instance for each thread
+                        let manager = CredentialsManager(authentication: authentication)
+                        manager.credentials { result in
+                            resultsLock.lock()
+                            results.append(result)
+                            resultsLock.unlock()
+                            group.leave()
+                        }
+                    }
+                }
+                
+                waitUntil(timeout: Timeout) { done in
+                    group.notify(queue: .main) {
+                        // All calls should succeed with synchronization barrier
+                        expect(results.count) == callCount
+                        
+                        for result in results {
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+        }
+        
+        describe("concurrent credentials retrieval with async/await") {
+            
+            beforeEach {
+                NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken])}, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn))
+            }
+
+            afterEach {
+                _ = credentialsManager.clear()
+            }
+            
+            it("should handle multiple concurrent async credentials() calls from the same instance") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                waitUntil(timeout: Timeout) { done in
+                    Task {
+                        let callCount = 5
+                        
+                        // Launch multiple concurrent tasks
+                        await withTaskGroup(of: Result<Credentials, CredentialsManagerError>.self) { group in
+                            for _ in 1...callCount {
+                                group.addTask {
+                                    do {
+                                        let creds = try await credentialsManager.credentials()
+                                        return .success(creds)
+                                    } catch let error as CredentialsManagerError {
+                                        return .failure(error)
+                                    } catch {
+                                        return .failure(CredentialsManagerError(code: .revokeFailed, cause: error))
+                                    }
+                                }
+                            }
+                            
+                            var results: [Result<Credentials, CredentialsManagerError>] = []
+                            for await result in group {
+                                results.append(result)
+                            }
+                            
+                            // All calls should succeed
+                            expect(results.count) == callCount
+                            
+                            for result in results {
+                                expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            }
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+            
+            it("should handle multiple concurrent async credentials() calls from different instances") {
+                credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManager.store(credentials: credentials)
+                
+                waitUntil(timeout: Timeout) { done in
+                    Task {
+                        let callCount = 5
+                        
+                        // Launch multiple concurrent tasks with different instances
+                        await withTaskGroup(of: Result<Credentials, CredentialsManagerError>.self) { group in
+                            for _ in 1...callCount {
+                                group.addTask {
+                                    // Create a NEW instance for each task
+                                    let manager = CredentialsManager(authentication: authentication)
+                                    do {
+                                        let creds = try await manager.credentials()
+                                        return .success(creds)
+                                    } catch let error as CredentialsManagerError {
+                                        return .failure(error)
+                                    } catch {
+                                        return .failure(CredentialsManagerError(code: .revokeFailed, cause: error))
+                                    }
+                                }
+                            }
+                            
+                            var results: [Result<Credentials, CredentialsManagerError>] = []
+                            for await result in group {
+                                results.append(result)
+                            }
+                            
+                            // All calls should succeed with synchronization barrier
+                            expect(results.count) == callCount
+                            
+                            for result in results {
+                                expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            }
+                        }
+                        
+                        done()
+                    }
+                }
+            }
+        }
+
+        describe("retry mechanism for credential renewal") {
+            var credentialsManagerWithRetry: CredentialsManager!
+            
+            beforeEach {
+                credentialsManagerWithRetry = CredentialsManager(authentication: authentication, maxRetries: 2)
+                credentials = Credentials(refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: -ExpiresIn))
+                _ = credentialsManagerWithRetry.store(credentials: credentials)
+            }
+            
+            afterEach {
+                _ = credentialsManagerWithRetry.clear()
+            }
+            
+            context("network errors") {
+                
+                it("should retry on timeout error and eventually succeed") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .timedOut)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should retry on network connection lost error") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .networkConnectionLost)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should retry on not connected to internet error") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .notConnectedToInternet)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should fail after exhausting all retries on network errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return networkErrorResponse(code: .timedOut)(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(10)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 3 // Initial + 2 retries
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("rate limiting errors") {
+                
+                it("should retry on 429 error and eventually succeed") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return rateLimitErrorResponse()(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should fail after exhausting all retries on 429 errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return rateLimitErrorResponse()(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(10)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 3 // Initial + 2 retries
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("server errors") {
+                
+                it("should retry on 500 error and eventually succeed") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return serverErrorResponse()(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 2
+                            done()
+                        }
+                    }
+                }
+                
+                it("should fail after exhausting all retries on server errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return serverErrorResponse()(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(10)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 3 // Initial + 2 retries
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("non-retryable errors") {
+                
+                it("should not retry on authentication errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return authFailure(code: "invalid_grant", description: "Invalid refresh token")(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(3)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 1 // Should not retry
+                            done()
+                        }
+                    }
+                }
+                
+                it("should not retry on unauthorized errors") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return apiFailureResponse(json: ["error": "unauthorized", "error_description": "Unauthorized"], statusCode: 401)(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(3)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 1 // Should not retry
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("retry disabled") {
+                
+                it("should not retry when maxRetries is 0") {
+                    var attemptCount = 0
+                    let credentialsManagerNoRetry = CredentialsManager(authentication: authentication, maxRetries: 0)
+                    _ = credentialsManagerNoRetry.store(credentials: credentials)
+                    
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        return networkErrorResponse(code: .timedOut)(request)
+                    }
+                    
+                    waitUntil(timeout: .seconds(3)) { done in
+                        credentialsManagerNoRetry.credentials { result in
+                            expect(result).to(beUnsuccessful())
+                            expect(attemptCount) == 1 // Should not retry
+                            _ = credentialsManagerNoRetry.clear()
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("exponential backoff") {
+                
+                it("should use exponential backoff between retries") {
+                    var attemptCount = 0
+                    var attemptTimestamps: [Date] = []
+                    
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        attemptTimestamps.append(Date())
+                        
+                        if attemptCount < 3 {
+                            return networkErrorResponse(code: .timedOut)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(10)) { done in
+                        credentialsManagerWithRetry.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken, NewRefreshToken))
+                            expect(attemptCount) == 3
+                            
+                            // Verify exponential backoff delays
+                            if attemptTimestamps.count == 3 {
+                                // First retry should be ~0.5s after initial attempt
+                                let delay1 = attemptTimestamps[1].timeIntervalSince(attemptTimestamps[0])
+                                expect(delay1).to(beCloseTo(0.5, within: 0.2))
+                                
+                                // Second retry should be ~1s after first retry
+                                let delay2 = attemptTimestamps[2].timeIntervalSince(attemptTimestamps[1])
+                                expect(delay2).to(beCloseTo(1.0, within: 0.2))
+                            }
+                            
+                            done()
+                        }
+                    }
+                }
+            }
+            
+            context("async/await") {
+                
+                it("should retry on network errors with async/await") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .timedOut)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        Task {
+                            do {
+                                let creds = try await credentialsManagerWithRetry.credentials()
+                                expect(creds.accessToken) == NewAccessToken
+                                expect(attemptCount) == 2
+                                done()
+                            } catch {
+                                fail("Should not fail: \(error)")
+                                done()
+                            }
+                        }
+                    }
+                }
+            }
+            
+            context("combine") {
+                var cancellables: Set<AnyCancellable>!
+                
+                beforeEach {
+                    cancellables = []
+                }
+                
+                it("should retry on network errors with combine") {
+                    var attemptCount = 0
+                    NetworkStub.addStub(condition: { $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken]) }) { request in
+                        attemptCount += 1
+                        if attemptCount == 1 {
+                            return networkErrorResponse(code: .timedOut)(request)
+                        } else {
+                            return authResponse(accessToken: NewAccessToken, idToken: NewIdToken, refreshToken: NewRefreshToken, expiresIn: ExpiresIn)(request)
+                        }
+                    }
+                    
+                    waitUntil(timeout: .seconds(5)) { done in
+                        credentialsManagerWithRetry.credentials()
+                            .sink(receiveCompletion: { completion in
+                                if case .failure(let error) = completion {
+                                    fail("Should not fail: \(error)")
+                                }
+                            }, receiveValue: { creds in
+                                expect(creds.accessToken) == NewAccessToken
+                                expect(attemptCount) == 2
+                                done()
+                            })
+                            .store(in: &cancellables)
+                    }
+                }
+            }
+        }
+
         describe("retrieval of api credentials") {
             
             beforeEach {
@@ -1122,7 +1704,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
                                                     scope: "openid phone")
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience,forScope: "openid phone")
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: "openid phone") { result in
                             expect(result).to(haveAPICredentials(AccessToken))
@@ -1140,7 +1722,7 @@ class CredentialsManagerSpec: QuickSpec {
                                                     tokenType: TokenType,
                                                     expiresIn: Date(timeIntervalSinceNow: ExpiresIn),
                                                     scope: "openid phone")
-                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "openid phone")
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, scope: "openid email") { result in
                             expect(result).to(haveAPICredentials(NewAccessToken))
@@ -1178,6 +1760,64 @@ class CredentialsManagerSpec: QuickSpec {
                     waitUntil(timeout: Timeout) { done in
                         credentialsManager.apiCredentials(forAudience: Audience, minTTL: minTTL) { result in
                             expect(result).to(haveCredentialsManagerError(expectedError))
+                            done()
+                        }
+                    }
+                }
+
+            }
+
+            context("retrieval of api credentials with scope") {
+
+                beforeEach {
+                    _ = credentialsManager.store(credentials: credentials)
+                }
+
+                afterEach {
+                    _ = credentialsManager.clear()
+                    _ = credentialsManager.clear(forAudience: Audience)
+                    _ = credentialsManager.clear(forAudience: Audience, scope: Scope)
+                    _ = credentialsManager.clear(forAudience: Audience, scope: "openid phone")
+                    _ = credentialsManager.clear(forAudience: Audience, scope: "different")
+                    _ = credentialsManager.clear(forAudience: Audience, scope: "read write")
+                }
+
+                it("should retrieve api credentials stored with matching scope") {
+                    apiCredentials = APICredentials(accessToken: AccessToken, tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: Scope)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: Scope)
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience, scope: Scope) { result in
+                            expect(result).to(haveAPICredentials(AccessToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should renew api credentials when scope does not match stored scope") {
+                    NetworkStub.clearStubs()
+                    NetworkStub.addStub(condition: {
+                        $0.isToken(Domain) && $0.hasAtLeast(["refresh_token": RefreshToken, "audience": Audience])
+                    }, response: authResponse(accessToken: NewAccessToken, idToken: NewIdToken, expiresIn: ExpiresIn, scope: "different"))
+
+                    apiCredentials = APICredentials(accessToken: AccessToken, tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: Scope)
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: Scope)
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience, scope: "different") { result in
+                            expect(result).to(haveAPICredentials(NewAccessToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should retrieve api credentials with scopes in different order") {
+                    apiCredentials = APICredentials(accessToken: AccessToken, tokenType: TokenType, expiresIn: Date(timeIntervalSinceNow: ExpiresIn), scope: "read write")
+                    _ = credentialsManager.store(apiCredentials: apiCredentials, forAudience: Audience, forScope: "read write")
+
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.apiCredentials(forAudience: Audience, scope: "write read") { result in
+                            expect(result).to(haveAPICredentials(AccessToken))
                             done()
                         }
                     }
@@ -2442,7 +3082,14 @@ private func fetchCredentials(from store: CredentialsStorage) -> Credentials? {
     return try? NSKeyedUnarchiver.unarchivedObject(ofClass: Credentials.self, from: data)
 }
 
-private func fetchAPICredentials(forAudience audience: String = Audience, from store: CredentialsStorage) -> APICredentials? {
-    guard let data = store.getEntry(forKey: audience) else { return nil }
+private func fetchAPICredentials(forAudience audience: String = Audience, forScope scope: String? = nil, from store: CredentialsStorage) -> APICredentials? {
+    let key: String
+    if let scope = scope {
+        let normalisedScopes = scope.split(separator: " ").sorted().joined(separator: "::")
+        key = "\(audience)::\(normalisedScopes)"
+    } else {
+        key = audience
+    }
+    guard let data = store.getEntry(forKey: key) else { return nil }
     return try? APICredentials(from: data)
 }

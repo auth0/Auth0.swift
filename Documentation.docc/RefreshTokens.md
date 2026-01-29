@@ -44,21 +44,6 @@ Rotating refresh tokens are effectively single-use. The renewed credentials will
 
 ### Common causes
 
-#### Multiple Credentials Manager instances
-
-If you are using the Credentials Manager to renew the credentials -either through the `credentials()` or the `renew()` method- you should use a single Credentials Manager instance. While these methods are thread-safe, the Credentials Manager cannot synchronize them across instances.
-
-This can happen, for example, by using a computed property to get a Credentials Manager instance:
-
-``` swift
-struct Services {
-    // ❌ This will return a new instance every time
-    var credentialsManager: CredentialsManager {
-        return CredentialsManager(authentication: Auth0.authentication())
-    }
-}
-```
-
 #### Using the Authentication API client to renew the credentials alongside the Credentials Manager
 
 If you are using the Credentials Manager to store and retrieve the credentials, you should not force renewals through the `renew()` method of the Authentication API client. This method is not thread-safe, and may end up issuing renewal requests concurrently with the `credentials()` method of the Credentials Manager.

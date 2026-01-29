@@ -6,7 +6,7 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/auth0/Auth0.swift)
 ![License](https://img.shields.io/github/license/auth0/Auth0.swift.svg?style=flat)
 
-📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
+📚 [**Documentation**](#documentation) • 🚀 [**Getting Started**](#getting-started) • 💡 [**Examples**](#examples) • 📃 [**Support Policy**](#support-policy) • 💬 [**Feedback**](#feedback)
 
 Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
@@ -15,7 +15,6 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 - [**Quickstart**](https://auth0.com/docs/quickstart/native/ios-swift/interactive)
  - shows how to integrate Auth0.swift into an iOS / macOS app from scratch.
 - [**Sample App**](https://github.com/auth0-samples/auth0-ios-swift-sample/tree/master/Sample-01) - a complete, running iOS / macOS app you can try.
-- [**Examples**](EXAMPLES.md) - explains how to use most features.
 - [**API Documentation**](https://auth0.github.io/Auth0.swift/documentation/auth0) - documentation auto-generated from the code comments that explains all the available features.
   + [Web Auth](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)
@@ -28,7 +27,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
 
 ### Requirements
 
-- iOS 14.0+ / macOS 11.0+ / tvOS 14.0+ / watchOS 7.0+
+- iOS 14.0+ / macOS 11.0+ / tvOS 14.0+ / watchOS 7.0+ / visionOS 1.0+
 - Xcode 16.x
 - Swift 6.0+
 
@@ -56,7 +55,7 @@ Then, select the dependency rule and press **Add Package**.
 Add the following line to your `Podfile`:
 
 ```ruby
-pod 'Auth0', '~> 2.15'
+pod 'Auth0', '~> 2.16'
 ```
 
 Then, run `pod install`.
@@ -66,7 +65,7 @@ Then, run `pod install`.
 Add the following line to your `Cartfile`:
 
 ```text
-github "auth0/Auth0.swift" ~> 2.15
+github "auth0/Auth0.swift" ~> 2.16
 ```
 
 Then, run `carthage bootstrap --use-xcframeworks`.
@@ -333,15 +332,95 @@ Check the [FAQ](FAQ.md) for more information about the alert box that pops up **
 > [!NOTE]
 > See also [this blog post](https://developer.okta.com/blog/2022/01/13/mobile-sso) for a detailed overview of single sign-on (SSO) on iOS.
 
-### Next steps
+## Examples
 
-**Learn about most features in [Examples ↗](EXAMPLES.md)**
+Explore common use cases and integration patterns for Auth0.swift.
 
-- [**Store credentials**](EXAMPLES.md#store-credentials) - store the user's credentials securely in the Keychain.
-- [**Check for stored credentials**](EXAMPLES.md#check-for-stored-credentials) - check if the user is already logged in when your app starts up.
-- [**Retrieve stored credentials**](EXAMPLES.md#retrieve-stored-credentials) - fetch the user's credentials from the Keychain, automatically renewing them if they have expired.
-- [**Clear stored credentials**](EXAMPLES.md#clear-stored-credentials) - delete the user's credentials to complete the logout process.
-- [**Retrieve user information**](EXAMPLES.md#retrieve-user-information) - fetch the latest user information from the `/userinfo` endpoint.
+> [!NOTE]
+> **For comprehensive guides:** See the [**Examples documentation**](EXAMPLES.md) for in-depth tutorials on biometric authentication, passkeys, passwordless login, DPoP, and more. ✨
+
+### Store credentials
+
+When your users log in, store their credentials securely in the Keychain.
+
+```swift
+let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+let didStore = credentialsManager.store(credentials: credentials)
+```
+
+### Retrieve stored credentials
+
+Retrieve the stored credentials from the Keychain. If the credentials have expired, they will be automatically renewed using the refresh token.
+
+```swift
+credentialsManager.credentials { result in 
+    switch result {
+    case .success(let credentials):
+        print("Obtained credentials: \(credentials)")
+    case .failure(let error):
+        print("Failed with: \(error)") 
+    }
+}
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await credentialsManager.credentials()
+    print("Obtained credentials: \(credentials)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+### Clear stored credentials
+
+The stored credentials can be removed from the Keychain by using the `clear()` method.
+
+> [!NOTE]
+> It is recommended to call `clear()` when the user logs out of the application to remove their credentials from the Keychain.
+
+```swift
+let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
+let didClear = credentialsManager.clear()
+```
+
+### Retrieve user information
+
+Fetch the latest user information from the `/userinfo` endpoint.
+
+```swift
+Auth0
+   .authentication()
+   .userInfo(withAccessToken: credentials.accessToken)
+   .start { result in
+       switch result {
+       case .success(let user):
+           print("Obtained user: \(user)")
+       case .failure(let error):
+           print("Failed with: \(error)")
+       }
+   }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let user = try await Auth0
+        .authentication()
+        .userInfo(withAccessToken: credentials.accessToken)
+        .start()
+    print("Obtained user: \(user)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
 
 ## Support Policy
 

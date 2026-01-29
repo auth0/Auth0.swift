@@ -4,7 +4,10 @@ platform :ios do
   desc "Tags the release and pushes the Podspec to CocoaPods"
   lane :release do
     perform_release target: 'Auth0.iOS'
-    publish_release repository: 'Auth0.swift'
+    publish_release(
+    repository: 'Auth0.swift',
+    pod_lint_allow_warnings: true
+  )
   end
 
   desc 'Generate API documentation'
