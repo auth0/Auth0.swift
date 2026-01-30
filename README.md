@@ -425,6 +425,9 @@ do {
 
 ### Multi-factor authentication
 
+> [!IMPORTANT]
+> Multi Factor Authentication support via SDKs is currently in Early Access. To request access to this feature, contact your Auth0 representative.
+
 Implement multi-factor authentication (MFA) flows using the MFA API. This includes enrolling MFA factors, challenging enrolled factors, and verifying MFA codes.
 
 > [!NOTE]

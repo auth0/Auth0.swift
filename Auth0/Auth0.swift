@@ -90,6 +90,25 @@ public func authentication(session: URLSession = .shared, bundle: Bundle = .main
 }
 
 
+/**
+ Multi-Factor Authentication (MFA) client for performing MFA operations during authentication flows.
+
+ ## Usage
+
+ ```swift
+ Auth0.mfa(clientId: "client-id", domain: "samples.us.auth0.com")
+ ```
+
+ - Parameters:
+   - clientId: Client ID of your Auth0 application.
+   - domain:   Domain of your Auth0 account, for example `samples.us.auth0.com`.
+   - session:  `URLSession` instance used for networking. Defaults to `URLSession.shared`.
+ - Returns: MFA client.
+
+ ## See Also
+
+ - ``MFAClient``
+ */
 public func mfa(clientId: String,
                 domain: String,
                 session: URLSession = .shared) -> MFAClient {
@@ -98,6 +117,41 @@ public func mfa(clientId: String,
                           session: session)
 }
 
+/**
+ Multi-Factor Authentication (MFA) client for performing MFA operations during authentication flows.
+
+ ## Usage
+
+ ```swift
+ Auth0.mfa()
+ ```
+
+ The Auth0 Client ID & Domain are loaded from the `Auth0.plist` file in your main bundle. It should have the following
+ content:
+
+ ```xml
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ <plist version="1.0">
+ <dict>
+     <key>ClientId</key>
+     <string>YOUR_AUTH0_CLIENT_ID</string>
+     <key>Domain</key>
+     <string>YOUR_AUTH0_DOMAIN</string>
+ </dict>
+ </plist>
+ ```
+
+ - Parameters:
+   - session: `URLSession` instance used for networking. Defaults to `URLSession.shared`.
+   - bundle:  Bundle used to locate the `Auth0.plist` file. Defaults to `Bundle.main`.
+ - Returns: MFA client.
+ - Warning: Calling this method without a valid `Auth0.plist` file will crash your application.
+
+ ## See Also
+
+ - ``MFAClient``
+ */
 public func mfa(session: URLSession = .shared,
                 bundle: Bundle = .main) -> MFAClient {
     let values = plistValues(bundle: bundle)!
