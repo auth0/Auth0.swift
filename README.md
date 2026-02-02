@@ -19,6 +19,7 @@ Migrating from v1? Check the [Migration Guide](V2_MIGRATION_GUIDE.md).
   + [Web Auth](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)
   + [Credentials Manager](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)
   + [Authentication API Client](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)
+  + [MFA API Client](https://auth0.github.io/Auth0.swift/documentation/auth0/mfaclient)
   + [Management API Client (Users)](https://auth0.github.io/Auth0.swift/documentation/auth0/users)
 - [**FAQ**](FAQ.md) - answers some common questions about Auth0.swift.
 - [**Auth0 Documentation**](https://auth0.com/docs) - explore our docs site and learn more about Auth0.
@@ -416,6 +417,152 @@ do {
         .userInfo(withAccessToken: credentials.accessToken)
         .start()
     print("Obtained user: \(user)")
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+### Multi-factor authentication
+
+> [!IMPORTANT]
+> Multi Factor Authentication support via SDKs is currently in Early Access. To request access to this feature, contact your Auth0 representative.
+
+Implement multi-factor authentication (MFA) flows using the MFA API. This includes enrolling MFA factors, challenging enrolled factors, and verifying MFA codes.
+
+> [!NOTE]
+> For complete MFA implementation examples including SMS, email, OTP, and push notifications, see the [**MFA section in EXAMPLES.md**](EXAMPLES.md#mfa-api-ios--macos--tvos--watchos--visionos).
+
+#### Handle MFA required errors
+
+When MFA is required during login, extract the MFA token and available factors from the error to proceed with the MFA flow.
+
+```swift
+Auth0
+    .authentication()
+    .login(usernameOrEmail: "support@auth0.com",
+           password: "secret-password",
+           realmOrConnection: "Username-Password-Authentication")
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error) where error.isMultifactorRequired:
+            if let mfaPayload = error.mfaRequiredErrorPayload {
+                let mfaToken = mfaPayload.mfaToken
+                print("MFA token: \(mfaToken)")
+
+                // Check available factors for enrollment or challenge
+                if let enrollTypes = mfaPayload.mfaRequirements.enroll {
+                    print("Available for enrollment: \(enrollTypes.map { $0.type })")
+                }
+                if let challengeTypes = mfaPayload.mfaRequirements.challenge {
+                    print("Available for challenge: \(challengeTypes.map { $0.type })")
+                }
+            }
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .authentication()
+        .login(usernameOrEmail: "support@auth0.com",
+               password: "secret-password",
+               realmOrConnection: "Username-Password-Authentication")
+        .start()
+    print("Obtained credentials: \(credentials)")
+} catch let error as AuthenticationError where error.isMultifactorRequired {
+    if let mfaPayload = error.mfaRequiredErrorPayload {
+        let mfaToken = mfaPayload.mfaToken
+        print("MFA token: \(mfaToken)")
+
+        if let enrollTypes = mfaPayload.mfaRequirements.enroll {
+            print("Available for enrollment: \(enrollTypes.map { $0.type })")
+        }
+        if let challengeTypes = mfaPayload.mfaRequirements.challenge {
+            print("Available for challenge: \(challengeTypes.map { $0.type })")
+        }
+    }
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+#### Enroll an OTP authenticator
+
+Enroll a time-based one-time password (TOTP) authenticator app like Google Authenticator or Authy.
+
+```swift
+Auth0
+    .mfa()
+    .enroll(mfaToken: mfaToken)
+    .start { result in
+        switch result {
+        case .success(let challenge):
+            // Display QR code to user
+            if let barcodeUri = challenge.barcodeUri {
+                print("QR Code URI: \(barcodeUri)")
+            }
+            if let secret = challenge.secret {
+                print("Secret: \(secret)")
+            }
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let challenge = try await Auth0.mfa().enroll(mfaToken: mfaToken).start()
+    if let barcodeUri = challenge.barcodeUri {
+        print("QR Code URI: \(barcodeUri)")
+    }
+} catch {
+    print("Failed with: \(error)")
+}
+```
+</details>
+
+#### Verify an OTP code
+
+Complete the MFA authentication by verifying the OTP code from the user's authenticator app.
+
+```swift
+Auth0
+    .mfa()
+    .verify(otp: "123456", mfaToken: mfaToken)
+    .start { result in
+        switch result {
+        case .success(let credentials):
+            print("Obtained credentials: \(credentials)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    let credentials = try await Auth0
+        .mfa()
+        .verify(otp: "123456", mfaToken: mfaToken)
+        .start()
+    print("Obtained credentials: \(credentials)")
 } catch {
     print("Failed with: \(error)")
 }

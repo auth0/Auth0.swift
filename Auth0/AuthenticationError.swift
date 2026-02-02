@@ -156,6 +156,37 @@ public extension AuthenticationError {
         return "Received error with code \(self.code)."
     }
 
+    /// Extracts the MFA required error payload when multifactor authentication is required.
+    ///
+    /// This property decodes the ``info`` dictionary into a structured ``MFARequiredErrorPayload`` object
+    /// containing the MFA token and enrollment requirements.
+    ///
+    /// - Returns: A decoded `MFARequiredErrorPayload` object, or `nil` if decoding fails.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// if error.isMultifactorRequired, let mfaPayload = error.mfaRequiredErrorPayload {
+    ///     let mfaToken = mfaPayload.mfaToken
+    ///     let enrollmentTypes = mfaPayload.mfaRequirements.enroll
+    /// }
+    /// ```
+    ///
+    /// ## See Also
+    ///
+    /// - ``isMultifactorRequired``
+    /// - ``MFARequiredErrorPayload``
+    var mfaRequiredErrorPayload: MFARequiredErrorPayload? {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: self.info, options: []) else {
+            return nil
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        return try? decoder.decode(MFARequiredErrorPayload.self, from: jsonData)
+    }
+
 }
 
 // MARK: - Equatable

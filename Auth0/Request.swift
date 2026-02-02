@@ -27,6 +27,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let session: URLSession
     let url: URL
     let method: String
+    let requestValidator: [RequestValidator]
     let handle: (Result<ResponseValue, E>, Callback) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
@@ -37,6 +38,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     init(session: URLSession,
          url: URL,
          method: String,
+         requestValidator: [RequestValidator] = [],
          handle: @escaping (Result<ResponseValue, E>, Callback) -> Void,
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
@@ -47,6 +49,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
         self.url = url
         self.method = method
         self.handle = handle
+        self.requestValidator = requestValidator
         self.parameters = parameters
         self.logger = logger
         self.telemetry = telemetry
@@ -91,8 +94,8 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
     private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
         var request = request
-
         do {
+            try runClientValidation()
             if let dpop = dpop, try dpop.shouldGenerateProof(for: url, parameters: parameters) {
                 let proof = try dpop.generateProof(for: request as URLRequest)
                 request.setValue(proof, forHTTPHeaderField: "DPoP")
@@ -126,6 +129,12 @@ public struct Request<T, E: Auth0APIError>: Requestable {
             }
         })
         task.resume()
+    }
+
+    func runClientValidation() throws {
+        for validator in requestValidator {
+            try validator.validate()
+        }
     }
 
     // MARK: - Request Modifiers
@@ -168,6 +177,21 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: self.dpop)
+    }
+
+    public func requestValidators(_ extraValidators: [RequestValidator]) -> Self {
+        var requestValidator = extraValidators
+        requestValidator.append(contentsOf: self.requestValidator)
+        return Request(session: session,
+                       url: url,
+                       method: method,
+                       requestValidator: requestValidator,
+                       handle: handle,
+                       parameters: parameters,
+                       headers: headers,
+                       logger: logger,
+                       telemetry: telemetry,
+                       dpop: dpop)
     }
 }
 
