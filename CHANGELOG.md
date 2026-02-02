@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.17.0](https://github.com/auth0/Auth0.swift/tree/2.17.0) (2026-02-02)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.16.3...2.17.0)
+
+**Added**
+- Flexible grant support  [\#1068](https://github.com/auth0/Auth0.swift/pull/1068) ([NandanPrabhu](https://github.com/NandanPrabhu))
+
 ## [2.16.3](https://github.com/auth0/Auth0.swift/tree/2.16.3) (2026-01-15)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.16.2...2.16.3)
 
