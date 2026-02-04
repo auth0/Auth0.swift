@@ -453,7 +453,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      ## Usage
      
-     The default connection is `"Username-Password-Authentication"`. By default, new Auth0 tenants have a database connection called Username-Password-Authentication however you can override the connection if you are using da custom connection
+     The default connection is `"Username-Password-Authentication"`. By default, new Auth0 tenants have a database connection called Username-Password-Authentication however you can override the connection if you are using dda custom connection
      
      ```swift
      Auth0
