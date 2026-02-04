@@ -904,7 +904,7 @@ Auth0
 
 ### Sign up with database connection
 
-The default connection is `"Username-Password-Authentication"`. You can omit the parameter:
+The default connection is `"Username-Password-Authentication"`.
 
 ```swift
 Auth0
