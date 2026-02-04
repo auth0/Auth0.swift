@@ -497,7 +497,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - email:          Email for the new user.
        - username:       Username for the new user (if the connection requires a username). Defaults to `nil`.
        - password:       Password for the new user.
-       - connection:     Name of the database connection where the user will be created.
+       - connection:     Name of the database connection where the user will be created. Defaults to `Username-Password-Authentication`.
        - userMetadata:   Additional user metadata parameters that will be added to the newly created user.
        - rootAttributes: Root attributes that will be added to the newly created user. These will not overwrite existing parameters. See https://auth0.com/docs/api/authentication#signup for the full list of supported attributes.
      - Returns: A request that will yield a newly created database user (just the email, username, and email verified flag).
@@ -1212,7 +1212,7 @@ public extension Authentication {
         return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope)
     }
 
-    func signup(email: String, username: String? = nil, password: String, connection: String, userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+    func signup(email: String, username: String? = nil, password: String, connection: String = "Username-Password-Authentication", userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
         return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
     }
 

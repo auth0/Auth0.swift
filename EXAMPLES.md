@@ -112,7 +112,7 @@ Auth0
 
 #### Add a scope value
 
-Specify a [scope](https://auth0.com/docs/get-started/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
+Specify a [scope](https://auth0.com/docs/get-started/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email offline_access`. Regardless of the scope value specified, `openid` is always included.
 
 ```swift
 Auth0
@@ -895,7 +895,7 @@ Auth0
 </details>
 
 > [!NOTE]
-> The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
+> The default scope value is `openid profile email offline_access`. Regardless of the scope value specified, `openid` is always included.
 
 ### Sign up with database connection
 
