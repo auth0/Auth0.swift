@@ -366,7 +366,7 @@ public struct CredentialsManager: Sendable {
     ///
     /// - Parameters:
     ///   - scope:      Space-separated list of scope values to request when renewing credentials. Defaults to `nil`, which will ask for the same scopes that were requested on login.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
     ///   - callback:   Callback that receives a `Result` containing either the user's credentials or an error.
@@ -385,7 +385,7 @@ public struct CredentialsManager: Sendable {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     public func credentials(withScope scope: String? = nil,
-                            minTTL: Int = 0,
+                            minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
@@ -473,7 +473,7 @@ public struct CredentialsManager: Sendable {
     ///
     /// - Parameters:
     ///   - scope:      Space-separated list of scope values to request when renewing credentials. Defaults to `nil`, which will ask for the same scopes that were requested on login.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
     ///   - callback:   Callback that receives a `Result` containing either the user's credentials or an error.
@@ -492,7 +492,7 @@ public struct CredentialsManager: Sendable {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     public func credentials(withScope scope: String? = nil,
-                            minTTL: Int = 0,
+                            minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
@@ -552,7 +552,7 @@ public struct CredentialsManager: Sendable {
     /// - Parameters:
     ///   - audience:   Identifier of the API that your application is requesting access to.
     ///   - scope:      Space-separated list of scope values to request when exchanging a refresh token for API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when exchanging a refresh token for API credentials.
     ///   - headers:    Additional headers to use when exchanging a refresh token for API credentials.
     ///   - callback:   Callback that receives a `Result` containing either the API credentials or an error.
@@ -570,7 +570,7 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func apiCredentials(forAudience audience: String,
                                scope: String? = nil,
-                               minTTL: Int = 0,
+                               minTTL: Int = 60,
                                parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
                                callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
@@ -1068,7 +1068,7 @@ public extension CredentialsManager {
     ///
     /// - Parameters:
     ///   - scope:      Space-separated list of scope values to request when renewing credentials. Defaults to `nil`, which will ask for the same scopes that were requested on login.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
     /// - Returns: A type-erased publisher.
@@ -1087,7 +1087,7 @@ public extension CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func credentials(withScope scope: String? = nil,
-                     minTTL: Int = 0,
+                     minTTL: Int = 60,
                      parameters: [String: Any] = [:],
                      headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
@@ -1162,7 +1162,7 @@ public extension CredentialsManager {
     /// - Parameters:
     ///   - audience:   Identifier of the API that your application is requesting access to.
     ///   - scope:      Space-separated list of scope values to request when exchanging a refresh token for API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when exchanging a refresh token for API credentials.
     ///   - headers:    Additional headers to use when exchanging a refresh token for API credentials.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
@@ -1179,7 +1179,7 @@ public extension CredentialsManager {
     /// - <doc:RefreshTokens>
     func apiCredentials(forAudience audience: String,
                         scope: String? = nil,
-                        minTTL: Int = 0,
+                        minTTL: Int = 60,
                         parameters: [String: Any] = [:],
                         headers: [String: String] = [:]) -> AnyPublisher<APICredentials, CredentialsManagerError> {
         return Deferred {
@@ -1415,7 +1415,7 @@ public extension CredentialsManager {
     ///
     /// - Parameters:
     ///   - scope:      Space-separated list of scope values to request when renewing credentials. Defaults to `nil`, which will ask for the same scopes that were requested on login.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
     /// - Returns: The user's credentials.
@@ -1435,7 +1435,7 @@ public extension CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func credentials(withScope scope: String? = nil,
-                     minTTL: Int = 0,
+                     minTTL: Int = 60,
                      parameters: [String: Any] = [:],
                      headers: [String: String] = [:]) async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
@@ -1492,7 +1492,7 @@ public extension CredentialsManager {
     /// - Parameters:
     ///   - audience:   Identifier of the API that your application is requesting access to.
     ///   - scope:      Space-separated list of scope values to request when exchanging a refresh token for API credentials. Defaults to `nil`, which will ask for the default scopes configured for the API.
-    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `0`.
+    ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when exchanging a refresh token for API credentials.
     ///   - headers:    Additional headers to use when exchanging a refresh token for API credentials.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
@@ -1509,7 +1509,7 @@ public extension CredentialsManager {
     /// - <doc:RefreshTokens>
     func apiCredentials(forAudience audience: String,
                         scope: String? = nil,
-                        minTTL: Int = 0,
+                        minTTL: Int = 60,
                         parameters: [String: Any] = [:],
                         headers: [String: String] = [:]) async throws -> APICredentials {
         return try await withCheckedThrowingContinuation { continuation in

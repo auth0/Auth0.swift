@@ -112,7 +112,7 @@ Auth0
 
 #### Add a scope value
 
-Specify a [scope](https://auth0.com/docs/get-started/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
+Specify a [scope](https://auth0.com/docs/get-started/apis/scopes) to request permission to access protected resources, like the user profile. The default scope value is `openid profile email offline_access`. Regardless of the scope value specified, `openid` is always included.
 
 ```swift
 Auth0
@@ -393,11 +393,16 @@ let credentialsManager = CredentialsManager(authentication: Auth0.authentication
 >     func fetchCredentials() async throws -> Credentials {
 >         // Safe to call from within an actor
 >         return try await credentialsManager.credentials(withScope: "openid profile email",
->                                                         minTTL: 60,
 >                                                         parameters: [:],
 >                                                         headers: [:])
 >     }
 > }
+> ```
+>
+> The default `minTTL` is 60 seconds. You can override it if needed:
+>
+> ```swift
+> let credentials = try await credentialsManager.credentials(minTTL: 120)
 > ```
 
 ### Store credentials
@@ -895,16 +900,36 @@ Auth0
 </details>
 
 > [!NOTE]
-> The default scope value is `openid profile email`. Regardless of the scope value specified, `openid` is always included.
+> The default scope value is `openid profile email offline_access`. Regardless of the scope value specified, `openid` is always included.
 
 ### Sign up with database connection
+
+The default connection is `"Username-Password-Authentication"`.
 
 ```swift
 Auth0
     .authentication()
     .signup(email: "support@auth0.com",
             password: "secret-password",
-            connection: "Username-Password-Authentication",
+            userMetadata: ["first_name": "John", "last_name": "Appleseed"])
+    .start { result in
+        switch result {
+        case .success(let user):
+            print("User signed up: \(user)")
+        case .failure(let error):
+            print("Failed with: \(error)")
+        }
+    }
+```
+
+Or specify a custom connection:
+
+```swift
+Auth0
+    .authentication()
+    .signup(email: "support@auth0.com",
+            password: "secret-password",
+            connection: "My-Custom-DB",
             userMetadata: ["first_name": "John", "last_name": "Appleseed"])
     .start { result in
         switch result {
