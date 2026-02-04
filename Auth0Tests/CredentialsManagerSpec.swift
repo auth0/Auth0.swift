@@ -821,6 +821,30 @@ class CredentialsManagerSpec: QuickSpec {
                     }
                 }
 
+                it("should renew credentials with default minTTL when expiring within 60 seconds") {
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: 30), scope: Scope)
+                    _ = credentialsManager.store(credentials: credentials)
+                    
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.credentials { result in
+                            expect(result).to(haveCredentials(NewAccessToken, NewIdToken))
+                            done()
+                        }
+                    }
+                }
+
+                it("should not renew credentials with default minTTL when expiring after 60 seconds") {
+                    credentials = Credentials(accessToken: AccessToken, tokenType: TokenType, idToken: IdToken, refreshToken: RefreshToken, expiresIn: Date(timeIntervalSinceNow: 120), scope: Scope)
+                    _ = credentialsManager.store(credentials: credentials)
+                    
+                    waitUntil(timeout: Timeout) { done in
+                        credentialsManager.credentials { result in
+                            expect(result).to(haveCredentials(AccessToken, IdToken))
+                            done()
+                        }
+                    }
+                }
+
             }
 
             context("serial renewal of credentials from same thread") {

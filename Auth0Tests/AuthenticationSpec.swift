@@ -1384,6 +1384,17 @@ class AuthenticationSpec: QuickSpec {
                 }
             }
             
+            it("should create a user with default connection") {
+                NetworkStub.clearStubs()
+                NetworkStub.addStub(condition: { $0.isSignUp(Domain) && $0.hasAllOf(["email": SupportAtAuth0, "password": ValidPassword, "connection": "Username-Password-Authentication", "client_id": ClientId])}, response: createdUser(email: SupportAtAuth0))
+                waitUntil(timeout: Timeout) { done in
+                    auth.signup(email: SupportAtAuth0, password: ValidPassword).start { result in
+                        expect(result).to(haveCreatedUser(SupportAtAuth0))
+                        done()
+                    }
+                }
+            }
+            
             it("should provide error payload from auth api") {
                 waitUntil(timeout: Timeout) { done in
                     let code = "invalid_username_password"
