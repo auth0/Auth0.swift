@@ -453,12 +453,13 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      ## Usage
      
+     The default connection is `"Username-Password-Authentication"`:
+     
      ```swift
      Auth0
          .authentication()
          .signup(email: "support@auth0.com",
-                 password: "secret-password",
-                 connection: "Username-Password-Authentication")
+                 password: "secret-password")
          .start { result in
              switch result {
              case .success(let user):
@@ -468,6 +469,17 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
              }
          }
      ```
+     
+     Or specify a custom connection:
+     
+     ```swift
+     Auth0
+         .authentication()
+         .signup(email: "support@auth0.com",
+                 password: "secret-password",
+                 connection: "My-Custom-DB")
+         .start { print($0) }
+     ```
 
      You can also add additional metadata when creating the user:
 
@@ -476,7 +488,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
          .authentication()
          .signup(email: "support@auth0.com",
                  password: "secret-password",
-                 connection: "Username-Password-Authentication",
                  userMetadata: ["first_name": "John", "last_name": "Appleseed"])
          .start { print($0) }
      ```
@@ -488,8 +499,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
          .authentication()
          .signup(email: "support@auth0.com",
                  username: "support",
-                 password: "secret-password",
-                 connection: "Username-Password-Authentication")
+                 password: "secret-password")
          .start { print($0) }
      ```
 
