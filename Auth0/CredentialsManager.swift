@@ -756,7 +756,7 @@ public struct CredentialsManager: Sendable {
                                          callback: callback)
     }
 
-    // swiftlint:disable:next function_parameter_count function_body_length
+    // swiftlint:disable:next function_parameter_count function_body_lengths
     private func retrieveCredentialsWithRetry(scope: String?,
                                              minTTL: Int,
                                              parameters: [String: Any],
