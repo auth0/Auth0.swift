@@ -8,14 +8,21 @@ import UIKit
 
 struct ContentView: View {
     @StateObject private var viewModel = ContentViewModel()
+    
+    #if os(macOS)
+    @State private var currentWindow: NSWindow?
+    #else
     @State private var currentWindow: UIWindow?
+    #endif
     
     var body: some View {
         VStack(spacing: 20) {
             // Web Login Button (Universal Login)
             Button {
                 Task {
+                    #if !os(macOS)
                     await viewModel.webLogin(presentationWindow: currentWindow)
+                    #endif
                 }
             } label: {
                 Text("Login with Browser")
@@ -26,7 +33,9 @@ struct ContentView: View {
             // Logout Button
             Button {
                 Task {
+                    #if !os(macOS)
                     await viewModel.logout(presentationWindow: currentWindow)
+                    #endif
                 }
             } label: {
                 Text("Logout")
