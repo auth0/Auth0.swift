@@ -17,7 +17,7 @@ extension UIWindow {
         return findTopViewController(from: root)
     }
 
-    private static func findTopViewController(from root: UIViewController) -> UIViewController? {
+    static func findTopViewController(from root: UIViewController) -> UIViewController? {
         if let presented = root.presentedViewController { return self.findTopViewController(from: presented) }
 
         switch root {

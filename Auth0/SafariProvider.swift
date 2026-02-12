@@ -36,17 +36,22 @@ public extension WebAuthentication {
     /// > Note: `SFSafariViewController` does not support using Universal Links as callback URLs.
     ///
     /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
+    /// - Parameter presentationWindow: Optional `UIWindow` to use for presenting the browser. If not specified,
+    /// the active key window will be used.
     /// - Returns: A ``WebAuthProvider`` instance.
     ///
     /// ## See Also
     ///
     /// - <doc:UserAgents>
-    static func safariProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
+    static func safariProvider(style: UIModalPresentationStyle = .fullScreen,
+                              presentationWindow: UIWindow? = nil) -> WebAuthProvider {
         return { url, callback in
             let safari = SFSafariViewController(url: url)
             safari.dismissButtonStyle = .cancel
             safari.modalPresentationStyle = style
-            return SafariUserAgent(controller: safari, callback: callback)
+            return SafariUserAgent(controller: safari,
+                                 callback: callback,
+                                 presentationWindow: presentationWindow)
         }
     }
 
@@ -56,17 +61,32 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     let controller: SFSafariViewController
     let callback: WebAuthProviderCallback
+    var presentationWindow: UIWindow?
 
-    init(controller: SFSafariViewController, callback: @escaping WebAuthProviderCallback) {
+    init(controller: SFSafariViewController,
+         callback: @escaping WebAuthProviderCallback,
+         presentationWindow: UIWindow? = nil) {
         self.controller = controller
         self.callback = callback
+        self.presentationWindow = presentationWindow
         super.init()
         self.controller.delegate = self
         self.controller.presentationController?.delegate = self
     }
 
     func start() {
-        UIWindow.topViewController?.present(controller, animated: true, completion: nil)
+        let topViewController: UIViewController?
+
+        // Use top view controller from custom window if provided
+        if let window = presentationWindow,
+           let rootVC = window.rootViewController {
+            topViewController = UIWindow.findTopViewController(from: rootVC)
+        } else {
+            // Fall back to key window's top view controller
+            topViewController = UIWindow.topViewController
+        }
+
+        topViewController?.present(controller, animated: true, completion: nil)
     }
 
     func finish(with result: WebAuthResult<Void>) {

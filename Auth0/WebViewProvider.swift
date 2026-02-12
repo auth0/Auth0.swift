@@ -36,6 +36,8 @@
 /// ```
 ///
 /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
+/// - Parameter presentationWindow: Optional `UIWindow` to use for presenting the browser. If not specified,
+/// the active key window will be used.
 /// - Returns: A ``WebAuthProvider`` instance.
 ///
 /// > Note: To use Universal Login's biometrics and passkeys with `WKWebView`, you must
@@ -49,13 +51,15 @@
 /// - [OAuth 2.0 Best Practices for Native Apps](https://auth0.com/blog/oauth-2-best-practices-for-native-apps)
 public extension WebAuthentication {
 
-    static func webViewProvider(style: UIModalPresentationStyle = .fullScreen) -> WebAuthProvider {
+    static func webViewProvider(style: UIModalPresentationStyle = .fullScreen,
+                               presentationWindow: UIWindow? = nil) -> WebAuthProvider {
         return { url, callback  in
             let redirectURL = extractRedirectURL(from: url)!
 
             return WebViewUserAgent(authorizeURL: url,
                                     redirectURL: redirectURL,
                                     modalPresentationStyle: style,
+                                    presentationWindow: presentationWindow,
                                     callback: callback)
         }
     }
@@ -73,13 +77,20 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     let viewController: UIViewController
     let redirectURL: URL
     let callback: WebAuthProviderCallback
+    var presentationWindow: UIWindow?
 
-    init(authorizeURL: URL, redirectURL: URL, viewController: UIViewController = UIViewController(), modalPresentationStyle: UIModalPresentationStyle = .fullScreen, callback: @escaping WebAuthProviderCallback) {
+    init(authorizeURL: URL,
+         redirectURL: URL,
+         viewController: UIViewController = UIViewController(),
+         modalPresentationStyle: UIModalPresentationStyle = .fullScreen,
+         presentationWindow: UIWindow? = nil,
+         callback: @escaping WebAuthProviderCallback) {
         self.request = URLRequest(url: authorizeURL)
         self.redirectURL = redirectURL
         self.callback = callback
         self.viewController = viewController
         self.viewController.modalPresentationStyle = modalPresentationStyle
+        self.presentationWindow = presentationWindow
 
         super.init()
         if !defaultSchemesSupportedByWKWebview.contains(redirectURL.scheme!) {
@@ -105,7 +116,19 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
 
     func start() {
         self.webview.load(self.request)
-        UIWindow.topViewController?.present(self.viewController, animated: true)
+
+        let topViewController: UIViewController?
+
+        // Use top view controller from custom window if provided
+        if let window = presentationWindow,
+           let rootVC = window.rootViewController {
+            topViewController = UIWindow.findTopViewController(from: rootVC)
+        } else {
+            // Fall back to key window's top view controller
+            topViewController = UIWindow.topViewController
+        }
+
+        topViewController?.present(self.viewController, animated: true)
     }
 
     func finish(with result: WebAuthResult<Void>) {
