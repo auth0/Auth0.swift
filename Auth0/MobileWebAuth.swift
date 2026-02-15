@@ -14,11 +14,19 @@ extension ASUserAgent: ASWebAuthenticationPresentationContextProviding {
 
 #if os(iOS)
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        // Use custom window if provided, otherwise fall back to key window
+        // Use custom window if provided
         if let window = presentationWindow {
             return window
         }
-        return UIApplication.shared()?.windows.last(where: \.isKeyWindow) ?? ASPresentationAnchor()
+
+        // Find the foreground active scene's key window for multi-window support
+        if let windowScene = UIApplication.shared()?.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            return windowScene.windows.first(where: \.isKeyWindow) ?? ASPresentationAnchor()
+        }
+
+        // Fallback to any key window
+        return UIApplication.shared()?.windows.first(where: \.isKeyWindow) ?? ASPresentationAnchor()
     }
 #endif
 

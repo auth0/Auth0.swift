@@ -2,8 +2,10 @@ import SwiftUI
 import Auth0
 import Combine
 
-#if os(iOS) || os(visionOS)
+#if !os(macOS)
 import UIKit
+#else
+import AppKit
 #endif
 
 @MainActor
@@ -14,9 +16,7 @@ final class ContentViewModel: ObservableObject {
     private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 
     #if os(macOS)
-    /// Web Authentication using Universal Login (Recommended)
-    /// - Parameter window: The UIWindow to present the authentication browser. Used for multi-window iPad apps.
-    func webLogin(presentationWindow window: NSWindow? = nil) async {
+    func webLoginWithAS(presentationWindow window: NSWindow? = nil) async {
         isLoading = true
         errorMessage = nil
 
@@ -26,16 +26,12 @@ final class ContentViewModel: ObservableObject {
                 .webAuth()
                 .scope("openid profile email offline_access")
 
-            // Use specific window for multi-window iPad support
-            #if os(iOS) || os(visionOS)
             if let window = window {
                 webAuth = webAuth.presentationWindow(window)
             }
-            #endif
 
             let credentials = try await webAuth.start()
 
-            // Store credentials securely
             let stored = credentialsManager.store(credentials: credentials)
             if stored {
                 isAuthenticated = true
@@ -54,8 +50,6 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
-    /// Logout and clear stored credentials
-    /// - Parameter window: The UIWindow to present the authentication browser. Used for multi-window iPad apps.
     func logout(presentationWindow window: NSWindow? = nil) async {
         isLoading = true
         errorMessage = nil
@@ -63,16 +57,12 @@ final class ContentViewModel: ObservableObject {
         do {
             var webAuth = Auth0.webAuth()
 
-            // Use specific window for multi-window iPad support
-            #if os(iOS) || os(visionOS)
             if let window = window {
                 webAuth = webAuth.presentationWindow(window)
             }
-            #endif
 
             try await webAuth.clearSession()
 
-            // Clear stored credentials
             let cleared = credentialsManager.clear()
             if cleared {
                 isAuthenticated = false
@@ -88,12 +78,9 @@ final class ContentViewModel: ObservableObject {
 
         isLoading = false
     }
-    #endif
+    #else
 
-    #if !os(macOS)
-    /// Web Authentication using Universal Login (Recommended)
-    /// - Parameter window: The UIWindow to present the authentication browser. Used for multi-window iPad apps.
-    func webLogin(presentationWindow window: UIWindow? = nil) async {
+    func webLoginWithAS(presentationWindow window: UIWindow? = nil) async {
         isLoading = true
         errorMessage = nil
 
@@ -103,26 +90,23 @@ final class ContentViewModel: ObservableObject {
                 .webAuth()
                 .scope("openid profile email offline_access")
 
-            // Use specific window for multi-window iPad support
-            #if os(iOS) || os(visionOS)
             if let window = window {
                 webAuth = webAuth.presentationWindow(window)
             }
-            #endif
 
             let credentials = try await webAuth.start()
 
-            // Store credentials securely
             let stored = credentialsManager.store(credentials: credentials)
             if stored {
                 isAuthenticated = true
+                print("✓ ASWebAuthenticationSession login successful")
                 print("Access Token: \(credentials.accessToken)")
             } else {
                 errorMessage = "Failed to store credentials"
             }
         } catch let error as Auth0Error {
-            errorMessage = "Login failed: \(error.localizedDescription)"
-            print("Web login failed with error: \(error)")
+            errorMessage = "AS login failed: \(error.localizedDescription)"
+            print("ASWebAuthenticationSession login failed: \(error)")
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
@@ -131,25 +115,21 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
-    /// Logout and clear stored credentials
-    /// - Parameter window: The UIWindow to present the authentication browser. Used for multi-window iPad apps.
     func logout(presentationWindow window: UIWindow? = nil) async {
         isLoading = true
         errorMessage = nil
         #if !os(tvOS) && !os(watchOS)
         do {
-            var webAuth = Auth0.webAuth()
-
-            // Use specific window for multi-window iPad support
-            #if os(iOS) || os(visionOS)
+            var webAuth = Auth0
+                .webAuth()
+            
             if let window = window {
                 webAuth = webAuth.presentationWindow(window)
             }
-            #endif
+            
+            try await webAuth
+                .clearSession()
 
-            try await webAuth.clearSession()
-
-            // Clear stored credentials
             let cleared = credentialsManager.clear()
             if cleared {
                 isAuthenticated = false
@@ -167,7 +147,6 @@ final class ContentViewModel: ObservableObject {
     }
     #endif
     
-    /// Check if user has valid credentials stored
     func checkAuthentication() async {
         do {
             let credentials = try await credentialsManager.credentials()
@@ -179,7 +158,6 @@ final class ContentViewModel: ObservableObject {
         }
     }
 }
-
 
 extension Array where Element: Hashable {
     func uniqued() -> [Element] {

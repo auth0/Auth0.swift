@@ -44,7 +44,7 @@ public extension WebAuthentication {
     ///
     /// - <doc:UserAgents>
     static func safariProvider(style: UIModalPresentationStyle = .fullScreen,
-                              presentationWindow: UIWindow? = nil) -> WebAuthProvider {
+                               presentationWindow: UIWindow? = nil) -> WebAuthProvider {
         return { url, callback in
             let safari = SFSafariViewController(url: url)
             safari.dismissButtonStyle = .cancel

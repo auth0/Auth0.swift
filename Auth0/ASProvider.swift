@@ -95,9 +95,9 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
     let callback: WebAuthProviderCallback
 
     #if os(macOS)
-    var presentationWindow: NSWindow?
+    weak var presentationWindow: NSWindow?
     #else
-    var presentationWindow: UIWindow?
+    weak var presentationWindow: UIWindow?
     #endif
 
     #if os(macOS)

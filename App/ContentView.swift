@@ -2,39 +2,56 @@ import SwiftUI
 import Combine
 import Auth0
 
-#if os(iOS) || os(visionOS)
-import UIKit
+#if !os(macOS)
+   import UIKit
+#else
+   import AppKit
 #endif
+
 
 struct ContentView: View {
     @StateObject private var viewModel = ContentViewModel()
-    
+
     #if os(macOS)
     @State private var currentWindow: NSWindow?
     #else
-    @State private var currentWindow: UIWindow?
+    @Environment(\.window) private var window
     #endif
-    
+
     var body: some View {
         VStack(spacing: 20) {
-            // Web Login Button (Universal Login)
+            Text("Multi-Window Authentication Demo")
+                .font(.headline)
+                .padding(.bottom)
+
             Button {
                 Task {
-                    #if !os(macOS)
-                    await viewModel.webLogin(presentationWindow: currentWindow)
+                    #if os(macOS)
+                    await viewModel.webLoginWithAS(presentationWindow: currentWindow)
+                    #else
+                    await viewModel.webLoginWithAS(presentationWindow: window)
                     #endif
                 }
             } label: {
-                Text("Login with Browser")
+                VStack(spacing: 4) {
+                    Text("Login with ASWebAuthenticationSession")
+                    Text("(Recommended)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
-            .buttonStyle(SecondaryButtonStyle())
+            .buttonStyle(PrimaryButtonStyle())
             .disabled(viewModel.isLoading)
-            
-            // Logout Button
+
+            Divider()
+                .padding(.vertical)
+
             Button {
                 Task {
-                    #if !os(macOS)
+                    #if os(macOS)
                     await viewModel.logout(presentationWindow: currentWindow)
+                    #else
+                    await viewModel.logout(presentationWindow: window)
                     #endif
                 }
             } label: {
@@ -42,26 +59,31 @@ struct ContentView: View {
             }
             .buttonStyle(PrimaryButtonStyle())
             .disabled(viewModel.isLoading || !viewModel.isAuthenticated)
-            
-            // Authentication Status
+
             if viewModel.isAuthenticated {
                 Text("✓ Authenticated")
                     .foregroundColor(.green)
                     .font(.caption)
             }
+
+            if let error = viewModel.errorMessage {
+                Text(error)
+                    .foregroundColor(.red)
+                    .font(.caption)
+                    .multilineTextAlignment(.center)
+            }
         }
         .padding(.horizontal)
         .padding(.top, 10)
         .task {
-            // Check for existing credentials on appear
             await viewModel.checkAuthentication()
         }
+        #if os(macOS)
         .onAppear {
-            // Capture the current window for multi-window iPad support
-#if os(iOS) || os(visionOS)
+            // Capture the window on appear for macOS
             currentWindow = getCurrentWindow()
-#endif
         }
+        #endif
     }
 }
 
@@ -93,17 +115,64 @@ struct SecondaryButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Window Helper
-
-#if os(iOS) || os(visionOS)
-/// Gets the current window for the view's scene
-/// This is particularly useful for multi-window iPad apps
-private func getCurrentWindow() -> UIWindow? {
-    guard let windowScene = UIApplication.shared.connectedScenes
-        .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else {
-        return nil
+#if os(macOS)
+private func getCurrentWindow() -> NSWindow? {
+    if let keyWindow = NSApplication.shared.keyWindow {
+        return keyWindow
     }
-    return windowScene.windows.first(where: \.isKeyWindow)
+
+    if let mainWindow = NSApplication.shared.mainWindow {
+        return mainWindow
+    }
+
+    return NSApplication.shared.windows.first
 }
+
+#else
+private struct WindowKey: EnvironmentKey {
+    static let defaultValue: UIWindow? = nil
+}
+
+extension EnvironmentValues {
+    var window: UIWindow? {
+        get { self[WindowKey.self] }
+        set { self[WindowKey.self] = newValue }
+    }
+}
+
+struct WindowReaderModifier: ViewModifier {
+    @State private var window: UIWindow?
+
+    func body(content: Content) -> some View {
+        content
+            .environment(\.window, window)
+            .background(
+                WindowAccessor(window: $window)
+            )
+    }
+}
+
+struct WindowAccessor: UIViewRepresentable {
+    @Binding var window: UIWindow?
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        DispatchQueue.main.async {
+            self.window = uiView.window
+        }
+    }
+}
+
+extension View {
+    func withWindowReader() -> some View {
+        self.modifier(WindowReaderModifier())
+    }
+}
+
 #endif
 

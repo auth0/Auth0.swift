@@ -42,9 +42,9 @@ final class Auth0WebAuth: WebAuth {
     private(set) var provider: WebAuthProvider?
     private(set) var onCloseCallback: (() -> Void)?
     #if os(macOS)
-    private(set) var presentationWindow: NSWindow?
+    private(set) weak var presentationWindow: NSWindow?
     #else
-    private(set) var presentationWindow: UIWindow?
+    private(set) weak var presentationWindow: UIWindow?
     #endif
 
     var state: String {
