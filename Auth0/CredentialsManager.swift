@@ -261,7 +261,7 @@ public struct CredentialsManager: Sendable {
     public func revoke(headers: [String: String] = [:],
                        _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
-        
+
         guard let credentials = self.retrieveCredentials(),
               let refreshToken = credentials.refreshToken else {
                   _ = self.clear()
@@ -392,7 +392,7 @@ public struct CredentialsManager: Sendable {
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
-        
+
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
                 let error = CredentialsManagerError(code: .biometricsFailed,
