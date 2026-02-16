@@ -167,11 +167,6 @@ In v2, completion callbacks would sometimes execute on the main thread and somet
 - All Credentials Manager methods using callbacks
 - All Web Auth methods using callbacks
 
-**Not Affected:**
-
-- Async/await APIs (already `@MainActor` where appropriate)
-- Combine publishers (developers control threading via operators)
-
 **Impact:** If your code performs CPU-intensive work in callbacks, you should explicitly dispatch to a background queue.
 
 <details>

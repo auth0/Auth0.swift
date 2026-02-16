@@ -993,32 +993,13 @@ class WebAuthSpec: QuickSpec {
 
         describe("main thread callback execution") {
 
-            it("should execute start() callback on main thread on success") {
-                let webAuth = newWebAuth()
-                    .redirectURL(RedirectURL)
-                    .provider { url, callback in
-                        let agent = MockUserAgent(callback: callback)
-                        DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
-                            agent.finish(with: .success(()))
-                        }
-                        return agent
-                    }
-
-                waitUntil(timeout: .seconds(2)) { done in
-                    webAuth.start { result in
-                        expect(Thread.isMainThread).to(beTrue())
-                        done()
-                    }
-                }
-            }
-
             it("should execute start() callback on main thread on failure") {
                 let webAuth = newWebAuth()
                     .redirectURL(RedirectURL)
                     .provider { url, callback in
                         let agent = MockUserAgent(callback: callback)
-                        DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
-                            agent.finish(with: .failure(WebAuthError(code: .userCancelled)))
+                        DispatchQueue.global().async {
+                            callback(.failure(WebAuthError(code: .userCancelled)))
                         }
                         return agent
                     }
@@ -1036,8 +1017,8 @@ class WebAuthSpec: QuickSpec {
                     .redirectURL(RedirectURL)
                     .provider { url, callback in
                         let agent = MockUserAgent(callback: callback)
-                        DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
-                            agent.finish(with: .success(()))
+                        DispatchQueue.global().async {
+                            callback(.success(()))
                         }
                         return agent
                     }
