@@ -516,6 +516,76 @@ class RequestSpec: QuickSpec {
         }
         #endif
 
+        describe("main thread callback execution") {
+
+            it("should execute callback on main thread on success") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiSuccessResponse(json: ["key": "value"]))
+
+                waitUntil(timeout: Timeout) { done in
+                    Request().start { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should execute callback on main thread on failure") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    Request().start { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should execute callback on main thread on network error") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: { _ in
+                    return HTTPStubsResponse(error: URLError(.notConnectedToInternet))
+                })
+
+                waitUntil(timeout: Timeout) { done in
+                    Request().start { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            #if canImport(_Concurrency)
+            it("should execute callback on main thread for async/await success") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiSuccessResponse(json: ["key": "value"]))
+
+                waitUntil(timeout: Timeout) { done in
+                    Task {
+                        _ = try? await Request().start()
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should execute callback on main thread for async/await failure") {
+                NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
+                                    response: apiFailureResponse())
+
+                waitUntil(timeout: Timeout) { done in
+                    Task {
+                        _ = try? await Request().start()
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+            #endif
+
+        }
+
     }
 }
 

@@ -260,11 +260,13 @@ public struct CredentialsManager: Sendable {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
     public func revoke(headers: [String: String] = [:],
                        _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
+        let mainThreadCallback = dispatchOnMain(callback)
+        
         guard let credentials = self.retrieveCredentials(),
               let refreshToken = credentials.refreshToken else {
                   _ = self.clear()
 
-                  return callback(.success(()))
+                  return mainThreadCallback(.success(()))
         }
 
         self.authentication
@@ -273,11 +275,11 @@ public struct CredentialsManager: Sendable {
             .start { result in
                 switch result {
                 case .failure(let error):
-                    callback(.failure(CredentialsManagerError(code: .revokeFailed, cause: error)))
+                    mainThreadCallback(.failure(CredentialsManagerError(code: .revokeFailed, cause: error)))
                 case .success:
                     _ = self.clear()
 
-                    callback(.success(()))
+                    mainThreadCallback(.success(()))
                 }
             }
     }
@@ -389,11 +391,13 @@ public struct CredentialsManager: Sendable {
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+        let mainThreadCallback = dispatchOnMain(callback)
+        
         if let bioAuth = self.bioAuth {
             guard bioAuth.available else {
                 let error = CredentialsManagerError(code: .biometricsFailed,
                                                     cause: LAError(.biometryNotAvailable))
-                return callback(.failure(error))
+                return mainThreadCallback(.failure(error))
             }
 
             // Check if biometric session is valid based on policy
@@ -404,13 +408,13 @@ public struct CredentialsManager: Sendable {
                                          parameters: parameters,
                                          headers: headers,
                                          forceRenewal: false,
-                                         callback: callback)
+                                         callback: mainThreadCallback)
                 return
             }
 
             bioAuth.validateBiometric { error in
                 guard error == nil else {
-                    return callback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: error!)))
+                    return mainThreadCallback(.failure(CredentialsManagerError(code: .biometricsFailed, cause: error!)))
                 }
 
                 // Update biometric session after successful authentication (only for session-based policies)
@@ -421,7 +425,7 @@ public struct CredentialsManager: Sendable {
                                          parameters: parameters,
                                          headers: headers,
                                          forceRenewal: false,
-                                         callback: callback)
+                                         callback: mainThreadCallback)
             }
         } else {
             self.retrieveCredentials(scope: scope,
@@ -429,7 +433,7 @@ public struct CredentialsManager: Sendable {
                                      parameters: parameters,
                                      headers: headers,
                                      forceRenewal: false,
-                                     callback: callback)
+                                     callback: mainThreadCallback)
         }
     }
     #else
@@ -501,7 +505,7 @@ public struct CredentialsManager: Sendable {
                                  parameters: parameters,
                                  headers: headers,
                                  forceRenewal: false,
-                                 callback: callback)
+                                 callback: dispatchOnMain(callback))
     }
     #endif
 
@@ -579,7 +583,7 @@ public struct CredentialsManager: Sendable {
                                     minTTL: minTTL,
                                     parameters: parameters,
                                     headers: headers,
-                                    callback: callback)
+                                    callback: dispatchOnMain(callback))
     }
 
     /// Exchanges the refresh token for a session transfer token that can be used to perform web single sign-on (SSO).
@@ -654,7 +658,7 @@ public struct CredentialsManager: Sendable {
     public func ssoCredentials(parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
                                callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
-        self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: callback)
+        self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: dispatchOnMain(callback))
     }
 
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
@@ -704,7 +708,7 @@ public struct CredentialsManager: Sendable {
                                  parameters: parameters,
                                  headers: headers,
                                  forceRenewal: true,
-                                 callback: callback)
+                                 callback: dispatchOnMain(callback))
     }
 
     public func store(apiCredentials: APICredentials, forAudience audience: String, forScope scope: String? = nil) -> Bool {

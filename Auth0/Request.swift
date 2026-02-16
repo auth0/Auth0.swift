@@ -89,7 +89,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
      - Parameter callback: Callback that receives the result of the request when it completes.
      */
     public func start(_ callback: @escaping Callback) {
-        self.startDataTask(retryCount: 0, request: self.request, callback: callback)
+        self.startDataTask(retryCount: 0, request: self.request, callback: dispatchOnMain(callback))
     }
 
     private func startDataTask(retryCount: Int, request: URLRequest, callback: @escaping Callback) {
