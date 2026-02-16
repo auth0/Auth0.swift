@@ -158,6 +158,186 @@ Auth0
 > [!NOTE]
 > This custom `URLSession` instance will be used when communicating with the Auth0 Authentication API, not when opening the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
 
+#### Specify a presentation window
+
+When building apps that support multiple windows (such as iPad apps with Split View or Stage Manager, or macOS apps with multiple windows), you can specify which window should present the authentication UI using the `presentationWindow()` method.
+
+<details>
+  <summary>Using the UIKit app lifecycle</summary>
+
+**iOS / iPadOS:**
+
+```swift
+guard let window = view.window else { return }
+
+Auth0
+    .webAuth()
+    .presentationWindow(window) // Pass the UIWindow
+    .start { result in
+        // ...
+    }
+```
+
+**macOS:**
+
+```swift
+guard let window = view.window else { return }
+
+Auth0
+    .webAuth()
+    .presentationWindow(window) // Pass the NSWindow
+    .start { result in
+        // ...
+    }
+```
+
+</details>
+
+<details>
+  <summary>Using the SwiftUI app lifecycle</summary>
+
+**iOS / iPadOS:**
+
+```swift
+import SwiftUI
+import Auth0
+
+struct ContentView: View {
+    @Environment(\.window) private var window // Custom environment key
+
+    var body: some View {
+        Button("Login") {
+            Task {
+                var webAuth = Auth0.webAuth()
+
+                if let window = window {
+                    webAuth = webAuth.presentationWindow(window)
+                }
+
+                let credentials = try await webAuth.start()
+                // Handle credentials...
+            }
+        }
+    }
+}
+
+// MARK: - Window Environment Setup
+
+@main
+struct YourApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .withWindowReader() // Enable window tracking
+        }
+    }
+}
+
+// Window tracking infrastructure
+private struct WindowKey: EnvironmentKey {
+    static let defaultValue: UIWindow? = nil
+}
+
+extension EnvironmentValues {
+    var window: UIWindow? {
+        get { self[WindowKey.self] }
+        set { self[WindowKey.self] = newValue }
+    }
+}
+
+struct WindowReaderModifier: ViewModifier {
+    @State private var window: UIWindow?
+
+    func body(content: Content) -> some View {
+        content
+            .environment(\.window, window)
+            .background(WindowAccessor(window: $window))
+    }
+}
+
+struct WindowAccessor: UIViewRepresentable {
+    @Binding var window: UIWindow?
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        DispatchQueue.main.async {
+            self.window = uiView.window
+        }
+    }
+}
+
+extension View {
+    func withWindowReader() -> some View {
+        self.modifier(WindowReaderModifier())
+    }
+}
+```
+
+**macOS:**
+
+```swift
+import SwiftUI
+import Auth0
+
+struct ContentView: View {
+    @State private var currentWindow: NSWindow?
+
+    var body: some View {
+        Button("Login") {
+            Task {
+                var webAuth = Auth0.webAuth()
+
+                if let window = currentWindow {
+                    webAuth = webAuth.presentationWindow(window)
+                }
+
+                let credentials = try await webAuth.start()
+                // Handle credentials...
+            }
+        }
+        .onAppear {
+            currentWindow = getCurrentWindow()
+        }
+    }
+
+    private func getCurrentWindow() -> NSWindow? {
+        if let keyWindow = NSApplication.shared.keyWindow {
+            return keyWindow
+        }
+        if let mainWindow = NSApplication.shared.mainWindow {
+            return mainWindow
+        }
+        return NSApplication.shared.windows.first
+    }
+}
+```
+
+</details>
+
+You can also specify a presentation window when using the `SFSafariViewController` or `WKWebView` providers:
+
+```swift
+// SFSafariViewController
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.safariProvider(presentationWindow: window))
+    // ...
+
+// WKWebView
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.webViewProvider(presentationWindow: window))
+    // ...
+```
+
+> [!NOTE]
+> If you don't specify a presentation window, Auth0.swift will automatically use the foreground active scene's key window for multi-window iPad apps.
+
 #### Use `SFSafariViewController` instead of `ASWebAuthenticationSession`
 
 You can use the built-in `SFSafariViewController` Web Auth provider to open the [Universal Login](https://auth0.com/docs/authenticate/login/auth0-universal-login) page.
