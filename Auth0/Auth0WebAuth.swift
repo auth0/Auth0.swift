@@ -174,7 +174,7 @@ final class Auth0WebAuth: WebAuth {
 
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
-        
+
         guard barrier.raise() else {
             return mainThreadCallback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
@@ -222,7 +222,7 @@ final class Auth0WebAuth: WebAuth {
 
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
-        
+
         guard barrier.raise() else {
             return mainThreadCallback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
