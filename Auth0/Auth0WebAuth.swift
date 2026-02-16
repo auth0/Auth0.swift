@@ -174,6 +174,7 @@ final class Auth0WebAuth: WebAuth {
 
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
+        let mainThreadOnCloseCallback = onCloseCallback.map { dispatchOnMain($0) }
 
         guard barrier.raise() else {
             return mainThreadCallback(.failure(WebAuthError(code: .transactionActiveAlready)))
@@ -198,13 +199,13 @@ final class Auth0WebAuth: WebAuth {
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      ephemeralSession: ephemeralSession,
                                                                      headers: headers)
-        let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
+        let userAgent = provider(authorizeURL) { [storage, barrier, mainThreadOnCloseCallback] result in
             storage.clear()
             barrier.lower()
 
             switch result {
             case .success:
-                onCloseCallback?()
+                mainThreadOnCloseCallback?()
             case .failure(let error):
                 mainThreadCallback(.failure(error))
             }

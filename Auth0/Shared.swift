@@ -50,3 +50,8 @@ func dispatchOnMain<T>(_ callback: @escaping (T) -> Void) -> (T) -> Void {
         }
     }
 }
+
+func dispatchOnMain(_ callback: @escaping () -> Void) -> () -> Void {
+    let wrapped = dispatchOnMain { (_: Void) in callback() }
+    return { wrapped(()) }
+}
