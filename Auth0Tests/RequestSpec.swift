@@ -545,7 +545,7 @@ class RequestSpec: QuickSpec {
             it("should execute callback on main thread on network error") {
                 NetworkStub.addStub(condition: { $0.isHost(Url.host!) },
                                     response: { _ in
-                    return HTTPStubsResponse(error: URLError(.notConnectedToInternet))
+                    return (nil, nil, URLError(.notConnectedToInternet))
                 })
 
                 waitUntil(timeout: Timeout) { done in

@@ -3111,7 +3111,7 @@ class CredentialsManagerSpec: QuickSpec {
 
             it("should execute revoke() callback on main thread") {
                 _ = credentialsManager.store(credentials: credentials)
-                NetworkStub.addStub(condition: { $0.isRevoke(Domain) && $0.hasAtLeast(["token": RefreshToken]) },
+                NetworkStub.addStub(condition: { $0.isRevokeToken(Domain) && $0.hasAtLeast(["token": RefreshToken]) },
                                     response: revokeTokenResponse())
 
                 waitUntil(timeout: Timeout) { done in
