@@ -173,12 +173,15 @@ final class Auth0WebAuth: WebAuth {
     }
 
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+        let mainThreadCallback = dispatchOnMain(callback)
+        let mainThreadOnCloseCallback = onCloseCallback.map { dispatchOnMain($0) }
+
         guard barrier.raise() else {
-            return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
+            return mainThreadCallback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
         guard let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            return mainThreadCallback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
         let handler = self.handler(redirectURL)
@@ -190,21 +193,21 @@ final class Auth0WebAuth: WebAuth {
                                                       defaults: handler.defaults,
                                                       state: state)
         } catch {
-            return callback(.failure(error))
+            return mainThreadCallback(.failure(error))
         }
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      ephemeralSession: ephemeralSession,
                                                                      headers: headers)
-        let userAgent = provider(authorizeURL) { [storage, barrier, onCloseCallback] result in
+        let userAgent = provider(authorizeURL) { [storage, barrier, mainThreadOnCloseCallback] result in
             storage.clear()
             barrier.lower()
 
             switch result {
             case .success:
-                onCloseCallback?()
+                mainThreadOnCloseCallback?()
             case .failure(let error):
-                callback(.failure(error))
+                mainThreadCallback(.failure(error))
             }
         }
         let transaction = LoginTransaction(redirectURL: redirectURL,
@@ -212,15 +215,17 @@ final class Auth0WebAuth: WebAuth {
                                            userAgent: userAgent,
                                            handler: handler,
                                            logger: self.logger,
-                                           callback: callback)
+                                           callback: mainThreadCallback)
         self.storage.store(transaction)
         userAgent.start()
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
     func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
+        let mainThreadCallback = dispatchOnMain(callback)
+
         guard barrier.raise() else {
-            return callback(.failure(WebAuthError(code: .transactionActiveAlready)))
+            return mainThreadCallback(.failure(WebAuthError(code: .transactionActiveAlready)))
         }
 
         let endpoint = federated ?
@@ -233,14 +238,14 @@ final class Auth0WebAuth: WebAuth {
         components?.queryItems = queryItems + [returnTo, clientId]
 
         guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
-            return callback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            return mainThreadCallback(.failure(WebAuthError(code: .noBundleIdentifier)))
         }
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, headers: headers)
         let userAgent = provider(logoutURL) { [storage, barrier] result in
             storage.clear()
             barrier.lower()
-            callback(result)
+            mainThreadCallback(result)
         }
         let transaction = ClearSessionTransaction(userAgent: userAgent)
         self.storage.store(transaction)

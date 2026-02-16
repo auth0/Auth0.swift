@@ -236,6 +236,9 @@ Auth0
     }
 ```
 
+> [!NOTE]
+> Completion callbacks are executed on the main thread, making it safe to update UI directly. If needed, explicitly dispatch to a background thread.
+
 <details>
   <summary>Using async/await</summary>
 

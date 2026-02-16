@@ -15,6 +15,9 @@
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/webauth)**
 
+> [!NOTE]
+> All completion callbacks in Auth0.swift execute on the main thread, making it safe to update UI directly. If needed, explicitly dispatch to a background thread.
+
 - [Web Auth signup](#web-auth-signup)
 - [Web Auth configuration](#web-auth-configuration)
 - [ID token validation](#id-token-validation)
@@ -351,6 +354,9 @@ Web Auth will only produce `WebAuthError` error values. You can find the underly
 ## Credentials Manager (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/credentialsmanager)**
+
+> [!NOTE]
+> All completion callbacks in Auth0.swift execute on the main thread, making it safe to update UI directly. If needed, explicitly dispatch to a background thread.
 
 - [Store credentials](#store-credentials)
 - [Check for stored credentials](#check-for-stored-credentials)
@@ -815,6 +821,9 @@ The Credentials Manager will only produce `CredentialsManagerError` error values
 ## Authentication API (iOS / macOS / tvOS / watchOS / visionOS)
 
 **See all the available features in the [API documentation ↗](https://auth0.github.io/Auth0.swift/documentation/auth0/authentication)**
+
+> [!NOTE]
+> All completion callbacks in Auth0.swift execute on the main thread, making it safe to update UI directly. If needed, explicitly dispatch to a background thread.
 
 - [Log in with database connection](#log-in-with-database-connection)
 - [Sign up with database connection](#sign-up-with-database-connection)
