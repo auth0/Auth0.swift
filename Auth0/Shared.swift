@@ -36,3 +36,22 @@ func extractRedirectURL(from url: URL) -> URL? {
 struct SendableBox<T>: @unchecked Sendable {
     let value: T
 }
+
+/// Ensures a callback is executed on the main thread.
+/// If already on the main thread, executes immediately. Otherwise, dispatches asynchronously to main.
+func dispatchOnMain<T>(_ callback: @escaping (T) -> Void) -> (T) -> Void {
+    return { result in
+        if Thread.isMainThread {
+            callback(result)
+        } else {
+            DispatchQueue.main.async {
+                callback(result)
+            }
+        }
+    }
+}
+
+func dispatchOnMain(_ callback: @escaping () -> Void) -> () -> Void {
+    let wrapped = dispatchOnMain { (_: Void) in callback() }
+    return { wrapped(()) }
+}

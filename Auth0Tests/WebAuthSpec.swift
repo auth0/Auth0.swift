@@ -991,6 +991,48 @@ class WebAuthSpec: QuickSpec {
         }
         #endif
 
+        describe("main thread callback execution") {
+
+            it("should execute start() callback on main thread on failure") {
+                let webAuth = newWebAuth()
+                    .redirectURL(RedirectURL)
+                    .provider { url, callback in
+                        let agent = MockUserAgent(callback: callback)
+                        DispatchQueue.global().async {
+                            callback(.failure(WebAuthError(code: .userCancelled)))
+                        }
+                        return agent
+                    }
+
+                waitUntil(timeout: .seconds(2)) { done in
+                    webAuth.start { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+            it("should execute clearSession() callback on main thread") {
+                let webAuth = newWebAuth()
+                    .redirectURL(RedirectURL)
+                    .provider { url, callback in
+                        let agent = MockUserAgent(callback: callback)
+                        DispatchQueue.global().async {
+                            callback(.success(()))
+                        }
+                        return agent
+                    }
+
+                waitUntil(timeout: .seconds(2)) { done in
+                    webAuth.clearSession(federated: false) { result in
+                        expect(Thread.isMainThread).to(beTrue())
+                        done()
+                    }
+                }
+            }
+
+        }
+
     }
 
 }
