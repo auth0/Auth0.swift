@@ -20,9 +20,6 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Multi-Window Authentication Demo")
-                .font(.headline)
-                .padding(.bottom)
 
             Button {
                 Task {
@@ -34,10 +31,7 @@ struct ContentView: View {
                 }
             } label: {
                 VStack(spacing: 4) {
-                    Text("Login with ASWebAuthenticationSession")
-                    Text("(Recommended)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Text("Login")
                 }
             }
             .buttonStyle(PrimaryButtonStyle())

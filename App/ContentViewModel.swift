@@ -90,9 +90,10 @@ final class ContentViewModel: ObservableObject {
                 .webAuth()
                 .scope("openid profile email offline_access")
 
-            if let window = window {
-                webAuth = webAuth.presentationWindow(window)
-            }
+            // MARK: uncomment to test multi window in app browser support for iPadOS
+//            if let window = window {
+//                webAuth = webAuth.presentationWindow(window)
+//            }
 
             let credentials = try await webAuth.start()
 
