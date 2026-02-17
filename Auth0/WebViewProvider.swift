@@ -52,7 +52,7 @@
 public extension WebAuthentication {
 
     static func webViewProvider(style: UIModalPresentationStyle = .fullScreen,
-                                presentationWindow: WindowRepresentable? = nil) -> WebAuthProvider {
+                                presentationWindow: Auth0WindowRepresentable? = nil) -> WebAuthProvider {
         return { url, callback  in
             let redirectURL = extractRedirectURL(from: url)!
 
@@ -77,7 +77,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     let viewController: UIViewController
     let redirectURL: URL
     let callback: WebAuthProviderCallback
-    private weak var presentationWindow: WindowRepresentable?
+    private weak var presentationWindow: Auth0WindowRepresentable?
 
     init(authorizeURL: URL,
          redirectURL: URL,
@@ -122,10 +122,10 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
         // Use top view controller from custom window if provided
         if let window = presentationWindow,
            let rootVC = window.rootViewController {
-            topViewController = WindowRepresentable.findTopViewController(from: rootVC)
+            topViewController = Auth0WindowRepresentable.findTopViewController(from: rootVC)
         } else {
             // Fall back to key window's top view controller
-            topViewController = WindowRepresentable.topViewController
+            topViewController = Auth0WindowRepresentable.topViewController
         }
 
         topViewController?.present(self.viewController, animated: true)

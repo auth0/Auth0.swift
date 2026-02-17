@@ -13,7 +13,7 @@ struct ContentView: View {
     @StateObject private var viewModel = ContentViewModel()
 
     #if os(macOS)
-    @State private var currentWindow: WindowRepresentable?
+    @State private var currentWindow: Auth0WindowRepresentable?
     #else
     @Environment(\.window) private var window
     #endif

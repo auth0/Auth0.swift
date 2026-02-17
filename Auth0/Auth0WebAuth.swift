@@ -9,9 +9,9 @@ import AppKit
 
 
 #if canImport(UIKit)
-public typealias WindowRepresentable = UIWindow
+public typealias Auth0WindowRepresentable = UIWindow
 #elseif canImport(AppKit)
-public typealias WindowRepresentable = NSWindow
+public typealias Auth0WindowRepresentable = NSWindow
 #endif
 
 final class Auth0WebAuth: WebAuth {
@@ -48,7 +48,7 @@ final class Auth0WebAuth: WebAuth {
     private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
     private(set) var onCloseCallback: (() -> Void)?
-    private(set) weak var presentationWindow: WindowRepresentable?
+    private(set) weak var presentationWindow: Auth0WindowRepresentable?
 
     var state: String {
         return self.parameters["state"] ?? self.generateDefaultState()
@@ -185,7 +185,7 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    func presentationWindow(_ window: WindowRepresentable) -> Self {
+    func presentationWindow(_ window: Auth0WindowRepresentable) -> Self {
         self.presentationWindow = window
         return self
     }

@@ -7,7 +7,7 @@ extension WebAuthentication {
     static func asProvider(redirectURL: URL,
                            ephemeralSession: Bool = false,
                            headers: [String: String]? = nil,
-                           presentationWindow: WindowRepresentable? = nil) -> WebAuthProvider {
+                           presentationWindow: Auth0WindowRepresentable? = nil) -> WebAuthProvider {
         return { url, callback in
             let session: ASWebAuthenticationSession
 
@@ -60,11 +60,11 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
     private(set) static var currentSession: ASWebAuthenticationSession?
     let callback: WebAuthProviderCallback
 
-    weak var presentationWindow: WindowRepresentable?
+    weak var presentationWindow: Auth0WindowRepresentable?
 
     init(session: ASWebAuthenticationSession,
          callback: @escaping WebAuthProviderCallback,
-         presentationWindow: WindowRepresentable? = nil) {
+         presentationWindow: Auth0WindowRepresentable? = nil) {
         self.callback = callback
         self.presentationWindow = presentationWindow
         super.init()

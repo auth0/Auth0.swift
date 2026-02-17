@@ -7,6 +7,7 @@ Auth0.swift v3 includes many significant changes:
 - Updated default values for better out-of-the-box behavior.
 - Behavior changes to improve developer experience:
   - Consistent main thread callback execution for UI updates.
+- Methods added for supporting new features
 
 
 As expected with a major release, Auth0.swift v3 contains breaking changes. Please review this guide thoroughly to understand the changes required to migrate your application to v3.
@@ -21,6 +22,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Signup connection](#signup-connection)
 - [**Behavior Changes**](#behavior-changes)
   + [Completion callbacks](#completion-callbacks)
+- [**Methods Added**](#methods-added)
+  + [Web Auth](#web-auth)
 
 ---
 
@@ -199,4 +202,27 @@ credentialsManager.credentials { result in
 
 **Reason:** After performing operations with Auth0.swift, it's common to run presentation logic – for example, to show an error or navigate to the main flow of the app. Having callbacks execute on the main thread by default improves developer experience and reduces boilerplate.
 
+## Methods Added
+
+### Web Auth
+
+Auth0.swift now supports passing a custom window in which to present the in-app browser. For this reason, the following method is added to the Web Auth builder:
+
+- `presentationWindow(_ window:)`
+
+<details>
+  <summary>Code</summary>
+
+```swift
+Auth0
+    .webAuth()
+    .presentationWindow(window)
+    .start { result in
+        // ...
+    }
+```
+</details>
+
 ---
+
+[Go up ⤴](#table-of-contents)

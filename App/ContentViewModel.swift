@@ -15,7 +15,7 @@ final class ContentViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
     private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 
-    func webLogin(presentationWindow window: WindowRepresentable? = nil) async {
+    func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
 
@@ -25,22 +25,21 @@ final class ContentViewModel: ObservableObject {
                 .webAuth()
                 .scope("openid profile email offline_access")
 
-            if let window = window {
-                webAuth = webAuth.presentationWindow(window)
-            }
+            // MARK: uncomment to test multi window in app browser support for iPadOS
+//            if let window = window {
+//                webAuth = webAuth.presentationWindow(window)
+//            }
 
             let credentials = try await webAuth.start()
 
             let stored = credentialsManager.store(credentials: credentials)
             if stored {
                 isAuthenticated = true
-                print("Access Token: \(credentials.accessToken)")
             } else {
                 errorMessage = "Failed to store credentials"
             }
         } catch let error as Auth0Error {
             errorMessage = "Login failed: \(error.localizedDescription)"
-            print("Web login failed with error: \(error)")
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
@@ -49,7 +48,7 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
-    func logout(presentationWindow window: WindowRepresentable? = nil) async {
+    func logout(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
         #if !os(tvOS) && !os(watchOS)
