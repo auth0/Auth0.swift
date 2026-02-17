@@ -19,6 +19,7 @@
 - [Web Auth configuration](#web-auth-configuration)
 - [ID token validation](#id-token-validation)
 - [DPoP [EA]](#dpop-ea)
+- [PAR (Pushed Authorization Requests)](#par-pushed-authorization-requests)
 - [Web Auth errors](#web-auth-errors)
 
 ### Web Auth signup
@@ -338,6 +339,97 @@ try DPoP.clearKeypair()
 
 > [!NOTE]  
 > When logging out, you do not need to call `useDPoP()` as it has no effect during the logout process.
+
+### PAR (Pushed Authorization Request)
+
+PAR (Pushed Authorization Request) enables a Backend-for-Frontend (BFF) pattern where your backend server handles the `/par` and `/token` endpoints while the SDK manages the browser-based authorization flow.
+
+This is useful when:
+- You need to use a confidential client with a `client_secret`
+- You want to keep sensitive parameters server-side
+- You're implementing a BFF architecture
+
+#### Usage
+
+The PAR flow requires coordination between your backend (BFF) and the mobile app:
+
+1. **Backend calls `/par` endpoint** - Your backend initiates the PAR request with the `client_secret` and receives a `request_uri`
+2. **SDK opens `/authorize`** - The mobile app uses the `request_uri` to open the browser for user authentication
+3. **SDK returns authorization code** - After authentication, the SDK returns the authorization code to the app
+4. **Backend exchanges code for tokens** - Your backend exchanges the code for tokens using the `client_secret`
+
+```swift
+// Step 1: Your BFF calls /par and returns request_uri to the app
+let requestURI = yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
+
+// Step 2 & 3: SDK opens browser and returns authorization code
+Auth0
+    .webAuth()
+    .authorizeWithRequestUri(requestURI: requestURI) { result in
+        switch result {
+        case .success(let authorizationCode):
+            // Step 4: Send code to BFF to exchange for tokens
+            yourBffClient.exchangeCode(authorizationCode.code)
+        case .failure(let error):
+            if error.isUserCancelled {
+                // User closed the browser
+            } else {
+                // Handle error
+            }
+        }
+    }
+```
+
+<details>
+  <summary>Using async/await</summary>
+
+```swift
+do {
+    // Step 1: Your BFF calls /par and returns request_uri
+    let requestURI = try await yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
+    
+    // Step 2 & 3: SDK opens browser and returns authorization code
+    let authorizationCode = try await Auth0
+        .webAuth()
+        .authorizeWithRequestUri(requestURI: requestURI)
+    
+    // Step 4: Send code to BFF to exchange for tokens
+    let credentials = try await yourBffClient.exchangeCode(authorizationCode.code)
+    credentialsManager.store(credentials: credentials)
+} catch let error as WebAuthError where error.isUserCancelled {
+    // User closed the browser
+} catch {
+    // Handle error
+}
+```
+</details>
+
+<details>
+  <summary>Using Combine</summary>
+
+```swift
+yourBffClient.initiatePAR(scope: "openid profile", audience: "https://api.example.com")
+    .flatMap { requestURI in
+        Auth0
+            .webAuth()
+            .authorizeWithRequestUri(requestURI: requestURI)
+    }
+    .flatMap { authorizationCode in
+        yourBffClient.exchangeCode(authorizationCode.code)
+    }
+    .sink(receiveCompletion: { completion in
+        if case .failure(let error) = completion {
+            // Handle error
+        }
+    }, receiveValue: { credentials in
+        credentialsManager.store(credentials: credentials)
+    })
+    .store(in: &cancellables)
+```
+</details>
+
+> [!NOTE]
+> The SDK only handles opening the browser with the `request_uri` and returning the authorization code. Token exchange must be performed by your backend server which holds the `client_secret`.
 
 ### Web Auth errors
 
