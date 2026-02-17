@@ -7,6 +7,13 @@ import UIKit
 import AppKit
 #endif
 
+
+#if canImport(UIKit)
+public typealias WindowRepresentable = UIWindow
+#elseif canImport(AppKit)
+public typealias WindowRepresentable = NSWindow
+#endif
+
 final class Auth0WebAuth: WebAuth {
 
     let clientId: String
@@ -41,11 +48,7 @@ final class Auth0WebAuth: WebAuth {
     private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
     private(set) var onCloseCallback: (() -> Void)?
-    #if os(macOS)
-    private(set) weak var presentationWindow: NSWindow?
-    #else
-    private(set) weak var presentationWindow: UIWindow?
-    #endif
+    private(set) weak var presentationWindow: WindowRepresentable?
 
     var state: String {
         return self.parameters["state"] ?? self.generateDefaultState()
@@ -182,19 +185,10 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    #if os(macOS)
-    @available(macOS 10.15, *)
-    func presentationWindow(_ window: NSWindow) -> Self {
+    func presentationWindow(_ window: WindowRepresentable) -> Self {
         self.presentationWindow = window
         return self
     }
-    #else
-    @available(iOS 13.0, visionOS 1.0, *)
-    func presentationWindow(_ window: UIWindow) -> Self {
-        self.presentationWindow = window
-        return self
-    }
-    #endif
 
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)

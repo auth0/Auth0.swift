@@ -13,7 +13,7 @@ struct ContentView: View {
     @StateObject private var viewModel = ContentViewModel()
 
     #if os(macOS)
-    @State private var currentWindow: NSWindow?
+    @State private var currentWindow: WindowRepresentable?
     #else
     @Environment(\.window) private var window
     #endif
@@ -24,9 +24,9 @@ struct ContentView: View {
             Button {
                 Task {
                     #if os(macOS)
-                    await viewModel.webLoginWithAS(presentationWindow: currentWindow)
+                    await viewModel.webLogin(presentationWindow: currentWindow)
                     #else
-                    await viewModel.webLoginWithAS(presentationWindow: window)
+                    await viewModel.webLogin(presentationWindow: window)
                     #endif
                 }
             } label: {

@@ -15,8 +15,7 @@ final class ContentViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
     private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 
-    #if os(macOS)
-    func webLoginWithAS(presentationWindow window: NSWindow? = nil) async {
+    func webLogin(presentationWindow window: WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
 
@@ -50,7 +49,7 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
-    func logout(presentationWindow window: NSWindow? = nil) async {
+    func logout(presentationWindow window: WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
         #if !os(tvOS) && !os(watchOS)
@@ -78,74 +77,6 @@ final class ContentViewModel: ObservableObject {
 
         isLoading = false
     }
-    #else
-
-    func webLoginWithAS(presentationWindow window: UIWindow? = nil) async {
-        isLoading = true
-        errorMessage = nil
-
-        #if !os(tvOS) && !os(watchOS)
-        do {
-            var webAuth = Auth0
-                .webAuth()
-                .scope("openid profile email offline_access")
-
-            // MARK: uncomment to test multi window in app browser support for iPadOS
-//            if let window = window {
-//                webAuth = webAuth.presentationWindow(window)
-//            }
-
-            let credentials = try await webAuth.start()
-
-            let stored = credentialsManager.store(credentials: credentials)
-            if stored {
-                isAuthenticated = true
-                print("✓ ASWebAuthenticationSession login successful")
-            } else {
-                errorMessage = "Failed to store credentials"
-            }
-        } catch let error as Auth0Error {
-            errorMessage = "AS login failed: \(error.localizedDescription)"
-            print("ASWebAuthenticationSession login failed: \(error)")
-        } catch {
-            errorMessage = "Unexpected error: \(error.localizedDescription)"
-        }
-        #endif
-
-        isLoading = false
-    }
-
-    func logout(presentationWindow window: UIWindow? = nil) async {
-        isLoading = true
-        errorMessage = nil
-        #if !os(tvOS) && !os(watchOS)
-        do {
-            var webAuth = Auth0
-                .webAuth()
-            
-            if let window = window {
-                webAuth = webAuth.presentationWindow(window)
-            }
-            
-            try await webAuth
-                .clearSession()
-
-            let cleared = credentialsManager.clear()
-            if cleared {
-                isAuthenticated = false
-                print("Logout successful")
-            }
-        } catch let error as Auth0Error {
-            errorMessage = "Logout failed: \(error.localizedDescription)"
-            print("Logout failed with error: \(error)")
-        } catch {
-            errorMessage = "Unexpected error: \(error.localizedDescription)"
-        }
-        #endif
-
-        isLoading = false
-    }
-    #endif
     
     func checkAuthentication() async {
         do {

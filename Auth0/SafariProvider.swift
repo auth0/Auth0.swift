@@ -61,11 +61,11 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     let controller: SFSafariViewController
     let callback: WebAuthProviderCallback
-    private weak var presentationWindow: UIWindow?
+    private weak var presentationWindow: WindowRepresentable?
 
     init(controller: SFSafariViewController,
          callback: @escaping WebAuthProviderCallback,
-         presentationWindow: UIWindow? = nil) {
+         presentationWindow: WindowRepresentable? = nil) {
         self.controller = controller
         self.callback = callback
         self.presentationWindow = presentationWindow
@@ -80,10 +80,10 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
         // Use top view controller from custom window if provided
         if let window = presentationWindow,
            let rootVC = window.rootViewController {
-            topViewController = UIWindow.findTopViewController(from: rootVC)
+            topViewController = WindowRepresentable.findTopViewController(from: rootVC)
         } else {
             // Fall back to key window's top view controller
-            topViewController = UIWindow.topViewController
+            topViewController = WindowRepresentable.topViewController
         }
 
         topViewController?.present(controller, animated: true, completion: nil)

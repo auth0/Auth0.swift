@@ -4,11 +4,10 @@ import AuthenticationServices
 typealias ASHandler = ASWebAuthenticationSession.CompletionHandler
 
 extension WebAuthentication {
-    #if os(macOS)
     static func asProvider(redirectURL: URL,
                            ephemeralSession: Bool = false,
                            headers: [String: String]? = nil,
-                           presentationWindow: NSWindow? = nil) -> WebAuthProvider {
+                           presentationWindow: WindowRepresentable? = nil) -> WebAuthProvider {
         return { url, callback in
             let session: ASWebAuthenticationSession
 
@@ -36,39 +35,6 @@ extension WebAuthentication {
             return ASUserAgent(session: session, callback: callback, presentationWindow: presentationWindow)
         }
     }
-    #else
-    static func asProvider(redirectURL: URL,
-                           ephemeralSession: Bool = false,
-                           headers: [String: String]? = nil,
-                           presentationWindow: UIWindow? = nil) -> WebAuthProvider {
-        return { url, callback in
-            let session: ASWebAuthenticationSession
-
-            if #available(iOS 17.4, macOS 14.4, visionOS 1.2, *) {
-                if redirectURL.scheme == "https" {
-                    session = ASWebAuthenticationSession(url: url,
-                                                         callback: .https(host: redirectURL.host!,
-                                                                          path: redirectURL.path),
-                                                         completionHandler: completionHandler(callback))
-                } else {
-                    session = ASWebAuthenticationSession(url: url,
-                                                         callback: .customScheme(redirectURL.scheme!),
-                                                         completionHandler: completionHandler(callback))
-                }
-
-                session.additionalHeaderFields = headers
-            } else {
-                session = ASWebAuthenticationSession(url: url,
-                                                     callbackURLScheme: redirectURL.scheme,
-                                                     completionHandler: completionHandler(callback))
-            }
-
-            session.prefersEphemeralWebBrowserSession = ephemeralSession
-
-            return ASUserAgent(session: session, callback: callback, presentationWindow: presentationWindow)
-        }
-    }
-    #endif
 
      static let completionHandler: (_ callback: @escaping WebAuthProviderCallback) -> ASHandler = { callback in
         return {
@@ -94,16 +60,11 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
     private(set) static var currentSession: ASWebAuthenticationSession?
     let callback: WebAuthProviderCallback
 
-    #if os(macOS)
-    weak var presentationWindow: NSWindow?
-    #else
-    weak var presentationWindow: UIWindow?
-    #endif
+    weak var presentationWindow: WindowRepresentable?
 
-    #if os(macOS)
     init(session: ASWebAuthenticationSession,
          callback: @escaping WebAuthProviderCallback,
-         presentationWindow: NSWindow? = nil) {
+         presentationWindow: WindowRepresentable? = nil) {
         self.callback = callback
         self.presentationWindow = presentationWindow
         super.init()
@@ -111,18 +72,6 @@ class ASUserAgent: NSObject, WebAuthUserAgent {
         session.presentationContextProvider = self
         ASUserAgent.currentSession = session
     }
-    #else
-    init(session: ASWebAuthenticationSession,
-         callback: @escaping WebAuthProviderCallback,
-         presentationWindow: UIWindow? = nil) {
-        self.callback = callback
-        self.presentationWindow = presentationWindow
-        super.init()
-
-        session.presentationContextProvider = self
-        ASUserAgent.currentSession = session
-    }
-    #endif
 
     func start() {
         _ = ASUserAgent.currentSession?.start()
