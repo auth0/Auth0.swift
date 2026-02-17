@@ -510,12 +510,14 @@ struct Auth0Authentication: Authentication {
                              subjectTokenType: String,
                              audience: String?,
                              scope: String,
-                             organization: String?) -> Request<Credentials, AuthenticationError> {
+                             organization: String?,
+                             parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
         return self.tokenExchange(subjectToken: subjectToken,
                                   subjectTokenType: subjectTokenType,
                                   scope: scope,
                                   audience: audience,
-                                  organization: organization)
+                                  organization: organization,
+                                  parameters: parameters)
     }
 
 }
