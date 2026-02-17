@@ -1157,7 +1157,6 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - audience: API Identifier that your application is requesting access to. Defaults to `nil`.
        - scope: Space-separated list of requested scope values. Defaults to `openid profile email`.
        - organization: Identifier of an organization the user is a member of.
-       - parameters: Additional parameters to send in the token exchange request (e.g. RFC 8693 optional claims).
      - Returns: A request that will yield Auth0 user's credentials.
   
      ## See Also
@@ -1170,8 +1169,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                              subjectTokenType: String,
                              audience: String?,
                              scope: String,
-                             organization: String?,
-                             parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
+                             organization: String?) -> Request<Credentials, AuthenticationError>
 }
 
 public extension Authentication {
@@ -1301,14 +1299,12 @@ public extension Authentication {
                              subjectTokenType: String,
                              audience: String? = nil,
                              scope: String = defaultScope,
-                             organization: String? = nil,
-                             parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
+                             organization: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.customTokenExchange(subjectToken: subjectToken,
                                         subjectTokenType: subjectTokenType,
                                         audience: audience,
                                         scope: scope,
-                                        organization: organization,
-                                        parameters: parameters)
+                                        organization: organization)
     }
 
 }

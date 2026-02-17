@@ -2032,36 +2032,6 @@ class AuthenticationSpec: QuickSpec {
                         }
                 }
             }
-
-            it("should include custom parameters in the oauth/token request") {
-                let customParam = "session_context"
-                let deviceFingerprint = "a3d8f7xyz123"
-                let extraParameters: [String: Any] = [
-                    "custom_param": customParam,
-                    "device_fingerprint": deviceFingerprint
-                ]
-
-                NetworkStub.addStub(condition: {
-                    guard $0.isToken(Domain) else { return false }
-                    guard $0.hasAtLeast([
-                        "grant_type": TokenExchangeGrantType,
-                        "subject_token": subjectToken,
-                        "subject_token_type": subjectTokenType,
-                        "client_id": ClientId
-                    ]) else { return false }
-                    return $0.hasAtLeast(extraParameters)
-                }, response: authResponse(accessToken: AccessToken, idToken: IdToken))
-
-                waitUntil(timeout: Timeout) { done in
-                    auth.customTokenExchange(subjectToken: subjectToken,
-                                            subjectTokenType: subjectTokenType,
-                                            parameters: extraParameters)
-                        .start { result in
-                            expect(result).to(haveCredentials(AccessToken, IdToken))
-                            done()
-                        }
-                }
-            }
         }
         
         describe("jwks") {
