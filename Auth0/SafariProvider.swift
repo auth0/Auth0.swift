@@ -61,7 +61,7 @@ class SafariUserAgent: NSObject, WebAuthUserAgent {
 
     let controller: SFSafariViewController
     let callback: WebAuthProviderCallback
-    var presentationWindow: UIWindow?
+    private weak var presentationWindow: UIWindow?
 
     init(controller: SFSafariViewController,
          callback: @escaping WebAuthProviderCallback,

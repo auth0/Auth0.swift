@@ -39,7 +39,7 @@ extension ASUserAgent: ASWebAuthenticationPresentationContextProviding {
 
         // Fall back to key window in foreground-active scene
         if let windowScene = UIApplication.shared()?.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-            return windowScene.windows.last(where: \.isKeyWindow) ?? ASPresentationAnchor()
+            return windowScene.windows.first(where: \.isKeyWindow) ?? ASPresentationAnchor()
         }
 
         return ASPresentationAnchor()

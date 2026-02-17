@@ -77,7 +77,7 @@ class WebViewUserAgent: NSObject, WebAuthUserAgent {
     let viewController: UIViewController
     let redirectURL: URL
     let callback: WebAuthProviderCallback
-    var presentationWindow: UIWindow?
+    private weak var presentationWindow: UIWindow?
 
     init(authorizeURL: URL,
          redirectURL: URL,

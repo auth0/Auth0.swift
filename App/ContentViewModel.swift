@@ -101,7 +101,6 @@ final class ContentViewModel: ObservableObject {
             if stored {
                 isAuthenticated = true
                 print("✓ ASWebAuthenticationSession login successful")
-                print("Access Token: \(credentials.accessToken)")
             } else {
                 errorMessage = "Failed to store credentials"
             }

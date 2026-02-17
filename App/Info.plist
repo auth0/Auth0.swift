@@ -13,10 +13,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>UIApplicationSceneManifest</key>
-	<dict>
-		<key>UIApplicationSupportsMultipleScenes</key>
-		<true/>
-	</dict>
+	<dict/>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>
