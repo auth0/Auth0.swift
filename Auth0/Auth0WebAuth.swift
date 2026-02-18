@@ -7,13 +7,6 @@ import UIKit
 import AppKit
 #endif
 
-
-#if canImport(UIKit)
-public typealias Auth0WindowRepresentable = UIWindow
-#elseif canImport(AppKit)
-public typealias Auth0WindowRepresentable = NSWindow
-#endif
-
 final class Auth0WebAuth: WebAuth {
 
     let clientId: String

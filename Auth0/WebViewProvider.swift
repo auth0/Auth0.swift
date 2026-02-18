@@ -36,7 +36,7 @@
 /// ```
 ///
 /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
-/// - Parameter presentationWindow: Optional `UIWindow` to use for presenting the browser. If not specified,
+/// - Parameter presentationWindow: Optional `UIWindow/NSWindow` to use for presenting the browser. If not specified,
 /// the active key window will be used.
 /// - Returns: A ``WebAuthProvider`` instance.
 ///

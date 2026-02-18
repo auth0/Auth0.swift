@@ -2,11 +2,6 @@ import SwiftUI
 import Auth0
 import Combine
 
-#if canImport(UIKit)
-typealias WindowRepresentable = UIWindow
-#else
-typealias WindowRepresentable = NSWindow
-#endif
 @MainActor
 final class ContentViewModel: ObservableObject {
     @Published var isLoading: Bool = false
@@ -14,7 +9,7 @@ final class ContentViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
     private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 
-    func webLogin(presentationWindow window: WindowRepresentable? = nil) async {
+    func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
 
@@ -42,7 +37,7 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
-    func logout(presentationWindow window: WindowRepresentable? = nil) async {
+    func logout(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
         #if !os(tvOS) && !os(watchOS)

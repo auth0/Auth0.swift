@@ -214,11 +214,10 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     func onClose(_ callback: (() -> Void)?) -> Self
 
-    #if os(macOS)
-    /// Specify a custom NSWindow to present the in-app browser.
+    /// Specify a custom UIWindow/NSWindow to present the in-app browser.
     /// If not specified, the system will use the active key window.
     ///
-    /// - Parameter window: The NSWindow to use for presenting the browser.
+    /// - Parameter window: The UIWindow/NSWindow to use for presenting the browser.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
     ///
     /// ## Usage
@@ -238,35 +237,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
     /// - Note: Don't use this method along with a custom provider that doesn't support window configuration.
     /// This method works with the default `ASWebAuthenticationSession` implementation and the built-in
     /// `safariProvider()` and `webViewProvider()` factories.
-    @available(macOS 10.15, *)
-    func presentationWindow(_ window: NSWindow) -> Self
-    #else
-    /// Specify a custom UIWindow to present the in-app browser.
-    /// If not specified, the system will use the active key window.
-    ///
-    /// - Parameter window: The UIWindow to use for presenting the browser.
-    /// - Returns: The same `WebAuth` instance to allow method chaining.
-    ///
-    /// ## Usage
-    ///
-    /// This is particularly useful for multi-window apps where you want to control
-    /// which window displays the authentication browser.
-    ///
-    /// ```swift
-    /// Auth0
-    ///     .webAuth()
-    ///     .presentationWindow(myWindow)
-    ///     .start { result in
-    ///         // Handle result
-    ///     }
-    /// ```
-    ///
-    /// - Note: Don't use this method along with a custom provider that doesn't support window configuration.
-    /// This method works with the default `ASWebAuthenticationSession` implementation and the built-in
-    /// `safariProvider()` and `webViewProvider()` factories.
-    @available(iOS 13.0, visionOS 1.0, *)
-    func presentationWindow(_ window: UIWindow) -> Self
-    #endif
+    func presentationWindow(_ window: Auth0WindowRepresentable) -> Self
 
     // MARK: - Methods
 

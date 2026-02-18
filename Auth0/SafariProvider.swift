@@ -36,7 +36,7 @@ public extension WebAuthentication {
     /// > Note: `SFSafariViewController` does not support using Universal Links as callback URLs.
     ///
     /// - Parameter style: `UIModalPresentationStyle` to be used. Defaults to `.fullScreen`.
-    /// - Parameter presentationWindow: Optional `UIWindow` to use for presenting the browser. If not specified,
+    /// - Parameter presentationWindow: Optional `UIWindow/NSWindow` to use for presenting the browser. If not specified,
     /// the active key window will be used.
     /// - Returns: A ``WebAuthProvider`` instance.
     ///
@@ -44,7 +44,7 @@ public extension WebAuthentication {
     ///
     /// - <doc:UserAgents>
     static func safariProvider(style: UIModalPresentationStyle = .fullScreen,
-                               presentationWindow: UIWindow? = nil) -> WebAuthProvider {
+                               presentationWindow: Auth0WindowRepresentable? = nil) -> WebAuthProvider {
         return { url, callback in
             let safari = SFSafariViewController(url: url)
             safari.dismissButtonStyle = .cancel
