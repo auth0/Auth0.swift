@@ -1,11 +1,3 @@
-//
-//  WebAuthPresentationWindowSpec.swift
-//  Auth0Tests
-//
-//  Created by Auth0 on 10/02/26.
-//  Copyright © 2026 Auth0. All rights reserved.
-//
-
 import Quick
 import Nimble
 
