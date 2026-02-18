@@ -32,12 +32,12 @@ By default, Auth0.swift uses `ASWebAuthenticationSession` with `prefersEphemeral
 
 ### With ephemeral sessions
 
-Auth0.swift allows to set `prefersEphemeralWebBrowserSession` to `true`, by calling `useEphemeralSession()`.
+Auth0.swift allows to set `prefersEphemeralWebBrowserSession` to `true`, by calling `provider(WebAuthentication.asProvider(ephemeralSession: true))`.
 
 ```swift
 Auth0
     .webAuth()
-    .useEphemeralSession()
+    .provider(WebAuthentication.asProvider(ephemeralSession: true))
     .start { result in
         // ...
     }

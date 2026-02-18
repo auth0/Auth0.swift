@@ -147,11 +147,6 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    func useEphemeralSession() -> Self {
-        self.ephemeralSession = true
-        return self
-    }
-
     func invitationURL(_ invitationURL: URL) -> Self {
         self.invitationURL = invitationURL
         return self

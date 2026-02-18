@@ -21,6 +21,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Signup connection](#signup-connection)
 - [**Behavior Changes**](#behavior-changes)
   + [Completion callbacks](#completion-callbacks)
+- [**API Changes**](#api-changes)
+  + [Ephemeral sessions](#ephemeral-sessions)
 
 ---
 
@@ -198,5 +200,41 @@ credentialsManager.credentials { result in
 </details>
 
 **Reason:** After performing operations with Auth0.swift, it's common to run presentation logic – for example, to show an error or navigate to the main flow of the app. Having callbacks execute on the main thread by default improves developer experience and reduces boilerplate.
+
+---
+
+## API Changes
+
+### Ephemeral sessions
+
+**Change:** The `useEphemeralSession()` method has been removed. Use `provider(WebAuthentication.asProvider(ephemeralSession:))` instead.
+
+The `useEphemeralSession()` method created API confusion as it was mutually exclusive with the `provider()` method but could be called alongside it, leading to unexpected behavior where one would silently override the other.
+
+**Impact:** You must replace all calls to `useEphemeralSession()` with explicit provider configuration using `WebAuthentication.asProvider(ephemeralSession: true)`.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2 - used dedicated method
+Auth0
+    .webAuth()
+    .useEphemeralSession()
+    .start { result in
+        // ...
+    }
+
+// v3 - use explicit provider configuration
+Auth0
+    .webAuth()
+    .provider(WebAuthentication.asProvider(ephemeralSession: true))
+    .start { result in
+        // ...
+    }
+```
+</details>
+
+**Reason:** Exposing the default `ASWebAuthenticationSession` provider explicitly makes the API more consistent and prevents mutually exclusive methods from being used together. The new approach clearly shows that you're configuring the provider with specific options, making the code more self-documenting and preventing confusion about which method takes precedence.
 
 ---

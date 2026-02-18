@@ -32,21 +32,21 @@ That alert box is displayed and managed by `ASWebAuthenticationSession`, not by 
 
 #### Use ephemeral sessions
 
-You can disable this behavior by adding `useEphemeralSession()` to the login call. This will configure `ASWebAuthenticationSession` to not store the session cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
+You can disable this behavior by adding `provider(WebAuthentication.asProvider(ephemeralSession: true))` to the login call. This will configure `ASWebAuthenticationSession` to not store the session cookie in the shared cookie jar, as if using an incognito browser window. With no shared cookie, `ASWebAuthenticationSession` will not prompt the user for consent.
 
 ```swift
 Auth0
     .webAuth()
-    .useEphemeralSession() // No SSO, therefore no alert box
+    .provider(WebAuthentication.asProvider(ephemeralSession: true)) // No SSO, therefore no alert box
     .start { result in
         // ...
     }
 ```
 
-Note that with `useEphemeralSession()` you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with `useEphemeralSession()` there will be no shared cookie to remove.
+Note that with ephemeral sessions you don't need to call `clearSession(federated:)` at all. Just clearing the credentials from the app will suffice. What `clearSession(federated:)` does is clear the shared session cookie, so that in the next login call the user gets asked to log in again. But with ephemeral sessions there will be no shared cookie to remove.
 
 > [!NOTE]
-> `useEphemeralSession()` relies on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`.
+> Ephemeral sessions rely on the `prefersEphemeralWebBrowserSession` configuration option of `ASWebAuthenticationSession`.
 
 #### Use `SFSafariViewController`
 
@@ -73,7 +73,7 @@ If you need SSO with `ASWebAuthenticationSession` and/or are willing to tolerate
 ```swift
 Auth0
     .webAuth()
-    .useEphemeralSession()
+    .provider(WebAuthentication.asProvider(ephemeralSession: true))
     .parameters(["prompt": "login"]) // Ignore the cookie (if present) and show the login page
     .start { result in
         // ...

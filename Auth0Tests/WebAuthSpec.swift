@@ -447,10 +447,6 @@ class WebAuthSpec: QuickSpec {
                     expect(newWebAuth().ephemeralSession).to(beFalse())
                 }
 
-                it("should use ephemeral session") {
-                    expect(newWebAuth().useEphemeralSession().ephemeralSession).to(beTrue())
-                }
-
             }
 
             context("nonce") {
