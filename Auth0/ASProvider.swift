@@ -3,6 +3,63 @@ import AuthenticationServices
 
 typealias ASHandler = ASWebAuthenticationSession.CompletionHandler
 
+public extension WebAuthentication {
+
+    /// Creates a Web Auth provider that uses `ASWebAuthenticationSession` as the external user agent.
+    ///
+    /// This is the default provider used by Web Auth. You can use this method to explicitly configure
+    /// ephemeral sessions.
+    ///
+    /// ## Usage
+    ///
+    /// Default ASWebAuthenticationSession:
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .webAuth()
+    ///     .provider(WebAuthentication.asProvider())
+    ///     .start { result in
+    ///         // ...
+    ///     }
+    /// ```
+    ///
+    /// With ephemeral session (no SSO):
+    ///
+    /// ```swift
+    /// Auth0
+    ///     .webAuth()
+    ///     .provider(WebAuthentication.asProvider(ephemeralSession: true))
+    ///     .start { result in
+    ///         // ...
+    ///     }
+    /// ```
+    ///
+    /// - Parameter ephemeralSession: If the session should not be shared with the system browser. Using this will disable
+    ///   single sign-on (SSO). Defaults to `false`.
+    /// - Returns: A ``WebAuthProvider`` instance that uses `ASWebAuthenticationSession`.
+    /// - Important: You don't need to call ``WebAuth/clearSession(federated:callback:)`` if you are using
+    /// ephemeral sessions on login, because there will be no shared cookie to remove.
+    ///
+    /// ## See Also
+    ///
+    /// - <doc:UserAgents>
+    /// - [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md)
+    /// - [prefersEphemeralWebBrowserSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio)
+    static func asProvider(ephemeralSession: Bool = false) -> WebAuthProvider {
+        return { url, callback in
+            // Extract redirect_uri from the authorization URL
+            guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+                  let redirectURIString = components.queryItems?.first(where: { $0.name == "redirect_uri" })?.value,
+                  let redirectURL = URL(string: redirectURIString) else {
+                fatalError("Could not extract redirect_uri from authorization URL")
+            }
+            
+            return asProvider(redirectURL: redirectURL, ephemeralSession: ephemeralSession, headers: nil)(url, callback)
+        }
+    }
+
+}
+
 extension WebAuthentication {
 
     static func asProvider(redirectURL: URL,

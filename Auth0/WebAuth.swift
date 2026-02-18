@@ -162,22 +162,6 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
     /// method will only work with the default `ASWebAuthenticationSession` implementation.
     func useHTTPS() -> Self
 
-    /// Use a private browser session to avoid storing the session cookie in the shared cookie jar.
-    /// Using this method will disable single sign-on (SSO).
-    ///
-    /// - Returns: The same `WebAuth` instance to allow method chaining.
-    /// - Important: You don't need to call ``WebAuth/clearSession(federated:callback:)-9yv61`` if you are using this
-    /// method on login, because there will be no shared cookie to remove.
-    /// - Note: Don't use this method along with ``provider(_:)``. Use either one or the other, because this
-    /// method will only work with the default `ASWebAuthenticationSession` implementation.
-    ///
-    /// ## See Also
-    ///
-    /// - <doc:UserAgents>
-    /// - [FAQ](https://github.com/auth0/Auth0.swift/blob/master/FAQ.md)
-    /// - [prefersEphemeralWebBrowserSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio)
-    func useEphemeralSession() -> Self
-
     /// Specify an invitation URL to join an organization.
     ///
     /// - Parameter invitationURL: Invitation URL for the organization.
@@ -194,8 +178,6 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
     ///
     /// - Parameter provider: A custom Web Auth provider.
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    /// - Note: Don't use this method along with ``useEphemeralSession()``. Use either one or the other, because
-    /// ``useEphemeralSession()`` will only work with the default `ASWebAuthenticationSession` implementation.
     ///
     /// ## See Also
     ///
@@ -322,8 +304,8 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
        - callback: Callback that receives a `Result` containing either an empty success case or an error.
      - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application
      settings in the [Dashboard](https://manage.auth0.com/#/applications/).
-     - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will
-     be no shared cookie to remove.
+     - Note: You don't need to call this method if you are using ephemeral sessions
+     (`provider(WebAuthentication.asProvider(ephemeralSession: true))`) on login, because there will be no shared cookie to remove.
 
      ## See Also
 
@@ -366,8 +348,8 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      - Returns: A type-erased publisher.
      - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application
      settings in the [Dashboard](https://manage.auth0.com/#/applications/).
-     - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will
-     be no shared cookie to remove.
+     - Note: You don't need to call this method if you are using ephemeral sessions
+     (`provider(WebAuthentication.asProvider(ephemeralSession: true))`) on login, because there will be no shared cookie to remove.
 
      ## See Also
 
@@ -399,8 +381,8 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      - Parameter federated: If the identity provider session should be removed. Defaults to `false`.
      - Requires: The **Callback URL** to have been added to the **Allowed Logout URLs** field of your Auth0 application
      settings in the [Dashboard](https://manage.auth0.com/#/applications/).
-     - Note: You don't need to call this method if you are using ``useEphemeralSession()`` on login, because there will
-     be no shared cookie to remove.
+     - Note: You don't need to call this method if you are using ephemeral sessions
+     (`provider(WebAuthentication.asProvider(ephemeralSession: true))`) on login, because there will be no shared cookie to remove.
 
      ## See Also
 

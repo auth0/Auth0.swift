@@ -4593,7 +4593,7 @@ Auth0
                     .useHTTPS() // Use a Universal Link callback URL on iOS 17.4+ / macOS 14.4+
                     .connection(connection)
                     .scope(scope)
-                    .useEphemeralSession() // Otherwise a session cookie will remain
+                    .provider(WebAuthentication.asProvider(ephemeralSession: true)) // Otherwise a session cookie will remain
                     .parameters(["login_hint": email]) // So the user doesn't have to type it again
                     .start { result in
                         // ...
