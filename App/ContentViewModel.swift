@@ -42,7 +42,7 @@ final class ContentViewModel: ObservableObject {
         isLoading = false
     }
 
-    func logout(presentationWindow window: Auth0WindowRepresentable? = nil) async {
+    func logout(presentationWindow window: WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
         #if !os(tvOS) && !os(watchOS)
