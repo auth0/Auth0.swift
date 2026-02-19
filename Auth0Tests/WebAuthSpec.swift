@@ -326,7 +326,14 @@ class WebAuthSpec: QuickSpec {
 
                 expect {
                     try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State)
-                }.to(throwError())
+                }.to(throwError { (error: WebAuthError) in
+                    guard case .unknown(let message) = error.code else {
+                        fail("Expected .unknown error, got \(error)")
+                        return
+                    }
+                    expect(error.cause).to(beNil())
+                    expect(message).to(contain("Invalid invitation URL"))
+                })
             }
 
             it("should include dpop_jkt parameter when DPoP is enabled") {
