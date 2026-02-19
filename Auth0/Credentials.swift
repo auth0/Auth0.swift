@@ -13,7 +13,6 @@ private struct _A0Credentials {
 /// User's credentials obtained from Auth0.
 @objc(A0Credentials)
 public final class Credentials: NSObject, Sendable {
-
     /// Token that can be used to make authenticated requests to the specified API (the **audience** value used on login).
     ///
     /// ## See Also
