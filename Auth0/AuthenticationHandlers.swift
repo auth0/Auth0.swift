@@ -62,3 +62,4 @@ func authenticationNoBody(from result: Result<ResponseValue, AuthenticationError
         callback(.failure(error))
     }
 }
+
