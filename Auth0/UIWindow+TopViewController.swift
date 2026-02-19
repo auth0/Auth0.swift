@@ -6,13 +6,13 @@ extension UIWindow {
         // Find the foreground active scene's key window for multi-window support
         if let windowScene = UIApplication.shared()?.connectedScenes
             .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
-           let keyWindow = windowScene.windows.first(where: \.isKeyWindow),
+           let keyWindow = windowScene.windows.last(where: \.isKeyWindow),
            let root = keyWindow.rootViewController {
             return findTopViewController(from: root)
         }
 
         // Fallback to any key window
-        guard let root = UIApplication.shared()?.windows.first(where: \.isKeyWindow)?.rootViewController else {
+        guard let root = UIApplication.shared()?.windows.last(where: \.isKeyWindow)?.rootViewController else {
             return nil
         }
         return findTopViewController(from: root)
