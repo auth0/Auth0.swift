@@ -45,7 +45,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -67,7 +69,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -87,7 +91,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -111,7 +117,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -131,7 +139,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -269,7 +279,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -331,7 +343,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -474,7 +488,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: oauthToken,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -542,7 +558,9 @@ private extension Auth0Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -568,25 +586,28 @@ private extension Auth0Authentication {
         return Request(session: session,
                        url: token,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: parameters,
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: dpop)
     }
 
-    func token<T: Codable>() -> Request<T, AuthenticationError> {
+    func token<T: IDTokenProtocol>() -> Request<T, AuthenticationError> {
         let token = URL(string: "oauth/token", relativeTo: self.url)!
         let payload: [String: Any] = ["client_id": self.clientId]
 
         return Request(session: session,
                        url: token,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(issuer: "", authentication: self, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: self.dpop)
     }
-
 }

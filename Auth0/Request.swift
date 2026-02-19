@@ -28,7 +28,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
     let url: URL
     let method: String
     let requestValidator: [RequestValidator]
-    let handle: (Result<ResponseValue, E>, Callback) -> Void
+    let handle: (Result<ResponseValue, E>, @escaping Callback) -> Void
     let parameters: [String: Any]
     let headers: [String: String]
     let logger: Logger?
@@ -39,7 +39,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
          url: URL,
          method: String,
          requestValidator: [RequestValidator] = [],
-         handle: @escaping (Result<ResponseValue, E>, Callback) -> Void,
+         handle: @escaping (Result<ResponseValue, E>, @escaping Callback) -> Void,
          parameters: [String: Any] = [:],
          headers: [String: String] = [:],
          logger: Logger?,
