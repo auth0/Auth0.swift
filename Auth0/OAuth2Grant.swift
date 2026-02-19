@@ -79,20 +79,24 @@ struct PKCE: OAuth2Grant {
         authentication
             .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
             .start { result in
-                switch result {
-                case .failure(let error) where error.localizedDescription == "Unauthorized":
-                    return callback(.failure(WebAuthError(code: .unknown("PKCE not allowed - Application Type must be 'Native' and Token Endpoint Authentication Method must be 'None'"))))
-                case .failure(let error):
-                    return callback(.failure(WebAuthError(code: .codeExchangeFailed, cause: error)))
-                case .success(let credentials):
-                    validate(idToken: credentials.idToken, with: validatorContext) { error in
-                        if let error = error {
-                            return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error)))
-                        }
-                        callback(.success(credentials))
-                    }
-                }
+                self.handleCodeExchangeResult(result, validatorContext: validatorContext, callback: callback)
             }
+    }
+
+    private func handleCodeExchangeResult(_ result: Result<Credentials, AuthenticationError>, validatorContext: IDTokenValidatorContext, callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+        switch result {
+        case .failure(let error) where error.localizedDescription == "Unauthorized":
+            return callback(.failure(WebAuthError(code: .unknown("PKCE not allowed - Application Type must be 'Native' and Token Endpoint Authentication Method must be 'None'"))))
+        case .failure(let error):
+            return callback(.failure(WebAuthError(code: .codeExchangeFailed, cause: error)))
+        case .success(let credentials):
+            validate(idToken: credentials.idToken, with: validatorContext) { error in
+                if let error = error {
+                    return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error)))
+                }
+                callback(.success(credentials))
+            }
+        }
     }
 
     func values(fromComponents components: URLComponents) -> [String: String] {
