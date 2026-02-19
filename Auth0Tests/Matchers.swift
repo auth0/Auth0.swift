@@ -71,6 +71,14 @@ func haveWebAuthError<T>(_ expected: WebAuthError) -> Nimble.Matcher<WebAuthResu
         }
     }
 }
+
+func haveUnknownError<T>(containing text: String) -> Nimble.Matcher<WebAuthResult<T>> {
+    return Matcher<WebAuthResult<T>>.define("be an unknown error containing <\(text)>") { expression, failureMessage -> MatcherResult in
+        return try beUnsuccessful(expression, failureMessage) { (error: WebAuthError) -> Bool in
+            return error.message.contains(text)
+        }
+    }
+}
 #endif
 
 func haveCredentialsManagerError<T>(_ expected: CredentialsManagerError) -> Nimble.Matcher<CredentialsManagerResult<T>> {

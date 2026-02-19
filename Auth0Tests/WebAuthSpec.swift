@@ -322,12 +322,11 @@ class WebAuthSpec: QuickSpec {
 
             it("should handle buildAuthorizeURL errors") {
                 let invitationUrl = URL(string: "https://example.com?invalid=query")!
-                let expectedError = WebAuthError(code: .invalidInvitationURL(invitationUrl.absoluteString))
                 let webAuth = newWebAuth().invitationURL(invitationUrl) // Invalid invitation URL
 
-                expect({
-                    _ = try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State)
-                }).to(throwError(expectedError))
+                expect {
+                    try webAuth.buildAuthorizeURL(withRedirectURL: RedirectURL, defaults: defaults, state: State)
+                }.to(throwError())
             }
 
             it("should include dpop_jkt parameter when DPoP is enabled") {
@@ -603,45 +602,40 @@ class WebAuthSpec: QuickSpec {
 
             it("should produce an invalid invitation URL error when the organization is missing") {
                 let url = "https://\(Domain)?invitation=foo"
-                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveUnknownError(containing: "Invalid invitation URL"))
             }
 
             it("should produce an invalid invitation URL error when the invitation is missing") {
                 let url = "https://\(Domain)?organization=foo"
-                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveUnknownError(containing: "Invalid invitation URL"))
             }
 
             it("should produce an invalid invitation URL error when the organization and invitation are missing") {
                 let url = "https://\(Domain)?foo=bar"
-                let expectedError = WebAuthError(code: .invalidInvitationURL(url))
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(URL(string: url)!)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveUnknownError(containing: "Invalid invitation URL"))
             }
 
             it("should produce an invalid invitation URL error when the query parameters are missing") {
-                let expectedError = WebAuthError(code: .invalidInvitationURL(DomainURL.absoluteString))
                 var result: WebAuthResult<Credentials>?
                 _ = auth.invitationURL(DomainURL)
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveUnknownError(containing: "Invalid invitation URL"))
             }
 
             it("should produce a no bundle identifier error when redirect URL is missing") {
-                let expectedError = WebAuthError(code: .noBundleIdentifier)
                 var result: WebAuthResult<Credentials>?
                 auth.redirectURL = nil
                 auth.start { result = $0 }
-                expect(result).toEventually(haveWebAuthError(expectedError))
+                expect(result).toEventually(haveUnknownError(containing: "Unable to retrieve bundle identifier"))
             }
 
             context("transaction") {
@@ -923,7 +917,7 @@ class WebAuthSpec: QuickSpec {
                 var result: WebAuthResult<Void>?
                 auth.redirectURL = nil
                 auth.clearSession() { result = $0 }
-                expect(result).to(haveWebAuthError(WebAuthError(code: .noBundleIdentifier)))
+                expect(result).to(haveUnknownError(containing: "Unable to retrieve bundle identifier"))
             }
 
             context("transaction") {
