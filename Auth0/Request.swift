@@ -210,6 +210,98 @@ public extension Request {
 
 }
 
+// MARK: - ID Token Validation
+
+#if WEB_AUTH_PLATFORM
+public extension Request where T == Credentials, E == AuthenticationError {
+
+    /**
+     Starts the request and automatically validates the ID token if present in the response.
+
+     - Parameters:
+       - issuer: The expected issuer of the ID token.
+       - leeway: The amount of leeway, in milliseconds, to accommodate potential clock skew. Defaults to 60000ms (60 seconds).
+       - maxAge: The maximum authentication age, in seconds. Optional.
+       - nonce: The expected nonce value. Optional.
+       - organization: The expected organization ID or name. Optional.
+       - authentication: The Authentication instance used for JWKS retrieval.
+       - callback: Callback that receives the validated credentials or an error.
+     */
+    func startWithIDTokenValidation(issuer: String,
+                                   leeway: Int = 60000,
+                                   maxAge: Int? = nil,
+                                   nonce: String? = nil,
+                                   organization: String? = nil,
+                                   authentication: Authentication,
+                                   callback: @escaping Callback) {
+        self.start { result in
+            switch result {
+            case .failure(let error):
+                callback(.failure(error))
+            case .success(let credentials):
+                guard !credentials.idToken.isEmpty else {
+                    return callback(.success(credentials))
+                }
+
+                let validatorContext = IDTokenValidatorContext(authentication: authentication,
+                                                               issuer: issuer,
+                                                               leeway: leeway,
+                                                               maxAge: maxAge,
+                                                               nonce: nonce,
+                                                               organization: organization)
+                validate(idToken: credentials.idToken, with: validatorContext) { error in
+                    if let error = error {
+                        return callback(.failure(AuthenticationError(cause: error)))
+                    }
+                    callback(.success(credentials))
+                }
+            }
+        }
+    }
+}
+
+public extension Request where T == SSOCredentials, E == AuthenticationError {
+
+    /**
+     Starts the request and automatically validates the ID token if present in the response.
+
+     - Parameters:
+       - issuer: The expected issuer of the ID token.
+       - leeway: The amount of leeway, in milliseconds, to accommodate potential clock skew. Defaults to 60000ms (60 seconds).
+       - authentication: The Authentication instance used for JWKS retrieval.
+       - callback: Callback that receives the validated credentials or an error.
+     */
+    func startWithIDTokenValidation(issuer: String,
+                                   leeway: Int = 60000,
+                                   authentication: Authentication,
+                                   callback: @escaping Callback) {
+        self.start { result in
+            switch result {
+            case .failure(let error):
+                callback(.failure(error))
+            case .success(let credentials):
+                guard !credentials.idToken.isEmpty else {
+                    return callback(.success(credentials))
+                }
+
+                let validatorContext = IDTokenValidatorContext(authentication: authentication,
+                                                               issuer: issuer,
+                                                               leeway: leeway,
+                                                               maxAge: nil,
+                                                               nonce: nil,
+                                                               organization: nil)
+                validate(idToken: credentials.idToken, with: validatorContext) { error in
+                    if let error = error {
+                        return callback(.failure(AuthenticationError(cause: error)))
+                    }
+                    callback(.success(credentials))
+                }
+            }
+        }
+    }
+}
+#endif
+
 // MARK: - Async/Await
 
 #if canImport(_Concurrency)

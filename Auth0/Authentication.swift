@@ -952,6 +952,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      */
     func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
 
+
     /**
      Exchanges a user's refresh token for a session transfer token that can be used to perform web single sign-on
      (SSO).
@@ -1308,3 +1309,4 @@ public extension Authentication {
     }
 
 }
+
