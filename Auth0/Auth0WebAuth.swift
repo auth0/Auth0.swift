@@ -181,7 +181,7 @@ final class Auth0WebAuth: WebAuth {
         }
 
         guard let redirectURL = self.redirectURL else {
-            return mainThreadCallback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            return mainThreadCallback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
         let handler = self.handler(redirectURL)
@@ -238,7 +238,7 @@ final class Auth0WebAuth: WebAuth {
         components?.queryItems = queryItems + [returnTo, clientId]
 
         guard let logoutURL = components?.url, let redirectURL = self.redirectURL else {
-            return mainThreadCallback(.failure(WebAuthError(code: .noBundleIdentifier)))
+            return mainThreadCallback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, headers: headers)
@@ -276,7 +276,7 @@ final class Auth0WebAuth: WebAuth {
             guard let queryItems = URLComponents(url: invitationURL, resolvingAgainstBaseURL: false)?.queryItems,
                   let organizationId = queryItems.first(where: { $0.name == "organization" })?.value,
                   let invitationId = queryItems.first(where: { $0.name == "invitation" })?.value else {
-                throw WebAuthError(code: .invalidInvitationURL(invitationURL.absoluteString))
+                throw WebAuthError(code: .unknown("Invalid invitation URL: missing organization or invitation parameters"))
             }
 
             entries["organization"] = organizationId

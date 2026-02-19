@@ -21,6 +21,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Signup connection](#signup-connection)
 - [**Behavior Changes**](#behavior-changes)
   + [Completion callbacks](#completion-callbacks)
+- [**API Changes**](#api-changes)
+  + [WebAuthError cases](#webautherror-cases)
 
 ---
 
@@ -198,5 +200,27 @@ credentialsManager.credentials { result in
 </details>
 
 **Reason:** After performing operations with Auth0.swift, it's common to run presentation logic – for example, to show an error or navigate to the main flow of the app. Having callbacks execute on the main thread by default improves developer experience and reduces boilerplate.
+
+---
+
+## API Changes
+
+### WebAuthError cases
+
+**Change:** WebAuthError has been refined to provide more actionable error information:
+
+**Removed cases** (now return `.unknown` with descriptive messages):
+- `.noBundleIdentifier` - Configuration error that should be caught during development
+- `.noAuthorizationCode` - Rare edge case in PKCE flow
+- `.invalidInvitationURL` - Configuration error for organization invitations
+- `.pkceNotAllowed` - Configuration error (Application Type must be "Native" and Token Endpoint Authentication Method must be "None"). This error happens at most once when integrating the SDK into the app
+
+**New cases**:
+- `.authenticationFailed` - Server-side authentication failures (wrong password, MFA required, account locked, etc.)
+- `.codeExchangeFailed` - Token exchange failures (network issues, invalid grant, backend errors, etc.)
+
+**Impact:** Error handling code needs to be updated to use the new error cases. The removed cases will now throw `.unknown` errors with descriptive messages.
+
+**Reason:** The removed error cases represent configuration issues that should be caught during development, not handled in production code. This will result in a more useful and meaningful set of WebAuthError cases.
 
 ---
