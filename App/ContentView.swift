@@ -23,10 +23,12 @@ struct ContentView: View {
 
             Button {
                 Task {
+                    #if WEB_AUTH_PLATFORM
                     #if os(macOS)
                     await viewModel.webLogin(presentationWindow: currentWindow)
                     #else
                     await viewModel.webLogin(presentationWindow: window)
+                    #endif
                     #endif
                 }
             } label: {
@@ -42,10 +44,13 @@ struct ContentView: View {
 
             Button {
                 Task {
+                    #if WEB_AUTH_PLATFORM
+
                     #if os(macOS)
                     await viewModel.logout(presentationWindow: currentWindow)
                     #else
                     await viewModel.logout(presentationWindow: window)
+                    #endif
                     #endif
                 }
             } label: {
