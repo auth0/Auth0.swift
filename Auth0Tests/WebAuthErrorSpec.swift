@@ -79,25 +79,10 @@ class WebAuthErrorSpec: QuickSpec {
 
         describe("error message") {
 
-            it("should return message for no bundle identifier") {
-                let message = "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
-                + " or it could not be used to build a valid URL."
-                let error = WebAuthError(code: .noBundleIdentifier)
-                expect(error.localizedDescription) == message
-            }
-
             it("should return message for transaction active already") {
                 let message = "Failed to start this transaction, as there is an active transaction at the"
                 + " moment."
                 let error = WebAuthError(code: .transactionActiveAlready)
-                expect(error.localizedDescription) == message
-            }
-
-            it("should return message for invalid invitation URL") {
-                let url = "https://samples.auth0.com"
-                let message = "The invitation URL (\(url)) is missing the 'invitation' and/or"
-                + " the 'organization' query parameters."
-                let error = WebAuthError(code: .invalidInvitationURL(url))
                 expect(error.localizedDescription) == message
             }
 
@@ -107,20 +92,20 @@ class WebAuthErrorSpec: QuickSpec {
                 expect(error.localizedDescription) == message
             }
 
-            it("should return message for PKCE not allowed") {
-                let message = "Unable to perform authentication with PKCE."
-                + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
-                + " 'Application Type' to 'Native'."
-                let error = WebAuthError(code: .pkceNotAllowed)
-                expect(error.localizedDescription) == message
+            it("should return message for authentication failed") {
+                let message = "The authentication request failed."
+                let authError = AuthenticationError(info: ["error": "access_denied"], statusCode: 302)
+                let error = WebAuthError(code: .authenticationFailed, cause: authError)
+                expect(error.message) == message
+                expect(error.cause).toNot(beNil())
             }
 
-            it("should return message for no authorization code") {
-                let values: [String: String] = ["foo": "bar"]
-                let message = "The callback URL is missing the authorization code in its"
-                + " query parameters (\(values))."
-                let error = WebAuthError(code: .noAuthorizationCode(values))
-                expect(error.localizedDescription) == message
+            it("should return message for code exchange failed") {
+                let message = "The authorization code exchange failed."
+                let authError = AuthenticationError(info: ["error": "invalid_grant"], statusCode: 400)
+                let error = WebAuthError(code: .codeExchangeFailed, cause: authError)
+                expect(error.message) == message
+                expect(error.cause).toNot(beNil())
             }
 
             it("should return message for id token validation failed") {

@@ -65,7 +65,7 @@ struct PKCE: OAuth2Grant {
 
     func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         guard let code = values["code"] else {
-            return callback(.failure(WebAuthError(code: .noAuthorizationCode(values))))
+            return callback(.failure(WebAuthError(code: .unknown("Authorization code missing from callback URL query parameters (\(values))"))))
         }
         let authentication = self.authentication
         let verifier = self.verifier
@@ -81,8 +81,9 @@ struct PKCE: OAuth2Grant {
             .start { result in
                 switch result {
                 case .failure(let error) where error.localizedDescription == "Unauthorized":
-                    return callback(.failure(WebAuthError(code: .pkceNotAllowed)))
-                case .failure(let error): return callback(.failure(WebAuthError(code: .other, cause: error)))
+                    return callback(.failure(WebAuthError(code: .unknown("PKCE not allowed - Application Type must be 'Native' and Token Endpoint Authentication Method must be 'None'"))))
+                case .failure(let error):
+                    return callback(.failure(WebAuthError(code: .codeExchangeFailed, cause: error)))
                 case .success(let credentials):
                     validate(idToken: credentials.idToken, with: validatorContext) { error in
                         if let error = error {
