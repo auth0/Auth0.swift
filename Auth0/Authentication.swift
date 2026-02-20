@@ -67,7 +67,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/authenticate-user)
      */
-    func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(email: String, code: String, audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError>
 
     /**
      Logs a user in using a phone number and an OTP code received via SMS. This is the last part of the passwordless login flow.
@@ -113,7 +113,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/authenticate-user)
      */
-    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError>
 
     /**
      Logs a user in using a username and password with a realm or connection.
@@ -163,7 +163,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/resource-owner-password-flow/get-token)
      */
-    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError>
 
     /**
      Verifies multi-factor authentication (MFA) using a one-time password (OTP).
@@ -197,7 +197,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - ``MFAClient``
      */
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
+    func login(withOTP otp: String, mfaToken: String) -> any Requestable<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either push notification, SMS
     /// or voice).
@@ -231,7 +231,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-out-of-band)
     /// - ``MFAClient``
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> any Requestable<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using a recovery code.
     /// Some multi-factor authentication (MFA) providers support using a recovery code to login. Use this method to
@@ -268,7 +268,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-recovery-code)
     /// - ``MFAClient``
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> any Requestable<Credentials, AuthenticationError>
 
     /// Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
     /// application and user.
@@ -304,7 +304,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/request-mfa-challenge)
     /// - ``MFAClient``
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> Request<Challenge, AuthenticationError>
+    func multifactorChallenge(mfaToken: String, types: [String]?, authenticatorId: String?) -> any Requestable<Challenge, AuthenticationError>
 
     /**
      Logs a user in with their Sign In with Apple authorization code.
@@ -353,7 +353,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                fullName: PersonNameComponents?,
                profile: [String: Any]?,
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError>
+               scope: String) -> any Requestable<Credentials, AuthenticationError>
 
     /**
      Logs a user in with their Facebook [session info access token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and profile data.
@@ -401,7 +401,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     func login(facebookSessionAccessToken sessionAccessToken: String,
                profile: [String: Any],
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError>
+               scope: String) -> any Requestable<Credentials, AuthenticationError>
 
     /**
      Logs a user in using a username and password in the default directory.
@@ -446,7 +446,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/resource-owner-password-flow/get-token)
      */
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> any Requestable<Credentials, AuthenticationError>
 
     /**
      Creates a user in a database connection.
@@ -516,7 +516,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/signup/create-a-new-user)
      */
-    func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> Request<DatabaseUser, AuthenticationError>
+    func signup(email: String, username: String?, password: String, connection: String, userMetadata: [String: Any]?, rootAttributes: [String: Any]?) -> any Requestable<DatabaseUser, AuthenticationError>
 
     #if PASSKEYS_PLATFORM
     /// Logs a user in using an existing passkey credential and the login challenge. This is the last part of the passkey login flow.
@@ -579,7 +579,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError>
+               organization: String?) -> any Requestable<Credentials, AuthenticationError>
 
     /// Requests a challenge for logging a user in with an existing passkey. This is the first part of the passkey login flow.
     ///
@@ -641,7 +641,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Connect-to-a-service-with-an-existing-account)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyLoginChallenge(connection: String?,
-                               organization: String?) -> Request<PasskeyLoginChallenge, AuthenticationError>
+                               organization: String?) -> any Requestable<PasskeyLoginChallenge, AuthenticationError>
 
     /// Logs a new user in using a signup passkey credential and the signup challenge. This is the last part of the passkey signup flow.
     ///
@@ -703,7 +703,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError>
+               organization: String?) -> any Requestable<Credentials, AuthenticationError>
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
@@ -785,7 +785,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                                 username: String?,
                                 name: String?,
                                 connection: String?,
-                                organization: String?) -> Request<PasskeySignupChallenge, AuthenticationError>
+                                organization: String?) -> any Requestable<PasskeySignupChallenge, AuthenticationError>
     #endif
 
     /**
@@ -810,7 +810,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/change-password/change-password)
      */
-    func resetPassword(email: String, connection: String) -> Request<Void, AuthenticationError>
+    func resetPassword(email: String, connection: String) -> any Requestable<Void, AuthenticationError>
 
     /**
      Starts passwordless authentication by sending an email with an OTP code. This is the first part of the
@@ -846,7 +846,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/get-code-or-link)
      */
-    func startPasswordless(email: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
+    func startPasswordless(email: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError>
 
     /**
      Starts passwordless authentication by sending an SMS with an OTP code. This is the first part of the passwordless
@@ -882,7 +882,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/get-code-or-link)
      */
-    func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> Request<Void, AuthenticationError>
+    func startPasswordless(phoneNumber: String, type: PasswordlessType, connection: String) -> any Requestable<Void, AuthenticationError>
 
     /**
      Returns OIDC standard claims information by performing a request to the `/userinfo` endpoint.
@@ -915,7 +915,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/user-profile/get-user-info)
      */
-    func userInfo(withAccessToken accessToken: String, tokenType: String) -> Request<UserInfo, AuthenticationError>
+    func userInfo(withAccessToken accessToken: String, tokenType: String) -> any Requestable<UserInfo, AuthenticationError>
 
     /**
      Performs the last step of Proof Key for Code Exchange (PKCE).
@@ -950,7 +950,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/authorization-code-flow-with-pkce/get-token-pkce)
      - [RFC 7636](https://tools.ietf.org/html/rfc7636)
      */
-    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> any Requestable<Credentials, AuthenticationError>
 
     /**
      Exchanges a user's refresh token for a session transfer token that can be used to perform web single sign-on
@@ -1012,7 +1012,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
      */
-    func ssoExchange(withRefreshToken refreshToken: String) -> Request<SSOCredentials, AuthenticationError>
+    func ssoExchange(withRefreshToken refreshToken: String) -> any Requestable<SSOCredentials, AuthenticationError>
 
     /**
      Renews the user's credentials using a refresh token.
@@ -1059,7 +1059,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
      - <doc:RefreshTokens>
      */
-    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
+    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> any Requestable<Credentials, AuthenticationError>
 
     /**
      Revokes a user's refresh token by performing a request to the `/oauth/revoke` endpoint.
@@ -1081,7 +1081,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
      - [Error Responses](https://auth0.com/docs/api/authentication#post-oauth-revoke)
      */
-    func revoke(refreshToken: String) -> Request<Void, AuthenticationError>
+    func revoke(refreshToken: String) -> any Requestable<Void, AuthenticationError>
 
     /**
      Returns JSON Web Key Set (JWKS) information from the `/.well-known/jwks.json` endpoint.
@@ -1108,7 +1108,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
      - [JSON Web Key Sets](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-key-sets)
      */
-    func jwks() -> Request<JWKS, AuthenticationError>
+    func jwks() -> any Requestable<JWKS, AuthenticationError>
 
     /**
      Performs a custom token exchange to obtain Auth0 credentials using an existing identity provider token.
@@ -1169,30 +1169,30 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                              subjectTokenType: String,
                              audience: String?,
                              scope: String,
-                             organization: String?) -> Request<Credentials, AuthenticationError>
+                             organization: String?) -> any Requestable<Credentials, AuthenticationError>
 }
 
 public extension Authentication {
 
-    func login(email: String, code: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+    func login(email: String, code: String, audience: String? = nil, scope: String = defaultScope) -> any Requestable<Credentials, AuthenticationError> {
         return self.login(email: email, code: code, audience: audience, scope: scope)
     }
 
-    func login(phoneNumber: String, code: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+    func login(phoneNumber: String, code: String, audience: String? = nil, scope: String = defaultScope) -> any Requestable<Credentials, AuthenticationError> {
         return self.login(phoneNumber: phoneNumber, code: code, audience: audience, scope: scope)
     }
 
-    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String? = nil, scope: String = defaultScope) -> any Requestable<Credentials, AuthenticationError> {
         return self.login(usernameOrEmail: username, password: password, realmOrConnection: realm, audience: audience, scope: scope)
     }
 
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil) -> Request<Credentials, AuthenticationError> {
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil) -> any Requestable<Credentials, AuthenticationError> {
         return self.login(withOOBCode: oobCode, mfaToken: mfaToken, bindingCode: bindingCode)
     }
 
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func multifactorChallenge(mfaToken: String, types: [String]? = nil, authenticatorId: String? = nil) -> Request<Challenge, AuthenticationError> {
+    func multifactorChallenge(mfaToken: String, types: [String]? = nil, authenticatorId: String? = nil) -> any Requestable<Challenge, AuthenticationError> {
         return self.multifactorChallenge(mfaToken: mfaToken, types: types, authenticatorId: authenticatorId)
     }
 
@@ -1200,7 +1200,7 @@ public extension Authentication {
                fullName: PersonNameComponents? = nil,
                profile: [String: Any]? = nil,
                audience: String? = nil,
-               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope) -> any Requestable<Credentials, AuthenticationError> {
         return self.login(appleAuthorizationCode: authorizationCode,
                           fullName: fullName,
                           profile: profile,
@@ -1211,18 +1211,18 @@ public extension Authentication {
     func login(facebookSessionAccessToken sessionAccessToken: String,
                profile: [String: Any],
                audience: String? = nil,
-               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope) -> any Requestable<Credentials, AuthenticationError> {
         return self.login(facebookSessionAccessToken: sessionAccessToken,
                           profile: profile,
                           audience: audience,
                           scope: scope)
     }
 
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String = defaultScope) -> any Requestable<Credentials, AuthenticationError> {
         return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope)
     }
 
-    func signup(email: String, username: String? = nil, password: String, connection: String = "Username-Password-Authentication", userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
+    func signup(email: String, username: String? = nil, password: String, connection: String = "Username-Password-Authentication", userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> any Requestable<DatabaseUser, AuthenticationError> {
         return self.signup(email: email, username: username, password: password, connection: connection, userMetadata: userMetadata, rootAttributes: rootAttributes)
     }
 
@@ -1233,7 +1233,7 @@ public extension Authentication {
                connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope,
-               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+               organization: String? = nil) -> any Requestable<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
@@ -1243,7 +1243,7 @@ public extension Authentication {
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
-    func passkeyLoginChallenge(connection: String? = nil, organization: String? = nil) -> Request<PasskeyLoginChallenge, AuthenticationError> {
+    func passkeyLoginChallenge(connection: String? = nil, organization: String? = nil) -> any Requestable<PasskeyLoginChallenge, AuthenticationError> {
         return self.passkeyLoginChallenge(connection: connection, organization: organization)
     }
 
@@ -1253,7 +1253,7 @@ public extension Authentication {
                connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope,
-               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+               organization: String? = nil) -> any Requestable<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
@@ -1268,7 +1268,7 @@ public extension Authentication {
                                 username: String? = nil,
                                 name: String? = nil,
                                 connection: String? = nil,
-                                organization: String? = nil) -> Request<PasskeySignupChallenge, AuthenticationError> {
+                                organization: String? = nil) -> any Requestable<PasskeySignupChallenge, AuthenticationError> {
         return self.passkeySignupChallenge(email: email,
                                            phoneNumber: phoneNumber,
                                            username: username,
@@ -1278,20 +1278,20 @@ public extension Authentication {
     }
     #endif
 
-    func startPasswordless(email: String, type: PasswordlessType = .code, connection: String = "email") -> Request<Void, AuthenticationError> {
+    func startPasswordless(email: String, type: PasswordlessType = .code, connection: String = "email") -> any Requestable<Void, AuthenticationError> {
         return self.startPasswordless(email: email, type: type, connection: connection)
     }
 
-    func startPasswordless(phoneNumber: String, type: PasswordlessType = .code, connection: String = "sms") -> Request<Void, AuthenticationError> {
+    func startPasswordless(phoneNumber: String, type: PasswordlessType = .code, connection: String = "sms") -> any Requestable<Void, AuthenticationError> {
         return self.startPasswordless(phoneNumber: phoneNumber, type: type, connection: connection)
     }
 
     func userInfo(withAccessToken accessToken: String,
-                  tokenType: String = "Bearer") -> Request<UserInfo, AuthenticationError> {
+                  tokenType: String = "Bearer") -> any Requestable<UserInfo, AuthenticationError> {
         self.userInfo(withAccessToken: accessToken, tokenType: tokenType)
     }
 
-    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> any Requestable<Credentials, AuthenticationError> {
         return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
     }
 
@@ -1299,7 +1299,7 @@ public extension Authentication {
                              subjectTokenType: String,
                              audience: String? = nil,
                              scope: String = defaultScope,
-                             organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+                             organization: String? = nil) -> any Requestable<Credentials, AuthenticationError> {
         return self.customTokenExchange(subjectToken: subjectToken,
                                         subjectTokenType: subjectTokenType,
                                         audience: audience,

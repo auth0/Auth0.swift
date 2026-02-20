@@ -74,7 +74,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String?,
-                                    connection: String?) -> Request<PasskeyEnrollmentChallenge, MyAccountError>
+                                    connection: String?) -> any Requestable<PasskeyEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new passkey credential. This is the last part of the enrollment flow.
     ///
@@ -115,7 +115,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - [Supporting passkeys](https://developer.apple.com/documentation/authenticationservices/supporting-passkeys#Register-a-new-account-on-a-service)
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func enroll(passkey: NewPasskey,
-                challenge: PasskeyEnrollmentChallenge) -> Request<PasskeyAuthenticationMethod, MyAccountError>
+                challenge: PasskeyEnrollmentChallenge) -> any Requestable<PasskeyAuthenticationMethod, MyAccountError>
 #endif
 
     /// Requests a challenge for enrolling a recovery code authentication method. This is the first part of the enrollment flow.
@@ -148,7 +148,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request that will yield an recovery code challenge
-    func enrollRecoveryCode() -> Request<RecoveryCodeEnrollmentChallenge, MyAccountError>
+    func enrollRecoveryCode() -> any Requestable<RecoveryCodeEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new Recovery code credential. This is the last part of the enrollment flow.
     ///
@@ -184,7 +184,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - authSession: The unique session identifier for the enrollment as returned by POST /authentication-methods
     /// - Returns: A request that will yield an enrolled recovery code authentication method.
     func confirmRecoveryCodeEnrollment(id: String,
-                                       authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+                                       authSession: String) -> any Requestable<AuthenticationMethod, MyAccountError>
 
     /// Requests a challenge for enrolling a TOTP authentication method. This is the first part of the enrollment flow.
     ///
@@ -216,7 +216,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request that will yield a totp enrollment challenge
-    func enrollTOTP() -> Request<TOTPEnrollmentChallenge, MyAccountError>
+    func enrollTOTP() -> any Requestable<TOTPEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new ToTP authentication method. This is the last part of the enrollment flow.
     ///
@@ -254,7 +254,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Returns: A request that will yield an enrolled TOTP authentication method.
     func confirmTOTPEnrollment(id: String,
                                authSession: String,
-                               otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+                               otpCode: String) -> any Requestable<AuthenticationMethod, MyAccountError>
 
     /// Requests a challenge for enrolling a push notification authentication method. This is the first part of the enrollment flow.
     ///
@@ -286,7 +286,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request that will yield a push notification enrolment challenge
-    func enrollPushNotification() -> Request<PushEnrollmentChallenge, MyAccountError>
+    func enrollPushNotification() -> any Requestable<PushEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new Push Notification authentication method. This is the last part of the enrollment flow.
     ///
@@ -323,7 +323,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Returns: A request that will yield an enrolled Push Notification authentication method.
     ///
     func confirmPushNotificationEnrollment(id: String,
-                                           authSession: String) -> Request<AuthenticationMethod, MyAccountError>
+                                           authSession: String) -> any Requestable<AuthenticationMethod, MyAccountError>
 
     /// Requests a challenge for enrolling a Email authentication method. This is the first part of the enrollment flow.
     ///
@@ -357,7 +357,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Parameters:
     ///   - emailAddress:  The email address to use for sending one-time codes.
     /// - Returns: A request that will yield a email enrolment challenge
-    func enrollEmail(emailAddress: String) -> Request<EmailEnrollmentChallenge, MyAccountError>
+    func enrollEmail(emailAddress: String) -> any Requestable<EmailEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new Email authentication method. This is the last part of the enrollment flow.
     ///
@@ -395,7 +395,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Returns: A request that will yield an enrolled email authentication method.
     func confirmEmailEnrollment(id: String,
                                 authSession: String,
-                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+                                otpCode: String) -> any Requestable<AuthenticationMethod, MyAccountError>
 
     /// Requests a challenge for enrolling a Phone authentication method. This is the first part of the enrollment flow.
     ///
@@ -431,7 +431,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     ///   - preferredAuthenticationMethod: The preferred communication method(sms). If no value is passed by default sms will be the preferred authentication method
     /// - Returns: A request that will yield a phone enrollment challenge
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> Request<PhoneEnrollmentChallenge, MyAccountError>
+                     preferredAuthenticationMethod: PreferredAuthenticationMethod?) -> any Requestable<PhoneEnrollmentChallenge, MyAccountError>
 
     /// Enrolls a new Phone authentication method. This is the last part of the enrollment flow.
     ///
@@ -469,7 +469,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Returns: A request that will yield an enrolled phone authentication method.
     func confirmPhoneEnrollment(id: String,
                                 authSession: String,
-                                otpCode: String) -> Request<AuthenticationMethod, MyAccountError>
+                                otpCode: String) -> any Requestable<AuthenticationMethod, MyAccountError>
 
     /// Delete an authentication method associated with an id
     ///
@@ -503,7 +503,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Parameters:
     ///   - id: Id of the authentication method user wishes to delete
     /// - Returns: A request that will delete an authentication method associated with an id
-    func deleteAuthenticationMethod(by id: String) -> Request<Void, MyAccountError>
+    func deleteAuthenticationMethod(by id: String) -> any Requestable<Void, MyAccountError>
 
     /// Fetch details of an authentication method associated with an id
     ///
@@ -537,7 +537,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// - Parameters:
     ///   - id:  Id of the returned authentication method
     /// - Returns: A request to fetch authentication method associated with the id.
-    func getAuthenticationMethod(by id: String) -> Request<AuthenticationMethod, MyAccountError>
+    func getAuthenticationMethod(by id: String) -> any Requestable<AuthenticationMethod, MyAccountError>
 
     /// Retrieve detailed list of authentication methods belonging to the authenticated user.
     ///
@@ -569,7 +569,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request that will return list of authentication methods of an authenticated user
-    func getAuthenticationMethods() -> Request<[AuthenticationMethod], MyAccountError>
+    func getAuthenticationMethods() -> any Requestable<[AuthenticationMethod], MyAccountError>
 
     /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
     ///
@@ -601,7 +601,7 @@ public protocol MyAccountAuthenticationMethods: MyAccountClient {
     /// ```
     ///
     /// - Returns: A request to fetch factors enabled for the Auth0 tenant and available for enrollment
-    func getFactors() -> Request<[Factor], MyAccountError>
+    func getFactors() -> any Requestable<[Factor], MyAccountError>
 }
 // MARK: - Default Parameters
 
@@ -610,13 +610,13 @@ public extension MyAccountAuthenticationMethods {
     #if PASSKEYS_PLATFORM
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
     func passkeyEnrollmentChallenge(userIdentityId: String? = nil,
-                                    connection: String? = nil) -> Request<PasskeyEnrollmentChallenge, MyAccountError> {
+                                    connection: String? = nil) -> any Requestable<PasskeyEnrollmentChallenge, MyAccountError> {
         self.passkeyEnrollmentChallenge(userIdentityId: userIdentityId, connection: connection)
     }
     #endif
 
     func enrollPhone(phoneNumber: String,
-                     preferredAuthenticationMethod: PreferredAuthenticationMethod? = nil) -> Request<PhoneEnrollmentChallenge, MyAccountError> {
+                     preferredAuthenticationMethod: PreferredAuthenticationMethod? = nil) -> any Requestable<PhoneEnrollmentChallenge, MyAccountError> {
         self.enrollPhone(phoneNumber: phoneNumber,
                          preferredAuthenticationMethod: preferredAuthenticationMethod)
     }

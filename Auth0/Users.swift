@@ -71,7 +71,7 @@ public protocol Users: Trackable, Loggable {
 
      - [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id)
      */
-    func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError>
+    func get(_ identifier: String, fields: [String], include: Bool) -> any Requestable<ManagementObject, ManagementError>
 
     /**
      Updates a user's root values (those which are allowed to be updated).
@@ -125,7 +125,7 @@ public protocol Users: Trackable, Loggable {
      - [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      */
     @available(*, deprecated, message: "This operation can no longer be performed from native apps for security reasons")
-    func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError>
+    func patch(_ identifier: String, attributes: UserPatchAttributes) -> any Requestable<ManagementObject, ManagementError>
 
     /**
      Updates only the user's `user_metadata` field.
@@ -149,7 +149,7 @@ public protocol Users: Trackable, Loggable {
 
      - [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id)
      */
-    func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError>
+    func patch(_ identifier: String, userMetadata: [String: Any]) -> any Requestable<ManagementObject, ManagementError>
 
     /**
      Links a user given its identifier with a secondary user given its ID token.
@@ -176,7 +176,7 @@ public protocol Users: Trackable, Loggable {
      - [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
      - [User Account Linking](https://auth0.com/docs/manage-users/user-accounts/user-account-linking)
      */
-    func link(_ identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError>
+    func link(_ identifier: String, withOtherUserToken token: String) -> any Requestable<[ManagementObject], ManagementError>
 
     /**
      Links a user given its identifier with a secondary user given its identifier, provider and connection identifier.
@@ -203,7 +203,7 @@ public protocol Users: Trackable, Loggable {
      - [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/post_identities)
      - [User Account Linking](https://auth0.com/docs/manage-users/user-accounts/user-account-linking)
      */
-    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String?) -> Request<[ManagementObject], ManagementError>
+    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String?) -> any Requestable<[ManagementObject], ManagementError>
 
     /**
      Removes an identity from a user.
@@ -229,17 +229,17 @@ public protocol Users: Trackable, Loggable {
      - [Management API Endpoint](https://auth0.com/docs/api/management/v2#!/Users/delete_user_identity_by_user_id)
      - [User Account Linking](https://auth0.com/docs/manage-users/user-accounts/user-account-linking)
      */
-    func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError>
+    func unlink(identityId: String, provider: String, fromUserId identifier: String) -> any Requestable<[ManagementObject], ManagementError>
 
 }
 
 public extension Users {
 
-    func get(_ identifier: String, fields: [String] = [], include: Bool = true) -> Request<ManagementObject, ManagementError> {
+    func get(_ identifier: String, fields: [String] = [], include: Bool = true) -> any Requestable<ManagementObject, ManagementError> {
         return self.get(identifier, fields: fields, include: include)
     }
 
-    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
+    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> any Requestable<[ManagementObject], ManagementError> {
         return self.link(identifier, withUser: userId, provider: provider, connectionId: connectionId)
     }
 
@@ -247,7 +247,7 @@ public extension Users {
 
 extension Management: Users {
 
-    func get(_ identifier: String, fields: [String], include: Bool) -> Request<ManagementObject, ManagementError> {
+    func get(_ identifier: String, fields: [String], include: Bool) -> any Requestable<ManagementObject, ManagementError> {
         let userPath = "api/v2/users/\(identifier)"
         var component = components(baseURL: self.url as URL, path: userPath)
         let value = fields.joined(separator: ",")
@@ -261,23 +261,23 @@ extension Management: Users {
         return Request(session: self.session, url: component.url!, method: "GET", handle: self.managementObject, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func patch(_ identifier: String, attributes: UserPatchAttributes) -> Request<ManagementObject, ManagementError> {
+    func patch(_ identifier: String, attributes: UserPatchAttributes) -> any Requestable<ManagementObject, ManagementError> {
         let userPath = "api/v2/users/\(identifier)"
         let component = components(baseURL: self.url as URL, path: userPath)
 
         return Request(session: self.session, url: component.url!, method: "PATCH", handle: self.managementObject, parameters: attributes.dictionary, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func patch(_ identifier: String, userMetadata: [String: Any]) -> Request<ManagementObject, ManagementError> {
+    func patch(_ identifier: String, userMetadata: [String: Any]) -> any Requestable<ManagementObject, ManagementError> {
         let attributes = UserPatchAttributes().userMetadata(userMetadata)
         return patch(identifier, attributes: attributes)
     }
 
-    func link(_ identifier: String, withOtherUserToken token: String) -> Request<[ManagementObject], ManagementError> {
+    func link(_ identifier: String, withOtherUserToken token: String) -> any Requestable<[ManagementObject], ManagementError> {
         return link(identifier, parameters: ["link_with": token])
     }
 
-    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> Request<[ManagementObject], ManagementError> {
+    func link(_ identifier: String, withUser userId: String, provider: String, connectionId: String? = nil) -> any Requestable<[ManagementObject], ManagementError> {
         var payload = [
             "user_id": userId,
             "provider": provider
@@ -286,13 +286,13 @@ extension Management: Users {
         return link(identifier, parameters: payload)
     }
 
-    private func link(_ identifier: String, parameters: [String: Any]) -> Request<[ManagementObject], ManagementError> {
+    private func link(_ identifier: String, parameters: [String: Any]) -> any Requestable<[ManagementObject], ManagementError> {
         let identitiesPath = "api/v2/users/\(identifier)/identities"
         let url = components(baseURL: self.url as URL, path: identitiesPath).url!
         return Request(session: self.session, url: url, method: "POST", handle: self.managementObjects, parameters: parameters, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)
     }
 
-    func unlink(identityId: String, provider: String, fromUserId identifier: String) -> Request<[ManagementObject], ManagementError> {
+    func unlink(identityId: String, provider: String, fromUserId identifier: String) -> any Requestable<[ManagementObject], ManagementError> {
         let identityPath = "api/v2/users/\(identifier)/identities/\(provider)/\(identityId)"
         let url = components(baseURL: self.url as URL, path: identityPath).url!
         return Request(session: self.session, url: url, method: "DELETE", handle: self.managementObjects, headers: self.defaultHeaders, logger: self.logger, telemetry: self.telemetry)

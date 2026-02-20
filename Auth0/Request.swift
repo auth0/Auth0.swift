@@ -144,7 +144,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
      - Parameter extraParameters: Additional parameters for the request.
      */
-    public func parameters(_ extraParameters: [String: Any]) -> Self {
+    public func parameters(_ extraParameters: [String: Any]) -> any Requestable<T, E> {
         var parameters = extraParameters.merging(self.parameters) {(current, _) in current}
 
         parameters["scope"] = includeRequiredScope(in: parameters["scope"] as? String)
@@ -165,7 +165,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
 
      - Parameter extraHeaders: Additional headers for the request.
      */
-    public func headers(_ extraHeaders: [String: String]) -> Self {
+    public func headers(_ extraHeaders: [String: String]) -> any Requestable<T, E> {
         let headers = extraHeaders.merging(self.headers) {(current, _) in current}
 
         return Request(session: self.session,
@@ -179,7 +179,7 @@ public struct Request<T, E: Auth0APIError>: Requestable {
                        dpop: self.dpop)
     }
 
-    public func requestValidators(_ extraValidators: [RequestValidator]) -> Self {
+    public func requestValidators(_ extraValidators: [RequestValidator]) -> any Requestable<T, E> {
         var requestValidator = extraValidators
         requestValidator.append(contentsOf: self.requestValidator)
         return Request(session: session,
