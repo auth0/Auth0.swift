@@ -65,7 +65,7 @@ struct PKCE: OAuth2Grant {
 
     func credentials(from values: [String: String], callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         guard let code = values["code"] else {
-            return callback(.failure(WebAuthError(code: .unknown("Authorization code missing from callback URL"))))
+            return callback(.failure(WebAuthError(code: .unknown("Authorization code missing from callback URL query parameters (\(values))"))))
         }
         let authentication = self.authentication
         let verifier = self.verifier
