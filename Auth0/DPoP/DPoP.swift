@@ -24,7 +24,7 @@ public struct DPoP: Sendable {
     public let keychainIdentifier: String
 
     static let nonceRequiredErrorCode = "use_dpop_nonce"
-    static private(set) var auth0Nonce: String?
+    nonisolated(unsafe) static private(set) var auth0Nonce: String?
     static private let maxRetries = 1
 
     private let keyStore: DPoPKeyStore

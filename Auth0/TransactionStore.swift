@@ -2,9 +2,9 @@
 import Foundation
 
 /// Keeps track of the current Auth Transaction.
-class TransactionStore {
+class TransactionStore: @unchecked Sendable {
 
-    static let shared = TransactionStore()
+    nonisolated(unsafe) static let shared = TransactionStore()
 
     private(set) var current: AuthTransaction?
 

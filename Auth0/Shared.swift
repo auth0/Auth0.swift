@@ -39,19 +39,21 @@ struct SendableBox<T>: @unchecked Sendable {
 
 /// Ensures a callback is executed on the main thread.
 /// If already on the main thread, executes immediately. Otherwise, dispatches asynchronously to main.
-func dispatchOnMain<T>(_ callback: @escaping (T) -> Void) -> (T) -> Void {
+/// Uses SendableBox internally to allow dispatch of non-Sendable result types (e.g. [String: Any]).
+func dispatchOnMain<T>(_ callback: @escaping @Sendable (T) -> Void) -> @Sendable (T) -> Void {
     return { result in
+        let resultBox = SendableBox(value: result)
         if Thread.isMainThread {
-            callback(result)
+            callback(resultBox.value)
         } else {
             DispatchQueue.main.async {
-                callback(result)
+                callback(resultBox.value)
             }
         }
     }
 }
 
-func dispatchOnMain(_ callback: @escaping () -> Void) -> () -> Void {
+func dispatchOnMain(_ callback: @escaping @Sendable () -> Void) -> @Sendable () -> Void {
     let wrapped = dispatchOnMain { (_: Void) in callback() }
     return { wrapped(()) }
 }

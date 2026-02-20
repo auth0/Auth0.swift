@@ -83,7 +83,7 @@ public struct CredentialsManager: Sendable {
         guard let credentials = self.retrieveCredentials(),
               let jwt = try? decode(jwt: credentials.idToken) else { return nil }
 
-        return UserInfo(json: jwt.body)
+        return UserInfo(json: jwt.body.mapValues { $0 as Any })
     }
 
     #if WEB_AUTH_PLATFORM
@@ -259,7 +259,7 @@ public struct CredentialsManager: Sendable {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
     public func revoke(headers: [String: String] = [:],
-                       _ callback: @escaping (CredentialsManagerResult<Void>) -> Void) {
+                       _ callback: @escaping @Sendable (CredentialsManagerResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
         guard let credentials = self.retrieveCredentials(),
@@ -390,7 +390,7 @@ public struct CredentialsManager: Sendable {
                             minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
-                            callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                            callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
         if let bioAuth = self.bioAuth {
@@ -577,7 +577,7 @@ public struct CredentialsManager: Sendable {
                                minTTL: Int = 60,
                                parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
-                               callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
+                               callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
         self.retrieveAPICredentials(audience: audience,
                                     scope: scope,
                                     minTTL: minTTL,
@@ -657,7 +657,7 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func ssoCredentials(parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
-                               callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+                               callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
         self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: dispatchOnMain(callback))
     }
 
@@ -702,7 +702,7 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func renew(parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
-                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                      callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: nil,
                                  minTTL: 0,
                                  parameters: parameters,
@@ -750,7 +750,7 @@ public struct CredentialsManager: Sendable {
                                      parameters: [String: Any],
                                      headers: [String: String],
                                      forceRenewal: Bool,
-                                     callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                                     callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentialsWithRetry(scope: scope,
                                          minTTL: minTTL,
                                          parameters: parameters,
@@ -767,7 +767,7 @@ public struct CredentialsManager: Sendable {
                                              headers: [String: String],
                                              forceRenewal: Bool,
                                              retryCount: Int,
-                                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                                             callback: @escaping @Sendable (CredentialsManagerResult<Credentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             guard let credentials = self.retrieveCredentials() else {
                 complete()
@@ -785,6 +785,7 @@ public struct CredentialsManager: Sendable {
                 return callback(.failure(.noRefreshToken))
             }
 
+            let paramsBox = SendableBox(value: parameters)
             self.authentication
                 .renew(withRefreshToken: refreshToken, scope: scope)
                 .parameters(parameters)
@@ -815,7 +816,7 @@ public struct CredentialsManager: Sendable {
                             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) {
                                 self.retrieveCredentialsWithRetry(scope: scope,
                                                                  minTTL: minTTL,
-                                                                 parameters: parameters,
+                                                                 parameters: paramsBox.value,
                                                                  headers: headers,
                                                                  forceRenewal: forceRenewal,
                                                                  retryCount: retryCount + 1,
@@ -836,7 +837,7 @@ public struct CredentialsManager: Sendable {
 
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
-                                        callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
+                                        callback: @escaping @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             guard let credentials = self.retrieveCredentials() else {
                 complete()
@@ -878,7 +879,7 @@ public struct CredentialsManager: Sendable {
                                         minTTL: Int,
                                         parameters: [String: Any],
                                         headers: [String: String],
-                                        callback: @escaping (CredentialsManagerResult<APICredentials>) -> Void) {
+                                        callback: @escaping @Sendable (CredentialsManagerResult<APICredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             if let apiCredentials = self.retrieveAPICredentials(audience: audience, scope: scope),
                   !self.hasExpired(apiCredentials.expiresIn),
@@ -1012,7 +1013,9 @@ public extension CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/revoke-refresh-token/revoke-refresh-token)
     func revoke(headers: [String: String] = [:]) -> AnyPublisher<Void, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
+            Future { promise in
+                let box = SendableBox(value: promise)
+                let callback: @Sendable (CredentialsManagerResult<Void>) -> Void = { box.value($0) }
                 return self.revoke(headers: headers, callback)
             }
         }.eraseToAnyPublisher()
@@ -1095,7 +1098,9 @@ public extension CredentialsManager {
                      parameters: [String: Any] = [:],
                      headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
+            Future { promise in
+                let box = SendableBox(value: promise)
+                let callback: @Sendable (CredentialsManagerResult<Credentials>) -> Void = { box.value($0) }
                 return self.credentials(withScope: scope,
                                         minTTL: minTTL,
                                         parameters: parameters,
@@ -1187,7 +1192,9 @@ public extension CredentialsManager {
                         parameters: [String: Any] = [:],
                         headers: [String: String] = [:]) -> AnyPublisher<APICredentials, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
+            Future { promise in
+                let box = SendableBox(value: promise)
+                let callback: @Sendable (CredentialsManagerResult<APICredentials>) -> Void = { box.value($0) }
                 return self.apiCredentials(forAudience: audience,
                                            scope: scope,
                                            minTTL: minTTL,
@@ -1275,7 +1282,9 @@ public extension CredentialsManager {
     func ssoCredentials(parameters: [String: Any] = [:],
                         headers: [String: String] = [:]) -> AnyPublisher<SSOCredentials, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
+            Future { promise in
+                let box = SendableBox(value: promise)
+                let callback: @Sendable (CredentialsManagerResult<SSOCredentials>) -> Void = { box.value($0) }
                 return self.ssoCredentials(parameters: parameters, headers: headers, callback: callback)
             }
         }.eraseToAnyPublisher()
@@ -1329,7 +1338,9 @@ public extension CredentialsManager {
     func renew(parameters: [String: Any] = [:],
                headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
-            Future { callback in
+            Future { promise in
+                let box = SendableBox(value: promise)
+                let callback: @Sendable (CredentialsManagerResult<Credentials>) -> Void = { box.value($0) }
                 return self.renew(parameters: parameters,
                                   headers: headers,
                                   callback: callback)

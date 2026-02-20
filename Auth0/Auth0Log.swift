@@ -30,7 +30,7 @@ enum LogLevel {
 enum Auth0Log {
     
     /// Shared logging service instance (can be replaced for testing).
-    static var loggingService: UnifiedLogging = OSUnifiedLoggingService()
+    nonisolated(unsafe) static var loggingService: UnifiedLogging = OSUnifiedLoggingService()
     
     /// Centralized subsystem identifier for all Auth0 logs.
     static var subsystem: String { OSUnifiedLoggingService.subsystem }

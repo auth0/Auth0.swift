@@ -3,7 +3,7 @@ import Foundation
 
 class LoginTransaction: NSObject, AuthTransaction {
 
-    typealias FinishTransaction = (WebAuthResult<Credentials>) -> Void
+    typealias FinishTransaction = @Sendable (WebAuthResult<Credentials>) -> Void
 
     private(set) var userAgent: WebAuthUserAgent?
 

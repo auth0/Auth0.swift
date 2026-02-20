@@ -8,7 +8,7 @@ private struct _A0APICredentials {
 }
 
 /// User's credentials obtained from Auth0 for a specific API as the result of exchanging a refresh token.
-public struct APICredentials: CustomStringConvertible {
+public struct APICredentials: CustomStringConvertible, Sendable {
 
     /// Token that can be used to make authenticated requests to the API.
     ///

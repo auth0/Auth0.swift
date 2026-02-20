@@ -2,7 +2,7 @@
 import Foundation
 import Combine
 
-final class Auth0WebAuth: WebAuth {
+final class Auth0WebAuth: WebAuth, @unchecked Sendable {
 
     let clientId: String
     let url: URL
@@ -35,7 +35,7 @@ final class Auth0WebAuth: WebAuth {
     private(set) var invitationURL: URL?
     private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
-    private(set) var onCloseCallback: (() -> Void)?
+    private(set) var onCloseCallback: (@Sendable () -> Void)?
 
     var state: String {
         return self.parameters["state"] ?? self.generateDefaultState()
@@ -167,12 +167,12 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
-    func onClose(_ callback: (() -> Void)?) -> Self {
+    func onClose(_ callback: (@Sendable () -> Void)?) -> Self {
         self.onCloseCallback = callback
         return self
     }
 
-    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
         let mainThreadOnCloseCallback = onCloseCallback.map { dispatchOnMain($0) }
 
@@ -221,7 +221,7 @@ final class Auth0WebAuth: WebAuth {
         logger?.trace(url: authorizeURL, source: String(describing: userAgent.self))
     }
 
-    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    func clearSession(federated: Bool, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
         guard barrier.raise() else {
@@ -339,15 +339,21 @@ final class Auth0WebAuth: WebAuth {
 extension Auth0WebAuth {
 
     public func start() -> AnyPublisher<Credentials, WebAuthError> {
-        return Deferred { Future(self.start) }.eraseToAnyPublisher()
+        return Deferred {
+            Future { promise in
+                let box = SendableBox(value: promise)
+                let callback: @Sendable (WebAuthResult<Credentials>) -> Void = { box.value($0) }
+                self.start(callback)
+            }
+        }.eraseToAnyPublisher()
     }
 
     public func clearSession(federated: Bool) -> AnyPublisher<Void, WebAuthError> {
         return Deferred {
-            Future { callback in
-                self.clearSession(federated: federated) { result in
-                    callback(result)
-                }
+            Future { promise in
+                let box = SendableBox(value: promise)
+                let callback: @Sendable (WebAuthResult<Void>) -> Void = { box.value($0) }
+                self.clearSession(federated: federated, callback: callback)
             }
         }.eraseToAnyPublisher()
     }
@@ -360,12 +366,9 @@ extension Auth0WebAuth {
 extension Auth0WebAuth {
 
     func start() async throws -> Credentials {
-        var alreadyResumed = false
         return try await withCheckedThrowingContinuation { continuation in
             Task { @MainActor in
                 self.start { result in
-                    guard !alreadyResumed else { return }
-                    alreadyResumed = true
                     continuation.resume(with: result)
                 }
             }

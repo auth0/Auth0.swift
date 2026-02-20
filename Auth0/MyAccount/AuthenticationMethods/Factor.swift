@@ -1,9 +1,9 @@
 /// List of factors enabled for the Auth0 tenant and available for enrollment by this user.
-public struct Factors: Decodable {
+public struct Factors: Decodable, Sendable {
     public let factors: [Factor]
 }
 
-public struct Factor: Decodable {
+public struct Factor: Decodable, Sendable {
     /// Authentication method type (factor)
     public let type: String
 

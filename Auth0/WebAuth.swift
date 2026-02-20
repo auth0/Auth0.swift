@@ -207,7 +207,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
     ///
     /// - Parameter callback: A callback to be executed
     /// - Returns: The same `WebAuth` instance to allow method chaining.
-    func onClose(_ callback: (() -> Void)?) -> Self
+    func onClose(_ callback: (@Sendable () -> Void)?) -> Self
 
     // MARK: - Methods
 
@@ -236,7 +236,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
      - Requires: The **Callback URL** to have been added to the **Allowed Callback URLs** field of your Auth0
      application settings in the [Dashboard](https://manage.auth0.com/#/applications/).
      */
-    func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void)
+    func start(_ callback: @escaping @Sendable (WebAuthResult<Credentials>) -> Void)
 
     #if canImport(_Concurrency)
     /**
@@ -329,7 +329,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
      - [Logout](https://auth0.com/docs/authenticate/login/logout)
      */
-    func clearSession(federated: Bool, callback: @escaping (WebAuthResult<Void>) -> Void)
+    func clearSession(federated: Bool, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void)
 
     /**
      Removes the Auth0 session and optionally removes the identity provider (IdP) session.
@@ -413,7 +413,7 @@ public protocol WebAuth: SenderConstraining, Trackable, Loggable {
 
 public extension WebAuth {
 
-    func clearSession(federated: Bool = false, callback: @escaping (WebAuthResult<Void>) -> Void) {
+    func clearSession(federated: Bool = false, callback: @escaping @Sendable (WebAuthResult<Void>) -> Void) {
         self.clearSession(federated: federated, callback: callback)
     }
 

@@ -5,7 +5,7 @@ import os.log
 typealias OSLogger = os.Logger
 
 /// Protocol for unified logging operations.
-protocol UnifiedLogging {
+protocol UnifiedLogging: Sendable {
     /// Log a message with the specified parameters.
     /// - Parameters:
     ///   - category: The log category for filtering (e.g., `.networkTracing`, `.configuration`)

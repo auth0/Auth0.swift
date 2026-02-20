@@ -1,7 +1,7 @@
 import Foundation
 
 /// A TOTP enrollment challenge.
-public struct TOTPEnrollmentChallenge {
+public struct TOTPEnrollmentChallenge: Sendable {
 
     /// The unique identifier for the authentication method.
     public let authenticationId: String
