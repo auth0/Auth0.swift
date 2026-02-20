@@ -6,12 +6,10 @@ public struct WebAuthError: Auth0Error, Sendable {
 
     enum Code: Equatable {
         case webViewFailure(String)
-        case noBundleIdentifier
         case transactionActiveAlready
-        case invalidInvitationURL(String)
         case userCancelled
-        case noAuthorizationCode([String: String])
-        case pkceNotAllowed
+        case authenticationFailed
+        case codeExchangeFailed
         case idTokenValidationFailed
         case other
         case unknown(String)
@@ -36,32 +34,23 @@ public struct WebAuthError: Auth0Error, Sendable {
 
     // MARK: - Error Cases
 
-    /// The bundle identifier could not be retrieved from `Bundle.main.bundleIdentifier`, or it could not be used to
-    /// build a valid URL.
-    /// This error does not include a ``Auth0Error/cause-9wuyi``.
-    public static let noBundleIdentifier: WebAuthError = .init(code: .noBundleIdentifier)
-
     /// There is already an active transaction at the moment; therefore, this newly initiated transaction is canceled.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let transactionActiveAlready: WebAuthError = .init(code: .transactionActiveAlready)
-
-    /// The invitation URL is missing the `invitation` and/or the `organization` query parameters.
-    /// This error does not include a ``Auth0Error/cause-9wuyi``.
-    public static let invalidInvitationURL: WebAuthError = .init(code: .invalidInvitationURL(""))
 
     /// The user cancelled the Web Auth operation.
     /// This error does not include a ``Auth0Error/cause-9wuyi``.
     public static let userCancelled: WebAuthError = .init(code: .userCancelled)
 
-    /// The Auth0 application does not support authentication with Proof Key for Code Exchange (PKCE).
-    /// PKCE support needs to be enabled in the settings page of the [Auth0 application](https://manage.auth0.com/#/applications/),
-    /// by setting the **Application Type** to 'Native'.
-    /// This error does not include a ``Auth0Error/cause-9wuyi``.
-    public static let pkceNotAllowed: WebAuthError = .init(code: .pkceNotAllowed)
+    /// The callback URL contains an error returned by the authorization server.
+    /// This occurs when authentication fails on the server side.
+    /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let authenticationFailed: WebAuthError = .init(code: .authenticationFailed)
 
-    /// The callback URL is missing the `code` query parameter.
-    /// This error does not include a ``Auth0Error/cause-9wuyi``.
-    public static let noAuthorizationCode: WebAuthError = .init(code: .noAuthorizationCode([:]))
+    /// The authorization code exchange request failed.
+    /// This occurs when the SDK cannot exchange the authorization code for tokens.
+    /// The underlying ``AuthenticationError`` can be accessed via the ``Auth0Error/cause-9wuyi`` property.
+    public static let codeExchangeFailed: WebAuthError = .init(code: .codeExchangeFailed)
 
     /// The ID token validation performed after authentication failed.
     /// The underlying `Error` value can be accessed via the ``Auth0Error/cause-9wuyi`` property.
@@ -84,18 +73,11 @@ public extension WebAuthError {
     var message: String {
         switch self.code {
         case .webViewFailure(let webViewFailureMessage): return webViewFailureMessage
-        case .noBundleIdentifier: return "Unable to retrieve the bundle identifier from Bundle.main.bundleIdentifier,"
-            + " or it could not be used to build a valid URL."
         case .transactionActiveAlready: return "Failed to start this transaction, as there is an active transaction at the"
             + " moment."
-        case .invalidInvitationURL(let url): return "The invitation URL (\(url)) is missing the 'invitation' and/or"
-            + " the 'organization' query parameters."
         case .userCancelled: return "The user cancelled the Web Auth operation."
-        case .pkceNotAllowed: return "Unable to perform authentication with PKCE."
-            + " Enable PKCE support in the settings page of the Auth0 application, by setting the"
-            + " 'Application Type' to 'Native'."
-        case .noAuthorizationCode(let values): return "The callback URL is missing the authorization code in its"
-            + " query parameters (\(values))."
+        case .authenticationFailed: return "The authentication request failed."
+        case .codeExchangeFailed: return "The authorization code exchange failed."
         case .idTokenValidationFailed: return "The ID token validation performed after authentication failed."
         case .other: return "An unexpected error occurred."
         case .unknown(let message): return message
