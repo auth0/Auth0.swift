@@ -21,7 +21,7 @@ extension ASUserAgent: ASWebAuthenticationPresentationContextProviding {
 
         // Find the foreground active scene's key window for multi-window support
         if let windowScene = UIApplication.shared()?.connectedScenes
-            .last(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
             return windowScene.windows.last(where: \.isKeyWindow) ?? ASPresentationAnchor()
         }
 
