@@ -1,23 +1,24 @@
-//
-//  UIWindow+TopViewController.swift
-//  Auth0
-//
-//  Created by Desu Sai Venkat on 01/10/24.
-//  Copyright © 2024 Auth0. All rights reserved.
-//
-
 #if os(iOS)
 import UIKit
 
 extension UIWindow {
     static var topViewController: UIViewController? {
+        // Find the foreground active scene's key window for multi-window support
+        if let windowScene = UIApplication.shared()?.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+           let keyWindow = windowScene.windows.last(where: \.isKeyWindow),
+           let root = keyWindow.rootViewController {
+            return findTopViewController(from: root)
+        }
+
+        // Fallback to any key window
         guard let root = UIApplication.shared()?.windows.last(where: \.isKeyWindow)?.rootViewController else {
             return nil
         }
         return findTopViewController(from: root)
     }
 
-    private static func findTopViewController(from root: UIViewController) -> UIViewController? {
+    static func findTopViewController(from root: UIViewController) -> UIViewController? {
         if let presented = root.presentedViewController { return self.findTopViewController(from: presented) }
 
         switch root {

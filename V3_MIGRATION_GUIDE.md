@@ -7,6 +7,7 @@ Auth0.swift v3 includes many significant changes:
 - Updated default values for better out-of-the-box behavior.
 - Behavior changes to improve developer experience:
   - Consistent main thread callback execution for UI updates.
+- Methods added for supporting new features
 
 
 As expected with a major release, Auth0.swift v3 contains breaking changes. Please review this guide thoroughly to understand the changes required to migrate your application to v3.
@@ -21,6 +22,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Signup connection](#signup-connection)
 - [**Behavior Changes**](#behavior-changes)
   + [Completion callbacks](#completion-callbacks)
+- [**Methods Added**](#methods-added)
+  + [Web Auth](#web-auth)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
 
@@ -201,6 +204,27 @@ credentialsManager.credentials { result in
 
 **Reason:** After performing operations with Auth0.swift, it's common to run presentation logic – for example, to show an error or navigate to the main flow of the app. Having callbacks execute on the main thread by default improves developer experience and reduces boilerplate.
 
+## Methods Added
+
+### Web Auth
+
+Auth0.swift will use a current key window to present the in-app browser for Web Auth. When using ASWebAuthenticationSession, it will grab a key window and use it as the ASPresentationAnchor. With SFSafariViewController, Auth0.swift will present it using the topmost view controller in this key window. While this approach works well for single-window apps, on multi-window apps the in-app browser may show up in a different window than expected. Auth0.swift now supports passing a custom window in which to present the in-app browser. For this reason, the following method is added to the Web Auth builder:
+
+- `presentationWindow(_ window:)`
+
+<details>
+  <summary>Code</summary>
+
+```swift
+Auth0
+    .webAuth()
+    .presentationWindow(window)
+    .start { result in
+        // ...
+    }
+```
+</details>
+
 ---
 
 ## API Changes
@@ -224,3 +248,4 @@ credentialsManager.credentials { result in
 **Reason:** The removed error cases represent configuration issues that should be caught during development, not handled in production code. This will result in a more useful and meaningful set of WebAuthError cases.
 
 ---
+[Go up ⤴](#table-of-contents)
