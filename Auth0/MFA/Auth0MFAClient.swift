@@ -18,7 +18,7 @@ struct Auth0MFAClient: MFAClient {
         self.telemetry = telemetry
     }
 
-    func getAuthenticators(mfaToken: String, factorsAllowed: [String]) -> Request<[Authenticator], MfaListAuthenticatorsError> {
+    func getAuthenticators(mfaToken: String, factorsAllowed: [String]) -> any Requestable<[Authenticator], MfaListAuthenticatorsError> {
         let url = URL(string: "/mfa/authenticators", relativeTo: self.url)!
         return Request(session: session,
                        url: url,
@@ -31,7 +31,7 @@ struct Auth0MFAClient: MFAClient {
         .requestValidators([ListAuthenticatorsValidator(factorsAllowed: factorsAllowed)])
     }
 
-    func enroll(mfaToken: String, phoneNumber: String) -> Request<MFAEnrollmentChallenge, MfaEnrollmentError> {
+    func enroll(mfaToken: String, phoneNumber: String) -> any Requestable<MFAEnrollmentChallenge, MfaEnrollmentError> {
         let url = URL(string: "mfa/associate", relativeTo: self.url)!
         var payload: [String: Any] = [:]
         payload["authenticator_types"] = ["oob"]
@@ -47,7 +47,7 @@ struct Auth0MFAClient: MFAClient {
                        telemetry: telemetry)
     }
 
-    func challenge(with authenticatorId: String, mfaToken: String) -> Request<MFAChallenge, MfaChallengeError> {
+    func challenge(with authenticatorId: String, mfaToken: String) -> any Requestable<MFAChallenge, MfaChallengeError> {
         let url = URL(string: "mfa/challenge", relativeTo: self.url)!
         var payload: [String: Any] = [:]
         payload["client_id"] = clientId
@@ -65,7 +65,7 @@ struct Auth0MFAClient: MFAClient {
 
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError> {
         var parameters: [String: Any] = [:]
         parameters["oob_code"] = oobCode
         parameters["binding_code"] = bindingCode
@@ -75,7 +75,7 @@ struct Auth0MFAClient: MFAClient {
             .parameters(parameters)
     }
 
-    func enroll(mfaToken: String) -> Request<OTPMFAEnrollmentChallenge, MfaEnrollmentError> {
+    func enroll(mfaToken: String) -> any Requestable<OTPMFAEnrollmentChallenge, MfaEnrollmentError> {
         let url = URL(string: "mfa/associate", relativeTo: self.url)!
         var payload: [String: Any] = [:]
         payload["authenticator_types"] = ["otp"]
@@ -90,7 +90,7 @@ struct Auth0MFAClient: MFAClient {
     }
 
     func verify(otp: String,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["otp"] = otp
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-otp"
@@ -99,7 +99,7 @@ struct Auth0MFAClient: MFAClient {
     }
 
     func verify(recoveryCode: String,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError> {
+                mfaToken: String) -> any Requestable<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["recovery_code"] = recoveryCode
         payload["mfa_token"] = mfaToken
@@ -108,7 +108,7 @@ struct Auth0MFAClient: MFAClient {
         return token().parameters(payload)
     }
 
-    func enroll(mfaToken: String) -> Request<PushMFAEnrollmentChallenge, MfaEnrollmentError> {
+    func enroll(mfaToken: String) -> any Requestable<PushMFAEnrollmentChallenge, MfaEnrollmentError> {
         let url = URL(string: "mfa/associate", relativeTo: self.url)!
         var payload: [String: Any] = [:]
         payload["authenticator_types"] = ["oob"]
@@ -123,7 +123,7 @@ struct Auth0MFAClient: MFAClient {
                        telemetry: telemetry)
     }
 
-    func enroll(mfaToken: String, email: String) -> Request<MFAEnrollmentChallenge, MfaEnrollmentError> {
+    func enroll(mfaToken: String, email: String) -> any Requestable<MFAEnrollmentChallenge, MfaEnrollmentError> {
         let url = URL(string: "mfa/associate", relativeTo: url)!
         var payload: [String: Any] = [:]
         payload["authenticator_types"] = ["oob"]
@@ -141,7 +141,7 @@ struct Auth0MFAClient: MFAClient {
 }
 
 private extension Auth0MFAClient {
-    func token<T: Codable>() -> Request<T, MFAVerifyError> {
+    func token<T: Codable>() -> any Requestable<T, MFAVerifyError> {
         let token = URL(string: "oauth/token", relativeTo: self.url)!
         let payload: [String: Any] = ["client_id": self.clientId]
 

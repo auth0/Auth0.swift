@@ -52,30 +52,32 @@ class RequestSpec: QuickSpec {
                 }
 
                 it("should create a new request with extra parameters") {
-                    let request = Request().parameters(["foo": "bar"])
+                    let request = Request().parameters(["foo": "bar"]) as! Request<[String: Any], AuthenticationError>
                     expect(request.parameters["foo"] as? String) == "bar"
                 }
 
                 it("should merge extra parameters with existing parameters") {
-                    let request = Request(parameters: ["foo": "bar"]).parameters(["baz": "qux"])
+                    let request = Request(parameters: ["foo": "bar"]).parameters(["baz": "qux"]) as! Request<[String: Any], AuthenticationError>
                     expect(request.parameters["foo"] as? String) == "bar"
                     expect(request.parameters["baz"] as? String) == "qux"
                 }
 
                 it("should overwrite existing parameters with extra parameters") {
-                    let request = Request(parameters: ["foo": "bar"]).parameters(["foo": "baz"])
+                    let request = Request(parameters: ["foo": "bar"]).parameters(["foo": "baz"]) as! Request<[String: Any], AuthenticationError>
                     expect(request.parameters["foo"] as? String) == "baz"
                 }
 
                 it("should create a new request and not mutate an existing request") {
                     let request = Request(parameters: ["foo": "bar"])
-                    expect(request.parameters(["foo": "baz"]).parameters["foo"] as? String) == "baz"
+                    let updated = request.parameters(["foo": "baz"]) as! Request<[String: Any], AuthenticationError>
+                    expect(updated.parameters["foo"] as? String) == "baz"
                     expect(request.parameters["foo"] as? String) == "bar"
                 }
 
                 it("should enforce the openid scope when adding extra parameters") {
                     let request = Request(parameters: ["foo": "bar"])
-                    expect(request.parameters(["scope": "email phone"]).parameters["scope"] as? String) == "openid email phone"
+                    let updated = request.parameters(["scope": "email phone"]) as! Request<[String: Any], AuthenticationError>
+                    expect(updated.parameters["scope"] as? String) == "openid email phone"
                 }
 
                 it("should add the parameters as query parameters") {
@@ -111,24 +113,25 @@ class RequestSpec: QuickSpec {
                 }
 
                 it("should create a new request with extra headers") {
-                    let request = Request().headers(["foo": "bar"])
+                    let request = Request().headers(["foo": "bar"]) as! Request<[String: Any], AuthenticationError>
                     expect(request.headers["foo"]) == "bar"
                 }
 
                 it("should merge extra headers with existing headers") {
-                    let request = Request(headers: ["foo": "bar"]).headers(["baz": "qux"])
+                    let request = Request(headers: ["foo": "bar"]).headers(["baz": "qux"]) as! Request<[String: Any], AuthenticationError>
                     expect(request.headers["foo"]) == "bar"
                     expect(request.headers["baz"]) == "qux"
                 }
 
                 it("should overwrite existing headers with extra headers") {
-                    let request = Request(headers: ["foo": "bar"]).headers(["foo": "baz"])
+                    let request = Request(headers: ["foo": "bar"]).headers(["foo": "baz"]) as! Request<[String: Any], AuthenticationError>
                     expect(request.headers["foo"]) == "baz"
                 }
 
                 it("should create a new request and not mutate an existing request") {
                     let request = Request(headers: ["foo": "bar"])
-                    expect(request.headers(["foo": "baz"]).headers["foo"]) == "baz"
+                    let updated = request.headers(["foo": "baz"]) as! Request<[String: Any], AuthenticationError>
+                    expect(updated.headers["foo"]) == "baz"
                     expect(request.headers["foo"]) == "bar"
                 }
 
@@ -152,12 +155,12 @@ class RequestSpec: QuickSpec {
                 }
 
                 it("should preserve dpop when adding parameters") {
-                    let request = Request(dpop: DPoP()).parameters(["foo": "bar"])
+                    let request = Request(dpop: DPoP()).parameters(["foo": "bar"]) as! Request<[String: Any], AuthenticationError>
                     expect(request.dpop).toNot(beNil())
                 }
 
                 it("should preserve dpop when adding headers") {
-                    let request = Request(dpop: DPoP()).headers(["foo": "bar"])
+                    let request = Request(dpop: DPoP()).headers(["foo": "bar"]) as! Request<[String: Any], AuthenticationError>
                     expect(request.dpop).toNot(beNil())
                 }
 

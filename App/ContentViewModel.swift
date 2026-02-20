@@ -9,14 +9,12 @@ final class ContentViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
     private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 
-#if WEB_AUTH_PLATFORM
+    #if WEB_AUTH_PLATFORM
     func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
 
-        #if !os(tvOS) && !os(watchOS)
         do {
-
             let credentials = try await Auth0
                 .webAuth()
                 .scope("openid profile email offline_access")
@@ -33,23 +31,17 @@ final class ContentViewModel: ObservableObject {
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
-        #endif
 
         isLoading = false
     }
+    #endif
 
+    #if WEB_AUTH_PLATFORM
     func logout(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
-        #if !os(tvOS) && !os(watchOS)
         do {
-            var webAuth = Auth0.webAuth()
-
-            if let window = window {
-                webAuth = webAuth.presentationWindow(window)
-            }
-
-            try await webAuth.logout()
+            try await Auth0.webAuth().logout()
 
             let cleared = credentialsManager.clear()
             if cleared {
@@ -62,13 +54,11 @@ final class ContentViewModel: ObservableObject {
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
-        #endif
 
         isLoading = false
     }
-    
     #endif
-    
+
     func checkAuthentication() async {
         do {
             let credentials = try await credentialsManager.credentials()
