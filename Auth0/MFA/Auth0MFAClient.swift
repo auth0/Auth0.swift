@@ -1,3 +1,4 @@
+// swiftlint:disable function_parameter_count
 import Foundation
 
 struct Auth0MFAClient: MFAClient {
@@ -65,13 +66,24 @@ struct Auth0MFAClient: MFAClient {
 
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError> {
+                mfaToken: String,
+                authentication: Authentication,
+                issuer: String,
+                leeway: Int,
+                maxAge: Int?,
+                nonce: String?,
+                organization: String?) -> Request<Credentials, MFAVerifyError> {
         var parameters: [String: Any] = [:]
         parameters["oob_code"] = oobCode
         parameters["binding_code"] = bindingCode
         parameters["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-oob"
         parameters["mfa_token"] = mfaToken
-        return self.token()
+        return self.token(authentication: authentication,
+                          issuer: issuer,
+                          leeway: leeway,
+                          maxAge: maxAge,
+                          nonce: nonce,
+                          organization: organization)
             .parameters(parameters)
     }
 
@@ -90,22 +102,44 @@ struct Auth0MFAClient: MFAClient {
     }
 
     func verify(otp: String,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError> {
+                mfaToken: String,
+                authentication: Authentication,
+                issuer: String,
+                leeway: Int,
+                maxAge: Int?,
+                nonce: String?,
+                organization: String?) -> Request<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["otp"] = otp
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-otp"
         payload["mfa_token"] = mfaToken
-        return self.token().parameters(payload)
+        return self.token(authentication: authentication,
+                          issuer: issuer,
+                          leeway: leeway,
+                          maxAge: maxAge,
+                          nonce: nonce,
+                          organization: organization).parameters(payload)
     }
 
     func verify(recoveryCode: String,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError> {
+                mfaToken: String,
+                authentication: Authentication,
+                issuer: String,
+                leeway: Int,
+                maxAge: Int?,
+                nonce: String?,
+                organization: String?) -> Request<Credentials, MFAVerifyError> {
         var payload: [String: Any] = [:]
         payload["recovery_code"] = recoveryCode
         payload["mfa_token"] = mfaToken
         payload["grant_type"] = "http://auth0.com/oauth/grant-type/mfa-recovery-code"
         payload["client_id"] = clientId
-        return token().parameters(payload)
+        return token(authentication: authentication,
+                     issuer: issuer,
+                     leeway: leeway,
+                     maxAge: maxAge,
+                     nonce: nonce,
+                     organization: organization).parameters(payload)
     }
 
     func enroll(mfaToken: String) -> Request<PushMFAEnrollmentChallenge, MfaEnrollmentError> {
@@ -141,14 +175,30 @@ struct Auth0MFAClient: MFAClient {
 }
 
 private extension Auth0MFAClient {
-    func token<T: Codable>() -> Request<T, MFAVerifyError> {
-        let token = URL(string: "oauth/token", relativeTo: self.url)!
+    func token<T: Decodable>(authentication: Authentication,
+                              issuer: String,
+                              leeway: Int = 60000,
+                              maxAge: Int? = nil,
+                              nonce: String? = nil,
+                              organization: String? = nil) -> Request<T, MFAVerifyError> {
+        let tokenURL = URL(string: "oauth/token", relativeTo: self.url)!
         let payload: [String: Any] = ["client_id": self.clientId]
 
         return Request(session: session,
-                       url: token,
+                       url: tokenURL,
                        method: "POST",
-                       handle: mfaVerifyDecodable,
+                       handle: { result, callback in
+                           mfaVerifyDecodableWithIDTokenValidation(
+                               authentication: authentication,
+                               issuer: issuer,
+                               leeway: leeway,
+                               maxAge: maxAge,
+                               nonce: nonce,
+                               organization: organization,
+                               from: result,
+                               callback: callback
+                           )
+                       },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
