@@ -1,3 +1,4 @@
+// swiftlint:disable function_parameter_count
 import Foundation
 
 /**
@@ -149,9 +150,15 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      ```
 
      - Parameters:
-       - oobCode: The out-of-band code received via SMS or email.
-       - bindingCode: Optional binding code for additional security verification.
-       - mfaToken: The MFA token received from an authentication error when MFA is required.
+       - oobCode:       The out-of-band code received via SMS or email.
+       - bindingCode:   Optional binding code for additional security verification.
+       - mfaToken:      The MFA token received from an authentication error when MFA is required.
+       - authentication: The ``Authentication`` instance used to retrieve JWKS for ID token signature validation.
+       - issuer:        Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
      - Requires: MFA OOB Grant `http://auth0.com/oauth/grant-type/mfa-oob`.
 
@@ -161,7 +168,13 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      */
     func verify(oobCode: String,
                 bindingCode: String?,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError>
+                mfaToken: String,
+                authentication: Authentication,
+                issuer: String,
+                leeway: Int,
+                maxAge: Int?,
+                nonce: String?,
+                organization: String?) -> Request<Credentials, MFAVerifyError>
 
     // MARK: - OTP Enrollment
 
@@ -223,8 +236,14 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      ```
 
      - Parameters:
-       - otp: The 6-digit one-time password code from the authenticator app.
-       - mfaToken: The MFA token received from an authentication error when MFA is required.
+       - otp:           The 6-digit one-time password code from the authenticator app.
+       - mfaToken:      The MFA token received from an authentication error when MFA is required.
+       - authentication: The ``Authentication`` instance used to retrieve JWKS for ID token signature validation.
+       - issuer:        Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
      - Requires: MFA OTP Grant `http://auth0.com/oauth/grant-type/mfa-otp`.
 
@@ -233,7 +252,13 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-mfa-with-otp)
      */
     func verify(otp: String,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError>
+                mfaToken: String,
+                authentication: Authentication,
+                issuer: String,
+                leeway: Int,
+                maxAge: Int?,
+                nonce: String?,
+                organization: String?) -> Request<Credentials, MFAVerifyError>
 
     // MARK: - Recovery Code Verification
 
@@ -260,8 +285,14 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      ```
 
      - Parameters:
-       - recoveryCode: The recovery code provided during MFA enrollment.
-       - mfaToken: The MFA token received from an authentication error when MFA is required.
+       - recoveryCode:  The recovery code provided during MFA enrollment.
+       - mfaToken:      The MFA token received from an authentication error when MFA is required.
+       - authentication: The ``Authentication`` instance used to retrieve JWKS for ID token signature validation.
+       - issuer:        Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
      - Requires: MFA Recovery Code Grant `http://auth0.com/oauth/grant-type/mfa-recovery-code`.
 
@@ -270,7 +301,13 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-recovery-code)
      */
     func verify(recoveryCode: String,
-                mfaToken: String) -> Request<Credentials, MFAVerifyError>
+                mfaToken: String,
+                authentication: Authentication,
+                issuer: String,
+                leeway: Int,
+                maxAge: Int?,
+                nonce: String?,
+                organization: String?) -> Request<Credentials, MFAVerifyError>
 
     // MARK: - Push Notification Enrollment
 
@@ -340,5 +377,65 @@ public protocol MFAClient: SenderConstraining, Trackable, Loggable, Sendable {
      - [Multi factor authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/add-an-authenticator)
      */
     func enroll(mfaToken: String, email: String) -> Request<MFAEnrollmentChallenge, MfaEnrollmentError>
+
+}
+
+public extension MFAClient {
+
+    func verify(oobCode: String,
+                bindingCode: String?,
+                mfaToken: String,
+                authentication: Authentication,
+                issuer: String = "",
+                leeway: Int = 60000,
+                maxAge: Int? = nil,
+                nonce: String? = nil,
+                organization: String? = nil) -> Request<Credentials, MFAVerifyError> {
+        return verify(oobCode: oobCode,
+                      bindingCode: bindingCode,
+                      mfaToken: mfaToken,
+                      authentication: authentication,
+                      issuer: issuer,
+                      leeway: leeway,
+                      maxAge: maxAge,
+                      nonce: nonce,
+                      organization: organization)
+    }
+
+    func verify(otp: String,
+                mfaToken: String,
+                authentication: Authentication,
+                issuer: String = "",
+                leeway: Int = 60000,
+                maxAge: Int? = nil,
+                nonce: String? = nil,
+                organization: String? = nil) -> Request<Credentials, MFAVerifyError> {
+        return verify(otp: otp,
+                      mfaToken: mfaToken,
+                      authentication: authentication,
+                      issuer: issuer,
+                      leeway: leeway,
+                      maxAge: maxAge,
+                      nonce: nonce,
+                      organization: organization)
+    }
+
+    func verify(recoveryCode: String,
+                mfaToken: String,
+                authentication: Authentication,
+                issuer: String = "",
+                leeway: Int = 60000,
+                maxAge: Int? = nil,
+                nonce: String? = nil,
+                organization: String? = nil) -> Request<Credentials, MFAVerifyError> {
+        return verify(recoveryCode: recoveryCode,
+                      mfaToken: mfaToken,
+                      authentication: authentication,
+                      issuer: issuer,
+                      leeway: leeway,
+                      maxAge: maxAge,
+                      nonce: nonce,
+                      organization: organization)
+    }
 
 }

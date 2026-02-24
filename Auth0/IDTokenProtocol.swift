@@ -1,5 +1,5 @@
 /// Protocol for types that contain an ID token that can be validated
-protocol IDTokenProtocol: Codable {
+protocol IDTokenProtocol: Decodable {
     var idToken: String { get }
 }
 

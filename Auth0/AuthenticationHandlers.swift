@@ -63,24 +63,15 @@ func authenticationNoBody(from result: Result<ResponseValue, AuthenticationError
     }
 }
 
-/// Factory function that creates an authentication handler with ID token validation.
-/// This handler decodes the response and validates the ID token before returning.
-///
-/// - Parameters:
-///   - issuer: The expected issuer of the ID token.
-///   - leeway: The amount of leeway, in milliseconds, to accommodate potential clock skew.
-///   - maxAge: The maximum authentication age, in seconds. Optional.
-///   - nonce: The expected nonce value. Optional.
-///   - organization: The expected organization ID or name. Optional.
-///   - authentication: The Authentication instance used for JWKS retrieval.
-/// - Returns: A handler function that can be used with Request initialization.
-func authenticationDecodableWithIDTokenValidation<T: IDTokenProtocol>(
-    issuer: String,
-    leeway: Int = 60000,
-    maxAge: Int? = nil,
-    nonce: String? = nil,
-    organization: String? = nil,
+// Decodes the response and validates the ID token when
+// the decoded type conforms to IDTokenProtocol (i.e. Credentials and SSOCredentials).
+func authenticationDecodableWithIDTokenValidation<T: Decodable>(
     authentication: Authentication,
+    issuer: String,
+    leeway: Int,
+    maxAge: Int?,
+    nonce: String?,
+    organization: String?,
     from result: Result<ResponseValue, AuthenticationError>,
     callback: @escaping Request<T, AuthenticationError>.Callback
 ) {
@@ -91,28 +82,25 @@ func authenticationDecodableWithIDTokenValidation<T: IDTokenProtocol>(
             decoder.dateDecodingStrategy = .secondsSince1970
             let decodedObject = try decoder.decode(T.self, from: data)
 
-            // Validate the decoded object (which includes ID token validation)
-            guard !decodedObject.idToken.isEmpty else {
-                // No ID token to validate, return as-is
-                return callback(.success(decodedObject))
-            }
-
-            // Validate ID token
-            let validatorContext = IDTokenValidatorContext(
-                authentication: authentication,
-                issuer: issuer,
-                leeway: leeway,
-                maxAge: maxAge,
-                nonce: nonce,
-                organization: organization
-            )
-
-            validate(idToken: decodedObject.idToken, with: validatorContext) { error in
-                if let error = error {
-                    callback(.failure(AuthenticationError(cause: error)))
+            if let carrier = decodedObject as? any IDTokenProtocol, !carrier.idToken.isEmpty, !issuer.isEmpty {
+                let validatorContext = IDTokenValidatorContext(
+                    authentication: authentication,
+                    issuer: issuer,
+                    leeway: leeway,
+                    maxAge: maxAge,
+                    nonce: nonce,
+                    organization: organization
+                )
+                validate(idToken: carrier.idToken, with: validatorContext) { error in
+                    if let error = error {
+                        return callback(.failure(AuthenticationError(cause: error)))
+                    }
+                    callback(.success(decodedObject))
                 }
-                callback(.success(decodedObject))
+                return
             }
+
+            callback(.success(decodedObject))
         } else {
             callback(.failure(AuthenticationError(from: response)))
         }

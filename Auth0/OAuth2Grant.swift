@@ -70,20 +70,21 @@ struct PKCE: OAuth2Grant {
         let authentication = self.authentication
         let verifier = self.verifier
         let redirectUrlString = self.redirectURL.absoluteString
-        let validatorContext = IDTokenValidatorContext(authentication: authentication,
-                                                       issuer: self.issuer,
-                                                       leeway: self.leeway,
-                                                       maxAge: self.maxAge,
-                                                       nonce: self.defaults["nonce"],
-                                                       organization: self.organization)
         authentication
-            .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
+            .codeExchange(withCode: code,
+                          codeVerifier: verifier,
+                          redirectURI: redirectUrlString,
+                          issuer: self.issuer,
+                          leeway: self.leeway,
+                          maxAge: self.maxAge,
+                          nonce: self.defaults["nonce"],
+                          organization: self.organization)
             .start { result in
-                self.handleCodeExchangeResult(result, validatorContext: validatorContext, callback: callback)
+                self.handleCodeExchangeResult(result, callback: callback)
             }
     }
 
-    private func handleCodeExchangeResult(_ result: Result<Credentials, AuthenticationError>, validatorContext: IDTokenValidatorContext, callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+    private func handleCodeExchangeResult(_ result: Result<Credentials, AuthenticationError>, callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         switch result {
         case .failure(let error) where error.localizedDescription == "Unauthorized":
             return callback(.failure(WebAuthError(code: .unknown("PKCE not allowed - Application Type must be 'Native' and Token Endpoint Authentication Method must be 'None'"))))
