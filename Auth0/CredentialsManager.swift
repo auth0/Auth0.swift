@@ -904,8 +904,11 @@ public struct CredentialsManager: Sendable {
                         }
                     case .failure(let error):
                         complete()
+                        // ID token validation failures are deterministic — do not retry them
+                        if let cause = error.cause, isIDTokenValidationError(cause) {
+                            callback(.failure(CredentialsManagerError(code: .renewFailed, cause: cause)))
                         // Check if we should retry based on error type and retry count
-                        if self.shouldRetryRenewal(for: error, retryCount: retryCount) {
+                        } else if self.shouldRetryRenewal(for: error, retryCount: retryCount) {
                             // Calculate exponential backoff delay: 0.5s, 1s, 2s, etc.
                             let delay = pow(2.0, Double(retryCount)) * 0.5
                             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) {
@@ -979,7 +982,11 @@ public struct CredentialsManager: Sendable {
                         }
                     case .failure(let error):
                         complete()
-                        callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: error)))
+                        if let cause = error.cause, isIDTokenValidationError(cause) {
+                            callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: cause)))
+                        } else {
+                            callback(.failure(CredentialsManagerError(code: .ssoExchangeFailed, cause: error)))
+                        }
                     }
                 }
         }

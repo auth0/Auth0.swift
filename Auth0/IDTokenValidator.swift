@@ -46,6 +46,24 @@ enum IDTokenDecodingError: Auth0Error {
     }
 }
 
+/// Returns `true` if the given error is one of the known ID token validation error types.
+/// Use this instead of `cause is any Auth0Error` since many types (e.g. `AuthenticationError`,
+/// `CredentialsManagerError`) also conform to `Auth0Error` and would produce false positives.
+func isIDTokenValidationError(_ error: Error) -> Bool {
+    return error is IDTokenDecodingError
+        || error is IDTokenIssValidator.ValidationError
+        || error is IDTokenSubValidator.ValidationError
+        || error is IDTokenAudValidator.ValidationError
+        || error is IDTokenExpValidator.ValidationError
+        || error is IDTokenIatValidator.ValidationError
+        || error is IDTokenNonceValidator.ValidationError
+        || error is IDTokenAzpValidator.ValidationError
+        || error is IDTokenAuthTimeValidator.ValidationError
+        || error is IDTokenOrgIDValidator.ValidationError
+        || error is IDTokenOrgNameValidator.ValidationError
+        || error is IDTokenSignatureValidator.ValidationError
+}
+
 func validate(idToken: String,
               with context: IDTokenValidatorContext,
               signatureValidator: JWTAsyncValidator? = nil, // for testing
