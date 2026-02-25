@@ -177,7 +177,7 @@ struct Auth0MFAClient: MFAClient {
 private extension Auth0MFAClient {
     func token<T: Decodable>(authentication: Authentication,
                               issuer: String,
-                              leeway: Int = 60000,
+                              leeway: Int = 60 * 1000,
                               maxAge: Int? = nil,
                               nonce: String? = nil,
                               organization: String? = nil) -> Request<T, MFAVerifyError> {

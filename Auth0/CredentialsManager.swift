@@ -371,6 +371,11 @@ public struct CredentialsManager: Sendable {
     ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     ///   - callback:   Callback that receives a `Result` containing either the user's credentials or an error.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// the credentials are expired and there is no refresh token, the callback will be called with a
@@ -386,10 +391,16 @@ public struct CredentialsManager: Sendable {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
+    // swiftlint:disable:next function_parameter_count
     public func credentials(withScope scope: String? = nil,
                             minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
+                            issuer: String? = nil,
+                            leeway: Int = 60 * 1000,
+                            maxAge: Int? = nil,
+                            nonce: String? = nil,
+                            organization: String? = nil,
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
 
@@ -407,6 +418,11 @@ public struct CredentialsManager: Sendable {
                                          minTTL: minTTL,
                                          parameters: parameters,
                                          headers: headers,
+                                         issuer: issuer,
+                                         leeway: leeway,
+                                         maxAge: maxAge,
+                                         nonce: nonce,
+                                         organization: organization,
                                          forceRenewal: false,
                                          callback: mainThreadCallback)
                 return
@@ -424,6 +440,11 @@ public struct CredentialsManager: Sendable {
                                          minTTL: minTTL,
                                          parameters: parameters,
                                          headers: headers,
+                                         issuer: issuer,
+                                         leeway: leeway,
+                                         maxAge: maxAge,
+                                         nonce: nonce,
+                                         organization: organization,
                                          forceRenewal: false,
                                          callback: mainThreadCallback)
             }
@@ -432,6 +453,11 @@ public struct CredentialsManager: Sendable {
                                      minTTL: minTTL,
                                      parameters: parameters,
                                      headers: headers,
+                                     issuer: issuer,
+                                     leeway: leeway,
+                                     maxAge: maxAge,
+                                     nonce: nonce,
+                                     organization: organization,
                                      forceRenewal: false,
                                      callback: mainThreadCallback)
         }
@@ -480,6 +506,11 @@ public struct CredentialsManager: Sendable {
     ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     ///   - callback:   Callback that receives a `Result` containing either the user's credentials or an error.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// the credentials are expired and there is no refresh token, the callback will be called with a
@@ -495,15 +526,26 @@ public struct CredentialsManager: Sendable {
     /// - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
+    // swiftlint:disable:next function_parameter_count
     public func credentials(withScope scope: String? = nil,
                             minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
+                            issuer: String? = nil,
+                            leeway: Int = 60 * 1000,
+                            maxAge: Int? = nil,
+                            nonce: String? = nil,
+                            organization: String? = nil,
                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: scope,
                                  minTTL: minTTL,
                                  parameters: parameters,
                                  headers: headers,
+                                 issuer: issuer,
+                                 leeway: leeway,
+                                 maxAge: maxAge,
+                                 nonce: nonce,
+                                 organization: organization,
                                  forceRenewal: false,
                                  callback: dispatchOnMain(callback))
     }
@@ -644,6 +686,11 @@ public struct CredentialsManager: Sendable {
     /// - Parameters:
     ///   - parameters: Additional parameters to use.
     ///   - headers:    Additional headers to use.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     ///   - callback:   Callback that receives a `Result` containing either the SSO credentials or an error.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// there is no refresh token, the callback will be called with a ``CredentialsManagerError/noRefreshToken`` error.
@@ -657,8 +704,20 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func ssoCredentials(parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
+                               issuer: String? = nil,
+                               leeway: Int = 60 * 1000,
+                               maxAge: Int? = nil,
+                               nonce: String? = nil,
+                               organization: String? = nil,
                                callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
-        self.retrieveSSOCredentials(parameters: parameters, headers: headers, callback: dispatchOnMain(callback))
+        self.retrieveSSOCredentials(parameters: parameters,
+                                    headers: headers,
+                                    issuer: issuer,
+                                    leeway: leeway,
+                                    maxAge: maxAge,
+                                    nonce: nonce,
+                                    organization: organization,
+                                    callback: dispatchOnMain(callback))
     }
 
     /// Renews credentials using the refresh token and stores them in the Keychain. **This method is thread-safe**.
@@ -686,6 +745,11 @@ public struct CredentialsManager: Sendable {
     /// - Parameters:
     ///   - parameters: Additional parameters to use.
     ///   - headers:    Additional headers to use.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     ///   - callback:   Callback that receives a `Result` containing either the renewed user's credentials or an error.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// there is no refresh token, the callback will be called with a ``CredentialsManagerError/noRefreshToken`` error.
@@ -702,11 +766,21 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func renew(parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
+                      issuer: String? = nil,
+                      leeway: Int = 60 * 1000,
+                      maxAge: Int? = nil,
+                      nonce: String? = nil,
+                      organization: String? = nil,
                       callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentials(scope: nil,
                                  minTTL: 0,
                                  parameters: parameters,
                                  headers: headers,
+                                 issuer: issuer,
+                                 leeway: leeway,
+                                 maxAge: maxAge,
+                                 nonce: nonce,
+                                 organization: organization,
                                  forceRenewal: true,
                                  callback: dispatchOnMain(callback))
     }
@@ -749,12 +823,22 @@ public struct CredentialsManager: Sendable {
                                      minTTL: Int,
                                      parameters: [String: Any],
                                      headers: [String: String],
+                                     issuer: String?,
+                                     leeway: Int,
+                                     maxAge: Int?,
+                                     nonce: String?,
+                                     organization: String?,
                                      forceRenewal: Bool,
                                      callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         self.retrieveCredentialsWithRetry(scope: scope,
                                          minTTL: minTTL,
                                          parameters: parameters,
                                          headers: headers,
+                                         issuer: issuer,
+                                         leeway: leeway,
+                                         maxAge: maxAge,
+                                         nonce: nonce,
+                                         organization: organization,
                                          forceRenewal: forceRenewal,
                                          retryCount: 0,
                                          callback: callback)
@@ -762,12 +846,17 @@ public struct CredentialsManager: Sendable {
 
     // swiftlint:disable:next function_parameter_count function_body_length
     private func retrieveCredentialsWithRetry(scope: String?,
-                                             minTTL: Int,
-                                             parameters: [String: Any],
-                                             headers: [String: String],
-                                             forceRenewal: Bool,
-                                             retryCount: Int,
-                                             callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
+                                              minTTL: Int,
+                                              parameters: [String: Any],
+                                              headers: [String: String],
+                                              issuer: String?,
+                                              leeway: Int,
+                                              maxAge: Int?,
+                                              nonce: String?,
+                                              organization: String?,
+                                              forceRenewal: Bool,
+                                              retryCount: Int,
+                                              callback: @escaping (CredentialsManagerResult<Credentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             guard let credentials = self.retrieveCredentials() else {
                 complete()
@@ -785,8 +874,15 @@ public struct CredentialsManager: Sendable {
                 return callback(.failure(.noRefreshToken))
             }
 
+            let resolvedIssuer = issuer ?? self.authentication.url.absoluteString
             self.authentication
-                .renew(withRefreshToken: refreshToken, scope: scope)
+                .renew(withRefreshToken: refreshToken,
+                       scope: scope,
+                       issuer: resolvedIssuer,
+                       leeway: leeway,
+                       maxAge: maxAge,
+                       nonce: nonce,
+                       organization: organization)
                 .parameters(parameters)
                 .headers(headers)
                 .start { result in
@@ -817,6 +913,11 @@ public struct CredentialsManager: Sendable {
                                                                  minTTL: minTTL,
                                                                  parameters: parameters,
                                                                  headers: headers,
+                                                                 issuer: issuer,
+                                                                 leeway: leeway,
+                                                                 maxAge: maxAge,
+                                                                 nonce: nonce,
+                                                                 organization: organization,
                                                                  forceRenewal: forceRenewal,
                                                                  retryCount: retryCount + 1,
                                                                  callback: callback)
@@ -834,8 +935,14 @@ public struct CredentialsManager: Sendable {
         return error.isRetryable
     }
 
+    // swiftlint:disable:next function_parameter_count
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
+                                        issuer: String?,
+                                        leeway: Int,
+                                        maxAge: Int?,
+                                        nonce: String?,
+                                        organization: String?,
                                         callback: @escaping (CredentialsManagerResult<SSOCredentials>) -> Void) {
         SynchronizationBarrier.shared.execute { complete in
             guard let credentials = self.retrieveCredentials() else {
@@ -847,8 +954,14 @@ public struct CredentialsManager: Sendable {
                 return callback(.failure(.noRefreshToken))
             }
 
+            let resolvedIssuer = issuer ?? self.authentication.url.absoluteString
             self.authentication
-                .ssoExchange(withRefreshToken: refreshToken)
+                .ssoExchange(withRefreshToken: refreshToken,
+                             issuer: resolvedIssuer,
+                             leeway: leeway,
+                             maxAge: maxAge,
+                             nonce: nonce,
+                             organization: organization)
                 .parameters(parameters)
                 .headers(headers)
                 .start { result in
@@ -1075,6 +1188,11 @@ public extension CredentialsManager {
     ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     /// - Returns: A type-erased publisher.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// the credentials are expired and there is no refresh token, the subscription will complete with a
@@ -1093,13 +1211,23 @@ public extension CredentialsManager {
     func credentials(withScope scope: String? = nil,
                      minTTL: Int = 60,
                      parameters: [String: Any] = [:],
-                     headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
+                     headers: [String: String] = [:],
+                     issuer: String? = nil,
+                     leeway: Int = 60 * 1000,
+                     maxAge: Int? = nil,
+                     nonce: String? = nil,
+                     organization: String? = nil) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
             Future { callback in
                 return self.credentials(withScope: scope,
                                         minTTL: minTTL,
                                         parameters: parameters,
                                         headers: headers,
+                                        issuer: issuer,
+                                        leeway: leeway,
+                                        maxAge: maxAge,
+                                        nonce: nonce,
+                                        organization: organization,
                                         callback: callback)
             }
         }.eraseToAnyPublisher()
@@ -1262,6 +1390,11 @@ public extension CredentialsManager {
     /// - Parameters:
     ///   - parameters: Additional parameters to use.
     ///   - headers:    Additional headers to use.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// there is no refresh token, the callback will be called with a ``CredentialsManagerError/noRefreshToken`` error.
     /// - Important: To ensure that no concurrent renewal requests get made, do not call this method from multiple
@@ -1273,10 +1406,22 @@ public extension CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
     func ssoCredentials(parameters: [String: Any] = [:],
-                        headers: [String: String] = [:]) -> AnyPublisher<SSOCredentials, CredentialsManagerError> {
+                        headers: [String: String] = [:],
+                        issuer: String? = nil,
+                        leeway: Int = 60 * 1000,
+                        maxAge: Int? = nil,
+                        nonce: String? = nil,
+                        organization: String? = nil) -> AnyPublisher<SSOCredentials, CredentialsManagerError> {
         return Deferred {
             Future { callback in
-                return self.ssoCredentials(parameters: parameters, headers: headers, callback: callback)
+                return self.ssoCredentials(parameters: parameters,
+                                           headers: headers,
+                                           issuer: issuer,
+                                           leeway: leeway,
+                                           maxAge: maxAge,
+                                           nonce: nonce,
+                                           organization: organization,
+                                           callback: callback)
             }
         }.eraseToAnyPublisher()
     }
@@ -1312,6 +1457,11 @@ public extension CredentialsManager {
     /// - Parameters:
     ///   - parameters: Additional parameters to use.
     ///   - headers:    Additional headers to use.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// there is no refresh token, the subscription will complete with a ``CredentialsManagerError/noRefreshToken``
     /// error.
@@ -1327,11 +1477,21 @@ public extension CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func renew(parameters: [String: Any] = [:],
-               headers: [String: String] = [:]) -> AnyPublisher<Credentials, CredentialsManagerError> {
+               headers: [String: String] = [:],
+               issuer: String? = nil,
+               leeway: Int = 60 * 1000,
+               maxAge: Int? = nil,
+               nonce: String? = nil,
+               organization: String? = nil) -> AnyPublisher<Credentials, CredentialsManagerError> {
         return Deferred {
             Future { callback in
                 return self.renew(parameters: parameters,
                                   headers: headers,
+                                  issuer: issuer,
+                                  leeway: leeway,
+                                  maxAge: maxAge,
+                                  nonce: nonce,
+                                  organization: organization,
                                   callback: callback)
             }
         }.eraseToAnyPublisher()
@@ -1422,6 +1582,11 @@ public extension CredentialsManager {
     ///   - minTTL:     Minimum time in seconds the access token must remain valid to avoid being renewed. Defaults to `60`.
     ///   - parameters: Additional parameters to use when renewing credentials.
     ///   - headers:    Additional headers to use when renewing credentials.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     /// - Returns: The user's credentials.
     /// - Throws: An error of type ``CredentialsManagerError``.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
@@ -1441,12 +1606,22 @@ public extension CredentialsManager {
     func credentials(withScope scope: String? = nil,
                      minTTL: Int = 60,
                      parameters: [String: Any] = [:],
-                     headers: [String: String] = [:]) async throws -> Credentials {
+                     headers: [String: String] = [:],
+                     issuer: String? = nil,
+                     leeway: Int = 60 * 1000,
+                     maxAge: Int? = nil,
+                     nonce: String? = nil,
+                     organization: String? = nil) async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
             self.credentials(withScope: scope,
                              minTTL: minTTL,
                              parameters: parameters,
-                             headers: headers) { result in
+                             headers: headers,
+                             issuer: issuer,
+                             leeway: leeway,
+                             maxAge: maxAge,
+                             nonce: nonce,
+                             organization: organization) { result in
                 continuation.resume(with: result)
             }
         }
@@ -1583,6 +1758,11 @@ public extension CredentialsManager {
     /// - Parameters:
     ///   - parameters: Additional parameters to use.
     ///   - headers:    Additional headers to use.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     /// - Returns: SSO credentials contaning a session transfer token.
     /// - Throws: An error of type ``CredentialsManagerError``.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
@@ -1596,9 +1776,20 @@ public extension CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
     /// - <doc:RefreshTokens>
     func ssoCredentials(parameters: [String: Any] = [:],
-                        headers: [String: String] = [:]) async throws -> SSOCredentials {
+                        headers: [String: String] = [:],
+                        issuer: String? = nil,
+                        leeway: Int = 60 * 1000,
+                        maxAge: Int? = nil,
+                        nonce: String? = nil,
+                        organization: String? = nil) async throws -> SSOCredentials {
         return try await withCheckedThrowingContinuation { continuation in
-            self.ssoCredentials(parameters: parameters, headers: headers) { result in
+            self.ssoCredentials(parameters: parameters,
+                                headers: headers,
+                                issuer: issuer,
+                                leeway: leeway,
+                                maxAge: maxAge,
+                                nonce: nonce,
+                                organization: organization) { result in
                 continuation.resume(with: result)
             }
         }
@@ -1627,6 +1818,11 @@ public extension CredentialsManager {
     /// - Parameters:
     ///   - parameters: Additional parameters to use.
     ///   - headers:    Additional headers to use.
+    ///   - issuer:        Expected issuer (`iss` claim) of the ID token. Defaults to the authentication URL.
+    ///   - leeway:        Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:        Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:         Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization:  Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
     /// - Requires: The scope `offline_access` to have been requested on login to get a refresh token from Auth0. If
     /// there is no refresh token, a ``CredentialsManagerError/noRefreshToken`` error will be thrown.
     /// - Warning: Do not call `store(credentials:)` afterward. The Credentials Manager automatically persists the
@@ -1641,9 +1837,20 @@ public extension CredentialsManager {
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/refresh-token/refresh-token)
     /// - <doc:RefreshTokens>
     func renew(parameters: [String: Any] = [:],
-               headers: [String: String] = [:]) async throws -> Credentials {
+               headers: [String: String] = [:],
+               issuer: String? = nil,
+               leeway: Int = 60 * 1000,
+               maxAge: Int? = nil,
+               nonce: String? = nil,
+               organization: String? = nil) async throws -> Credentials {
         return try await withCheckedThrowingContinuation { continuation in
-            self.renew(parameters: parameters, headers: headers) { result in
+            self.renew(parameters: parameters,
+                       headers: headers,
+                       issuer: issuer,
+                       leeway: leeway,
+                       maxAge: maxAge,
+                       nonce: nonce,
+                       organization: organization) { result in
                 continuation.resume(with: result)
             }
         }

@@ -82,7 +82,10 @@ func authenticationDecodableWithIDTokenValidation<T: Decodable>(
             decoder.dateDecodingStrategy = .secondsSince1970
             let decodedObject = try decoder.decode(T.self, from: data)
 
-            if let carrier = decodedObject as? any IDTokenProtocol, !carrier.idToken.isEmpty, !issuer.isEmpty {
+            if let carrier = decodedObject as? any IDTokenProtocol,
+               !carrier.idToken.isEmpty,
+               !issuer.isEmpty,
+               carrier.idToken.components(separatedBy: ".").count == 3 {
                 let validatorContext = IDTokenValidatorContext(
                     authentication: authentication,
                     issuer: issuer,
