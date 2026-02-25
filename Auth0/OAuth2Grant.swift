@@ -89,6 +89,11 @@ struct PKCE: OAuth2Grant {
         case .failure(let error) where error.localizedDescription == "Unauthorized":
             return callback(.failure(WebAuthError(code: .unknown("PKCE not allowed - Application Type must be 'Native' and Token Endpoint Authentication Method must be 'None'"))))
         case .failure(let error):
+            // ID token validation failures are wrapped in AuthenticationError(cause:) where the
+            // cause is an Auth0Error from the validator. Map these to .idTokenValidationFailed.
+            if let cause = error.cause, cause is any Auth0Error {
+                return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: cause)))
+            }
             return callback(.failure(WebAuthError(code: .codeExchangeFailed, cause: error)))
         case .success(let credentials):
             callback(.success(credentials))

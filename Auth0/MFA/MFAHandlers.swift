@@ -43,7 +43,7 @@ func mfaVerifyDecodable<T: Decodable>(from result: Result<ResponseValue, MFAVeri
 func mfaVerifyDecodableWithIDTokenValidation<T: Decodable>(
     authentication: Authentication,
     issuer: String,
-    leeway: Int = 60000,
+    leeway: Int = 60 * 1000,
     maxAge: Int? = nil,
     nonce: String? = nil,
     organization: String? = nil,
@@ -57,7 +57,10 @@ func mfaVerifyDecodableWithIDTokenValidation<T: Decodable>(
             decoder.dateDecodingStrategy = .secondsSince1970
             let decodedObject = try decoder.decode(T.self, from: data)
 
-            if let carrier = decodedObject as? any IDTokenProtocol, !carrier.idToken.isEmpty, !issuer.isEmpty {
+            if let carrier = decodedObject as? any IDTokenProtocol,
+               !carrier.idToken.isEmpty,
+               !issuer.isEmpty,
+               carrier.idToken.components(separatedBy: ".").count == 3 {
                 let validatorContext = IDTokenValidatorContext(
                     authentication: authentication,
                     issuer: issuer,

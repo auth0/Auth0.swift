@@ -482,7 +482,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testVerifyOOBSuccess() async {
-        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).verify(oobCode: "oob123", bindingCode: "bind456", mfaToken: "mfa_token")
+        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "kjjknb", domain: "test.auth0.com", session: makeMockSession()).verify(oobCode: "oob123", bindingCode: "bind456", mfaToken: "mfa_token", authentication: Auth0.authentication(clientId: "jhgjb", domain: "test.auth0.com"))
 
         do {
             try await confirmation(expectedCount: 1) { confirmation in
@@ -509,7 +509,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testVerifyOOBWithoutBindingCode() async {
-        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).verify(oobCode: "oob123", bindingCode: nil, mfaToken: "mfa_token")
+        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "yvjhjh", domain: "test.auth0.com", session: makeMockSession()).verify(oobCode: "oob123", bindingCode: nil, mfaToken: "mfa_token", authentication: Auth0.authentication(clientId: "jrgjbn", domain: "test.auth0.com"))
 
         do {
             try await confirmation(expectedCount: 1) { confirmation in
@@ -536,7 +536,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testVerifyOTPSuccess() async {
-        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).verify(otp: "123456", mfaToken: "mfa_token")
+        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "jbjhbj", domain: "test.auth0.com", session: makeMockSession()).verify(otp: "123456", mfaToken: "mfa_token", authentication: Auth0.authentication())
 
         do {
             try await confirmation(expectedCount: 1) { confirmation in
@@ -563,7 +563,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testVerifyRecoveryCodeSuccess() async {
-        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).verify(recoveryCode: "RECOVERY123", mfaToken: "mfa_token")
+        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "jhgbhjbj", domain: "test.auth0.com", session: makeMockSession()).verify(recoveryCode: "RECOVERY123", mfaToken: "mfa_token", authentication: Auth0.authentication())
 
         do {
             try await confirmation(expectedCount: 1) { confirmation in
@@ -591,7 +591,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testGetAuthenticatorsFailureUnauthorized() async {
-        let request = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).getAuthenticators(mfaToken: "invalid_token", factorsAllowed: [])
+        let request = Auth0.mfa(clientId: "jhbhjb", domain: "test.auth0.com", session: makeMockSession()).getAuthenticators(mfaToken: "invalid_token", factorsAllowed: [])
 
         MockURLProtocol.requestHandler = { _ in
             let response = HTTPURLResponse(
@@ -616,7 +616,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testPhoneEnrollmentFailure() async {
-        let request = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).enroll(mfaToken: "", phoneNumber: "invalid")
+        let request = Auth0.mfa(clientId: "jkkjn", domain: "test.auth0.com", session: makeMockSession()).enroll(mfaToken: "", phoneNumber: "invalid")
 
         MockURLProtocol.requestHandler = { _ in
             let response = HTTPURLResponse(
@@ -641,7 +641,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testOTPEnrollmentFailure() async {
-        let request: Request<OTPMFAEnrollmentChallenge, MfaEnrollmentError> = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).enroll(mfaToken: "expired_token")
+        let request: Request<OTPMFAEnrollmentChallenge, MfaEnrollmentError> = Auth0.mfa(clientId: "jjbj", domain: "test.auth0.com", session: makeMockSession()).enroll(mfaToken: "expired_token")
 
         MockURLProtocol.requestHandler = { _ in
             let response = HTTPURLResponse(
@@ -666,7 +666,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testChallengeFailure() async {
-        let request = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).challenge(with: "invalid_id", mfaToken: "")
+        let request = Auth0.mfa(clientId: "knkn", domain: "test.auth0.com", session: makeMockSession()).challenge(with: "invalid_id", mfaToken: "")
 
         MockURLProtocol.requestHandler = { _ in
             let response = HTTPURLResponse(
@@ -691,7 +691,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testVerifyOOBFailure() async {
-        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).verify(oobCode: "invalid", bindingCode: nil, mfaToken: "")
+        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "kjbjnb", domain: "test.auth0.com", session: makeMockSession()).verify(oobCode: "invalid", bindingCode: nil, mfaToken: "", authentication: Auth0.authentication())
 
         MockURLProtocol.requestHandler = { _ in
             let response = HTTPURLResponse(
@@ -716,7 +716,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testVerifyOTPFailure() async {
-        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).verify(otp: "000000", mfaToken: "")
+        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "jbjbj", domain: "test.auth0.com", session: makeMockSession()).verify(otp: "000000", mfaToken: "", authentication: Auth0.authentication())
 
         MockURLProtocol.requestHandler = { _ in
             let response = HTTPURLResponse(
@@ -741,7 +741,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testVerifyRecoveryCodeFailure() async {
-        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).verify(recoveryCode: "INVALID", mfaToken: "")
+        let request: Request<Credentials, MFAVerifyError> = Auth0.mfa(clientId: "89809", domain: "test.auth0.com", session: makeMockSession()).verify(recoveryCode: "INVALID", mfaToken: "", authentication: Auth0.authentication(clientId: "987u89u", domain: "test.auth0.com"))
 
         MockURLProtocol.requestHandler = { _ in
             let response = HTTPURLResponse(
@@ -766,7 +766,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testEmailEnrollmentFailure() async {
-        let request = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).enroll(mfaToken: "", email: "invalid_email")
+        let request = Auth0.mfa(clientId: "dknknb", domain: "test.auth0.com", session: makeMockSession()).enroll(mfaToken: "", email: "invalid_email")
 
         MockURLProtocol.requestHandler = { _ in
             let response = HTTPURLResponse(
@@ -791,7 +791,7 @@ struct Auth0MFAClientTests {
 
     @Test
     func testPushEnrollmentFailure() async {
-        let request: Request<PushMFAEnrollmentChallenge, MfaEnrollmentError> = Auth0.mfa(clientId: "", domain: "", session: makeMockSession()).enroll(mfaToken: "")
+        let request: Request<PushMFAEnrollmentChallenge, MfaEnrollmentError> = Auth0.mfa(clientId: "khjkg", domain: "test.auth0.com", session: makeMockSession()).enroll(mfaToken: "")
 
         MockURLProtocol.requestHandler = { _ in
             let response = HTTPURLResponse(
