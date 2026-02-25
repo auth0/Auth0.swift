@@ -8,49 +8,49 @@ final class ContentViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isAuthenticated: Bool = false
     private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
-    
-    /// Web Authentication using Universal Login (Recommended)
-    func webLogin() async {
+
+#if WEB_AUTH_PLATFORM
+    func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
-    
+
         #if !os(tvOS) && !os(watchOS)
         do {
+
             let credentials = try await Auth0
                 .webAuth()
                 .scope("openid profile email offline_access")
                 .start()
-            
-            // Store credentials securely
+
             let stored = credentialsManager.store(credentials: credentials)
             if stored {
                 isAuthenticated = true
-                print("Access Token: \(credentials.accessToken)")
             } else {
                 errorMessage = "Failed to store credentials"
             }
         } catch let error as Auth0Error {
             errorMessage = "Login failed: \(error.localizedDescription)"
-            print("Web login failed with error: \(error)")
         } catch {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
         #endif
-        
+
         isLoading = false
     }
-    
-    /// Logout and clear stored credentials
-    func logout() async {
+
+    func logout(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
         #if !os(tvOS) && !os(watchOS)
         do {
-            try await Auth0
-                .webAuth()
-                .clearSession()
-            
-            // Clear stored credentials
+            var webAuth = Auth0.webAuth()
+
+            if let window = window {
+                webAuth = webAuth.presentationWindow(window)
+            }
+
+            try await webAuth.clearSession()
+
             let cleared = credentialsManager.clear()
             if cleared {
                 isAuthenticated = false
@@ -63,11 +63,12 @@ final class ContentViewModel: ObservableObject {
             errorMessage = "Unexpected error: \(error.localizedDescription)"
         }
         #endif
-        
+
         isLoading = false
     }
     
-    /// Check if user has valid credentials stored
+    #endif
+    
     func checkAuthentication() async {
         do {
             let credentials = try await credentialsManager.credentials()
@@ -79,7 +80,6 @@ final class ContentViewModel: ObservableObject {
         }
     }
 }
-
 
 extension Array where Element: Hashable {
     func uniqued() -> [Element] {
