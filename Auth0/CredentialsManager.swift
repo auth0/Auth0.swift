@@ -396,7 +396,7 @@ public struct CredentialsManager: Sendable {
                             minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
-                            issuer: String? = nil,
+                            issuer: String = "",
                             leeway: Int = 60 * 1000,
                             maxAge: Int? = nil,
                             nonce: String? = nil,
@@ -531,7 +531,7 @@ public struct CredentialsManager: Sendable {
                             minTTL: Int = 60,
                             parameters: [String: Any] = [:],
                             headers: [String: String] = [:],
-                            issuer: String? = nil,
+                            issuer: String = "",
                             leeway: Int = 60 * 1000,
                             maxAge: Int? = nil,
                             nonce: String? = nil,
@@ -704,7 +704,7 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func ssoCredentials(parameters: [String: Any] = [:],
                                headers: [String: String] = [:],
-                               issuer: String? = nil,
+                               issuer: String = "",
                                leeway: Int = 60 * 1000,
                                maxAge: Int? = nil,
                                nonce: String? = nil,
@@ -766,7 +766,7 @@ public struct CredentialsManager: Sendable {
     /// - <doc:RefreshTokens>
     public func renew(parameters: [String: Any] = [:],
                       headers: [String: String] = [:],
-                      issuer: String? = nil,
+                      issuer: String = "",
                       leeway: Int = 60 * 1000,
                       maxAge: Int? = nil,
                       nonce: String? = nil,
@@ -823,7 +823,7 @@ public struct CredentialsManager: Sendable {
                                      minTTL: Int,
                                      parameters: [String: Any],
                                      headers: [String: String],
-                                     issuer: String?,
+                                     issuer: String,
                                      leeway: Int,
                                      maxAge: Int?,
                                      nonce: String?,
@@ -849,7 +849,7 @@ public struct CredentialsManager: Sendable {
                                               minTTL: Int,
                                               parameters: [String: Any],
                                               headers: [String: String],
-                                              issuer: String?,
+                                              issuer: String,
                                               leeway: Int,
                                               maxAge: Int?,
                                               nonce: String?,
@@ -874,7 +874,7 @@ public struct CredentialsManager: Sendable {
                 return callback(.failure(.noRefreshToken))
             }
 
-            let resolvedIssuer = issuer ?? self.authentication.url.absoluteString
+            let resolvedIssuer = issuer.isEmpty ? self.authentication.url.absoluteString : issuer
             self.authentication
                 .renew(withRefreshToken: refreshToken,
                        scope: scope,
@@ -941,7 +941,7 @@ public struct CredentialsManager: Sendable {
     // swiftlint:disable:next function_parameter_count
     private func retrieveSSOCredentials(parameters: [String: Any],
                                         headers: [String: String],
-                                        issuer: String?,
+                                        issuer: String,
                                         leeway: Int,
                                         maxAge: Int?,
                                         nonce: String?,
@@ -957,7 +957,7 @@ public struct CredentialsManager: Sendable {
                 return callback(.failure(.noRefreshToken))
             }
 
-            let resolvedIssuer = issuer ?? self.authentication.url.absoluteString
+            let resolvedIssuer = issuer.isEmpty ? self.authentication.url.absoluteString : issuer
             self.authentication
                 .ssoExchange(withRefreshToken: refreshToken,
                              issuer: resolvedIssuer,
@@ -1219,7 +1219,7 @@ public extension CredentialsManager {
                      minTTL: Int = 60,
                      parameters: [String: Any] = [:],
                      headers: [String: String] = [:],
-                     issuer: String? = nil,
+                     issuer: String = "",
                      leeway: Int = 60 * 1000,
                      maxAge: Int? = nil,
                      nonce: String? = nil,
@@ -1414,7 +1414,7 @@ public extension CredentialsManager {
     /// - <doc:RefreshTokens>
     func ssoCredentials(parameters: [String: Any] = [:],
                         headers: [String: String] = [:],
-                        issuer: String? = nil,
+                        issuer: String = "",
                         leeway: Int = 60 * 1000,
                         maxAge: Int? = nil,
                         nonce: String? = nil,
@@ -1485,7 +1485,7 @@ public extension CredentialsManager {
     /// - <doc:RefreshTokens>
     func renew(parameters: [String: Any] = [:],
                headers: [String: String] = [:],
-               issuer: String? = nil,
+               issuer: String = "",
                leeway: Int = 60 * 1000,
                maxAge: Int? = nil,
                nonce: String? = nil,
@@ -1614,7 +1614,7 @@ public extension CredentialsManager {
                      minTTL: Int = 60,
                      parameters: [String: Any] = [:],
                      headers: [String: String] = [:],
-                     issuer: String? = nil,
+                     issuer: String = "",
                      leeway: Int = 60 * 1000,
                      maxAge: Int? = nil,
                      nonce: String? = nil,
@@ -1784,7 +1784,7 @@ public extension CredentialsManager {
     /// - <doc:RefreshTokens>
     func ssoCredentials(parameters: [String: Any] = [:],
                         headers: [String: String] = [:],
-                        issuer: String? = nil,
+                        issuer: String = "",
                         leeway: Int = 60 * 1000,
                         maxAge: Int? = nil,
                         nonce: String? = nil,
@@ -1845,7 +1845,7 @@ public extension CredentialsManager {
     /// - <doc:RefreshTokens>
     func renew(parameters: [String: Any] = [:],
                headers: [String: String] = [:],
-               issuer: String? = nil,
+               issuer: String = "",
                leeway: Int = 60 * 1000,
                maxAge: Int? = nil,
                nonce: String? = nil,
