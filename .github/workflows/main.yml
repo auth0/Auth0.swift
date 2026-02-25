@@ -83,12 +83,12 @@ jobs:
 
     pod-lint:
         name: Lint podspec using Xcode ${{ matrix.xcode }}
-        runs-on: macos-14-xlarge
+        runs-on: macos-15-xlarge
 
         strategy:
           matrix:
             xcode: 
-              - '16.1'
+              - '26.2'
 
         steps:
             - name: Checkout
@@ -105,7 +105,7 @@ jobs:
 
     swiftlint:
         name: Lint code with SwiftLint
-        runs-on: macos-14
+        runs-on: macos-15
 
         steps:
             - name: Checkout
