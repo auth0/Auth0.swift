@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.17.1](https://github.com/auth0/Auth0.swift/tree/2.17.1) (2026-02-13)
+[Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.17.0...2.17.1)
+
+**Added**
+- pass down custom params to token exchange [\#1086](https://github.com/auth0/Auth0.swift/pull/1086) ([popaulina](https://github.com/popaulina))
+
 ## [2.17.0](https://github.com/auth0/Auth0.swift/tree/2.17.0) (2026-02-02)
 [Full Changelog](https://github.com/auth0/Auth0.swift/compare/2.16.3...2.17.0)
 
