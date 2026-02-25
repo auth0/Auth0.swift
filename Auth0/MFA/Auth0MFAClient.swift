@@ -196,7 +196,17 @@ private extension Auth0MFAClient {
                                nonce: nonce,
                                organization: organization,
                                from: result,
-                               callback: callback
+                               callback: { (verifyResult: Result<T, MFAVerifyError>) in
+                                   switch verifyResult {
+                                   case .failure(let error):
+                                       if let cause = error.cause, isIDTokenValidationError(cause) {
+                                           return callback(.failure(MFAVerifyError(cause: cause)))
+                                       }
+                                       callback(.failure(error))
+                                   case .success(let value):
+                                       callback(.success(value))
+                                   }
+                               }
                            )
                        },
                        parameters: payload,

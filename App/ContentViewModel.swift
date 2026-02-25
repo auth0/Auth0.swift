@@ -9,7 +9,6 @@ final class ContentViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
     private let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
 
-#if WEB_AUTH_PLATFORM
     func webLogin(presentationWindow window: Auth0WindowRepresentable? = nil) async {
         isLoading = true
         errorMessage = nil
@@ -66,9 +65,7 @@ final class ContentViewModel: ObservableObject {
 
         isLoading = false
     }
-    
-    #endif
-    
+
     func checkAuthentication() async {
         do {
             let credentials = try await credentialsManager.credentials()

@@ -91,7 +91,7 @@ struct PKCE: OAuth2Grant {
         case .failure(let error):
             // ID token validation failures are wrapped in AuthenticationError(cause:) where the
             // cause is an Auth0Error from the validator. Map these to .idTokenValidationFailed.
-            if let cause = error.cause, cause is any Auth0Error {
+            if let cause = error.cause, isIDTokenValidationError(cause) {
                 return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: cause)))
             }
             return callback(.failure(WebAuthError(code: .codeExchangeFailed, cause: error)))
