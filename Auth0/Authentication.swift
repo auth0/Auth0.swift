@@ -1298,31 +1298,31 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
 
 public extension Authentication {
 
-    func login(email: String, code: String, audience: String? = nil, scope: String = defaultScope, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(email: email, code: code, audience: audience, scope: scope, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    func login(email: String, code: String, audience: String? = nil, scope: String = defaultScope, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(email: email, code: code, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
-    func login(phoneNumber: String, code: String, audience: String? = nil, scope: String = defaultScope, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(phoneNumber: phoneNumber, code: code, audience: audience, scope: scope, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    func login(phoneNumber: String, code: String, audience: String? = nil, scope: String = defaultScope, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(phoneNumber: phoneNumber, code: code, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
-    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String? = nil, scope: String = defaultScope, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(usernameOrEmail: username, password: password, realmOrConnection: realm, audience: audience, scope: scope, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
-    }
-
-    @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withOTP otp: String, mfaToken: String, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(withOTP: otp, mfaToken: mfaToken, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String? = nil, scope: String = defaultScope, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(usernameOrEmail: username, password: password, realmOrConnection: realm, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(withOOBCode: oobCode, mfaToken: mfaToken, bindingCode: bindingCode, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    func login(withOTP otp: String, mfaToken: String, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(withOTP: otp, mfaToken: mfaToken, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withRecoveryCode recoveryCode: String, mfaToken: String, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(withRecoveryCode: recoveryCode, mfaToken: mfaToken, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(withOOBCode: oobCode, mfaToken: mfaToken, bindingCode: bindingCode, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    }
+
+    @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(withRecoveryCode: recoveryCode, mfaToken: mfaToken, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
@@ -1335,7 +1335,7 @@ public extension Authentication {
                profile: [String: Any]? = nil,
                audience: String? = nil,
                scope: String = defaultScope,
-               issuer: String? = nil,
+               issuer: String = "",
                leeway: Int = 60 * 1000,
                maxAge: Int? = nil,
                nonce: String? = nil,
@@ -1345,7 +1345,7 @@ public extension Authentication {
                           profile: profile,
                           audience: audience,
                           scope: scope,
-                          issuer: issuer ?? url.absoluteString,
+                          issuer: issuer.isEmpty ? url.absoluteString : issuer,
                           leeway: leeway,
                           maxAge: maxAge,
                           nonce: nonce,
@@ -1356,7 +1356,7 @@ public extension Authentication {
                profile: [String: Any],
                audience: String? = nil,
                scope: String = defaultScope,
-               issuer: String? = nil,
+               issuer: String = "",
                leeway: Int = 60 * 1000,
                maxAge: Int? = nil,
                nonce: String? = nil,
@@ -1365,15 +1365,15 @@ public extension Authentication {
                           profile: profile,
                           audience: audience,
                           scope: scope,
-                          issuer: issuer ?? url.absoluteString,
+                          issuer: issuer.isEmpty ? url.absoluteString : issuer,
                           leeway: leeway,
                           maxAge: maxAge,
                           nonce: nonce,
                           organization: organization)
     }
 
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String = defaultScope, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String = defaultScope, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
     func signup(email: String, username: String? = nil, password: String, connection: String = "Username-Password-Authentication", userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
@@ -1388,7 +1388,7 @@ public extension Authentication {
                audience: String? = nil,
                scope: String = defaultScope,
                organization: String? = nil,
-               issuer: String? = nil,
+               issuer: String = "",
                leeway: Int = 60 * 1000,
                maxAge: Int? = nil,
                nonce: String? = nil) -> Request<Credentials, AuthenticationError> {
@@ -1398,7 +1398,7 @@ public extension Authentication {
                           audience: audience,
                           scope: scope,
                           organization: organization,
-                          issuer: issuer ?? url.absoluteString,
+                          issuer: issuer.isEmpty ? url.absoluteString : issuer,
                           leeway: leeway,
                           maxAge: maxAge,
                           nonce: nonce)
@@ -1416,7 +1416,7 @@ public extension Authentication {
                audience: String? = nil,
                scope: String = defaultScope,
                organization: String? = nil,
-               issuer: String? = nil,
+               issuer: String = "",
                leeway: Int = 60 * 1000,
                maxAge: Int? = nil,
                nonce: String? = nil) -> Request<Credentials, AuthenticationError> {
@@ -1426,7 +1426,7 @@ public extension Authentication {
                           audience: audience,
                           scope: scope,
                           organization: organization,
-                          issuer: issuer ?? url.absoluteString,
+                          issuer: issuer.isEmpty ? url.absoluteString : issuer,
                           leeway: leeway,
                           maxAge: maxAge,
                           nonce: nonce)
@@ -1461,12 +1461,12 @@ public extension Authentication {
         self.userInfo(withAccessToken: accessToken, tokenType: tokenType)
     }
 
-    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
-    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
     func customTokenExchange(subjectToken: String,
@@ -1475,7 +1475,7 @@ public extension Authentication {
                              scope: String = defaultScope,
                              organization: String? = nil,
                              parameters: [String: Any] = [:],
-                             issuer: String? = nil,
+                             issuer: String = "",
                              leeway: Int = 60 * 1000,
                              maxAge: Int? = nil,
                              nonce: String? = nil) -> Request<Credentials, AuthenticationError> {
@@ -1485,14 +1485,14 @@ public extension Authentication {
                                         scope: scope,
                                         organization: organization,
                                         parameters: parameters,
-                                        issuer: issuer ?? url.absoluteString,
+                                        issuer: issuer.isEmpty ? url.absoluteString : issuer,
                                         leeway: leeway,
                                         maxAge: maxAge,
                                         nonce: nonce)
     }
 
-    func ssoExchange(withRefreshToken refreshToken: String, issuer: String? = nil, leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<SSOCredentials, AuthenticationError> {
-        return self.ssoExchange(withRefreshToken: refreshToken, issuer: issuer ?? url.absoluteString, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    func ssoExchange(withRefreshToken refreshToken: String, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<SSOCredentials, AuthenticationError> {
+        return self.ssoExchange(withRefreshToken: refreshToken, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
 }
