@@ -140,7 +140,7 @@ While the SDK can be configured in code, it defaults to reading from `Auth0.plis
 
 ## Dependencies
 
-- **JWTDecode.swift**: For decoding JWTs to extract claims/expiry.
+- **JWTDecode.swift**: For decoding JWTs to extract claims/expiry (v4.0+, Swift 6 compliant).
 - **SimpleKeychain**: For Keychain access (iOS/macOS).
 - **Quick/Nimble**: (Test Target only) Behavior-driven testing.
 
