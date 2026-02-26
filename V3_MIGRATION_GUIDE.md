@@ -16,6 +16,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
 
 ## Table of Contents
 
+- [**Dependency Updates**](#dependency-updates)
+  + [JWTDecode.swift](#jwtdecodeswift)
 - [**Default Values Changed**](#default-values-changed)
   + [Scope](#scope)
   + [Credentials Manager minTTL](#credentials-manager-minttl)
@@ -26,6 +28,18 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Web Auth](#web-auth)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
+
+---
+
+## Dependency Updates
+
+### JWTDecode.swift
+
+**Change:** The JWTDecode.swift dependency has been upgraded from v3.3.0 to v4.0.0.
+
+**Impact:** JWTDecode.swift v4.0.0 is fully Swift 6 compliant with complete concurrency support. This upgrade ensures Auth0.swift is ready for Swift 6 adoption and provides better thread-safety guarantees when working with JWTs.
+
+**Action Required:** No code changes are required in your application.
 
 ---
 

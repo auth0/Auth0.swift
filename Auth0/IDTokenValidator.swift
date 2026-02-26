@@ -1,6 +1,6 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
-@preconcurrency import JWTDecode
+import JWTDecode
 
 protocol JWTValidator {
     func validate(_ jwt: JWT) -> Auth0Error?
