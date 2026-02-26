@@ -1,5 +1,11 @@
 import Foundation
 
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
+
 /**
  `Result` wrapper for Authentication API operations.
  */
@@ -16,6 +22,14 @@ public typealias ManagementResult<T> = Result<T, ManagementError>
 public typealias MyAccountResult<T> = Result<T, MyAccountError>
 
 #if WEB_AUTH_PLATFORM
+/**
+ `UIWindow or NSWindow` wrapper for presentation window
+ */
+#if canImport(UIKit)
+public typealias Auth0WindowRepresentable = UIWindow
+#elseif canImport(AppKit)
+public typealias Auth0WindowRepresentable = NSWindow
+#endif
 /**
  `Result` wrapper for Web Auth operations.
  */

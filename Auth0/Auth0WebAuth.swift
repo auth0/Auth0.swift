@@ -1,6 +1,11 @@
 #if WEB_AUTH_PLATFORM
 import Foundation
 import Combine
+#if os(iOS) || os(visionOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 final class Auth0WebAuth: WebAuth {
 
@@ -36,6 +41,7 @@ final class Auth0WebAuth: WebAuth {
     private(set) var overrideAuthorizeURL: URL?
     private(set) var provider: WebAuthProvider?
     private(set) var onCloseCallback: (() -> Void)?
+    private(set) weak var presentationWindow: Auth0WindowRepresentable?
 
     var state: String {
         return self.parameters["state"] ?? self.generateDefaultState()
@@ -172,6 +178,11 @@ final class Auth0WebAuth: WebAuth {
         return self
     }
 
+    func presentationWindow(_ window: Auth0WindowRepresentable) -> Self {
+        self.presentationWindow = window
+        return self
+    }
+
     func start(_ callback: @escaping (WebAuthResult<Credentials>) -> Void) {
         let mainThreadCallback = dispatchOnMain(callback)
         let mainThreadOnCloseCallback = onCloseCallback.map { dispatchOnMain($0) }
@@ -198,7 +209,8 @@ final class Auth0WebAuth: WebAuth {
 
         let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
                                                                      ephemeralSession: ephemeralSession,
-                                                                     headers: headers)
+                                                                     headers: headers,
+                                                                     presentationWindow: self.presentationWindow)
         let userAgent = provider(authorizeURL) { [storage, barrier, mainThreadOnCloseCallback] result in
             storage.clear()
             barrier.lower()
@@ -241,7 +253,9 @@ final class Auth0WebAuth: WebAuth {
             return mainThreadCallback(.failure(WebAuthError(code: .unknown("Unable to retrieve bundle identifier"))))
         }
 
-        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL, headers: headers)
+        let provider = self.provider ?? WebAuthentication.asProvider(redirectURL: redirectURL,
+                                                                     headers: headers,
+                                                                     presentationWindow: self.presentationWindow)
         let userAgent = provider(logoutURL) { [storage, barrier] result in
             storage.clear()
             barrier.lower()
