@@ -108,6 +108,8 @@
 		5C3D886A2DC2CCA200AACC34 /* PasskeyLoginChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D88672DC2CCA100AACC34 /* PasskeyLoginChallenge.swift */; };
 		5C3D886B2DC2CCA200AACC34 /* PasskeyLoginChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3D88672DC2CCA100AACC34 /* PasskeyLoginChallenge.swift */; };
 		5C41F6A4244DC94E00252548 /* LoginTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A3244DC94E00252548 /* LoginTransaction.swift */; };
+		3769D5DE49783F3E7A8A8BF6 /* PARCodeTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1390B32E7A3E23006360CC66 /* PARCodeTransaction.swift */; };
+		B9A0CE27CB43C94D51114FF0 /* PARCodeTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1390B32E7A3E23006360CC66 /* PARCodeTransaction.swift */; };
 		5C41F6AA244DCAFB00252548 /* ClearSessionTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */; };
 		5C41F6B1244DCC3B00252548 /* MobileWebAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */; };
 		5C41F6B6244DCF2F00252548 /* LoginTransactionSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C41F6B4244DCEED00252548 /* LoginTransactionSpec.swift */; };
@@ -420,6 +422,8 @@
 		5FD255B41D14DD2600387ECB /* ManagementError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B31D14DD2600387ECB /* ManagementError.swift */; };
 		5FD255B51D14DD2600387ECB /* ManagementError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B31D14DD2600387ECB /* ManagementError.swift */; };
 		5FD255B71D14F00900387ECB /* Auth0Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B61D14F00900387ECB /* Auth0Error.swift */; };
+		6502A63583E00FD4893D3AE7 /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1347B62E8314D67B233725EA /* AuthorizationCode.swift */; };
+		D0A513B85A8C9DAFBA1FC7C8 /* AuthorizationCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1347B62E8314D67B233725EA /* AuthorizationCode.swift */; };
 		5FD255B81D14F00900387ECB /* Auth0Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B61D14F00900387ECB /* Auth0Error.swift */; };
 		5FD255BA1D14F70B00387ECB /* WebAuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD255B91D14F70B00387ECB /* WebAuthError.swift */; };
 		5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDE87461D8A422300EA27DC /* Telemetry.swift */; };
@@ -944,6 +948,7 @@
 		5C3D88232DC1509300AACC34 /* LoginPasskey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPasskey.swift; sourceTree = "<group>"; };
 		5C3D88672DC2CCA100AACC34 /* PasskeyLoginChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasskeyLoginChallenge.swift; sourceTree = "<group>"; };
 		5C41F6A3244DC94E00252548 /* LoginTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTransaction.swift; sourceTree = "<group>"; };
+		1390B32E7A3E23006360CC66 /* PARCodeTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PARCodeTransaction.swift; sourceTree = "<group>"; };
 		5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearSessionTransaction.swift; sourceTree = "<group>"; };
 		5C41F6B0244DCC3B00252548 /* MobileWebAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileWebAuth.swift; sourceTree = "<group>"; };
 		5C41F6B4244DCEED00252548 /* LoginTransactionSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTransactionSpec.swift; sourceTree = "<group>"; };
@@ -1059,6 +1064,7 @@
 		5FD255B01D14A9E000387ECB /* AuthenticationErrorSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthenticationErrorSpec.swift; path = Auth0Tests/AuthenticationErrorSpec.swift; sourceTree = SOURCE_ROOT; };
 		5FD255B31D14DD2600387ECB /* ManagementError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ManagementError.swift; path = Auth0/ManagementError.swift; sourceTree = SOURCE_ROOT; };
 		5FD255B61D14F00900387ECB /* Auth0Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0Error.swift; sourceTree = "<group>"; };
+		1347B62E8314D67B233725EA /* AuthorizationCode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthorizationCode.swift; sourceTree = "<group>"; };
 		5FD255B91D14F70B00387ECB /* WebAuthError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebAuthError.swift; path = Auth0/WebAuthError.swift; sourceTree = SOURCE_ROOT; };
 		5FDE87461D8A422300EA27DC /* Telemetry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
 		5FDE87491D8A424700EA27DC /* Auth0Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth0Authentication.swift; sourceTree = "<group>"; };
@@ -1279,6 +1285,7 @@
 			isa = PBXGroup;
 			children = (
 				5C41F6A3244DC94E00252548 /* LoginTransaction.swift */,
+				1390B32E7A3E23006360CC66 /* PARCodeTransaction.swift */,
 				5C41F6A9244DCAFB00252548 /* ClearSessionTransaction.swift */,
 			);
 			name = Transactions;
@@ -1493,6 +1500,7 @@
 				5F3965C01CF679B500CDE7C0 /* WebAuth */,
 				5F06DDC81CC66B710011842B /* Auth0.swift */,
 				5FD255B61D14F00900387ECB /* Auth0Error.swift */,
+				1347B62E8314D67B233725EA /* AuthorizationCode.swift */,
 				5CDF67352DD3A8D200A9B513 /* Auth0APIError.swift */,
 				5C6513A62791CDDE004EBC22 /* Version.swift */,
 				A7DDDF6B2BC9A81E0077B067 /* PrivacyInfo.xcprivacy */,
@@ -2578,6 +2586,7 @@
 				D424ED6E2F15FF5200052186 /* Authenticator.swift in Sources */,
 				D46390942F18F29100FD84D7 /* RequestValidator.swift in Sources */,
 				5FD255B71D14F00900387ECB /* Auth0Error.swift in Sources */,
+				6502A63583E00FD4893D3AE7 /* AuthorizationCode.swift in Sources */,
 				5C3D88202DC1491500AACC34 /* PublicKeyCredentialRequestOptions.swift in Sources */,
 				5F06DDC91CC66B710011842B /* Auth0.swift in Sources */,
 				5C3D87E92DB99C5C00AACC34 /* PasskeySignupChallenge.swift in Sources */,
@@ -2597,6 +2606,7 @@
 				5FE2F8B81CD0E910003628F4 /* Request.swift in Sources */,
 				5CDF67512DD3DB5400A9B513 /* MyAccountHandlers.swift in Sources */,
 				5C41F6A4244DC94E00252548 /* LoginTransaction.swift in Sources */,
+				3769D5DE49783F3E7A8A8BF6 /* PARCodeTransaction.swift in Sources */,
 				5F3965C21CF67CF000CDE7C0 /* WebAuth.swift in Sources */,
 				5FCAB1761D0900CF00331C84 /* TransactionStore.swift in Sources */,
 				5FDE87471D8A422300EA27DC /* Telemetry.swift in Sources */,
@@ -2646,6 +2656,7 @@
 				5C41F6CD244F96FD00252548 /* IDTokenSignatureValidator.swift in Sources */,
 				5C3D87E32DB8276000AACC34 /* PublicKeyCredentialCreationOptions.swift in Sources */,
 				5FD255B81D14F00900387ECB /* Auth0Error.swift in Sources */,
+				D0A513B85A8C9DAFBA1FC7C8 /* AuthorizationCode.swift in Sources */,
 				5C505FCD2E2167EB005D0757 /* DPoPKeyStore.swift in Sources */,
 				5C41F6D0244F971700252548 /* JWK+RSA.swift in Sources */,
 				5C41F6C7244F968B00252548 /* AuthTransaction.swift in Sources */,
@@ -2673,6 +2684,7 @@
 				5C3D87F32DB9B3DF00AACC34 /* SignupPasskey.swift in Sources */,
 				5C41F6CE244F970500252548 /* IDTokenValidator.swift in Sources */,
 				5C41F6CA244F96AE00252548 /* LoginTransaction.swift in Sources */,
+				B9A0CE27CB43C94D51114FF0 /* PARCodeTransaction.swift in Sources */,
 				D499DAF92E6EB1FD000E7E2F /* PasskeyEnrollmentChallenge.swift in Sources */,
 				D499DAFA2E6EB1FD000E7E2F /* PhoneEnrollmentChallenge.swift in Sources */,
 				D499DAFB2E6EB1FD000E7E2F /* PushEnrollmentChallenge.swift in Sources */,
