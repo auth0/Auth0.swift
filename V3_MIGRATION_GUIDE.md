@@ -26,6 +26,8 @@ As expected with a major release, Auth0.swift v3 contains breaking changes. Plea
   + [Completion callbacks](#completion-callbacks)
 - [**Methods Added**](#methods-added)
   + [Web Auth](#web-auth)
+- [**Swift 6 Concurrency**](#swift-6-concurrency)
+  + [Sendable protocol conformances](#sendable-protocol-conformances)
 - [**API Changes**](#api-changes)
   + [WebAuthError cases](#webautherror-cases)
 
@@ -236,6 +238,58 @@ Auth0
     .start { result in
         // ...
     }
+```
+</details>
+
+---
+
+## Swift 6 Concurrency
+
+v3 adopts Swift 6 strict concurrency by adding `Sendable` conformances across the SDK. If your application defines custom types conforming to SDK protocols, some changes may be required.
+
+### Sendable protocol conformances
+
+**Change:** `Auth0Error` and `Logger` now inherit from `Sendable`.
+
+```swift
+// v3
+public protocol Auth0Error: LocalizedError, CustomDebugStringConvertible, Sendable { ... }
+public protocol Logger: Sendable { ... }
+```
+
+**Impact:** If your application defines a custom type that conforms to either protocol, that type must now also conform to `Sendable`.
+
+<details>
+  <summary>Migration example</summary>
+
+```swift
+// v2 - no Sendable requirement on conforming types
+struct MyAppError: Auth0Error {
+    var cause: Error?
+    var debugDescription: String { "my error" }
+    var errorDescription: String? { "my error" }
+}
+
+struct MyLogger: Logger {
+    func trace(request: URLRequest, session: URLSession) { ... }
+    func trace(response: URLResponse, data: Data?) { ... }
+    func trace(url: URL, source: String?) { ... }
+}
+
+// v3 - conforming types must be Sendable
+// For structs with only Sendable stored properties, conformance is automatic:
+struct MyAppError: Auth0Error { // implicitly Sendable - no changes needed
+    var cause: Error?
+    var debugDescription: String { "my error" }
+    var errorDescription: String? { "my error" }
+}
+
+// For classes or types with non-Sendable stored properties, add @unchecked Sendable
+// and ensure thread safety manually:
+final class MyLogger: Logger, @unchecked Sendable {
+    private let lock = NSLock()
+    // ... thread-safe implementation
+}
 ```
 </details>
 

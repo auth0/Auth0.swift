@@ -2,11 +2,11 @@
 import Foundation
 import JWTDecode
 
-protocol JWTValidator {
+protocol JWTValidator: Sendable {
     func validate(_ jwt: JWT) -> Auth0Error?
 }
 
-protocol JWTAsyncValidator {
+protocol JWTAsyncValidator: Sendable {
     func validate(_ jwt: JWT, callback: @escaping (Auth0Error?) -> Void)
 }
 

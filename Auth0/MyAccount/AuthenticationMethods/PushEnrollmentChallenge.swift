@@ -1,7 +1,7 @@
 import Foundation
 
 /// A Push enrollment challenge.
-public struct PushEnrollmentChallenge {
+public struct PushEnrollmentChallenge: Sendable {
 
     /// The unique identifier for the authentication method.
     public let authenticationId: String
