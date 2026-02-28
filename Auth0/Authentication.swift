@@ -63,11 +63,20 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check
      [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
 
+     ## ID Token Validation Parameters
+
+     - Parameters:
+       - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/authenticate-user)
      */
-    func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(email: String, code: String, audience: String?, scope: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs a user in using a phone number and an OTP code received via SMS. This is the last part of the passwordless login flow.
@@ -109,11 +118,20 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - Requires: Passwordless OTP Grant `http://auth0.com/oauth/grant-type/passwordless/otp`. Check
      [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
 
+     ## ID Token Validation Parameters
+
+     - Parameters:
+       - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/passwordless/authenticate-user)
      */
-    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(phoneNumber: String, code: String, audience: String?, scope: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs a user in using a username and password with a realm or connection.
@@ -159,11 +177,20 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - Requires: The `http://auth0.com/oauth/grant-type/password-realm` grant. Check
      [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
 
+     ## ID Token Validation Parameters
+
+     - Parameters:
+       - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/resource-owner-password-flow/get-token)
      */
-    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Verifies multi-factor authentication (MFA) using a one-time password (OTP).
@@ -191,13 +218,22 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - Requires: The `http://auth0.com/oauth/grant-type/mfa-otp` grant. Check
      [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
 
+     ## ID Token Validation Parameters
+
+     - Parameters:
+       - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-mfa-with-otp)
      - ``MFAClient``
      */
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
+    func login(withOTP otp: String, mfaToken: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using an out-of-band (OOB) challenge (either push notification, SMS
     /// or voice).
@@ -226,12 +262,21 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-oob` grant. Check
     /// [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
     ///
+    /// ## ID Token Validation Parameters
+    ///
+    /// - Parameters:
+    ///   - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+    ///   - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
+    ///
     /// ## See Also
     ///
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-out-of-band)
     /// - ``MFAClient``
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError>
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError>
 
     /// Verifies multi-factor authentication (MFA) using a recovery code.
     /// Some multi-factor authentication (MFA) providers support using a recovery code to login. Use this method to
@@ -262,13 +307,22 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// - Requires: The `http://auth0.com/oauth/grant-type/mfa-recovery-code` grant. Check
     /// [our documentation](https://auth0.com/docs/get-started/applications/application-grant-types) for more information.
     ///
+    /// ## ID Token Validation Parameters
+    ///
+    /// - Parameters:
+    ///   - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+    ///   - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+    ///   - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
+    ///
     /// ## See Also
     ///
     /// - ``Credentials/recoveryCode``
     /// - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/muti-factor-authentication/verify-with-recovery-code)
     /// - ``MFAClient``
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError>
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError>
 
     /// Requests a challenge for multi-factor authentication (MFA) based on the challenge types supported by the
     /// application and user.
@@ -343,6 +397,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - profile:           Additional user profile data returned with the Apple ID Credentials.
        - audience:          API Identifier that your application is requesting access to.
        - scope:             Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - issuer:            Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:            Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:            Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:             Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization:      Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
@@ -353,7 +412,12 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                fullName: PersonNameComponents?,
                profile: [String: Any]?,
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError>
+               scope: String,
+               issuer: String,
+               leeway: Int,
+               maxAge: Int?,
+               nonce: String?,
+               organization: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs a user in with their Facebook [session info access token](https://developers.facebook.com/docs/facebook-login/access-tokens/session-info-access-token/) and profile data.
@@ -392,6 +456,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - profile:            The user profile data retrieved from Facebook.
        - audience:           API Identifier that your application is requesting access to.
        - scope:              Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - issuer:             Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:             Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:             Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:              Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization:       Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
@@ -401,7 +470,12 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     func login(facebookSessionAccessToken sessionAccessToken: String,
                profile: [String: Any],
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError>
+               scope: String,
+               issuer: String,
+               leeway: Int,
+               maxAge: Int?,
+               nonce: String?,
+               organization: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Logs a user in using a username and password in the default directory.
@@ -436,17 +510,22 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      ```
 
      - Parameters:
-       - username: Username or email of the user.
-       - password: Password of the user.
-       - audience: API Identifier that your application is requesting access to.
-       - scope:    Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - username:     Username or email of the user.
+       - password:     Password of the user.
+       - audience:     API Identifier that your application is requesting access to.
+       - scope:        Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/resource-owner-password-flow/get-token)
      */
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError>
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Creates a user in a database connection.
@@ -560,12 +639,16 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// ```
     ///
     /// - Parameters:
-    ///   - passkey:  The existing passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
-    ///   - challenge:  The passkey challenge obtained from ``passkeyLoginChallenge(connection:)``.
-    ///   - connection: Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
-    ///   - audience:  API Identifier that your application is requesting access to. Defaults to `nil`.
-    ///   - scope:  Space-separated list of requested scope values. Defaults to `openid profile email`.
-    ///   - organization: Identifier of an organization the user is a member of.
+    ///   - passkey:      The existing passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+    ///   - challenge:    The passkey challenge obtained from ``passkeyLoginChallenge(connection:)``.
+    ///   - connection:   Name of the database connection. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - audience:     API Identifier that your application is requesting access to. Defaults to `nil`.
+    ///   - scope:        Space-separated list of requested scope values. Defaults to `openid profile email`.
+    ///   - organization: Identifier of an organization the user is a member of. Also used to validate the `org_id`/`org_name` claim in the ID token.
+    ///   - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+    ///   - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -579,7 +662,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError>
+               organization: String?,
+               issuer: String,
+               leeway: Int,
+               maxAge: Int?,
+               nonce: String?) -> Request<Credentials, AuthenticationError>
 
     /// Requests a challenge for logging a user in with an existing passkey. This is the first part of the passkey login flow.
     ///
@@ -684,12 +771,16 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
     /// ```
     ///
     /// - Parameters:
-    ///   - passkey: The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
-    ///   - challenge:   The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
-    ///   - connection:  Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
-    ///   - audience:    API Identifier that your application is requesting access to. Defaults to `nil`.
-    ///   - scope:       Space-separated list of requested scope values. Defaults to `openid profile email`.
-    ///   - organization: Identifier of an organization the user is a member of.
+    ///   - passkey:      The signup passkey credential obtained from the [`ASAuthorizationControllerDelegate`](https://developer.apple.com/documentation/authenticationservices/asauthorizationcontrollerdelegate) delegate.
+    ///   - challenge:    The passkey signup challenge obtained from ``passkeySignupChallenge(email:phoneNumber:username:name:connection:)``.
+    ///   - connection:   Name of the database connection where the user will be created. If a connection name is not specified, your tenant's default directory will be used.
+    ///   - audience:     API Identifier that your application is requesting access to. Defaults to `nil`.
+    ///   - scope:        Space-separated list of requested scope values. Defaults to `openid profile email`.
+    ///   - organization: Identifier of an organization the user is a member of. Also used to validate the `org_id`/`org_name` claim in the ID token.
+    ///   - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+    ///   - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+    ///   - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+    ///   - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
     /// - Returns: A request that will yield Auth0 user's credentials.
     ///
     /// ## See Also
@@ -703,7 +794,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError>
+               organization: String?,
+               issuer: String,
+               leeway: Int,
+               maxAge: Int?,
+               nonce: String?) -> Request<Credentials, AuthenticationError>
 
     /// Requests a challenge for registering a new user with a passkey. This is the first part of the passkey signup flow.
     ///
@@ -943,6 +1038,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - code:         Code returned after a request to `/oauth/authorize`.
        - codeVerifier: Verifier used to generate the challenge sent in the request to `/oauth/authorize`.
        - redirectURI:  Redirect URI sent in the request to `/oauth/authorize`.
+       - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
@@ -950,7 +1050,8 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/authorization-code-flow-with-pkce/get-token-pkce)
      - [RFC 7636](https://tools.ietf.org/html/rfc7636)
      */
-    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError>
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError>
+
 
     /**
      Exchanges a user's refresh token for a session transfer token that can be used to perform web single sign-on
@@ -1004,7 +1105,13 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      is using the provided Auth0 domain (like `example.us.auth0.com`), set the cookie's domain to this value. On the
      other hand, if your website is using a custom domain, use this value instead.
 
-     - Parameter refreshToken: The refresh token.
+     - Parameters:
+       - refreshToken: The refresh token.
+       - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
      - Returns: A request that will yield SSO credentials.
 
      ## See Also
@@ -1012,7 +1119,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication#refresh-token)
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
      */
-    func ssoExchange(withRefreshToken refreshToken: String) -> Request<SSOCredentials, AuthenticationError>
+    func ssoExchange(withRefreshToken refreshToken: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<SSOCredentials, AuthenticationError>
 
     /**
      Renews the user's credentials using a refresh token.
@@ -1051,6 +1158,11 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
        - refreshToken: The refresh token.
        - audience:     Identifier of the API that your application is requesting access to. Currently, only the Auth0 My Account API is supported. Defaults to `nil`.
        - scope:        Space-separated list of scope values to request. Defaults to `nil`.
+       - issuer:       Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:       Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:       Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:        Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
+       - organization: Expected organization ID or name to validate the `org_id`/`org_name` claim. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
 
      ## See Also
@@ -1059,7 +1171,7 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      - [Refresh Tokens](https://auth0.com/docs/secure/tokens/refresh-tokens)
      - <doc:RefreshTokens>
      */
-    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?) -> Request<Credentials, AuthenticationError>
+    func renew(withRefreshToken refreshToken: String, audience: String?, scope: String?, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError>
 
     /**
      Revokes a user's refresh token by performing a request to the `/oauth/revoke` endpoint.
@@ -1152,14 +1264,20 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
      ```
 
      - Parameters:
-       - subjectToken: The security token to be exchanged.
+       - subjectToken:     The security token to be exchanged.
        - subjectTokenType: URI that identifies the type of the subject token.
        - audience: API Identifier that your application is requesting access to. Defaults to `nil`.
        - scope: Space-separated list of requested scope values. Defaults to `openid profile email`.
-       - organization: Identifier of an organization the user is a member of.
        - parameters: Additional parameters to send in the token exchange request (e.g. RFC 8693 optional claims).
+       - audience:         API Identifier that your application is requesting access to. Defaults to `nil`.
+       - scope:            Space-separated list of requested scope values. Defaults to `openid profile email`.
+       - organization:     Identifier of an organization the user is a member of. Also used to validate the `org_id`/`org_name` claim in the ID token.
+       - issuer:           Expected issuer (`iss` claim) of the ID token. Provide this to enable ID token validation. Defaults to `""` (no validation).
+       - leeway:           Clock-skew leeway in milliseconds used during ID token validation. Defaults to `60000` (60 seconds).
+       - maxAge:           Maximum authentication age in seconds. When set, the `auth_time` claim is validated. Defaults to `nil`.
+       - nonce:            Expected nonce value to validate the `nonce` claim in the ID token. Defaults to `nil`.
      - Returns: A request that will yield Auth0 user's credentials.
-  
+
      ## See Also
 
      - [Authentication API Endpoint](https://auth0.com/docs/api/authentication/token-exchange)
@@ -1171,26 +1289,40 @@ public protocol Authentication: SenderConstraining, Trackable, Loggable, Sendabl
                              audience: String?,
                              scope: String,
                              organization: String?,
-                             parameters: [String: Any]) -> Request<Credentials, AuthenticationError>
+                             parameters: [String: Any],
+                             issuer: String,
+                             leeway: Int,
+                             maxAge: Int?,
+                             nonce: String?) -> Request<Credentials, AuthenticationError>
 }
 
 public extension Authentication {
 
-    func login(email: String, code: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(email: email, code: code, audience: audience, scope: scope)
+    func login(email: String, code: String, audience: String? = nil, scope: String = defaultScope, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(email: email, code: code, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
-    func login(phoneNumber: String, code: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(phoneNumber: phoneNumber, code: code, audience: audience, scope: scope)
+    func login(phoneNumber: String, code: String, audience: String? = nil, scope: String = defaultScope, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(phoneNumber: phoneNumber, code: code, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
-    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.login(usernameOrEmail: username, password: password, realmOrConnection: realm, audience: audience, scope: scope)
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String? = nil, scope: String = defaultScope, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(usernameOrEmail: username, password: password, realmOrConnection: realm, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.login(withOOBCode: oobCode, mfaToken: mfaToken, bindingCode: bindingCode)
+    func login(withOTP otp: String, mfaToken: String, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(withOTP: otp, mfaToken: mfaToken, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    }
+
+    @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String? = nil, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(withOOBCode: oobCode, mfaToken: mfaToken, bindingCode: bindingCode, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    }
+
+    @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.login(withRecoveryCode: recoveryCode, mfaToken: mfaToken, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
     @available(*, deprecated, message: "This method is deprecated and will be removed in the next major version. Use the MFAClient protocol APIs instead. See MFAClient.swift for the new MFA operations.")
@@ -1202,26 +1334,46 @@ public extension Authentication {
                fullName: PersonNameComponents? = nil,
                profile: [String: Any]? = nil,
                audience: String? = nil,
-               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope,
+               issuer: String = "",
+               leeway: Int = 60 * 1000,
+               maxAge: Int? = nil,
+               nonce: String? = nil,
+               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(appleAuthorizationCode: authorizationCode,
                           fullName: fullName,
                           profile: profile,
                           audience: audience,
-                          scope: scope)
+                          scope: scope,
+                          issuer: issuer.isEmpty ? url.absoluteString : issuer,
+                          leeway: leeway,
+                          maxAge: maxAge,
+                          nonce: nonce,
+                          organization: organization)
     }
 
     func login(facebookSessionAccessToken sessionAccessToken: String,
                profile: [String: Any],
                audience: String? = nil,
-               scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
+               scope: String = defaultScope,
+               issuer: String = "",
+               leeway: Int = 60 * 1000,
+               maxAge: Int? = nil,
+               nonce: String? = nil,
+               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(facebookSessionAccessToken: sessionAccessToken,
                           profile: profile,
                           audience: audience,
-                          scope: scope)
+                          scope: scope,
+                          issuer: issuer.isEmpty ? url.absoluteString : issuer,
+                          leeway: leeway,
+                          maxAge: maxAge,
+                          nonce: nonce,
+                          organization: organization)
     }
 
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String = defaultScope) -> Request<Credentials, AuthenticationError> {
-        return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope)
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String? = nil, scope: String = defaultScope, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.loginDefaultDirectory(withUsername: username, password: password, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
     func signup(email: String, username: String? = nil, password: String, connection: String = "Username-Password-Authentication", userMetadata: [String: Any]? = nil, rootAttributes: [String: Any]? = nil) -> Request<DatabaseUser, AuthenticationError> {
@@ -1235,13 +1387,21 @@ public extension Authentication {
                connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope,
-               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+               organization: String? = nil,
+               issuer: String = "",
+               leeway: Int = 60 * 1000,
+               maxAge: Int? = nil,
+               nonce: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
                           audience: audience,
                           scope: scope,
-                          organization: organization)
+                          organization: organization,
+                          issuer: issuer.isEmpty ? url.absoluteString : issuer,
+                          leeway: leeway,
+                          maxAge: maxAge,
+                          nonce: nonce)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -1255,13 +1415,21 @@ public extension Authentication {
                connection: String? = nil,
                audience: String? = nil,
                scope: String = defaultScope,
-               organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+               organization: String? = nil,
+               issuer: String = "",
+               leeway: Int = 60 * 1000,
+               maxAge: Int? = nil,
+               nonce: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.login(passkey: passkey,
                           challenge: challenge,
                           connection: connection,
                           audience: audience,
                           scope: scope,
-                          organization: organization)
+                          organization: organization,
+                          issuer: issuer.isEmpty ? url.absoluteString : issuer,
+                          leeway: leeway,
+                          maxAge: maxAge,
+                          nonce: nonce)
     }
 
     @available(iOS 16.6, macOS 13.5, visionOS 1.0, *)
@@ -1293,8 +1461,12 @@ public extension Authentication {
         self.userInfo(withAccessToken: accessToken, tokenType: tokenType)
     }
 
-    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
-        return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope)
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.codeExchange(withCode: code, codeVerifier: codeVerifier, redirectURI: redirectURI, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
+    }
+
+    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<Credentials, AuthenticationError> {
+        return self.renew(withRefreshToken: refreshToken, audience: audience, scope: scope, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
     func customTokenExchange(subjectToken: String,
@@ -1302,13 +1474,26 @@ public extension Authentication {
                              audience: String? = nil,
                              scope: String = defaultScope,
                              organization: String? = nil,
-                             parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
+                             parameters: [String: Any] = [:],
+                             issuer: String = "",
+                             leeway: Int = 60 * 1000,
+                             maxAge: Int? = nil,
+                             nonce: String? = nil) -> Request<Credentials, AuthenticationError> {
         return self.customTokenExchange(subjectToken: subjectToken,
                                         subjectTokenType: subjectTokenType,
                                         audience: audience,
                                         scope: scope,
                                         organization: organization,
-                                        parameters: parameters)
+                                        parameters: parameters,
+                                        issuer: issuer.isEmpty ? url.absoluteString : issuer,
+                                        leeway: leeway,
+                                        maxAge: maxAge,
+                                        nonce: nonce)
+    }
+
+    func ssoExchange(withRefreshToken refreshToken: String, issuer: String = "", leeway: Int = 60 * 1000, maxAge: Int? = nil, nonce: String? = nil, organization: String? = nil) -> Request<SSOCredentials, AuthenticationError> {
+        return self.ssoExchange(withRefreshToken: refreshToken, issuer: issuer.isEmpty ? url.absoluteString : issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
 }
+

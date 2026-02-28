@@ -21,15 +21,15 @@ struct Auth0Authentication: Authentication {
         self.telemetry = telemetry
     }
 
-    func login(email: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
-        return login(username: email, otp: code, realm: "email", audience: audience, scope: scope)
+    func login(email: String, code: String, audience: String?, scope: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError> {
+        return login(username: email, otp: code, realm: "email", audience: audience, scope: scope, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
-    func login(phoneNumber: String, code: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
-        return login(username: phoneNumber, otp: code, realm: "sms", audience: audience, scope: scope)
+    func login(phoneNumber: String, code: String, audience: String?, scope: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError> {
+        return login(username: phoneNumber, otp: code, realm: "sms", audience: audience, scope: scope, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization)
     }
 
-    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func login(usernameOrEmail username: String, password: String, realmOrConnection realm: String, audience: String?, scope: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -45,14 +45,16 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: self.dpop)
     }
 
-    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func loginDefaultDirectory(withUsername username: String, password: String, audience: String?, scope: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -67,14 +69,16 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: self.dpop)
     }
 
-    func login(withOTP otp: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
+    func login(withOTP otp: String, mfaToken: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         let payload: [String: Any] = [
@@ -87,14 +91,16 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: self.dpop)
     }
 
-    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?) -> Request<Credentials, AuthenticationError> {
+    func login(withOOBCode oobCode: String, mfaToken: String, bindingCode: String?, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -111,14 +117,16 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: self.dpop)
     }
 
-    func login(withRecoveryCode recoveryCode: String, mfaToken: String) -> Request<Credentials, AuthenticationError> {
+    func login(withRecoveryCode recoveryCode: String, mfaToken: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         let payload: [String: Any] = [
@@ -131,7 +139,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -166,7 +176,12 @@ struct Auth0Authentication: Authentication {
                fullName: PersonNameComponents?,
                profile: [String: Any]?,
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError> {
+               scope: String,
+               issuer: String,
+               leeway: Int,
+               maxAge: Int?,
+               nonce: String?,
+               organization: String?) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = [:]
         var profile: [String: Any] = profile ?? [:]
 
@@ -186,13 +201,23 @@ struct Auth0Authentication: Authentication {
                                   subjectTokenType: "http://auth0.com/oauth/token-type/apple-authz-code",
                                   scope: scope,
                                   audience: audience,
+                                  issuer: issuer,
+                                  leeway: leeway,
+                                  maxAge: maxAge,
+                                  nonce: nonce,
+                                  organization: organization,
                                   parameters: parameters)
     }
 
     func login(facebookSessionAccessToken sessionAccessToken: String,
                profile: [String: Any],
                audience: String?,
-               scope: String) -> Request<Credentials, AuthenticationError> {
+               scope: String,
+               issuer: String,
+               leeway: Int,
+               maxAge: Int?,
+               nonce: String?,
+               organization: String?) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: String] = [:]
         if let jsonData = try? JSONSerialization.data(withJSONObject: profile, options: []),
             let json = String(data: jsonData, encoding: .utf8) {
@@ -202,6 +227,11 @@ struct Auth0Authentication: Authentication {
                                   subjectTokenType: "http://auth0.com/oauth/token-type/facebook-info-session-access-token",
                                   scope: scope,
                                   audience: audience,
+                                  issuer: issuer,
+                                  leeway: leeway,
+                                  maxAge: maxAge,
+                                  nonce: nonce,
+                                  organization: organization,
                                   parameters: parameters)
     }
 
@@ -237,7 +267,11 @@ struct Auth0Authentication: Authentication {
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError> {
+               organization: String?,
+               issuer: String,
+               leeway: Int,
+               maxAge: Int?,
+               nonce: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -269,7 +303,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -300,7 +336,11 @@ struct Auth0Authentication: Authentication {
                connection: String?,
                audience: String?,
                scope: String,
-               organization: String?) -> Request<Credentials, AuthenticationError> {
+               organization: String?,
+               issuer: String,
+               leeway: Int,
+               maxAge: Int?,
+               nonce: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
         let id = passkey.credentialID.encodeBase64URLSafe()
 
@@ -331,7 +371,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -436,8 +478,8 @@ struct Auth0Authentication: Authentication {
                        dpop: dpop)
     }
 
-    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String) -> Request<Credentials, AuthenticationError> {
-        return self.token().parameters([
+    func codeExchange(withCode code: String, codeVerifier: String, redirectURI: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError> {
+        return self.token(issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization).parameters([
             "code": code,
             "code_verifier": codeVerifier,
             "redirect_uri": redirectURI,
@@ -445,15 +487,15 @@ struct Auth0Authentication: Authentication {
         ])
     }
 
-    func ssoExchange(withRefreshToken refreshToken: String) -> Request<SSOCredentials, AuthenticationError> {
-        return self.token().parameters([
+    func ssoExchange(withRefreshToken refreshToken: String, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<SSOCredentials, AuthenticationError> {
+        return self.token(issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization).parameters([
             "refresh_token": refreshToken,
             "grant_type": "refresh_token",
             "audience": "urn:\(self.url.host!):session_transfer"
         ])
     }
 
-    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil) -> Request<Credentials, AuthenticationError> {
+    func renew(withRefreshToken refreshToken: String, audience: String? = nil, scope: String? = nil, issuer: String, leeway: Int, maxAge: Int?, nonce: String?, organization: String?) -> Request<Credentials, AuthenticationError> {
         let oauthToken = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -474,7 +516,9 @@ struct Auth0Authentication: Authentication {
         return Request(session: session,
                        url: oauthToken,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -511,11 +555,19 @@ struct Auth0Authentication: Authentication {
                              audience: String?,
                              scope: String,
                              organization: String?,
-                             parameters: [String: Any]) -> Request<Credentials, AuthenticationError> {
+                             parameters: [String: Any],
+                             issuer: String,
+                             leeway: Int,
+                             maxAge: Int?,
+                             nonce: String?) -> Request<Credentials, AuthenticationError> {
         return self.tokenExchange(subjectToken: subjectToken,
                                   subjectTokenType: subjectTokenType,
                                   scope: scope,
                                   audience: audience,
+                                  issuer: issuer,
+                                  leeway: leeway,
+                                  maxAge: maxAge,
+                                  nonce: nonce,
                                   organization: organization,
                                   parameters: parameters)
     }
@@ -526,7 +578,16 @@ struct Auth0Authentication: Authentication {
 
 private extension Auth0Authentication {
 
-    func login(username: String, otp: String, realm: String, audience: String?, scope: String) -> Request<Credentials, AuthenticationError> {
+    func login(username: String,
+               otp: String,
+               realm: String,
+               audience: String?,
+               scope: String,
+               issuer: String,
+               leeway: Int,
+               maxAge: Int?,
+               nonce: String?,
+               organization: String?) -> Request<Credentials, AuthenticationError> {
         let url = URL(string: "oauth/token", relativeTo: self.url)!
 
         var payload: [String: Any] = [
@@ -542,7 +603,9 @@ private extension Auth0Authentication {
         return Request(session: session,
                        url: url,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self, issuer: issuer, leeway: leeway, maxAge: maxAge, nonce: nonce, organization: organization, from: result, callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
@@ -553,7 +616,11 @@ private extension Auth0Authentication {
                        subjectTokenType: String,
                        scope: String,
                        audience: String?,
-                       organization: String? = nil,
+                       issuer: String,
+                       leeway: Int,
+                       maxAge: Int?,
+                       nonce: String?,
+                       organization: String?,
                        parameters: [String: Any] = [:]) -> Request<Credentials, AuthenticationError> {
         var parameters: [String: Any] = parameters
         parameters["client_id"] = self.clientId
@@ -568,25 +635,46 @@ private extension Auth0Authentication {
         return Request(session: session,
                        url: token,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self,
+                                                         issuer: issuer,
+                                                         leeway: leeway,
+                                                         maxAge: maxAge,
+                                                         nonce: nonce,
+                                                         organization: organization,
+                                                         from: result,
+                                                         callback: callback)
+        },
                        parameters: parameters,
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: dpop)
     }
 
-    func token<T: Codable>() -> Request<T, AuthenticationError> {
+    func token<T: IDTokenProtocol>(issuer: String,
+                                   leeway: Int,
+                                   maxAge: Int?,
+                                   nonce: String?,
+                                   organization: String?) -> Request<T, AuthenticationError> {
         let token = URL(string: "oauth/token", relativeTo: self.url)!
         let payload: [String: Any] = ["client_id": self.clientId]
 
         return Request(session: session,
                        url: token,
                        method: "POST",
-                       handle: authenticationDecodable,
+                       handle: { result, callback in
+            authenticationDecodableWithIDTokenValidation(authentication: self,
+                                                         issuer: issuer,
+                                                         leeway: leeway,
+                                                         maxAge: maxAge,
+                                                         nonce: nonce,
+                                                         organization: organization,
+                                                         from: result,
+                                                         callback: callback)
+        },
                        parameters: payload,
                        logger: self.logger,
                        telemetry: self.telemetry,
                        dpop: self.dpop)
     }
-
 }

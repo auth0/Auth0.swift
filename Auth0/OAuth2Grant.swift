@@ -70,29 +70,34 @@ struct PKCE: OAuth2Grant {
         let authentication = self.authentication
         let verifier = self.verifier
         let redirectUrlString = self.redirectURL.absoluteString
-        let validatorContext = IDTokenValidatorContext(authentication: authentication,
-                                                       issuer: self.issuer,
-                                                       leeway: self.leeway,
-                                                       maxAge: self.maxAge,
-                                                       nonce: self.defaults["nonce"],
-                                                       organization: self.organization)
         authentication
-            .codeExchange(withCode: code, codeVerifier: verifier, redirectURI: redirectUrlString)
+            .codeExchange(withCode: code,
+                          codeVerifier: verifier,
+                          redirectURI: redirectUrlString,
+                          issuer: self.issuer,
+                          leeway: self.leeway,
+                          maxAge: self.maxAge,
+                          nonce: self.defaults["nonce"],
+                          organization: self.organization)
             .start { result in
-                switch result {
-                case .failure(let error) where error.localizedDescription == "Unauthorized":
-                    return callback(.failure(WebAuthError(code: .unknown("PKCE not allowed - Application Type must be 'Native' and Token Endpoint Authentication Method must be 'None'"))))
-                case .failure(let error):
-                    return callback(.failure(WebAuthError(code: .codeExchangeFailed, cause: error)))
-                case .success(let credentials):
-                    validate(idToken: credentials.idToken, with: validatorContext) { error in
-                        if let error = error {
-                            return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: error)))
-                        }
-                        callback(.success(credentials))
-                    }
-                }
+                self.handleCodeExchangeResult(result, callback: callback)
             }
+    }
+
+    private func handleCodeExchangeResult(_ result: Result<Credentials, AuthenticationError>, callback: @escaping (WebAuthResult<Credentials>) -> Void) {
+        switch result {
+        case .failure(let error) where error.localizedDescription == "Unauthorized":
+            return callback(.failure(WebAuthError(code: .unknown("PKCE not allowed - Application Type must be 'Native' and Token Endpoint Authentication Method must be 'None'"))))
+        case .failure(let error):
+            // ID token validation failures are wrapped in AuthenticationError(cause:) where the
+            // cause is an Auth0Error from the validator. Map these to .idTokenValidationFailed.
+            if let cause = error.cause, isIDTokenValidationError(cause) {
+                return callback(.failure(WebAuthError(code: .idTokenValidationFailed, cause: cause)))
+            }
+            return callback(.failure(WebAuthError(code: .codeExchangeFailed, cause: error)))
+        case .success(let credentials):
+            callback(.success(credentials))
+        }
     }
 
     func values(fromComponents components: URLComponents) -> [String: String] {

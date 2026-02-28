@@ -62,3 +62,54 @@ func authenticationNoBody(from result: Result<ResponseValue, AuthenticationError
         callback(.failure(error))
     }
 }
+
+// Decodes the response and validates the ID token when
+// the decoded type conforms to IDTokenProtocol (i.e. Credentials and SSOCredentials).
+func authenticationDecodableWithIDTokenValidation<T: Decodable>(
+    authentication: Authentication,
+    issuer: String,
+    leeway: Int,
+    maxAge: Int?,
+    nonce: String?,
+    organization: String?,
+    from result: Result<ResponseValue, AuthenticationError>,
+    callback: @escaping Request<T, AuthenticationError>.Callback
+) {
+    do {
+        let response = try result.get()
+        if let data = response.data {
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .secondsSince1970
+            let decodedObject = try decoder.decode(T.self, from: data)
+
+            if let carrier = decodedObject as? any IDTokenProtocol,
+               !carrier.idToken.isEmpty,
+               !issuer.isEmpty,
+               carrier.idToken.components(separatedBy: ".").count == 3 {
+                let validatorContext = IDTokenValidatorContext(
+                    authentication: authentication,
+                    issuer: issuer,
+                    leeway: leeway,
+                    maxAge: maxAge,
+                    nonce: nonce,
+                    organization: organization
+                )
+                validate(idToken: carrier.idToken, with: validatorContext) { error in
+                    if let error = error {
+                        return callback(.failure(AuthenticationError(cause: error)))
+                    }
+                    callback(.success(decodedObject))
+                }
+                return
+            }
+
+            callback(.success(decodedObject))
+        } else {
+            callback(.failure(AuthenticationError(from: response)))
+        }
+    } catch let error as AuthenticationError {
+        callback(.failure(error))
+    } catch {
+        callback(.failure(AuthenticationError(cause: error)))
+    }
+}
